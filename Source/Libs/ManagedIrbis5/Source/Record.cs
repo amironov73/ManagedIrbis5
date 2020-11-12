@@ -28,7 +28,7 @@ namespace ManagedIrbis
     /// <summary>
     /// Библиографическая запись. Состоит из произвольного количества полей.
     /// </summary>
-    public class MarcRecord
+    public class Record
     {
         #region Properties
 
@@ -55,7 +55,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Список полей.
         /// </summary>
-        public List<RecordField> Fields { get; } = new List<RecordField>();
+        public List<Field> Fields { get; } = new List<Field>();
 
         /// <summary>
         /// Описание в произвольной форме (опциональное).
@@ -72,13 +72,13 @@ namespace ManagedIrbis
         /// <returns>
         /// Свежедобавленное поле.
         /// </returns>
-        public RecordField Add
+        public Field Add
             (
                 int tag,
                 string? value = null
             )
         {
-            var result = new RecordField { Tag = tag, Value = value };
+            var result = new Field { Tag = tag, Value = value };
             Fields.Add(result);
 
             return result;
@@ -90,7 +90,7 @@ namespace ManagedIrbis
         /// <returns>
         /// Очищенную запись.
         /// </returns>
-        public MarcRecord Clear()
+        public Record Clear()
         {
             Fields.Clear();
 

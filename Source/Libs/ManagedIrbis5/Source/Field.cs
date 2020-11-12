@@ -28,7 +28,7 @@ namespace ManagedIrbis
     /// <summary>
     /// Поле библиографической записи.
     /// </summary>
-    public class RecordField
+    public class Field
     {
         #region Properties
 
@@ -54,7 +54,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Добавление подполя.
         /// </summary>
-        public RecordField Add
+        public Field Add
             (
                 char code,
                 string? value
@@ -69,7 +69,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Очистка подполей.
         /// </summary>
-        public RecordField Clear()
+        public Field Clear()
         {
             Value = null;
             Subfields.Clear();
