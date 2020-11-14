@@ -34,6 +34,7 @@ namespace AM
     /// специфичных для проекта Ars Magna.
     /// </summary>
     public class ArsMagnaException
+        : ApplicationException
     {
         #region Properties
 
@@ -41,6 +42,43 @@ namespace AM
         /// Аттачменты.
         /// </summary>
         public List<BinaryAttachment> Attachments { get; } = new ();
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ArsMagnaException()
+        {
+            Attachments = new List<BinaryAttachment>();
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ArsMagnaException
+            (
+                string message
+            )
+            : base(message)
+        {
+            Attachments = new List<BinaryAttachment>();
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public ArsMagnaException
+            (
+                string message,
+                Exception innerException
+            )
+            : base(message, innerException)
+        {
+            Attachments = new List<BinaryAttachment>();
+        }
 
         #endregion
 

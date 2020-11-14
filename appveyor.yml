@@ -1,0 +1,26 @@
+version: 5.0.0.{build}
+configuration: Debug
+image: Visual Studio 2019 Preview
+
+init:
+  - git config --global core.autocrlf true
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+
+nuget:
+  account_feed: false
+  project_feed: false
+
+before_build:
+- cmd: dotnet --info
+- cmd: dotnet restore Source/ManagedIrbis5.sln
+
+build_script:
+- dotnet msbuild "C:\projects\managedirbis5\Source\ManagedIrbis5.sln" /m /verbosity:minimal

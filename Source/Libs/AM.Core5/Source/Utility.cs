@@ -33,6 +33,52 @@ namespace AM
     /// </summary>
     public static class Utility
     {
+        #region Properties
+
+        /// <summary>
+        /// Gets the CP866 (cyrillic) <see cref="Encoding"/>.
+        /// </summary>
+        public static Encoding Cp866
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                if (ReferenceEquals(_cp866, null))
+                {
+                    RegisterEncodingProviders();
+                    _cp866 = Encoding.GetEncoding(866);
+                }
+
+                return _cp866;
+            }
+        }
+
+        /// <summary>
+        /// Gets the Windows-1251 (cyrillic) <see cref="Encoding"/>.
+        /// </summary>
+        public static Encoding Windows1251
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                if (ReferenceEquals(_windows1251, null))
+                {
+                    RegisterEncodingProviders();
+                    _windows1251 = Encoding.GetEncoding(1251);
+                }
+
+                return _windows1251;
+            }
+        }
+
+        #endregion
+
+        #region Private members
+
+        private static Encoding? _cp866, _windows1251;
+
+        #endregion
+
         #region Public methods
 
         /// <summary>
@@ -344,11 +390,165 @@ namespace AM
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
         public static string ToInvariantString
-        (
-            this short value
-        )
+            (
+                this short value
+            )
         {
             return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        /// <param name="value">Число для преобразования.</param>
+        /// <returns>Строковое представление числа.</returns>
+        public static string ToInvariantString
+            (
+                this ushort value
+            )
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        /// <param name="value">Число для преобразования.</param>
+        /// <returns>Строковое представление числа.</returns>
+        public static string ToInvariantString
+            (
+                this int value
+            )
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        /// <param name="value">Число для преобразования.</param>
+        /// <returns>Строковое представление числа.</returns>
+        public static string ToInvariantString
+            (
+                this uint value
+            )
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        /// <param name="value">Число для преобразования.</param>
+        /// <returns>Строковое представление числа.</returns>
+        public static string ToInvariantString
+            (
+                this long value
+            )
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        /// <param name="value">Число для преобразования.</param>
+        /// <returns>Строковое представление числа.</returns>
+        public static string ToInvariantString
+            (
+                this ulong value
+            )
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Register required encoding providers.
+        /// </summary>
+        public static void RegisterEncodingProviders()
+        {
+            Encoding.RegisterProvider
+                (
+                    CodePagesEncodingProvider.Instance
+                );
+        }
+
+        /// <summary>
+        /// Безопасное преобразование строки в целое.
+        /// </summary>
+        public static int SafeToInt32
+            (
+                this string? text,
+                int defaultValue,
+                int minValue,
+                int maxValue
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return defaultValue;
+            }
+
+            if (!int.TryParse(text, out var result))
+            {
+                result = defaultValue;
+            }
+
+            if (result < minValue
+                || result > maxValue)
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Безопасное преобразование строки в целое.
+        /// </summary>
+        public static int SafeToInt32
+            (
+                this string? text,
+                int defaultValue
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return defaultValue;
+            }
+
+            if (!int.TryParse(text, out var result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Безопасное преобразование строки в целое.
+        /// </summary>
+        public static int SafeToInt32
+            (
+                this string? text
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return 0;
+            }
+
+            if (!int.TryParse(text, out var result))
+            {
+                result = 0;
+            }
+
+            return result;
         }
 
         #endregion
