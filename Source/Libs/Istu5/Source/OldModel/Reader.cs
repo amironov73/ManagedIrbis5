@@ -43,7 +43,7 @@ namespace Istu.OldModel
         /// Фамилия, имя, отчество читателя.
         /// </summary>
         [Column]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Категория: студент, преподаватель, сотрудник.
@@ -67,7 +67,7 @@ namespace Istu.OldModel
         /// Номер читательского билета.
         /// </summary>
         [Column]
-        public string Ticket { get; set; }
+        public string? Ticket { get; set; }
 
         /// <summary>
         /// Дата регистрации в системе книговыдачи.
@@ -184,7 +184,7 @@ namespace Istu.OldModel
         /// Фото.
         /// </summary>
         [Column]
-        public byte[] Photo { get; set; }
+        public byte[]? Photo { get; set; }
 
         /// <summary>
         /// В академическом отпуске?

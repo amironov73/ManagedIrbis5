@@ -20,8 +20,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
@@ -30,7 +28,7 @@ using AM.Collections;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis.Infrastructure
 {
     /// <summary>
     /// Ответ сервера ИРБИС64.
@@ -40,37 +38,39 @@ namespace ManagedIrbis
         #region Properties
 
         /// <summary>
-        ///
+        /// Код команды.
         /// </summary>
         public string? Command { get; private set; }
 
         /// <summary>
-        ///
+        /// Идентификатор клиента.
         /// </summary>
         public int ClientId { get; private set; }
 
         /// <summary>
-        ///
+        /// Порядковый номер запроса.
         /// </summary>
         public int QueryId { get; private set; }
 
         /// <summary>
-        ///
+        /// Код возврвата (не для всех запросов).
         /// </summary>
         public int ReturnCode { get; private set; }
 
         /// <summary>
-        ///
+        /// Размер запроса в байтах
+        /// (не всегда присылвается сервером).
         /// </summary>
         public int AnswerSize { get; private set; }
 
         /// <summary>
-        ///
+        /// Версия сервера (присылается в ответ на запрос A,
+        /// т. е. регистрацию клиента).
         /// </summary>
         public string? ServerVersion { get; private set; }
 
         /// <summary>
-        /// End of text?
+        /// Достигнут конец текста?
         /// </summary>
         public bool EOT { get; private set; }
 
@@ -79,7 +79,7 @@ namespace ManagedIrbis
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public Response()
         {
@@ -90,13 +90,24 @@ namespace ManagedIrbis
 
         #region Private members
 
-        internal readonly List<ArraySegment<byte>> _memory;
+        private readonly List<ArraySegment<byte>> _memory;
         private ArraySegment<byte> _currentChunk;
         private int _currentIndex, _currentOffset;
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Добавление сегмента данных.
+        /// </summary>
+        public void Add
+            (
+                ArraySegment<byte> chunk
+            )
+        {
+            _memory.Add(chunk);
+        }
 
         /// <summary>
         ///
@@ -114,31 +125,6 @@ namespace ManagedIrbis
 
             return true;
         }
-
-        /// <summary>
-        /// Pull the data from the stream -- in asynchronous manner.
-        /// </summary>
-        public async Task PullDataAsync
-            (
-                Stream stream,
-                int bufferSize,
-                CancellationToken token
-            )
-        {
-            while (true)
-            {
-                token.ThrowIfCancellationRequested();
-                var buffer = new byte[bufferSize];
-                var read = await stream.ReadAsync(buffer, 0, bufferSize, token);
-                if (read <= 0)
-                {
-                    break;
-                }
-
-                var chunk = new ArraySegment<byte>(buffer, 0, read);
-                _memory.Add(chunk);
-            }
-        } // method PullDataAsync
 
         /// <summary>
         /// Начальный разбор ответа сервера.
@@ -347,7 +333,7 @@ namespace ManagedIrbis
         /// </summary>
         public void Debug
             (
-                TextWriter writer
+                TextWriter? writer
             )
         {
             if (!ReferenceEquals(writer, null))

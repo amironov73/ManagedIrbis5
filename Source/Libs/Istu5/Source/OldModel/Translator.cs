@@ -41,13 +41,13 @@ namespace Istu.OldModel
         /// Штрих-код экземпляра.
         /// </summary>
         [Column]
-        public string Barcode { get; set; }
+        public string? Barcode { get; set; }
 
         /// <summary>
         /// Дата привязки штрих-кода.
         /// </summary>
         [Column (Name = "whn")]
-        public string Moment { get; set; }
+        public string? Moment { get; set; }
 
         /// <summary>
         /// Взято на обработку.

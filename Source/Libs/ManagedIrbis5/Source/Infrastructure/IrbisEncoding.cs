@@ -22,13 +22,15 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
+using AM;
+
 using CM=System.Configuration.ConfigurationManager;
 
 #endregion
 
 #nullable enable
 
-namespace AM
+namespace ManagedIrbis.Infrastructure
 {
     /// <summary>
     /// Работа с кодировками, применяемыми в ИРБИС64.

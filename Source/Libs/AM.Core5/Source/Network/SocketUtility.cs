@@ -42,7 +42,7 @@ namespace AM.Network
         /// Resolve IPv4 address
         /// </summary>
         /// <returns>Resolved IP address of the host.</returns>
-        public static IPAddress ResolveAddressIPv4
+        public static IPAddress? ResolveAddressIPv4
             (
                 string address
             )
@@ -116,7 +116,7 @@ namespace AM.Network
         /// Resolve IPv6 address
         /// </summary>
         /// <returns>Resolved IP address of the host.</returns>
-        public static IPAddress ResolveAddressIPv6
+        public static IPAddress? ResolveAddressIPv6
             (
                 string address
             )

@@ -31,18 +31,26 @@ namespace ManagedIrbis
         #region Properties
 
         /// <summary>
-        ///
+        /// Код подполя.
         /// </summary>
-        public char Code { get; set; }
+        public char Code { get; set; } = '\0';
 
         /// <summary>
-        ///
+        /// Значение подполя.
         /// </summary>
         public string? Value { get; set; }
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Клонирование подполя.
+        /// </summary>
+        public SubField Clone()
+        {
+            return (SubField) MemberwiseClone();
+        }
 
         /// <summary>
         /// Декодирование строки.
@@ -63,7 +71,9 @@ namespace ManagedIrbis
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            return "^" + Code + Value;
+            return Code == '\0'
+                ? Value ?? string.Empty
+                : "^" + Code + Value;
         }
 
         #endregion

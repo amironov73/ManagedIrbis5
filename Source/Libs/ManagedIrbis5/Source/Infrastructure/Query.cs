@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 using AM;
@@ -45,10 +44,7 @@ namespace ManagedIrbis.Infrastructure
         {
            // Sure.NotNullNorEmpty(commandCode, nameof(commandCode));
 
-           _chunks = new List<byte[]>
-           {
-               _newLine // будет заменена на длину пакета
-           };
+           _stream = new MemoryStream(1024);
 
            var header = commandCode + "\n"
                 + connection.Workstation + "\n"
@@ -59,113 +55,87 @@ namespace ManagedIrbis.Infrastructure
                 + connection.Username + "\n"
                 + "\n\n";
             AddAnsi(header);
-        }
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private static readonly byte[] _newLine = { 10 };
-
-        private readonly List<byte[]> _chunks;
+        private readonly MemoryStream _stream;
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Add integer number.
+        /// Добавление строки с целым числом (плюс перевод строки).
         /// </summary>
-        public Query Add
-            (
-                int value
-            )
-        {
-            return AddAnsi(value.ToInvariantString());
-        }
+        public Query Add (int value) => AddAnsi(value.ToInvariantString());
+        // method Add
 
         /// <summary>
-        /// Add the text in ANSI encoding.
+        /// Добавление строки в кодировке ANSI (плюс перевод строки).
         /// </summary>
         public Query AddAnsi
             (
                 string? value
             )
         {
-            if (!string.IsNullOrEmpty(value))
-            {
-                var converted = IrbisEncoding.Ansi.GetBytes(value);
-                _chunks.Add(converted);
-                NewLine();
-            }
+            value ??= string.Empty;
+            var converted = IrbisEncoding.Ansi.GetBytes(value);
+            _stream.Write(converted);
+            NewLine();
 
             return this;
-        }
+        } // method AddAnsi
 
         /// <summary>
-        /// Add the text in UTF-8 encoding.
+        /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
         /// </summary>
         public Query AddUtf
             (
                 string? value
             )
         {
-            if (!string.IsNullOrEmpty(value))
-            {
-                byte[] converted = IrbisEncoding.Utf8.GetBytes(value);
-                _chunks.Add(converted);
-                NewLine();
-            }
+            value ??= String.Empty;
+            var converted = IrbisEncoding.Utf8.GetBytes(value);
+            _stream.Write(converted);
+            NewLine();
 
             return this;
-        }
+        } // method AddUtf
 
         /// <summary>
-        /// Debug print.
+        /// Отладочная печать.
         /// </summary>
         public void Debug
             (
                 TextWriter writer
             )
         {
-            foreach (var memory in _chunks)
+            foreach (var b in _stream.ToArray())
             {
-                foreach (var b in memory)
-                {
-                    writer.Write($" {b:X2}");
-                }
+                writer.Write($" {b:X2}");
             }
-        }
+        } // method AddDebug
 
         /// <summary>
-        ///
+        /// Получение массива фрагментов, из которых состоит
+        /// клиентский запрос.
         /// </summary>
-        public byte[][] GetChunks()
-        {
-            return _chunks.ToArray();
-        }
+        public byte[] GetBody() => _stream.ToArray();
 
         /// <summary>
-        ///
+        /// Подсчет общей длины запроса (в байтах).
         /// </summary>
-        public int GetLength()
-        {
-            int result = 0;
-
-            foreach (var chunk in _chunks)
-            {
-                result += chunk.Length;
-            }
-
-            return result;
-        }
+        public int GetLength() => (int) _stream.Length;
 
         /// <summary>
-        /// Перевод строки.
+        /// Добавление одного перевода строки.
         /// </summary>
         public Query NewLine()
         {
-            _chunks.Add(_newLine);
+            _stream.WriteByte(10);
 
             return this;
         }

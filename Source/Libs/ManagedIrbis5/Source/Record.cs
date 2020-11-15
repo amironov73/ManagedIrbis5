@@ -16,8 +16,13 @@
 #region Using directives
 
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Text;
+
+using AM;
+using AM.Collections;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -28,7 +33,8 @@ namespace ManagedIrbis
     /// <summary>
     /// Библиографическая запись. Состоит из произвольного количества полей.
     /// </summary>
-    public class Record
+    [DebuggerDisplay("[{Database}] MFN={Mfn} ({Version})")]
+    public sealed class Record
     {
         #region Properties
 
@@ -55,7 +61,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Список полей.
         /// </summary>
-        public List<Field> Fields { get; } = new List<Field>();
+        public List<Field> Fields { get; } = new List<Field>( );
 
         /// <summary>
         /// Описание в произвольной форме (опциональное).
@@ -82,7 +88,7 @@ namespace ManagedIrbis
             Fields.Add(result);
 
             return result;
-        }
+        } // method Add
 
         /// <summary>
         /// Очистка записи (удаление всех полей).
@@ -95,7 +101,195 @@ namespace ManagedIrbis
             Fields.Clear();
 
             return this;
-        }
+        } // method Clear
+
+        /// <summary>
+        /// Создание глубокой копии записи.
+        /// </summary>
+        public Record Clone()
+        {
+            var result = (Record) MemberwiseClone();
+
+            for (int i = 0; i < result.Fields.Count; i++)
+            {
+                result.Fields[i] = result.Fields[i].Clone();
+            }
+
+            return result;
+        } // method Clone
+
+        /// <summary>
+        /// Декодирование ответа сервера.
+        /// </summary>
+        public void Decode
+            (
+                Response response
+            )
+        {
+            var line = response.ReadUtf();
+
+            var first = line.Split('#');
+            Mfn = int.Parse(first[0]);
+            Status = (RecordStatus) first[1].SafeToInt32();
+
+            line = response.ReadUtf();
+            var second = line.Split('#');
+            Version = int.Parse(second[1]);
+
+            while (!response.EOT)
+            {
+                line = response.ReadUtf();
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+
+                var field = new Field();
+                field.Decode(line);
+                Fields.Add(field);
+            }
+        } // method Decode
+
+        /// <summary>
+        /// Кодирование записи в текстовое представление.
+        /// </summary>
+        public string Encode
+            (
+                string delimiter = IrbisText.IrbisDelimiter
+            )
+        {
+            StringBuilder result = new StringBuilder(512);
+            result.Append(Mfn.ToInvariantString())
+                .Append('#')
+                .Append(((int) Status).ToInvariantString())
+                .Append(delimiter)
+                .Append("0#")
+                .Append(Version.ToInvariantString())
+                .Append(delimiter);
+
+            foreach (var field in Fields)
+            {
+                result.Append(field)
+                    .Append(delimiter);
+            }
+
+            return result.ToString();
+        } // method Encode
+
+        /// <summary>
+        /// Получить текст поля до разделителей подполей
+        /// первого повторения поля с указанной меткой.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <returns>Значение поля или <c>null</c>.</returns>
+        public string? FM
+            (
+                int tag
+            )
+        {
+            return GetFirstField(tag)?.Value;
+        } // method FM
+
+        /// <summary>
+        /// Текст первого подполя с указанным тегом и кодом.
+        /// </summary>
+        public string? FM
+            (
+                int tag,
+                char code
+            )
+        {
+            var field = GetFirstField(tag);
+
+            if (!ReferenceEquals(field, null))
+            {
+                return code == '*'
+                    ? field.GetValueOrFirstSubField()
+                    : field.GetFirstSubFieldValue(code);
+            }
+
+            return null;
+        } // method FM
+
+        /// <summary>
+        /// Текст всех полей с указанным тегом.
+        /// </summary>
+        public string[] FMA
+            (
+                int tag
+            )
+        {
+            var result = new LocalList<string>();
+
+            foreach (var field in Fields)
+            {
+                if (field.Tag == tag
+                    && !string.IsNullOrEmpty(field.Value))
+                {
+                    result.Add(field.Value);
+                }
+            }
+
+            return result.ToArray();
+        } // method FMA
+
+        /// <summary>
+        /// Текст всех подполей с указанным тегом и кодом.
+        /// </summary>
+        // ReSharper disable InconsistentNaming
+        public string[] FMA
+            (
+                int tag,
+                char code
+            )
+        {
+            var result = new LocalList<string>();
+
+            foreach (var field in Fields)
+            {
+                if (field.Tag == tag)
+                {
+                    var value = code == '*'
+                        ? field.GetValueOrFirstSubField()
+                        : field.GetFirstSubFieldValue(code);
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        result.Add(value);
+                    }
+                }
+            }
+
+            return result.ToArray();
+        } // method FMA
+
+        /// <summary>
+        /// Получение первого поля с указанной меткой.
+        /// </summary>
+        public Field? GetFirstField
+            (
+                int tag
+            )
+        {
+            foreach (var field in Fields)
+            {
+                if (field.Tag == tag)
+                {
+                    return field;
+                }
+            }
+
+            return null;
+        } // method GetFirstField
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString()
+        {
+            return Encode("\n");
+        } // method ToString
 
         #endregion
     }

@@ -34,7 +34,7 @@ namespace Istu.OldModel
         /// <summary>
         /// Наименование услуги.
         /// </summary>
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Цена за единицу.
@@ -44,7 +44,7 @@ namespace Istu.OldModel
         /// <summary>
         /// Единица измерения.
         /// </summary>
-        public string Unit { get; set; }
+        public string? Unit { get; set; }
 
         #endregion
 

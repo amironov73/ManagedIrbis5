@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
@@ -31,13 +30,14 @@ using AM;
 namespace ManagedIrbis.Infrastructure.Sockets
 {
     /// <summary>
-    /// Клиентский сокет на основе TCP/IP 4.
+    /// Простейший клиентский сокет на основе TCP/IP 4.
     /// </summary>
     public sealed class PlainTcp4Socket
         : ClientSocket
     {
         #region ClientSocket methods
 
+        /// <inheritdoc cref="ClientSocket.TransactAsync"/>
         public override async Task<Response?> TransactAsync
             (
                 Query query
@@ -59,34 +59,18 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
 
             var socket = client.Client;
-            //var stream = client.GetStream();
-
             var length = query.GetLength();
             var prefix = Encoding.ASCII.GetBytes
                 (
                     length.ToInvariantString() + "\n"
                 );
-            var chunks = query.GetChunks();
-            chunks[0] = prefix;
-            var segments = new List<ArraySegment<byte>>(chunks.Length);
-            foreach (var chunk in chunks)
-            {
-                var segment = new ArraySegment<byte>(chunk);
-                segments.Add(segment);
-            }
+            var body = query.GetBody();
 
             try
             {
-                foreach (var chunk in chunks)
-                {
-                    //connection.Cancellation.ThrowIfCancellationRequested();
-                    //await stream.WriteAsync(chunk, connection.Cancellation);
-                    await socket.SendAsync(segments, SocketFlags.None);
-                    //await socket.SendAsync(chunk, SocketFlags.None);
-                }
-
-                // await stream.FlushAsync();
-                // socket.Shutdown(SocketShutdown.Send);
+                await socket.SendAsync(prefix, SocketFlags.None);
+                await socket.SendAsync(body, SocketFlags.None);
+                socket.Shutdown(SocketShutdown.Send);
             }
             catch (Exception exception)
             {
@@ -95,19 +79,9 @@ namespace ManagedIrbis.Infrastructure.Sockets
                 return null;
             }
 
-            //await stream.FlushAsync();
-            socket.Shutdown(SocketShutdown.Send);
-
             var result = new Response();
             try
             {
-                //connection.Cancellation.ThrowIfCancellationRequested();
-                // await result.PullDataAsync
-                //     (
-                //         stream,
-                //         2048,
-                //         connection.Cancellation
-                //     );
                 while (true)
                 {
                     var buffer = new byte[2048];
@@ -119,7 +93,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
                     }
 
                     chunk = new ArraySegment<byte>(buffer, 0, read);
-                    result._memory.Add(chunk);
+                    result.Add(chunk);
                 }
             }
             catch (Exception exception)

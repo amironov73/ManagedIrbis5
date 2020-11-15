@@ -41,7 +41,7 @@ namespace Istu.OldModel
         /// Фамилия, имя, отчество оператора.
         /// </summary>
         [Column]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Комментарий в произвольной форме.
@@ -53,7 +53,7 @@ namespace Istu.OldModel
         /// Штрих-код.
         /// </summary>
         [Column]
-        public string Barcode { get; set; }
+        public string? Barcode { get; set; }
 
         #endregion
     }

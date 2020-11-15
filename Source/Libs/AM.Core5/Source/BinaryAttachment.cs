@@ -34,12 +34,12 @@ namespace AM
         /// <summary>
         /// Name of the attachment.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Content of the attachment.
         /// </summary>
-        public byte[] Content { get; set;  }
+        public byte[]? Content { get; set;  }
 
         #endregion
 
@@ -49,7 +49,7 @@ namespace AM
         [Pure]
         public override string ToString()
         {
-            string result = $"{Name}: {Content.Length} bytes";
+            string result = $"{Name.ToVisibleString()}: {Content?.Length} bytes";
 
             return result;
         }

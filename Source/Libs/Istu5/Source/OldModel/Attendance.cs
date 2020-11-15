@@ -43,20 +43,20 @@ namespace Istu.OldModel
         /// Имя машины, с которой зарегистрировано посещение.
         /// </summary>
         [Column, Nullable]
-        public string Machine { get; set; }
+        public string? Machine { get; set; }
 
         /// <summary>
         /// Наименование абонемента, на котором произошло
         /// посещение.
         /// </summary>
         [Column, Nullable]
-        public string Abonement { get; set; }
+        public string? Abonement { get; set; }
 
         /// <summary>
         /// Номер читательского билета.
         /// </summary>
         [Column]
-        public string Ticket { get; set; }
+        public string? Ticket { get; set; }
 
         /// <summary>
         /// Момент посещения (по часам машины,
@@ -83,7 +83,7 @@ namespace Istu.OldModel
         /// или полученного в ходе посещения.
         /// </summary>
         [Column, Nullable]
-        public string Number { get; set; }
+        public string? Number { get; set; }
 
         #endregion
     }

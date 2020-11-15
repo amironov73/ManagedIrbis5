@@ -551,6 +551,41 @@ namespace AM
             return result;
         }
 
+        /// <summary>
+        /// Determines whether is one of the specified values.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf<T>
+            (
+                this T value,
+                params T[] array
+            )
+            where T : IComparable<T>
+        {
+            foreach (var one in array)
+            {
+                if (value.CompareTo(one) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Converts empty string to <c>null</c>.
+        /// </summary>
+        public static string? EmptyToNull
+            (
+                this string? value
+            )
+        {
+            return string.IsNullOrEmpty(value)
+                ? null
+                : value;
+        }
+
         #endregion
     }
 }

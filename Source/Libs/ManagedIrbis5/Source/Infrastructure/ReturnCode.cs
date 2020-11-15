@@ -11,7 +11,7 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace ManagedIrbis5.Infrastructure
+namespace ManagedIrbis.Infrastructure
 {
     /// <summary>
     /// Коды возврата, используемые при общении с сервером ИРБИС64.

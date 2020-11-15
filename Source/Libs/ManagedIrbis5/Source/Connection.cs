@@ -24,6 +24,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AM.Collections;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
 
@@ -58,7 +60,7 @@ namespace ManagedIrbis
         /// <summary>
         ///
         /// </summary>
-        public int Port { get; set; } = 6666;
+        public ushort Port { get; set; } = 6666;
 
         /// <summary>
         ///
@@ -184,6 +186,46 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
+        /// Актуализация всех неактуализированных записей
+        /// в указанной базе данных.
+        /// </summary>
+        /// <param name="database">Имя базы данных.</param>
+        /// <returns>Признак успешности операции.</returns>
+        public async Task<bool> ActualizeDatabaseAsync
+            (
+                string? database = default
+            )
+        {
+            var result = await ActualizeRecordAsync(database, 0);
+
+            return result;
+        } // method ActualizeDatabase
+
+        /// <summary>
+        /// Актуализация записи с указанным MFN.
+        /// </summary>
+        /// <param name="database">Имя базы данных.</param>
+        /// <param name="mfn">MFN, подлежащий актуализации.</param>
+        /// <returns>Признак успешности операции.</returns>
+        public async Task<bool> ActualizeRecordAsync
+            (
+                string? database,
+                int mfn
+            )
+        {
+            database ??= Database;
+            var response = await ExecuteAsync
+                (
+                    CommandCode.ActualizeRecord,
+                    database,
+                    mfn
+                );
+
+            return !ReferenceEquals(response, null);
+        } // method ActualizeRecordAsync
+
+
+        /// <summary>
         /// Cancel the current operation.
         /// </summary>
         public void CancelOperation()
@@ -192,7 +234,7 @@ namespace ManagedIrbis
         } // method CancelOperation
 
         /// <summary>
-        ///
+        /// Подключение к серверу ИРБИС64.
         /// </summary>
         public async Task<bool> ConnectAsync()
         {
@@ -201,10 +243,10 @@ namespace ManagedIrbis
                 return true;
             }
 
-            AGAIN:
+            AGAIN: QueryId = 1;
             ClientId = new Random().Next(100000, 999999);
-            QueryId = 1;
-            var query = new Query(this, "A");
+
+            var query = new Query(this, CommandCode.RegisterClient);
             query.AddAnsi(Username);
             query.AddAnsi(Password);
 
@@ -233,14 +275,117 @@ namespace ManagedIrbis
         } // method ConnectAsync
 
         /// <summary>
+        /// Создание базы данных.
+        /// </summary>
+        /// <param name="database">Имя создаваемой базы.</param>
+        /// <param name="description">Описание в свободной форме.</param>
+        /// <param name="readerAccess">Читатель будет иметь доступ?</param>
+        /// <returns>Признак успешности операции.</returns>
+        public async Task<bool> CreateDatabaseAsync
+            (
+                string database,
+                string description,
+                bool readerAccess = true
+            )
+        {
+            if (!CheckConnection())
+            {
+                return false;
+            }
+
+            var query = new Query(this, CommandCode.CreateDatabase);
+            query.AddAnsi(database).NewLine();
+            query.AddAnsi(description).NewLine();
+            query.Add(readerAccess ? 1 : 0).NewLine();
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return false;
+            }
+
+            if (!response.CheckReturnCode())
+            {
+                return false;
+            }
+
+            return true;
+        } // method CreateDatabaseAsync
+
+
+        /// <summary>
+        /// Создание словаря в указанной базе данных.
+        /// </summary>
+        /// <param name="database">Имя базы данных.</param>
+        /// <returns>Признак успешности операции.</returns>
+        public async Task<bool> CreateDictionaryAsync
+            (
+                string? database = default
+            )
+        {
+            if (!CheckConnection())
+            {
+                return false;
+            }
+
+            database ??= Database;
+            var query = new Query(this, CommandCode.CreateDictionary);
+            query.AddAnsi(database).NewLine();
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return false;
+            }
+
+            if (!response.CheckReturnCode())
+            {
+                return false;
+            }
+
+            return true;
+        } // method CreateDictionaryAsync
+
+        /// <summary>
+        /// Удаление указанной базы данных.
+        /// </summary>
+        /// <param name="database">Имя удаляемой базы данных.</param>
+        /// <returns>Признак успешности операции.</returns>
+        public async Task<bool> DeleteDatabaseAsync
+            (
+                string? database = default
+            )
+        {
+            if (!CheckConnection())
+            {
+                return false;
+            }
+
+            database ??= Database;
+            var query = new Query(this, CommandCode.DeleteDatabase);
+            query.AddAnsi(database).NewLine();
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return false;
+            }
+
+            if (!response.CheckReturnCode())
+            {
+                return false;
+            }
+
+            return true;
+
+        } // method DeleteDatabaseAsync
+
+        /// <summary>
         /// Отключение от сервера.
         /// </summary>
-        /// <returns>Признак успешности операции.</returns>
+        /// <returns>Признак успешности завершения операции.</returns>
         public async Task<bool> DisconnectAsync()
         {
             if (Connected)
             {
-                var query = new Query(this, "B");
+                var query = new Query(this, CommandCode.UnregisterClient);
                 query.AddAnsi(Username);
                 try
                 {
@@ -343,6 +488,46 @@ namespace ManagedIrbis
         } // method ExecuteAsync
 
         /// <summary>
+        /// Форматирование записи с указанием её MFN.
+        /// </summary>
+        /// <param name="format">Спецификация формата.</param>
+        /// <param name="mfn">MFN записи.</param>
+        /// <returns>Результат расформатирования.</returns>
+        public async Task<string?> FormatRecordAsync
+            (
+                string format,
+                int mfn
+            )
+        {
+            if (!CheckConnection())
+            {
+                return null;
+            }
+
+            var query = new Query(this, CommandCode.FormatRecord);
+            query.AddAnsi(Database);
+            var prepared = IrbisFormat.PrepareFormat(format);
+            query.AddAnsi(prepared);
+            query.Add(1);
+            query.Add(mfn);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return null;
+            }
+
+            response.CheckReturnCode();
+            string result = response.ReadRemainingUtfText();
+            if (!string.IsNullOrEmpty(result))
+            {
+                result = result.TrimEnd();
+            }
+
+            return result;
+        } // method FormatRecordAsync
+
+
+        /// <summary>
         /// Получение максимального MFN для указанной базы данных.
         /// </summary>
         /// <param name="database">Опциональное имя базы данных
@@ -359,7 +544,7 @@ namespace ManagedIrbis
             }
 
             database ??= Database;
-            var query = new Query(this, "O");
+            var query = new Query(this, CommandCode.GetMaxMfn);
             query.AddAnsi(database);
             var response = await ExecuteAsync(query);
             if (ReferenceEquals(response, null))
@@ -376,6 +561,97 @@ namespace ManagedIrbis
         } // method GetMaxMfnAsync
 
         /// <summary>
+        ///
+        /// </summary>
+        public async Task<ServerVersion?> GetServerVersionAsync()
+        {
+            if (!CheckConnection())
+            {
+                return null;
+            }
+
+            var query = new Query(this, CommandCode.ServerInfo);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return null;
+            }
+
+            response.CheckReturnCode();
+            var result = new ServerVersion();
+            result.Parse(response);
+
+            return result;
+        } // method GetServerVersionAsync
+
+        /// <summary>
+        /// Получение списка файлов на сервере.
+        /// </summary>
+        public async Task<string[]> ListFilesAsync
+            (
+                string specification
+            )
+        {
+            if (!CheckConnection() || string.IsNullOrEmpty(specification))
+            {
+                return Array.Empty<string>();
+            }
+
+            var query = new Query(this, CommandCode.ListFiles);
+            query.AddAnsi(specification);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return Array.Empty<string>();
+            }
+
+            var lines = response.ReadRemainingAnsiLines();
+            var result = new LocalList<string>();
+            foreach (var line in lines)
+            {
+                var files = IrbisText.SplitIrbisToLines(line);
+                foreach (var file1 in files)
+                {
+                    if (!string.IsNullOrEmpty(file1))
+                    {
+                        foreach (var file2 in file1.Split(IrbisText.WindowsDelimiter))
+                        {
+                            if (!string.IsNullOrEmpty(file2))
+                            {
+                                result.Add(file2);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result.ToArray();
+        } // method ListFilesAsync
+
+        /// <summary>
+        /// Получение списка процессов на сервере.
+        /// </summary>
+        public async Task<ProcessInfo[]> ListProcessesAsync()
+        {
+            if (!CheckConnection())
+            {
+                return Array.Empty<ProcessInfo>();
+            }
+
+            var query = new Query(this, CommandCode.GetProcessList);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return Array.Empty<ProcessInfo>();
+            }
+
+            response.CheckReturnCode();
+            var result = ProcessInfo.Parse(response);
+
+            return result;
+        } // method ListProcessesAsync
+
+        /// <summary>
         /// Пустая операция.
         /// </summary>
         /// <returns>Признак успешного завершения операции.</returns>
@@ -386,14 +662,160 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var response = await ExecuteAsync("N");
-            if (ReferenceEquals(response, null))
+            var response = await ExecuteAsync(CommandCode.Nop);
+
+            return !ReferenceEquals(response, null)
+                   && response.CheckReturnCode();
+        } // method NopAsync
+
+        /// <summary>
+        /// Разбор строки подключения.
+        /// </summary>
+        public void ParseConnectionString
+            (
+                string? connectionString
+            )
+        {
+            if (string.IsNullOrEmpty(connectionString))
             {
-                return false;
+                return;
             }
 
-            return response.CheckReturnCode();
-        } // method NopAsync
+            var pairs = connectionString.Split
+                (
+                    ';',
+                    StringSplitOptions.RemoveEmptyEntries
+                );
+            foreach (var pair in pairs)
+            {
+                if (!pair.Contains('='))
+                {
+                    continue;
+                }
+
+                var parts = pair.Split('=', 2);
+                var name = parts[0].Trim().ToLowerInvariant();
+                if (string.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
+
+                var value = parts[1].Trim();
+
+                switch (name)
+                {
+                    case "host":
+                    case "server":
+                    case "address":
+                        Host = value;
+                        break;
+
+                    case "port":
+                        Port = ushort.Parse(value);
+                        break;
+
+                    case "user":
+                    case "username":
+                    case "name":
+                    case "login":
+                    case "account":
+                        Username = value;
+                        break;
+
+                    case "password":
+                    case "pwd":
+                    case "secret":
+                        Password = value;
+                        break;
+
+                    case "db":
+                    case "database":
+                    case "base":
+                    case "catalog":
+                        Database = value;
+                        break;
+
+                    case "arm":
+                    case "workstation":
+                        Workstation = value;
+                        break;
+
+                    case "debug":
+                        _debug = true;
+                        break;
+
+                    default:
+                        throw new IrbisException($"Unknown key {name}");
+                }
+            }
+        } // method ParseConnectionString
+
+        /// <summary>
+        /// Чтение библиографической записи с сервера.
+        /// </summary>
+        public async Task<Record?> ReadRecordAsync
+            (
+                int mfn
+            )
+        {
+            if (!CheckConnection())
+            {
+                return null;
+            }
+
+            var query = new Query(this, CommandCode.ReadRecord);
+            query.AddAnsi(Database);
+            query.Add(mfn);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return null;
+            }
+
+            if (!response.CheckReturnCode(_goodCodesForReadRecord))
+            {
+                return null;
+            }
+
+            var result = new Record
+            {
+                Database = Database
+            };
+            result.Decode(response);
+
+            return result;
+        } // method ReadRecordAsync
+
+        /// <summary>
+        ///
+        /// </summary>
+        public async Task<string?> ReadTextFileAsync
+            (
+                string? specification
+            )
+        {
+            if (!CheckConnection())
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(specification))
+            {
+                return null;
+            }
+
+            var query = new Query(this, CommandCode.ReadDocument);
+            query.AddAnsi(specification);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return null;
+            }
+
+            var result = IrbisText.IrbisToWindows(response.ReadAnsi());
+
+            return result;
+        } // method ReadTextFileAsync
 
         #endregion
 

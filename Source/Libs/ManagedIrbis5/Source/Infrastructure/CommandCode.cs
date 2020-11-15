@@ -13,7 +13,7 @@
 
 #nullable enable
 
-namespace ManagedIrbis5.Infrastructure
+namespace ManagedIrbis.Infrastructure
 {
     /// <summary>
     /// Коды команд для сервера ИРБИС64.
