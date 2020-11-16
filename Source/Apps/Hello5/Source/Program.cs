@@ -38,7 +38,9 @@ internal class Program
             using var connection = ConnectionFactory.Default
                 .CreateConnection();
 
-            connection.Host = "127.0.0.1";
+            connection.Host = args.Length == 0
+                ? "127.0.0.1"
+                : args[0];
             connection.Username = "librarian";
             connection.Password = "secret";
 
