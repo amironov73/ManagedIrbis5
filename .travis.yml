@@ -1,0 +1,9 @@
+language: csharp
+dist: bionic
+solution: ManagedIrbis5.sln
+mono: none
+dotnet: 5.0.100
+script:
+  - dotnet --info
+  - dotnet restore ./Source/
+  - dotnet build ./Source/
