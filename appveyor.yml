@@ -14,16 +14,18 @@ dotnet_csproj:
   file_version: '{version}'
   informational_version: '{version}'
 
-nuget:
-  account_feed: false
-  project_feed: false
-
 before_build:
-- cmd: dotnet --info
-- cmd: dotnet restore Source/ManagedIrbis5.sln
 - cmd: C:\Python36-x64\python -m pip install --upgrade pip
 - cmd: C:\Python36-x64\Scripts\pip install --upgrade pygount
 - cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
+- cmd: dotnet --info
 
 build_script:
-- dotnet msbuild "C:\projects\managedirbis5\Source\ManagedIrbis5.sln" /m /verbosity:minimal
+- cmd: dotnet restore Source/ManagedIrbis5.sln
+- cmd: dotnet build --no-restore --configuration Release Source/ManagedIrbis5.sln
+
+test_script:
+- cmd: dotnet test --no-restore --no-build --configuration Release Source/ManagedIrbis5.sln
+
+after_build:
+- cmd: dotnet pack -no-restore --no-build --configuration Release Source/ManagedIrbis5.sln
