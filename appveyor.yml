@@ -28,4 +28,4 @@ test_script:
 - cmd: dotnet test --no-restore --no-build --configuration Release Source/ManagedIrbis5.sln
 
 after_build:
-- cmd: dotnet pack -no-restore --no-build --configuration Release Source/ManagedIrbis5.sln
+- cmd: dotnet pack --no-restore --no-build --configuration Release Source/ManagedIrbis5.sln

@@ -24,6 +24,8 @@ using System.Text;
 
 using AM;
 
+using ManagedIrbis5.Properties;
+
 using CM=System.Configuration.ConfigurationManager;
 
 #endregion
@@ -172,11 +174,11 @@ namespace ManagedIrbis.Infrastructure
         {
             if (!encoding.IsSingleByte)
             {
-                // Log.Error
-                //     (
-                //         nameof(IrbisEncoding) + "::" + nameof(SetAnsiEncoding)
-                //         + Resources.IrbisEncoding_NotSingleByteEncoding
-                //     );
+                Magna.Error
+                    (
+                        nameof(IrbisEncoding) + "::" + nameof(SetAnsiEncoding)
+                        + Resources.IrbisEncoding_NotSingleByteEncoding
+                    );
 
                 throw new ArgumentOutOfRangeException(nameof(encoding));
             }
@@ -194,11 +196,11 @@ namespace ManagedIrbis.Infrastructure
         {
             if (!encoding.IsSingleByte)
             {
-                // Log.Error
-                //     (
-                //         nameof(IrbisEncoding) + "::" + nameof(SetOemEncoding)
-                //         + Resources.IrbisEncoding_NotSingleByteEncoding
-                //     );
+                Magna.Error
+                    (
+                        nameof(IrbisEncoding) + "::" + nameof(SetOemEncoding)
+                        + Resources.IrbisEncoding_NotSingleByteEncoding
+                    );
 
                 throw new ArgumentOutOfRangeException(nameof(encoding));
             }

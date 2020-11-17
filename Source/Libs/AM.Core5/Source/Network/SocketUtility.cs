@@ -16,14 +16,12 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
+
+using AM.Core.Properties;
 
 #endregion
 
@@ -47,12 +45,12 @@ namespace AM.Network
                 string address
             )
         {
-            // Sure.NotNullNorEmpty(address, nameof(address));
+            Sure.NotNullNorEmpty(address, nameof(address));
 
-            // if (address.OneOf("localhost", "local", "(local)"))
-            // {
-            //     return IPAddress.Loopback;
-            // }
+            //if (address.OneOf("localhost", "local", "(local)"))
+            //{
+            //    return IPAddress.Loopback;
+            //}
 
             IPAddress? result = default;
             try
@@ -60,22 +58,22 @@ namespace AM.Network
                 result = IPAddress.Parse(address);
                 if (result.AddressFamily != AddressFamily.InterNetwork)
                 {
-                    // Log.Error
-                    //     (
-                    //         nameof(SocketUtility)
-                    //         + "::"
-                    //         + nameof(ResolveAddressIPv4)
-                    //         + Resources.AddressMustBeIPv4ButGiven
-                    //         + result.AddressFamily
-                    //     );
-                    //
-                    // throw new ArsMagnaException(Resources.AddressMustBeIPv4);
+                    Magna.Error
+                        (
+                            nameof(SocketUtility)
+                            + "::"
+                            + nameof(ResolveAddressIPv4)
+                            + Resources.AddressMustBeIPv4ButGiven
+                            + result.AddressFamily
+                        );
+
+                    throw new ArsMagnaException(Resources.AddressMustBeIPv4);
                 }
             }
             catch
             {
                 var entry = Dns.GetHostEntry(address);
-                if (entry.AddressList != null && entry.AddressList.Length != 0)
+                if (entry.AddressList.Length != 0)
                 {
                     var addresses = entry.AddressList
                         .Where(item => item.AddressFamily == AddressFamily.InterNetwork)
@@ -83,13 +81,13 @@ namespace AM.Network
 
                     if (addresses.Length == 0)
                     {
-                        // Log.Error
-                        //     (
-                        //         nameof(SocketUtility) + "::" + nameof(ResolveAddressIPv4)
-                        //         + Resources.CantResolveIPv4Address2
-                        //     );
-                        //
-                        // throw new ArsMagnaException(Resources.CantResolveIPv4Address);
+                        Magna.Error
+                            (
+                                nameof(SocketUtility) + "::" + nameof(ResolveAddressIPv4)
+                                + Resources.CantResolveIPv4Address2
+                            );
+
+                        throw new ArsMagnaException(Resources.CantResolveIPv4Address);
                     }
 
                     result = addresses.Length == 1
@@ -100,13 +98,13 @@ namespace AM.Network
 
             if (ReferenceEquals(result, null))
             {
-                // Log.Error
-                //     (
-                //         nameof(SocketUtility) + "::" + nameof(ResolveAddressIPv4)
-                //         + Resources.CantResolveAddress2
-                //     );
-                //
-                // throw new ArsMagnaException(Resources.CantResolveAddress);
+                Magna.Error
+                    (
+                        nameof(SocketUtility) + "::" + nameof(ResolveAddressIPv4)
+                        + Resources.CantResolveAddress2
+                    );
+
+                throw new ArsMagnaException(Resources.CantResolveAddress);
             }
 
             return result;
@@ -121,7 +119,7 @@ namespace AM.Network
                 string address
             )
         {
-            // Sure.NotNullNorEmpty(address, nameof(address));
+            Sure.NotNullNorEmpty(address, nameof(address));
 
             // if (address.OneOf("localhost", "local", "(local)"))
             // {
@@ -134,22 +132,22 @@ namespace AM.Network
                 result = IPAddress.Parse(address);
                 if (result.AddressFamily != AddressFamily.InterNetworkV6)
                 {
-                    // Log.Error
-                    //     (
-                    //         nameof(SocketUtility)
-                    //         + "::"
-                    //         + nameof(ResolveAddressIPv6)
-                    //         + Resources.AddressMustBeIPv6ButGiven
-                    //         + result.AddressFamily
-                    //     );
-                    //
-                    // throw new Exception(Resources.AddressMustBeIPv6);
+                    Magna.Error
+                        (
+                            nameof(SocketUtility)
+                            + "::"
+                            + nameof(ResolveAddressIPv6)
+                            + Resources.AddressMustBeIPv6ButGiven
+                            + result.AddressFamily
+                        );
+
+                    throw new Exception(Resources.AddressMustBeIPv6);
                 }
             }
             catch
             {
                 var entry = Dns.GetHostEntry(address);
-                if (entry.AddressList != null && entry.AddressList.Length != 0)
+                if (entry.AddressList.Length != 0)
                 {
                     var addresses = entry.AddressList
                         .Where(item => item.AddressFamily == AddressFamily.InterNetworkV6)
@@ -157,15 +155,15 @@ namespace AM.Network
 
                     if (addresses.Length == 0)
                     {
-                        // Log.Error
-                        //     (
-                        //         nameof(SocketUtility)
-                        //         + "::"
-                        //         + nameof(ResolveAddressIPv6)
-                        //         + Resources.CantResolveIPv6Address2
-                        //     );
-                        //
-                        // throw new ArsMagnaException(Resources.CantResolveIPv6Address);
+                        Magna.Error
+                            (
+                                nameof(SocketUtility)
+                                + "::"
+                                + nameof(ResolveAddressIPv6)
+                                + Resources.CantResolveIPv6Address2
+                            );
+
+                        throw new ArsMagnaException(Resources.CantResolveIPv6Address);
                     }
 
                     result = addresses.Length == 1
@@ -176,15 +174,15 @@ namespace AM.Network
 
             if (ReferenceEquals(result, null))
             {
-                // Log.Error
-                //     (
-                //         nameof(SocketUtility)
-                //         + "::"
-                //         + nameof(ResolveAddressIPv6)
-                //         + Resources.CantResolveAddress2
-                //     );
-                //
-                // throw new ArsMagnaException(Resources.CantResolveAddress);
+                Magna.Error
+                    (
+                        nameof(SocketUtility)
+                        + "::"
+                        + nameof(ResolveAddressIPv6)
+                        + Resources.CantResolveAddress2
+                    );
+
+                throw new ArsMagnaException(Resources.CantResolveAddress);
             }
 
             return result;
@@ -199,7 +197,7 @@ namespace AM.Network
                 int dataLength
             )
         {
-            // Sure.NonNegative(dataLength, nameof(dataLength));
+            Sure.NonNegative(dataLength, nameof(dataLength));
 
             using var result = new MemoryStream(dataLength);
             var buffer = new byte[32 * 1024];
@@ -209,15 +207,15 @@ namespace AM.Network
 
                 if (readed <= 0)
                 {
-                    // Log.Error
-                    //     (
-                    //         nameof(SocketUtility)
-                    //         + "::"
-                    //         + nameof(ReceiveExact)
-                    //         + Resources.ErrorReadingSocket
-                    //     );
-                    //
-                    // throw new ArsMagnaException(Resources.SocketReadingError);
+                    Magna.Error
+                        (
+                            nameof(SocketUtility)
+                            + "::"
+                            + nameof(ReceiveExact)
+                            + Resources.ErrorReadingSocket
+                        );
+
+                    throw new ArsMagnaException(Resources.SocketReadingError);
                 }
 
                 result.Write(buffer, 0, readed);
@@ -237,6 +235,7 @@ namespace AM.Network
             )
         {
             using var stream = new MemoryStream();
+
             return socket.ReceiveToEnd(stream);
         }
 
@@ -256,15 +255,15 @@ namespace AM.Network
 
                 if (readed < 0)
                 {
-                    // Log.Error
-                    //     (
-                    //         nameof(SocketUtility)
-                    //         + "::"
-                    //         + nameof(ReceiveToEnd)
-                    //         + Resources.ErrorReadingSocket
-                    //     );
-                    //
-                    // throw new ArsMagnaException(Resources.SocketReadingError);
+                    Magna.Error
+                        (
+                            nameof(SocketUtility)
+                            + "::"
+                            + nameof(ReceiveToEnd)
+                            + Resources.ErrorReadingSocket
+                        );
+
+                    throw new ArsMagnaException(Resources.SocketReadingError);
                 }
 
                 if (readed == 0)
@@ -277,7 +276,6 @@ namespace AM.Network
 
             return stream.ToArray();
         }
-
 
         #endregion
     }

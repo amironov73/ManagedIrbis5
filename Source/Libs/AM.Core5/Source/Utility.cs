@@ -16,11 +16,14 @@
 #region Using directives
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using AM.PlatformAbstraction;
 
 #endregion
 
@@ -34,6 +37,87 @@ namespace AM
     public static class Utility
     {
         #region Properties
+
+        /// <summary>
+        /// Gets the date of next month first day.
+        /// </summary>
+        /// <value>Next month first day.</value>
+        public static DateTime NextMonth => ThisMonth.AddMonths(1);
+
+        /// <summary>
+        /// Gets the date of next year first day.
+        /// </summary>
+        /// <value>Next year first day.</value>
+        public static DateTime NextYear => ThisYear.AddYears(1);
+
+        /// <summary>
+        /// Gets the date of previous month first day.
+        /// </summary>
+        /// <value>Previous month first day.</value>
+        public static DateTime PreviousMonth => ThisMonth.AddMonths(-1);
+
+        /// <summary>
+        /// Gets the date of previous year first day.
+        /// </summary>
+        /// <value>Previous year first day.</value>
+        public static DateTime PreviousYear => ThisYear.AddYears(-1);
+
+        /// <summary>
+        /// Gets the date of current month first day.
+        /// </summary>
+        /// <value>Current month first day.</value>
+        public static DateTime ThisMonth
+        {
+            get
+            {
+                var today = PlatformAbstractionLayer.Current.Today();
+
+                return new DateTime(today.Year, today.Month, 1);
+            }
+        }
+
+        /// <summary>
+        /// Gets the date of current year first day.
+        /// </summary>
+        /// <value>Current year first day.</value>
+        public static DateTime ThisYear => new DateTime
+            (
+                PlatformAbstractionLayer.Current.Today().Year,
+                1,
+                1
+            );
+
+        /// <summary>
+        /// Gets the date for tomorrow.
+        /// </summary>
+        /// <value>Tomorrow date.</value>
+        public static DateTime Tomorrow => PlatformAbstractionLayer.Current.Today().AddDays(1.0);
+
+        /// <summary>
+        /// Gets the for yesterday.
+        /// </summary>
+        /// <value>Yesterday date.</value>
+        public static DateTime Yesterday => PlatformAbstractionLayer.Current.Today().AddDays(-1.0);
+
+        /// <summary>
+        /// One day.
+        /// </summary>
+        public static TimeSpan OneDay => new TimeSpan(1, 0, 0, 0);
+
+        /// <summary>
+        /// One hour.
+        /// </summary>
+        public static TimeSpan OneHour => new TimeSpan(1, 0, 0);
+
+        /// <summary>
+        /// One minute.
+        /// </summary>
+        public static TimeSpan OneMinute => new TimeSpan(0, 1, 0);
+
+        /// <summary>
+        /// One second.
+        /// </summary>
+        public static TimeSpan OneSecond => new TimeSpan(0, 0, 1);
 
         /// <summary>
         /// Gets the CP866 (cyrillic) <see cref="Encoding"/>.
@@ -244,16 +328,16 @@ namespace AM
             )
             where T : class
         {
-            //Sure.NotNull(message, nameof(message));
+            Sure.NotNull(message, nameof(message));
 
             if (ReferenceEquals(value, null))
             {
-                //Log.Error
-                //(
-                //    nameof(Utility) + "::" + nameof(ThrowIfNull)
-                //    + ": "
-                //    + message
-                //);
+                Magna.Error
+                    (
+                        nameof(Utility) + "::" + nameof(ThrowIfNull)
+                        + ": "
+                        + message
+                    );
 
                 throw new ArgumentException (message);
             }
@@ -584,6 +668,447 @@ namespace AM
             return string.IsNullOrEmpty(value)
                 ? null
                 : value;
+        }
+
+        /// <summary>
+        /// Determines whether given value can be converted to
+        /// the specified type.
+        /// </summary>
+        /// <param name="value">Value to be converted.</param>
+        /// <returns>
+        /// <c>true</c> if value can be converted;
+        /// otherwise, <c>false</c>.
+        /// </returns>
+        public static bool CanConvertTo<T>
+            (
+                object? value
+            )
+        {
+            if (!ReferenceEquals(value, null))
+            {
+                Type sourceType = value.GetType();
+                Type targetType = typeof(T);
+
+                if (ReferenceEquals(targetType, sourceType))
+                {
+                    return true;
+                }
+
+                if (targetType.IsAssignableFrom(sourceType))
+                {
+                    return true;
+                }
+
+                IConvertible? convertible = value as IConvertible;
+                if (!ReferenceEquals(convertible, null))
+                {
+                    return true; // ???
+                }
+
+                TypeConverter converterFrom = TypeDescriptor.GetConverter(value);
+                if (converterFrom.CanConvertTo(targetType))
+                {
+                    return true;
+                }
+
+                TypeConverter converterTo = TypeDescriptor.GetConverter(targetType);
+                if (converterTo.CanConvertFrom(sourceType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Converts given value to the specified type.
+        /// </summary>
+        /// <param name="value">The value to be converted.</param>
+        /// <returns>Converted value.</returns>
+        public static T ConvertTo<T>
+            (
+                object? value
+            )
+        {
+            if (ReferenceEquals(value, null))
+            {
+                return default!;
+            }
+
+            var sourceType = value.GetType();
+            var targetType = typeof(T);
+
+            if (targetType == typeof(string))
+            {
+                return (T)(object)value.ToString()!;
+            }
+
+            if (targetType.IsAssignableFrom(sourceType))
+            {
+                return (T)value;
+            }
+
+            if (value is IConvertible)
+            {
+                return (T)Convert.ChangeType(value, targetType);
+            }
+
+            var converterFrom = TypeDescriptor.GetConverter(value);
+            if (!ReferenceEquals(converterFrom, null)
+                && converterFrom.CanConvertTo(targetType))
+            {
+                return (T)converterFrom.ConvertTo
+                            (
+                                value,
+                                targetType
+                            );
+            }
+
+            TypeConverter converterTo = TypeDescriptor.GetConverter(targetType);
+            if (!ReferenceEquals(converterTo, null)
+                && converterTo.CanConvertFrom(sourceType))
+            {
+                return (T)converterTo.ConvertFrom(value);
+            }
+
+            throw new ArsMagnaException();
+        }
+
+        /// <summary>
+        /// Converts given object to boolean value.
+        /// </summary>
+        /// <param name="value">Object to be converted.</param>
+        /// <returns>Converted value.</returns>
+        /// <exception cref="FormatException">
+        /// Value can't be converted.
+        /// </exception>
+        public static bool ToBoolean
+            (
+                object value
+            )
+        {
+            if (value is bool)
+            {
+                return (bool)value;
+            }
+
+            try
+            {
+                var result = bool.Parse(value as string ?? false.ToString());
+
+                return result;
+            }
+            // ReSharper disable once EmptyGeneralCatchClause
+            catch
+            {
+                // Pass through
+            }
+
+            var svalue = value as string;
+            if (!ReferenceEquals(svalue, null))
+            {
+                svalue = svalue.ToLowerInvariant();
+
+                if (svalue == "false"
+                    || svalue == "0"
+                    || svalue == "no"
+                    || svalue == "n"
+                    || svalue == "off"
+                    || svalue == "negative"
+                    || svalue == "neg"
+                    || svalue == "disabled"
+                    || svalue == "incorrect"
+                    || svalue == "wrong"
+                    || svalue == "нет"
+                )
+                {
+                    return false;
+                }
+
+                if (svalue == "true"
+                    || svalue == "1"
+                    || svalue == "yes"
+                    || svalue == "y"
+                    || svalue == "on"
+                    || svalue == "positiva"
+                    || svalue == "pos"
+                    || svalue == "enabled"
+                    || svalue == "correct"
+                    || svalue == "right"
+                    || svalue == "да"
+                )
+                {
+                    return true;
+                }
+            }
+
+            if (value is IConvertible)
+            {
+                return Convert.ToBoolean(value);
+            }
+
+            var converterFrom = TypeDescriptor.GetConverter(value);
+            if (!ReferenceEquals(converterFrom, null)
+                && converterFrom.CanConvertTo(typeof(bool)))
+            {
+                return (bool)converterFrom.ConvertTo
+                    (
+                        value,
+                        typeof(bool)
+                    );
+            }
+
+            Magna.Error
+                (
+                    nameof(Utility) + "::" + nameof(ToBoolean)
+                    + "bad value="
+                    + value
+                );
+
+            throw new FormatException
+                (
+                    "Bad value " + value
+                );
+        }
+
+        /// <summary>
+        /// Raises the specified handler.
+        /// </summary>
+        public static void Raise
+            (
+                this EventHandler? handler,
+                object? sender,
+                EventArgs args
+            )
+        {
+            handler?.Invoke(sender, args);
+        }
+
+        /// <summary>
+        /// Raises the specified handler.
+        /// </summary>
+        public static void Raise<T>
+            (
+                this EventHandler<T>? handler,
+                object? sender,
+                T args
+            )
+            where T : EventArgs
+        {
+            handler?.Invoke(sender, args);
+        }
+
+        /// <summary>
+        /// Raises the specified handler.
+        /// </summary>
+        public static void Raise<T>
+            (
+                this EventHandler<T>? handler,
+                object? sender
+            )
+            where T : EventArgs
+        {
+            handler?.Invoke(sender, null!);
+        }
+
+        /// <summary>
+        /// Raises the specified handler.
+        /// </summary>
+        public static void Raise
+            (
+                this EventHandler? handler,
+                object? sender
+            )
+        {
+            handler?.Invoke(sender, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Raises the specified handler.
+        /// </summary>
+        public static void Raise<T>
+            (
+                this EventHandler<T>? handler
+            )
+            where T : EventArgs
+        {
+            handler?.Invoke(null, null!);
+        }
+
+        /// <summary>
+        /// Raises the specified handler.
+        /// </summary>
+        public static Task RaiseAsync
+            (
+                this EventHandler? handler,
+                object? sender,
+                EventArgs args
+            )
+        {
+            Task result = Task.Factory.StartNew
+                (
+                    () =>
+                    {
+                        handler?.Invoke(sender, args);
+                    }
+                );
+
+            return result;
+        }
+
+        /// <summary>
+        /// Raises the specified handler.
+        /// </summary>
+        public static Task RaiseAsync
+            (
+                this EventHandler? handler,
+                object? sender
+            )
+        {
+            Task result = Task.Factory.StartNew
+                (
+                    () =>
+                    {
+                        handler?.Invoke(sender, EventArgs.Empty);
+                    }
+                );
+
+            return result;
+        }
+
+        /// <summary>
+        /// Is zero-length time span?
+        /// </summary>
+        public static bool IsZero(this TimeSpan timeSpan)
+            => TimeSpan.Compare(timeSpan, TimeSpan.Zero) == 0;
+
+        /// <summary>
+        /// Is zero-length or less?
+        /// </summary>
+        public static bool IsZeroOrLess(this TimeSpan timeSpan)
+            => TimeSpan.Compare(timeSpan, TimeSpan.Zero) <= 0;
+
+        /// <summary>
+        /// Is length of the time span less than zero?
+        /// </summary>
+        public static bool LessThanZero(this TimeSpan timeSpan)
+            => TimeSpan.Compare(timeSpan, TimeSpan.Zero) < 0;
+
+        /// <summary>
+        /// Converts time span to string
+        /// automatically selecting format
+        /// according duration of the span.
+        /// </summary>
+        public static string ToAutoString
+            (
+                this TimeSpan span
+            )
+        {
+            if (span >= OneDay)
+            {
+                return span.ToDayString();
+            }
+
+            if (span >= OneHour)
+            {
+                return span.ToHourString();
+            }
+
+            if (span >= OneMinute)
+            {
+                return span.ToMinuteString();
+            }
+
+            return span.ToSecondString();
+        }
+
+        /// <summary>
+        /// Converts time span using format 'dd:hh:mm:ss'
+        /// </summary>
+        public static string ToDayString
+            (
+                this TimeSpan span
+            )
+        {
+            return string.Format
+                (
+                    CultureInfo.InvariantCulture,
+                    "{0:00} d {1:00} h {2:00} m {3:00} s",
+                    span.Days,
+                    span.Hours,
+                    span.Minutes,
+                    span.Seconds
+                );
+        }
+
+        /// <summary>
+        /// Converts time span using format 'hh:mm:ss'
+        /// </summary>
+        public static string ToHourString
+            (
+                this TimeSpan span
+            )
+        {
+            return string.Format
+                (
+                    CultureInfo.InvariantCulture,
+                    "{0:00}:{1:00}:{2:00}",
+                    span.Hours + span.Days * 60,
+                    span.Minutes,
+                    span.Seconds
+                );
+        }
+
+        /// <summary>
+        /// Converts time span using format 'mm:ss'
+        /// </summary>
+        public static string ToMinuteString
+            (
+                this TimeSpan span
+            )
+        {
+            var totalMinutes = span.TotalMinutes;
+            var minutes = (int)totalMinutes;
+            var seconds = (int)((totalMinutes - minutes) * 60.0);
+
+            return string.Format
+                (
+                    CultureInfo.InvariantCulture,
+                    "{0:00}:{1:00}",
+                    minutes,
+                    seconds
+                );
+        }
+
+        /// <summary>
+        /// Converts time span using format 's.ff'
+        /// </summary>
+        public static string ToSecondString
+            (
+                this TimeSpan span
+            )
+        {
+            return span.TotalSeconds.ToString
+                (
+                    "F2",
+                    CultureInfo.InvariantCulture
+                );
+        }
+
+        /// <summary>
+        /// Converts time span using format 's'
+        /// </summary>
+        public static string ToWholeSecondsString
+            (
+                this TimeSpan span
+            )
+        {
+            return span.TotalSeconds.ToString
+                (
+                    "F0",
+                    CultureInfo.InvariantCulture
+                );
         }
 
         #endregion

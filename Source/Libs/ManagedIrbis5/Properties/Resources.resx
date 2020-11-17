@@ -1,0 +1,389 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<!-- 
+		Microsoft ResX Schema
+
+		Version 1.3
+
+		The primary goals of this format is to allow a simple XML format 
+		that is mostly human readable. The generation and parsing of the 
+		various data types are done through the TypeConverter classes 
+		associated with the data types.
+
+		Example:
+
+		... ado.net/XML headers & schema ...
+		<resheader name="resmimetype">text/microsoft-resx</resheader>
+		<resheader name="version">1.3</resheader>
+		<resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+		<resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+		<data name="Name1">this is my long string</data>
+		<data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+		<data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+			[base64 mime encoded serialized .NET Framework object]
+		</data>
+		<data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+			[base64 mime encoded string representing a byte array form of the .NET Framework object]
+		</data>
+
+		There are any number of "resheader" rows that contain simple 
+		name/value pairs.
+
+		Each data row contains a name, and value. The row also contains a 
+		type or mimetype. Type corresponds to a .NET class that support 
+		text/value conversion through the TypeConverter architecture. 
+		Classes that don't support this are serialized and stored with the 
+		mimetype set.
+
+		The mimetype is used for serialized objects, and tells the 
+		ResXResourceReader how to depersist the object. This is currently not 
+		extensible. For a given mimetype the value must be set accordingly:
+
+		Note - application/x-microsoft.net.object.binary.base64 is the format 
+		that the ResXResourceWriter will generate, however the reader can 
+		read any of the formats listed below.
+
+		mimetype: application/x-microsoft.net.object.binary.base64
+		value   : The object must be serialized with 
+			: System.Serialization.Formatters.Binary.BinaryFormatter
+			: and then encoded with base64 encoding.
+
+		mimetype: application/x-microsoft.net.object.soap.base64
+		value   : The object must be serialized with 
+			: System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+			: and then encoded with base64 encoding.
+
+		mimetype: application/x-microsoft.net.object.bytearray.base64
+		value   : The object must be serialized into a byte array 
+			: using a System.ComponentModel.TypeConverter
+			: and then encoded with base64 encoding.
+	-->
+	
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>1.3</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+  <data name="BrokenNetworkEvent" xml:space="preserve">
+    <value>Broken network event</value>
+  </data>
+  <data name="CantResolveHost" xml:space="preserve">
+    <value>Can't resolve host </value>
+  </data>
+  <data name="EmptyResponse" xml:space="preserve">
+    <value>Empty response</value>
+  </data>
+  <data name="SmartRead_Expected" xml:space="preserve">
+    <value>: expected=</value>
+  </data>
+  <data name="SmartRead_Readed" xml:space="preserve">
+    <value>, readed=</value>
+  </data>
+  <data name="CantReadFirstLineOfTheResponse" xml:space="preserve">
+    <value>: can't read first line of the response</value>
+  </data>
+  <data name="SmartRead_EmptyResponse" xml:space="preserve">
+    <value>: empty response</value>
+  </data>
+  <data name="ConnectionCreatorNotSet" xml:space="preserve">
+    <value>ConnectionCreator not set</value>
+  </data>
+  <data name="FieldTag_Verify_BadTag1" xml:space="preserve">
+    <value>: bad tag=</value>
+  </data>
+  <data name="FieldTag_Verify_BadTag2" xml:space="preserve">
+    <value>bad tag=</value>
+  </data>
+  <data name="FieldValue_Verify_BadValue" xml:space="preserve">
+    <value>: bad value=</value>
+  </data>
+  <data name="FieldValue_Verify_BadFieldValue" xml:space="preserve">
+    <value>Bad Field.Value: </value>
+  </data>
+  <data name="IrbisEncoding_NotSingleByteEncoding" xml:space="preserve">
+    <value>: not single-byte encoding</value>
+  </data>
+  <data name="ErrorDescription_UnknownError" xml:space="preserve">
+    <value>Unknown error</value>
+  </data>
+  <data name="ErrorDescription_NoError" xml:space="preserve">
+    <value>No error</value>
+  </data>
+  <data name="ErrorDescription_NormalReturn" xml:space="preserve">
+    <value>Normal return</value>
+  </data>
+  <data name="ErrorDescription_GivenMfnOutsideTheDatabaseRange" xml:space="preserve">
+    <value>Given MFN is outside the database range</value>
+  </data>
+  <data name="ErrorDescription_GeneralError" xml:space="preserve">
+    <value>General error</value>
+  </data>
+  <data name="ErrorDescription_FileNotExist" xml:space="preserve">
+    <value>File not exist</value>
+  </data>
+  <data name="ErrorDescription_BadPassword" xml:space="preserve">
+    <value>Bad password</value>
+  </data>
+  <data name="ErrorDescription_ClientAlreadyRegistered" xml:space="preserve">
+    <value>The client is already registered</value>
+  </data>
+  <data name="ErrorDescription_WorkstationAccesDenied" xml:space="preserve">
+    <value>Workstation access denied</value>
+  </data>
+  <data name="ErrorDescription_ClientNotAllowed" xml:space="preserve">
+    <value>Client not allowed</value>
+  </data>
+  <data name="ErrorDescription_WriteError" xml:space="preserve">
+    <value>Write error</value>
+  </data>
+  <data name="ErrorDescription_ActualizationError" xml:space="preserve">
+    <value>Error during actualization</value>
+  </data>
+  <data name="ErrorDescription_NoPreviousVersionOfTheRecord" xml:space="preserve">
+    <value>No previous version of the record</value>
+  </data>
+  <data name="ErrorDescription_FieldIsAbsent" xml:space="preserve">
+    <value>The field is absent</value>
+  </data>
+  <data name="ErrorDescription_MfnOutsideTheDatabaseRange" xml:space="preserve">
+    <value>MFN outside the database range</value>
+  </data>
+  <data name="ErrorDescription_BadShelfNumber" xml:space="preserve">
+    <value>Bad shelf number</value>
+  </data>
+  <data name="ErrorDescription_BadShelfSize" xml:space="preserve">
+    <value>Bad shelf size</value>
+  </data>
+  <data name="ErrorDescription_ReadError" xml:space="preserve">
+    <value>Read error</value>
+  </data>
+  <data name="ErrorDescription_RecordIsLogicallyDeleted" xml:space="preserve">
+    <value>The record is logically deleted</value>
+  </data>
+  <data name="ErrorDescription_RecordIsPhysicallyDeleted" xml:space="preserve">
+    <value>The record is physically deleted</value>
+  </data>
+  <data name="ErrorDescription_RecordIsBlocked" xml:space="preserve">
+    <value>The record is blocked</value>
+  </data>
+  <data name="ErrorDescription_ProtocolError" xml:space="preserve">
+    <value>Protocol error</value>
+  </data>
+  <data name="ErrorDescription_ClientNotRegistered" xml:space="preserve">
+    <value>Client not registered</value>
+  </data>
+  <data name="ErrorDescription_ClientNotInUse" xml:space="preserve">
+    <value>Client doesn't in use</value>
+  </data>
+  <data name="ErrorDescription_BadClientIdentifier" xml:space="preserve">
+    <value>Bad client identifier</value>
+  </data>
+  <data name="ErrorDescription_ProcessError" xml:space="preserve">
+    <value>Administrator thread error</value>
+  </data>
+  <data name="ErrorDescription_ServerOverloaded" xml:space="preserve">
+    <value>Server is overloaded</value>
+  </data>
+  <data name="ErrorDescription_AutoinGblError" xml:space="preserve">
+    <value>Error during autoin.gbl processing</value>
+  </data>
+  <data name="ErrorDescription_RecordVersionError" xml:space="preserve">
+    <value>Record version mismatch</value>
+  </data>
+  <data name="ErrorDescription_BackupCreationError" xml:space="preserve">
+    <value>Backup creation error</value>
+  </data>
+  <data name="ErrorDescription_BackupRestoreError" xml:space="preserve">
+    <value>Backup restore error</value>
+  </data>
+  <data name="ErrorDescription_SortingError" xml:space="preserve">
+    <value>Error during sorting</value>
+  </data>
+  <data name="ErrorDescription_BadTerm" xml:space="preserve">
+    <value>Bad term</value>
+  </data>
+  <data name="ErrorDescription_DictionaryCreationError" xml:space="preserve">
+    <value>Dictionary creation error</value>
+  </data>
+  <data name="ErrorDescription_ServerExecutionError" xml:space="preserve">
+    <value>Server execution error</value>
+  </data>
+  <data name="ErrorDescription_DictionaryLoadingError" xml:space="preserve">
+    <value>Dictionary loading error</value>
+  </data>
+  <data name="ErrorDescription_GlobalCorrectionParameterError" xml:space="preserve">
+    <value>Global correction parameter error</value>
+  </data>
+  <data name="ErrorDescription_ERR_GBL_REP" xml:space="preserve">
+    <value>Global correction: bad rep tag</value>
+  </data>
+  <data name="ErrorDescription_ERR_GBL_MET" xml:space="preserve">
+    <value>Global correction: bad tag</value>
+  </data>
+  <data name="ErrorDescription_TermNotExist" xml:space="preserve">
+    <value>Term doesn't exist</value>
+  </data>
+  <data name="ErrorDescription_LastTerm" xml:space="preserve">
+    <value>Last term in the list</value>
+  </data>
+  <data name="ErrorDescription_FirstTerm" xml:space="preserve">
+    <value>First term in the list</value>
+  </data>
+  <data name="ErrorDescription_DatabaseIsLocked" xml:space="preserve">
+    <value>Database is exclusively locked</value>
+  </data>
+  <data name="ErrorDescription_MstError" xml:space="preserve">
+    <value>Master file error</value>
+  </data>
+  <data name="ErrorDescription_IfpError" xml:space="preserve">
+    <value>Index file error</value>
+  </data>
+  <data name="VerifyFormat_TextIsAbsent" xml:space="preserve">
+    <value>Text is absent</value>
+  </data>
+  <data name="VerifyFormat_TextIsAbsent2" xml:space="preserve">
+    <value>: text is absent</value>
+  </data>
+  <data name="DatabaseNotSet" xml:space="preserve">
+    <value>Database not set</value>
+  </data>
+  <data name="IrbisProvider_NonOverriden" xml:space="preserve">
+    <value>: non overriden</value>
+  </data>
+  <data name="ProviderManager_ProviderNameNotSpecified" xml:space="preserve">
+    <value>: provider name not specified</value>
+  </data>
+  <data name="ProviderManager_ProviderNotFound" xml:space="preserve">
+    <value>: provider not found: </value>
+  </data>
+  <data name="ProviderManager_ProviderNotFound2" xml:space="preserve">
+    <value>Provider not found: </value>
+  </data>
+  <data name="ProviderManager_CanTFindType" xml:space="preserve">
+    <value>: can't find type: </value>
+  </data>
+  <data name="ProviderManager_CantFindType2" xml:space="preserve">
+    <value>Can't find type: </value>
+  </data>
+  <data name="ProviderManager_IrbisProviderConfigurationKeyNotSpecified" xml:space="preserve">
+    <value>IrbisProvider configuration key not specified</value>
+  </data>
+  <data name="ServerResponse_BadFormat" xml:space="preserve">
+    <value>: bad format=</value>
+  </data>
+  <data name="AbstractEngine_NotConnected" xml:space="preserve">
+    <value>Not connected</value>
+  </data>
+  <data name="AbstractEngine_NotConnected2" xml:space="preserve">
+    <value>: not connected</value>
+  </data>
+  <data name="AbstractEngine_StandardExecution_Failed" xml:space="preserve">
+    <value> failed</value>
+  </data>
+  <data name="BatchAccessor_SomeRecordsNotRetrieved" xml:space="preserve">
+    <value>some records not retrieved</value>
+  </data>
+  <data name="BatchAccessor_EmptyRecordDetected" xml:space="preserve">
+    <value>: empty record detected</value>
+  </data>
+  <data name="IrbisConnection_CantSetSocketWhileConnected" xml:space="preserve">
+    <value>Can't set socket while connected</value>
+  </data>
+  <data name="IrbisConnection_DecryptedStateIsNull" xml:space="preserve">
+    <value>Decrypted state is null</value>
+  </data>
+  <data name="IrbisConnection_NoRecordRetrieved" xml:space="preserve">
+    <value>no record retrieved</value>
+  </data>
+  <data name="IrbisConnection_ResultRecordIsNull" xml:space="preserve">
+    <value>result record is null</value>
+  </data>
+  <data name="UsernameNotSpecified" xml:space="preserve">
+    <value>username not specified</value>
+  </data>
+  <data name="PasswordNotSpecified" xml:space="preserve">
+    <value>password not specified</value>
+  </data>
+  <data name="AlreadyConnected" xml:space="preserve">
+    <value>Already connected</value>
+  </data>
+  <data name="IrbisNetworkUtility_DatabaseNotSpecified" xml:space="preserve">
+    <value>database not specified</value>
+  </data>
+  <data name="IrbisNetworkUtility_EmptyRecordDetected" xml:space="preserve">
+    <value>empty record detected</value>
+  </data>
+  <data name="IrbisNetworkUtility_RecordIsNull" xml:space="preserve">
+    <value>record is null</value>
+  </data>
+  <data name="WriteRecordsCommand_NoRecordsGiven" xml:space="preserve">
+    <value>no records given</value>
+  </data>
+  <data name="WriteRecordsCommand_TooManyRecords" xml:space="preserve">
+    <value>too many records</value>
+  </data>
+  <data name="WriteRecordsCommand_DatabaseNotSet" xml:space="preserve">
+    <value>database not set</value>
+  </data>
+  <data name="DirectoryNotExist" xml:space="preserve">
+    <value>directory not exist: </value>
+  </data>
+  <data name="UnlockRecordsCommand_RecordListIsEmpty" xml:space="preserve">
+    <value>record list is empty</value>
+  </data>
+  <data name="ListFilesCommand_SpecificationListIsEmpty" xml:space="preserve">
+    <value>specification list is empty</value>
+  </data>
+  <data name="ReadBinaryFileCommand_FileNameNotSpecified" xml:space="preserve">
+    <value>file name not specified</value>
+  </data>
+  <data name="ReadBinaryFileCommand_NoBinaryDataReceived" xml:space="preserve">
+    <value>no binary data received</value>
+  </data>
+  <data name="NoFilesSpecified" xml:space="preserve">
+    <value>no files specified</value>
+  </data>
+  <data name="ReadPostingsCommand_ListOfTermsNull" xml:space="preserve">
+    <value>list of terms == null</value>
+  </data>
+  <data name="UserListNotSet" xml:space="preserve">
+    <value>UserList not set</value>
+  </data>
+  <data name="RecordTooLong" xml:space="preserve">
+    <value>Record too long</value>
+  </data>
+</root>

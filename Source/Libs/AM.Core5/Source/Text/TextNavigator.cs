@@ -494,8 +494,7 @@ namespace AM.Text
                     c = ReadChar();
                     if (c == EOF)
                     {
-                        /*
-                        Log.Error
+                        Magna.Error
                             (
                                 nameof(TextNavigator)
                                 + "::"
@@ -503,7 +502,6 @@ namespace AM.Text
                                 + ": "
                                 + "unexpected end of stream"
                             );
-                            */
 
                         throw new FormatException();
                     }

@@ -368,12 +368,12 @@ namespace AM
         {
             if (pieceSize <= 0)
             {
-                //Log.Error
-                //    (
-                //        nameof(Sequence) + "::" + nameof(Slice)
-                //        + "pieceSize="
-                //        + pieceSize
-                //    );
+                Magna.Error
+                    (
+                        nameof(Sequence) + "::" + nameof(Slice)
+                        + "pieceSize="
+                        + pieceSize
+                    );
 
                 throw new ArgumentOutOfRangeException(nameof(pieceSize));
             }

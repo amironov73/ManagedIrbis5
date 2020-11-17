@@ -4,6 +4,7 @@ solution: ManagedIrbis5.sln
 mono: none
 dotnet: 5.0.100
 script:
-  - dotnet restore ./Source/
-  - dotnet build ./Source/
-  - dotnet test ./Source/
+  - dotnet restore                                               ./Source/ManagedIrbis5.sln
+  - dotnet build --no-restore            --configuration Release ./Source/ManagedIrbis5.sln
+  - dotnet test  --no-restore --no-build --configuration Release ./Source/ManagedIrbis5.sln
+  - dotnet pack  --no-restore --no-build --configuration Release ./Source/ManagedIrbis5.sln

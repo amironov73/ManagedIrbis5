@@ -15,17 +15,9 @@
 
 #region Using directives
 
-using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Infrastructure.Sockets;
+using AM;
 
 #endregion
 
@@ -202,7 +194,6 @@ namespace ManagedIrbis.Infrastructure
             return result.ToString();
         } // method PrepareFormat
 
-        /*
         /// <summary>
         /// Verify format string.
         /// </summary>
@@ -214,7 +205,7 @@ namespace ManagedIrbis.Infrastructure
         {
             if (string.IsNullOrEmpty(text))
             {
-                Log.Error
+                Magna.Error
                     (
                         nameof(IrbisFormat) + "::" + nameof(VerifyFormat)
                         + "text is absent"
@@ -232,7 +223,7 @@ namespace ManagedIrbis.Infrastructure
             {
                 if (c < ' ')
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             nameof(IrbisFormat) + "::" + nameof(VerifyFormat)
                             + "contains forbidden symbols"
@@ -267,7 +258,7 @@ namespace ManagedIrbis.Infrastructure
                     default:
                         if (c == '/' && index + 1 < length && text[index + 1] == '*')
                         {
-                            Log.Error
+                            Magna.Error
                                 (
                                     nameof(IrbisFormat) + "::"
                                     + nameof(VerifyFormat)
@@ -293,7 +284,7 @@ namespace ManagedIrbis.Infrastructure
 
             if (state != zero)
             {
-                Log.Error
+                Magna.Error
                     (
                         nameof(IrbisFormat) + "::" + nameof(VerifyFormat)
                         + "nonclosed literal"
@@ -308,7 +299,6 @@ namespace ManagedIrbis.Infrastructure
 
             return true;
         } // method VerifyFormat
-        */
 
         #endregion
 

@@ -321,7 +321,7 @@ namespace AM
         /// </summary>
         public void Throw()
         {
-            // Log.Error(nameof(Verifier<T>) + "::" + nameof(Throw));
+            Magna.Error(nameof(Verifier<T>) + "::" + nameof(Throw));
 
             throw new VerificationException();
         }
@@ -334,11 +334,11 @@ namespace AM
                 string message
             )
         {
-            //Log.Error
-            //    (
-            //        nameof(Verifier<T>) + "::" + nameof(Throw)
-            //        + ": " + message
-            //    );
+            Magna.Error
+                (
+                    nameof(Verifier<T>) + "::" + nameof(Throw)
+                    + ": " + message
+                );
 
             throw new VerificationException(message);
         }
