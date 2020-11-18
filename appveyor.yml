@@ -18,6 +18,8 @@ before_build:
 - cmd: C:\Python36-x64\python -m pip install --upgrade pip
 - cmd: C:\Python36-x64\Scripts\pip install --upgrade pygount
 - cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
+- cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Tests -s cs -N "*.Designer.cs" -F "obj"
+- cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Apps -s cs -N "*.Designer.cs" -F "obj"
 - cmd: dotnet --info
 
 build_script:
@@ -29,3 +31,6 @@ test_script:
 
 after_build:
 - cmd: dotnet pack --no-restore --no-build --configuration Release Source/ManagedIrbis5.sln
+
+artifacts:
+  - path: '**\*.nupkg'
