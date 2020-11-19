@@ -17,18 +17,12 @@
 
 using System;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
+using AM.IO;
+using AM.Runtime;
 using AM.Text;
-using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Infrastructure.Sockets;
 
 #endregion
 
@@ -55,8 +49,8 @@ namespace ManagedIrbis.Infrastructure
     [DebuggerDisplay("{" + nameof(Path) + "} {" + nameof(Database)
                      + "} {" + nameof (FileName) + "}")]
     public sealed class FileSpecification
-        : /* IHandmadeSerializable,
-            IVerifiable, */
+        :  IHandmadeSerializable,
+            IVerifiable,
             IEquatable<FileSpecification>
     {
         #region Properties
@@ -155,7 +149,6 @@ namespace ManagedIrbis.Infrastructure
 
         #region IHandmadeSerializable members
 
-        /*
         /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
         public void RestoreFromStream
             (
@@ -186,13 +179,11 @@ namespace ManagedIrbis.Infrastructure
                 .WriteNullable(FileName)
                 .WriteNullable(Content);
         }
-        */
 
         #endregion
 
         #region IVerifiable members
 
-        /*
         /// <inheritdoc cref="IVerifiable.Verify" />
         public bool Verify
             (
@@ -216,7 +207,6 @@ namespace ManagedIrbis.Infrastructure
 
             return verifier.Result;
         }
-        */
 
         #endregion
 

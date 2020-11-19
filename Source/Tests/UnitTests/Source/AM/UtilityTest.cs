@@ -14,6 +14,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM;
 
+#nullable enable
+
 namespace UnitTests.AM
 {
     [TestClass]
@@ -30,7 +32,7 @@ namespace UnitTests.AM
         [ExpectedException(typeof(ArgumentException))]
         public void Utility_ThrowIfNull_2()
         {
-            string text = null;
+            string? text = null;
 
             // ReSharper disable ExpressionIsAlwaysNull
             // ReSharper disable ReturnValueOfPureMethodIsNotUsed
@@ -42,7 +44,7 @@ namespace UnitTests.AM
         [TestMethod]
         public void Utility_ToVisibleString_1()
         {
-            string text = "Hello";
+            string? text = "Hello";
             Assert.AreEqual("Hello", text.ToVisibleString());
 
             text = null;
