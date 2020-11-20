@@ -106,6 +106,24 @@ namespace ManagedIrbis.Infrastructure
         } // method AddUtf
 
         /// <summary>
+        /// Добавление формата.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        public Query AddFormat
+            (
+                string? format
+            )
+        {
+            if (string.IsNullOrEmpty(format))
+            {
+                return NewLine();
+            }
+
+            return AddAnsi(format);
+        } // method AddFormat
+
+        /// <summary>
         /// Отладочная печать.
         /// </summary>
         public void Debug

@@ -123,17 +123,9 @@ namespace AM.IO
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ChunkedBuffer()
-            : this(DefaultChunkSize)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public ChunkedBuffer
             (
-                int chunkSize
+                int chunkSize = DefaultChunkSize
             )
         {
             Sure.Positive(chunkSize, nameof(chunkSize));

@@ -15,12 +15,8 @@
 
 #region Using directives
 
-using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Text;
+using ManagedIrbis;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -84,6 +80,29 @@ namespace AM
 
         #region Public methods
 
+        /// <summary>
+        /// Кодирование параметров поиска для клиентского запроса.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="query"></param>
+        public void Encode
+            (
+                Connection connection,
+                Query query
+            )
+        {
+            var database = (Database ?? connection.Database)
+                .ThrowIfNull(nameof(Database));
+
+            query.AddAnsi(database)
+                .AddUtf(Expression)
+                .Add(NumberOfRecords)
+                .Add(FirstRecord)
+                .AddFormat(Format)
+                .Add(MinMfn)
+                .Add(MaxMfn)
+                .AddAnsi(Sequential);
+        }
 
         #endregion
     }

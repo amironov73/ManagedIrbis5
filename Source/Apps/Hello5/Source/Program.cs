@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -65,6 +66,10 @@ internal class Program
 
             await connection.NopAsync();
             WriteLine("NOP");
+
+            var found = await connection.SearchAsync(Search.Keyword("бетон$"));
+            WriteLine("Found: "
+                + string.Join<int>(", ", found));
 
             var record = await connection.ReadRecordAsync(1);
             WriteLine($"ReadRecord={record?.FM(200, 'a')}");

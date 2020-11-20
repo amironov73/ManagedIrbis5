@@ -23,7 +23,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AM;
 using AM.Collections;
 
 using ManagedIrbis.Infrastructure;
@@ -816,6 +816,65 @@ namespace ManagedIrbis
 
             return result;
         } // method ReadTextFileAsync
+
+        /// <summary>
+        /// Расширенный поиск.
+        /// </summary>
+        /// <param name="parameters">Параметры поиска.</param>
+        /// <returns>Массив элементов, описывающих найденные записи.</returns>
+        public async Task<FoundItem[]> SearchAsync
+            (
+                SearchParameters parameters
+            )
+        {
+            if (!CheckConnection())
+            {
+                return Array.Empty<FoundItem>();
+            }
+
+            var query = new Query(this, CommandCode.Search);
+            parameters.Encode(this, query);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null)
+                || !response.CheckReturnCode())
+            {
+                return Array.Empty<FoundItem>();
+            }
+
+            return FoundItem.Parse(response);
+        } // method SearchAsync
+
+        /// <summary>
+        /// Расширенный поиск.
+        /// </summary>
+        /// <param name="expression">Выражение для поиска по словарю.</param>
+        /// <returns>Массив MFN найденных записей.</returns>
+        public async Task<int[]> SearchAsync
+            (
+                string expression
+            )
+        {
+            if (!CheckConnection())
+            {
+                return Array.Empty<int>();
+            }
+
+            var query = new Query(this, CommandCode.Search);
+            var parameters = new SearchParameters
+            {
+                Database = Database,
+                Expression = expression
+            };
+            parameters.Encode(this, query);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null)
+                || !response.CheckReturnCode())
+            {
+                return Array.Empty<int>();
+            }
+
+            return FoundItem.ParseMfn(response);
+        } // method SearchAsync
 
         #endregion
 

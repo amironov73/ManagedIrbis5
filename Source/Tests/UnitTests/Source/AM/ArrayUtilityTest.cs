@@ -221,7 +221,7 @@ namespace UnitTests.AM
         [TestMethod]
         public void ArrayUtility_SafeLength_1()
         {
-            int[] array = new int[0];
+            int[]? array = new int[0];
             Assert.AreEqual(0, ArrayUtility.SafeLength(array));
             array = new[] { 1, 2, 3 };
             Assert.AreEqual(3, ArrayUtility.SafeLength(array));
@@ -248,7 +248,7 @@ namespace UnitTests.AM
         [TestMethod]
         public void ArrayUtility_ToString_2()
         {
-            string[] array = {"one", null, "three"};
+            string?[] array = {"one", null, "three"};
             string[] lines = ArrayUtility.ToString(array);
             Assert.AreEqual(3, lines.Length);
             Assert.AreEqual("one", lines[0]);

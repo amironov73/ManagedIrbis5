@@ -15,12 +15,10 @@
 
 #region Using directives
 
-using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Text;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -50,6 +48,65 @@ namespace AM
 
         #region Public methods
 
+        /// <summary>
+        /// Разбор ответа сервера.
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public static FoundItem[] Parse
+            (
+                Response response
+            )
+        {
+            var expected = response.ReadInteger();
+            var result = new List<FoundItem>(expected);
+            while (!response.EOT)
+            {
+                var line = response.ReadAnsi();
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+
+                var parts = line.Split('#', 2);
+                var item = new FoundItem
+                {
+                    Mfn = int.Parse(parts[0]),
+                    Text = parts.Length == 2 ? parts[1] : string.Empty
+                };
+                result.Add(item);
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Разбор ответа сервера.
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public static int[] ParseMfn
+            (
+                Response response
+            )
+        {
+            var expected = response.ReadInteger();
+            var result = new List<int>(expected);
+            while (!response.EOT)
+            {
+                var line = response.ReadAnsi();
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+
+                var parts = line.Split('#', 2);
+                var mfn = int.Parse(parts[0]);
+                result.Add(mfn);
+            }
+
+            return result.ToArray();
+        }
 
         #endregion
     }

@@ -44,11 +44,13 @@ internal class Program
             WriteLine(version);
 
             var processes = await connection.ListProcessesAsync();
-            WriteLine("Processes: "
-                + string.Join<ProcessInfo>(" | ", processes));
+            WriteLine("Processes: " + string.Join<ProcessInfo>(" | ", processes));
 
             var maxMfn = await connection.GetMaxMfnAsync();
             WriteLine($"Max MFN={maxMfn}");
+
+            var found = await connection.SearchAsync(Search.Keyword("бетон$"));
+            WriteLine("Found: " + string.Join<int>(", ", found));
 
             await connection.NopAsync();
             WriteLine("NOP");
