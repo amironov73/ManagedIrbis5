@@ -26,7 +26,7 @@ using System.Text;
 
 #nullable enable
 
-namespace AM
+namespace ManagedIrbis
 {
     /// <summary>
     /// Связь термина

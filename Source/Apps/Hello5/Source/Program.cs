@@ -20,7 +20,7 @@ using System;
 using System.Threading.Tasks;
 
 using ManagedIrbis;
-
+using Microsoft.VisualBasic;
 using static System.Console;
 
 #endregion
@@ -68,8 +68,16 @@ internal class Program
             WriteLine("NOP");
 
             var found = await connection.SearchAsync(Search.Keyword("бетон$"));
-            WriteLine("Found: "
-                + string.Join<int>(", ", found));
+            WriteLine("Found: " + string.Join<int>(", ", found));
+
+            var terms = await connection.ReadTermsAsync("K=БЕТОН", 10);
+            WriteLine("Terms: " + string.Join<Term>(", ", terms));
+
+            if (terms.Length != 0)
+            {
+                var postings = await connection.ReadPostingsAsync(terms[0].Text!, 10);
+                WriteLine("Postings: " + string.Join<TermPosting>(", ", postings));
+            }
 
             var record = await connection.ReadRecordAsync(1);
             WriteLine($"ReadRecord={record?.FM(200, 'a')}");

@@ -22,11 +22,15 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
+using AM;
+
+using ManagedIrbis.Infrastructure;
+
 #endregion
 
 #nullable enable
 
-namespace AM
+namespace ManagedIrbis
 {
     /// <summary>
     /// Параметры запроса терминов.
@@ -64,6 +68,25 @@ namespace AM
 
         #region Public methods
 
+        /// <summary>
+        /// Кодирование параметров постингов для клиентского запроса.
+        /// </summary>
+        /// <param name="connection">Ссылка на подключение к серверу.</param>
+        /// <param name="query">Клиентский запрос.</param>
+        public void Encode
+            (
+                Connection connection,
+                Query query
+            )
+        {
+            var database = (Database ?? connection.Database)
+                .ThrowIfNull(nameof(Database));
+
+            query.AddAnsi(database)
+                .AddUtf(StartTerm)
+                .Add(NumberOfTerms)
+                .AddFormat(Format);
+        }
 
         #endregion
     }

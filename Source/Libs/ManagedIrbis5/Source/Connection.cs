@@ -584,21 +584,45 @@ namespace ManagedIrbis
             return result;
         } // method GetServerVersionAsync
 
+        /*
+        /// <summary>
+        /// Получение списка баз данных с сервера.
+        /// </summary>
+        /// <param name="fileName">Имя файла со списком баз данных.</param>
+        /// <returns>Массив описаний баз данных.</returns>
+        public async Task<DatabaseInfo[]> ListDatabasesAsync
+            (
+                string fileName
+            )
+        {
+            if (!CheckConnection())
+            {
+                return Array.Empty<DatabaseInfo>();
+            }
+
+            return Array.Empty<DatabaseInfo>();
+        } // method ListDatabasesAsync
+        */
+
         /// <summary>
         /// Получение списка файлов на сервере.
         /// </summary>
         public async Task<string[]> ListFilesAsync
             (
-                string specification
+                params string[] specifications
             )
         {
-            if (!CheckConnection() || string.IsNullOrEmpty(specification))
+            if (!CheckConnection() || specifications.Length == 0)
             {
                 return Array.Empty<string>();
             }
 
             var query = new Query(this, CommandCode.ListFiles);
-            query.AddAnsi(specification);
+            foreach (var specification in specifications)
+            {
+                query.AddAnsi(specification);
+            }
+
             var response = await ExecuteAsync(query);
             if (ReferenceEquals(response, null))
             {
@@ -787,6 +811,115 @@ namespace ManagedIrbis
         } // method ReadRecordAsync
 
         /// <summary>
+        /// Чтение постингов указанного термина.
+        /// </summary>
+        /// <param name="term">Термин.</param>
+        /// <param name="numberOfPostings">Максимальное количество постингов</param>
+        /// <returns>Массив прочитанных постингов.</returns>
+        public async Task<TermPosting[]> ReadPostingsAsync
+            (
+                string term,
+                int numberOfPostings
+            )
+        {
+            var parameters = new PostingParameters
+            {
+                Database = Database,
+                Terms = new[] { term },
+                NumberOfPostings = numberOfPostings
+            };
+
+            return await ReadPostingsAsync(parameters);
+        }
+
+        /// <summary>
+        /// Чтение постингов указанных терминов.
+        /// </summary>
+        /// <param name="parameters">Параметры постингов.</param>
+        /// <returns>Массив прочитанных постингов.</returns>
+        public async Task<TermPosting[]> ReadPostingsAsync
+            (
+                PostingParameters parameters
+            )
+        {
+            if (!CheckConnection())
+            {
+                return Array.Empty<TermPosting>();
+            }
+
+            var query = new Query(this, CommandCode.ReadPostings);
+            parameters.Encode(this, query);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return Array.Empty<TermPosting>();
+            }
+
+            if (!response.CheckReturnCode(_goodCodesForReadTerms))
+            {
+                return Array.Empty<TermPosting>();
+            }
+
+            return TermPosting.Parse(response);
+        }
+
+        /// <summary>
+        /// Чтение терминов словаря.
+        /// </summary>
+        /// <param name="startTerm">Параметры терминов.</param>
+        /// <param name="numberOfTerms">Максимальное число терминов.</param>
+        /// <returns>Массив прочитанных терминов.</returns>
+        public async Task<Term[]> ReadTermsAsync
+            (
+                string startTerm,
+                int numberOfTerms
+            )
+        {
+            var parameters = new TermParameters
+            {
+                Database = Database,
+                StartTerm = startTerm,
+                NumberOfTerms = numberOfTerms
+            };
+
+            return await ReadTermsAsync(parameters);
+        }
+
+        /// <summary>
+        /// Чтение терминов словаря.
+        /// </summary>
+        /// <param name="parameters">Параметры терминов.</param>
+        /// <returns>Массив прочитанных терминов.</returns>
+        public async Task<Term[]> ReadTermsAsync
+            (
+                TermParameters parameters
+            )
+        {
+            if (!CheckConnection())
+            {
+                return Array.Empty<Term>();
+            }
+
+            var command = parameters.ReverseOrder
+                ? CommandCode.ReadTermsReverse
+                : CommandCode.ReadTerms;
+            var query = new Query(this, command);
+            parameters.Encode(this, query);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return Array.Empty<Term>();
+            }
+
+            if (!response.CheckReturnCode(_goodCodesForReadTerms))
+            {
+                return Array.Empty<Term>();
+            }
+
+            return Term.Parse(response);
+        } // method ReadTermsAsync
+
+        /// <summary>
         ///
         /// </summary>
         public async Task<string?> ReadTextFileAsync
@@ -875,6 +1008,40 @@ namespace ManagedIrbis
 
             return FoundItem.ParseMfn(response);
         } // method SearchAsync
+
+        /// <summary>
+        /// Определение количества записей, удовлетворяющих
+        /// заданному запросу.
+        /// </summary>
+        /// <param name="expression">Выражение для поиска по словарю.</param>
+        /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
+        public async Task<int> SearchCountAsync
+            (
+                string expression
+            )
+        {
+            if (!CheckConnection())
+            {
+                return -1;
+            }
+
+            var query = new Query(this, CommandCode.Search);
+            var parameters = new SearchParameters
+            {
+                Database = Database,
+                Expression = expression,
+                FirstRecord = 0
+            };
+            parameters.Encode(this, query);
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null)
+                || !response.CheckReturnCode())
+            {
+                return -1;
+            }
+
+            return response.ReadInteger();
+        } // method SearchCountAsync
 
         #endregion
 

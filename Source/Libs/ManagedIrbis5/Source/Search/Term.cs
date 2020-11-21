@@ -16,17 +16,20 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Text;
 
+using ManagedIrbis.Infrastructure;
+
 #endregion
 
 #nullable enable
 
-namespace AM
+namespace ManagedIrbis
 {
     /// <summary>
     /// Термин в поисковом словаре.
@@ -49,6 +52,46 @@ namespace AM
 
         #region Public methods
 
+        /// <summary>
+        /// Разбор ответа сервера.
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public static Term[] Parse
+            (
+                Response response
+            )
+        {
+            var result = new List<Term>();
+            while (!response.EOT)
+            {
+                var line = response.ReadUtf();
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+
+                var parts = line.Split('#', 2);
+                var item = new Term
+                {
+                    Count = int.Parse(parts[0]),
+                    Text = parts.Length == 2 ? parts[1] : string.Empty
+                };
+                result.Add(item);
+            }
+
+            return result.ToArray();
+        }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="Object.ToString"/>
+        public override string ToString()
+        {
+            return $"{Count}#{Text}";
+        }
 
         #endregion
     }

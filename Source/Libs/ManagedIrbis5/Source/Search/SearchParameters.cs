@@ -15,14 +15,15 @@
 
 #region Using directives
 
-using ManagedIrbis;
+using AM;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
 
 #nullable enable
 
-namespace AM
+namespace ManagedIrbis
 {
     /// <summary>
     /// Параметры поискового запроса.
@@ -83,8 +84,8 @@ namespace AM
         /// <summary>
         /// Кодирование параметров поиска для клиентского запроса.
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="query"></param>
+        /// <param name="connection">Ссылка на подключение к серверу.</param>
+        /// <param name="query">Клиентский запрос.</param>
         public void Encode
             (
                 Connection connection,

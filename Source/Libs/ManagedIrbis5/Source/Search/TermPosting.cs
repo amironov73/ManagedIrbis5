@@ -16,17 +16,15 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Text;
+using System.Collections.Generic;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
 #nullable enable
 
-namespace AM
+namespace ManagedIrbis
 {
     /// <summary>
     /// Постинг термина.
@@ -64,6 +62,54 @@ namespace AM
 
         #region Public methods
 
+        /// <summary>
+        /// Разбор ответа сервера.
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        public static TermPosting[] Parse
+            (
+                Response response
+            )
+        {
+            var result = new List<TermPosting>();
+            while (!response.EOT)
+            {
+                var line = response.ReadUtf();
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+
+                var parts = line.Split('#', 5);
+                if (parts.Length < 4)
+                {
+                    break;
+                }
+
+                var item = new TermPosting
+                {
+                    Mfn = int.Parse(parts[0]),
+                    Tag = int.Parse(parts[1]),
+                    Occurrence = int.Parse(parts[2]),
+                    Count = int.Parse(parts[3]),
+                    Text = parts.Length == 5 ? parts[4] : string.Empty
+                };
+                result.Add(item);
+            }
+
+            return result.ToArray();
+        }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="Object.ToString" />
+        public override string ToString()
+        {
+            return $"{Mfn}#{Tag}#{Occurrence}#{Count}#{Text}";
+        }
 
         #endregion
     }

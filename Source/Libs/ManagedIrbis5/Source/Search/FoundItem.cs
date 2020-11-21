@@ -24,7 +24,7 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace AM
+namespace ManagedIrbis
 {
     /// <summary>
     /// Одна строка в ответе сервера на поисковый запрос.
