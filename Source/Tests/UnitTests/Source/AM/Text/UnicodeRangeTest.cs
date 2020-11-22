@@ -84,7 +84,6 @@ namespace UnitTests.AM.Text
         }
 
         /*
-
         [TestMethod]
         public void UnicodeRange_ToJson_1()
         {
@@ -104,7 +103,6 @@ namespace UnitTests.AM.Text
             range = _GetRange();
             Assert.AreEqual("<range name=\"Lower Latin\" from=\"97\" to=\"122\" />", XmlUtility.SerializeShort(range));
         }
-
         */
 
         [TestMethod]

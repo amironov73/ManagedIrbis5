@@ -104,21 +104,21 @@ namespace UnitTests.AM.Text
             Assert.AreEqual(first.Position, second.Position);
         }
 
-        // [TestMethod]
-        // public void TextNavigator_FromFile_1()
-        // {
-        //     string fileName = Path.Combine(TestDataPath, "record.txt");
-        //     TextNavigator navigator = TextNavigator.FromFile(fileName);
-        //     Assert.AreEqual('#', navigator.ReadChar());
-        // }
+        [TestMethod]
+        public void TextNavigator_FromFile_1()
+        {
+            string fileName = Path.Combine(TestDataPath, "record.txt");
+            TextNavigator navigator = TextNavigator.FromFile(fileName);
+            Assert.AreEqual('#', navigator.ReadChar());
+        }
 
-        // [TestMethod]
-        // public void TextNavigator_FromFile_2()
-        // {
-        //     string fileName = Path.Combine(TestDataPath, "record.txt");
-        //     TextNavigator navigator = TextNavigator.FromFile(fileName, Encoding.UTF8);
-        //     Assert.AreEqual('#', navigator.ReadChar());
-        // }
+        [TestMethod]
+        public void TextNavigator_FromFile_2()
+        {
+            string fileName = Path.Combine(TestDataPath, "record.txt");
+            TextNavigator navigator = TextNavigator.FromFile(fileName, Encoding.UTF8);
+            Assert.AreEqual('#', navigator.ReadChar());
+        }
 
         [TestMethod]
         public void TextNavigator_GetRemainingText_1()
