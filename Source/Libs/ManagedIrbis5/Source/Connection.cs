@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
@@ -23,8 +24,11 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AM;
 using AM.Collections;
+using AM.IO;
+using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
@@ -39,7 +43,8 @@ namespace ManagedIrbis
     /// Подключение к серверу ИРБИС64.
     /// </summary>
     public sealed class Connection
-        : IDisposable
+        : IDisposable,
+        IHandmadeSerializable
     {
         #region Events
 
@@ -774,6 +779,61 @@ namespace ManagedIrbis
             }
         } // method ParseConnectionString
 
+        public async Task<Term[]> ReadAllTermsAsync
+        (
+            string prefix
+        )
+        {
+            if (!CheckConnection())
+            {
+                return Array.Empty<Term>();
+            }
+
+            prefix = prefix.ToUpperInvariant();
+            var result = new LocalList<Term>();
+            var startTerm = prefix;
+            var flag = true;
+            while (flag)
+            {
+                var terms = await ReadTermsAsync(startTerm, 1024);
+                if (terms.Length == 0)
+                {
+                    break;
+                }
+
+                int startIndex = 0;
+                if (result.Count != 0)
+                {
+                    var lastTerm = result[^1];
+                    var firstTerm = terms[0];
+                    if (firstTerm.Text == lastTerm.Text)
+                    {
+                        startIndex = 1;
+                    }
+                }
+
+                for (var i = startIndex; i < terms.Length; i++)
+                {
+                    var term = terms[i];
+                    var text = term.Text;
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        break;
+                    }
+
+                    if (!text.StartsWith(prefix))
+                    {
+                        flag = false;
+                        break;
+                    }
+
+                    result.Add(term);
+                }
+            }
+
+            return result.ToArray();
+        } // method ReadAllTermsAsync
+
         /// <summary>
         /// Чтение библиографической записи с сервера.
         /// </summary>
@@ -950,6 +1010,72 @@ namespace ManagedIrbis
             return result;
         } // method ReadTextFileAsync
 
+        public Task<bool> ReloadDictionaryAsync
+            (
+                string? database = default
+            )
+        {
+            throw new NotImplementedException();
+        } // method ReloadDictionaryAsync
+
+        public Task<bool> ReloadMasterFileAsync
+            (
+                string? database = default
+            )
+        {
+            throw new NotImplementedException();
+        } // method ReloadMasterFileAsync
+
+        /// <summary>
+        /// Перезапуск сервера.
+        /// </summary>
+        /// <returns></returns>
+        public Task<bool> RestartServerAsync()
+        {
+            throw new NotImplementedException();
+        } // method RestartServerAsync
+
+        /// <summary>
+        /// Восстановление ранее прикрытого с помощью <see cref="Suspend"/>
+        /// соединения.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public static Connection Restore
+            (
+                string state
+            )
+        {
+            throw new NotImplementedException();
+
+            /*
+            ConnectionSettings settings = ConnectionSettings.Decrypt(state);
+
+            if (ReferenceEquals(settings, null))
+            {
+                throw new IrbisException
+                (
+                    "Decrypted state is null"
+                );
+            }
+
+            var result = new IrbisConnection();
+            settings.ApplyToConnection(result);
+
+            return result;
+            */
+        } // method Restore
+
+        /// <summary>
+        /// Восстановление флага подключения, ранее погашенного
+        /// при помощи <see cref="Suspend"/>.
+        /// </summary>
+        public void Rise()
+        {
+            throw new NotImplementedException();
+        } // method Rise
+
+
         /// <summary>
         /// Расширенный поиск.
         /// </summary>
@@ -1043,6 +1169,170 @@ namespace ManagedIrbis
             return response.ReadInteger();
         } // method SearchCountAsync
 
+        public Task<Record[]> SearchReadAsync
+            (
+                string expression,
+                int limit = 0
+            )
+        {
+            throw new NotImplementedException();
+        } // method SearchReadAsync
+
+        public Task<Record?> SearchSingleRecordAsync
+            (
+                string expression
+            )
+        {
+            throw new NotImplementedException();
+        } // method SearchSingleRecordAsync
+
+        /// <summary>
+        /// Временно "закрывает" соединение с сервером
+        /// (на самом деле соединение не разрывается)
+        /// и сериализует его состояние в строку
+        /// с возможностью последующего восстановления.
+        /// </summary>
+        /// <returns></returns>
+        public string Suspend()
+        {
+            throw new NotImplementedException();
+        } // method Suspend
+
+        public Task<bool> TruncateDatabaseAsync
+            (
+                string? database = default
+            )
+        {
+            throw new NotImplementedException();
+        } // method TruncateDatabaseAsync
+
+        public Task<bool> UnlockDatabaseAsync
+            (
+                string? database = default
+            )
+        {
+            throw new NotImplementedException();
+        } // method UnlockDatabaseAsync
+
+        public Task<bool> UnlockRecordsAsync
+            (
+                string? database,
+                params int[] mfnList
+            )
+        {
+            throw new NotImplementedException();
+        } // method UnlockRecordsAsync
+
+        public Task<bool> UpdateIniFileAsync
+            (
+                IEnumerable<string> lines
+            )
+        {
+            throw new NotImplementedException();
+        } // method UpdateIniFileAsync
+
+        public Task<bool> UpdateUserListAsync
+            (
+                IEnumerable<UserInfo> userList
+            )
+        {
+            throw new NotImplementedException();
+        } // method UpdateUserListAsync
+
+        public Task<Record> WriteRecordAsync
+            (
+                Record record,
+                bool lockFlag = false,
+                bool actualize = true
+            )
+        {
+            throw new NotImplementedException();
+        } // method WriteRecordAsync
+
+        public Task<Record[]> WriteRecordsAsync
+            (
+                Record[] records,
+                bool lockFlag = false,
+                bool actualize = true
+            )
+        {
+            throw new NotImplementedException();
+        } // method WriteRecordsAsync
+
+        public async Task<bool> WriteTextFileAsync
+            (
+                params FileSpecification[] specifications
+            )
+        {
+            if (!CheckConnection())
+            {
+                return false;
+            }
+
+            var query = new Query(this, CommandCode.ReadDocument);
+            foreach (var specification in specifications)
+            {
+                query.AddAnsi(specification.ToString());
+            }
+            var response = await ExecuteAsync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return false;
+            }
+
+            throw new NotImplementedException();
+        } // method WriteTextFileAsync
+
+        #endregion
+
+        #region IHandmadeSerializable members
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Host = reader.ReadNullableString()
+                .ThrowIfNull("Host");
+            Port = (ushort) reader.ReadPackedInt32();
+
+            var username = reader.ReadNullableString();
+            if (!string.IsNullOrEmpty(username))
+            {
+                Username = username;
+            }
+
+            var password = reader.ReadNullableString();
+            if (!ReferenceEquals(password, null))
+            {
+                Password = password;
+            }
+
+            Database = reader.ReadNullableString()
+                .ThrowIfNull("Database");
+
+            var workstation = reader.ReadNullableString();
+            if (!string.IsNullOrEmpty(workstation))
+            {
+                Workstation = workstation;
+            }
+        } // method RestoreFromStream
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            writer
+                .WriteNullable(Host)
+                .WritePackedInt32(Port)
+                .WriteNullable(Username)
+                .WriteNullable(Password)
+                .WriteNullable(Database)
+                .WriteNullable(Workstation);
+        } // method SaveTiStream
+
         #endregion
 
         #region IDisposable members
@@ -1055,6 +1345,18 @@ namespace ManagedIrbis
                 DisconnectAsync().GetAwaiter().GetResult();
             }
         }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="Object.ToString" />
+        public override string ToString()
+        {
+            var status = Connected ? "[*]" : "[]";
+
+            return $"{Host} {Database} {Username} {status}";
+        } // method ToString
 
         #endregion
 

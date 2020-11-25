@@ -20,7 +20,7 @@ using System;
 using System.Threading.Tasks;
 
 using ManagedIrbis;
-using Microsoft.VisualBasic;
+
 using static System.Console;
 
 #endregion
@@ -48,7 +48,7 @@ internal class Program
             var success = await connection.ConnectAsync();
             if (!success)
             {
-                Error.WriteLine("Can't connect");
+                await Error.WriteLineAsync("Can't connect");
                 return 1;
             }
 
