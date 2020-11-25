@@ -20,6 +20,7 @@ using System;
 using System.Threading.Tasks;
 
 using ManagedIrbis;
+using ManagedIrbis.Infrastructure;
 
 using static System.Console;
 

@@ -15,17 +15,7 @@
 
 #region Using directives
 
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml;
-using AM.PlatformAbstraction;
 
 #endregion
 

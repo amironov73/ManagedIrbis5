@@ -1,24 +1,19 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
 /* XmlNamespaces.cs -- some well known XML namespaces
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
-
-#region Using directives
-
-using JetBrains.Annotations;
-
-#endregion
 
 namespace AM.Xml
 {
     /// <summary>
     /// Some well known XML namespaces.
     /// </summary>
-    [PublicAPI]
     public static class XmlNamespaces
     {
         #region Constants
@@ -26,8 +21,7 @@ namespace AM.Xml
         /// <summary>
         /// Msbuild.exe
         /// </summary>
-        public const string Msbuild =
-            "http://schemas.microsoft.com/developer/msbuild/2003";
+        public const string Msbuild = "http://schemas.microsoft.com/developer/msbuild/2003";
 
         /// <summary>
         /// Msdata.

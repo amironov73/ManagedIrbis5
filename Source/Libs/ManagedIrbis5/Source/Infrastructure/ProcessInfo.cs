@@ -17,13 +17,11 @@
 
 using AM.Collections;
 
-using ManagedIrbis.Infrastructure;
-
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis.Infrastructure
 {
     /// <summary>
     /// Информация о процессе на сервере ИРБИС64.
