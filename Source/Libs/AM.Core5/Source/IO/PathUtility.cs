@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -33,7 +32,7 @@ namespace AM.IO
     {
         #region Private members
 
-        private static string _backslash
+        private static readonly string _backslash
             = new string(Path.DirectorySeparatorChar, 1);
 
         #endregion
@@ -57,7 +56,7 @@ namespace AM.IO
             var result = ConvertSlashes(path);
             if (!result.EndsWith(_backslash))
             {
-                result = result + _backslash;
+                result += _backslash;
             }
 
             return result;

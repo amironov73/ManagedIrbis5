@@ -44,7 +44,8 @@ namespace ManagedIrbis
     /// </summary>
     public sealed class Connection
         : IDisposable,
-        IHandmadeSerializable
+        IHandmadeSerializable,
+        IIrbisConnection
     {
         #region Events
 

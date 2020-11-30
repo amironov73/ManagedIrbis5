@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
+
+using AM.IO;
 
 //using ManagedIrbis;
 //using ManagedIrbis.Client;
@@ -11,6 +12,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 namespace UnitTests.Common
 {
@@ -28,14 +31,9 @@ namespace UnitTests.Common
         {
             get
             {
-                var assembly = typeof(CommonUnitTest).Assembly;
-                var codeBase = assembly.Location;
-                var uri = new UriBuilder(codeBase!);
-                var asmPath = Uri.UnescapeDataString(uri.Path);
-                var result = Path.GetDirectoryName(asmPath);
-                Assert.IsNotNull(result, "UnitTestDllPath");
+                var result = AppContext.BaseDirectory;
 
-                return result!;
+                return result;
             }
         }
 

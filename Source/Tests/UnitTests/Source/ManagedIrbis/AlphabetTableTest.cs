@@ -8,7 +8,7 @@ using ManagedIrbis.Infrastructure;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-//using Moq;
+using Moq;
 
 #nullable enable
 
@@ -19,7 +19,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis
 {
     [TestClass]
-    public class IrbisAlphabetTableTest
+    public class AlphabetTableTest
         : Common.CommonUnitTest
     {
         private AlphabetTable _GetTable()
@@ -37,14 +37,14 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_Construction_1()
+        public void AlphabetTable_Construction_1()
         {
             var table = new AlphabetTable();
             Assert.AreEqual(182, table.Characters.Length);
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_Construction_2()
+        public void AlphabetTable_Construction_2()
         {
             var encoding = IrbisEncoding.Ansi;
             byte[] bytes =
@@ -75,7 +75,7 @@ namespace UnitTests.ManagedIrbis
 
         /*
         [TestMethod]
-        public void IrbisAlphabetTable_Construction_3()
+        public void AlphabetTable_Construction_3()
         {
             string fileName = Path.Combine
                 (
@@ -88,7 +88,7 @@ namespace UnitTests.ManagedIrbis
                 .Returns(text);
 
             IIrbisConnection connection = mock.Object;
-            IrbisAlphabetTable table = new IrbisAlphabetTable(connection);
+            AlphabetTable table = new AlphabetTable(connection);
             Assert.AreEqual(182, table.Characters.Length);
 
             mock.Verify
@@ -99,7 +99,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_Construction_4()
+        public void AlphabetTable_Construction_4()
         {
             string fileName = Path.Combine
                 (
@@ -128,14 +128,14 @@ namespace UnitTests.ManagedIrbis
         */
 
         [TestMethod]
-        public void IrbisAlphabetTable_ParseLocalFile_1()
+        public void AlphabetTable_ParseLocalFile_1()
         {
             var table = _GetTable();
             Assert.AreEqual(182, table.Characters.Length);
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_ParseText_1()
+        public void AlphabetTable_ParseText_1()
         {
             var text = "001 002 003";
             TextReader reader = new StringReader(text);
@@ -145,7 +145,7 @@ namespace UnitTests.ManagedIrbis
 
         [TestMethod]
         [ExpectedException(typeof(IrbisException))]
-        public void IrbisAlphabetTable_ParseText_2()
+        public void AlphabetTable_ParseText_2()
         {
             var text = "wrong file";
             TextReader reader = new StringReader(text);
@@ -155,7 +155,7 @@ namespace UnitTests.ManagedIrbis
 
         [TestMethod]
         [ExpectedException(typeof(IrbisException))]
-        public void IrbisAlphabetTable_ParseText_3()
+        public void AlphabetTable_ParseText_3()
         {
             var text = "   ";
             TextReader reader = new StringReader(text);
@@ -164,13 +164,13 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_ResetInstance_1()
+        public void AlphabetTable_ResetInstance_1()
         {
             AlphabetTable.ResetInstance();
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_SplitWords_1()
+        public void AlphabetTable_SplitWords_1()
         {
             var table = _GetTable();
             const string text = "Hello, world! Съешь ещё(этих)мягких "
@@ -191,7 +191,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_SplitWords_2()
+        public void AlphabetTable_SplitWords_2()
         {
             var table = _GetTable();
             const string text = "Hello, world";
@@ -202,7 +202,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_SplitWords_3()
+        public void AlphabetTable_SplitWords_3()
         {
             var table = _GetTable();
             var words = table.SplitWords(null);
@@ -213,7 +213,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_TrimText_1()
+        public void AlphabetTable_TrimText_1()
         {
             var table = _GetTable();
 
@@ -231,7 +231,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_ToSourceCode_1()
+        public void AlphabetTable_ToSourceCode_1()
         {
             var table = _GetTable();
             var writer = new StringWriter();
@@ -241,7 +241,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_ToSourceCode_2()
+        public void AlphabetTable_ToSourceCode_2()
         {
             byte[] bytes = {0x10, 0x11, 0x12};
             var table = new AlphabetTable(IrbisEncoding.Ansi, bytes);
@@ -252,7 +252,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_Serialize_1()
+        public void AlphabetTable_Serialize_1()
         {
             var table1 = _GetTable();
 
@@ -278,7 +278,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_WriteTable_1()
+        public void AlphabetTable_WriteTable_1()
         {
             var table = _GetTable();
             var writer = new StringWriter();
@@ -296,7 +296,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_WriteLocalFile_1()
+        public void AlphabetTable_WriteLocalFile_1()
         {
             var fileName = Path.GetTempFileName();
             var table = _GetTable();
@@ -315,14 +315,14 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_Verify_1()
+        public void AlphabetTable_Verify_1()
         {
             var table = _GetTable();
             Assert.IsTrue(table.Verify(false));
         }
 
         [TestMethod]
-        public void IrbisAlphabetTable_Verify_2()
+        public void AlphabetTable_Verify_2()
         {
             var encoding = IrbisEncoding.Ansi;
             byte[] bytes =
@@ -353,12 +353,12 @@ namespace UnitTests.ManagedIrbis
 
         /*
         [TestMethod]
-        public void IrbisAlphabetTable_GetInstance_1()
+        public void AlphabetTable_GetInstance_1()
         {
             string fileName = Path.Combine
                 (
                     TestDataPath,
-                    IrbisAlphabetTable.FileName
+                    AlphabetTable.DefaultFileName
                 );
             string text = File.ReadAllText(fileName);
             Mock<IIrbisConnection> mock = new Mock<IIrbisConnection>();
@@ -366,10 +366,10 @@ namespace UnitTests.ManagedIrbis
                 .Returns(text);
 
             IIrbisConnection connection = mock.Object;
-            IrbisAlphabetTable table1 = IrbisAlphabetTable.GetInstance(connection);
+            var table1 = AlphabetTable.GetInstance(connection);
             Assert.AreEqual(182, table1.Characters.Length);
 
-            IrbisAlphabetTable table2 = IrbisAlphabetTable.GetInstance(connection);
+            var table2 = AlphabetTable.GetInstance(connection);
             Assert.AreSame(table1, table2);
 
             mock.Verify

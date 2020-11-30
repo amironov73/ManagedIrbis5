@@ -29,7 +29,7 @@ namespace AM.Runtime
         /// <summary>
         /// Restore the object from a stream.
         /// </summary>
-        void RestoreFromStream
+        public void RestoreFromStream
         (
             BinaryReader reader
         );
@@ -37,7 +37,7 @@ namespace AM.Runtime
         /// <summary>
         /// Store the object to a stream.
         /// </summary>
-        void SaveToStream
+        public void SaveToStream
         (
             BinaryWriter writer
         );
