@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using AM.Collections;
 
 #endregion
@@ -93,7 +94,7 @@ namespace ManagedIrbis.Infrastructure
             )
         {
             var lines = response.ReadRemainingAnsiLines();
-            var result = new LocalList<ProcessInfo>();
+            var result = new List<ProcessInfo>();
             var processCount = int.Parse(lines[0]);
             var linesPerProcess = int.Parse(lines[1]);
             if (processCount == 0 || linesPerProcess == 0)

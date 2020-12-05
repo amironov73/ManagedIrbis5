@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -173,7 +174,7 @@ namespace ManagedIrbis.Infrastructure
         {
             // Sure.NotNull(response, nameof(response));
 
-            var result = new LocalList<UserInfo>();
+            var result = new List<UserInfo>();
             response.ReadAnsiStrings(2);
             while (true)
             {

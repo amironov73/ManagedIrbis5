@@ -636,7 +636,7 @@ namespace ManagedIrbis
             }
 
             var lines = response.ReadRemainingAnsiLines();
-            var result = new LocalList<string>();
+            var result = new List<string>();
             foreach (var line in lines)
             {
                 var files = IrbisText.SplitIrbisToLines(line);
@@ -781,9 +781,9 @@ namespace ManagedIrbis
         } // method ParseConnectionString
 
         public async Task<Term[]> ReadAllTermsAsync
-        (
-            string prefix
-        )
+            (
+                string prefix
+            )
         {
             if (!CheckConnection())
             {
@@ -791,7 +791,7 @@ namespace ManagedIrbis
             }
 
             prefix = prefix.ToUpperInvariant();
-            var result = new LocalList<Term>();
+            var result = new List<Term>();
             var startTerm = prefix;
             var flag = true;
             while (flag)

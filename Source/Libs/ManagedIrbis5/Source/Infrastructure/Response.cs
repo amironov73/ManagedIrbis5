@@ -376,9 +376,9 @@ namespace ManagedIrbis.Infrastructure
                 int count
             )
         {
-            //Sure.Positive(count, nameof(count));
+            Sure.Positive(count, nameof(count));
 
-            var result = new LocalList<string>(count);
+            var result = new List<string>(count);
             for (var i = 0; i < count; i++)
             {
                 var line = ReadAnsi();
@@ -386,6 +386,7 @@ namespace ManagedIrbis.Infrastructure
                 {
                     return null;
                 }
+
                 result.Add(line);
             }
 
@@ -403,9 +404,9 @@ namespace ManagedIrbis.Infrastructure
                 int count
             )
         {
-            // Sure.Positive(count, nameof(count));
+            Sure.Positive(count, nameof(count));
 
-            var result = new LocalList<string>(count);
+            var result = new List<string>(count);
             int index = 0;
             string line;
             for (; index < 1; index++)

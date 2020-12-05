@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 
 #endregion
@@ -28,28 +29,38 @@ namespace AM.Collections
     /// A fairly simple dynamic list implemented as a value type
     /// to reduce memory allocations.
     /// </summary>
-    public struct LocalList<T>
+    public ref struct LocalList<T>
+        where T : IEquatable<T>
     {
         #region Private members
 
-        private const int InitialCapacity = 4;
-
-        private T[]? _array;
+        private T[]? _arrayFromPool;
+        private Span<T> _array;
         private int _size;
 
         private void _Extend(int newSize)
         {
-            var newArray = new T[newSize];
-            _array?.CopyTo(newArray, 0);
+            var newArray = ArrayPool<T>.Shared.Rent(newSize);
+            _array.CopyTo(newArray);
+            if (_arrayFromPool is not null)
+            {
+                ArrayPool<T>.Shared.Return(_arrayFromPool);
+            }
 
+            _arrayFromPool = newArray;
             _array = newArray;
         }
 
         private void _GrowAsNeeded()
         {
-            if (_size >= _array!.Length)
+            if (_size >= _array.Length)
             {
-                _Extend(_size * 2);
+                var newSize = _size * 2;
+                if (newSize < 4)
+                {
+                    newSize = 4;
+                }
+                _Extend(newSize);
             }
         }
 
@@ -62,16 +73,13 @@ namespace AM.Collections
         /// </summary>
         public LocalList
             (
-                int capacity
+                Span<T> initialSpan
             )
             : this()
         {
-            // Sure.Positive(capacity, nameof(capacity));
-
-            if (capacity > 0)
-            {
-                _Extend(capacity);
-            }
+            //_arrayFromPool = null;
+            //_size = 0;
+            _array = initialSpan;
         }
 
         #endregion
@@ -79,12 +87,9 @@ namespace AM.Collections
         #region Public methods
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
-        public IEnumerator<T> GetEnumerator()
+        public Span<T>.Enumerator GetEnumerator()
         {
-            for (var i = 0; i < _size; i++)
-            {
-                yield return _array![i];
-            }
+            return _array.Slice(0, _size).GetEnumerator();
         }
 
         /// <inheritdoc cref="ICollection{T}.Add" />
@@ -93,13 +98,8 @@ namespace AM.Collections
                 T item
             )
         {
-            if (ReferenceEquals(_array, null))
-            {
-                _Extend(InitialCapacity);
-            }
-
             _GrowAsNeeded();
-            _array![_size++] = item;
+            _array[_size++] = item;
         }
 
         /// <summary>
@@ -110,15 +110,10 @@ namespace AM.Collections
                 IEnumerable<T> items
             )
         {
-            if (ReferenceEquals(_array, null))
-            {
-                _Extend(InitialCapacity);
-            }
-
             foreach (var item in items)
             {
                 _GrowAsNeeded();
-                _array![_size++] = item;
+                _array[_size++] = item;
             }
         }
 
@@ -134,13 +129,7 @@ namespace AM.Collections
                 T item
             )
         {
-            if (ReferenceEquals(_array, null))
-            {
-                return false;
-            }
-
-            var index = Array.IndexOf(_array, item, 0, _size);
-            return index >= 0;
+            return _array.Slice(0, _size).Contains(item);
         }
 
         /// <inheritdoc cref="ICollection{T}.CopyTo" />
@@ -150,9 +139,9 @@ namespace AM.Collections
                 int arrayIndex
             )
         {
-            if (!ReferenceEquals(_array, null))
+            if (_size != 0)
             {
-                Array.Copy(_array, 0, array, arrayIndex, _size);
+                _array.Slice(0, _size).CopyTo(array.AsSpan().Slice(arrayIndex));
             }
         }
 
@@ -162,19 +151,30 @@ namespace AM.Collections
                 T item
             )
         {
-            var index = IndexOf(item);
-            if (index >= 0)
-            {
-                RemoveAt(index);
+            var result = false;
 
-                return true;
+            while (true)
+            {
+                var index = IndexOf(item);
+                if (index < 0)
+                {
+                    break;
+                }
+
+                RemoveAt(index);
+                result = true;
             }
 
-            return false;
+            return result;
         }
 
         /// <inheritdoc cref="ICollection{T}.Count" />
         public int Count => _size;
+
+        /// <summary>
+        /// Емкость.
+        /// </summary>
+        public int Capacity => _array.Length;
 
         /// <inheritdoc cref="ICollection{T}.IsReadOnly" />
         public bool IsReadOnly => false;
@@ -185,9 +185,7 @@ namespace AM.Collections
                 T item
             )
         {
-            return ReferenceEquals(_array, null)
-                ? -1
-                : Array.IndexOf(_array, item, 0, _size);
+            return _array.Slice(0, _size).IndexOf(item);
         }
 
         /// <inheritdoc cref="IList{T}.Insert" />
@@ -197,27 +195,19 @@ namespace AM.Collections
                 T item
             )
         {
-            if (ReferenceEquals(_array, null))
+            _GrowAsNeeded();
+            if (index != _size)
             {
-                _Extend(InitialCapacity);
+                for (int i = _size - 1; i != index; --i)
+                {
+                    _array[i + 1] = _array[i];
+                }
+
+                _array[index + 1] = _array[index];
             }
 
-            var array = _array!;
-
-            if (_size != 0 && index != _size - 1)
-            {
-                Array.Copy
-                    (
-                        array,
-                        index,
-                        array,
-                        index + 1,
-                        _size - index - 1
-                    );
-            }
-
-            array[index] = item;
-            _size++;
+            _array[index] = item;
+            ++_size;
         }
 
         /// <inheritdoc cref="IList{T}.RemoveAt" />
@@ -226,71 +216,32 @@ namespace AM.Collections
                 int index
             )
         {
-            if (!ReferenceEquals(_array, null))
+            if (index != _size - 1)
             {
-                if (index != _size - 1)
-                {
-                    Array.Copy(_array, index + 1, _array, index, _size - index - 1);
-                }
-
-                _size--;
+                _array.Slice(index + 1, _size - index - 1)
+                    .CopyTo(_array.Slice(index, _size - index));
             }
+
+            --_size;
         }
 
         /// <inheritdoc cref="IList{T}.this" />
         public T this[int index]
         {
-            get
-            {
-                if (ReferenceEquals(_array, null))
-                {
-                    throw new IndexOutOfRangeException();
-                }
-
-                return _array[index];
-            }
-            set
-            {
-                if (ReferenceEquals(_array, null))
-                {
-                    throw new IndexOutOfRangeException();
-                }
-
-                _array[index] = value;
-            }
+            get => _array.Slice(0, _size)[index];
+            set => _array.Slice(0, _size)[index] = value;
         }
 
         /// <summary>
         /// Convert the list to array.
         /// </summary>
-        public T[] ToArray()
-        {
-            if (ReferenceEquals(_array, null) || _size == 0)
-            {
-                return Array.Empty<T>();
-            }
-
-            if (_size == _array.Length)
-            {
-                return _array;
-            }
-
-            var result = new T[_size];
-            Array.Copy(_array, result, _size);
-
-            return result;
-        }
+        public T[] ToArray() => _array.Slice(0, _size).ToArray();
 
         /// <summary>
         /// Convert the list to <see cref="List{T}"/>.
         /// </summary>
         public List<T> ToList()
         {
-            if (ReferenceEquals(_array, null) || _size == 0)
-            {
-                return new List<T>();
-            }
-
             var result = new List<T>(_size);
             for (var i = 0; i < _size; i++)
             {
@@ -298,6 +249,22 @@ namespace AM.Collections
             }
 
             return result;
+        }
+
+        #endregion
+
+        #region IDisposable members
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose()
+        {
+            if (_arrayFromPool is not null)
+            {
+                ArrayPool<T>.Shared.Return(_arrayFromPool);
+                _arrayFromPool = null;
+            }
+
+            _array = Span<T>.Empty;
         }
 
         #endregion
