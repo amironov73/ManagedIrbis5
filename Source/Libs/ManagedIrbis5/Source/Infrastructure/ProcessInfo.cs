@@ -15,7 +15,9 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
+
 using AM.Collections;
 
 #endregion
@@ -28,6 +30,7 @@ namespace ManagedIrbis.Infrastructure
     /// Информация о процессе на сервере ИРБИС64.
     /// </summary>
     public sealed class ProcessInfo
+        : IEquatable<ProcessInfo>
     {
         #region Properties
 
@@ -94,9 +97,9 @@ namespace ManagedIrbis.Infrastructure
             )
         {
             var lines = response.ReadRemainingAnsiLines();
-            var result = new List<ProcessInfo>();
             var processCount = int.Parse(lines[0]);
             var linesPerProcess = int.Parse(lines[1]);
+            var result = new List<ProcessInfo>(processCount);
             if (processCount == 0 || linesPerProcess == 0)
             {
                 return result.ToArray();
@@ -126,6 +129,16 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result.ToArray();
+        }
+
+        #endregion
+
+        #region IEquatable members
+
+        /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+        public bool Equals(ProcessInfo? other)
+        {
+            return Number?.Equals(other?.Number) ?? false;
         }
 
         #endregion

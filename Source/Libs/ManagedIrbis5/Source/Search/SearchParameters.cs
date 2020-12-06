@@ -2,12 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* SearchParameters.cs -- параметры поискового запроса
  * Ars Magna project, http://arsmagna.ru
@@ -15,7 +10,13 @@
 
 #region Using directives
 
+using System.IO;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+
 using AM;
+using AM.IO;
+using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 
@@ -29,57 +30,91 @@ namespace ManagedIrbis
     /// Параметры поискового запроса.
     /// </summary>
     public sealed class SearchParameters
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Database name.
+        /// Имя базы данных.
         /// </summary>
+        [XmlAttribute("database")]
+        [JsonPropertyName("database")]
         public string? Database { get; set; }
 
         /// <summary>
-        /// First record offset.
+        /// Смещение первой записи, которую необходимо вернуть.
+        /// Нумерация с 1.
+        /// По умолчанию 1.
         /// </summary>
+        [XmlAttribute("first")]
+        [JsonPropertyName("first")]
         public int FirstRecord { get; set; } = 1;
 
         /// <summary>
-        /// Format specification.
+        /// Опциональная спецификация формата.
         /// </summary>
+        [XmlAttribute("format")]
+        [JsonPropertyName("format")]
         public string? Format { get; set; }
 
         /// <summary>
-        /// Maximal MFN.
+        /// Максимальный MFN.
+        /// По умолчанию 0 - без ограничения по MFN.
         /// </summary>
+        [XmlAttribute("max")]
+        [JsonPropertyName("max")]
         public int MaxMfn { get; set; }
 
         /// <summary>
-        /// Minimal MFN.
+        /// Минимальный MFN.
+        /// По умолчанию 0 - без ограничения по MFN.
         /// </summary>
+        [XmlAttribute("min")]
+        [JsonPropertyName("min")]
         public int MinMfn { get; set; }
 
         /// <summary>
-        /// Number of records.
+        /// Количество записей, которые необходимо вернуть.
+        /// По умолчанию 0 - максимально возможное
+        /// (ограничение текущей реализации MAX_PACKET).
         /// </summary>
+        [XmlAttribute("records")]
+        [JsonPropertyName("records")]
         public int NumberOfRecords { get; set; }
 
         /// <summary>
-        /// Search query expression.
+        /// Выражение для поиска по словарю.
         /// </summary>
+        [XmlAttribute("expression")]
+        [JsonPropertyName("expression")]
         public string? Expression { get; set; }
 
         /// <summary>
-        /// Specification of sequential search.
+        /// Опциональное выражение для последовательного поиска.
         /// </summary>
+        [XmlAttribute("sequential")]
+        [JsonPropertyName("sequential.")]
         public string? Sequential { get; set; }
 
         /// <summary>
-        /// Specification for local filter.
+        /// Опциональная спецификация для фильтрации на клиенте.
         /// </summary>
+        [XmlAttribute("filter")]
+        [JsonPropertyName("filter")]
         public string? Filter { get; set; }
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Клонирование параметров поиска.
+        /// </summary>
+        public SearchParameters Clone()
+        {
+            return (SearchParameters) MemberwiseClone();
+        }
 
         /// <summary>
         /// Кодирование параметров поиска для клиентского запроса.
@@ -103,6 +138,80 @@ namespace ManagedIrbis
                 .Add(MinMfn)
                 .Add(MaxMfn)
                 .AddAnsi(Sequential);
+        }
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Database = reader.ReadNullableString();
+            FirstRecord = reader.ReadPackedInt32();
+            Format = reader.ReadNullableString();
+            MaxMfn = reader.ReadPackedInt32();
+            MinMfn = reader.ReadPackedInt32();
+            NumberOfRecords = reader.ReadPackedInt32();
+            Expression = reader.ReadNullableString();
+            Sequential = reader.ReadNullableString();
+            Filter = reader.ReadNullableString();
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull(writer, nameof(writer));
+
+            writer
+                .WriteNullable(Database)
+                .WritePackedInt32(FirstRecord)
+                .WriteNullable(Format)
+                .WritePackedInt32(MaxMfn)
+                .WritePackedInt32(MinMfn)
+                .WritePackedInt32(NumberOfRecords)
+                .WriteNullable(Expression)
+                .WriteNullable(Sequential)
+                .WriteNullable(Filter);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc />
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier
+                = new Verifier<SearchParameters>(this, throwOnError);
+
+            verifier.Assert
+                (
+                    !string.IsNullOrWhiteSpace(Expression)
+                    || !string.IsNullOrWhiteSpace(Sequential),
+                    "Expression and Sequential"
+                );
+
+            return verifier.Result;
+        }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString()
+        {
+            return (Expression ?? Sequential).ToVisibleString();
         }
 
         #endregion

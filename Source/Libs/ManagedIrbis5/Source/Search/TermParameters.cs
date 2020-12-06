@@ -15,14 +15,13 @@
 
 #region Using directives
 
-using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.IO;
-using System.Text;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 using AM;
+using AM.IO;
+using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 
@@ -35,38 +34,61 @@ namespace ManagedIrbis
     /// <summary>
     /// Параметры запроса терминов.
     /// </summary>
+    [XmlRoot("terms")]
     public sealed class TermParameters
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Database name.
+        /// Имя базы данных.
         /// </summary>
+        [XmlAttribute("database")]
+        [JsonPropertyName("database")]
         public string? Database { get; set; }
 
         /// <summary>
-        /// Number of terms to return.
+        /// Количество терминов, которое необходимо вернуть.
+        /// По умолчанию 0 - максимально возможное.
+        /// Ограничение текущей реализации MAX_PACKET.
         /// </summary>
+        [XmlAttribute("number")]
+        [JsonPropertyName("number")]
         public int NumberOfTerms { get; set; }
 
         /// <summary>
-        /// Reverse order?
+        /// Термины в обратном порядке?
         /// </summary>
+        [XmlAttribute("reverse")]
+        [JsonPropertyName("reverse")]
         public bool ReverseOrder { get; set; }
 
         /// <summary>
-        /// Start term.
+        /// Стартовый термин.
         /// </summary>
+        [XmlAttribute("start")]
+        [JsonPropertyName("start")]
         public string? StartTerm { get; set; }
 
         /// <summary>
-        /// Format.
+        /// Опциональная спецификация формата.
         /// </summary>
+        [XmlAttribute("format")]
+        [JsonPropertyName("format")]
         public string? Format { get; set; }
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Клонирование параметров.
+        /// </summary>
+        public TermParameters Clone()
+        {
+            return (TermParameters) MemberwiseClone();
+        }
 
         /// <summary>
         /// Кодирование параметров постингов для клиентского запроса.
@@ -86,6 +108,69 @@ namespace ManagedIrbis
                 .AddUtf(StartTerm)
                 .Add(NumberOfTerms)
                 .AddFormat(Format);
+        }
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Database = reader.ReadNullableString();
+            NumberOfTerms = reader.ReadPackedInt32();
+            StartTerm = reader.ReadNullableString();
+            Format = reader.ReadNullableString();
+            ReverseOrder = reader.ReadBoolean();
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            writer
+                .WriteNullable(Database)
+                .WritePackedInt32(NumberOfTerms)
+                .WriteNullable(StartTerm)
+                .WriteNullable(Format)
+                .Write(ReverseOrder);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc />
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<TermParameters>
+                (
+                    this,
+                    throwOnError
+                );
+
+            /* Тут что-то надо делать? */
+
+            return verifier.Result;
+        }
+
+        #endregion
+
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString()
+        {
+            return StartTerm.ToVisibleString();
         }
 
         #endregion
