@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -1110,6 +1111,35 @@ namespace AM
                     "F0",
                     CultureInfo.InvariantCulture
                 );
+        }
+
+        /// <summary>
+        /// Mangle given text with the escape character.
+        /// </summary>
+        public static string? Mangle
+            (
+                string? text,
+                char escape,
+                char[] badCharacters
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
+            var result = new StringBuilder(text.Length);
+            foreach (char c in text)
+            {
+                if (badCharacters.Contains(c) || c == escape)
+                {
+                    result.Append(escape);
+                }
+
+                result.Append(c);
+            }
+
+            return result.ToString();
         }
 
         #endregion

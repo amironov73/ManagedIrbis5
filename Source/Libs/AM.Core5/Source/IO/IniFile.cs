@@ -394,30 +394,6 @@ namespace AM.IO
                     string key,
                     T? defaultValue
                 )
-                where T: class
-            {
-                Sure.NotNullNorEmpty(key, nameof(key));
-
-                string? value = GetValue(key, null);
-                if (string.IsNullOrEmpty(value))
-                {
-                    return defaultValue;
-                }
-
-                T result = Utility.ConvertTo<T>(value);
-
-                return result;
-            }
-
-            /// <summary>
-            /// Get value associated with given key.
-            /// </summary>
-            public T? GetValue<T>
-                (
-                    string key,
-                    T? defaultValue
-                )
-                where T: struct
             {
                 Sure.NotNullNorEmpty(key, nameof(key));
 
@@ -919,26 +895,6 @@ namespace AM.IO
                 string keyName,
                 T? defaultValue
             )
-            where T: class
-        {
-            var section = GetSection(sectionName);
-            var result = ReferenceEquals(section, null)
-                ? defaultValue
-                : section.GetValue(keyName, defaultValue);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Get value from the given section and key.
-        /// </summary>
-        public T? GetValue<T>
-            (
-                string sectionName,
-                string keyName,
-                T? defaultValue
-            )
-            where T: struct
         {
             var section = GetSection(sectionName);
             var result = ReferenceEquals(section, null)
