@@ -120,8 +120,7 @@ namespace AM.Parameters
         /// <summary>
         /// Get the parameter with specified name.
         /// </summary>
-#nullable disable
-        public static T GetParameter<T>
+        public static T? GetParameter<T>
             (
                 this Parameter[] parameters,
                 string name,
@@ -151,7 +150,6 @@ namespace AM.Parameters
         {
             return GetParameter(parameters, name, default(T));
         }
-#nullable restore
 
         /// <summary>
         /// Parse specified string.

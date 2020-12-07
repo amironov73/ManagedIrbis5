@@ -16,15 +16,11 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
 using System.Text;
 
 using AM;
 
-using ManagedIrbis5.Properties;
+using ManagedIrbis.Properties;
 
 using CM=System.Configuration.ConfigurationManager;
 
@@ -130,7 +126,7 @@ namespace ManagedIrbis.Infrastructure
                 string key
             )
         {
-            // Sure.NotNullNorEmpty(key, nameof(key));
+            Sure.NotNullNorEmpty(key, nameof(key));
 
             var name = CM.AppSettings[key];
             var result = ByName(name);

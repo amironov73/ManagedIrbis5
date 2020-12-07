@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ManagedIrbis5.Properties {
+namespace ManagedIrbis.Properties {
     using System;
     
     

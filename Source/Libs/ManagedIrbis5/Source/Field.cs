@@ -48,7 +48,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Список подполей.
         /// </summary>
-        public List<SubField> Subfields { get; } = new List<SubField> ();
+        public List<SubField> Subfields { get; } = new ();
 
         #endregion
 
@@ -130,8 +130,18 @@ namespace ManagedIrbis
             var index = line.IndexOf('#');
             Tag = int.Parse(line.Slice(0, index));
             line = line.Slice(index + 1);
+            DecodeBody(line);
+        } // method Decode
 
-            index = line.IndexOf('^');
+        /// <summary>
+        /// Декодирование тела поля.
+        /// </summary>
+        public void DecodeBody
+            (
+                ReadOnlySpan<char> line
+            )
+        {
+            var index = line.IndexOf('^');
             if (index < 0)
             {
                 Value = line.ToString();
@@ -156,7 +166,7 @@ namespace ManagedIrbis
                 Add(line[0], line.Slice(1, index - 1).ToString());
                 line = line.Slice(index + 1);
             }
-        } // method Decode
+        } // method DecodeBody
 
         /// <summary>
         /// Получение первого подполя с указанным кодом.

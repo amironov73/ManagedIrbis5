@@ -61,7 +61,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Список полей.
         /// </summary>
-        public List<Field> Fields { get; } = new List<Field>( );
+        public List<Field> Fields { get; } = new ();
 
         /// <summary>
         /// Описание в произвольной форме (опциональное).
@@ -84,7 +84,8 @@ namespace ManagedIrbis
                 string? value = null
             )
         {
-            var result = new Field { Tag = tag, Value = value };
+            var result = new Field {Tag = tag};
+            result.DecodeBody(value);
             Fields.Add(result);
 
             return result;

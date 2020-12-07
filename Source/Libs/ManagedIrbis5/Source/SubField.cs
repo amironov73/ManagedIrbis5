@@ -28,6 +28,19 @@ namespace ManagedIrbis
     /// </summary>
     public class SubField
     {
+        #region Constants
+
+        /// <summary>
+        /// Нет кода подполя, т. е. код пока не задан.
+        /// </summary>
+        public const char NoCode = '\0';
+
+        /// <summary>
+        /// Subfield delimiter.
+        /// </summary>
+        public const char Delimiter = '^';
+
+        #endregion
         #region Properties
 
         /// <summary>
