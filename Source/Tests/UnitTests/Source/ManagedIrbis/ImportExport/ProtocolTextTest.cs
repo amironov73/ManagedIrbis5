@@ -321,7 +321,7 @@ namespace UnitTests.ManagedIrbis.ImportExport
         [TestMethod]
         public void ProtocolText_ParseResponseForAllFormat_4()
         {
-            string response = null;
+            string? response = null;
             var record1 = new Record();
             var record2 = ProtocolText.ParseResponseForAllFormat(response, record1);
             Assert.IsNull(record2);
@@ -345,7 +345,7 @@ namespace UnitTests.ManagedIrbis.ImportExport
         [TestMethod]
         public void ProtocolText_ParseResponseForGblFormat_2()
         {
-            string response = null;
+            string? response = null;
             var record1 = new Record();
             var record2 = ProtocolText.ParseResponseForGblFormat(response, record1);
             Assert.IsNull(record2);
@@ -368,8 +368,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
         [TestMethod]
         public void ProtocolText_ToProtocolText_2()
         {
-            Record record = null;
-            string expected = null;
+            Record? record = null;
+            string? expected = null;
             var actual = record.ToProtocolText();
             Assert.AreEqual(expected, actual);
         }

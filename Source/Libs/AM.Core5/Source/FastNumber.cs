@@ -16,11 +16,7 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.IO;
-
-using AM.Collections;
-using AM.Runtime;
+using System.Runtime.CompilerServices;
 
 #endregion
 
@@ -40,12 +36,13 @@ namespace AM
         /// <summary>
         /// Convert integer to string.
         /// </summary>
-        public static string Int32ToString
+        [SkipLocalsInit]
+        public static unsafe string Int32ToString
             (
                 int number
             )
         {
-            var buffer = new char[10];
+            var buffer = stackalloc char[10];
             var offset = 9;
             if (number == 0)
             {
@@ -69,12 +66,13 @@ namespace AM
         /// <summary>
         /// Convert integer to string.
         /// </summary>
-        public static string Int64ToString
+        [SkipLocalsInit]
+        public static unsafe string Int64ToString
             (
                 long number
             )
         {
-            var buffer = new char[20];
+            var buffer = stackalloc char[20];
             var offset = 19;
             if (number == 0)
             {
@@ -98,7 +96,7 @@ namespace AM
         /// <summary>
         /// Fast number parsing.
         /// </summary>
-        public static int ParseInt32
+        public static unsafe int ParseInt32
             (
                 string text
             )
@@ -106,9 +104,13 @@ namespace AM
             var result = 0;
             unchecked
             {
-                foreach (char c in text)
+                fixed (char* ptr = text)
                 {
-                    result = result * 10 + c - '0';
+                    var length = text.Length;
+                    for (var i = 0; i < length; i++)
+                    {
+                        result = result * 10 + ptr[i] - '0';
+                    }
                 }
             }
 
@@ -118,7 +120,7 @@ namespace AM
         /// <summary>
         /// Fast number parsing.
         /// </summary>
-        public static int ParseInt32
+        public static unsafe int ParseInt32
             (
                 string text,
                 int offset,
@@ -128,9 +130,12 @@ namespace AM
             var result = 0;
             unchecked
             {
-                for (; length > 0; length--, offset++)
+                fixed (char* ptr = text)
                 {
-                    result = result * 10 + text[offset] - '0';
+                    for (; length > 0; length--, offset++)
+                    {
+                        result = result * 10 + ptr[offset] - '0';
+                    }
                 }
             }
 
@@ -140,7 +145,7 @@ namespace AM
         /// <summary>
         /// Fast number parsing.
         /// </summary>
-        public static int ParseInt32
+        public static unsafe int ParseInt32
             (
                 char[] text,
                 int offset,
@@ -150,9 +155,12 @@ namespace AM
             var result = 0;
             unchecked
             {
-                for (; length > 0; length--, offset++)
+                fixed (char* ptr = text)
                 {
-                    result = result * 10 + text[offset] - '0';
+                    for (; length > 0; length--, offset++)
+                    {
+                        result = result * 10 + ptr[offset] - '0';
+                    }
                 }
             }
 
@@ -162,7 +170,7 @@ namespace AM
         /// <summary>
         /// Fast number parsing.
         /// </summary>
-        public static int ParseInt32
+        public static unsafe int ParseInt32
             (
                 byte[] text,
                 int offset,
@@ -172,9 +180,12 @@ namespace AM
             var result = 0;
             unchecked
             {
-                for (; length > 0; length--, offset++)
+                fixed (byte* ptr = text)
                 {
-                    result = result * 10 + text[offset] - '0';
+                    for (; length > 0; length--, offset++)
+                    {
+                        result = result * 10 + ptr[offset] - '0';
+                    }
                 }
             }
 
@@ -184,18 +195,20 @@ namespace AM
         /// <summary>
         /// Fast number parsing.
         /// </summary>
-        public static int ParseInt32
+        public static unsafe int ParseInt32
             (
                 ReadOnlyMemory<char> text
             )
         {
             var result = 0;
-            var span = text.Span;
             unchecked
             {
-                for (int i = 0; i < text.Length; i++)
+                fixed (char* ptr = text.Span)
                 {
-                    result = result * 10 + span[i] - '0';
+                    for (int i = 0; i < text.Length; i++)
+                    {
+                        result = result * 10 + ptr[i] - '0';
+                    }
                 }
             }
 
@@ -205,18 +218,20 @@ namespace AM
         /// <summary>
         /// Fast number parsing.
         /// </summary>
-        public static int ParseInt32
+        public static unsafe int ParseInt32
             (
                 ReadOnlyMemory<byte> text
             )
         {
             var result = 0;
-            var span = text.Span;
             unchecked
             {
-                for (int i = 0; i < text.Length; i++)
+                fixed (byte* ptr = text.Span)
                 {
-                    result = result * 10 + span[i] - '0';
+                    for (int i = 0; i < text.Length; i++)
+                    {
+                        result = result * 10 + ptr[i] - '0';
+                    }
                 }
             }
 
@@ -284,6 +299,7 @@ namespace AM
                 while ((c = *text) != 0)
                 {
                     result = result * 10 + c - '0';
+                    text++;
                 }
             }
 

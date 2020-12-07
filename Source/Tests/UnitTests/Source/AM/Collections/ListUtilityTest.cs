@@ -10,6 +10,8 @@ using AM.Collections;
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
 
+#nullable enable
+
 namespace UnitTests.AM.Collections
 {
     [TestClass]
@@ -18,7 +20,7 @@ namespace UnitTests.AM.Collections
         [TestMethod]
         public void ListUtility_IsNullOrEmpty_1()
         {
-            List<int> list = null;
+            List<int>? list = null;
             Assert.IsTrue(list.IsNullOrEmpty());
 
             list = new List<int>();
@@ -122,7 +124,7 @@ namespace UnitTests.AM.Collections
         [ExpectedException(typeof(ArgumentNullException))]
         public void ListUtility_ThrowIfNullOrEmpty_5()
         {
-            List<int> list = null;
+            List<int>? list = null;
             ListUtility.ThrowIfNullOrEmpty(list);
         }
 
@@ -130,7 +132,7 @@ namespace UnitTests.AM.Collections
         [ExpectedException(typeof(ArgumentNullException))]
         public void ListUtility_ThrowIfNullOrEmpty_6()
         {
-            List<int> list = null;
+            List<int>? list = null;
             ListUtility.ThrowIfNullOrEmpty(list, "list");
         }
 
@@ -138,7 +140,7 @@ namespace UnitTests.AM.Collections
         [ExpectedException(typeof(ArgumentNullException))]
         public void ListUtility_ThrowIfNullOrEmpty_7()
         {
-            int[] array = null;
+            int[]? array = null;
             ListUtility.ThrowIfNullOrEmpty(array);
         }
 
@@ -146,7 +148,7 @@ namespace UnitTests.AM.Collections
         [ExpectedException(typeof(ArgumentNullException))]
         public void ListUtility_ThrowIfNullOrEmpty_8()
         {
-            int[] array = null;
+            int[]? array = null;
             ListUtility.ThrowIfNullOrEmpty(array, "array");
         }
 

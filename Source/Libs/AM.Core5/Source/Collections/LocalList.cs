@@ -38,10 +38,17 @@ namespace AM.Collections
         private Span<T> _array;
         private int _size;
 
-        private void _Extend(int newSize)
+        private void _Grow()
         {
+            var newSize = _size * 2;
+            if (newSize < 4)
+            {
+                newSize = 4;
+            }
+
             var newArray = ArrayPool<T>.Shared.Rent(newSize);
             _array.CopyTo(newArray);
+
             if (_arrayFromPool is not null)
             {
                 ArrayPool<T>.Shared.Return(_arrayFromPool);
@@ -49,19 +56,6 @@ namespace AM.Collections
 
             _arrayFromPool = newArray;
             _array = newArray;
-        }
-
-        private void _GrowAsNeeded()
-        {
-            if (_size >= _array.Length)
-            {
-                var newSize = _size * 2;
-                if (newSize < 4)
-                {
-                    newSize = 4;
-                }
-                _Extend(newSize);
-            }
         }
 
         #endregion
@@ -77,8 +71,6 @@ namespace AM.Collections
             )
             : this()
         {
-            //_arrayFromPool = null;
-            //_size = 0;
             _array = initialSpan;
         }
 
@@ -98,7 +90,11 @@ namespace AM.Collections
                 T item
             )
         {
-            _GrowAsNeeded();
+            if (_size == _array.Length)
+            {
+                _Grow();
+            }
+
             _array[_size++] = item;
         }
 
@@ -112,7 +108,11 @@ namespace AM.Collections
         {
             foreach (var item in items)
             {
-                _GrowAsNeeded();
+                if (_size == _array.Length)
+                {
+                    _Grow();
+                }
+
                 _array[_size++] = item;
             }
         }
@@ -195,7 +195,11 @@ namespace AM.Collections
                 T item
             )
         {
-            _GrowAsNeeded();
+            if (_size == _array.Length)
+            {
+                _Grow();
+            }
+
             if (index != _size)
             {
                 for (int i = _size - 1; i != index; --i)
