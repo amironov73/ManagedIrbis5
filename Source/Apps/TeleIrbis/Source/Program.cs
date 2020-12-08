@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
 /* Program.cs -- точка входа в программу
@@ -15,6 +16,9 @@
 #region Using directives
 
 using System;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 using Topshelf;
 using Topshelf.HostConfigurators;
@@ -46,16 +50,15 @@ namespace TeleIrbis
             service.SetServiceName("TelegramBot");
 
             service.StartAutomaticallyDelayed();
-            service.RunAsLocalSystem();
+            service.RunAsNetworkService();
             service.EnableShutdown();
 
-            service.UseNLog();
+            //service.UseNLog();
 
             // Необязательная настройка восстановления после сбоев
             service.EnableServiceRecovery(recovery =>
             {
                 recovery.RestartService(1);
-
             });
 
             // Реакция на исключение
@@ -79,6 +82,37 @@ namespace TeleIrbis
             return (int)result;
         }
 
+        /// <summary>
+        /// Заглушка на случай сбоев сертификатов.
+        /// </summary>
+        private static bool _ServerCertificateValidationCallback
+            (
+                object sender,
+                X509Certificate certificate,
+                X509Chain chain,
+                SslPolicyErrors sslpolicyerrors
+            )
+        {
+            return true;
+        }
+
+        private static void ConfigureSecurityProtocol()
+        {
+            ServicePointManager.SecurityProtocol =
+                // SecurityProtocolType.Ssl3 |
+                // SecurityProtocolType.Tls |
+                // SecurityProtocolType.Tls11 |
+                SecurityProtocolType.Tls12;
+            ServicePointManager.CheckCertificateRevocationList = false;
+            ServicePointManager.ServerCertificateValidationCallback
+                = _ServerCertificateValidationCallback;
+        }
+
+        private static void SetupLogging()
+        {
+            HostLogger.UseLogger(new NLogLogWriterFactory.NLogHostLoggerConfigurator());
+        }
+
         #endregion
 
         #region Program entry point
@@ -88,6 +122,9 @@ namespace TeleIrbis
         /// </summary>
         static int Main(string[] args)
         {
+            //SetupLogging();
+            ConfigureSecurityProtocol();
+
             return ConfigureAndRunService(args);
         }
 

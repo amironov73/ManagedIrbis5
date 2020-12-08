@@ -71,7 +71,7 @@ namespace ManagedIrbis
             var result = new List<FoundItem>(expected);
             while (!response.EOT)
             {
-                var line = response.ReadAnsi();
+                var line = response.ReadUtf();
                 if (string.IsNullOrEmpty(line))
                 {
                     break;
