@@ -88,8 +88,8 @@ namespace TeleIrbis
         private static bool _ServerCertificateValidationCallback
             (
                 object sender,
-                X509Certificate certificate,
-                X509Chain chain,
+                X509Certificate? certificate,
+                X509Chain? chain,
                 SslPolicyErrors sslpolicyerrors
             )
         {
@@ -100,18 +100,18 @@ namespace TeleIrbis
         {
             ServicePointManager.SecurityProtocol =
                 // SecurityProtocolType.Ssl3 |
-                // SecurityProtocolType.Tls |
-                // SecurityProtocolType.Tls11 |
+                SecurityProtocolType.Tls |
+                SecurityProtocolType.Tls11 |
                 SecurityProtocolType.Tls12;
             ServicePointManager.CheckCertificateRevocationList = false;
             ServicePointManager.ServerCertificateValidationCallback
                 = _ServerCertificateValidationCallback;
         }
 
-        private static void SetupLogging()
-        {
-            HostLogger.UseLogger(new NLogLogWriterFactory.NLogHostLoggerConfigurator());
-        }
+        // private static void SetupLogging()
+        // {
+        //     HostLogger.UseLogger(new NLogLogWriterFactory.NLogHostLoggerConfigurator());
+        // }
 
         #endregion
 

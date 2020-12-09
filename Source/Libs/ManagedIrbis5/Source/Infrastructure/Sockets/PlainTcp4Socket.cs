@@ -37,6 +37,75 @@ namespace ManagedIrbis.Infrastructure.Sockets
     {
         #region ClientSocket methods
 
+        /// <inheritdoc cref="ClientSocket.TransactSync"/>
+        public override Response? TransactSync
+            (
+                Query query
+            )
+        {
+            var connection = Connection.ThrowIfNull();
+            connection.Cancellation.ThrowIfCancellationRequested();
+
+            using var client = new TcpClient();
+            try
+            {
+                client.Connect(connection.Host, connection.Port);
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.Message);
+                connection.LastError = -100_002;
+                return null;
+            }
+
+            var socket = client.Client;
+            var length = query.GetLength();
+            var prefix = Encoding.ASCII.GetBytes
+                (
+                    length.ToInvariantString() + "\n"
+                );
+            var body = query.GetBody();
+
+            try
+            {
+                socket.Send(prefix, SocketFlags.None);
+                socket.Send(body, SocketFlags.None);
+                socket.Shutdown(SocketShutdown.Send);
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.Message);
+                connection.LastError = -100_002;
+                return null;
+            }
+
+            var result = new Response();
+            try
+            {
+                while (true)
+                {
+                    var buffer = new byte[2048];
+                    var chunk = new ArraySegment<byte>(buffer, 0, buffer.Length);
+                    var read = socket.Receive(chunk, SocketFlags.None);
+                    if (read <= 0)
+                    {
+                        break;
+                    }
+
+                    chunk = new ArraySegment<byte>(buffer, 0, read);
+                    result.Add(chunk);
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.Message);
+                connection.LastError = -100_002;
+                return null;
+            }
+
+            return result;
+        }
+
         /// <inheritdoc cref="ClientSocket.TransactAsync"/>
         public override async Task<Response?> TransactAsync
             (

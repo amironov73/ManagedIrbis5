@@ -42,8 +42,9 @@ namespace ManagedIrbis
     /// <summary>
     /// Подключение к серверу ИРБИС64.
     /// </summary>
-    public sealed class Connection
+    public sealed partial class Connection
         : IDisposable,
+        IAsyncDisposable,
         IHandmadeSerializable,
         IIrbisConnection
     {
@@ -531,7 +532,6 @@ namespace ManagedIrbis
 
             return result;
         } // method FormatRecordAsync
-
 
         /// <summary>
         /// Получение максимального MFN для указанной базы данных.
@@ -1343,9 +1343,19 @@ namespace ManagedIrbis
         {
             if (Connected)
             {
-                DisconnectAsync().GetAwaiter().GetResult();
+                Disconnect();
             }
-        }
+        } // method Dispose
+
+        #endregion
+
+        #region IAsyncDisposable members
+
+        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
+        public async ValueTask DisposeAsync()
+        {
+            await DisconnectAsync();
+        } // method DisposeAsync
 
         #endregion
 
