@@ -17,23 +17,20 @@
 #region Using directives
 
 using System;
-using System.Threading.Tasks;
 
 using ManagedIrbis;
-using ManagedIrbis.Infrastructure;
 
 using static System.Console;
 
 #endregion
 
 #nullable enable
-
-internal class Program
+class Program
 {
     /// <summary>
     /// Точка входа в программу.
     /// </summary>
-    private static async Task<int> Main(string[] args)
+    private static int Main(string[] args)
     {
         try
         {
@@ -46,54 +43,54 @@ internal class Program
             connection.Username = "librarian";
             connection.Password = "secret";
 
-            var success = await connection.ConnectAsync();
+            var success = connection.Connect();
             if (!success)
             {
-                await Error.WriteLineAsync("Can't connect");
+                Error.WriteLine("Can't connect");
                 return 1;
             }
 
             WriteLine("Successfully connected");
 
-            var version = await connection.GetServerVersionAsync();
-            WriteLine(version);
+            //var version = connection.GetServerVersion();
+            //WriteLine(version);
 
-            var processes = await connection.ListProcessesAsync();
-            WriteLine("Processes: "
-                + string.Join<ProcessInfo>(" | ", processes));
+            //var processes = connection.ListProcesses();
+            //WriteLine("Processes: "
+            //          + string.Join<ProcessInfo>(" | ", processes));
 
-            var maxMfn = await connection.GetMaxMfnAsync();
+            var maxMfn = connection.GetMaxMfn();
             WriteLine($"Max MFN={maxMfn}");
 
-            await connection.NopAsync();
+            connection.Nop();
             WriteLine("NOP");
 
-            var found = await connection.SearchAsync(Search.Keyword("бетон$"));
+            var found = connection.Search(Search.Keyword("бетон$"));
             WriteLine("Found: " + string.Join(", ", found));
 
-            var terms = await connection.ReadTermsAsync("K=БЕТОН", 10);
+            var terms = connection.ReadTerms("K=БЕТОН", 10);
             WriteLine("Terms: " + string.Join<Term>(", ", terms));
 
-            if (terms.Length != 0)
-            {
-                var postings = await connection.ReadPostingsAsync(terms[0].Text!, 10);
-                WriteLine("Postings: " + string.Join<TermPosting>(", ", postings));
-            }
+            //if (terms.Length != 0)
+            //{
+            //    var postings = connection.ReadPostings(terms[0].Text!, 10);
+            //    WriteLine("Postings: " + string.Join<TermPosting>(", ", postings));
+            //}
 
-            var record = await connection.ReadRecordAsync(1);
+            var record = connection.ReadRecord(1);
             WriteLine($"ReadRecord={record?.FM(200, 'a')}");
 
-            var formatted = await connection.FormatRecordAsync("@brief", 1);
+            var formatted = connection.FormatRecord("@brief", 1);
             WriteLine($"Formatted={formatted}");
 
-            var files = await connection.ListFilesAsync("2.IBIS.*.mnu");
-            WriteLine("Files: " + string.Join(",", files));
+            //var files = connection.ListFiles("2.IBIS.*.mnu");
+            //WriteLine("Files: " + string.Join(",", files));
 
-            var fileText = await connection.ReadTextFileAsync("2.IBIS.brief.pft");
+            var fileText = connection.ReadTextFile("2.IBIS.brief.pft");
             WriteLine($"BRIEF: {fileText}");
             WriteLine();
 
-            await connection.DisconnectAsync();
+            connection.Disconnect();
             WriteLine("Successfully disconnected");
         }
         catch (Exception exception)

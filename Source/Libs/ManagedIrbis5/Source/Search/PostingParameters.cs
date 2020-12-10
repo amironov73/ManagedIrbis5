@@ -101,22 +101,22 @@ namespace ManagedIrbis
         public void Encode
             (
                 Connection connection,
-                Query query
+                IQuery query
             )
         {
             var database = (Database ?? connection.Database)
                 .ThrowIfNull(nameof(Database));
 
-            query.AddAnsi(database)
-                .Add(NumberOfPostings)
-                .Add(FirstPosting)
-                .AddFormat(Format);
+            query.AddAnsi(database);
+            query.Add(NumberOfPostings);
+            query.Add(FirstPosting);
+            query.AddFormat(Format);
 
             foreach (var term in Terms.ThrowIfNull())
             {
                 query.AddUtf(term);
             }
-        }
+        } // method Encode
 
         #endregion
 

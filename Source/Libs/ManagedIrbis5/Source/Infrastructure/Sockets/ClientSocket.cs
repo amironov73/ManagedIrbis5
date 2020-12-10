@@ -46,7 +46,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
         /// </summary>
         public abstract Response? TransactSync
             (
-                Query query
+                ref ValueQuery query
             );
 
         /// <summary>

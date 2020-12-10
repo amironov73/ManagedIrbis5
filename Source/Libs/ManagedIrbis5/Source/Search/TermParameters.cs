@@ -98,17 +98,37 @@ namespace ManagedIrbis
         public void Encode
             (
                 Connection connection,
-                Query query
+                IQuery query
             )
         {
             var database = (Database ?? connection.Database)
                 .ThrowIfNull(nameof(Database));
 
-            query.AddAnsi(database)
-                .AddUtf(StartTerm)
-                .Add(NumberOfTerms)
-                .AddFormat(Format);
-        }
+            query.AddAnsi(database);
+            query.AddUtf(StartTerm);
+            query.Add(NumberOfTerms);
+            query.AddFormat(Format);
+        } // method Encode
+
+        /// <summary>
+        /// Кодирование параметров постингов для клиентского запроса.
+        /// </summary>
+        /// <param name="connection">Ссылка на подключение к серверу.</param>
+        /// <param name="query">Клиентский запрос.</param>
+        public void Encode
+            (
+                Connection connection,
+                ref ValueQuery query
+            )
+        {
+            var database = (Database ?? connection.Database)
+                .ThrowIfNull(nameof(Database));
+
+            query.AddAnsi(database);
+            query.AddUtf(StartTerm);
+            query.Add(NumberOfTerms);
+            query.AddFormat(Format);
+        } // method Encode
 
         #endregion
 

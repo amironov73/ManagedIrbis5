@@ -45,11 +45,11 @@ namespace ManagedIrbis
             AGAIN: QueryId = 1;
             ClientId = new Random().Next(100000, 999999);
 
-            var query = new Query(this, CommandCode.RegisterClient);
+            var query = new ValueQuery(this, CommandCode.RegisterClient);
             query.AddAnsi(Username);
             query.AddAnsi(Password);
 
-            var response = ExecuteSync(query);
+            var response = ExecuteSync(ref query);
             if (ReferenceEquals(response, null))
             {
                 return false;
@@ -81,11 +81,11 @@ namespace ManagedIrbis
         {
             if (Connected)
             {
-                var query = new Query(this, CommandCode.UnregisterClient);
+                var query = new ValueQuery(this, CommandCode.UnregisterClient);
                 query.AddAnsi(Username);
                 try
                 {
-                    ExecuteSync(query);
+                    ExecuteSync(ref query);
                 }
                 catch (Exception exception)
                 {
@@ -106,7 +106,7 @@ namespace ManagedIrbis
         /// <returns>Ответ от сервера.</returns>
         public Response? ExecuteSync
             (
-                Query query
+                ref ValueQuery query
             )
         {
             SetBusy(true);
@@ -125,7 +125,7 @@ namespace ManagedIrbis
                         query.Debug(Console.Out);
                     }
 
-                    result = Socket.TransactSync(query);
+                    result = Socket.TransactSync(ref query);
                 }
                 catch (Exception exception)
                 {
@@ -172,13 +172,13 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, command);
+            var query = new ValueQuery(this, command);
             foreach (var arg in args)
             {
                 query.AddAnsi(arg?.ToString());
             }
 
-            var result = ExecuteSync(query);
+            var result = ExecuteSync(ref query);
 
             return result;
         } // method ExecuteSync
@@ -200,13 +200,13 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.FormatRecord);
+            var query = new ValueQuery(this, CommandCode.FormatRecord);
             query.AddAnsi(Database);
             var prepared = IrbisFormat.PrepareFormat(format);
             query.AddAnsi(prepared);
             query.Add(1);
             query.Add(mfn);
-            var response = ExecuteSync(query);
+            var response = ExecuteSync(ref query);
             if (ReferenceEquals(response, null))
             {
                 return null;
@@ -239,9 +239,9 @@ namespace ManagedIrbis
             }
 
             database ??= Database;
-            var query = new Query(this, CommandCode.GetMaxMfn);
+            var query = new ValueQuery(this, CommandCode.GetMaxMfn);
             query.AddAnsi(database);
-            var response = ExecuteSync(query);
+            var response = ExecuteSync(ref query);
             if (ReferenceEquals(response, null))
             {
                 return 0;
@@ -285,11 +285,11 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ReadRecord);
+            var query = new ValueQuery(this, CommandCode.ReadRecord);
             query.AddAnsi(Database);
             query.Add(mfn);
-            var response = ExecuteSync(query);
-            if (ReferenceEquals(response, null))
+            var response = ExecuteSync(ref query);
+            if (response is null)
             {
                 return null;
             }
@@ -311,6 +311,28 @@ namespace ManagedIrbis
         /// <summary>
         /// Чтение терминов словаря.
         /// </summary>
+        /// <param name="startTerm">Параметры терминов.</param>
+        /// <param name="numberOfTerms">Максимальное число терминов.</param>
+        /// <returns>Массив прочитанных терминов.</returns>
+        public Term[] ReadTerms
+            (
+                string startTerm,
+                int numberOfTerms
+            )
+        {
+            var parameters = new TermParameters
+            {
+                Database = Database,
+                StartTerm = startTerm,
+                NumberOfTerms = numberOfTerms
+            };
+
+            return ReadTerms(parameters);
+        } // method ReadTerms
+
+        /// <summary>
+        /// Чтение терминов словаря.
+        /// </summary>
         /// <param name="parameters">Параметры терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
         public Term[] ReadTerms
@@ -326,10 +348,10 @@ namespace ManagedIrbis
             var command = parameters.ReverseOrder
                 ? CommandCode.ReadTermsReverse
                 : CommandCode.ReadTerms;
-            var query = new Query(this, command);
-            parameters.Encode(this, query);
-            var response = ExecuteSync(query);
-            if (ReferenceEquals(response, null))
+            var query = new ValueQuery(this, command);
+            parameters.Encode(this, ref query);
+            var response = ExecuteSync(ref query);
+            if (response is null)
             {
                 return Array.Empty<Term>();
             }
@@ -360,10 +382,10 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ReadDocument);
+            var query = new ValueQuery(this, CommandCode.ReadDocument);
             query.AddAnsi(specification);
-            var response = ExecuteSync(query);
-            if (ReferenceEquals(response, null))
+            var response = ExecuteSync(ref query);
+            if (response is null)
             {
                 return null;
             }
@@ -388,10 +410,10 @@ namespace ManagedIrbis
                 return Array.Empty<FoundItem>();
             }
 
-            var query = new Query(this, CommandCode.Search);
-            parameters.Encode(this, query);
-            var response = ExecuteSync(query);
-            if (ReferenceEquals(response, null)
+            var query = new ValueQuery(this, CommandCode.Search);
+            parameters.Encode(this, ref query);
+            var response = ExecuteSync(ref query);
+            if (response is null
                 || !response.CheckReturnCode())
             {
                 return Array.Empty<FoundItem>();
@@ -415,15 +437,15 @@ namespace ManagedIrbis
                 return Array.Empty<int>();
             }
 
-            var query = new Query(this, CommandCode.Search);
+            var query = new ValueQuery(this, CommandCode.Search);
             var parameters = new SearchParameters
             {
                 Database = Database,
                 Expression = expression
             };
-            parameters.Encode(this, query);
-            var response = ExecuteSync(query);
-            if (ReferenceEquals(response, null)
+            parameters.Encode(this, ref query);
+            var response = ExecuteSync(ref query);
+            if (response is null
                 || !response.CheckReturnCode())
             {
                 return Array.Empty<int>();
@@ -448,16 +470,16 @@ namespace ManagedIrbis
                 return -1;
             }
 
-            var query = new Query(this, CommandCode.Search);
+            var query = new ValueQuery(this, CommandCode.Search);
             var parameters = new SearchParameters
             {
                 Database = Database,
                 Expression = expression,
                 FirstRecord = 0
             };
-            parameters.Encode(this, query);
-            var response = ExecuteSync(query);
-            if (ReferenceEquals(response, null)
+            parameters.Encode(this, ref query);
+            var response = ExecuteSync(ref query);
+            if (response is null
                 || !response.CheckReturnCode())
             {
                 return -1;

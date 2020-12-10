@@ -18,15 +18,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
@@ -166,17 +162,19 @@ namespace ManagedIrbis
 
         private CancellationTokenSource _cancellation;
 
-        private bool _debug = false;
+        private bool _debug;
 
         private void SetBusy
             (
                 bool busy
             )
         {
-            Busy = busy;
-            BusyChanged?.Invoke(this, EventArgs.Empty);
+            if (Busy != busy)
+            {
+                Busy = busy;
+                BusyChanged?.Invoke(this, EventArgs.Empty);
+            }
         } // method SetBusy
-
 
         private bool CheckConnection()
         {
@@ -228,7 +226,7 @@ namespace ManagedIrbis
                     mfn
                 );
 
-            return !ReferenceEquals(response, null);
+            return response is not null;
         } // method ActualizeRecordAsync
 
 
@@ -258,7 +256,7 @@ namespace ManagedIrbis
             query.AddAnsi(Password);
 
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
+            if (response is null)
             {
                 return false;
             }
@@ -301,16 +299,11 @@ namespace ManagedIrbis
             }
 
             var query = new Query(this, CommandCode.CreateDatabase);
-            query.AddAnsi(database).NewLine();
-            query.AddAnsi(description).NewLine();
-            query.Add(readerAccess ? 1 : 0).NewLine();
+            query.AddAnsi(database);
+            query.AddAnsi(description);
+            query.Add(readerAccess ? 1 : 0);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
-            {
-                return false;
-            }
-
-            if (!response.CheckReturnCode())
+            if (response is null || !response.CheckReturnCode())
             {
                 return false;
             }
@@ -336,14 +329,9 @@ namespace ManagedIrbis
 
             database ??= Database;
             var query = new Query(this, CommandCode.CreateDictionary);
-            query.AddAnsi(database).NewLine();
+            query.AddAnsi(database);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
-            {
-                return false;
-            }
-
-            if (!response.CheckReturnCode())
+            if (response is null || !response.CheckReturnCode())
             {
                 return false;
             }
@@ -368,20 +356,14 @@ namespace ManagedIrbis
 
             database ??= Database;
             var query = new Query(this, CommandCode.DeleteDatabase);
-            query.AddAnsi(database).NewLine();
+            query.AddAnsi(database);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
-            {
-                return false;
-            }
-
-            if (!response.CheckReturnCode())
+            if (response is null || !response.CheckReturnCode())
             {
                 return false;
             }
 
             return true;
-
         } // method DeleteDatabaseAsync
 
         /// <summary>
@@ -444,17 +426,16 @@ namespace ManagedIrbis
                     return null;
                 }
 
-                if (ReferenceEquals(result, null))
+                if (result is not null)
                 {
-                    return null;
+                    if (_debug)
+                    {
+                        result.Debug(Console.Out);
+                    }
+
+                    result.Parse();
                 }
 
-                if (_debug)
-                {
-                    result.Debug(Console.Out);
-                }
-
-                result.Parse();
                 QueryId++;
 
                 return result;
@@ -486,7 +467,7 @@ namespace ManagedIrbis
             var query = new Query(this, command);
             foreach (var arg in args)
             {
-                query.AddAnsi(arg?.ToString());
+                query.AddAnsi(arg.ToString());
             }
 
             var result = await ExecuteAsync(query);
@@ -518,13 +499,13 @@ namespace ManagedIrbis
             query.Add(1);
             query.Add(mfn);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
+            if (response is null)
             {
                 return null;
             }
 
             response.CheckReturnCode();
-            string result = response.ReadRemainingUtfText();
+            var result = response.ReadRemainingUtfText();
             if (!string.IsNullOrEmpty(result))
             {
                 result = result.TrimEnd();
@@ -553,12 +534,7 @@ namespace ManagedIrbis
             var query = new Query(this, CommandCode.GetMaxMfn);
             query.AddAnsi(database);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
-            {
-                return 0;
-            }
-
-            if (!response.CheckReturnCode())
+            if (response is null || !response.CheckReturnCode())
             {
                 return 0;
             }
@@ -578,7 +554,7 @@ namespace ManagedIrbis
 
             var query = new Query(this, CommandCode.ServerInfo);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
+            if (response is null)
             {
                 return null;
             }
@@ -630,7 +606,7 @@ namespace ManagedIrbis
             }
 
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
+            if (response is null)
             {
                 return Array.Empty<string>();
             }
@@ -670,7 +646,7 @@ namespace ManagedIrbis
 
             var query = new Query(this, CommandCode.GetProcessList);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
+            if (response is null)
             {
                 return Array.Empty<ProcessInfo>();
             }
@@ -694,7 +670,7 @@ namespace ManagedIrbis
 
             var response = await ExecuteAsync(CommandCode.Nop);
 
-            return !ReferenceEquals(response, null)
+            return response is not null
                    && response.CheckReturnCode();
         } // method NopAsync
 
@@ -852,12 +828,8 @@ namespace ManagedIrbis
             query.AddAnsi(Database);
             query.Add(mfn);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
-            {
-                return null;
-            }
-
-            if (!response.CheckReturnCode(_goodCodesForReadRecord))
+            if (response is null
+                || !response.CheckReturnCode(_goodCodesForReadRecord))
             {
                 return null;
             }
@@ -911,18 +883,14 @@ namespace ManagedIrbis
             var query = new Query(this, CommandCode.ReadPostings);
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
-            {
-                return Array.Empty<TermPosting>();
-            }
-
-            if (!response.CheckReturnCode(_goodCodesForReadTerms))
+            if (response is null
+                || !response.CheckReturnCode(_goodCodesForReadTerms))
             {
                 return Array.Empty<TermPosting>();
             }
 
             return TermPosting.Parse(response);
-        }
+        } // method ReadPostingsAsync
 
         /// <summary>
         /// Чтение терминов словаря.
@@ -944,7 +912,7 @@ namespace ManagedIrbis
             };
 
             return await ReadTermsAsync(parameters);
-        }
+        } // method ReadTermsAsync
 
         /// <summary>
         /// Чтение терминов словаря.
@@ -967,12 +935,8 @@ namespace ManagedIrbis
             var query = new Query(this, command);
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
-            {
-                return Array.Empty<Term>();
-            }
-
-            if (!response.CheckReturnCode(_goodCodesForReadTerms))
+            if (response is null
+                || !response.CheckReturnCode(_goodCodesForReadTerms))
             {
                 return Array.Empty<Term>();
             }
@@ -981,19 +945,15 @@ namespace ManagedIrbis
         } // method ReadTermsAsync
 
         /// <summary>
-        ///
+        /// Чтение указанного текстового файла с сервера.
         /// </summary>
         public async Task<string?> ReadTextFileAsync
             (
                 string? specification
             )
         {
-            if (!CheckConnection())
-            {
-                return null;
-            }
-
-            if (string.IsNullOrEmpty(specification))
+            if (!CheckConnection()
+                || !string.IsNullOrWhiteSpace(specification))
             {
                 return null;
             }
@@ -1001,7 +961,7 @@ namespace ManagedIrbis
             var query = new Query(this, CommandCode.ReadDocument);
             query.AddAnsi(specification);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
+            if (response is null)
             {
                 return null;
             }
@@ -1095,7 +1055,7 @@ namespace ManagedIrbis
             var query = new Query(this, CommandCode.Search);
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null)
+            if (response is null
                 || !response.CheckReturnCode())
             {
                 return Array.Empty<FoundItem>();
@@ -1127,7 +1087,7 @@ namespace ManagedIrbis
             };
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null)
+            if (response is null
                 || !response.CheckReturnCode())
             {
                 return Array.Empty<int>();
@@ -1161,7 +1121,7 @@ namespace ManagedIrbis
             };
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null)
+            if (response is null
                 || !response.CheckReturnCode())
             {
                 return -1;
@@ -1276,7 +1236,7 @@ namespace ManagedIrbis
                 query.AddAnsi(specification.ToString());
             }
             var response = await ExecuteAsync(query);
-            if (ReferenceEquals(response, null))
+            if (response is null)
             {
                 return false;
             }

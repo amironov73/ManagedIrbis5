@@ -40,7 +40,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
         /// <inheritdoc cref="ClientSocket.TransactSync"/>
         public override Response? TransactSync
             (
-                Query query
+                ref ValueQuery query
             )
         {
             var connection = Connection.ThrowIfNull();
@@ -104,7 +104,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
 
             return result;
-        }
+        } // method TransactSync
 
         /// <inheritdoc cref="ClientSocket.TransactAsync"/>
         public override async Task<Response?> TransactAsync
@@ -173,7 +173,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
 
             return result;
-        }
+        } // method TransactAsync
 
         #endregion
     }

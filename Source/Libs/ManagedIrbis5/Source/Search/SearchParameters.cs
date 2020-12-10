@@ -124,21 +124,45 @@ namespace ManagedIrbis
         public void Encode
             (
                 Connection connection,
-                Query query
+                IQuery query
             )
         {
             var database = (Database ?? connection.Database)
                 .ThrowIfNull(nameof(Database));
 
-            query.AddAnsi(database)
-                .AddUtf(Expression)
-                .Add(NumberOfRecords)
-                .Add(FirstRecord)
-                .AddFormat(Format)
-                .Add(MinMfn)
-                .Add(MaxMfn)
-                .AddAnsi(Sequential);
-        }
+            query.AddAnsi(database);
+            query.AddUtf(Expression);
+            query.Add(NumberOfRecords);
+            query.Add(FirstRecord);
+            query.AddFormat(Format);
+            query.Add(MinMfn);
+            query.Add(MaxMfn);
+            query.AddAnsi(Sequential);
+        } // method Encode
+
+        /// <summary>
+        /// Кодирование параметров поиска для клиентского запроса.
+        /// </summary>
+        /// <param name="connection">Ссылка на подключение к серверу.</param>
+        /// <param name="query">Клиентский запрос.</param>
+        public void Encode
+            (
+                Connection connection,
+                ref ValueQuery query
+            )
+        {
+            var database = (Database ?? connection.Database)
+                .ThrowIfNull(nameof(Database));
+
+            query.AddAnsi(database);
+            query.AddUtf(Expression);
+            query.Add(NumberOfRecords);
+            query.Add(FirstRecord);
+            query.AddFormat(Format);
+            query.Add(MinMfn);
+            query.Add(MaxMfn);
+            query.AddAnsi(Sequential);
+        } // method Encode
 
         #endregion
 

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Query.cs -- клиентский запрос к серверу ИРБИС64
+/* ValueQuery.cs -- клиентский запрос к серверу ИРБИС64 (для синхронного сценария)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,34 +27,35 @@ using AM;
 namespace ManagedIrbis.Infrastructure
 {
     /// <summary>
-    /// Клиентский запрос к серверу ИРБИС64.
+    /// Клиентский запрос к серверу ИРБИС64
+    /// (для синхронного сценария).
     /// </summary>
-    public sealed class Query
-        : IQuery
+    public readonly ref struct ValueQuery
     {
         #region Construction
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public Query
+        public ValueQuery
             (
                 Connection connection,
                 string commandCode
             )
+            : this()
         {
-           // Sure.NotNullNorEmpty(commandCode, nameof(commandCode));
+            // Sure.NotNullNorEmpty(commandCode, nameof(commandCode));
 
-           _stream = new MemoryStream(1024);
+            _stream = new MemoryStream(1024);
 
-           var header = commandCode + "\n"
-                + connection.Workstation + "\n"
-                + commandCode + "\n"
-                + connection.ClientId.ToInvariantString() + "\n"
-                + connection.QueryId.ToInvariantString() + "\n"
-                + connection.Password + "\n"
-                + connection.Username + "\n"
-                + "\n\n";
+            var header = commandCode + "\n"
+                 + connection.Workstation + "\n"
+                 + commandCode + "\n"
+                 + connection.ClientId.ToInvariantString() + "\n"
+                 + connection.QueryId.ToInvariantString() + "\n"
+                 + connection.Password + "\n"
+                 + connection.Username + "\n"
+                 + "\n\n";
             AddAnsi(header);
         } // constructor
 
@@ -71,7 +72,8 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Добавление строки с целым числом (плюс перевод строки).
         /// </summary>
-        public void Add (int value) => AddAnsi(value.ToInvariantString());
+        public void Add(int value) => AddAnsi(value.ToInvariantString());
+        // method Add
 
         /// <summary>
         /// Добавление строки в кодировке ANSI (плюс перевод строки).
@@ -142,13 +144,16 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Подсчет общей длины запроса (в байтах).
         /// </summary>
-        public int GetLength() => (int) _stream.Length;
+        public int GetLength() => (int)_stream.Length;
 
         /// <summary>
         /// Добавление одного перевода строки.
         /// </summary>
-        public void NewLine() => _stream.WriteByte(10);
+        public void NewLine()
+        {
+            _stream.WriteByte(10);
+        }
 
         #endregion
-    } // class Query
-} // namespace ManagedIrbis.Infrastructure
+    }
+}
