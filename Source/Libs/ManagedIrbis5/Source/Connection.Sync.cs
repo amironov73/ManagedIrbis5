@@ -488,6 +488,49 @@ namespace ManagedIrbis
             return response.ReadInteger();
         } // method SearchCount
 
+        /// <summary>
+        /// Сохранение/обновление записи на сервере.
+        /// </summary>
+        /// <param name="record">Запись, подлежащая сохранению.</param>
+        /// <param name="lockFlag">Оставить запись заблокированной?</param>
+        /// <param name="actualize">Актуализировать запись?</param>
+        /// <param name="dontParse">Не разбирать ответ сервера?</param>
+        /// <returns>Новый максимальный MFN в базе данных.</returns>
+        public int WriteRecord
+            (
+                Record record,
+                bool lockFlag = false,
+                bool actualize = true,
+                bool dontParse = false
+            )
+        {
+            if (!CheckConnection())
+            {
+                return 0;
+            }
+
+            var query = new ValueQuery(this, CommandCode.UpdateRecord);
+            query.AddAnsi(record.Database ?? Database);
+            query.Add(lockFlag ? 1 : 0);
+            query.Add(actualize ? 1 : 0);
+            query.AddUtf(record.Encode());
+
+            var response = ExecuteSync(ref query);
+            if (response is null || !response.CheckReturnCode())
+            {
+                return 0;
+            }
+
+            var result = response.ReturnCode;
+            if (!dontParse)
+            {
+                record.Database ??= Database;
+                // TODO reparse the record
+            }
+
+            return result;
+        } // method WriteRecord
+
         #endregion
     }
 }

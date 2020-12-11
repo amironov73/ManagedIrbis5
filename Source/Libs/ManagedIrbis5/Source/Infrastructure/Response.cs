@@ -138,7 +138,7 @@ namespace ManagedIrbis.Infrastructure
             else
             {
                 EOT = false;
-                _currentChunk = _memory.FirstOrDefault();
+                _currentChunk = _memory.First();
                 _currentIndex = 0;
                 _currentOffset = 0;
 
@@ -204,7 +204,7 @@ namespace ManagedIrbis.Infrastructure
                 _currentChunk = _memory[_currentIndex];
             }
 
-            byte result = _currentChunk[_currentOffset];
+            var result = _currentChunk[_currentOffset];
             _currentOffset++;
 
             if (_currentOffset > _currentChunk.Count)

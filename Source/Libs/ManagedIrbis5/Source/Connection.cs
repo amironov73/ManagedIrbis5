@@ -525,21 +525,12 @@ namespace ManagedIrbis
                 string? database = default
             )
         {
-            if (!CheckConnection())
-            {
-                return 0;
-            }
-
             database ??= Database;
-            var query = new Query(this, CommandCode.GetMaxMfn);
-            query.AddAnsi(database);
-            var response = await ExecuteAsync(query);
-            if (response is null || !response.CheckReturnCode())
-            {
-                return 0;
-            }
+            var response = await ExecuteAsync(CommandCode.GetMaxMfn, database);
 
-            return response.ReturnCode;
+            return response is null || !response.CheckReturnCode()
+                ? 0
+                : response.ReturnCode;
         } // method GetMaxMfnAsync
 
         /// <summary>
@@ -971,29 +962,55 @@ namespace ManagedIrbis
             return result;
         } // method ReadTextFileAsync
 
-        public Task<bool> ReloadDictionaryAsync
+        /// <summary>
+        /// Пересоздание словаря для указанной базы данных.
+        /// </summary>
+        /// <param name="database">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        public async Task<bool> ReloadDictionaryAsync
             (
                 string? database = default
             )
         {
-            throw new NotImplementedException();
+            var response = await ExecuteAsync
+                (
+                    CommandCode.ReloadDictionary,
+                    database ?? Database
+                );
+
+            return response is not null && response.CheckReturnCode();
         } // method ReloadDictionaryAsync
 
-        public Task<bool> ReloadMasterFileAsync
+        /// <summary>
+        /// Пересоздание мастер-файла для указанной базы данных.
+        /// </summary>
+        /// <param name="database">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns></returns>
+        public async Task<bool> ReloadMasterFileAsync
             (
                 string? database = default
             )
         {
-            throw new NotImplementedException();
+            var response = await ExecuteAsync
+                (
+                    CommandCode.ReloadMasterFile,
+                    database ?? Database
+                );
+
+            return response is not null && response.CheckReturnCode();
         } // method ReloadMasterFileAsync
 
         /// <summary>
-        /// Перезапуск сервера.
+        /// Асинхронный ерезапуск сервера без утери подключенных клиентов.
         /// </summary>
-        /// <returns></returns>
-        public Task<bool> RestartServerAsync()
+        /// <returns>Признак успешного завергения операции.</returns>
+        public async Task<bool> RestartServerAsync()
         {
-            throw new NotImplementedException();
+            var response = await ExecuteAsync(CommandCode.RestartServer);
+
+            return response is not null;
         } // method RestartServerAsync
 
         /// <summary>
@@ -1159,55 +1176,172 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method Suspend
 
-        public Task<bool> TruncateDatabaseAsync
+        /// <summary>
+        /// Опустошение указанной базы данных.
+        /// </summary>
+        /// <param name="database">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        public async Task<bool> TruncateDatabaseAsync
             (
                 string? database = default
             )
         {
-            throw new NotImplementedException();
+            var response = await ExecuteAsync
+                (
+                    CommandCode.EmptyDatabase,
+                    database ?? Database
+                );
+
+            return response is not null && response.CheckReturnCode();
         } // method TruncateDatabaseAsync
 
-        public Task<bool> UnlockDatabaseAsync
+        /// <summary>
+        /// Разблокирование указанной базы данных.
+        /// </summary>
+        /// <param name="database">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        public async Task<bool> UnlockDatabaseAsync
             (
                 string? database = default
             )
         {
-            throw new NotImplementedException();
+            var response = await ExecuteAsync
+                (
+                    CommandCode.UnlockDatabase,
+                    database ?? Database
+                );
+
+            return response is not null && response.CheckReturnCode();
         } // method UnlockDatabaseAsync
 
-        public Task<bool> UnlockRecordsAsync
+        /// <summary>
+        /// Разблокирование указанных записей в указанной базе данных.
+        /// </summary>
+        /// <param name="mfnList">Перечень MFN, подлежащих разблокировке.</param>
+        /// <param name="database">Имя базы данных.
+        /// По умолчанию текущая база данных.</param>
+        /// <returns>Признак успешности </returns>
+        public async Task<bool> UnlockRecordsAsync
             (
-                string? database,
-                params int[] mfnList
+                IEnumerable<int> mfnList,
+                string? database = default
             )
         {
-            throw new NotImplementedException();
+            if (!CheckConnection())
+            {
+                return false;
+            }
+
+            var query = new Query(this, CommandCode.UnlockRecords);
+            query.AddAnsi(database ?? Database);
+            foreach (var mfn in mfnList)
+            {
+                query.Add(mfn);
+            }
+
+            var response = await ExecuteAsync(query);
+
+            return response is not null && response.CheckReturnCode();
         } // method UnlockRecordsAsync
 
-        public Task<bool> UpdateIniFileAsync
+        /// <summary>
+        /// Обновление указанных строк серверного INI-файла.
+        /// </summary>
+        /// <param name="lines">Измененные строки INI-файла.</param>
+        /// <returns>Признак успешности завершения операции.</returns>
+        public async Task<bool> UpdateIniFileAsync
             (
                 IEnumerable<string> lines
             )
         {
-            throw new NotImplementedException();
+            if (!CheckConnection())
+            {
+                return false;
+            }
+
+            var query = new Query(this, CommandCode.UpdateIniFile);
+            foreach (var line in lines)
+            {
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    query.AddAnsi(line);
+                }
+            }
+
+            var response = await ExecuteAsync(query);
+
+            return response is not null;
         } // method UpdateIniFileAsync
 
-        public Task<bool> UpdateUserListAsync
+        /// <summary>
+        /// Обновление списка пользователей системы на сервере.
+        /// </summary>
+        /// <param name="userList">Список пользователей.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        public async Task<bool> UpdateUserListAsync
             (
                 IEnumerable<UserInfo> userList
             )
         {
-            throw new NotImplementedException();
+            if (!CheckConnection())
+            {
+                return false;
+            }
+
+            var query = new Query(this, CommandCode.SetUserList);
+            foreach (var user in userList)
+            {
+                query.AddAnsi(user.Encode());
+            }
+
+            var response = await ExecuteAsync(query);
+
+            return response is not null;
         } // method UpdateUserListAsync
 
-        public Task<Record> WriteRecordAsync
+        /// <summary>
+        /// Сохранение/обновление записи на сервере.
+        /// </summary>
+        /// <param name="record">Запись, подлежащая сохранению.</param>
+        /// <param name="lockFlag">Оставить запись заблокированной?</param>
+        /// <param name="actualize">Актуализировать запись?</param>
+        /// <param name="dontParse">Не разбирать ответ сервера?</param>
+        /// <returns>Новый максимальный MFN в базе данных.</returns>
+        public async Task<int> WriteRecordAsync
             (
                 Record record,
                 bool lockFlag = false,
-                bool actualize = true
+                bool actualize = true,
+                bool dontParse = false
             )
         {
-            throw new NotImplementedException();
+            if (!CheckConnection())
+            {
+                return 0;
+            }
+
+            var query = new Query(this, CommandCode.UpdateRecord);
+            query.AddAnsi(record.Database ?? Database);
+            query.Add(lockFlag ? 1 : 0);
+            query.Add(actualize ? 1 : 0);
+            query.AddUtf(record.Encode());
+
+            var response = await ExecuteAsync(query);
+            if (response is null || !response.CheckReturnCode())
+            {
+                return 0;
+            }
+
+            var result = response.ReturnCode;
+            if (!dontParse)
+            {
+                record.Database ??= Database;
+                // TODO reparse the record
+            }
+
+            return result;
         } // method WriteRecordAsync
 
         public Task<Record[]> WriteRecordsAsync

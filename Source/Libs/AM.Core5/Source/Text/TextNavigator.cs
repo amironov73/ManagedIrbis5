@@ -33,7 +33,7 @@ namespace AM.Text
     {
         #region Nested structures
 
-        struct StateHolder
+        readonly struct StateHolder
             : IDisposable
         {
             private readonly TextNavigator _navigator;

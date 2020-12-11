@@ -11,6 +11,7 @@ namespace CoreBenchmarks
         {
             BenchmarkRunner.Run<ListBenchmark>();
             BenchmarkRunner.Run<FastNumberBenchmark>();
+            BenchmarkRunner.Run<TextNavigatorBenchmark>();
         }
 
         static void DebugRun()

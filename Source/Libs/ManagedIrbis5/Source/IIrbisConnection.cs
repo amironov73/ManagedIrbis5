@@ -17,11 +17,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
-using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
@@ -181,9 +178,9 @@ namespace ManagedIrbis
         /// <param name="database">Имя удаляемой базы данных.</param>
         /// <returns>Признак успешности операции.</returns>
         Task<bool> DeleteDatabaseAsync
-        (
-            string? database = default
-        );
+            (
+                string? database = default
+            );
 
         /// <summary>
         /// Отключение от сервера.
@@ -198,9 +195,9 @@ namespace ManagedIrbis
         /// <param name="query">Клиентский запрос.</param>
         /// <returns>Ответ от сервера.</returns>
         Task<Response?> ExecuteAsync
-        (
-            Query query
-        );
+            (
+                Query query
+            );
 
         /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
@@ -210,10 +207,10 @@ namespace ManagedIrbis
         /// (в кодировке ANSI).</param>
         /// <returns>Ответ сервера.</returns>
         Task<Response?> ExecuteAsync
-        (
-            string command,
-            params object[] args
-        );
+            (
+                string command,
+                params object[] args
+            );
 
         /// <summary>
         /// Форматирование записи с указанием её MFN.
@@ -222,10 +219,10 @@ namespace ManagedIrbis
         /// <param name="mfn">MFN записи.</param>
         /// <returns>Результат расформатирования.</returns>
         Task<string?> FormatRecordAsync
-        (
-            string format,
-            int mfn
-        );
+            (
+                string format,
+                int mfn
+            );
 
         /// <summary>
         /// Получение максимального MFN для указанной базы данных.
@@ -234,9 +231,9 @@ namespace ManagedIrbis
         /// (<c>null</c> означает текущую базу данных).</param>
         /// <returns>Макисмальный MFN.</returns>
         Task<int> GetMaxMfnAsync
-        (
-            string? database = default
-        );
+            (
+                string? database = default
+            );
 
         /// <summary>
         ///
@@ -384,20 +381,20 @@ namespace ManagedIrbis
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
         Task<int> SearchCountAsync
-        (
-            string expression
-        );
+            (
+                string expression
+            );
 
         Task<Record[]> SearchReadAsync
-        (
-            string expression,
-            int limit = 0
-        );
+            (
+                string expression,
+                int limit = 0
+            );
 
         Task<Record?> SearchSingleRecordAsync
-        (
-            string expression
-        );
+            (
+                string expression
+            );
 
         /// <summary>
         /// Временно "закрывает" соединение с сервером
@@ -409,66 +406,50 @@ namespace ManagedIrbis
         string Suspend();
 
         Task<bool> TruncateDatabaseAsync
-        (
-            string? database = default
-        );
+            (
+                string? database = default
+            );
 
         Task<bool> UnlockDatabaseAsync
-        (
-            string? database = default
-        );
+            (
+                string? database = default
+            );
 
         Task<bool> UnlockRecordsAsync
-        (
-            string? database,
-            params int[] mfnList
-        );
+            (
+                IEnumerable<int> mfnList,
+                string? database = null
+            );
 
         Task<bool> UpdateIniFileAsync
-        (
-            IEnumerable<string> lines
-        );
+            (
+                IEnumerable<string> lines
+            );
 
         Task<bool> UpdateUserListAsync
-        (
-            IEnumerable<UserInfo> userList
-        );
+            (
+                IEnumerable<UserInfo> userList
+            );
 
-        Task<Record> WriteRecordAsync
-        (
-            Record record,
-            bool lockFlag = false,
-            bool actualize = true
-        );
+        Task<int> WriteRecordAsync
+            (
+                Record record,
+                bool lockFlag = false,
+                bool actualize = true,
+                bool dontParse = false
+            );
 
         Task<Record[]> WriteRecordsAsync
-        (
-            Record[] records,
-            bool lockFlag = false,
-            bool actualize = true
-        );
+            (
+                Record[] records,
+                bool lockFlag = false,
+                bool actualize = true
+            );
 
         Task<bool> WriteTextFileAsync
-        (
-            params FileSpecification[] specifications
-        );
+            (
+                params FileSpecification[] specifications
+            );
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        void RestoreFromStream
-        (
-            BinaryReader reader
-        );
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        void SaveToStream
-        (
-            BinaryWriter writer
-        );
-
-        /// <inheritdoc cref="IDisposable"/>
-        void Dispose();
-
-        /// <inheritdoc cref="Object.ToString" />
-        string ToString();
     } // interface IIrbisConnection
 }
