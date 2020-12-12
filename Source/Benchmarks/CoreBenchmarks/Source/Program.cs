@@ -7,11 +7,12 @@ namespace CoreBenchmarks
 {
     class Program
     {
-        static void BenchmarkRun()
+        static void BenchmarkRun(string[] args)
         {
-            BenchmarkRunner.Run<ListBenchmark>();
-            BenchmarkRunner.Run<FastNumberBenchmark>();
-            BenchmarkRunner.Run<TextNavigatorBenchmark>();
+            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+            //BenchmarkRunner.Run<ListBenchmark>();
+            //BenchmarkRunner.Run<FastNumberBenchmark>();
+            //BenchmarkRunner.Run<TextNavigatorBenchmark>();
         }
 
         static void DebugRun()
@@ -31,7 +32,7 @@ namespace CoreBenchmarks
             }
             else
             {
-                BenchmarkRun();
+                BenchmarkRun(args);
             }
         }
     }

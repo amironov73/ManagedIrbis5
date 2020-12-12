@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* ValueTextNavigator.cs -- навигатор по тексту, оформленный как структура
+/* UnsafeTextNavigator.cs -- навигатор по тексту, небезопасный вариант
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +17,6 @@
 
 using System;
 using System.Diagnostics.Contracts;
-using System.IO;
 using System.Text;
 
 #endregion
@@ -27,9 +26,9 @@ using System.Text;
 namespace AM.Text
 {
     /// <summary>
-    /// Навигатор по тексту, оформленный как структура.
+    /// Навигатор по тексту, небезопасный вариант.
     /// </summary>
-    public ref struct ValueTextNavigator
+    public unsafe ref struct UnsafeTextNavigator
     {
         #region Constants
 
@@ -46,13 +45,13 @@ namespace AM.Text
         /// Текст закончился?
         /// </summary>
         [Pure]
-        public bool IsEOF => _position >= _text.Length;
+        public bool IsEOF => _position >= _length;
 
         /// <summary>
         /// Общая длина текста в символах.
         /// </summary>
         [Pure]
-        public int Length => _text.Length;
+        public int Length => _length;
 
         /// <summary>
         /// Текущая позиция в тексте.
@@ -61,10 +60,16 @@ namespace AM.Text
         public int Position => _position;
 
         /// <summary>
+        /// Хранимый текст в виде спана.
+        /// </summary>
+        [Pure]
+        public ReadOnlySpan<char> AsSpan => new (_text, _length);
+
+        /// <summary>
         /// Текст, хранимый в навигаторе.
         /// </summary>
         [Pure]
-        public string Text => _text.ToString();
+        public string Text => new (_text, 0, _length);
 
         #endregion
 
@@ -73,13 +78,34 @@ namespace AM.Text
         /// <summary>
         /// Конструктор.
         /// </summary>
-        /// <param name="text">Текст</param>
-        public ValueTextNavigator
+        /// <param name="text">Указатель на первый символ.</param>
+        /// <param name="length">Длина текста в символах.</param>
+        public UnsafeTextNavigator
             (
-                ReadOnlySpan<char> text
+                char *text,
+                int length
             )
         {
             _text = text;
+            _length = length;
+            _position = 0;
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="text">Строка текста.</param>
+        public UnsafeTextNavigator
+            (
+                string text
+            )
+        {
+            fixed (char* ptr = text)
+            {
+                _text = ptr;
+            }
+
+            _length = text.Length;
             _position = 0;
         } // constructor
 
@@ -87,7 +113,8 @@ namespace AM.Text
 
         #region Private members
 
-        private readonly ReadOnlySpan<char> _text;
+        private readonly char* _text;
+        private readonly int _length;
         private int _position;
 
         #endregion
@@ -98,33 +125,15 @@ namespace AM.Text
         /// Клонирование навигатора.
         /// </summary>
         [Pure]
-        public ValueTextNavigator Clone()
+        public UnsafeTextNavigator Clone()
         {
-            var result = new ValueTextNavigator(_text)
+            var result = new UnsafeTextNavigator(_text, _length)
             {
                 _position = _position
             };
 
             return result;
         } // method Clone
-
-        /// <summary>
-        /// Навигатор по текстовому файлу.
-        /// </summary>
-        public static ValueTextNavigator FromFile
-            (
-                string fileName,
-                Encoding? encoding = default
-            )
-        {
-            Sure.FileExists(fileName, nameof(fileName));
-
-            encoding ??= Encoding.UTF8;
-            var text = File.ReadAllText(fileName, encoding);
-            var result = new ValueTextNavigator(text);
-
-            return result;
-        } // method FromFile
 
         /// <summary>
         /// Выдать остаток текста.
@@ -136,7 +145,7 @@ namespace AM.Text
         {
             return IsEOF
                 ? new ReadOnlySpan<char>()
-                : _text.Slice(_position);
+                : Substring(_position);
         } // method GetRemainingText
 
         /// <summary>
@@ -203,7 +212,7 @@ namespace AM.Text
         public char LookAhead()
         {
             var newPosition = _position + 1;
-            return newPosition >= _text.Length
+            return newPosition >= _length
                 ? EOF
                 : _text[newPosition];
         } // method LookAhead
@@ -220,7 +229,7 @@ namespace AM.Text
             Sure.NonNegative(distance, nameof(distance));
 
             var newPosition = _position + distance;
-            return newPosition >= _text.Length
+            return newPosition >= _length
                 ? EOF
                 : _text[newPosition];
         } // method LookAhead
@@ -260,14 +269,14 @@ namespace AM.Text
                 int distance
             )
         {
-            _position = Math.Max (0, Math.Min(_position + distance, _text.Length));
+            _position = Math.Max (0, Math.Min(_position + distance, _length));
         } // method Move
 
         /// <summary>
         /// Подглядывание текущего символа.
         /// </summary>
         [Pure]
-        public char PeekChar() => _position >= _text.Length
+        public char PeekChar() => _position >= _length
                 ? EOF
                 : _text[_position];
 
@@ -298,7 +307,7 @@ namespace AM.Text
                 }
             }
 
-            var result = _text.Slice(start, _position - start);
+            var result = Substring(start, _position - start);
             _position = start;
 
             return result;
@@ -378,7 +387,7 @@ namespace AM.Text
         /// </summary>
         public char ReadChar()
         {
-            if (_position >= _text.Length)
+            if (_position >= _length)
             {
                 return EOF;
             }
@@ -484,7 +493,7 @@ namespace AM.Text
                 }
             }
 
-            return _text.Slice
+            return Substring
                 (
                     start,
                     _position - start
@@ -532,7 +541,7 @@ namespace AM.Text
                 }
             }
 
-            return _text.Slice
+            return Substring
                 (
                     start,
                     _position - start
@@ -557,7 +566,7 @@ namespace AM.Text
                 ReadChar();
             }
 
-            return _text.Slice
+            return Substring
                 (
                     startPosition,
                     _position - startPosition
@@ -597,7 +606,7 @@ namespace AM.Text
                 }
             }
 
-            return _text.Slice
+            return Substring
                 (
                     startPosition,
                     stopPosition - startPosition
@@ -644,7 +653,7 @@ namespace AM.Text
                 char stopChar
             )
         {
-            var startPosition = _position;
+            var start = _position;
             while (true)
             {
                 var c = ReadChar();
@@ -656,8 +665,8 @@ namespace AM.Text
 
             return Substring
                 (
-                    startPosition,
-                    length: _position - startPosition
+                    start,
+                    length: _position - start
                 );
         } // method ReadTo
 
@@ -729,9 +738,9 @@ namespace AM.Text
                 }
             }
 
-            var result = _text.Slice
+            var result = Substring
                 (
-                    start: start,
+                    start,
                     length: _position - start
                 );
             return result;
@@ -748,7 +757,7 @@ namespace AM.Text
                 char stopChar
             )
         {
-            var start = _position;
+            var startPosition = _position;
             while (true)
             {
                 var c = PeekChar();
@@ -759,10 +768,10 @@ namespace AM.Text
                 ReadChar();
             }
 
-            return _text.Slice
+            return Substring
                 (
-                    start,
-                    _position - start
+                    startPosition,
+                    _position - startPosition
                 );
         } // method ReadUntil
 
@@ -805,7 +814,7 @@ namespace AM.Text
                 }
             }
 
-            var result = _text.Slice
+            var result = Substring
                 (
                     position,
                     _position - position - stopString.Length
@@ -837,7 +846,7 @@ namespace AM.Text
                 ReadChar();
             }
 
-            return _text.Slice
+            return Substring
                 (
                     savePosition,
                     _position - savePosition
@@ -891,7 +900,7 @@ namespace AM.Text
                 ReadChar();
             }
 
-            return _text.Slice
+            return Substring
                 (
                     start,
                     _position - start
@@ -919,7 +928,7 @@ namespace AM.Text
                 ReadChar();
             }
 
-            return _text.Slice
+            return Substring
                 (
                     startPosition,
                     _position - startPosition
@@ -948,7 +957,7 @@ namespace AM.Text
                 ReadChar();
             }
 
-            return _text.Slice
+            return Substring
                 (
                     startPosition,
                     _position - startPosition
@@ -972,7 +981,7 @@ namespace AM.Text
                 ReadChar();
             }
 
-            return _text.Slice
+            return Substring
                 (
                     startPosition,
                     _position - startPosition
@@ -1000,7 +1009,7 @@ namespace AM.Text
                 ReadChar();
             }
 
-            return _text.Slice
+            return Substring
                 (
                     savePosition,
                     _position - savePosition
@@ -1023,10 +1032,10 @@ namespace AM.Text
                 start = 0;
             }
 
-            if (start >= _text.Length)
+            if (start >= _length)
             {
                 length = 0;
-                start = _text.Length - 1;
+                start = _length - 1;
             }
 
             if (length < 0)
@@ -1384,7 +1393,7 @@ namespace AM.Text
                 int offset
             )
         {
-            return _text.Slice(offset);
+            return AsSpan.Slice(offset);
         } // method Substring
 
         /// <summary>
@@ -1397,9 +1406,9 @@ namespace AM.Text
                 int length
             )
         {
-            return offset >= _text.Length || length <= 0
+            return offset >= _length || length <= 0
                 ? ReadOnlySpan<char>.Empty
-                : _text.Slice(offset, length);
+                : AsSpan.Slice(offset, length);
         } // method Substring
 
         #endregion
@@ -1415,6 +1424,6 @@ namespace AM.Text
 
         #endregion
 
-    } // struct ValueTextNavigator
+    } // struct UnsafeTextNavigator
 
 } // namespace AM.Text
