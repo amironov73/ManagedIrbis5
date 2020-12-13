@@ -7,13 +7,12 @@ namespace CoreBenchmarks
 {
     class Program
     {
-        static void BenchmarkRun(string[] args)
+        static void BenchmarkRun()
         {
-            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
-            //BenchmarkRunner.Run<ListBenchmark>();
-            //BenchmarkRunner.Run<FastNumberBenchmark>();
-            //BenchmarkRunner.Run<TextNavigatorBenchmark>();
-        }
+            //BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).RunAll();
+            BenchmarkRunner.Run(typeof(Program).Assembly);
+
+        } // method BenchmarkRun
 
         static void DebugRun()
         {
@@ -22,7 +21,7 @@ namespace CoreBenchmarks
             {
                 benchmark.UseSkipLocalsInit();
             }
-        }
+        } // method DebugRun
 
         static void Main(string[] args)
         {
@@ -32,8 +31,10 @@ namespace CoreBenchmarks
             }
             else
             {
-                BenchmarkRun(args);
+                BenchmarkRun();
             }
-        }
-    }
-}
+        } // method Main
+
+    } // class Program
+
+} // namespace CoreBenchmarks
