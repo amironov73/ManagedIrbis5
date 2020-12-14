@@ -15,13 +15,9 @@
 
 #region Using directives
 
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Text;
-
-using AM.IO;
 
 #endregion
 
@@ -85,7 +81,6 @@ namespace AM.Text
         /// <summary>
         /// Constructor.
         /// </summary>
-#nullable disable
         public TextSeparator
             (
                 string open,
@@ -95,10 +90,9 @@ namespace AM.Text
             Sure.NotNullNorEmpty(open, nameof(open));
             Sure.NotNullNorEmpty(close, nameof(close));
 
-            Close = close;
-            Open = open;
+            _close = close.ToCharArray();
+            _open = open.ToCharArray();
         }
-#nullable restore
 
         /// <summary>
         /// Constructor.

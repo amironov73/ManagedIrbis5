@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* ValueTextNavigator.cs -- навигатор по тексту, оформленный как структура
  * Ars Magna project, http://arsmagna.ru
@@ -29,6 +25,32 @@ namespace AM.Text
     /// <summary>
     /// Навигатор по тексту, оформленный как структура.
     /// </summary>
+    /// <example>
+    /// Пример разбиения текста на слова.
+    /// <code>
+    /// <remarks>
+    /// Все методы класса не потокобезопасные.
+    /// </remarks>
+    /// var text = "У попа была собака, он её любил.";
+    /// var navigator = new ValueTextNavigator(text);
+    ///
+    /// while (true)
+    /// {
+    ///   var word = navigator.ReadWord();
+    ///   if (word.IsEmpty)
+    ///   {
+    ///      break;
+    ///   }
+    ///
+    ///   Console.WriteLine(word.ToString());
+    ///
+    ///   if (!navigator.SkipNonWord())
+    ///   {
+    ///      break;
+    ///   }
+    /// }
+    /// </code>
+    /// </example>
     public ref struct ValueTextNavigator
     {
         #region Constants
@@ -95,7 +117,7 @@ namespace AM.Text
         #region Public methods
 
         /// <summary>
-        /// Клонирование навигатора.
+        /// Клонирование навигатора (включая текущую позицию в тексте).
         /// </summary>
         [Pure]
         public ValueTextNavigator Clone()
@@ -140,76 +162,80 @@ namespace AM.Text
         } // method GetRemainingText
 
         /// <summary>
-        /// Управляющий символ?
+        /// Текущий символ - управляющий?
         /// </summary>
         [Pure]
         public bool IsControl() => char.IsControl(PeekChar());
 
         /// <summary>
-        /// Цифра?
+        /// Текущий символ - цифра?
         /// </summary>
         [Pure]
         public bool IsDigit() => char.IsDigit(PeekChar());
 
         /// <summary>
-        /// Буква?
+        /// Текущий символ - буква?
         /// </summary>
         [Pure]
         public bool IsLetter() => char.IsLetter(PeekChar());
 
         /// <summary>
-        /// Буква или цифра?
+        /// Текущий символ - буква или цифра?
         /// </summary>
         [Pure]
         public bool IsLetterOrDigit() => char.IsLetterOrDigit(PeekChar());
 
         /// <summary>
-        /// Часть числа?
+        /// Текущий символ - часть числа?
         /// </summary>
         [Pure]
         public bool IsNumber() => char.IsNumber(PeekChar());
 
         /// <summary>
-        /// Знак пунктуации?
+        /// Текущий символ - знак пунктуации?
         /// </summary>
         [Pure]
         public bool IsPunctuation() => char.IsPunctuation(PeekChar());
 
         /// <summary>
-        /// Разделитель?
+        /// Текущий символ - разделитель?
         /// </summary>
         [Pure]
         public bool IsSeparator() => char.IsSeparator(PeekChar());
 
         /// <summary>
-        /// Символ?
+        /// Текущий символ принадлежит одной
+        /// из Unicode категорий: MathSymbol,
+        /// CurrencySymbol, ModifierSymbol либо OtherSymbol?
         /// </summary>
         [Pure]
         public bool IsSymbol() => char.IsSymbol(PeekChar());
 
         /// <summary>
-        /// Пробельный символ?
+        /// Текущий символ - пробельный?
         /// </summary>
         [Pure]
         public bool IsWhiteSpace() => char.IsWhiteSpace(PeekChar());
 
         /// <summary>
-        /// Заглядывание вперёд на 1 позицию.
+        /// Заглядывание вперёд на одну позицию.
+        /// Движения по тексту не происходит.
         /// </summary>
-        /// <remarks>Это на 1 позицию дальше,
+        /// <remarks>Это на одну позицию дальше,
         /// чем <see cref="PeekChar()"/>
         /// </remarks>
         [Pure]
         public char LookAhead()
         {
-            var newPosition = _position + 1;
-            return newPosition >= _text.Length
+            var ahead = _position + 1;
+            return ahead >= _text.Length
                 ? EOF
-                : _text[newPosition];
+                : _text[ahead];
         } // method LookAhead
 
         /// <summary>
-        /// Заглядывание вперёд.
+        /// Заглядывание вперёд на указанное количество символов.
+        /// Движения по тексту не происходит.
         /// </summary>
         [Pure]
         public char LookAhead
@@ -219,14 +245,15 @@ namespace AM.Text
         {
             Sure.NonNegative(distance, nameof(distance));
 
-            var newPosition = _position + distance;
-            return newPosition >= _text.Length
+            var ahead = _position + distance;
+            return ahead >= _text.Length
                 ? EOF
-                : _text[newPosition];
+                : _text[ahead];
         } // method LookAhead
 
         /// <summary>
-        /// Заглядывание назад.
+        /// Заглядывание назад на одну позицию.
+        /// Движения по тексту не происходит.
         /// </summary>
         [Pure]
         public char LookBehind()
@@ -237,8 +264,13 @@ namespace AM.Text
         } // method LookBehind
 
         /// <summary>
-        /// Заглядывание назад.
+        /// Заглядывание назад на указанное число позиций.
+        /// Движения по тексту не происходит.
         /// </summary>
+        /// <param name="distance">Дистанция, на которую
+        /// предполагается заглянуть - положительное число,
+        /// означающее количество символов, на которые
+        /// нужно "отмотать назад".</param>
         [Pure]
         public char LookBehind
             (
@@ -253,8 +285,12 @@ namespace AM.Text
         } // method LookBehind
 
         /// <summary>
-        /// Относительное мещение указателя на указанную дистанцию.
+        /// Относительное перемещение указателя на указанную дистанцию.
         /// </summary>
+        /// <remarks>
+        /// Переместить указатель за пределы текста не получится,
+        /// он остановится в крайней (начальной или конечной) позиции.
+        /// </remarks>
         public void Move
             (
                 int distance
@@ -264,7 +300,7 @@ namespace AM.Text
         } // method Move
 
         /// <summary>
-        /// Подглядывание текущего символа.
+        /// Подглядывание текущего символа (т. е. символа в текущей позиции).
         /// </summary>
         [Pure]
         public char PeekChar() => _position >= _text.Length
@@ -274,8 +310,12 @@ namespace AM.Text
         /// <summary>
         /// Подглядывание строки вплоть до указанной длины.
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
+        /// <remarks>
+        /// Символы перевода строки в данном методе
+        /// считаются обычными символами и включаются в результат.
+        /// </remarks>
         public ReadOnlySpan<char> PeekString
             (
                 int length
@@ -308,29 +348,29 @@ namespace AM.Text
         /// Подглядывание вплоть до указанного символа
         /// (включая его).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlySpan<char> PeekTo
             (
                 char stopChar
             )
         {
-            var postion = _position;
+            var position = _position;
             var result = ReadTo(stopChar);
-            _position = postion;
+            _position = position;
 
             return result;
-        }
+        } // method PeekTo
 
         /// <summary>
         /// Подглядывание вплоть до указанных символов
         /// (включая их).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlySpan<char> PeekTo
             (
-                char[] stopChars
+                params char[] stopChars
             )
         {
             var position = _position;
@@ -341,9 +381,10 @@ namespace AM.Text
         } // method PeekTo
 
         /// <summary>
-        /// Подглядывание вплоть до указанного символа.
+        /// Подглядывание вплоть до указанного символа
+        /// (не включая его).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlySpan<char> PeekUntil
             (
@@ -358,9 +399,10 @@ namespace AM.Text
         } // method PeekUntil
 
         /// <summary>
-        /// Подглядывание вплоть до указанных символов.
+        /// Подглядывание вплоть до указанных символов
+        /// (не включая их).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlySpan<char> PeekUntil
             (
@@ -370,11 +412,14 @@ namespace AM.Text
             var position = _position;
             var result = ReadUntil(stopChars);
             _position = position;
+
             return result;
         } // metdho PeekUntil
 
         /// <summary>
-        /// Считывание символа.
+        /// Считывание одного символа.
+        /// Если достигнут конец текста, возвращается
+        /// <see cref="EOF"/>.
         /// </summary>
         public char ReadChar()
         {
@@ -390,8 +435,14 @@ namespace AM.Text
         /// Считывание экранированной строки вплоть до разделителя
         /// (не включая его).
         /// </summary>
+        /// <param name="escapeChar">Экранирующий символ,
+        /// как правило, '\\'.</param>
+        /// <param name="stopChar">Стоп-символ (разделитель).</param>
         /// <returns><c>null</c>, если достигнут конец текста.
         /// </returns>
+        /// <exception cref="FormatException">Нарушен формат (есть символ
+        /// экранирования, но за ним строка обрывается).
+        /// </exception>
         public string? ReadEscapedUntil
             (
                 char escapeChar,
@@ -447,9 +498,8 @@ namespace AM.Text
         /// Считывание начиная с открывающего символа
         /// до закрывающего (включая их).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
-        /// Пустая строка, если нет открывающего
-        /// или закрывающего символа.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+        /// или нет открывающего либо закрывающего символа.
         /// </returns>
         public ReadOnlySpan<char> ReadFrom
             (
@@ -463,8 +513,7 @@ namespace AM.Text
             }
 
             var start = _position;
-            var c = PeekChar();
-            if (c != openChar)
+            if (PeekChar() != openChar)
             {
                 return ReadOnlySpan<char>.Empty;
             }
@@ -472,12 +521,13 @@ namespace AM.Text
 
             while (true)
             {
-                c = ReadChar();
+                var c = ReadChar();
                 if (c == EOF)
                 {
                     _position = start;
                     return ReadOnlySpan<char>.Empty;
                 }
+
                 if (c == closeChar)
                 {
                     break;
@@ -495,9 +545,8 @@ namespace AM.Text
         /// Считывание начиная с открывающего символа
         /// до закрывающего (включая их).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
-        /// Пустая строка, если нет открывающего
-        /// или закрывающего символа.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+        /// или если нет открывающего либо закрывающего символа.
         /// </returns>
         public ReadOnlySpan<char> ReadFrom
             (
@@ -511,8 +560,7 @@ namespace AM.Text
             }
 
             var start = _position;
-            var c = PeekChar();
-            if (!openChars.Contains(c))
+            if (!openChars.Contains(PeekChar()))
             {
                 return ReadOnlySpan<char>.Empty;
             }
@@ -520,7 +568,7 @@ namespace AM.Text
 
             while (true)
             {
-                c = ReadChar();
+                var c = ReadChar();
                 if (c == EOF)
                 {
                     _position = start;
@@ -542,8 +590,8 @@ namespace AM.Text
         /// <summary>
         /// Чтение беззнакового целого.
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
-        /// Пустую строку, если не число.</returns>
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+        /// или текущий символ не цифровой.</returns>
         public ReadOnlySpan<char> ReadInteger()
         {
             if (!IsDigit())
@@ -579,12 +627,11 @@ namespace AM.Text
                 }
                 ReadChar();
             }
-            var stopPosition = _position;
 
+            var stopPosition = _position;
             if (!IsEOF)
             {
                 var c = PeekChar();
-
                 if (c == '\r')
                 {
                     ReadChar();
@@ -607,7 +654,7 @@ namespace AM.Text
         /// <summary>
         /// Чтение строки вплоть до указанной длины.
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlySpan<char> ReadString
             (
@@ -637,7 +684,7 @@ namespace AM.Text
         /// Считывание вплоть до указанного символа
         /// (включая его).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlySpan<char> ReadTo
             (
@@ -666,6 +713,8 @@ namespace AM.Text
         /// (разделитель не помещается в возвращаемое значение,
         /// однако, считывается).
         /// </summary>
+        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
+        /// </remarks>
         public ReadOnlySpan<char> ReadToString
             (
                 ReadOnlySpan<char> stopString
@@ -711,7 +760,7 @@ namespace AM.Text
         /// Считывание вплоть до указанного символа
         /// (включая один из них).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlySpan<char> ReadTo
             (
@@ -741,7 +790,7 @@ namespace AM.Text
         /// Считывание вплоть до указанного символа
         /// (не включая его).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlySpan<char> ReadUntil
             (
@@ -771,6 +820,8 @@ namespace AM.Text
         /// (разделитель не помещается в возвращаемое значение
         /// и не считывается).
         /// </summary>
+        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
+        /// </remarks>
         public ReadOnlySpan<char> ReadUntilString
             (
                 ReadOnlySpan<char> stopString
@@ -818,7 +869,7 @@ namespace AM.Text
         /// Считывание вплоть до указанных символов
         /// (не включая их).
         /// </summary>
-        /// <remarks><c>null</c>, если достигнут конец текста.
+        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </remarks>
         public ReadOnlySpan<char> ReadUntil
             (
@@ -848,7 +899,8 @@ namespace AM.Text
         /// Считывание вплоть до указанных символов
         /// (не включая их).
         /// </summary>
-        /// <remarks><c>null</c>, если достигнут конец текста.
+        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста
+        /// или текущий символ не открывающий.
         /// </remarks>
         public ReadOnlySpan<char> ReadUntil
             (
@@ -901,7 +953,8 @@ namespace AM.Text
         /// <summary>
         /// Считывание, пока встречается указанный символ.
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Простой фрагмент</c>, если достигнут конец текста
+        /// или текущий символ не совпадает с указанным.
         /// </returns>
         public ReadOnlySpan<char> ReadWhile
             (
@@ -929,14 +982,15 @@ namespace AM.Text
         /// <summary>
         /// Считывание, пока встречается указанные символы.
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+        /// или текущий символ не входит в число "хороших".
         /// </returns>
         public ReadOnlySpan<char> ReadWhile
             (
                 params char[] goodChars
             )
         {
-            var startPosition = _position;
+            var start = _position;
             while (true)
             {
                 var c = PeekChar();
@@ -950,14 +1004,17 @@ namespace AM.Text
 
             return _text.Slice
                 (
-                    startPosition,
-                    _position - startPosition
+                    start,
+                    _position - start
                 );
         } // method ReadWhile
 
         /// <summary>
-        /// Считываем слово под курсором.
+        /// Считываем слово, начиная с текущей позиции.
         /// </summary>
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+        /// или текущий символ "не-словесный".
+        /// </returns>
         public ReadOnlySpan<char> ReadWord()
         {
             var startPosition = _position;
@@ -982,6 +1039,11 @@ namespace AM.Text
         /// <summary>
         /// Считываем слово под курсором.
         /// </summary>
+        /// <param name="additionalWordCharacters">Дополнительные символы,
+        /// которые мы полагаем "словесными".</param>
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+        /// или текущий символ "не-словесный".
+        /// </returns>
         public ReadOnlySpan<char> ReadWord
             (
                 params char[] additionalWordCharacters
@@ -1010,6 +1072,8 @@ namespace AM.Text
         /// <summary>
         /// Получаем недавно считанный текст указанной длины.
         /// </summary>
+        /// <param name="length">Желаемая длина текста в символах
+        /// (положительное целое).</param>
         [Pure]
         public ReadOnlySpan<char> RecentText
             (
@@ -1040,7 +1104,7 @@ namespace AM.Text
         /// <summary>
         /// Пропускает один символ, если он совпадает с указанным.
         /// </summary>
-        /// <returns><c>true</c>, если символ был съеден успешно
+        /// <returns><c>true</c>, если символ был съеден успешно.
         /// </returns>
         public bool SkipChar
             (
@@ -1098,6 +1162,8 @@ namespace AM.Text
         /// <summary>
         /// Пропускаем управляющие символы.
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipControl()
         {
             while (true)
@@ -1121,6 +1187,8 @@ namespace AM.Text
         /// <summary>
         /// Пропускаем пунктуацию.
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipPunctuation()
         {
             while (true)
@@ -1142,8 +1210,10 @@ namespace AM.Text
         } // method SkipPunctuation
 
         /// <summary>
-        /// Skip non-word characters.
+        /// Пропускаем "не-словесные" символы.
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipNonWord()
         {
             while (true)
@@ -1166,8 +1236,10 @@ namespace AM.Text
         } // method SkipNonWord
 
         /// <summary>
-        /// Skip non-word characters.
+        /// Пропускаем "не-словесные" символы.
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipNonWord
             (
                 params char[] additionalWordCharacters
@@ -1195,8 +1267,10 @@ namespace AM.Text
 
         /// <summary>
         /// Пропускаем произвольное количество символов
-        /// из указанного диапазона.
+        /// из указанного диапазона (например, от 'A' до 'Z').
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipRange
             (
                 char fromChar,
@@ -1225,6 +1299,8 @@ namespace AM.Text
         /// <summary>
         /// Пропустить указанный символ.
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipWhile
             (
                 char skipChar
@@ -1252,6 +1328,8 @@ namespace AM.Text
         /// <summary>
         /// Пропустить указанные символы.
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipWhile
             (
                 params char[] skipChars
@@ -1277,9 +1355,11 @@ namespace AM.Text
         } // method SkipWhile
 
         /// <summary>
-        /// Пропустить, пока не встретится указанный символ.
-        /// Сам символ не считывается.
+        /// Пропустить, пока не встретится указанный стоп-символ.
+        /// Сам стоп-символ не считывается.
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipTo
             (
                 char stopChar
@@ -1292,7 +1372,7 @@ namespace AM.Text
                     return false;
                 }
 
-                char c = PeekChar();
+                var c = PeekChar();
                 if (c == stopChar)
                 {
                     return true;
@@ -1305,6 +1385,8 @@ namespace AM.Text
         /// <summary>
         /// Пропустить, пока не встретятся указанные символы.
         /// </summary>
+        /// <returns><c>false</c>, если достигнут конец текста.
+        /// </returns>
         public bool SkipWhileNot
             (
                 params char[] goodChars
@@ -1376,7 +1458,7 @@ namespace AM.Text
         } // method SkipWhitespaceAndPunctuation
 
         /// <summary>
-        /// Get substring.
+        /// Извлечение подстроки, начиная с указанного смещения.
         /// </summary>
         [Pure]
         public ReadOnlySpan<char> Substring
@@ -1384,12 +1466,20 @@ namespace AM.Text
                 int offset
             )
         {
-            return _text.Slice(offset);
+            return offset < 0
+                || offset >= _text.Length
+                ? ReadOnlySpan<char>.Empty
+                : _text.Slice(offset);
         } // method Substring
 
         /// <summary>
-        /// Get substring.
+        /// Извлечение подстроки.
         /// </summary>
+        /// <remarks>Если параметры заданы неверно,
+        /// метод может выбросить исключение
+        /// <see cref="ArgumentOutOfRangeException"/>.</remarks>
+        /// <param name="offset">Смещение до начала подстроки в символах.</param>
+        /// <param name="length">Длина подстроки в символах.</param>
         [Pure]
         public ReadOnlySpan<char> Substring
             (
@@ -1397,7 +1487,9 @@ namespace AM.Text
                 int length
             )
         {
-            return offset >= _text.Length || length <= 0
+            return offset < 0
+                || offset >= _text.Length
+                || length <= 0
                 ? ReadOnlySpan<char>.Empty
                 : _text.Slice(offset, length);
         } // method Substring

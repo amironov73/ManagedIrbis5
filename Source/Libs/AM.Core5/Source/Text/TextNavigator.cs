@@ -305,7 +305,7 @@ namespace AM.Text
                 int distance
             )
         {
-            // Sure.Positive(distance, nameof(distance));
+            Sure.Positive(distance, nameof(distance));
 
             return _position < distance
                 ? EOF
@@ -338,7 +338,7 @@ namespace AM.Text
         /// <summary>
         /// Подглядывание строки вплоть до указанной длины.
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlyMemory<char> PeekString
             (
@@ -372,7 +372,7 @@ namespace AM.Text
         /// Подглядывание вплоть до указанного символа
         /// (включая его).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlyMemory<char> PeekTo
             (
@@ -390,11 +390,11 @@ namespace AM.Text
         /// Подглядывание вплоть до указанных символов
         /// (включая их).
         /// </summary>
-        /// <returns><c>null</c>, если достигнут конец текста.
+        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         public ReadOnlyMemory<char> PeekTo
             (
-                char[] stopChars
+                params char[] stopChars
             )
         {
             using (new StateHolder(this))
