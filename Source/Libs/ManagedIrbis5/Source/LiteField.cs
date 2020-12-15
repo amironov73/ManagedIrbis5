@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Field.cs -- поле библиографической записи
+/* LiteField.cs -- облегченное поле библиографической записи
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,42 +29,42 @@ using AM;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Поле библиографической записи.
+    /// Облегченное поле библиографической записи.
     /// </summary>
-    public class Field
+    public sealed class LiteField
     {
         #region Properties
 
         /// <summary>
         /// Метка поля.
         /// </summary>
-        public int Tag { get; set; } = 0;
+        public int Tag { get; set; }
 
         /// <summary>
         /// Значение поля до первого разделителя.
         /// </summary>
-        public string? Value { get; set; }
+        public ReadOnlyMemory<byte> Value => GetFirstSubFieldValue('\0');
 
         /// <summary>
         /// Список подполей.
         /// </summary>
-        public List<SubField> Subfields { get; } = new ();
+        public List<LiteSubField> Subfields { get; } = new ();
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Добавление подполя в конец списка подполей.
+        /// Добавление подполя с указанными кодом и значением
+        /// в конец списка подполей.
         /// </summary>
-        public Field Add
+        public LiteField Add
             (
-                char code,
-                object? value
+                byte code,
+                ReadOnlyMemory<byte> value
             )
         {
-            var text = value?.ToString();
-            var subfield = new SubField { Code = code, Value = text };
+            var subfield = new LiteSubField { Code = code, Value = value };
             Subfields.Add(subfield);
 
             return this;
@@ -74,20 +74,16 @@ namespace ManagedIrbis
         /// Добавление подполя в конец списка подполей
         /// при условии, что значение поля не пустое.
         /// </summary>
-        public Field AddNonEmpty
+        public LiteField AddNonEmpty
             (
-                char code,
-                object? value
+                byte code,
+                ReadOnlyMemory<byte> value
             )
         {
-            if (!ReferenceEquals(value, null))
+            if (!value.IsEmpty)
             {
-                var text = value.ToString();
-                if (!string.IsNullOrEmpty(text))
-                {
-                    var subfield = new SubField {Code = code, Value = text};
-                    Subfields.Add(subfield);
-                }
+                var subfield = new LiteSubField {Code = code, Value = value};
+                Subfields.Add(subfield);
             }
 
             return this;
@@ -96,9 +92,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Очистка подполей.
         /// </summary>
-        public Field Clear()
+        public LiteField Clear()
         {
-            Value = null;
             Subfields.Clear();
 
             return this;
@@ -107,9 +102,9 @@ namespace ManagedIrbis
         /// <summary>
         /// Клонирование поля.
         /// </summary>
-        public Field Clone()
+        public LiteField Clone()
         {
-            var result = (Field) MemberwiseClone();
+            var result = (LiteField) MemberwiseClone();
 
             for (var i = 0; i < Subfields.Count; i++)
             {
@@ -124,11 +119,12 @@ namespace ManagedIrbis
         /// </summary>
         public void Decode
             (
-                ReadOnlySpan<char> line
+                ReadOnlyMemory<byte> line
             )
         {
-            var index = line.IndexOf('#');
-            Tag = int.Parse(line.Slice(0, index));
+            var span = line.Span;
+            var index = span.IndexOf((byte)'#');
+            Tag = FastNumber.ParseInt32(line.Slice(0, index));
             line = line.Slice(index + 1);
             DecodeBody(line);
         } // method Decode
@@ -138,47 +134,39 @@ namespace ManagedIrbis
         /// </summary>
         public void DecodeBody
             (
-                ReadOnlySpan<char> line
+                ReadOnlyMemory<byte> line
             )
         {
-            var index = line.IndexOf('^');
-            if (index < 0)
+            while (!line.IsEmpty)
             {
-                Value = line.ToString();
-                return;
-            }
-
-            if (index != 0)
-            {
-                Value = line.Slice(0, index).ToString();
-            }
-            line = line.Slice(index + 1);
-
-            while (true)
-            {
-                index = line.IndexOf('^');
+                var span = line.Span;
+                var index = span.IndexOf(LiteSubField.Delimiter);
+                var subField = new LiteSubField();
                 if (index < 0)
                 {
-                    Add(line[0], line.Slice(1).ToString());
-                    return;
+                    subField.Decode(line);
                 }
-
-                Add(line[0], line.Slice(1, index - 1).ToString());
-                line = line.Slice(index + 1);
+                else
+                {
+                    subField.Decode(line.Slice(0, index));
+                    line = line.Slice(index + 1);
+                }
+                Subfields.Add(subField);
             }
         } // method DecodeBody
 
         /// <summary>
         /// Получение первого подполя с указанным кодом.
         /// </summary>
-        public SubField? GetFirstSubField
+        public LiteSubField? GetFirstSubField
             (
                 char code
             )
         {
+            var byteCode = (byte)Char.ToLowerInvariant(code);
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code == byteCode)
                 {
                     return subfield;
                 }
@@ -194,15 +182,16 @@ namespace ManagedIrbis
         /// <remarks>Сравнение кодов происходит без учета
         /// регистра символов.</remarks>
         /// <returns>Найденные подполя.</returns>
-        public SubField[] GetSubField
+        public LiteSubField[] GetSubField
             (
                 char code
             )
         {
-            List<SubField> result = new ();
+            var byteCode = (byte)char.ToLowerInvariant(code);
+            List<LiteSubField> result = new ();
             foreach (var subField in Subfields)
             {
-                if (subField.Code.SameChar(code))
+                if (subField.Code == byteCode)
                 {
                     result.Add(subField);
                 }
@@ -219,15 +208,16 @@ namespace ManagedIrbis
         /// Нумерация начинается с нуля.
         /// Отрицательные индексы отсчитываются с конца массива.</param>
         /// <returns>Найденное подполе или <c>null</c>.</returns>
-        public SubField? GetSubField
+        public LiteSubField? GetSubField
             (
                 char code,
                 int occurrence
             )
         {
+            var byteCode = (byte)char.ToLowerInvariant(code);
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code == byteCode)
                 {
                     if (occurrence == 0)
                     {
@@ -249,7 +239,7 @@ namespace ManagedIrbis
         /// Нумерация начинается с нуля.
         /// Отрицательные индексы отсчитываются с конца массива.</param>
         /// <returns>Текст найденного подполя или <c>null</c>.</returns>
-        public string? GetSubFieldValue
+        public ReadOnlyMemory<byte> GetSubFieldValue
             (
                 char code,
                 int occurrence
@@ -257,32 +247,33 @@ namespace ManagedIrbis
         {
             var result = GetSubField(code, occurrence);
 
-            return result?.Value;
+            return result?.Value ?? ReadOnlyMemory<byte>.Empty;
         } // method GetSubFieldValue
 
         /// <summary>
         /// Получает значение первого появления подполя
         /// с указанным кодом.
         /// </summary>
-        public string? GetFirstSubFieldValue
+        public ReadOnlyMemory<byte> GetFirstSubFieldValue
             (
                 char code
             )
         {
             var result = GetFirstSubField(code);
 
-            return result?.Value;
+            return result?.Value ?? ReadOnlyMemory<byte>.Empty;
         } // method GetFirstSubFieldValue
 
         /// <summary>
         /// For * specification.
         /// </summary>
-        public string? GetValueOrFirstSubField()
+        public ReadOnlyMemory<byte> GetValueOrFirstSubField()
         {
             var result = Value;
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty && Subfields.Count != 0)
             {
-                result = Subfields.FirstOrDefault()?.Value;
+                result = Subfields.FirstOrDefault()?.Value
+                         ?? ReadOnlyMemory<byte>.Empty;
             }
 
             return result;
@@ -295,12 +286,9 @@ namespace ManagedIrbis
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            int length = 4 + (Value?.Length ?? 0)
-                           + Subfields.Sum(sf => (sf.Value?.Length ?? 0) + 2);
-            var result = new StringBuilder (length);
+            var result = new StringBuilder ();
             result.Append(Tag.ToInvariantString())
-                .Append('#')
-                .Append(Value);
+                .Append('#');
             foreach (var subfield in Subfields)
             {
                 result.Append(subfield);
@@ -311,6 +299,6 @@ namespace ManagedIrbis
 
         #endregion
 
-    } // class Field
+    } // class LiteField
 
 } // namespace ManagedIrbis

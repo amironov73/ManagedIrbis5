@@ -2,10 +2,14 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
 
-/* SubField.cs -- подполе библиографической записи
+/* LiteSubField.cs -- облегченное подполе библиографической записи
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,6 +19,8 @@ using System;
 
 using AM;
 
+using ManagedIrbis.Infrastructure;
+
 #endregion
 
 #nullable enable
@@ -22,9 +28,9 @@ using AM;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Подполе библиографической записи.
+    /// Облегченное подполе библиографической записи.
     /// </summary>
-    public class SubField
+    public sealed class LiteSubField
         : IVerifiable
     {
         #region Constants
@@ -32,12 +38,12 @@ namespace ManagedIrbis
         /// <summary>
         /// Нет кода подполя, т. е. код пока не задан.
         /// </summary>
-        public const char NoCode = '\0';
+        public const byte NoCode = 0;
 
         /// <summary>
         /// Subfield delimiter.
         /// </summary>
-        public const char Delimiter = '^';
+        public const byte Delimiter = (byte)'^';
 
         #endregion
         #region Properties
@@ -45,12 +51,12 @@ namespace ManagedIrbis
         /// <summary>
         /// Код подполя.
         /// </summary>
-        public char Code { get; set; } = '\0';
+        public byte Code { get; set; }
 
         /// <summary>
         /// Значение подполя.
         /// </summary>
-        public string? Value { get; set; }
+        public ReadOnlyMemory<byte> Value { get; set; }
 
         #endregion
 
@@ -59,23 +65,23 @@ namespace ManagedIrbis
         /// <summary>
         /// Клонирование подполя.
         /// </summary>
-        public SubField Clone()
+        public LiteSubField Clone()
         {
-            return (SubField) MemberwiseClone();
-        } // method Clone
+            return (LiteSubField)MemberwiseClone();
+        }
 
         /// <summary>
         /// Декодирование строки.
         /// </summary>
         public void Decode
             (
-                ReadOnlySpan<char> text
+                ReadOnlyMemory<byte> text
             )
         {
             if (!text.IsEmpty)
             {
-                Code = char.ToLowerInvariant(text[0]);
-                Value = text.Slice(1).ToString();
+                Code = text.Span[0];
+                Value = text.Slice(1);
             }
         } // method Decode
 
@@ -89,13 +95,10 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<SubField>(this, throwOnError);
+            var verifier = new Verifier<LiteSubField>(this, throwOnError);
 
-            verifier.Assert(Code > ' ', "Wrong Code");
-            if (!string.IsNullOrEmpty(Value))
-            {
-                verifier.Assert(!Value.Contains(Delimiter));
-            }
+            verifier.Assert(Code > (byte)' ', "Wrong Code");
+            verifier.Assert(!Value.Span.Contains(Delimiter));
 
             return verifier.Result;
         } // method Verify
@@ -107,9 +110,13 @@ namespace ManagedIrbis
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            return Code == '\0'
-                ? Value ?? string.Empty
-                : "^" + char.ToLowerInvariant(Code) + Value;
+            var value = Value.IsEmpty
+                ? string.Empty
+                : IrbisEncoding.Utf8.GetString(Value.Span);
+
+            return Code == 0
+                ? value
+                : "^" + (char)Code + value;
         } // method ToString
 
         #endregion

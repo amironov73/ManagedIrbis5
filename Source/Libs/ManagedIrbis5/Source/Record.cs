@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* MarcRecord.cs -- библиографическая запись
+/* Record.cs -- библиографическая запись
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -293,5 +293,7 @@ namespace ManagedIrbis
         } // method ToString
 
         #endregion
-    }
-}
+
+    } // class Record
+
+} // namespace ManagedIrbis
