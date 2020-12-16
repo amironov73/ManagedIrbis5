@@ -1140,7 +1140,41 @@ namespace AM
             }
 
             return result.ToString();
-        }
+        } // method Mangle
+
+        /// <summary>
+        /// Сравнение двух фрагментов.
+        /// </summary>
+        public static int CompareSpans
+            (
+                ReadOnlySpan<byte> first,
+                ReadOnlySpan<byte> second
+            )
+        {
+            for (var i = 0; ; i++)
+            {
+                if (i == first.Length)
+                {
+                    if (i == second.Length)
+                    {
+                        return 0;
+                    }
+
+                    return -1;
+                }
+
+                if (i == second.Length)
+                {
+                    return 1;
+                }
+
+                var result = first[i] - second[i];
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
+        } // method CompareSpans
 
         #endregion
     }

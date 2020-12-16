@@ -313,18 +313,19 @@ namespace AM.IO
             var start = _position;
             while (!IsEOF)
             {
-                var c = PeekChar();
+                var c = PeekByte();
                 if (c == '\r' || c == '\n')
                 {
                     break;
                 }
-                ReadChar();
+
+                ReadByte();
             }
 
             var stop = _position;
             if (!IsEOF)
             {
-                var c = PeekChar();
+                var c = PeekByte();
                 if (c == '\r')
                 {
                     ReadChar();
@@ -333,7 +334,7 @@ namespace AM.IO
 
                 if (c == '\n')
                 {
-                    ReadChar();
+                    ReadByte();
                 }
             }
 
@@ -352,30 +353,34 @@ namespace AM.IO
 
             while (!IsEOF)
             {
-                var c = PeekChar();
+                var c = PeekByte();
                 if (c == '\r' || c == '\n')
                 {
                     break;
                 }
-                ReadChar();
+
+                ReadByte();
             }
 
             if (!IsEOF)
             {
-                var c = PeekChar();
+                var c = PeekByte();
 
                 if (c == '\r')
                 {
-                    ReadChar();
-                    c = PeekChar();
+                    ReadByte();
+                    c = PeekByte();
                 }
+
                 if (c == '\n')
                 {
-                    ReadChar();
+                    ReadByte();
                 }
             }
         } // method SkipLine
 
         #endregion
+
     } // struct UnsafeByteNavigator
+
 } // namespace AM.IO

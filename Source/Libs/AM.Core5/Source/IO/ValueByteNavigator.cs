@@ -46,7 +46,7 @@ namespace AM.IO
         /// <summary>
         /// Используемая кодировка.
         /// </summary>
-        public Encoding Encoding { get; set; }
+        public Decoder Decoder { get; }
 
         /// <summary>
         /// Достигнут конец данных?
@@ -82,13 +82,15 @@ namespace AM.IO
         /// </summary>
         public ValueByteNavigator
             (
-                ReadOnlySpan<byte> data
+                ReadOnlySpan<byte> data,
+                Encoding? encoding = default
             )
         {
             _data = data;
             _position = 0;
-            Encoding = Encoding.Default;
-        }
+            encoding ??= Encoding.Default;
+            Decoder = encoding.GetDecoder();
+        } // constructor
 
         #endregion
 
@@ -100,20 +102,6 @@ namespace AM.IO
         #endregion
 
         #region Public methods
-
-        /// <summary>
-        /// Клонирование навигатора.
-        /// </summary>
-        public ValueByteNavigator Clone()
-        {
-            var result = new ValueByteNavigator (_data)
-            {
-                Encoding = Encoding,
-                _position = _position
-            };
-
-            return result;
-        } // method Clone
 
         /// <summary>
         /// Навигатор по двоичному файлу.
@@ -259,19 +247,67 @@ namespace AM.IO
                 : _data[_position];
 
         /// <summary>
+        /// Заглядывание вперед на указанную дистанцию.
+        /// </summary>
+        /// <param name="distantion">Дистанция, байты.</param>
+        public int LookAhead
+            (
+                int distantion
+            )
+        {
+            var position = _position + distantion;
+
+            return position >= _data.Length
+                ? EOF
+                : _data[position];
+        }
+
+        /// <summary>
         /// Peek one char.
         /// </summary>
         [Pure]
-        public char PeekChar()
+        public unsafe char PeekChar()
         {
-            if (_position >= _data.Length)
+            // Максимальная длина для UTF-8
+            const int MaxBytes = 6;
+
+            var current = PeekByte();
+            if (current < 0)
             {
                 return '\0';
             }
 
-            // TODO implement properly
+            var bytes = stackalloc byte[MaxBytes];
+            bytes[0] = (byte)current;
+            var count = 1;
 
-            var result = (char)_data[_position];
+            var result = '?';
+            var ptr = &result;
+            Decoder.Reset();
+            Decoder.Convert(bytes, count, ptr, 1,
+                false, out var _, out var charsUsed,
+                out var _);
+            while (charsUsed != 1)
+            {
+                if (count == MaxBytes)
+                {
+                    return '\0';
+                }
+
+                current = LookAhead(count);
+                if (current < 0)
+                {
+                    return '\0';
+                }
+
+                ++bytes;
+                *bytes = (byte)current;
+                count++;
+
+                Decoder.Convert(bytes, count, ptr, 1,
+                    false, out _, out charsUsed,
+                    out _);
+            }
 
             return result;
         } // method PeekChar
@@ -296,55 +332,51 @@ namespace AM.IO
         /// Чтение одного символа
         /// (текущая позиция продвигается).
         /// </summary>
-        public char ReadChar()
+        public unsafe char ReadChar()
         {
-            if (_position >= _data.Length)
+            // Максимальная длина для UTF-8
+            const int MaxBytes = 6;
+
+            var current = ReadByte();
+            if (current < 0)
             {
                 return '\0';
             }
 
-            var result = (char)_data[_position++];
+            var bytes = stackalloc byte[MaxBytes];
+            bytes[0] = (byte)current;
+            var count = 1;
+
+            var result = '?';
+            var ptr = &result;
+            Decoder.Reset();
+            Decoder.Convert(bytes, count, ptr, 1,
+                false, out var _, out var charsUsed,
+                out var _);
+            while (charsUsed != 1)
+            {
+                if (count == MaxBytes)
+                {
+                    return '\0';
+                }
+
+                current = ReadByte();
+                if (current < 0)
+                {
+                    return '\0';
+                }
+
+                ++bytes;
+                *bytes = (byte)current;
+                count++;
+
+                Decoder.Convert(bytes, count, ptr, 1,
+                    false, out _, out charsUsed,
+                    out _);
+            }
 
             return result;
 
-            // TODO implement properly
-
-            //byte[] bytes = new byte[Encoding.GetMaxByteCount(1)];
-            //bytes[0] = _data[Position];
-            //Position++;
-            //int count = 1;
-
-            //Decoder decoder = Encoding.GetDecoder();
-            //decoder.Reset();
-
-            //char[] chars = new char[1];
-            //int bytesUsed, charsUsed;
-            //bool completed;
-            //decoder.Convert(bytes, 0, count, chars, 0, 1,
-            //    false, out bytesUsed, out charsUsed,
-            //    out completed);
-            //while (charsUsed != 1)
-            //{
-            //    if (count == bytes.Length)
-            //    {
-            //        return '\0';
-            //    }
-
-            //    if (Position >= Length)
-            //    {
-            //        return '\0';
-            //    }
-
-            //    bytes[count] = _data[Position];
-            //    count++;
-            //    Position++;
-
-            //    decoder.Convert(bytes, 0, count, chars, 0, 1,
-            //        false, out bytesUsed, out charsUsed,
-            //        out completed);
-            //}
-
-            //return chars[0];
         } // method ReadChar
 
         /// <summary>
@@ -360,32 +392,74 @@ namespace AM.IO
             var start = _position;
             while (!IsEOF)
             {
-                var c = PeekChar();
+                var c = PeekByte();
                 if (c == '\r' || c == '\n')
                 {
                     break;
                 }
-                ReadChar();
+
+                ReadByte();
             }
 
             var stop = _position;
             if (!IsEOF)
             {
-                var c = PeekChar();
+                var c = PeekByte();
                 if (c == '\r')
                 {
-                    ReadChar();
-                    c = PeekChar();
+                    ReadByte();
+                    c = PeekByte();
                 }
 
                 if (c == '\n')
                 {
-                    ReadChar();
+                    ReadByte();
                 }
             }
 
             return _data.Slice(start, stop - start);
         } // method ReadLine
+
+        /// <summary>
+        /// Чтение до конца строки.
+        /// </summary>
+        public ReadOnlySpan<byte> ReadIrbisLine()
+        {
+            if (IsEOF)
+            {
+                return ReadOnlySpan<byte>.Empty;
+            }
+
+            var start = _position;
+            while (!IsEOF)
+            {
+                var c = PeekByte();
+                if (c == 0x1F || c == 0x1E)
+                {
+                    break;
+                }
+
+                ReadByte();
+            }
+
+            var stop = _position;
+            if (!IsEOF)
+            {
+                var c = PeekByte();
+                if (c == 0x1F)
+                {
+                    ReadByte();
+                    c = PeekByte();
+                }
+
+                if (c == 0x1E)
+                {
+                    ReadByte();
+                }
+            }
+
+            return _data.Slice(start, stop - start);
+        } // method ReadIrbisLine
 
         /// <summary>
         /// Пропускаем строку
@@ -399,30 +473,33 @@ namespace AM.IO
 
             while (!IsEOF)
             {
-                var c = PeekChar();
+                var c = PeekByte();
                 if (c == '\r' || c == '\n')
                 {
                     break;
                 }
-                ReadChar();
+                ReadByte();
             }
 
             if (!IsEOF)
             {
-                var c = PeekChar();
+                var c = PeekByte();
 
                 if (c == '\r')
                 {
-                    ReadChar();
-                    c = PeekChar();
+                    ReadByte();
+                    c = PeekByte();
                 }
+
                 if (c == '\n')
                 {
-                    ReadChar();
+                    ReadByte();
                 }
             }
         } // method SkipLine
 
         #endregion
+
     } // struct ValueByteNavigator
+
 } // namespace AM.IO

@@ -63,7 +63,7 @@ namespace TeleIrbis
 
             var uri = new Uri("http://172.27.100.5:4444");
             _proxy = new WebProxy(uri);
-            _token = "no:such:tocken";
+            _token = "no:such:token";
             _client = new TelegramBotClient(_token, _proxy);
 
             var me = _client.GetMeAsync().Result;
