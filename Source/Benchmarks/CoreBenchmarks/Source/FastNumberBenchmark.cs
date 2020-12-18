@@ -61,7 +61,7 @@ namespace CoreBenchmarks
         [Benchmark]
         public void Int32_ToString()
         {
-            for (int i = 0; i < 10000; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 _data2 = i.ToInvariantString();
             }
@@ -70,9 +70,20 @@ namespace CoreBenchmarks
         [Benchmark]
         public void FastNumber_Int32ToString()
         {
-            for (int i = 0; i < 10000; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 _data2 = FastNumber.Int32ToString(i);
+            }
+        }
+
+        [Benchmark]
+        public unsafe void FastNumber_Int32ToChars()
+        {
+            Span<char> buffer = stackalloc char[10];
+
+            for (var i = 0; i < 10000; i++)
+            {
+                FastNumber.Int32ToChars(i, buffer);
             }
         }
     }

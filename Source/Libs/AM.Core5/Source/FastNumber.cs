@@ -53,13 +53,165 @@ namespace AM
             {
                 for (; number != 0; offset--)
                 {
-                    number = Math.DivRem(number, 10, out int rem);
+                    number = Math.DivRem(number, 10, out var rem);
                     buffer[offset] = (char) ('0' + rem);
                 }
             }
 
             return new string(buffer, offset + 1, 9 - offset);
-        }
+        } // method Int32ToString
+
+        /// <summary>
+        /// Преобразование целого числа в строку (знак игнорируем).
+        /// </summary>
+        public static unsafe int Int32ToChars
+            (
+                int number,
+                Span<char> buffer
+            )
+        {
+            fixed (char* start = buffer)
+            {
+                var length = 0;
+                if (number == 0)
+                {
+                    *start = '0';
+                    return 1;
+                }
+
+                var end = start;
+                for (; number != 0; ++end)
+                {
+                    number = Math.DivRem(number, 10, out var rem);
+                    *end = (char) ('0' + rem);
+                    ++length;
+                }
+
+                var ptr1 = start;
+                var ptr2 = end;
+                while (ptr1 != ptr2)
+                {
+                    var c = *ptr1;
+                    *ptr1++ = *--ptr2;
+                    *ptr2 = c;
+                }
+
+                return length;
+            }
+        } // method Int32ToChars
+
+        /// <summary>
+        /// Преобразование целого числа в строку (знак игнорируем).
+        /// </summary>
+        public static unsafe char* Int32ToChars
+            (
+                int number,
+                char *buffer
+            )
+        {
+            var start = buffer;
+            var length = 0;
+            if (number == 0)
+            {
+                *start = '0';
+                return buffer + 1;
+            }
+
+            var end = start;
+            for (; number != 0; ++end)
+            {
+                number = Math.DivRem(number, 10, out var rem);
+                *end = (char) ('0' + rem);
+                ++length;
+            }
+
+            var ptr1 = start;
+            var ptr2 = end;
+            while (ptr1 != ptr2)
+            {
+                var c = *ptr1;
+                *ptr1++ = *--ptr2;
+                *ptr2 = c;
+            }
+
+            return buffer + length;
+        } //hod Int32ToChars
+
+        /// <summary>
+        /// Преобразование целого числа в строку (знак игнорируем).
+        /// </summary>
+        public static unsafe int Int32ToBytes
+            (
+                int number,
+                Span<byte> buffer
+            )
+        {
+            fixed (byte* start = buffer)
+            {
+                var length = 0;
+                if (number == 0)
+                {
+                    *start = (byte)'0';
+                    return 1;
+                }
+
+                var end = start;
+                for (; number != 0; ++end)
+                {
+                    number = Math.DivRem(number, 10, out var rem);
+                    *end = (byte) ('0' + rem);
+                    ++length;
+                }
+
+                var ptr1 = start;
+                var ptr2 = end;
+                while (ptr1 != ptr2)
+                {
+                    var c = *ptr1;
+                    *ptr1++ = *--ptr2;
+                    *ptr2 = c;
+                }
+
+                return length;
+            }
+        } // method Int32ToBytes
+
+        /// <summary>
+        /// Преобразование целого числа в строку (знак игнорируем).
+        /// </summary>
+        public static unsafe byte* Int32ToBytes
+            (
+                int number,
+                byte* buffer
+            )
+        {
+            var start = buffer;
+            var length = 0;
+            if (number == 0)
+            {
+                *start = (byte)'0';
+                return buffer + 1;
+            }
+
+            var end = start;
+            for (; number != 0; ++end)
+            {
+                number = Math.DivRem(number, 10, out var rem);
+                *end = (byte) ('0' + rem);
+                ++length;
+            }
+
+            var ptr1 = start;
+            var ptr2 = end;
+            while (ptr1 != ptr2)
+            {
+                var c = *ptr1;
+                *ptr1++ = *--ptr2;
+                *ptr2 = c;
+            }
+
+            return buffer + length;
+        } // method Int32ToBytes
 
         // ==========================================================
 
@@ -439,5 +591,7 @@ namespace AM
         // ==========================================================
 
         #endregion
-    }
-}
+
+    } // class FastNumber
+
+} // namespace AM
