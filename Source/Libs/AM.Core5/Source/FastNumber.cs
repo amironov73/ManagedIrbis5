@@ -80,20 +80,20 @@ namespace AM
                 }
 
                 var end = start;
-                for (; number != 0; ++end)
+                for (; number != 0;)
                 {
                     number = Math.DivRem(number, 10, out var rem);
-                    *end = (char) ('0' + rem);
+                    *end++ = (char) ('0' + rem);
                     ++length;
                 }
 
                 var ptr1 = start;
-                var ptr2 = end;
-                while (ptr1 != ptr2)
+                var ptr2 = end - 1;
+                while (ptr1 < ptr2)
                 {
                     var c = *ptr1;
-                    *ptr1++ = *--ptr2;
-                    *ptr2 = c;
+                    *ptr1++ = *ptr2;
+                    *ptr2-- = c;
                 }
 
                 return length;
@@ -118,23 +118,23 @@ namespace AM
             }
 
             var end = start;
-            for (; number != 0; ++end)
+            for (; number != 0;)
             {
                 number = Math.DivRem(number, 10, out var rem);
-                *end = (char) ('0' + rem);
+                *end++ = (char) ('0' + rem);
                 ++length;
             }
 
             var ptr1 = start;
-            var ptr2 = end;
-            while (ptr1 != ptr2)
+            var ptr2 = end - 1;
+            while (ptr1 < ptr2)
             {
                 var c = *ptr1;
-                *ptr1++ = *--ptr2;
-                *ptr2 = c;
+                *ptr1++ = *ptr2;
+                *ptr2-- = c;
             }
 
-            return buffer + length;
+            return buffer + length; // return end?
         } //hod Int32ToChars
 
         /// <summary>
@@ -156,20 +156,20 @@ namespace AM
                 }
 
                 var end = start;
-                for (; number != 0; ++end)
+                for (; number != 0;)
                 {
                     number = Math.DivRem(number, 10, out var rem);
-                    *end = (byte) ('0' + rem);
+                    *end++ = (byte) ('0' + rem);
                     ++length;
                 }
 
                 var ptr1 = start;
-                var ptr2 = end;
-                while (ptr1 != ptr2)
+                var ptr2 = end - 1;
+                while (ptr1 < ptr2)
                 {
                     var c = *ptr1;
-                    *ptr1++ = *--ptr2;
-                    *ptr2 = c;
+                    *ptr1++ = *ptr2;
+                    *ptr2-- = c;
                 }
 
                 return length;
@@ -194,23 +194,23 @@ namespace AM
             }
 
             var end = start;
-            for (; number != 0; ++end)
+            for (; number != 0;)
             {
                 number = Math.DivRem(number, 10, out var rem);
-                *end = (byte) ('0' + rem);
+                *end++ = (byte) ('0' + rem);
                 ++length;
             }
 
             var ptr1 = start;
-            var ptr2 = end;
-            while (ptr1 != ptr2)
+            var ptr2 = end - 1;
+            while (ptr1 < ptr2)
             {
                 var c = *ptr1;
-                *ptr1++ = *--ptr2;
-                *ptr2 = c;
+                *ptr1++ = *ptr2;
+                *ptr2-- = c;
             }
 
-            return buffer + length;
+            return buffer + length; // return end?
         } // method Int32ToBytes
 
         // ==========================================================

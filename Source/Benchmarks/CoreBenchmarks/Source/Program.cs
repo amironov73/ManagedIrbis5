@@ -16,10 +16,10 @@ namespace CoreBenchmarks
 
         static void DebugRun()
         {
-            var benchmark = new ListBenchmark();
+            var benchmark = new FastNumberBenchmark();
             for (var i = 0; i < 1000; ++i)
             {
-                benchmark.UseSkipLocalsInit();
+                benchmark.FastNumber_Int32ToChars();
             }
         } // method DebugRun
 
