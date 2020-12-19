@@ -9,14 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Ean13.cs -- работа со штрих-кодом EAN13
+/* Ean8.cs -- работа со штрих-кодом EAN8
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Diagnostics;
 
 #endregion
 
@@ -35,16 +34,16 @@ namespace ManagedIrbis.Identifiers
     // американского стандарта UPC.
     //
     // Пример проверки контрольной суммы
-    // 4600051000057 (сигареты «Прима») — код EAN-13.
-    // 4x1 + 6x3 + 0x1 + 0x3 + 0x1 + 5x3 + 1x1 + 0x3 + 0x1 + 0x3 + 0x1 + 5x3 + 7x1=
-    // 4 + 18 + 0 + 0 + 0 + 15 + 1 + 0 + 0 + 0 + 0 + 15 + 7= 60.
+    // 46009333 (папиросы «Беломорканал») — код EAN-8.
+    // 4x3 + 6x1 + 0x3 + 0x1 + 9x3 + 3x1 + 3x3 + 3x1=
+    // 12 + 6 + 0 + 0 + 27 + 3 + 9 + 3= 60.
     // Контрольная сумма = 0 — номер правильный.
     //
 
     /// <summary>
-    /// Работа со штрих-кодом EAN-13.
+    /// Работа со штрих-кодом EAN8.
     /// </summary>
-    public sealed class Ean13
+    public sealed class Ean8
     {
         #region Private data
 
@@ -52,7 +51,7 @@ namespace ManagedIrbis.Identifiers
         /// Coefficients for control digit calculation.
         /// </summary>
         private static readonly int[] _coefficients
-            = { 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
+            = { 3, 1, 3, 1, 3, 1, 3, 1 };
 
         #endregion
 
@@ -67,14 +66,15 @@ namespace ManagedIrbis.Identifiers
             )
         {
             var sum = 0;
-            for (var i = 0; i < 12; i++)
+            for (var i = 0; i < 7; i++)
             {
                 sum = sum + (digits[i] - '0') * _coefficients[i];
             }
+
             var result = (char)(10 - sum % 10 + '0');
 
             return result;
-        }
+        } // method ComputeCheckDigit
 
         /// <summary>
         /// Check control digit.
@@ -85,15 +85,18 @@ namespace ManagedIrbis.Identifiers
             )
         {
             var sum = 0;
-            for (var i = 0; i < 13; i++)
+            for (var i = 0; i < 8; i++)
             {
                 sum = sum + (digits[i] - '0') * _coefficients[i];
             }
+
             var result = sum % 10 == 0;
 
             return result;
-        }
+        } // method CheckControlDigit
 
         #endregion
-    }
-}
+
+    } // class Ean8
+
+} // namespace ManagedIrbis.Identifiers
