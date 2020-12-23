@@ -7,42 +7,35 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
-/* ACCEL.cs -- клавиша-акселератор
- * Ars Magna project, http://arsmagna.ru
- */
-
-#region Using directives
-
-using System.Runtime.InteropServices;
-
-#endregion
-
-#nullable enable
+/* ImageType.cs -- indicates whether an image is a bitmap or a metafile
+   Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    /// The ImageType enumeration indicates whether
+    /// an image is a bitmap or a metafile. The Image::GetType
+    /// method returns an element of this enumeration.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
+    public enum ImageType
     {
         /// <summary>
-        /// The accelerator behavior.
+        /// Unknown image type.
         /// </summary>
-        public byte fVirt;
+        ImageTypeUnknown = 0,
 
         /// <summary>
-        /// The accelerator key.
+        /// Bitmap.
         /// </summary>
-        public short key;
+        ImageTypeBitmap = 1,
 
         /// <summary>
-        /// The accelerator identifier.
+        /// Metafile.
         /// </summary>
-        public short cmd;
+        ImageTypeMetafile = 2
 
-    } // struct ACCEL
+    } // enum ImageType
 
 } // namespace AM.Win32
