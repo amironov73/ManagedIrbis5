@@ -1,4 +1,5 @@
-﻿// ReSharper disable StringLiteralTypo
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable StringLiteralTypo
 
 using System;
 
@@ -32,11 +33,11 @@ namespace IrbisExamples
         public int Age { get; set; }
 
         [SubField('c')]
-        public decimal Price { get; set; }
+        public decimal Fund { get; set; }
 
         public override string ToString()
         {
-            return $"{nameof(Name)}: {Name}, {nameof(Age)}: {Age}, {nameof(Price)}: {Price}";
+            return $"{nameof(Name)}: {Name}, {nameof(Age)}: {Age}, {nameof(Fund)}: {Fund}";
         }
     }
 
@@ -45,15 +46,20 @@ namespace IrbisExamples
         public static void FieldMapping()
         {
             Console.WriteLine(new string('-', 70));
-            var field = new Field()
+            var field = new Field { Tag = 100 }
                 .Add('a', "Mironov")
                 .Add('b', "48")
                 .Add('c', "123.45");
             var person = new Person();
-            var mapper
-                = MappingUtility.CreateForwardFieldMapper<Person>();
-            mapper(field, person);
+            var mapper = MapperCache.GetFieldMapper<Person>();
+            mapper.FromField(field, person);
             Console.WriteLine(person);
+
+            person.Name = "Хоттабыч";
+            person.Age = 12345;
+            person.Fund = 321.45m;
+            mapper.ToField(field, person);
+            Console.WriteLine(field);
         }
 
         public static void RecordMapping()
@@ -63,10 +69,18 @@ namespace IrbisExamples
             record.Add(10, "123");
             record.Add(20, "Laptop");
             var order = new Order();
-            var mapper
-                = MappingUtility.CreateForwardRecordMapper<Order>();
-            mapper(record, order);
+            var mapper = MapperCache.GetRecordMapper<Order>();
+            mapper.FromRecord(record, order);
             Console.WriteLine(order);
+
+            order.Id = 321;
+            order.Title = "Smartphone";
+            mapper.ToRecord(record, order);
+            Console.WriteLine(record);
+
+            record = new Record();
+            mapper.ToRecord(record, order);
+            Console.WriteLine(record);
         }
     }
 }

@@ -5,9 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* FieldAttribute.cs -- задает отображение поля записи на свойство класса
  * Ars Magna project, http://arsmagna.ru
@@ -37,24 +34,19 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Тег.
         /// </summary>
-        public int Tag { get; set; }
+        public int Tag { get; }
 
         /// <summary>
-        /// Код подполя.
+        /// Код подполя (опциональный).
         /// </summary>
-        public char Code { get; set; }
-
-        /// <summary>
-        /// Повторение.
-        /// </summary>
-        public int Occurrence { get; set; }
+        public char Code { get; }
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public FieldAttribute
             (
@@ -62,10 +54,10 @@ namespace ManagedIrbis.Mapping
             )
         {
             Tag = tag;
-        }
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public FieldAttribute
             (
@@ -75,20 +67,7 @@ namespace ManagedIrbis.Mapping
         {
             Tag = tag;
             Code = code;
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public FieldAttribute
-            (
-                int tag,
-                int occurrence
-            )
-        {
-            Tag = tag;
-            Occurrence = occurrence;
-        }
+        } // constructor
 
         #endregion
 

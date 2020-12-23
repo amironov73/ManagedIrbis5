@@ -6,8 +6,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* SubFieldAttribute.cs -- задает отображение подполя записи на свойство класса
  * Ars Magna project, http://arsmagna.ru
@@ -37,19 +35,14 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Код.
         /// </summary>
-        public char Code { get; set; }
-
-        /// <summary>
-        /// Повторение.
-        /// </summary>
-        public int Occurrence { get; set; }
+        public char Code { get; }
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Конструктор
+        /// Конструктор.
         /// </summary>
         public SubFieldAttribute
             (
@@ -57,21 +50,7 @@ namespace ManagedIrbis.Mapping
             )
         {
             Code = code;
-            Occurrence = -1;
-        }
-
-        /// <summary>
-        /// Конструктор
-        /// </summary>
-        public SubFieldAttribute
-            (
-                char code,
-                int occurrence
-            )
-        {
-            Code = code;
-            Occurrence = occurrence;
-        }
+        } // constructor
 
         #endregion
 

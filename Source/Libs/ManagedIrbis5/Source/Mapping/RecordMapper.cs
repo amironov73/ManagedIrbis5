@@ -12,6 +12,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.Mapping
@@ -19,27 +25,58 @@ namespace ManagedIrbis.Mapping
     /// <summary>
     /// Абстрактный маппер для библиографической записи.
     /// </summary>
-    public abstract class RecordMapper
+    public sealed class RecordMapper<T>
     {
+        #region Private members
+
+        private Action<Record, T>? _fromRecord;
+
+        private Action<Record, T>? _toRecord;
+
+        #endregion
+
         #region Public methods
+
+        /// <summary>
+        /// Создание маппера для указанного типа.
+        /// </summary>
+        public static RecordMapper<T> Create()
+        {
+            var result = new RecordMapper<T>
+            {
+                _fromRecord = MappingUtility.CreateForwardRecordMapper<T>()
+                    .Compile(),
+
+                _toRecord = MappingUtility.CreateBackwardRecordMapper<T>()
+                    .Compile()
+            };
+
+            return result;
+        } // method Create
 
         /// <summary>
         /// Переносит данные из записи в объект.
         /// </summary>
-        public abstract void FromField<T>
+        public void FromRecord
             (
                 Record record,
                 T target
-            );
+            )
+        {
+            _fromRecord!(record, target);
+        }
 
         /// <summary>
         /// Переносит данные из объекта в запись.
         /// </summary>
-        public abstract void ToField<T>
+        public void ToRecord
             (
                 Record record,
                 T source
-            );
+            )
+        {
+            _toRecord!(record, source);
+        }
 
         #endregion
 

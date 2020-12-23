@@ -21,13 +21,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
 
 using AM;
-
-using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -40,436 +37,62 @@ namespace ManagedIrbis.Mapping
     /// </summary>
     public static class MappingUtility
     {
-        #region Public methods
+        #region Private members
 
-        /// <summary>
-        /// Преобразование в булево значение.
-        /// </summary>
-        public static bool ToBoolean
-            (
-                SubField subField
-            )
+        private static readonly Dictionary<TypeCode, string> _toType = new ()
         {
-            return !string.IsNullOrEmpty(subField.Value);
-        } // method ToBoolean
+            [TypeCode.Boolean]  = "ToBoolean",
+            [TypeCode.Byte]     = "ToByte",
+            [TypeCode.Char]     = "ToChar",
+            [TypeCode.DateTime] = "ToDateTime",
+            [TypeCode.DBNull]   = "ToError",
+            [TypeCode.Decimal]  = "ToDecimal",
+            [TypeCode.Double]   = "ToDouble",
+            [TypeCode.Empty]    = "ToError",
+            [TypeCode.Int16]    = "ToInt16",
+            [TypeCode.Int32]    = "ToInt32",
+            [TypeCode.Int64]    = "ToInt64",
+            [TypeCode.Object]   = "ToObject",
+            [TypeCode.SByte]    = "ToSByte",
+            [TypeCode.Single]   = "ToSingle",
+            [TypeCode.String]   = "ToString",
+            [TypeCode.UInt16]   = "ToUInt16",
+            [TypeCode.UInt32]   = "ToUInt32",
+            [TypeCode.UInt64]   = "ToUInt64"
+        }; // Dictionary _toType
 
-        /// <summary>
-        /// Преобразование в булево значение.
-        /// </summary>
-        public static bool ToBoolean
-            (
-                Field field,
-                char code
-            )
+        private static readonly Dictionary<TypeCode, string> _fromType = new ()
         {
-            if (code == '\0')
-            {
-                return !string.IsNullOrEmpty(field.Value);
-            }
+            [TypeCode.Boolean]  = "FromBoolean",
+            [TypeCode.Byte]     = "FromByte",
+            [TypeCode.Char]     = "FromChar",
+            [TypeCode.DateTime] = "FromDateTime",
+            [TypeCode.DBNull]   = "FromError",
+            [TypeCode.Decimal]  = "FromDecimal",
+            [TypeCode.Double]   = "FromDouble",
+            [TypeCode.Empty]    = "FromError",
+            [TypeCode.Int16]    = "FromInt16",
+            [TypeCode.Int32]    = "FromInt32",
+            [TypeCode.Int64]    = "FromInt64",
+            [TypeCode.Object]   = "FromObject",
+            [TypeCode.SByte]    = "FromSByte",
+            [TypeCode.Single]   = "FromSingle",
+            [TypeCode.String]   = "FromString",
+            [TypeCode.UInt16]   = "FromUInt16",
+            [TypeCode.UInt32]   = "FromUInt32",
+            [TypeCode.UInt64]   = "FromUInt64"
+        }; // Dictionary _fromType
 
-            var subField = field.GetFirstSubField(code);
-
-            return subField is null
-                ? false
-                : ToBoolean(subField);
-        } // method ToBoolean
-
-        /// <summary>
-        /// Преобразование в символ.
-        /// </summary>
-        public static char ToChar
-            (
-                SubField subField
-            )
-        {
-            var text = subField.Value;
-
-            return string.IsNullOrEmpty(text)
-                ? '\0'
-                : text[0];
-        } // method ToChar
-
-        /// <summary>
-        /// Преобразование в символ.
-        /// </summary>
-        public static char ToChar
-            (
-                Field field,
-                char code
-            )
-        {
-            if (code == '\0')
-            {
-                var text = field.Value;
-
-                return string.IsNullOrEmpty(text)
-                    ? '\0'
-                    : text[0];
-            }
-
-            var subfield = field.GetFirstSubField(code);
-
-            return subfield is null
-                ? '\0'
-                : ToChar(subfield);
-        } // method ToChar
-
-        /// <summary>
-        /// Преобразование в дату.
-        /// </summary>
-        public static DateTime ToDateTime
-            (
-                SubField subField
-            )
-        {
-            return IrbisDate.ConvertStringToDate(subField.Value);
-        } // method ToDateTime
-
-        /// <summary>
-        /// Преобразование в дату.
-        /// </summary>
-        public static DateTime ToDateTime
-            (
-                Field field,
-                char code
-            )
-        {
-            if (code == '\0')
-            {
-                var text = field.Value;
-
-                return string.IsNullOrEmpty(text)
-                    ? DateTime.MinValue
-                    : IrbisDate.ConvertStringToDate(text);
-            }
-
-            var subfield = field.GetFirstSubField(code);
-
-            return subfield is null
-                ? DateTime.MinValue
-                : ToDateTime(subfield);
-        } // method ToDateTime
-
-        /// <summary>
-        /// Преобразование в число с фиксированной точкой.
-        /// </summary>
-        public static decimal ToDecimal
-            (
-                SubField subField
-            )
-        {
-            decimal.TryParse
-                (
-                    subField.Value,
-                    NumberStyles.Any,
-                    CultureInfo.InvariantCulture,
-                    out var result
-                );
-
-            return result;
-        } // method ToDecimal
-
-        public static decimal ToDecimal
-            (
-                Field field,
-                char code
-            )
-        {
-            if (code == '\0')
-            {
-                decimal.TryParse
-                    (
-                        field.Value,
-                        NumberStyles.Any,
-                        CultureInfo.InvariantCulture,
-                        out var result
-                    );
-
-                return result;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-
-            return subfield is null
-                ? 0m
-                : ToDecimal(subfield);
-        }
-
-        /// <summary>
-        /// Преобразование в число с плавающей точкой
-        /// двойной точностью.
-        /// </summary>
-        public static double ToDouble
-            (
-                SubField subField
-            )
-        {
-            double.TryParse
-                (
-                    subField.Value,
-                    NumberStyles.Any,
-                    CultureInfo.InvariantCulture,
-                    out var result
-                );
-
-            return result;
-        } // method ToDouble
-
-        public static double ToDouble
-            (
-                Field field,
-                char code
-            )
-        {
-            if (code == '\0')
-            {
-                double.TryParse
-                    (
-                        field.Value,
-                        NumberStyles.Any,
-                        CultureInfo.InvariantCulture,
-                        out var result
-                    );
-
-                return result;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-
-            return subfield is null
-                ? 0.0
-                : ToDouble(subfield);
-        }
-
-        /// <summary>
-        /// Преобразование в число с плавающей точкой
-        /// одинарной точности.
-        /// </summary>
-        public static float ToSingle
-            (
-                SubField subField
-            )
-        {
-            float.TryParse
-                (
-                    subField.Value,
-                    NumberStyles.Any,
-                    CultureInfo.InvariantCulture,
-                    out var result
-                );
-
-            return result;
-        } // method ToSingle
-
-
-        /// <summary>
-        /// Преобразование в 32-битное целое со знаком.
-        /// </summary>
-        public static int ToInt32
-            (
-                SubField subField
-            )
-        {
-            int.TryParse
-                (
-                    subField.Value,
-                    NumberStyles.Any,
-                    CultureInfo.InvariantCulture,
-                    out var result
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Преобразование в 32-битное целое со знаком.
-        /// </summary>
-        public static int ToInt32
-            (
-                Field field,
-                char code
-            )
-        {
-            if (code == '\0')
-            {
-                int.TryParse
-                    (
-                        field.Value,
-                        NumberStyles.Any,
-                        CultureInfo.InvariantCulture,
-                        out var result
-                    );
-
-                return result;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-
-            return subfield is null
-                ? 0
-                : ToInt32(subfield);
-        } // method ToInt32
-
-        /// <summary>
-        /// Преобразование в 32-битное целое со знаком.
-        /// </summary>
-        public static int ToInt32
-            (
-                Record record,
-                int tag,
-                char code
-            )
-        {
-            var field = record.GetFirstField(tag);
-
-            return field is null
-                ? 0
-                : ToInt32(field, code);
-        } // method ToInt32
-
-        /// <summary>
-        /// Преобразование в 64-битное целое со знаком.
-        /// </summary>
-        public static long ToInt64
-            (
-                SubField subField
-            )
-        {
-            long.TryParse
-                (
-                    subField.Value,
-                    NumberStyles.Any,
-                    CultureInfo.InvariantCulture,
-                    out var result
-                );
-
-            return result;
-        } // method ToInt64
-
-        /// <summary>
-        /// Преобразование в 64-битное целое со знаком.
-        /// </summary>
-        public static long ToInt64
-            (
-                Field field,
-                char code
-            )
-        {
-            if (code == '\0')
-            {
-                long.TryParse
-                    (
-                        field.Value,
-                        NumberStyles.Any,
-                        CultureInfo.InvariantCulture,
-                        out var result
-                    );
-
-                return result;
-            }
-            var subfield = field.GetFirstSubField(code);
-
-            return subfield is null
-                ? 0
-                : ToInt64(subfield);
-        } // method ToInt64
-
-        /// <summary>
-        /// Преобразование в 64-битное целое со знаком.
-        /// </summary>
-        public static long ToInt64
-            (
-                Record record,
-                int tag,
-                char code
-            )
-        {
-            var field = record.GetFirstField(tag);
-
-            return field is null
-                ? 0
-                : ToInt64(field, code);
-        } // method ToInt64
-
-        /// <summary>
-        /// Преобразование в строку (тривиальное).
-        /// </summary>
-        public static string? ToString
-            (
-                SubField subField
-            )
-        {
-            return subField.Value;
-        } // method ToString
-
-        /// <summary>
-        /// Преобразование в строку (тривиальное).
-        /// </summary>
-        public static string? ToString
-            (
-                Field field,
-                char code
-            )
-        {
-            if (code == '\0')
-            {
-                return field.Value;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-
-            return subfield is null
-                ? null
-                : ToString(subfield);
-        } // method ToString
-
-        /// <summary>
-        /// Преобразование в строку (тривиальное).
-        /// </summary>
-        public static string? ToString
-            (
-                Record record,
-                int tag,
-                char code
-            )
-        {
-            var field = record.GetFirstField(tag);
-
-            return field is null
-                ? null
-                : ToString(field, code);
-        } // method ToString
-
-        private static MethodInfo ChooseFieldMethod
+        private static MethodInfo ChooseForwardFieldMethod
             (
                 PropertyInfo property
             )
         {
-            string? methodName;
             var propertyType = property.PropertyType;
+            var typeCode = Type.GetTypeCode(propertyType);
+            var methodName = _toType[typeCode];
 
-            if (propertyType == typeof(decimal))
-            {
-                methodName = "ToDecimal";
-            }
-            else if (propertyType == typeof(double))
-            {
-                methodName = "ToDouble";
-            }
-            else if (propertyType == typeof(int))
-            {
-                methodName = "ToInt32";
-            }
-            else if (propertyType == typeof(string))
-            {
-                methodName = "ToString";
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
-
-            var method = typeof(MappingUtility).GetMethod
+            var method = typeof(Map).GetMethod
                 (
                     methodName.ThrowIfNull("methodName"),
                     new[] { typeof(Field), typeof(char) }
@@ -477,38 +100,37 @@ namespace ManagedIrbis.Mapping
                 .ThrowIfNull("method");
 
             return method;
-        }
+        } // method ChooseForwardFieldMethod
 
-        private static MethodInfo ChooseRecordMethod
+        private static MethodInfo ChooseBackwardFieldMethod
             (
                 PropertyInfo property
             )
         {
-            string? methodName;
             var propertyType = property.PropertyType;
+            var typeCode = Type.GetTypeCode(propertyType);
+            var methodName = _fromType[typeCode];
 
-            if (propertyType == typeof(decimal))
-            {
-                methodName = "ToDecimal";
-            }
-            else if (propertyType == typeof(double))
-            {
-                methodName = "ToDouble";
-            }
-            else if (propertyType == typeof(int))
-            {
-                methodName = "ToInt32";
-            }
-            else if (propertyType == typeof(string))
-            {
-                methodName = "ToString";
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
+            var method = typeof(Map).GetMethod
+                (
+                    methodName.ThrowIfNull("methodName"),
+                    new[] { typeof(Field), typeof(char), propertyType }
+                )
+                .ThrowIfNull("method");
 
-            var method = typeof(MappingUtility).GetMethod
+            return method;
+        } // method ChooseBackwardFieldMethod
+
+        private static MethodInfo ChooseForwardRecordMethod
+            (
+                PropertyInfo property
+            )
+        {
+            var propertyType = property.PropertyType;
+            var typeCode = Type.GetTypeCode(propertyType);
+            var methodName = _toType[typeCode];
+
+            var method = typeof(Map).GetMethod
                 (
                     methodName.ThrowIfNull("methodName"),
                     new[] { typeof(Record), typeof(int), typeof(char) }
@@ -516,7 +138,32 @@ namespace ManagedIrbis.Mapping
                 .ThrowIfNull("method");
 
             return method;
-        }
+        } // method ChooseForwardRecordMethod
+
+        private static MethodInfo ChooseBackwardRecordMethod
+            (
+                PropertyInfo property
+            )
+        {
+            var propertyType = property.PropertyType;
+            var typeCode = Type.GetTypeCode(propertyType);
+            var methodName = _fromType[typeCode];
+
+            var method = typeof(Map).GetMethod
+                (
+                    methodName.ThrowIfNull("methodName"),
+                    new[] { typeof(Record), typeof(int), typeof(char), propertyType }
+                )
+                .ThrowIfNull("method");
+
+            return method;
+        } // method ChooseForwardRecordMethod
+
+        #endregion
+
+        #region Public methods
+
+        /*
 
         /// <summary>
         /// Построение простого маппера для подполя.
@@ -531,7 +178,7 @@ namespace ManagedIrbis.Mapping
             var field = Expression.Parameter(typeof(Field), "field");
             var code = Expression.Constant(attribute.Code, typeof(char));
             var accessor = Expression.PropertyOrField(target, property.Name);
-            var method = ChooseFieldMethod(property);
+            var method = ChooseForwardFieldMethod(property);
             var call = Expression.Call(method, field, code);
             var assignment = Expression.Assign
                 (
@@ -548,10 +195,48 @@ namespace ManagedIrbis.Mapping
             return lambda.Compile();
         }
 
+        */
+
         /// <summary>
-        /// Построение маппера для заданного типа.
+        /// Построение прямого маппера для заданного типа.
         /// </summary>
-        public static Action<Field, T> CreateForwardFieldMapper<T>()
+        public static Expression<Action<Field, T>> CreateForwardFieldMapper<T>()
+        {
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+            var properties = typeof(T).GetProperties(flags);
+            var expressions = new List<Expression>();
+            var target = Expression.Parameter(typeof(T), "target");
+            var field = Expression.Parameter(typeof(Field), "field");
+
+            foreach (var property in properties)
+            {
+                var attribute = property.GetCustomAttribute<SubFieldAttribute>();
+                if (attribute is not null)
+                {
+                    var codeParameter = Expression.Constant(attribute.Code, typeof(char));
+                    var accessor = Expression.PropertyOrField(target, property.Name);
+                    var method = ChooseForwardFieldMethod(property);
+                    var call = Expression.Call(method, field, codeParameter);
+                    var assignment = Expression.Assign(accessor, call);
+                    expressions.Add(assignment);
+                }
+            }
+
+            var body = Expression.Block(expressions.ToArray());
+            var lambda = Expression.Lambda<Action<Field, T>>
+                (
+                    body,
+                    field,
+                    target
+                );
+
+            return lambda;
+        } // method CreateForwardFieldMapper
+
+        /// <summary>
+        /// Построение обратного маппера для указанного типа.
+        /// </summary>
+        public static Expression<Action<Field, T>> CreateBackwardFieldMapper<T>()
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
             var properties = typeof(T).GetProperties(flags);
@@ -566,10 +251,9 @@ namespace ManagedIrbis.Mapping
                 {
                     var code = Expression.Constant(attribute.Code, typeof(char));
                     var accessor = Expression.PropertyOrField(target, property.Name);
-                    var method = ChooseFieldMethod(property);
-                    var call = Expression.Call(method, field, code);
-                    var assignment = Expression.Assign(accessor, call);
-                    expressions.Add(assignment);
+                    var method = ChooseBackwardFieldMethod(property);
+                    var call = Expression.Call(method, field, code, accessor);
+                    expressions.Add(call);
                 }
             }
 
@@ -581,40 +265,13 @@ namespace ManagedIrbis.Mapping
                     target
                 );
 
-            return lambda.Compile();
-        } // method CreateForwardFieldMapper
-
-        public static Action<Field, T> CreateBackwardFieldMapper<T>()
-        {
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
-            var properties = typeof(T).GetProperties(flags);
-            var expressions = new List<Expression>();
-            var target = Expression.Parameter(typeof(T), "target");
-            var field = Expression.Parameter(typeof(Field), "field");
-
-            foreach (var property in properties)
-            {
-                var attribute = property.GetCustomAttribute<SubFieldAttribute>();
-                if (attribute is not null)
-                {
-                }
-            }
-
-            var body = Expression.Block(expressions.ToArray());
-            var lambda = Expression.Lambda<Action<Field, T>>
-            (
-                body,
-                field,
-                target
-            );
-
-            return lambda.Compile();
+            return lambda;
         } // method CreateBackwardFieldMapper
 
         /// <summary>
-        /// Построение маппера для заданного типа.
+        /// Построение прямого маппера для заданного типа.
         /// </summary>
-        public static Action<Record, T> CreateForwardRecordMapper<T>()
+        public static Expression<Action<Record, T>> CreateForwardRecordMapper<T>()
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
             var properties = typeof(T).GetProperties(flags);
@@ -630,7 +287,7 @@ namespace ManagedIrbis.Mapping
                     var tag = Expression.Constant(attribute.Tag, typeof(int));
                     var code = Expression.Constant(attribute.Code, typeof(char));
                     var accessor = Expression.PropertyOrField(target, property.Name);
-                    var method = ChooseRecordMethod(property);
+                    var method = ChooseForwardRecordMethod(property);
                     var call = Expression.Call(method, record, tag, code);
                     var assignment = Expression.Assign(accessor, call);
                     expressions.Add(assignment);
@@ -645,13 +302,13 @@ namespace ManagedIrbis.Mapping
                     target
                 );
 
-            return lambda.Compile();
+            return lambda;
         } // method CreateForwardRecordMapper
 
         /// <summary>
-        /// Построение маппера для заданного типа.
+        /// Построение обратного маппера для заданного типа.
         /// </summary>
-        public static Action<Record, T> CreateBackwardRecordMapper<T>()
+        public static Expression<Action<Record, T>> CreateBackwardRecordMapper<T>()
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
             var properties = typeof(T).GetProperties(flags);
@@ -664,6 +321,12 @@ namespace ManagedIrbis.Mapping
                 var attribute = property.GetCustomAttribute<FieldAttribute>();
                 if (attribute is not null)
                 {
+                    var tag = Expression.Constant(attribute.Tag, typeof(int));
+                    var code = Expression.Constant(attribute.Code, typeof(char));
+                    var accessor = Expression.PropertyOrField(target, property.Name);
+                    var method = ChooseBackwardRecordMethod(property);
+                    var call = Expression.Call(method, record, tag, code, accessor);
+                    expressions.Add(call);
                 }
             }
 
@@ -675,7 +338,7 @@ namespace ManagedIrbis.Mapping
                     target
                 );
 
-            return lambda.Compile();
+            return lambda;
         } // method CreateBackwardRecordMapper
 
         #endregion
