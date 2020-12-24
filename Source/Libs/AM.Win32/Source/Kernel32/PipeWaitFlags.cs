@@ -12,41 +12,40 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ACCEL.cs -- клавиша-акселератор
- * Ars Magna project, http://arsmagna.ru
- */
+/* PipeWaitFlags.cs -- wait intervals for named pipes
+   Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
 
-using System.Runtime.InteropServices;
+using System;
 
 #endregion
-
-#nullable enable
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    /// Wait intervals for named pipes.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
+    [Flags]
+    public enum PipeWaitFlags
     {
         /// <summary>
-        /// The accelerator behavior.
+        /// Waits indefinitely.
         /// </summary>
-        public byte fVirt;
+        NMPWAIT_WAIT_FOREVER = unchecked((int)0xffffffff),
 
         /// <summary>
-        /// The accelerator key.
+        /// Does not wait for the named pipe. If the named pipe
+        /// is not available, the function returns an error.
         /// </summary>
-        public short key;
+        NMPWAIT_NOWAIT = 0x00000001,
 
         /// <summary>
-        /// The accelerator identifier.
+        /// Uses the default time-out specified in a call to the
+        /// CreateNamedPipe function.
         /// </summary>
-        public short cmd;
+        NMPWAIT_USE_DEFAULT_WAIT = 0x00000000
 
-    } // struct ACCEL
+    } // enum PipeWaitFlags
 
 } // namespace AM.Win32

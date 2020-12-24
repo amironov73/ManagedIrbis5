@@ -12,41 +12,42 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ACCEL.cs -- клавиша-акселератор
- * Ars Magna project, http://arsmagna.ru
- */
+/* CONSOLE_CURSOR_INFO.cs -- contains information about the console cursor
+   Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
 
+using System;
 using System.Runtime.InteropServices;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Win32
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    /// Contains information about the console cursor.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
+    [Serializable]
+    [StructLayout(LayoutKind.Explicit, Size = 8)]
+    public struct CONSOLE_CURSOR_INFO
     {
         /// <summary>
-        /// The accelerator behavior.
+        /// Percentage of the character cell that is filled
+        /// by the cursor. This value is between 1 and 100.
+        /// The cursor appearance varies, ranging from completely
+        /// filling the cell to showing up as a horizontal line
+        /// at the bottom of the cell.
         /// </summary>
-        public byte fVirt;
+        [FieldOffset(0)]
+        int dwSize;
 
         /// <summary>
-        /// The accelerator key.
+        /// Visibility of the cursor. If the cursor is visible,
+        /// this member is TRUE.
         /// </summary>
-        public short key;
+        [FieldOffset(4)]
+        bool bVisible;
 
-        /// <summary>
-        /// The accelerator identifier.
-        /// </summary>
-        public short cmd;
-
-    } // struct ACCEL
+    } // struct CONSOLE_CURSOR_INFO
 
 } // namespace AM.Win32

@@ -12,41 +12,39 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ACCEL.cs -- клавиша-акселератор
- * Ars Magna project, http://arsmagna.ru
- */
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+/* FILETIME.cs -- 64-bit time
+   Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
 
+using System;
 using System.Runtime.InteropServices;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Win32
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    /// The FILETIME structure is a 64-bit value representing the
+    /// number of 100-nanosecond intervals since January 1, 1601 (UTC).
     /// </summary>
+    [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
+    public struct FILETIME
     {
         /// <summary>
-        /// The accelerator behavior.
+        /// Low-order part of the file time.
         /// </summary>
-        public byte fVirt;
+        public uint dwLowDateTime;
 
         /// <summary>
-        /// The accelerator key.
+        /// High-order part of the file time.
         /// </summary>
-        public short key;
+        public uint dwHighDateTime;
 
-        /// <summary>
-        /// The accelerator identifier.
-        /// </summary>
-        public short cmd;
-
-    } // struct ACCEL
+    } // struct FILETIME
 
 } // namespace AM.Win32

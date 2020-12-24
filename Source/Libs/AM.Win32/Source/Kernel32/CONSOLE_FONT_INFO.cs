@@ -12,41 +12,39 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ACCEL.cs -- клавиша-акселератор
- * Ars Magna project, http://arsmagna.ru
- */
+/* CONSOLE_FONT_INFO.cs -- contains information for a console font
+   Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
 
+using System;
 using System.Runtime.InteropServices;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Win32
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    /// Contains information for a console font.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
+    [Serializable]
+    [StructLayout(LayoutKind.Explicit, Size = 8)]
+    public struct CONSOLE_FONT_INFO
     {
         /// <summary>
-        /// The accelerator behavior.
+        /// Index of the font in the system's console font table.
         /// </summary>
-        public byte fVirt;
+        [FieldOffset(0)]
+        public int nFont;
 
         /// <summary>
-        /// The accelerator key.
+        /// A COORD structure that contains the width and height
+        /// of each character in the font. The X member contains
+        /// the width, while the Y member contains the height.
         /// </summary>
-        public short key;
+        [FieldOffset(4)]
+        public COORD dwFontSize;
 
-        /// <summary>
-        /// The accelerator identifier.
-        /// </summary>
-        public short cmd;
-
-    } // struct ACCEL
+    } // struct CONSOLE_FONT_INFO
 
 } // namespace AM.Win32

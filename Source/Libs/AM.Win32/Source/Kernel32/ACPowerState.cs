@@ -4,49 +4,38 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable FieldCanBeMadeReadOnly.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ACCEL.cs -- клавиша-акселератор
- * Ars Magna project, http://arsmagna.ru
- */
-
-#region Using directives
-
-using System.Runtime.InteropServices;
-
-#endregion
-
-#nullable enable
+/* ACPowerState.cs -- AC power status.
+   Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    /// AC power status.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
+    public enum ACPowerStatus
+        : byte
     {
         /// <summary>
-        /// The accelerator behavior.
+        /// Offline.
         /// </summary>
-        public byte fVirt;
+        Offline = 0,
 
         /// <summary>
-        /// The accelerator key.
+        /// Online.
         /// </summary>
-        public short key;
+        Online = 1,
 
         /// <summary>
-        /// The accelerator identifier.
+        /// Unknown.
         /// </summary>
-        public short cmd;
+        Unknown = 255
 
-    } // struct ACCEL
+    } // enum ACPowerStatus
 
 } // namespace AM.Win32

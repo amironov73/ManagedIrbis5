@@ -12,41 +12,44 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ACCEL.cs -- клавиша-акселератор
- * Ars Magna project, http://arsmagna.ru
- */
-
-#region Using directives
-
-using System.Runtime.InteropServices;
-
-#endregion
-
-#nullable enable
+/* FileTypeFlags.cs -- file (device) types
+   Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    /// File (device) types.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
+    public enum FileTypeFlags
     {
         /// <summary>
-        /// The accelerator behavior.
+        /// Either the type of the specified file is unknown,
+        /// or the function failed.
         /// </summary>
-        public byte fVirt;
+        FILE_TYPE_UNKNOWN = 0x0000,
 
         /// <summary>
-        /// The accelerator key.
+        /// The specified file is a disk file.
         /// </summary>
-        public short key;
+        FILE_TYPE_DISK = 0x0001,
 
         /// <summary>
-        /// The accelerator identifier.
+        /// The specified file is a character file, typically an
+        /// LPT device or a console.
         /// </summary>
-        public short cmd;
+        FILE_TYPE_CHAR = 0x0002,
 
-    } // struct ACCEL
+        /// <summary>
+        /// The specified file is a socket, a named pipe, or an
+        /// anonymous pipe.
+        /// </summary>
+        FILE_TYPE_PIPE = 0x0003,
+
+        /// <summary>
+        /// Unused.
+        /// </summary>
+        FILE_TYPE_REMOTE = 0x8000
+
+    } // enum FileTypeFlags
 
 } // namespace AM.Win32

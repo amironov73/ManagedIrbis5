@@ -12,41 +12,33 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ACCEL.cs -- клавиша-акселератор
- * Ars Magna project, http://arsmagna.ru
- */
+/* CodePageEnumFlags.cs -- specifies the code pages to enumerate
+   Ars Magna project, http://arsmagna.ru */
 
 #region Using directives
 
-using System.Runtime.InteropServices;
+using System;
 
 #endregion
-
-#nullable enable
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Клавиша-акселератор.
+    ///  Specifies the code pages to enumerate.
     /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    public struct ACCEL
+    [Flags]
+    public enum CodePageEnumFlags
     {
         /// <summary>
-        /// The accelerator behavior.
+        /// Enumerate only installed code pages.
         /// </summary>
-        public byte fVirt;
+        CP_INSTALLED = 0x00000001,
 
         /// <summary>
-        /// The accelerator key.
+        /// Enumerate all supported code pages.
         /// </summary>
-        public short key;
+        CP_SUPPORTED = 0x00000002
 
-        /// <summary>
-        /// The accelerator identifier.
-        /// </summary>
-        public short cmd;
-
-    } // struct ACCEL
+    } // enum CodePageEnumFlags
 
 } // namespace AM.Win32
