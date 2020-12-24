@@ -46,7 +46,10 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Добавление маппера в кэш.
         /// </summary>
-        public static void Add<T>(FieldMapper<T> mapper)
+        public static void Add<T>
+            (
+                FieldMapper<T> mapper
+            )
         {
             _fieldMappers[typeof(T)] = mapper;
         }
@@ -54,7 +57,10 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Добавление маппера в кэш.
         /// </summary>
-        public static void Add<T>(RecordMapper<T> mapper)
+        public static void Add<T>
+            (
+                RecordMapper<T> mapper
+            )
         {
             _recordMappers[typeof(T)] = mapper;
         }

@@ -2,6 +2,7 @@
 // ReSharper disable StringLiteralTypo
 
 using System;
+using System.Collections.Generic;
 
 using ManagedIrbis;
 using ManagedIrbis.Mapping;
@@ -35,9 +36,12 @@ namespace IrbisExamples
         [SubField('c')]
         public decimal Fund { get; set; }
 
+        [SubField('d')]
+        public DateTime Date { get; set; }
+
         public override string ToString()
         {
-            return $"{nameof(Name)}: {Name}, {nameof(Age)}: {Age}, {nameof(Fund)}: {Fund}";
+            return $"{nameof(Name)}: {Name}, {nameof(Age)}: {Age}, {nameof(Fund)}: {Fund}, {nameof(Date)}: {Date.ToShortDateString()}";
         }
     }
 
@@ -49,7 +53,8 @@ namespace IrbisExamples
             var field = new Field { Tag = 100 }
                 .Add('a', "Mironov")
                 .Add('b', "48")
-                .Add('c', "123.45");
+                .Add('c', "123.45")
+                .Add('d', "20201224");
             var person = new Person();
             var mapper = MapperCache.GetFieldMapper<Person>();
             mapper.FromField(field, person);
@@ -58,6 +63,11 @@ namespace IrbisExamples
             person.Name = "Хоттабыч";
             person.Age = 12345;
             person.Fund = 321.45m;
+            person.Date = DateTime.Today.AddDays(1.0);
+            mapper.ToField(field, person);
+            Console.WriteLine(field);
+
+            field = new Field { Tag = 100 };
             mapper.ToField(field, person);
             Console.WriteLine(field);
         }
@@ -80,6 +90,31 @@ namespace IrbisExamples
 
             record = new Record();
             mapper.ToRecord(record, order);
+            Console.WriteLine(record);
+        }
+
+        public static void FieldListMapping()
+        {
+            Console.WriteLine(new string('-', 70));
+            var record = new Record();
+            record.Add(100).Add('a', "Person1").Add('b', "10");
+            record.Add(100).Add('a', "Person2").Add('b', "20");
+            record.Add(100).Add('a', "Person3").Add('b', "30");
+            record.Add(200).Add('a', "Not person").Add('b', "Not age");
+            var list = new List<Person>();
+            Map.ToObject(record, 100, list);
+            foreach (var person in list)
+            {
+                Console.WriteLine(person);
+            }
+
+            var array = new Person[]
+            {
+                new() { Name = "First", Age = 101 },
+                new() { Name = "Second", Age = 102 },
+                new() { Name = "Third", Age = 103 },
+            };
+            Map.FromObject(record, 100, array);
             Console.WriteLine(record);
         }
     }

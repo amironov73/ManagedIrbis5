@@ -282,6 +282,47 @@ namespace ManagedIrbis
             return null;
         } // method GetFirstField
 
+        /// <summary>
+        /// Получение поля с указанной меткой
+        /// либо создание нового поля, если таковое отсутствует.
+        /// </summary>
+        /// <param name="tag">Искомая метка поля.</param>
+        /// <returns>Найденное либо созданное поле.</returns>
+        public Field GetOrAddField(int tag)
+        {
+            foreach (var field in Fields)
+            {
+                if (field.Tag == tag)
+                {
+                    return field;
+                }
+            }
+
+            var result = new Field { Tag = tag };
+            Fields.Add(result);
+
+            return result;
+        } // method GetOrAddField
+
+        /// <summary>
+        /// Удаление из записи поля с указанной меткой.
+        /// </summary>
+        /// <param name="tag">Искомая метка.</param>
+        /// <returns>this.</returns>
+        public Record RemoveField
+            (
+                int tag
+            )
+        {
+            Field? field;
+            while ((field = GetFirstField(tag)) is not null)
+            {
+                Fields.Remove(field);
+            }
+
+            return this;
+        }
+
         #endregion
 
         #region Object members

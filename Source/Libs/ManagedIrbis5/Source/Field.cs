@@ -38,7 +38,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Метка поля.
         /// </summary>
-        public int Tag { get; set; } = 0;
+        public int Tag { get; set; }
 
         /// <summary>
         /// Значение поля до первого разделителя.
@@ -212,6 +212,31 @@ namespace ManagedIrbis
         } // method GetSubField
 
         /// <summary>
+        /// Получение первого подполя с указанным кодом
+        /// либо создание нового подполя, если таковое отсуствует.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <returns>Найденное или созданное подполе.</returns>
+        public SubField GetOrAddSubField
+            (
+                char code
+            )
+        {
+            foreach (var subfield in Subfields)
+            {
+                if (subfield.Code.SameChar(code))
+                {
+                    return subfield;
+                }
+            }
+
+            var result = new SubField { Code = code };
+            Subfields.Add(result);
+
+            return result;
+        } // method GetOrAddSubField
+
+        /// <summary>
         /// Указанное повторение подполя с данным кодом.
         /// </summary>
         /// <param name="code">Искомый код подполя.</param>
@@ -254,11 +279,7 @@ namespace ManagedIrbis
                 char code,
                 int occurrence
             )
-        {
-            var result = GetSubField(code, occurrence);
-
-            return result?.Value;
-        } // method GetSubFieldValue
+            => GetSubField(code, occurrence)?.Value;
 
         /// <summary>
         /// Получает значение первого появления подполя
@@ -268,11 +289,9 @@ namespace ManagedIrbis
             (
                 char code
             )
-        {
-            var result = GetFirstSubField(code);
-
-            return result?.Value;
-        } // method GetFirstSubFieldValue
+            => code == '\0'
+                ? Value
+                : GetFirstSubField(code)?.Value;
 
         /// <summary>
         /// For * specification.
@@ -287,6 +306,57 @@ namespace ManagedIrbis
 
             return result;
         } // method GetValueOrFirstSubField
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue
+            (
+                char code,
+                string? value
+            )
+        {
+            if (code == '\0')
+            {
+                Value = value;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    RemoveSubField(code);
+                }
+                else
+                {
+                    GetOrAddSubField(code).Value = value;
+                }
+            }
+
+            return this;
+        } // method SetSubFieldValue
+
+        /// <summary>
+        /// Удаление подполей с указанным кодом.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <returns>this</returns>
+        public Field RemoveSubField
+            (
+                char code
+            )
+        {
+            SubField? subfield;
+
+            while ((subfield = GetFirstSubField(code)) is not null)
+            {
+                Subfields.Remove(subfield);
+            }
+
+            return this;
+        } // method RemoveSubField
 
         #endregion
 

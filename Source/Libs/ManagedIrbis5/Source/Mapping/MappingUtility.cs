@@ -236,6 +236,44 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Построение обратного маппера для указанного типа.
         /// </summary>
+        public static Expression<Action<Field, object>> CreateBackwardFieldMapper
+            (
+                Type type
+            )
+        {
+            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+            var properties = type.GetProperties(flags);
+            var expressions = new List<Expression>();
+            var target = Expression.Parameter(type, "target");
+            var field = Expression.Parameter(typeof(Field), "field");
+
+            foreach (var property in properties)
+            {
+                var attribute = property.GetCustomAttribute<SubFieldAttribute>();
+                if (attribute is not null)
+                {
+                    var code = Expression.Constant(attribute.Code, typeof(char));
+                    var accessor = Expression.PropertyOrField(target, property.Name);
+                    var method = ChooseBackwardFieldMethod(property);
+                    var call = Expression.Call(method, field, code, accessor);
+                    expressions.Add(call);
+                }
+            }
+
+            var body = Expression.Block(expressions.ToArray());
+            var lambda = Expression.Lambda<Action<Field, object>>
+            (
+                body,
+                field,
+                target
+            );
+
+            return lambda;
+        } // method CreateBackwardFieldMapper
+
+        /// <summary>
+        /// Построение обратного маппера для указанного типа.
+        /// </summary>
         public static Expression<Action<Field, T>> CreateBackwardFieldMapper<T>()
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
@@ -282,15 +320,27 @@ namespace ManagedIrbis.Mapping
             foreach (var property in properties)
             {
                 var attribute = property.GetCustomAttribute<FieldAttribute>();
-                if (attribute is not null)
+                var typeCode = Type.GetTypeCode(property.PropertyType);
+                if (typeCode == TypeCode.Object)
                 {
-                    var tag = Expression.Constant(attribute.Tag, typeof(int));
-                    var code = Expression.Constant(attribute.Code, typeof(char));
-                    var accessor = Expression.PropertyOrField(target, property.Name);
-                    var method = ChooseForwardRecordMethod(property);
-                    var call = Expression.Call(method, record, tag, code);
-                    var assignment = Expression.Assign(accessor, call);
-                    expressions.Add(assignment);
+                    attribute ??= property.PropertyType.GetCustomAttribute<FieldAttribute>();
+                    if (attribute is not null)
+                    {
+                        var tag = attribute.Tag;
+                    }
+                }
+                else
+                {
+                    if (attribute is not null)
+                    {
+                        var tag = Expression.Constant(attribute.Tag, typeof(int));
+                        var code = Expression.Constant(attribute.Code, typeof(char));
+                        var accessor = Expression.PropertyOrField(target, property.Name);
+                        var method = ChooseForwardRecordMethod(property);
+                        var call = Expression.Call(method, record, tag, code);
+                        var assignment = Expression.Assign(accessor, call);
+                        expressions.Add(assignment);
+                    }
                 }
             }
 

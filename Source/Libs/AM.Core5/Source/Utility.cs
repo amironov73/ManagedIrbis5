@@ -22,6 +22,8 @@ using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -1175,6 +1177,54 @@ namespace AM
                 }
             }
         } // method CompareSpans
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
+        public static MethodInfo GetMethodInfo(Expression<Action> expression)
+            => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
+        public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)
+            => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
+        public static MethodInfo GetMethodInfo<T1, T2>(Expression<Action<T1, T2>> expression)
+            => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
+        public static MethodInfo GetMethodInfo<T1, T2, T3>(Expression<Action<T1, T2, T3>> expression)
+            => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
+        public static MethodInfo GetMethodInfo<T>(Expression<Func<T>> expression)
+            => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
+        public static MethodInfo GetMethodInfo<T1, T2>(Expression<Func<T1, T2>> expression)
+            => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
+        public static MethodInfo GetMethodInfo<T1, T2, T3>(Expression<Func<T1, T2, T3>> expression)
+            => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
+        public static MethodInfo GetMethodInfo<T1, T2, T3, T4>(Expression<Func<T1, T2, T3, T4>> expression)
+            => ((MethodCallExpression) expression.Body).Method;
 
         #endregion
     }

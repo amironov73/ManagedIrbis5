@@ -21,7 +21,9 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using AM;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -68,19 +70,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 bool value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromBoolean(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromBoolean(value);
-            }
-        } // method FromBoolean
+            => field.SetSubFieldValue(code, FromBoolean(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -92,10 +82,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 bool value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromBoolean(field, code, value);
-        } // method FromBoolean
+            => FromBoolean(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в логическое значение.
@@ -170,19 +157,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 byte value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromByte(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromByte(value);
-            }
-        } // method FromByte
+            => field.SetSubFieldValue(code, FromByte(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -194,10 +169,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 byte value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromByte(field, code, value);
-        } // method FromByte
+            => FromByte(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в 8-битное целое без знака.
@@ -265,19 +237,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 char value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromChar(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromChar(value);
-            }
-        } // method FromChar
+            => field.SetSubFieldValue(code, FromChar(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -289,10 +249,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 char value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromChar(field, code, value);
-        } // method FromChar
+            => FromChar(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в символ.
@@ -355,19 +312,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 DateTime value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromDateTime(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromDateTime(value);
-            }
-        } // method FromDateTime
+            => field.SetSubFieldValue(code, FromDateTime(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -379,10 +324,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 DateTime value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromDateTime(field, code, value);
-        } // method FromDateTime
+            => FromDateTime(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в дату.
@@ -458,19 +400,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 decimal value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromDecimal(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromDecimal(value);
-            }
-        } // method FromDecimal
+            => field.SetSubFieldValue(code, FromDecimal(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -482,10 +412,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 decimal value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromDecimal(field, code, value);
-        } // method FromDecimal
+            => FromDecimal(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в денежный тип.
@@ -571,19 +498,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 double value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromDouble(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromDouble(value);
-            }
-        } // method FromDouble
+            => field.SetSubFieldValue(code, FromDouble(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -595,10 +510,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 double value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromDouble(field, code, value);
-        } // method FromDouble
+            => FromDouble(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в число с плавающей точкой двойной точности.
@@ -684,19 +596,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 short value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromInt16(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromInt16(value);
-            }
-        } // method FromInt16
+            => field.SetSubFieldValue(code, FromInt16(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -708,10 +608,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 short value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromInt16(field, code, value);
-        } // method FromInt16
+            => FromInt16(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в 16-битное целое число со знаком.
@@ -797,19 +694,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 int value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromInt32(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromInt32(value);
-            }
-        } // method FromInt32
+            => field.SetSubFieldValue(code, FromInt32(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -821,10 +706,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 int value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromInt32(field, code, value);
-        } // method FromInt32
+            => FromInt32(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в 32-битное целое число со знаком.
@@ -910,19 +792,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 long value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromInt64(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromInt64(value);
-            }
-        } // method FromInt64
+            => field.SetSubFieldValue(code, FromInt64(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -934,10 +804,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 long value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromInt64(field, code, value);
-        } // method FromInt64
+            => FromInt64(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в 64-битное целое число со знаком.
@@ -1023,19 +890,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 sbyte value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromSByte(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromSByte(value);
-            }
-        } // method FromSByte
+            => field.SetSubFieldValue(code, FromSByte(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -1047,11 +902,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 sbyte value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromSByte(field, code, value);
-        } // method FromSByte
-
+            => FromSByte(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в 8-битное целое со знаком.
@@ -1120,19 +971,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 float value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromSingle(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromSingle(value);
-            }
-        } // method FromSingle
+            => field.SetSubFieldValue(code, FromSingle(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -1144,10 +983,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 short value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromSingle(field, code, value);
-        } // method FromSingle
+            => FromSingle(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в число с плавающей точкой одинарной точности.
@@ -1227,19 +1063,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 string? value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = value;
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = value;
-            }
-        } // method FromString
+            => field.SetSubFieldValue(code, value);
 
         /// <summary>
         /// Преобразование в строку.
@@ -1251,10 +1075,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 string? value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromString(field, code, value);
-        } // method FromString
+            => FromString(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в строку.
@@ -1324,19 +1145,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 ushort value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromUInt16(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromUInt16(value);
-            }
-        } // method FromUInt16
+            => field.SetSubFieldValue(code, FromUInt16(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -1348,10 +1157,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 ushort value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromUInt16(field, code, value);
-        } // method FromUInt16
+            => FromUInt16(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в 16-битное целое число без знака.
@@ -1437,19 +1243,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 uint value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromUInt32(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromUInt32(value);
-            }
-        } // method FromUInt32
+            => field.SetSubFieldValue(code, FromUInt32(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -1461,10 +1255,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 uint value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromUInt32(field, code, value);
-        } // method FromUInt32
+            => FromUInt32(record.GetOrAddField(tag), code, value);
 
         /// <summary>
         /// Преобразование в 32-битное целое число без знака.
@@ -1550,19 +1341,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 ulong value
             )
-        {
-            if (code == NoCode)
-            {
-                field.Value = FromUInt64(value);
-                return;
-            }
-
-            var subfield = field.GetFirstSubField(code);
-            if (subfield is not null)
-            {
-                subfield.Value = FromUInt64(value);
-            }
-        } // method FromUInt64
+            => field.SetSubFieldValue(code, FromUInt64(value));
 
         /// <summary>
         /// Преобразование в строку.
@@ -1574,10 +1353,8 @@ namespace ManagedIrbis.Mapping
                 char code,
                 ulong value
             )
-        {
-            var field = record.GetFirstField(tag) ?? record.Add(tag);
-            FromUInt64(field, code, value);
-        } // method FromInt16
+            => FromUInt64(record.GetOrAddField(tag), code, value);
+        // method FromInt16
 
         /// <summary>
         /// Преобразование в 64-битное целое число без знака.
@@ -1637,6 +1414,73 @@ namespace ManagedIrbis.Mapping
                 ? 0
                 : ToUInt64(field, code);
         } // method ToUInt64
+
+        #endregion
+
+        #region Object
+
+        public static void FromObject<T>
+            (
+                Field field,
+                T source
+            )
+            where T: class
+        {
+            var mapper = MapperCache.GetFieldMapper<T>();
+            mapper.ToField(field, source);
+
+        } // method FromObject
+
+        public static void FromObject<T>
+            (
+                Record record,
+                int tag,
+                IEnumerable<T> source
+            )
+            where T: class
+        {
+            var mapper = MapperCache.GetFieldMapper<T>();
+            record.RemoveField(tag);
+
+            foreach (var item in source)
+            {
+                var notnull = item.ThrowIfNull("item");
+                var field = new Field { Tag = tag };
+                mapper.ToField(field, notnull);
+                record.Fields.Add(field);
+            }
+        } // method FromObject
+
+        public static void ToObject<T>
+            (
+                Field field,
+                T target
+            )
+            where T: class
+        {
+            var mapper = MapperCache.GetFieldMapper<T>();
+            mapper.FromField(field, target);
+        } // method ToObject
+
+        public static void ToObject<T>
+            (
+                Record record,
+                int tag,
+                IList<T> target
+            )
+            where T: class, new()
+        {
+            var mapper = MapperCache.GetFieldMapper<T>();
+            foreach (var field in record.Fields)
+            {
+                if (field.Tag == tag)
+                {
+                    var item = new T();
+                    mapper.FromField(field, item);
+                    target.Add(item);
+                }
+            }
+        } // method ToObject
 
         #endregion
 

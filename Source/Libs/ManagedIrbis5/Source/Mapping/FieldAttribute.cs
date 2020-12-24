@@ -25,7 +25,7 @@ namespace ManagedIrbis.Mapping
     /// Задаёт отображение поля записи на свойство класса.
     /// </summary>
     [DebuggerDisplay("Tag: {" + nameof(Tag) + "}")]
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Class)]
     public sealed class FieldAttribute
         : Attribute
     {
