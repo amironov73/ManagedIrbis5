@@ -22,6 +22,8 @@ using System.Text;
 
 using AM;
 
+using ManagedIrbis.Infrastructure;
+
 #endregion
 
 #nullable enable
@@ -32,7 +34,18 @@ namespace ManagedIrbis
     /// Поле библиографической записи.
     /// </summary>
     public class Field
+        // : IHandmadeSerializable
     {
+        #region Constants
+
+        /// <summary>
+        /// Специальный код, зарезервированный для
+        /// значения поля до первого разделителя.
+        /// </summary>
+        private const char ValueCode = '\0';
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -43,7 +56,29 @@ namespace ManagedIrbis
         /// <summary>
         /// Значение поля до первого разделителя.
         /// </summary>
-        public string? Value { get; set; }
+        /// <remarks>
+        /// Значение имитируется с помощью первого подполя,
+        /// код которого должен быть равен '\0'.
+        /// </remarks>
+        public string? Value
+        {
+            get => GetValueSubField()?.Value;
+            set
+            {
+                if (value is null)
+                {
+                    var valueSubfield = GetValueSubField();
+                    if (valueSubfield is not null)
+                    {
+                        Subfields.Remove(valueSubfield);
+                    }
+                }
+                else
+                {
+                    CreateValueSubField().Value = value;
+                }
+            } // set
+        } // property Value
 
         /// <summary>
         /// Список подполей.
@@ -55,6 +90,53 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
+        /// Если нет подполя, выделенного для хранения
+        /// значения поля до первого разделителя,
+        /// создаем его (оно должно быть первым в списке подполей).
+        /// </summary>
+        public SubField CreateValueSubField()
+        {
+            SubField result;
+
+            if (Subfields.Count == 0)
+            {
+                result = new SubField { Code = ValueCode };
+                Subfields.Add(result);
+                return result;
+
+            }
+
+            result = Subfields[0];
+            if (result.Code != ValueCode)
+            {
+                result = new SubField { Code = ValueCode };
+                Subfields.Insert(0, result);
+            }
+
+            return result;
+        } // method CreateValueSubField
+
+        /// <summary>
+        /// Получаем подполе, выделенное для хранения
+        /// значения поля до первого разделителя.
+        /// </summary>
+        public SubField? GetValueSubField()
+        {
+            if (Subfields.Count == 0)
+            {
+                return null;
+            }
+
+            var result = Subfields[0];
+            if (result.Code == ValueCode)
+            {
+                return result;
+            }
+
+            return null;
+        } // method GetValueSubField
+
+        /// <summary>
         /// Добавление подполя в конец списка подполей.
         /// </summary>
         public Field Add
@@ -63,12 +145,63 @@ namespace ManagedIrbis
                 object? value
             )
         {
+            if (code == ValueCode)
+            {
+                Value = value?.ToString();
+                return this;
+            }
+
             var text = value?.ToString();
             var subfield = new SubField { Code = code, Value = text };
             Subfields.Add(subfield);
 
             return this;
         } // method Add
+
+        public Field AddNonEmpty
+            (
+                char code,
+                int value
+            )
+        {
+            if (value is not 0)
+            {
+                Add(code, value.ToInvariantString());
+            }
+
+            return this;
+        }
+
+        public Field AddNonEmpty
+            (
+                char code,
+                long value
+            )
+        {
+            if (value is not 0)
+            {
+                Add(code, value.ToInvariantString());
+            }
+
+            return this;
+        }
+
+        public Field AddNonEmpty
+            (
+                char code,
+                DateTime? value
+            )
+        {
+            if (value is not null)
+            {
+                if (value.Value != DateTime.MinValue)
+                {
+                    Add(code, IrbisDate.ConvertDateToString(value.Value));
+                }
+            }
+
+            return this;
+        }
 
         /// <summary>
         /// Добавление подполя в конец списка подполей
@@ -80,12 +213,18 @@ namespace ManagedIrbis
                 object? value
             )
         {
-            if (!ReferenceEquals(value, null))
+            if (value is not null)
             {
+                if (code == ValueCode)
+                {
+                    Value = value.ToString();
+                    return this;
+                }
+
                 var text = value.ToString();
                 if (!string.IsNullOrEmpty(text))
                 {
-                    var subfield = new SubField {Code = code, Value = text};
+                    var subfield = new SubField { Code = code, Value = text };
                     Subfields.Add(subfield);
                 }
             }
@@ -98,7 +237,6 @@ namespace ManagedIrbis
         /// </summary>
         public Field Clear()
         {
-            Value = null;
             Subfields.Clear();
 
             return this;
@@ -176,6 +314,17 @@ namespace ManagedIrbis
                 char code
             )
         {
+            if (code == ValueCode)
+            {
+                var firstSubfield = Subfields.FirstOrDefault();
+                if (firstSubfield?.Code == ValueCode)
+                {
+                    return firstSubfield;
+                }
+
+                return null;
+            }
+
             foreach (var subfield in Subfields)
             {
                 if (subfield.Code.SameChar(code))
@@ -188,28 +337,21 @@ namespace ManagedIrbis
         } // method GetFirstSubField
 
         /// <summary>
-        /// Перечень подполей с указанным кодом.
+        /// Перечисление подполей с указанным кодом.
         /// </summary>
-        /// <param name="code">Искомый код подполя.</param>
-        /// <remarks>Сравнение кодов происходит без учета
-        /// регистра символов.</remarks>
-        /// <returns>Найденные подполя.</returns>
-        public SubField[] GetSubField
+        public IEnumerable<SubField> EnumerateSubFields
             (
                 char code
             )
         {
-            List<SubField> result = new ();
-            foreach (var subField in Subfields)
+            foreach (var subfield in Subfields)
             {
-                if (subField.Code.SameChar(code))
+                if (subfield.Code.SameChar(code))
                 {
-                    result.Add(subField);
+                    yield return subfield;
                 }
             }
-
-            return result.ToArray();
-        } // method GetSubField
+        } // method EnumerateSubFields
 
         /// <summary>
         /// Получение первого подполя с указанным кодом
@@ -222,6 +364,11 @@ namespace ManagedIrbis
                 char code
             )
         {
+            if (code == '\0')
+            {
+
+            }
+
             foreach (var subfield in Subfields)
             {
                 if (subfield.Code.SameChar(code))
@@ -247,9 +394,29 @@ namespace ManagedIrbis
         public SubField? GetSubField
             (
                 char code,
-                int occurrence
+                int occurrence = 0
             )
         {
+            if (code == ValueCode)
+            {
+                if (occurrence != 0)
+                {
+                    return null;
+                }
+
+                return GetValueSubField();
+            }
+
+            if (occurrence < 0)
+            {
+                // отрицательные индексы отсчитываются от конца
+                occurrence = Subfields.Count(sf => sf.Code.SameChar(code)) + occurrence;
+                if (occurrence < 0)
+                {
+                    return null;
+                }
+            }
+
             foreach (var subfield in Subfields)
             {
                 if (subfield.Code.SameChar(code))
@@ -277,35 +444,15 @@ namespace ManagedIrbis
         public string? GetSubFieldValue
             (
                 char code,
-                int occurrence
+                int occurrence = 0
             )
             => GetSubField(code, occurrence)?.Value;
-
-        /// <summary>
-        /// Получает значение первого появления подполя
-        /// с указанным кодом.
-        /// </summary>
-        public string? GetFirstSubFieldValue
-            (
-                char code
-            )
-            => code == '\0'
-                ? Value
-                : GetFirstSubField(code)?.Value;
 
         /// <summary>
         /// For * specification.
         /// </summary>
         public string? GetValueOrFirstSubField()
-        {
-            var result = Value;
-            if (string.IsNullOrEmpty(result))
-            {
-                result = Subfields.FirstOrDefault()?.Value;
-            }
-
-            return result;
-        } // method GetValueOrFirstSubField
+            => Subfields.FirstOrDefault()?.Value;
 
         /// <summary>
         /// Установка значения подполя.
@@ -319,7 +466,7 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            if (code == '\0')
+            if (code == ValueCode)
             {
                 Value = value;
             }
@@ -360,13 +507,46 @@ namespace ManagedIrbis
 
         #endregion
 
+        #region IHandmadeSerializable members
+
+        /*
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Tag = reader.ReadPackedInt32();
+            Value = reader.ReadNullableString();
+            Subfields.RestoreFromStream(reader);
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull(writer, nameof(writer));
+
+            writer.WritePackedInt32(Tag);
+            writer.WriteNullable(Value);
+            Subfields.SaveToStream(writer);
+        }
+        */
+
+        #endregion
+
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            int length = 4 + (Value?.Length ?? 0)
-                           + Subfields.Sum(sf => (sf.Value?.Length ?? 0) + 2);
+            var length = 4 + Subfields.Sum
+                (
+                    sf => (sf.Value?.Length ?? 0)
+                    + (sf.Code == ValueCode ? 1 : 2)
+                );
             var result = new StringBuilder (length);
             result.Append(Tag.ToInvariantString())
                 .Append('#')

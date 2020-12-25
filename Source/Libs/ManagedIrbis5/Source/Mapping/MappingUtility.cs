@@ -200,12 +200,16 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Построение прямого маппера для заданного типа.
         /// </summary>
-        public static Expression<Action<Field, T>> CreateForwardFieldMapper<T>()
+        public static Expression<Action<Field, object>> CreateForwardFieldMapper
+            (
+                Type type
+            )
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
-            var properties = typeof(T).GetProperties(flags);
+            var properties = type.GetProperties(flags);
             var expressions = new List<Expression>();
-            var target = Expression.Parameter(typeof(T), "target");
+            var target = Expression.Parameter(typeof(object), "target");
+            var casted = Expression.Convert(target, type);
             var field = Expression.Parameter(typeof(Field), "field");
 
             foreach (var property in properties)
@@ -214,7 +218,7 @@ namespace ManagedIrbis.Mapping
                 if (attribute is not null)
                 {
                     var codeParameter = Expression.Constant(attribute.Code, typeof(char));
-                    var accessor = Expression.PropertyOrField(target, property.Name);
+                    var accessor = Expression.PropertyOrField(casted, property.Name);
                     var method = ChooseForwardFieldMethod(property);
                     var call = Expression.Call(method, field, codeParameter);
                     var assignment = Expression.Assign(accessor, call);
@@ -223,7 +227,7 @@ namespace ManagedIrbis.Mapping
             }
 
             var body = Expression.Block(expressions.ToArray());
-            var lambda = Expression.Lambda<Action<Field, T>>
+            var lambda = Expression.Lambda<Action<Field, object>>
                 (
                     body,
                     field,
@@ -244,7 +248,8 @@ namespace ManagedIrbis.Mapping
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
             var properties = type.GetProperties(flags);
             var expressions = new List<Expression>();
-            var target = Expression.Parameter(type, "target");
+            var target = Expression.Parameter(typeof(object), "target");
+            var casted = Expression.Convert(target, type);
             var field = Expression.Parameter(typeof(Field), "field");
 
             foreach (var property in properties)
@@ -253,7 +258,7 @@ namespace ManagedIrbis.Mapping
                 if (attribute is not null)
                 {
                     var code = Expression.Constant(attribute.Code, typeof(char));
-                    var accessor = Expression.PropertyOrField(target, property.Name);
+                    var accessor = Expression.PropertyOrField(casted, property.Name);
                     var method = ChooseBackwardFieldMethod(property);
                     var call = Expression.Call(method, field, code, accessor);
                     expressions.Add(call);
@@ -272,49 +277,18 @@ namespace ManagedIrbis.Mapping
         } // method CreateBackwardFieldMapper
 
         /// <summary>
-        /// Построение обратного маппера для указанного типа.
-        /// </summary>
-        public static Expression<Action<Field, T>> CreateBackwardFieldMapper<T>()
-        {
-            const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
-            var properties = typeof(T).GetProperties(flags);
-            var expressions = new List<Expression>();
-            var target = Expression.Parameter(typeof(T), "target");
-            var field = Expression.Parameter(typeof(Field), "field");
-
-            foreach (var property in properties)
-            {
-                var attribute = property.GetCustomAttribute<SubFieldAttribute>();
-                if (attribute is not null)
-                {
-                    var code = Expression.Constant(attribute.Code, typeof(char));
-                    var accessor = Expression.PropertyOrField(target, property.Name);
-                    var method = ChooseBackwardFieldMethod(property);
-                    var call = Expression.Call(method, field, code, accessor);
-                    expressions.Add(call);
-                }
-            }
-
-            var body = Expression.Block(expressions.ToArray());
-            var lambda = Expression.Lambda<Action<Field, T>>
-                (
-                    body,
-                    field,
-                    target
-                );
-
-            return lambda;
-        } // method CreateBackwardFieldMapper
-
-        /// <summary>
         /// Построение прямого маппера для заданного типа.
         /// </summary>
-        public static Expression<Action<Record, T>> CreateForwardRecordMapper<T>()
+        public static Expression<Action<Record, object>> CreateForwardRecordMapper
+            (
+                Type type
+            )
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
-            var properties = typeof(T).GetProperties(flags);
+            var properties = type.GetProperties(flags);
             var expressions = new List<Expression>();
-            var target = Expression.Parameter(typeof(T), "target");
+            var target = Expression.Parameter(typeof(object), "target");
+            var casted = Expression.Convert(target, type);
             var record = Expression.Parameter(typeof(Record), "record");
 
             foreach (var property in properties)
@@ -326,7 +300,13 @@ namespace ManagedIrbis.Mapping
                     attribute ??= property.PropertyType.GetCustomAttribute<FieldAttribute>();
                     if (attribute is not null)
                     {
-                        var tag = attribute.Tag;
+                        var tag = Expression.Constant (attribute.Tag, typeof(int));
+                        var accessor = Expression.PropertyOrField(casted, property.Name);
+                        var method = Utility.GetMethodInfo((Record record, int tag, object target)
+                            => Map.ToObject(record, tag, target));
+                        var call = Expression.Call(method, new Expression[] { record, tag, target });
+                        var assignment = Expression.Assign(accessor, call);
+                        expressions.Add(assignment);
                     }
                 }
                 else
@@ -335,7 +315,7 @@ namespace ManagedIrbis.Mapping
                     {
                         var tag = Expression.Constant(attribute.Tag, typeof(int));
                         var code = Expression.Constant(attribute.Code, typeof(char));
-                        var accessor = Expression.PropertyOrField(target, property.Name);
+                        var accessor = Expression.PropertyOrField(casted, property.Name);
                         var method = ChooseForwardRecordMethod(property);
                         var call = Expression.Call(method, record, tag, code);
                         var assignment = Expression.Assign(accessor, call);
@@ -345,7 +325,7 @@ namespace ManagedIrbis.Mapping
             }
 
             var body = Expression.Block(expressions.ToArray());
-            var lambda = Expression.Lambda<Action<Record, T>>
+            var lambda = Expression.Lambda<Action<Record, object>>
                 (
                     body,
                     record,
@@ -358,12 +338,16 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Построение обратного маппера для заданного типа.
         /// </summary>
-        public static Expression<Action<Record, T>> CreateBackwardRecordMapper<T>()
+        public static Expression<Action<Record, object>> CreateBackwardRecordMapper
+            (
+                Type type
+            )
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
-            var properties = typeof(T).GetProperties(flags);
+            var properties = type.GetProperties(flags);
             var expressions = new List<Expression>();
-            var target = Expression.Parameter(typeof(T), "target");
+            var target = Expression.Parameter(typeof(object), "target");
+            var casted = Expression.Convert(target, type);
             var record = Expression.Parameter(typeof(Record), "record");
 
             foreach (var property in properties)
@@ -373,7 +357,7 @@ namespace ManagedIrbis.Mapping
                 {
                     var tag = Expression.Constant(attribute.Tag, typeof(int));
                     var code = Expression.Constant(attribute.Code, typeof(char));
-                    var accessor = Expression.PropertyOrField(target, property.Name);
+                    var accessor = Expression.PropertyOrField(casted, property.Name);
                     var method = ChooseBackwardRecordMethod(property);
                     var call = Expression.Call(method, record, tag, code, accessor);
                     expressions.Add(call);
@@ -381,7 +365,7 @@ namespace ManagedIrbis.Mapping
             }
 
             var body = Expression.Block(expressions.ToArray());
-            var lambda = Expression.Lambda<Action<Record, T>>
+            var lambda = Expression.Lambda<Action<Record, object>>
                 (
                     body,
                     record,

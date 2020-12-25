@@ -102,7 +102,7 @@ namespace IrbisExamples
             record.Add(100).Add('a', "Person3").Add('b', "30");
             record.Add(200).Add('a', "Not person").Add('b', "Not age");
             var list = new List<Person>();
-            Map.ToObject(record, 100, list);
+            Map.ToObject<Person>(record, 100, list);
             foreach (var person in list)
             {
                 Console.WriteLine(person);
@@ -114,7 +114,7 @@ namespace IrbisExamples
                 new() { Name = "Second", Age = 102 },
                 new() { Name = "Third", Age = 103 },
             };
-            Map.FromObject(record, 100, array);
+            Map.FromObject<Person>(record, 100, array);
             Console.WriteLine(record);
         }
     }

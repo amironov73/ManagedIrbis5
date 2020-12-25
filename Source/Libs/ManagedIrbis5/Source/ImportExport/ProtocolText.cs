@@ -88,13 +88,20 @@ namespace ManagedIrbis.ImportExport
                 SubField subField
             )
         {
-            builder.AppendFormat
-                (
-                    "{0}{1}{2}",
-                    SubField.Delimiter,
-                    subField.Code,
-                    subField.Value
-                );
+            if (subField.RepresentsValue)
+            {
+                builder.Append(subField.Value);
+            }
+            else
+            {
+                builder.AppendFormat
+                    (
+                        "{0}{1}{2}",
+                        SubField.Delimiter,
+                        subField.Code,
+                        subField.Value
+                    );
+            }
         }
 
         /// <summary>
@@ -111,8 +118,6 @@ namespace ManagedIrbis.ImportExport
                     "{0}#",
                     field.Tag
                 );
-
-            builder.Append(field.Value);
 
             foreach (var subField in field.Subfields)
             {

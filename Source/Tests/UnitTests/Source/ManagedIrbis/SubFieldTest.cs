@@ -1,10 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using ManagedIrbis;
-
-// ReSharper disable CheckNamespace
+﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using AM.Runtime;
+
+using ManagedIrbis;
 
 #nullable enable
 
@@ -59,7 +61,6 @@ namespace UnitTests.ManagedIrbis
             Assert.AreEqual("Value", subField.Value);
         }
 
-        /*
         private void _TestSerialization
             (
                 params SubField[] subFields
@@ -88,11 +89,12 @@ namespace UnitTests.ManagedIrbis
             _TestSerialization(new SubField[0]);
             _TestSerialization(new SubField());
             _TestSerialization(new SubField(), new SubField());
-            _TestSerialization(new SubField('a'), new SubField('b'));
-            _TestSerialization(new SubField('a', "Hello"),
-                new SubField('b', "World"));
+            _TestSerialization(new SubField { Code = 'a' }, new SubField { Code = 'b' });
+            _TestSerialization(new SubField { Code = 'a', Value = "Hello" },
+                new SubField { Code = 'b', Value = "World" } );
         }
 
+        /*
         [TestMethod]
         public void SubField_SetValue_1()
         {
@@ -158,28 +160,6 @@ namespace UnitTests.ManagedIrbis
                 SubFieldValue.ThrowOnVerify = save;
             }
         }
-
-        [TestMethod]
-        [ExpectedException(typeof(ReadOnlyException))]
-        public void SubField_ReadOnly_1()
-        {
-            SubField subField = new SubField('a', "Value", true, null);
-            Assert.AreEqual("Value", subField.Value);
-            subField.Value = "New value";
-            Assert.AreEqual("Value", subField.Value);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ReadOnlyException))]
-        public void SubField_AsReadOnly_1()
-        {
-            SubField subField = new SubField('a', "Value")
-                .AsReadOnly();
-            Assert.AreEqual("Value", subField.Value);
-            subField.Value = "New value";
-            Assert.AreEqual("Value", subField.Value);
-        }
-
 
         [TestMethod]
         public void SubField_ToJObject_1()
@@ -249,26 +229,13 @@ namespace UnitTests.ManagedIrbis
             Assert.AreEqual(field, subField.Field);
         }
 
-        [TestMethod]
-        public void SubField_Path_1()
-        {
-            SubField subField = new SubField();
-            Assert.AreEqual(string.Empty, subField.Path);
-
-            subField = new SubField('a', "Title");
-            Assert.AreEqual("^a", subField.Path);
-
-            RecordField field = new RecordField("200");
-            field.SubFields.Add(subField);
-            Assert.AreEqual("200/0^a", subField.Path);
-        }
         */
 
         [TestMethod]
         public void SubField_Verify_1()
         {
             var subField = new SubField();
-            Assert.IsFalse(subField.Verify(false));
+            Assert.IsTrue(subField.Verify(false));
 
             subField = new SubField { Code = 'a' };
             Assert.IsTrue(subField.Verify(false));

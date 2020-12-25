@@ -25,13 +25,13 @@ namespace ManagedIrbis.Mapping
     /// <summary>
     /// Абстрактный маппер для библиографической записи.
     /// </summary>
-    public sealed class RecordMapper<T>
+    public sealed class RecordMapper
     {
         #region Private members
 
-        private Action<Record, T>? _fromRecord;
+        private Action<Record, object>? _fromRecord;
 
-        private Action<Record, T>? _toRecord;
+        private Action<Record, object>? _toRecord;
 
         #endregion
 
@@ -40,14 +40,17 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Создание маппера для указанного типа.
         /// </summary>
-        public static RecordMapper<T> Create()
+        public static RecordMapper Create
+            (
+                Type type
+            )
         {
-            var result = new RecordMapper<T>
+            var result = new RecordMapper
             {
-                _fromRecord = MappingUtility.CreateForwardRecordMapper<T>()
+                _fromRecord = MappingUtility.CreateForwardRecordMapper(type)
                     .Compile(),
 
-                _toRecord = MappingUtility.CreateBackwardRecordMapper<T>()
+                _toRecord = MappingUtility.CreateBackwardRecordMapper(type)
                     .Compile()
             };
 
@@ -60,7 +63,7 @@ namespace ManagedIrbis.Mapping
         public void FromRecord
             (
                 Record record,
-                T target
+                object target
             )
         {
             _fromRecord!(record, target);
@@ -72,7 +75,7 @@ namespace ManagedIrbis.Mapping
         public void ToRecord
             (
                 Record record,
-                T source
+                object source
             )
         {
             _toRecord!(record, source);

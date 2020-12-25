@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Record.cs -- библиографическая запись
@@ -188,7 +189,7 @@ namespace ManagedIrbis
                 int tag
             )
         {
-            return GetFirstField(tag)?.Value;
+            return GetField(tag)?.Value;
         } // method FM
 
         /// <summary>
@@ -200,13 +201,13 @@ namespace ManagedIrbis
                 char code
             )
         {
-            var field = GetFirstField(tag);
+            var field = GetField(tag);
 
             if (!ReferenceEquals(field, null))
             {
                 return code == '*'
                     ? field.GetValueOrFirstSubField()
-                    : field.GetFirstSubFieldValue(code);
+                    : field.GetSubFieldValue(code);
             }
 
             return null;
@@ -237,7 +238,6 @@ namespace ManagedIrbis
         /// <summary>
         /// Текст всех подполей с указанным тегом и кодом.
         /// </summary>
-        // ReSharper disable InconsistentNaming
         public string[] FMA
             (
                 int tag,
@@ -252,7 +252,7 @@ namespace ManagedIrbis
                 {
                     var value = code == '*'
                         ? field.GetValueOrFirstSubField()
-                        : field.GetFirstSubFieldValue(code);
+                        : field.GetSubFieldValue(code);
                     if (!string.IsNullOrEmpty(value))
                     {
                         result.Add(value);
@@ -264,9 +264,35 @@ namespace ManagedIrbis
         } // method FMA
 
         /// <summary>
-        /// Получение первого поля с указанной меткой.
+        /// Получение заданного повторения поля с указанной меткой.
         /// </summary>
-        public Field? GetFirstField
+        public Field? GetField
+            (
+                int tag,
+                int occurrence = 0
+            )
+        {
+            foreach (var field in Fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (occurrence == 0)
+                    {
+                        return field;
+                    }
+
+                    --occurrence;
+                }
+            }
+
+            return null;
+        } // method GetField
+
+        /// <summary>
+        /// Перечисление полей с указанной меткой.
+        /// </summary>
+        /// <param name="tag">Искомая метка поля.</param>
+        public IEnumerable<Field> EnumerateField
             (
                 int tag
             )
@@ -275,12 +301,10 @@ namespace ManagedIrbis
             {
                 if (field.Tag == tag)
                 {
-                    return field;
+                    yield return field;
                 }
             }
-
-            return null;
-        } // method GetFirstField
+        }
 
         /// <summary>
         /// Получение поля с указанной меткой
@@ -315,7 +339,7 @@ namespace ManagedIrbis
             )
         {
             Field? field;
-            while ((field = GetFirstField(tag)) is not null)
+            while ((field = GetField(tag)) is not null)
             {
                 Fields.Remove(field);
             }

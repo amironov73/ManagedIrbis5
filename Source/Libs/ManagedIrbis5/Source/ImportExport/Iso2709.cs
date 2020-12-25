@@ -275,6 +275,9 @@ namespace ManagedIrbis.ImportExport
                     for (var j = 0; j < field.Subfields.Count; j++)
                     {
                         SubField subField = field.Subfields[j];
+                        if (!subField.RepresentsValue)
+                        {
+
 //                        if (!SubFieldCode.IsValidCode(subField.Code))
 //                        {
 //                            throw new IrbisException
@@ -283,8 +286,9 @@ namespace ManagedIrbis.ImportExport
 //                                );
 //                        }
 
-                        fldlen += 2; // Признак подполя и его код
-                        fldlen += encoding.GetByteCount(subField.Value ?? string.Empty);
+                            fldlen += 2; // Признак подполя и его код
+                            fldlen += encoding.GetByteCount(subField.Value ?? string.Empty);
+                        }
                     }
                 }
 
@@ -373,15 +377,19 @@ namespace ManagedIrbis.ImportExport
 
                     for (var j = 0; j < field.Subfields.Count; j++)
                     {
-                        bytes[currentAddress++] = SubfieldDelimiter;
-                        bytes[currentAddress++] = (byte)field.Subfields[j].Code;
-                        currentAddress = _Encode
+                        var subfield = field.Subfields[j];
+                        if (!subfield.RepresentsValue)
+                        {
+                            bytes[currentAddress++] = SubfieldDelimiter;
+                            bytes[currentAddress++] = (byte) subfield.Code;
+                            currentAddress = _Encode
                             (
                                 bytes,
                                 currentAddress,
-                                field.Subfields[j].Value,
+                                subfield.Value,
                                 encoding
                             );
+                        }
                     }
                 }
 

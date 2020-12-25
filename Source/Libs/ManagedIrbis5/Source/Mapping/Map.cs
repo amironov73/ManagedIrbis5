@@ -21,9 +21,12 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+
 using AM;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -125,7 +128,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? false
@@ -368,7 +371,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? DateTime.MinValue
@@ -466,7 +469,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0m
@@ -564,7 +567,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0.0
@@ -662,7 +665,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0
@@ -760,7 +763,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0
@@ -858,7 +861,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0
@@ -1037,7 +1040,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0.0f
@@ -1113,7 +1116,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? null
@@ -1211,7 +1214,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0
@@ -1309,7 +1312,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0
@@ -1408,7 +1411,7 @@ namespace ManagedIrbis.Mapping
                 char code
             )
         {
-            var field = record.GetFirstField(tag);
+            var field = record.GetField(tag);
 
             return field is null
                 ? 0
@@ -1419,27 +1422,30 @@ namespace ManagedIrbis.Mapping
 
         #region Object
 
-        public static void FromObject<T>
+        public static void FromObject
             (
                 Field field,
-                T source
+                Type type,
+                object source
             )
-            where T: class
         {
-            var mapper = MapperCache.GetFieldMapper<T>();
+            var mapper = MapperCache.GetFieldMapper(type);
             mapper.ToField(field, source);
-
         } // method FromObject
 
-        public static void FromObject<T>
+        public static void FromObject<T>(Field field, object source)
+            where T : class
+            => FromObject(field, typeof(T), source);
+
+        public static void FromObject
             (
                 Record record,
                 int tag,
-                IEnumerable<T> source
+                Type type,
+                IEnumerable source
             )
-            where T: class
         {
-            var mapper = MapperCache.GetFieldMapper<T>();
+            var mapper = MapperCache.GetFieldMapper(type);
             record.RemoveField(tag);
 
             foreach (var item in source)
@@ -1451,36 +1457,64 @@ namespace ManagedIrbis.Mapping
             }
         } // method FromObject
 
-        public static void ToObject<T>
+        public static void FromObject<T>(Record record, int tag, IEnumerable source)
+            where T : class
+            => FromObject(record, tag, typeof(T), source);
+
+        public static void ToObject
             (
                 Field field,
-                T target
+                Type type,
+                object target
             )
-            where T: class
         {
-            var mapper = MapperCache.GetFieldMapper<T>();
+            var mapper = MapperCache.GetFieldMapper(type);
             mapper.FromField(field, target);
         } // method ToObject
 
-        public static void ToObject<T>
+        public static void ToObject<T>(Field field, object target)
+            where T : class
+            => ToObject(field, typeof(T), target);
+
+        public static void ToObject
             (
                 Record record,
                 int tag,
-                IList<T> target
+                object target
             )
-            where T: class, new()
         {
-            var mapper = MapperCache.GetFieldMapper<T>();
+            var field = record.GetField(tag);
+            if (field is not null)
+            {
+                var mapper = MapperCache.GetFieldMapper(target.GetType());
+                mapper.FromField(field, target);
+            }
+        } // method ToObject
+
+        public static void ToObject
+            (
+                Record record,
+                int tag,
+                Type type,
+                IList target
+            )
+        {
+            var mapper = MapperCache.GetFieldMapper(type);
             foreach (var field in record.Fields)
             {
                 if (field.Tag == tag)
                 {
-                    var item = new T();
+                    var item = Activator.CreateInstance(type)
+                        .ThrowIfNull("item");
                     mapper.FromField(field, item);
                     target.Add(item);
                 }
             }
         } // method ToObject
+
+        public static void ToObject<T>(Record record, int tag, IList target)
+            where T : class, new()
+            => ToObject(record, tag, typeof(T), target);
 
         #endregion
 

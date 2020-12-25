@@ -35,9 +35,9 @@ namespace ManagedIrbis.Mapping
     {
         #region Private members
 
-        private static readonly ConcurrentDictionary<Type, object> _fieldMappers = new();
+        private static readonly ConcurrentDictionary<Type, FieldMapper> _fieldMappers = new();
 
-        private static readonly ConcurrentDictionary<Type, object> _recordMappers = new();
+        private static readonly ConcurrentDictionary<Type, RecordMapper> _recordMappers = new();
 
         #endregion
 
@@ -46,23 +46,25 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Добавление маппера в кэш.
         /// </summary>
-        public static void Add<T>
+        public static void Add
             (
-                FieldMapper<T> mapper
+                Type type,
+                FieldMapper mapper
             )
         {
-            _fieldMappers[typeof(T)] = mapper;
+            _fieldMappers[type] = mapper;
         }
 
         /// <summary>
         /// Добавление маппера в кэш.
         /// </summary>
-        public static void Add<T>
+        public static void Add
             (
-                RecordMapper<T> mapper
+                Type type,
+                RecordMapper mapper
             )
         {
-            _recordMappers[typeof(T)] = mapper;
+            _recordMappers[type] = mapper;
         }
 
         /// <summary>
@@ -77,30 +79,50 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Получение маппера для указанного типа.
         /// </summary>
-        public static FieldMapper<T> GetFieldMapper<T>()
+        public static FieldMapper GetFieldMapper
+            (
+                Type type
+            )
         {
             var result = _fieldMappers.GetOrAdd
                 (
-                    typeof(T),
-                    type => FieldMapper<T>.Create()
+                    type,
+                    FieldMapper.Create
                 );
 
-            return (FieldMapper<T>) result;
+            return result;
         } // method GetFieldMapper
 
         /// <summary>
         /// Получение маппера для указанного типа.
         /// </summary>
-        public static RecordMapper<T> GetRecordMapper<T>()
+        public static FieldMapper GetFieldMapper<T>()
+            where T : class, new()
+            => GetFieldMapper(typeof(T));
+
+        /// <summary>
+        /// Получение маппера для указанного типа.
+        /// </summary>
+        public static RecordMapper GetRecordMapper
+            (
+                Type type
+            )
         {
             var result = _recordMappers.GetOrAdd
                 (
-                    typeof(T),
-                    type => RecordMapper<T>.Create()
+                    type,
+                    RecordMapper.Create
                 );
 
-            return (RecordMapper<T>) result;
+            return result;
         } // method GetRecordMapper
+
+        /// <summary>
+        /// Получение маппера для указанного типа.
+        /// </summary>
+        public static RecordMapper GetRecordMapper<T>()
+            where T : class, new()
+            => GetRecordMapper(typeof(T));
 
         #endregion
 

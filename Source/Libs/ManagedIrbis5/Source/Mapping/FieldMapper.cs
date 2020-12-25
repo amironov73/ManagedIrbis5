@@ -25,13 +25,13 @@ namespace ManagedIrbis.Mapping
     /// <summary>
     /// Абстрактный маппер для поля записи.
     /// </summary>
-    public sealed class FieldMapper<T>
+    public sealed class FieldMapper
     {
         #region Private members
 
-        private Action<Field, T>? _fromField;
+        private Action<Field, object>? _fromField;
 
-        private Action<Field, T>? _toField;
+        private Action<Field, object>? _toField;
 
         #endregion
 
@@ -40,14 +40,17 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Создание маппера для указанного типа.
         /// </summary>
-        public static FieldMapper<T> Create()
+        public static FieldMapper Create
+            (
+                Type type
+            )
         {
-            var result = new FieldMapper<T>
+            var result = new FieldMapper
             {
-                _fromField = MappingUtility.CreateForwardFieldMapper<T>()
+                _fromField = MappingUtility.CreateForwardFieldMapper(type)
                     .Compile(),
 
-                _toField = MappingUtility.CreateBackwardFieldMapper<T>()
+                _toField = MappingUtility.CreateBackwardFieldMapper(type)
                     .Compile()
             };
 
@@ -60,7 +63,7 @@ namespace ManagedIrbis.Mapping
         public void FromField
             (
                 Field field,
-                T target
+                object target
             )
         {
             _fromField!(field, target);
@@ -72,7 +75,7 @@ namespace ManagedIrbis.Mapping
         public void ToField
             (
                 Field field,
-                T source
+                object source
             )
         {
             _toField!(field, source);

@@ -1205,6 +1205,12 @@ namespace AM
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        public static MethodInfo GetMethodInfo<T1, T2, T3, T4>(Expression<Action<T1, T2, T3, T4>> expression)
+            => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Упрощенное получение информации о методе.
+        /// </summary>
         public static MethodInfo GetMethodInfo<T>(Expression<Func<T>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
