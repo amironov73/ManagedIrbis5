@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 
 /* FoundLine.cs -- одна строка в ответе на поисковый запрос
  * Ars Magna project, http://arsmagna.ru

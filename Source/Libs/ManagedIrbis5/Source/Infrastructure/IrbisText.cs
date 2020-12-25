@@ -16,11 +16,6 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Text;
 using System.Text.RegularExpressions;
 
 using CM=System.Configuration.ConfigurationManager;
@@ -57,7 +52,7 @@ namespace ManagedIrbis.Infrastructure
 
         #region Private members
 
-        private static char[] _delimiters = { '\x1F' };
+        private static readonly char[] _delimiters = { '\x1F' };
 
         private static string _CleanupEvaluator
             (

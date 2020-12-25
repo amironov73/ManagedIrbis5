@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 
 /* PostingParameters.cs -- параметры запроса постингов
  * Ars Magna project, http://arsmagna.ru

@@ -515,6 +515,36 @@ namespace ManagedIrbis
         } // method FormatRecordAsync
 
         /// <summary>
+        /// Полнотекстовый поиск ИРБИС64+.
+        /// </summary>
+        public async Task<FullTextResult?> FullTextSearch
+            (
+                SearchParameters searchParameters,
+                TextParameters textParameters
+            )
+        {
+            if (!CheckConnection())
+            {
+                return null;
+            }
+
+            var query = new Query(this, CommandCode.Search);
+            searchParameters.Encode(this, query);
+            textParameters.Encode(this, query);
+            var response = await ExecuteAsync(query);
+            if (response is null
+                || !response.CheckReturnCode())
+            {
+                return null;
+            }
+
+            var result = new FullTextResult();
+            result.Parse(response);
+
+            return result;
+        }
+
+        /// <summary>
         /// Получение максимального MFN для указанной базы данных.
         /// </summary>
         /// <param name="database">Опциональное имя базы данных
