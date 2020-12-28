@@ -12,33 +12,47 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ActivateState.cs -- flags for WM_ACTIVATE message
+/* MessageBeepFlags.cs -- sound type
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Flags for WM_ACTIVATE message (low word of wparam).
+    /// Sound type, as identified by an entry in the registry.
     /// </summary>
-    public enum ActivateState
-        : ushort
+    public enum MessageBeepFlags
     {
         /// <summary>
-        /// Window has been deactivated.
+        /// Simple beep. If the sound card is not available,
+        /// the sound is generated using the speaker.
         /// </summary>
-        WA_INACTIVE = 0,
+        SimpleBeep = unchecked((int)0xFFFFFFFF),
 
         /// <summary>
-        /// Window activated by other than a mouse click,
-        /// like call to SetActiveWindow.
+        /// SystemAsterisk.
         /// </summary>
-        WA_ACTIVE = 1,
+        MB_ICONASTERISK = 0x40,
 
         /// <summary>
-        /// Window activated by a mouse click.
+        /// SystemExclamation.
         /// </summary>
-        WA_CLICKACTIVE = 2
+        MB_ICONEXCLAMATION = 0x30,
 
-    } // enum ActivateState
+        /// <summary>
+        /// SystemHand.
+        /// </summary>
+        MB_ICONHAND = 0x10,
+
+        /// <summary>
+        /// SystemQuestion.
+        /// </summary>
+        MB_ICONQUESTION = 0x20,
+
+        /// <summary>
+        /// SystemDefault.
+        /// </summary>
+        MB_OK = 0
+
+    } // enum MessageBeepFlags
 
 } // namespace AM.Win32

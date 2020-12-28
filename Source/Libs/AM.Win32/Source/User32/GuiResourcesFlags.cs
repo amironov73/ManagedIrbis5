@@ -12,33 +12,26 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ActivateState.cs -- flags for WM_ACTIVATE message
+/* GuiResourcesFlags.cs -- GUI object type
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Flags for WM_ACTIVATE message (low word of wparam).
+    /// GUI object type.
     /// </summary>
-    public enum ActivateState
-        : ushort
+    public enum GuiResourcesFlags
     {
         /// <summary>
-        /// Window has been deactivated.
+        /// Count of GDI objects.
         /// </summary>
-        WA_INACTIVE = 0,
+        GR_GDIOBJECTS = 0,
 
         /// <summary>
-        /// Window activated by other than a mouse click,
-        /// like call to SetActiveWindow.
+        /// Count of USER objects.
         /// </summary>
-        WA_ACTIVE = 1,
+        GR_USEROBJECTS = 1
 
-        /// <summary>
-        /// Window activated by a mouse click.
-        /// </summary>
-        WA_CLICKACTIVE = 2
-
-    } // enum ActivateState
+    } // enum GuiResourcesFlags
 
 } // namespace AM.Win32

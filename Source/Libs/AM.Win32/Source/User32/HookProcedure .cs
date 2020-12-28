@@ -12,33 +12,21 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ActivateState.cs -- flags for WM_ACTIVATE message
+/* HookProcedure.cs -- callback function used with the SetWindowsHookEx
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Flags for WM_ACTIVATE message (low word of wparam).
+    /// The HookProcedure hook procedure is an application-defined
+    /// or library-defined callback function used with the
+    /// SetWindowsHookEx function.
     /// </summary>
-    public enum ActivateState
-        : ushort
-    {
-        /// <summary>
-        /// Window has been deactivated.
-        /// </summary>
-        WA_INACTIVE = 0,
-
-        /// <summary>
-        /// Window activated by other than a mouse click,
-        /// like call to SetActiveWindow.
-        /// </summary>
-        WA_ACTIVE = 1,
-
-        /// <summary>
-        /// Window activated by a mouse click.
-        /// </summary>
-        WA_CLICKACTIVE = 2
-
-    } // enum ActivateState
+    public delegate int HookProcedure
+        (
+            int code,
+            int wParam,
+            int lParam
+        );
 
 } // namespace AM.Win32

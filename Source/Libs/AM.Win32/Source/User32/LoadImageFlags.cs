@@ -12,33 +12,36 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ActivateState.cs -- flags for WM_ACTIVATE message
+/* LoadImageFlags.cs -- flags for LoadImage function
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Flags for WM_ACTIVATE message (low word of wparam).
+    /// Flags for LoadImage function.
     /// </summary>
-    public enum ActivateState
-        : ushort
+    public enum LoadImageFlags
     {
         /// <summary>
-        /// Window has been deactivated.
+        /// Loads a bitmap.
         /// </summary>
-        WA_INACTIVE = 0,
+        IMAGE_BITMAP = 0,
 
         /// <summary>
-        /// Window activated by other than a mouse click,
-        /// like call to SetActiveWindow.
+        /// Loads an icon.
         /// </summary>
-        WA_ACTIVE = 1,
+        IMAGE_ICON = 1,
 
         /// <summary>
-        /// Window activated by a mouse click.
+        /// Loads a cursor.
         /// </summary>
-        WA_CLICKACTIVE = 2
+        IMAGE_CURSOR = 2,
 
-    } // enum ActivateState
+        /// <summary>
+        /// Loads an enhanced metafile.
+        /// </summary>
+        IMAGE_ENHMETAFILE = 3
+
+    } // enum LoadImageFlags
 
 } // namespace AM.Win32

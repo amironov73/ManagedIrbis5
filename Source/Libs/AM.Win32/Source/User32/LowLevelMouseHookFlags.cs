@@ -12,33 +12,28 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ActivateState.cs -- flags for WM_ACTIVATE message
+/* LowLevelMouseHookFlags.cs -- event-injected flags
    Ars Magna project, http://arsmagna.ru */
+
+#region Using directives
+
+using System;
+
+#endregion
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Flags for WM_ACTIVATE message (low word of wparam).
+    /// Specifies the event-injected flag.
     /// </summary>
-    public enum ActivateState
-        : ushort
+    [Flags]
+    public enum LowLevelMouseHookFlags
     {
         /// <summary>
-        /// Window has been deactivated.
+        /// Test the event-injected flag.
         /// </summary>
-        WA_INACTIVE = 0,
+        LLMHF_INJECTED = 0x00000001
 
-        /// <summary>
-        /// Window activated by other than a mouse click,
-        /// like call to SetActiveWindow.
-        /// </summary>
-        WA_ACTIVE = 1,
-
-        /// <summary>
-        /// Window activated by a mouse click.
-        /// </summary>
-        WA_CLICKACTIVE = 2
-
-    } // enum ActivateState
+    } // enum LowLevelMouseHookFlags
 
 } // namespace AM.Win32

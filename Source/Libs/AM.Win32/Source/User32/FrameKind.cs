@@ -12,33 +12,48 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ActivateState.cs -- flags for WM_ACTIVATE message
+/* FrameKind.cs -- options for DrawFrameControl method
    Ars Magna project, http://arsmagna.ru */
+
+#region Using directives
+
+using System;
+
+#endregion
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Flags for WM_ACTIVATE message (low word of wparam).
+    /// Options for DrawFrameControl method.
     /// </summary>
-    public enum ActivateState
-        : ushort
+    [Flags]
+    public enum FrameKind
     {
         /// <summary>
-        /// Window has been deactivated.
+        /// Title bar.
         /// </summary>
-        WA_INACTIVE = 0,
+        DFC_CAPTION = 1,
 
         /// <summary>
-        /// Window activated by other than a mouse click,
-        /// like call to SetActiveWindow.
+        /// Menu bar.
         /// </summary>
-        WA_ACTIVE = 1,
+        DFC_MENU = 2,
 
         /// <summary>
-        /// Window activated by a mouse click.
+        /// Scroll bar.
         /// </summary>
-        WA_CLICKACTIVE = 2
+        DFC_SCROLL = 3,
 
-    } // enum ActivateState
+        /// <summary>
+        /// Standard button.
+        /// </summary>
+        DFC_BUTTON = 4,
+
+        /// <summary>
+        /// Windows 98/Me, Windows 2000/XP: Popup menu item.
+        /// </summary>
+        DFC_POPUPMENU = 5
+
+    } // enum FrameKind
 
 } // namespace AM.Win32

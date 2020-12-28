@@ -12,33 +12,34 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ActivateState.cs -- flags for WM_ACTIVATE message
+/* GetAncestorFlags.cs -- specifies the ancestor to be retrieved
    Ars Magna project, http://arsmagna.ru */
 
 namespace AM.Win32
 {
     /// <summary>
-    /// Flags for WM_ACTIVATE message (low word of wparam).
+    /// Specifies the ancestor to be retrieved.
     /// </summary>
-    public enum ActivateState
-        : ushort
+    public enum GetAncestorFlags
     {
         /// <summary>
-        /// Window has been deactivated.
+        /// Retrieves the parent window. This does not include the
+        /// owner, as it does with the GetParent function.
         /// </summary>
-        WA_INACTIVE = 0,
+        GA_PARENT = 1,
 
         /// <summary>
-        /// Window activated by other than a mouse click,
-        /// like call to SetActiveWindow.
+        /// Retrieves the root window by walking the chain of parent
+        /// windows.
         /// </summary>
-        WA_ACTIVE = 1,
+        GA_ROOT = 2,
 
         /// <summary>
-        /// Window activated by a mouse click.
+        /// Retrieves the owned root window by walking the chain
+        /// of parent and owner windows returned by GetParent.
         /// </summary>
-        WA_CLICKACTIVE = 2
+        GA_ROOTOWNER = 3
 
-    } // enum ActivateState
+    } // enum GetAncestorFlags
 
 } // namespace AM.Win32
