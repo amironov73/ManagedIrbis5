@@ -517,7 +517,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Полнотекстовый поиск ИРБИС64+.
         /// </summary>
-        public async Task<FullTextResult?> FullTextSearch
+        public async Task<FullTextResult?> FullTextSearchAsync
             (
                 SearchParameters searchParameters,
                 TextParameters textParameters
