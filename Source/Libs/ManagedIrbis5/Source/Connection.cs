@@ -28,6 +28,7 @@ using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -151,11 +152,14 @@ namespace ManagedIrbis
             socket.Connection = this;
             _cancellation = new CancellationTokenSource();
             Cancellation = _cancellation.Token;
+            _logger = Magna.Factory.CreateLogger<Connection>();
         }
 
         #endregion
 
         #region Private members
+
+        internal ILogger _logger;
 
         private static readonly int[] _goodCodesForReadRecord = { -201, -600, -602, -603 };
         private static readonly int[] _goodCodesForReadTerms = { -202, -203, -204 };
@@ -171,6 +175,7 @@ namespace ManagedIrbis
         {
             if (Busy != busy)
             {
+                _logger.LogTrace($"SetBusy{busy}");
                 Busy = busy;
                 BusyChanged?.Invoke(this, EventArgs.Empty);
             }
