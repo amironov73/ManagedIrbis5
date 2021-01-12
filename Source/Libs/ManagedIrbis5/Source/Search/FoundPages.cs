@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
@@ -64,16 +65,65 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
-        /// Разбор строки ответа сервера.
+        /// Разбор текстовой строки.
         /// </summary>
-        /// <param name="line">Строка из ответа сервера.</param>
         public void Decode
             (
-                ReadOnlySpan<char> line
+                string line
             )
         {
-            throw new NotImplementedException();
-        } // method Decode
+            var parts = line.Split('#', 3);
+            var pages = new List<int>();
+            Mfn = int.Parse(parts[0]);
+            if (parts.Length == 3)
+            {
+                Formatted = parts[2];
+            }
+
+            if (parts.Length > 1)
+            {
+                parts = parts[1].Split('\x1F');
+                foreach (var part in parts)
+                {
+                    if (!string.IsNullOrEmpty(part))
+                    {
+                        var page = int.Parse(part);
+                        pages.Add(page);
+                    }
+                }
+            }
+
+            Pages = pages.ToArray();
+        }
+
+        /// <summary>
+        /// Разбор ответа сервера.
+        /// </summary>
+        public static FoundPages[] Decode
+            (
+                Response response
+            )
+        {
+            // response.Debug(Console.Out);
+            // response.DebugUtf(Console.Out);
+
+            var number = response.ReadInteger(); // количество найденных записей
+            var result = new List<FoundPages>(number);
+            for (var i = 0; i < number; i++)
+            {
+                var line = response.ReadUtf();
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+
+                var one = new FoundPages();
+                one.Decode(line);
+                result.Add(one);
+            }
+
+            return result.ToArray();
+        }
 
         #endregion
 

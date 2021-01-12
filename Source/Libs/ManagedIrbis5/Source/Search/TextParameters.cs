@@ -125,6 +125,15 @@ namespace ManagedIrbis
             var builder = new StringBuilder();
             builder.Append(Request);
             builder.Append(Delimiter);
+            if (Words is not null)
+            {
+                builder.Append(string.Join(' ', Words));
+            }
+            else
+            {
+                builder.Append(string.Empty);
+            }
+            builder.Append(Delimiter);
             builder.Append(Morphology ? "1" : "0");
             builder.Append(Delimiter);
             builder.Append(Prefix);
@@ -150,6 +159,19 @@ namespace ManagedIrbis
             (
                 Connection connection,
                 Query query
+            )
+        {
+            query.AddUtf(Encode());
+        } // method Encode
+
+        /// <summary>
+        /// Кодирование в пользовательский запрос.
+        /// </summary>
+        /// <param name="query">Пользовательский запрос.</param>
+        public void Encode
+            (
+                Connection connection,
+                ref ValueQuery query
             )
         {
             query.AddUtf(Encode());

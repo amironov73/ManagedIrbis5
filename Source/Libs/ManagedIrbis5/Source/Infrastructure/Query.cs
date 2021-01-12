@@ -131,7 +131,18 @@ namespace ManagedIrbis.Infrastructure
             {
                 writer.Write($" {b:X2}");
             }
-        } // method AddDebug
+        } // method Debug
+
+        /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void DebugUtf
+            (
+                TextWriter writer
+            )
+        {
+            writer.WriteLine(IrbisEncoding.Utf8.GetString(_stream.ToArray()));
+        } // method Debug
 
         /// <summary>
         /// Получение массива фрагментов, из которых состоит

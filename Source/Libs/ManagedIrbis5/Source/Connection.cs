@@ -522,6 +522,37 @@ namespace ManagedIrbis
         /// <summary>
         /// Полнотекстовый поиск ИРБИС64+.
         /// </summary>
+        public FullTextResult? FullTextSearch
+            (
+                SearchParameters searchParameters,
+                TextParameters textParameters
+            )
+        {
+            if (!CheckConnection())
+            {
+                return null;
+            }
+
+            var query = new ValueQuery(this, CommandCode.NewFulltextSearch);
+            searchParameters.Encode(this, ref query);
+            textParameters.Encode(this, ref query);
+            query.DebugUtf(Console.Out);
+            var response = ExecuteSync(ref query);
+            if (response is null
+                || !response.CheckReturnCode())
+            {
+                return null;
+            }
+
+            var result = new FullTextResult();
+            result.Decode(response);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Полнотекстовый поиск ИРБИС64+.
+        /// </summary>
         public async Task<FullTextResult?> FullTextSearchAsync
             (
                 SearchParameters searchParameters,
@@ -533,9 +564,10 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.Search);
+            var query = new Query(this, CommandCode.NewFulltextSearch);
             searchParameters.Encode(this, query);
             textParameters.Encode(this, query);
+            //query.DebugUtf(Console.Out);
             var response = await ExecuteAsync(query);
             if (response is null
                 || !response.CheckReturnCode())
@@ -544,7 +576,7 @@ namespace ManagedIrbis
             }
 
             var result = new FullTextResult();
-            result.Parse(response);
+            result.Decode(response);
 
             return result;
         }

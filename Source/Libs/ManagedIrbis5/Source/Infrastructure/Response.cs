@@ -349,6 +349,40 @@ namespace ManagedIrbis.Infrastructure
         }
 
         /// <summary>
+        /// Debug dump.
+        /// </summary>
+        public void DebugUtf
+            (
+                TextWriter? writer
+            )
+        {
+            if (!ReferenceEquals(writer, null))
+            {
+                foreach (var memory in _memory)
+                {
+                    writer.Write(IrbisEncoding.Utf8.GetString(memory));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Debug dump.
+        /// </summary>
+        public void DebugAnsi
+            (
+                TextWriter? writer
+            )
+        {
+            if (!ReferenceEquals(writer, null))
+            {
+                foreach (var memory in _memory)
+                {
+                    writer.Write(IrbisEncoding.Ansi.GetString(memory));
+                }
+            }
+        }
+
+        /// <summary>
         ///
         /// </summary>
         public int GetReturnCode()

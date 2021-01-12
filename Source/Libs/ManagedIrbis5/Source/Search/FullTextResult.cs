@@ -53,13 +53,12 @@ namespace ManagedIrbis
         /// <summary>
         /// Разбор ответа сервера.
         /// </summary>
-        /// <param name="response"></param>
-        public void Parse
+        public void Decode
             (
                 Response response
             )
         {
-            throw new NotImplementedException();
+            Pages = FoundPages.Decode(response);
         }
 
         #endregion
