@@ -867,6 +867,25 @@ namespace AM.IO
         /// <summary>
         /// Network to host byte conversion.
         /// </summary>
+        public static void NetworkToHost32
+            (
+                Span<byte> span
+            )
+        {
+            if (BitConverter.IsLittleEndian)
+            {
+                var temp1 = span[0];
+                var temp2 = span[1];
+                span[0] = span[3];
+                span[1] = span[2];
+                span[3] = temp1;
+                span[2] = temp2;
+            }
+        }
+
+        /// <summary>
+        /// Network to host byte conversion.
+        /// </summary>
         public static unsafe void NetworkToHost32
             (
                 byte* ptr
@@ -895,6 +914,19 @@ namespace AM.IO
         {
             NetworkToHost32(array, offset);
             NetworkToHost32(array, offset + 4);
+        }
+
+        /// <summary>
+        /// Network to host byte conversion.
+        /// </summary>
+        /// <remarks>IRBIS64-oriented!</remarks>
+        public static void NetworkToHost64
+            (
+                Span<byte> span
+            )
+        {
+            NetworkToHost32(span);
+            NetworkToHost32(span.Slice(4));
         }
 
         /// <summary>
