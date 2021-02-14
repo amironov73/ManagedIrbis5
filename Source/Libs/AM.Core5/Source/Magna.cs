@@ -56,6 +56,19 @@ namespace AM
         #region Public methods
 
         /// <summary>
+        /// Отладочное логирование.
+        /// </summary>
+        [Conditional("DEBUG")]
+        public static void Debug
+            (
+                string message,
+                params object[] args
+            )
+        {
+            Logger.LogDebug(message, args);
+        }
+
+        /// <summary>
         /// Логирует сообщение об ошибке.
         /// </summary>
         public static void Error
