@@ -1179,6 +1179,26 @@ namespace AM
         } // method CompareSpans
 
         /// <summary>
+        /// Разбивка текста на отдельные строки.
+        /// </summary>
+        /// <remarks>Пустые строки не удаляются.</remarks>
+        /// <param name="text">Текст для разбиения.</param>
+        /// <returns>Массив строк.</returns>
+        public static string[] SplitLines
+            (
+                this string text
+            )
+        {
+            // TODO реализовать эффективно
+
+            text = text.Replace("\r\n", "\n");
+            var result = text.Split('\n');
+
+            return result;
+        }
+
+
+        /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
         public static MethodInfo GetMethodInfo(Expression<Action> expression)
