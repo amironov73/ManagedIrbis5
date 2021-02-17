@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 
 /* Program.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
@@ -45,8 +46,10 @@ namespace ManagedIrbis
             var result = new Connection(socket);
 
             return result;
-        }
+        } // method CreateConnection
 
         #endregion
-    }
-}
+
+    } // class ConnectionFactory
+
+} // namespace ManagedIrbis
