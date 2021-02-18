@@ -16,6 +16,7 @@
 #region Using directives
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -93,6 +94,7 @@ namespace ManagedIrbis.Menus
         /// <summary>
         /// Should JSON serialize the comment?
         /// </summary>
+        [ExcludeFromCodeCoverage]
         public bool ShouldSerializeComment()
         {
             return !string.IsNullOrEmpty(Comment);
@@ -103,13 +105,13 @@ namespace ManagedIrbis.Menus
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return string.IsNullOrEmpty(Comment)
+        public override string ToString() =>
+            string.IsNullOrEmpty(Comment)
                 ? Code.ToVisibleString()
                 : $"{Code} - {Comment}";
-        }
 
         #endregion
-    }
-}
+
+    } // class MenuEntry
+
+} // namespace ManagedIrbis.Menus

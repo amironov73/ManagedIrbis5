@@ -51,8 +51,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Source\Client" />
-  </ItemGroup>
-
 </Project>

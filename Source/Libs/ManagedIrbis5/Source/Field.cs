@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -18,9 +19,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 
 using AM;
+using AM.IO;
 
 using ManagedIrbis.Infrastructure;
 
@@ -509,7 +512,6 @@ namespace ManagedIrbis
 
         #region IHandmadeSerializable members
 
-        /*
         /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
         public void RestoreFromStream
             (
@@ -518,7 +520,7 @@ namespace ManagedIrbis
         {
             Tag = reader.ReadPackedInt32();
             Value = reader.ReadNullableString();
-            Subfields.RestoreFromStream(reader);
+            //Subfields.RestoreFromStream(reader);
         }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -531,9 +533,8 @@ namespace ManagedIrbis
 
             writer.WritePackedInt32(Tag);
             writer.WriteNullable(Value);
-            Subfields.SaveToStream(writer);
+            //Subfields.SaveToStream(writer);
         }
-        */
 
         #endregion
 

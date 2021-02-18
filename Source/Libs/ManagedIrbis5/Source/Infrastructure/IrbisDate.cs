@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -88,12 +89,12 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public IrbisDate
             (
-                string text
+                string? text
             )
         {
             // Sure.NotNullNorEmpty(text, nameof(text));
 
-            Text = text;
+            Text = text ?? string.Empty;
             Date = ConvertStringToDate(text);
         }
 
@@ -179,7 +180,10 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Convert time to string.
         /// </summary>
-        public static string ConvertTimeToString (TimeSpan time)
+        public static string ConvertTimeToString
+            (
+                TimeSpan time
+            )
         {
             return String.Format
                 (
@@ -194,12 +198,12 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Неявное преобразование.
         /// </summary>
-        public static implicit operator IrbisDate (string text) => new IrbisDate(text);
+        public static implicit operator IrbisDate (string text) => new (text);
 
         /// <summary>
         /// Неявное преобразование.
         /// </summary>
-        public static implicit operator IrbisDate (DateTime date) => new IrbisDate(date);
+        public static implicit operator IrbisDate (DateTime date) => new (date);
 
         /// <summary>
         /// Неявное преобразование.
