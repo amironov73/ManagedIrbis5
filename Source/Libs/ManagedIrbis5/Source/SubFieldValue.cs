@@ -1,0 +1,125 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedType.Global
+
+/* SubFieldValue.cs -- subfield value related routines
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using AM;
+
+#endregion
+
+#nullable enable
+
+namespace ManagedIrbis
+{
+    /// <summary>
+    /// Subfield value related routines.
+    /// </summary>
+    public static class SubFieldValue
+    {
+        #region Properties
+
+        /// <summary>
+        /// Throw exception on verification error.
+        /// </summary>
+        public static bool ThrowOnVerify { get; set; }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Whether the value valid.
+        /// </summary>
+        public static bool IsValidValue
+            (
+                string? value
+            )
+        {
+            if (!ReferenceEquals(value, null))
+            {
+                foreach (char c in value)
+                {
+                    if (c == SubField.Delimiter)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        } // method IsValidValue
+
+        /// <summary>
+        /// SubField value normalization.
+        /// </summary>
+        public static string? Normalize
+            (
+                string? value
+            )
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+
+            var result = value.Trim();
+
+            return result;
+        } // method Normalize
+
+        /// <summary>
+        /// Verify subfield value.
+        /// </summary>
+        public static bool Verify
+            (
+                string? value
+            )
+        {
+            return Verify(value, ThrowOnVerify);
+        } // method Verify
+
+        /// <summary>
+        /// Verify subfield value.
+        /// </summary>
+        public static bool Verify
+            (
+                string? value,
+                bool throwOnError
+            )
+        {
+            var result = IsValidValue(value);
+
+            if (!result)
+            {
+                Magna.Debug
+                    (
+                        nameof(SubFieldValue) + "::" + nameof(Verify)
+                        + ": " + value.ToVisibleString()
+                    );
+
+                if (throwOnError)
+                {
+                    throw new VerificationException(nameof(SubField.Value));
+                }
+            }
+
+            return result;
+        } // method Verify
+
+        #endregion
+
+    } // class SubFieldValue
+
+} // namespace ManagedIrbis

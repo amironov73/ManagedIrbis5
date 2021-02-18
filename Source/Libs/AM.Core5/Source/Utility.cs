@@ -452,11 +452,78 @@ namespace AM
         }
 
         /// <summary>
+        /// Сравнивает символы с точностью до регистра.
+        /// </summary>
+        /// <param name="one">Первый символ.</param>
+        /// <param name="two">Второй символ.</param>
+        /// <param name="three">Третий символ.</param>
+        /// <returns>Символы совпадают с точностью до регистра.</returns>
+        public static bool SameChar
+            (
+                this char one,
+                char two,
+                char three
+            )
+        {
+            one = char.ToUpperInvariant(one);
+
+            return one == char.ToUpperInvariant(two)
+                || one == char.ToUpperInvariant(three);
+        }
+
+        /// <summary>
+        /// Сравнивает символы с точностью до регистра.
+        /// </summary>
+        /// <param name="one">Первый символ.</param>
+        /// <param name="two">Второй символ.</param>
+        /// <param name="three">Третий символ.</param>
+        /// <param name="four">Четвертый символ.</param>
+        /// <returns>Символы совпадают с точностью до регистра.</returns>
+        public static bool SameChar
+            (
+                this char one,
+                char two,
+                char three,
+                char four
+            )
+        {
+            one = char.ToUpperInvariant(one);
+
+            return one == char.ToUpperInvariant(two)
+                || one == char.ToUpperInvariant(three)
+                || one == char.ToUpperInvariant(four);
+        }
+
+        /// <summary>
+        /// Сравнивает символы с точностью до регистра.
+        /// </summary>
+        /// <param name="one">Левая часть.</param>
+        /// <param name="array">Правая часть.</param>
+        /// <returns>Результат поиска <paramref name="one"/> среди
+        /// элементов <paramref name="array"/>.</returns>
+        public static bool SameChar
+            (
+                this char one,
+                params char[] array
+            )
+        {
+            foreach (var two in array)
+            {
+                if (char.ToUpperInvariant(one) == char.ToUpperInvariant(two))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Сравнивает строки с точностью до регистра.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
-        /// <returns>Строки совпадают с точностью до регистра.</returns>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
         public static bool SameString
             (
                 this string? one,
@@ -469,7 +536,211 @@ namespace AM
                     two,
                     StringComparison.OrdinalIgnoreCase
                 ) == 0;
-        }
+        } // method SameString
+
+        /// <summary>
+        /// Сравнивает строки с точностью до регистра.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
+        /// <param name="three">Третья строка.</param>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
+        public static bool SameString
+            (
+                this string? one,
+                string? two,
+                string? three
+            )
+        {
+            return string.Compare
+                (
+                    one,
+                    two,
+                    StringComparison.OrdinalIgnoreCase
+                ) == 0
+            || string.Compare
+                (
+                    one,
+                    three,
+                    StringComparison.OrdinalIgnoreCase
+                ) == 0;
+        } // method SameString
+
+        /// <summary>
+        /// Сравнивает строки с точностью до регистра.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
+        /// <param name="three">Третья строка.</param>
+        /// <param name="four">Четвертая строка.</param>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
+        public static bool SameString
+            (
+                this string? one,
+                string? two,
+                string? three,
+                string? four
+            )
+        {
+            return string.Compare
+                (
+                    one,
+                    two,
+                    StringComparison.OrdinalIgnoreCase
+                ) == 0
+            || string.Compare
+                (
+                    one,
+                    three,
+                    StringComparison.OrdinalIgnoreCase
+                ) == 0
+            || string.Compare
+                (
+                    one,
+                    four,
+                    StringComparison.OrdinalIgnoreCase
+                ) == 0;
+        } // method SameString
+
+        /// <summary>
+        /// Сравнивает строки с точностью до регистра.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="array">Строки для сопоставления.</param>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
+        public static bool SameString
+            (
+                this string? one,
+                params string?[] array
+            )
+        {
+            foreach (var two in array)
+            {
+                if (string.Compare
+                    (
+                        one,
+                        two,
+                        StringComparison.OrdinalIgnoreCase
+                    ) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        } // method SameString
+
+        /// <summary>
+        /// Сравнивает строки.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
+        /// <returns>Строки совпадают?</returns>
+        public static bool SameStringSensitive
+            (
+                this string? one,
+                string? two
+            )
+        {
+            return string.Compare
+                (
+                    one,
+                    two,
+                    StringComparison.Ordinal
+                ) == 0;
+        } // method SameStringSensitive
+
+        /// <summary>
+        /// Сравнивает строки.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
+        /// <param name="three">Третья строка.</param>
+        /// <returns>Строки совпадают?</returns>
+        public static bool SameStringSensitive
+            (
+                this string? one,
+                string? two,
+                string? three
+            )
+        {
+            return string.Compare
+                (
+                    one,
+                    two,
+                    StringComparison.Ordinal
+                ) == 0
+            || string.Compare
+                (
+                    one,
+                    three,
+                    StringComparison.Ordinal
+                ) == 0;
+        } // method SameStringSensitive
+
+        /// <summary>
+        /// Сравнивает строки.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
+        /// <param name="three">Третья строка.</param>
+        /// <param name="four">Четвертая строка.</param>
+        /// <returns>Строки совпадают?</returns>
+        public static bool SameStringSensitive
+            (
+                this string? one,
+                string? two,
+                string? three,
+                string? four
+            )
+        {
+            return string.Compare
+                (
+                    one,
+                    two,
+                    StringComparison.OrdinalIgnoreCase
+                ) == 0
+            || string.Compare
+                (
+                    one,
+                    three,
+                    StringComparison.Ordinal
+                ) == 0
+            || string.Compare
+                (
+                    one,
+                    four,
+                    StringComparison.Ordinal
+                ) == 0;
+        } // method SameStringSensitive
+
+        /// <summary>
+        /// Сравнивает строки.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="array">Строки для сопоставления.</param>
+        /// <returns>Строки совпадают?</returns>
+        public static bool SameStringSensitive
+            (
+                this string? one,
+                params string?[] array
+            )
+        {
+            foreach (var two in array)
+            {
+                if (string.Compare
+                    (
+                        one,
+                        two,
+                        StringComparison.Ordinal
+                    ) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        } // method SameStringSensitive
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной

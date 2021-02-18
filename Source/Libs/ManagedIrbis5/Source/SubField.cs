@@ -29,7 +29,8 @@ namespace ManagedIrbis
     /// </summary>
     public class SubField
         : IVerifiable,
-        IHandmadeSerializable
+        IHandmadeSerializable,
+        IReadOnly<SubField>
     {
         #region Constants
 
@@ -64,6 +65,11 @@ namespace ManagedIrbis
         /// Подполе хранит значение поля до первого разделителя.
         /// </summary>
         public bool RepresentsValue => Code == NoCode;
+
+        /// <summary>
+        /// Ссылка на поле.
+        /// </summary>
+        public Field? Field { get; internal set; }
 
         #endregion
 
@@ -172,6 +178,37 @@ namespace ManagedIrbis
                 ? Value ?? string.Empty
                 : "^" + char.ToLowerInvariant(Code) + Value;
         } // method ToString
+
+        #endregion
+
+        #region IReadOnly<T> members
+
+        /// <inheritdoc cref="IReadOnly{T}.AsReadOnly"/>
+        public SubField AsReadOnly()
+        {
+            var result = Clone();
+            result.SetReadOnly();
+
+            return result;
+        }
+
+        /// <inheritdoc cref="IReadOnly{T}.ReadOnly"/>
+        public bool ReadOnly { get; private set; }
+
+        /// <inheritdoc cref="IReadOnly{T}.SetReadOnly"/>
+        public void SetReadOnly()
+        {
+            ReadOnly = true;
+        }
+
+        /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly"/>
+        public void ThrowIfReadOnly()
+        {
+            if (ReadOnly)
+            {
+                throw new ReadOnlyException();
+            }
+        }
 
         #endregion
 
