@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
@@ -508,6 +509,30 @@ namespace AM
             )
         {
             foreach (var two in array)
+            {
+                if (char.ToUpperInvariant(one) == char.ToUpperInvariant(two))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Сравнивает символы с точностью до регистра.
+        /// </summary>
+        /// <param name="one">Левая часть.</param>
+        /// <param name="text">Правая часть.</param>
+        /// <returns>Результат поиска <paramref name="one"/> среди
+        /// элементов <paramref name="text"/>.</returns>
+        public static bool SameChar
+            (
+                this char one,
+                IEnumerable<char> text
+            )
+        {
+            foreach (var two in text)
             {
                 if (char.ToUpperInvariant(one) == char.ToUpperInvariant(two))
                 {

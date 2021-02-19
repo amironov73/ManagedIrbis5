@@ -69,6 +69,11 @@ namespace ManagedIrbis
         /// </summary>
         public string? Description { get; set; }
 
+        /// <summary>
+        /// Признак того, что запись модифицирована.
+        /// </summary>
+        public bool Modified { get; internal set; }
+
         #endregion
 
         #region Public methods

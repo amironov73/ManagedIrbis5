@@ -8,6 +8,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Field.cs -- поле библиографической записи
@@ -24,6 +26,7 @@ using System.Text;
 
 using AM;
 using AM.IO;
+using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
 
@@ -37,7 +40,8 @@ namespace ManagedIrbis
     /// Поле библиографической записи.
     /// </summary>
     public class Field
-        // : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IReadOnly<Field>
     {
         #region Constants
 
@@ -46,6 +50,21 @@ namespace ManagedIrbis
         /// значения поля до первого разделителя.
         /// </summary>
         private const char ValueCode = '\0';
+
+        /// <summary>
+        /// Нет тега, т. е. тег ещё не присвоен.
+        /// </summary>
+        public const int NoTag = 0;
+
+        /// <summary>
+        /// Разделитель подполей.
+        /// </summary>
+        public const char Delimiter = '^';
+
+        /// <summary>
+        /// Количество индикаторов поля.
+        /// </summary>
+        public const int IndicatorCount = 2;
 
         #endregion
 
@@ -86,7 +105,20 @@ namespace ManagedIrbis
         /// <summary>
         /// Список подполей.
         /// </summary>
-        public List<SubField> Subfields { get; } = new ();
+        public SubFieldCollection Subfields { get; } = new ();
+
+        /// <summary>
+        /// Номер повторения поля.
+        /// </summary>
+        /// <remarks>
+        /// Формируется автоматически.
+        /// </remarks>
+        public int Repeat { get; internal set; }
+
+        /// <summary>
+        /// Запись, которой принадлежит поле.
+        /// </summary>
+        public Record? Record { get; internal set; }
 
         #endregion
 
@@ -535,6 +567,44 @@ namespace ManagedIrbis
             writer.WriteNullable(Value);
             //Subfields.SaveToStream(writer);
         }
+
+        #endregion
+
+        #region IReadOnly<T> members
+
+        /// <inheritdoc cref="IReadOnly{T}.AsReadOnly"/>
+        public Field AsReadOnly()
+        {
+            var result = Clone();
+            result.SetReadOnly();
+
+            return result;
+        } // method AsReadOnly
+
+        /// <inheritdoc cref="IReadOnly{T}.ReadOnly"/>
+        public bool ReadOnly { get; internal set; }
+
+        /// <inheritdoc cref="IReadOnly{T}.SetReadOnly"/>
+        public void SetReadOnly()
+        {
+            ReadOnly = true;
+
+            foreach (var subfield in Subfields)
+            {
+                subfield.SetReadOnly();
+            }
+        } // method SetReadOnly
+
+        /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly"/>
+        public void ThrowIfReadOnly()
+        {
+            if (ReadOnly)
+            {
+                Magna.Error(nameof(ThrowIfReadOnly));
+
+                throw new ReadOnlyException();
+            }
+        } // method ThrowIfReadOnly
 
         #endregion
 
