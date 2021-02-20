@@ -6,7 +6,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Magna.cs -- организация среды для приложения в целом
@@ -29,6 +31,44 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AM
 {
+    //
+    // .NET logging levels
+    //
+    // Trace = 0
+    // For information that is valuable only to a developer debugging
+    // an issue. These messages may contain sensitive application data
+    // and so should not be enabled in a production environment.
+    // Disabled by default.
+    // Example: Credentials: {"User":"someuser", "Password":"P@ssword"}
+    //
+    // Debug = 1
+    // or information that has short-term usefulness during development
+    // and debugging.
+    // Example: Entering method Configure with flag set to true.
+    //
+    // Information = 2
+    // For tracking the general flow of the application. These logs typically
+    // have some long-term value.
+    // Example: Request received for path /api/some
+    //
+    // Warning = 3
+    // For abnormal or unexpected events in the application flow. These may
+    // include errors or other conditions that do not cause the application
+    // to stop, but which may need to be investigated. Handled exceptions
+    // are a common place to use the Warning log level.
+    // Example: FileNotFoundException for file quotes.txt.
+    //
+    // Error = 4
+    // For errors and exceptions that cannot be handled. These messages
+    // indicate a failure in the current activity or operation (such as the
+    // current HTTP request), not an application-wide failure.
+    // Example log message: Cannot insert record due to duplicate key violation.
+    //
+    // Critical = 5
+    // For failures that require immediate attention. Examples: data
+    // loss scenarios, out of disk space.
+    //
+
     /// <summary>
     /// Организация среды для приложения в целом.
     /// </summary>
@@ -56,29 +96,54 @@ namespace AM
         #region Public methods
 
         /// <summary>
+        /// Критическая ситуация.
+        /// </summary>
+        public static void Critical (string message)
+            => Logger.LogCritical(message);
+
+        /// <summary>
+        /// Критическая ситуация.
+        /// </summary>
+        public static void Critical (string message, params object[] args)
+            => Logger.LogCritical(message, args);
+
+        /// <summary>
         /// Отладочное логирование.
         /// </summary>
         [Conditional("DEBUG")]
-        public static void Debug
-            (
-                string message,
-                params object[] args
-            )
-        {
-            Logger.LogDebug(message, args);
-        }
+        public static void Debug (string message)
+            => Logger.LogDebug(message);
+
+        /// <summary>
+        /// Отладочное логирование.
+        /// </summary>
+        [Conditional("DEBUG")]
+        public static void Debug (string message, params object[] args)
+            => Logger.LogDebug(message, args);
 
         /// <summary>
         /// Логирует сообщение об ошибке.
         /// </summary>
-        public static void Error
-            (
-                string message,
-                params object[] args
-            )
-        {
-            Logger.LogError(message, args);
-        }
+        public static void Error (string message)
+            => Logger.LogError(message);
+
+        /// <summary>
+        /// Логирует сообщение об ошибке.
+        /// </summary>
+        public static void Error (string message, params object[] args)
+            => Logger.LogError(message, args);
+
+        /// <summary>
+        /// Логирует информационное сообщение.
+        /// </summary>
+        public static void Info (string message)
+            => Logger.LogInformation(message);
+
+        /// <summary>
+        /// Логирует информационное сообщение.
+        /// </summary>
+        public static void Info (string message, params object[] args)
+            => Logger.LogInformation(message, args);
 
         /// <summary>
         /// Инициализация.
@@ -102,27 +167,35 @@ namespace AM
         /// Трассировочное логирование.
         /// </summary>
         [Conditional("TRACE")]
-        public static void Trace
-            (
-                string message,
-                params object[] args
-            )
-        {
-            Logger.LogTrace(message, args);
-        }
+        public static void Trace (string message) => Logger.LogTrace(message);
 
         /// <summary>
-        /// Trace the exception.
+        /// Трассировочное логирование.
         /// </summary>
-        public static void TraceException
-            (
-                string text,
-                Exception exception
-            )
-        {
-            Logger.Log(LogLevel.Trace, exception, text);
-        }
+        [Conditional("TRACE")]
+        public static void Trace (string message, params object[] args)
+            => Logger.LogTrace(message, args);
+
+        /// <summary>
+        /// Регистрация исключения в логах.
+        /// </summary>
+        public static void TraceException (string text, Exception exception)
+            => Logger.Log(LogLevel.Trace, exception, text);
+
+        /// <summary>
+        /// Логирование предупреждения.
+        /// </summary>
+        public static void Warning(string message)
+            => Logger.LogWarning(message);
+
+        /// <summary>
+        /// Логирование предупреждения.
+        /// </summary>
+        public static void Warning(string message, params object[] args)
+            => Logger.LogWarning(message, args);
 
         #endregion
-    }
-}
+
+    } // class Magna
+
+} // namespace AM
