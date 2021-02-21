@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 
 /* SubField.cs -- подполе библиографической записи
  * Ars Magna project, http://arsmagna.ru
@@ -27,10 +29,11 @@ namespace ManagedIrbis
     /// <summary>
     /// Подполе библиографической записи.
     /// </summary>
-    public class SubField
+    public sealed class SubField
         : IVerifiable,
         IHandmadeSerializable,
-        IReadOnly<SubField>
+        IReadOnly<SubField>,
+        IDisposable
     {
         #region Constants
 
@@ -65,6 +68,8 @@ namespace ManagedIrbis
         /// Подполе хранит значение поля до первого разделителя.
         /// </summary>
         public bool RepresentsValue => Code == NoCode;
+
+        public bool Modified { get; internal set; }
 
         /// <summary>
         /// Ссылка на поле.
@@ -121,6 +126,17 @@ namespace ManagedIrbis
                 Value = text.Slice(1).ToString();
             }
         } // method Decode
+
+        /// <summary>
+        /// Получение подполя из пула.
+        /// </summary>
+        /// <returns>Объект из пула.</returns>
+        public static SubField FromPool() => SubFieldPool.Default.Get();
+
+        /// <summary>
+        /// Возврат объекта в пул.
+        /// </summary>
+        public void ToPool() => SubFieldPool.Default.Return(this);
 
         #endregion
 
@@ -190,16 +206,13 @@ namespace ManagedIrbis
             result.SetReadOnly();
 
             return result;
-        }
+        } // method AsReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.ReadOnly"/>
         public bool ReadOnly { get; private set; }
 
         /// <inheritdoc cref="IReadOnly{T}.SetReadOnly"/>
-        public void SetReadOnly()
-        {
-            ReadOnly = true;
-        }
+        public void SetReadOnly() => ReadOnly = true;
 
         /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly"/>
         public void ThrowIfReadOnly()
@@ -208,7 +221,29 @@ namespace ManagedIrbis
             {
                 throw new ReadOnlyException();
             }
-        }
+        } // method ThrowIfReadOnly
+
+        #endregion
+
+        #region IDisposable members
+
+        /// <summary>
+        /// Очистка поля перед помещением его в пул.
+        /// </summary>
+        /// <remarks>
+        /// <para>Начиная с ManagedIrbis5, подполе поддерживает пулинг,
+        /// см. класс <see cref="SubFieldPool"/>.</para>
+        /// <para>Очистка перед помещением в пул выполняется с помощью
+        /// вызова <see cref="Dispose"/>.</para>
+        /// <para>При обычном использовании вызывать метод
+        /// <see cref="Dispose"/> не нужно.</para>
+        /// </remarks>
+        public void Dispose()
+        {
+            Code = NoCode;
+            Value = null;
+            Field = null;
+        } // method Dispose
 
         #endregion
 
