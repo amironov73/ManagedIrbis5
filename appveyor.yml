@@ -15,8 +15,9 @@ dotnet_csproj:
   informational_version: '{version}'
 
 before_build:
+- cmd: choco install miktex
 - cmd: C:\Python36-x64\python -m pip install --upgrade pip
-- cmd: C:\Python36-x64\Scripts\pip install --upgrade pygount
+- cmd: C:\Python36-x64\Scripts\pip install --upgrade pygount sphinx sphinx_rtd_theme
 - cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
 - cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Tests -s cs -N "*.Designer.cs" -F "obj"
 - cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Apps -s cs -N "*.Designer.cs" -F "obj"

@@ -351,3 +351,6 @@ MigrationBackup/
 
 # Rider
 .idea/
+
+# sphinx
+_build/
