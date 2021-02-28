@@ -32,7 +32,8 @@ test_script:
 - cmd: dotnet run  --no-restore --no-build --configuration Release --project Source/Benchmarks/CoreBenchmarks/CoreBenchmarks.csproj
 
 after_build:
-- cmd: dotnet pack --no-restore --no-build --configuration Release Source/ManagedIrbis5-windows.sln
+- dotnet pack --no-restore --no-build --configuration Release Source/ManagedIrbis5-windows.sln
+- cd 
 
 artifacts:
   - path: '**\*.nupkg'

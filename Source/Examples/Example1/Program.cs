@@ -1,9 +1,13 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable LocalizableElement
+// ReSharper disable StringLiteralTypo
+
+using System;
 using System.Threading.Tasks;
 
 using ManagedIrbis;
-
-using ManagedIrbis.Infrastructure;
 
 using static System.Console;
 
@@ -49,9 +53,12 @@ class Program
                 // Получаем запись из базы данных
                 var record = await connection.ReadRecordAsync(mfn);
 
-                // Извлекаем из записи интересующее нас поле и подполе
-                var title = record.FM(200, 'a');
-                WriteLine($"Title: {title}");
+                if (record is not null)
+                {
+                    // Извлекаем из записи интересующее нас поле и подполе
+                    var title = record.FM(200, 'a');
+                    WriteLine($"Title: {title}");
+                }
 
                 // Форматируем запись средствами сервера
                 var description = await connection.FormatRecordAsync
