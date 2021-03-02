@@ -36,13 +36,46 @@ namespace ManagedIrbis.CommandLine
         /// </summary>
         public static RootCommand GetRootCommand()
         {
-            var result = new RootCommand()
+            var result = new RootCommand
             {
-                new Option<string>("--host"),
-                new Option<int>("--port"),
-                new Option<string>("--user"),
-                new Option<string>("--password"),
-                new Option<string>("--arm")
+                new Option<string>
+                    (
+                        "--host",
+                        "host address"
+                    ),
+
+                new Option<int>
+                    (
+                        "--port",
+                        () => 6666,
+                        "port number"
+                    ),
+
+                new Option<string>
+                    (
+                        new [] { "--user", "--username", "--login" },
+                        "user name"
+                    ),
+
+                new Option<string>
+                    (
+                        "--password",
+                        "user password"
+                    ),
+
+                new Option<string>
+                    (
+                        "--arm",
+                        () => "C",
+                        "workstation kind"
+                    ),
+
+                new Option<string>
+                    (
+                        new[] { "--database", "--db", "--catalog" },
+                        () => "IBIS",
+                        "initial catalog"
+                    )
             };
 
             return result;
