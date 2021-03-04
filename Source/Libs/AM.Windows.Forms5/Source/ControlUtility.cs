@@ -67,7 +67,7 @@ namespace AM.Windows.Forms
                 return;
             }
 
-            int counter = 0;
+            var counter = 0;
 
             // When the form, thus the control, isn't visible yet,
             // InvokeRequired returns false, resulting still

@@ -212,7 +212,7 @@ namespace ManagedIrbis.Mapping
             var subField = field.GetFirstSubField(code);
 
             return subField is null
-                ? 0
+                ? (byte) 0
                 : ToByte(subField);
         } // method ToByte
 
@@ -651,7 +651,7 @@ namespace ManagedIrbis.Mapping
             var subField = field.GetFirstSubField(code);
 
             return subField is null
-                ? 0
+                ? (short) 0
                 : ToInt16(subField);
         } // method ToInt16
 
@@ -668,7 +668,7 @@ namespace ManagedIrbis.Mapping
             var field = record.GetField(tag);
 
             return field is null
-                ? 0
+                ? (short) 0
                 : ToInt16(field, code);
         } // method ToInt16
 
@@ -945,7 +945,7 @@ namespace ManagedIrbis.Mapping
             var subField = field.GetFirstSubField(code);
 
             return subField is null
-                ? 0
+                ? (sbyte) 0
                 : ToSByte(subField);
         } // method ToSByte
 
@@ -1200,7 +1200,7 @@ namespace ManagedIrbis.Mapping
             var subField = field.GetFirstSubField(code);
 
             return subField is null
-                ? 0
+                ? (ushort) 0
                 : ToUInt16(subField);
         } // method ToUInt16
 
@@ -1217,7 +1217,7 @@ namespace ManagedIrbis.Mapping
             var field = record.GetField(tag);
 
             return field is null
-                ? 0
+                ? (ushort) 0
                 : ToUInt16(field, code);
         } // method ToUInt16
 
