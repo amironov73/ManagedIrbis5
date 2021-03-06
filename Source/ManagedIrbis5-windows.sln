@@ -35,15 +35,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HelloSync", "Apps\HelloSync
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{788F67EC-79CA-4941-B29F-7970FA721205}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreExamples", "Examples\CoreExamples\CoreExamples.csproj", "{06AB2480-325E-4FF9-9740-E39D1B20C114}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreExamples", "Examples\CoreExamples\CoreExamples.csproj", "{06AB2480-325E-4FF9-9740-E39D1B20C114}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Win32", "Libs\AM.Win32\AM.Win32.csproj", "{9BCA6D67-7C60-499F-ADB1-04F9F78C1126}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Win32", "Libs\AM.Win32\AM.Win32.csproj", "{9BCA6D67-7C60-499F-ADB1-04F9F78C1126}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Windows.Forms5", "Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj", "{53A7E91A-DE88-4F9E-8DF6-D1A8475542DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Windows.Forms5", "Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj", "{53A7E91A-DE88-4F9E-8DF6-D1A8475542DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrbisExamples", "Examples\IrbisExamples\IrbisExamples.csproj", "{62AAC257-B9DA-4F8C-B3FB-66B14ABEDE35}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IrbisExamples", "Examples\IrbisExamples\IrbisExamples.csproj", "{62AAC257-B9DA-4F8C-B3FB-66B14ABEDE35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example1", "Examples\Example1\Example1.csproj", "{1481845C-5179-4CB9-B0A6-CF0094873D42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example1", "Examples\Example1\Example1.csproj", "{1481845C-5179-4CB9-B0A6-CF0094873D42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5.WinForms", "Libs\ManagedIrbis5.WinForms\ManagedIrbis5.WinForms.csproj", "{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -235,6 +237,18 @@ Global
 		{1481845C-5179-4CB9-B0A6-CF0094873D42}.Release|x64.Build.0 = Release|Any CPU
 		{1481845C-5179-4CB9-B0A6-CF0094873D42}.Release|x86.ActiveCfg = Release|Any CPU
 		{1481845C-5179-4CB9-B0A6-CF0094873D42}.Release|x86.Build.0 = Release|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Debug|x64.Build.0 = Debug|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Debug|x86.Build.0 = Debug|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Release|x64.ActiveCfg = Release|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Release|x64.Build.0 = Release|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Release|x86.ActiveCfg = Release|Any CPU
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -255,6 +269,7 @@ Global
 		{53A7E91A-DE88-4F9E-8DF6-D1A8475542DB} = {F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}
 		{62AAC257-B9DA-4F8C-B3FB-66B14ABEDE35} = {788F67EC-79CA-4941-B29F-7970FA721205}
 		{1481845C-5179-4CB9-B0A6-CF0094873D42} = {788F67EC-79CA-4941-B29F-7970FA721205}
+		{2F5739D6-6B34-470B-A8C0-95F0CF1DA752} = {F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E077767-1AE0-47E0-AEFB-59E4D7464AD4}

@@ -102,6 +102,23 @@ namespace ManagedIrbis.Infrastructure
 
          #region Public methods
 
+         /// <summary>
+         /// Построение спецификации файла по ее компонентам.
+         /// </summary>
+         public static string Build
+             (
+                IrbisPath path,
+                string database,
+                string fileName
+             )
+         {
+             return ((int) path).ToInvariantString()
+                    + "."
+                    + database
+                    + "."
+                    + fileName;
+         }
+
         /// <summary>
         /// Parse the text specification.
         /// </summary>

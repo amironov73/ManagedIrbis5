@@ -12,6 +12,7 @@
     <Product>Ars Magna</Product>
     <Description>Managed framework for Irbis64</Description>
     <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+    <RootNamespace>ManagedIrbis</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -98,6 +98,25 @@ namespace ManagedIrbis
         } // method Add
 
         /// <summary>
+        /// Добавление в запись непустого поля.
+        /// </summary>
+        public Record AddNonEmptyField
+            (
+                int tag,
+                string? value
+            )
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                var field = new Field {Tag = tag};
+                field.DecodeBody(value);
+                Fields.Add(field);
+            }
+
+            return this;
+        } // method AddNonEmptyField
+
+        /// <summary>
         /// Очистка записи (удаление всех полей).
         /// </summary>
         /// <returns>
@@ -363,7 +382,6 @@ namespace ManagedIrbis
         } // method ToString
 
         #endregion
-
     } // class Record
 
 } // namespace ManagedIrbis

@@ -204,7 +204,7 @@ namespace AM
         /// </summary>
         public static IEnumerable<T> NonNullItems<T>
             (
-                this IEnumerable<T> sequence
+                this IEnumerable<T?> sequence
             )
             where T : class
         {
