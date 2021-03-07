@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* IrbisEncoding.cs -- работа с кодировками, применяемыми в ИРБИС64
@@ -19,8 +20,6 @@ using System;
 using System.Text;
 
 using AM;
-
-using ManagedIrbis.Properties;
 
 using CM=System.Configuration.ConfigurationManager;
 
@@ -68,7 +67,7 @@ namespace ManagedIrbis.Infrastructure
                     encoderShouldEmitUTF8Identifier: false,
                     throwOnInvalidBytes: true
                 );
-        }
+        } // static constructor
 
         #endregion
 
@@ -115,7 +114,7 @@ namespace ManagedIrbis.Infrastructure
             var result = Encoding.GetEncoding(name);
 
             return result;
-        }
+        } // namespace ByName
 
         /// <summary>
         /// Get encoding from config file.
@@ -132,7 +131,7 @@ namespace ManagedIrbis.Infrastructure
             var result = ByName(name);
 
             return result;
-        }
+        } // method FromConfig
 
         /// <summary>
         /// Relax UTF-8 decoder, do not throw exceptions
@@ -145,7 +144,7 @@ namespace ManagedIrbis.Infrastructure
                     encoderShouldEmitUTF8Identifier: false,
                     throwOnInvalidBytes: false
                 );
-        }
+        } // method RelaxUtf8
 
         /// <summary>
         /// Strong UTF-8 decoder, throw exceptions
@@ -158,7 +157,7 @@ namespace ManagedIrbis.Infrastructure
                     encoderShouldEmitUTF8Identifier: false,
                     throwOnInvalidBytes: true
                 );
-        }
+        } // method StrongUtf8
 
         /// <summary>
         /// Override default single-byte encoding.
@@ -173,14 +172,14 @@ namespace ManagedIrbis.Infrastructure
                 Magna.Error
                     (
                         nameof(IrbisEncoding) + "::" + nameof(SetAnsiEncoding)
-                        + Resources.IrbisEncoding_NotSingleByteEncoding
+                        + ":  not single-byte encoding"
                     );
 
                 throw new ArgumentOutOfRangeException(nameof(encoding));
             }
 
             _ansi = encoding;
-        }
+        } // method SetAnsiEncoding
 
         /// <summary>
         /// Override OEM encoding.
@@ -195,15 +194,17 @@ namespace ManagedIrbis.Infrastructure
                 Magna.Error
                     (
                         nameof(IrbisEncoding) + "::" + nameof(SetOemEncoding)
-                        + Resources.IrbisEncoding_NotSingleByteEncoding
+                        + ":  not single-byte encoding"
                     );
 
                 throw new ArgumentOutOfRangeException(nameof(encoding));
             }
 
             _oem = encoding;
-        }
+        } // method SetOemEncoding
 
         #endregion
-    }
-}
+
+    } // class IrbisEncoding
+
+} // namespace ManagedIrbis.Infrastructure

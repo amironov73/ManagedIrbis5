@@ -25,6 +25,8 @@ using AM.Collections;
 
 using ManagedIrbis.Infrastructure;
 
+using static ManagedIrbis.RecordStatus;
+
 #endregion
 
 #nullable enable
@@ -58,6 +60,10 @@ namespace ManagedIrbis
         /// Статус записи.
         /// </summary>
         public RecordStatus Status { get; set; }
+
+        public bool Deleted => (Status &
+            (LogicallyDeleted | PhysicallyDeleted)) != 0;
+
 
         /// <summary>
         /// Список полей.

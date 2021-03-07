@@ -106,7 +106,7 @@ namespace ManagedIrbis
                 Magna.Debug
                     (
                         nameof(FieldValue) + "::" + nameof(Verify)
-                        + Resources.FieldValue_Verify_BadValue
+                        + ": bad field value="
                         + value.ToVisibleString()
                     );
 
@@ -114,7 +114,7 @@ namespace ManagedIrbis
                 {
                     throw new VerificationException
                         (
-                            Resources.FieldValue_Verify_BadFieldValue
+                            "FieldValue::Verify: bad field value="
                             + value.ToVisibleString()
                         );
                 }
