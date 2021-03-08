@@ -2,16 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
-/* GblSettings.cs -- настройки для выполнения глобальной корректировки
+/* GblSettings.cs -- settings for GBL
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,8 +15,8 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json.Serialization;
-using System.Xml.Serialization;
 
 using AM;
 using AM.Collections;
@@ -34,9 +30,8 @@ using AM.Runtime;
 namespace ManagedIrbis.Gbl
 {
     /// <summary>
-    /// Настройки для выполнения глобальной корректировки.
+    /// Settings for GBL execution.
     /// </summary>
-    [XmlRoot("gbl")]
     public sealed class GblSettings
         : IVerifiable,
         IHandmadeSerializable
@@ -46,42 +41,36 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Actualize records after processing.
         /// </summary>
-        [XmlAttribute("actualize")]
         [JsonPropertyName("actualize")]
         public bool Actualize { get; set; }
 
         /// <summary>
         /// Process 'autoin.gbl'.
         /// </summary>
-        [XmlAttribute("autoin")]
         [JsonPropertyName("autoin")]
         public bool Autoin { get; set; }
 
         /// <summary>
         /// Database name.
         /// </summary>
-        [XmlAttribute("database")]
         [JsonPropertyName("database")]
         public string? Database { get; set; }
 
         /// <summary>
         /// File name.
         /// </summary>
-        [XmlAttribute("fileName")]
         [JsonPropertyName("fileName")]
         public string? FileName { get; set; }
 
         /// <summary>
         /// First record MFN.
         /// </summary>
-        [XmlAttribute("firstRecord")]
         [JsonPropertyName("firstRecord")]
         public int FirstRecord { get; set; }
 
         /// <summary>
         /// Provide formal control.
         /// </summary>
-        [XmlAttribute("formalControl")]
         [JsonPropertyName("formalControl")]
         public bool FormalControl { get; set; }
 
@@ -90,14 +79,12 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         /// <remarks>0 means 'all records in the database'.
         /// </remarks>
-        [XmlAttribute("maxMfn")]
         [JsonPropertyName("maxMfn")]
         public int MaxMfn { get; set; }
 
         /// <summary>
         /// List of MFN to process.
         /// </summary>
-        [XmlAttribute("mfnList")]
         [JsonPropertyName("mfnList")]
         public int[]? MfnList { get; set; }
 
@@ -106,29 +93,30 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         /// <remarks>0 means 'all records in the database'.
         /// </remarks>
-        [XmlAttribute("minMfn")]
         [JsonPropertyName("minMfn")]
         public int MinMfn { get; set; }
 
         /// <summary>
         /// Number of records to process.
         /// </summary>
-        [XmlAttribute("numberOfRecords")]
         [JsonPropertyName("numberOfRecords")]
         public int NumberOfRecords { get; set; }
 
         /// <summary>
         /// Search expression.
         /// </summary>
-        [XmlAttribute("search")]
-        [JsonPropertyName("search")]
+        [JsonPropertyName("searchExpression")]
         public string? SearchExpression { get; set; }
 
         /// <summary>
         /// Statements.
         /// </summary>
         [JsonPropertyName("statements")]
-        public NonNullCollection<GblStatement> Statements { get; private set; }
+        public NonNullCollection<GblStatement> Statements
+        {
+            get;
+            private set;
+        }
 
         #endregion
 
@@ -146,38 +134,39 @@ namespace ManagedIrbis.Gbl
             MaxMfn = 0;
             MinMfn = 0;
             Statements = new NonNullCollection<GblStatement>();
-        } // constructor
+        }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public GblSettings
             (
-                Connection connection
+                IIrbisConnection connection
             )
             : this()
         {
             Database = connection.Database;
-        } // constructo
+        }
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public GblSettings
             (
-                Connection connection,
+                IIrbisConnection connection,
                 IEnumerable<GblStatement> statements
             )
             : this(connection)
         {
             Statements.AddRange(statements);
-        } // constructor
+        }
 
         #endregion
 
         #region Public methods
 
         /*
+
         /// <summary>
         /// Restore settings from JSON string.
         /// </summary>
@@ -192,7 +181,205 @@ namespace ManagedIrbis.Gbl
                 .DeserializeObject<GblSettings>(text);
 
             return result;
-        } // method FromJson
+        }
+
+        */
+
+        /// <summary>
+        /// Create <see cref="GblSettings"/>
+        /// for given interval of MFN.
+        /// </summary>
+        public static GblSettings ForInterval
+            (
+                IIrbisConnection connection,
+                int minMfn,
+                int maxMfn,
+                IEnumerable<GblStatement> statements
+            )
+        {
+            GblSettings result = new GblSettings(connection, statements)
+            {
+                MinMfn = minMfn,
+                MaxMfn = maxMfn
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create <see cref="GblSettings"/>
+        /// for given interval of MFN.
+        /// </summary>
+        public static GblSettings ForInterval
+            (
+                IIrbisConnection connection,
+                string database,
+                int minMfn,
+                int maxMfn,
+                IEnumerable<GblStatement> statements
+            )
+        {
+            GblSettings result = new GblSettings(connection, statements)
+            {
+                Database = database,
+                MinMfn = minMfn,
+                MaxMfn = maxMfn
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create <see cref="GblSettings"/>
+        /// for given list of MFN.
+        /// </summary>
+        public static GblSettings ForList
+            (
+                IIrbisConnection connection,
+                IEnumerable<int> mfnList,
+                IEnumerable<GblStatement> statements
+            )
+        {
+
+            GblSettings result = new GblSettings(connection, statements)
+            {
+                MfnList = mfnList.ToArray()
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create <see cref="GblSettings"/>
+        /// for given list of MFN.
+        /// </summary>
+        public static GblSettings ForList
+            (
+                IIrbisConnection connection,
+                string database,
+                IEnumerable<int> mfnList,
+                IEnumerable<GblStatement> statements
+            )
+        {
+            GblSettings result = new GblSettings(connection, statements)
+            {
+                Database = database,
+                MfnList = mfnList.ToArray()
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create <see cref="GblSettings"/>
+        /// for given list of MFN.
+        /// </summary>
+        public static GblSettings ForList
+            (
+                IIrbisConnection connection,
+                string database,
+                IEnumerable<int> mfnList
+            )
+        {
+            GblSettings result = new GblSettings(connection)
+            {
+                Database = database,
+                MfnList = mfnList.ToArray()
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create <see cref="GblSettings"/>
+        /// for given searchExpression.
+        /// </summary>
+        public static GblSettings ForSearchExpression
+            (
+                IIrbisConnection connection,
+                string searchExpression,
+                IEnumerable<GblStatement> statements
+            )
+        {
+            GblSettings result = new GblSettings(connection, statements)
+            {
+                SearchExpression = searchExpression
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Create <see cref="GblSettings"/>
+        /// for given searchExpression.
+        /// </summary>
+        public static GblSettings ForSearchExpression
+            (
+                IIrbisConnection connection,
+                string database,
+                string searchExpression,
+                IEnumerable<GblStatement> statements
+            )
+        {
+            GblSettings result = new GblSettings(connection, statements)
+            {
+                Database = database,
+                SearchExpression = searchExpression
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Set (server) file name.
+        /// </summary>
+        public GblSettings SetFileName
+            (
+                string fileName
+            )
+        {
+            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+
+            FileName = fileName;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Set first record and number of records
+        /// to process.
+        /// </summary>
+        public GblSettings SetRange
+            (
+                int firstRecord,
+                int numberOfRecords
+            )
+        {
+            Sure.NonNegative(firstRecord, nameof(firstRecord));
+            Sure.NonNegative(numberOfRecords, nameof(numberOfRecords));
+
+            FirstRecord = firstRecord;
+            NumberOfRecords = numberOfRecords;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Set search expression.
+        /// </summary>
+        public GblSettings SetSearchExpression
+            (
+                string searchExpression
+            )
+        {
+            Sure.NotNullNorEmpty(searchExpression, nameof(searchExpression));
+
+            SearchExpression = searchExpression;
+
+            return this;
+        }
+
+        /*
 
         /// <summary>
         /// Convert settings to JSON string.
@@ -203,7 +390,8 @@ namespace ManagedIrbis.Gbl
                 .ToString(Formatting.None);
 
             return result;
-        } // method ToJson
+        }
+
         */
 
         #endregion
@@ -216,6 +404,8 @@ namespace ManagedIrbis.Gbl
                 BinaryReader reader
             )
         {
+            Sure.NotNull(reader, nameof(reader));
+
             Actualize = reader.ReadBoolean();
             Autoin = reader.ReadBoolean();
             Database = reader.ReadNullableString();
@@ -228,7 +418,7 @@ namespace ManagedIrbis.Gbl
             NumberOfRecords = reader.ReadPackedInt32();
             SearchExpression = reader.ReadNullableString();
             Statements = reader.ReadNonNullCollection<GblStatement>();
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -236,6 +426,8 @@ namespace ManagedIrbis.Gbl
                 BinaryWriter writer
             )
         {
+            Sure.NotNull(writer, nameof(writer));
+
             writer.Write(Actualize);
             writer.Write(Autoin);
             writer.WriteNullable(Database);
@@ -248,7 +440,7 @@ namespace ManagedIrbis.Gbl
             writer.WritePackedInt32(NumberOfRecords);
             writer.WriteNullable(SearchExpression);
             writer.Write(Statements);
-        } // method SaveToStream
+        }
 
         #endregion
 
@@ -260,15 +452,15 @@ namespace ManagedIrbis.Gbl
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<GblSettings>
+            Verifier<GblSettings> verifier = new Verifier<GblSettings>
                 (
                     this,
                     throwOnError
                 );
 
             verifier
-                .NotNullNorEmpty(Database, nameof(Database))
-                .Assert(Statements.Count != 0, nameof(Statements));
+                .NotNullNorEmpty(Database, "Database")
+                .Assert(Statements.Count != 0, "Statements");
 
             foreach (GblStatement statement in Statements)
             {
@@ -276,7 +468,7 @@ namespace ManagedIrbis.Gbl
             }
 
             return verifier.Result;
-        } // method Verify
+        }
 
         #endregion
 

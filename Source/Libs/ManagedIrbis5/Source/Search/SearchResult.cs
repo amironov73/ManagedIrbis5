@@ -9,8 +9,6 @@
 
 /* SearchResult.cs -- результат ранее произведенного поиска
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #nullable enable

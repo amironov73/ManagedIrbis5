@@ -34,7 +34,7 @@ namespace ManagedIrbis
     /// </summary>
     [XmlRoot("term")]
     [DebuggerDisplay("{Count} {Text}")]
-    public sealed class Term
+    public class Term
         : IEquatable<Term>,
         IHandmadeSerializable,
         IVerifiable
@@ -137,7 +137,7 @@ namespace ManagedIrbis
         #region IHandmadeSerializable members
 
         /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
+        public virtual void RestoreFromStream
             (
                 BinaryReader reader
             )
@@ -147,7 +147,7 @@ namespace ManagedIrbis
         }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
+        public virtual void SaveToStream
             (
                 BinaryWriter writer
             )
@@ -170,7 +170,7 @@ namespace ManagedIrbis
         #region IVerifiable members
 
         /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
+        public virtual bool Verify
             (
                 bool throwOnError
             )

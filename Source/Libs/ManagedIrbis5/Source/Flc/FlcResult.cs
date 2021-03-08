@@ -7,8 +7,6 @@
 
 /* FlcResult.cs -- result of formal checking
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
