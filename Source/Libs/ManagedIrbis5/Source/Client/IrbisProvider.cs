@@ -44,6 +44,10 @@ namespace ManagedIrbis.Client
         /// </summary>
         public abstract int[] Search(string expression);
 
+        public abstract TermLink[] ExactSearchLinks(string term);
+
+        public abstract TermLink[] ExactSearchTrimLinks(string term, int i);
+
     } // class IrbisProvider
 
 } // namespace ManagedIrbis.Client
