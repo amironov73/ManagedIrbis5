@@ -32,7 +32,8 @@ using AM.Runtime;
 namespace ManagedIrbis.Menus
 {
     /// <summary>
-    /// Пара строк в MNU-файле.
+    /// Пара строк в MNU-файле: код и соответствующее значение
+    /// (либо комментарий).
     /// </summary>
     [XmlRoot("entry")]
     [DebuggerDisplay("{" + nameof(Code) + "} = {" + nameof(Comment) + "}")]
@@ -74,18 +75,12 @@ namespace ManagedIrbis.Menus
         {
             Code = reader.ReadNullableString();
             Comment = reader.ReadNullableString();
-        }
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(Code)
-                .WriteNullable(Comment);
-        }
+        public void SaveToStream (BinaryWriter writer) => writer
+            .WriteNullable(Code)
+            .WriteNullable(Comment);
 
         #endregion
 
@@ -95,20 +90,16 @@ namespace ManagedIrbis.Menus
         /// Should JSON serialize the comment?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeComment()
-        {
-            return !string.IsNullOrEmpty(Comment);
-        }
+        public bool ShouldSerializeComment() => !string.IsNullOrEmpty(Comment);
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            string.IsNullOrEmpty(Comment)
-                ? Code.ToVisibleString()
-                : $"{Code} - {Comment}";
+        public override string ToString() => string.IsNullOrEmpty(Comment)
+            ? Code.ToVisibleString()
+            : $"{Code} - {Comment}";
 
         #endregion
 

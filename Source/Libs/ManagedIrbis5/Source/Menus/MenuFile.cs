@@ -79,7 +79,7 @@ namespace ManagedIrbis.Menus
         public MenuFile()
         {
             Entries = new NonNullCollection<MenuEntry>();
-        }
+        } // constructor
 
         /// <summary>
         /// Internal constructor.
@@ -90,7 +90,7 @@ namespace ManagedIrbis.Menus
             )
         {
             Entries = entries;
-        }
+        } // constructor
 
         #endregion
 
@@ -122,7 +122,7 @@ namespace ManagedIrbis.Menus
             Entries.Add(entry);
 
             return this;
-        }
+        } // method Add
 
         /// <summary>
         /// Trims the code.
@@ -140,35 +140,19 @@ namespace ManagedIrbis.Menus
             }
 
             return code;
-        }
+        } // method TrimCode
 
         /// <summary>
         /// Finds the entry.
         /// </summary>
-        public MenuEntry? FindEntry
-            (
-                string code
-            )
-        {
-            return Entries.FirstOrDefault
-                (
-                    entry => entry.Code.SameString(code)
-                );
-        }
+        public MenuEntry? FindEntry (string code) =>
+            Entries.FirstOrDefault (entry => entry.Code.SameString(code));
 
         /// <summary>
         /// Finds the entry (case sensitive).
         /// </summary>
-        public MenuEntry? FindEntrySensitive
-            (
-                string code
-            )
-        {
-            return Entries.FirstOrDefault
-                (
-                    entry => string.CompareOrdinal (entry.Code, code) == 0
-                );
-        }
+        public MenuEntry? FindEntrySensitive (string code) =>
+            Entries.FirstOrDefault(entry => string.CompareOrdinal (entry.Code, code) == 0);
 
         /// <summary>
         /// Finds the entry.
@@ -195,7 +179,7 @@ namespace ManagedIrbis.Menus
             result = FindEntry(code);
 
             return result;
-        }
+        } // method GetEntry
 
         /// <summary>
         /// Finds the entry (case sensitive).
@@ -222,7 +206,7 @@ namespace ManagedIrbis.Menus
             result = FindEntrySensitive(code);
 
             return result;
-        }
+        } // method GetEntrySensitive
 
         /// <summary>
         /// Finds comment by the code.
@@ -238,7 +222,7 @@ namespace ManagedIrbis.Menus
             return ReferenceEquals(found, null)
                 ? defaultValue
                 : found.Comment;
-        }
+        } // method GetString
 
         /// <summary>
         /// Finds comment by the code (case sensitive).
@@ -254,7 +238,7 @@ namespace ManagedIrbis.Menus
             return ReferenceEquals(found, null)
                 ? defaultValue
                 : found.Comment;
-        }
+        } // method GetStringSensitive
 
         /// <summary>
         /// Parses the specified stream.
@@ -288,7 +272,7 @@ namespace ManagedIrbis.Menus
             }
 
             return result;
-        }
+        } // method ParseStream
 
         /// <summary>
         /// Parses the local file.
@@ -308,22 +292,13 @@ namespace ManagedIrbis.Menus
             result.FileName = Path.GetFileName(fileName);
 
             return result;
-        }
+        } // method ParseLocalFile
 
         /// <summary>
         /// Parses the local file.
         /// </summary>
-        public static MenuFile ParseLocalFile
-            (
-                string fileName
-            )
-        {
-            return ParseLocalFile
-                (
-                    fileName,
-                    IrbisEncoding.Ansi
-                );
-        }
+        public static MenuFile ParseLocalFile ( string fileName ) =>
+            ParseLocalFile(fileName, IrbisEncoding.Ansi);
 
         // /// <summary>
         // /// Parse server response.
@@ -347,13 +322,11 @@ namespace ManagedIrbis.Menus
                 string response
             )
         {
-            Sure.NotNullNorEmpty(response, nameof(response));
-
-            TextReader reader = new StringReader(response);
+            var reader = new StringReader(response);
             var result = ParseStream(reader);
 
             return result;
-        }
+        } // method ParseServerResponse
 
         /// <summary>
         /// Read <see cref="MenuFile"/> from server.
@@ -373,7 +346,7 @@ namespace ManagedIrbis.Menus
             var result = ParseServerResponse(response);
 
             return result;
-        }
+        } // method ReadFromServer
 
         /// <summary>
         /// Sorts the entries.
@@ -409,7 +382,7 @@ namespace ManagedIrbis.Menus
             }
 
             return copy.ToArray();
-        }
+        } // method SortEntries
 
         /// <summary>
         /// Builds text representation.
@@ -426,7 +399,7 @@ namespace ManagedIrbis.Menus
             result.AppendLine(StopMarker);
 
             return result.ToString();
-        }
+        } // method ToText
 
         #endregion
 
@@ -440,7 +413,7 @@ namespace ManagedIrbis.Menus
         {
             FileName = reader.ReadNullableString();
             reader.ReadCollection(Entries);
-        }
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -450,19 +423,17 @@ namespace ManagedIrbis.Menus
         {
             writer.WriteNullable(FileName);
             writer.Write(Entries);
-        }
+        } // method SaveToStream
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return FileName.ToVisibleString();
-        }
+        public override string ToString() => FileName.ToVisibleString();
 
         #endregion
-    }
-}
 
+    } // class MenuFile
+
+} // namespace ManagedIrbis.Menus
