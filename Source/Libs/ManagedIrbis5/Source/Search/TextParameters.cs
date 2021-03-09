@@ -157,7 +157,7 @@ namespace ManagedIrbis
         /// <param name="query">Пользовательский запрос.</param>
         public void Encode
             (
-                Connection connection,
+                IIrbisConnection connection,
                 Query query
             )
         {
@@ -170,7 +170,7 @@ namespace ManagedIrbis
         /// <param name="query">Пользовательский запрос.</param>
         public void Encode
             (
-                Connection connection,
+                IIrbisConnection connection,
                 ref ValueQuery query
             )
         {

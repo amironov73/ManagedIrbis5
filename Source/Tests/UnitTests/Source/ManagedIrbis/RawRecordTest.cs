@@ -26,7 +26,7 @@ namespace UnitTests.ManagedIrbis
             Assert.AreEqual((RecordStatus)0, record.Status);
             Assert.IsFalse(record.Deleted);
             Assert.AreEqual(0, record.Version);
-            Assert.IsNull(record.Fields);
+            Assert.IsNotNull(record.Fields);
         }
 
         private string[] _GetLines()

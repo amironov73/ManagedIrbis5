@@ -101,7 +101,7 @@ namespace ManagedIrbis
         /// <param name="query">Клиентский запрос.</param>
         public void Encode
             (
-                Connection connection,
+                IIrbisConnection connection,
                 IQuery query
             )
         {

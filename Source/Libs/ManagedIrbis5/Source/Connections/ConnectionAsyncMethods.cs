@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Connection.cs -- подключение к серверу ИРБИС64
+/* ConnectionAsyncMethods.cs -- асинхронные методы для подключения
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,17 +18,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
 
-using AM;
-using AM.IO;
-using AM.Runtime;
-
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Infrastructure.Sockets;
-using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -37,162 +29,10 @@ using Microsoft.Extensions.Logging;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Подключение к серверу ИРБИС64.
+    /// Асинхронные методы для подключения к серверу ИРБИС64.
     /// </summary>
-    public sealed partial class Connection
-        : IDisposable,
-        IAsyncDisposable,
-        IHandmadeSerializable,
-        IIrbisConnection
+    public static class ConnectionAsyncMethods
     {
-        #region Events
-
-        /// <summary>
-        /// Fired when <see cref="Busy"/> changed.
-        /// </summary>
-        public event EventHandler? BusyChanged;
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string Host { get; set; } = "127.0.0.1";
-
-        /// <summary>
-        ///
-        /// </summary>
-        public ushort Port { get; set; } = 6666;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string Username { get; set; } = "";
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string Password { get; set; } = "";
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string Database { get; set; } = "IBIS";
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string Workstation { get; set; } = "C";
-
-        /// <summary>
-        ///
-        /// </summary>
-        public int ClientId { get; private set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public int QueryId { get; private set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public string? ServerVersion { get; private set; }
-
-        // /// <summary>
-        // ///
-        // /// </summary>
-        // public IniFile? IniFile { get; private set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public int Interval { get; private set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public bool Connected { get; private set; }
-
-        /// <summary>
-        /// Socket.
-        /// </summary>
-        public ClientSocket Socket { get; private set; }
-
-        /// <summary>
-        /// Busy?
-        /// </summary>
-        public bool Busy { get; private set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        public CancellationToken Cancellation { get; }
-
-        /// <summary>
-        /// Last error code.
-        /// </summary>
-        public int LastError { get; internal set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public Connection
-            (
-                ClientSocket socket
-            )
-        {
-            Socket = socket;
-            socket.Connection = this;
-            _cancellation = new CancellationTokenSource();
-            Cancellation = _cancellation.Token;
-            _logger = Magna.Factory.CreateLogger<Connection>();
-        }
-
-        #endregion
-
-        #region Private members
-
-        internal ILogger _logger;
-
-        private static readonly int[] _goodCodesForReadRecord = { -201, -600, -602, -603 };
-        private static readonly int[] _goodCodesForReadTerms = { -202, -203, -204 };
-
-        private CancellationTokenSource _cancellation;
-
-        private bool _debug;
-
-        private void SetBusy
-            (
-                bool busy
-            )
-        {
-            if (Busy != busy)
-            {
-                _logger.LogTrace($"SetBusy{busy}");
-                Busy = busy;
-                BusyChanged?.Invoke(this, EventArgs.Empty);
-            }
-        } // method SetBusy
-
-        private bool CheckConnection()
-        {
-            if (!Connected)
-            {
-                LastError = -100_500;
-            }
-
-            return Connected;
-        } // method CheckConnection
-
-        #endregion
-
         #region Public methods
 
         /// <summary>
@@ -201,12 +41,13 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="database">Имя базы данных.</param>
         /// <returns>Признак успешности операции.</returns>
-        public async Task<bool> ActualizeDatabaseAsync
+        public static async Task<bool> ActualizeDatabaseAsync
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            var result = await ActualizeRecordAsync(database, 0);
+            var result = await connection.ActualizeRecordAsync(database, 0);
 
             return result;
         } // method ActualizeDatabase
@@ -217,14 +58,15 @@ namespace ManagedIrbis
         /// <param name="database">Имя базы данных.</param>
         /// <param name="mfn">MFN, подлежащий актуализации.</param>
         /// <returns>Признак успешности операции.</returns>
-        public async Task<bool> ActualizeRecordAsync
+        public static async Task<bool> ActualizeRecordAsync
             (
+                this IIrbisConnection connection,
                 string? database,
                 int mfn
             )
         {
-            database ??= Database;
-            var response = await ExecuteAsync
+            database ??= connection.Database;
+            var response = await connection.ExecuteAsync
                 (
                     CommandCode.ActualizeRecord,
                     database,
@@ -234,56 +76,6 @@ namespace ManagedIrbis
             return response is not null;
         } // method ActualizeRecordAsync
 
-
-        /// <summary>
-        /// Cancel the current operation.
-        /// </summary>
-        public void CancelOperation()
-        {
-            _cancellation.Cancel();
-        } // method CancelOperation
-
-        /// <summary>
-        /// Подключение к серверу ИРБИС64.
-        /// </summary>
-        public async Task<bool> ConnectAsync()
-        {
-            if (Connected)
-            {
-                return true;
-            }
-
-            AGAIN: QueryId = 1;
-            ClientId = new Random().Next(100000, 999999);
-
-            var query = new Query(this, CommandCode.RegisterClient);
-            query.AddAnsi(Username);
-            query.AddAnsi(Password);
-
-            var response = await ExecuteAsync(query);
-            if (response is null)
-            {
-                return false;
-            }
-
-            if (response.GetReturnCode() == -3337)
-            {
-                goto AGAIN;
-            }
-
-            if (response.ReturnCode < 0)
-            {
-                return false;
-            }
-
-            Connected = true;
-            ServerVersion = response.ServerVersion;
-            Interval = response.ReadInteger();
-            // TODO Read INI-file
-
-            return true;
-        } // method ConnectAsync
-
         /// <summary>
         /// Создание базы данных.
         /// </summary>
@@ -291,23 +83,24 @@ namespace ManagedIrbis
         /// <param name="description">Описание в свободной форме.</param>
         /// <param name="readerAccess">Читатель будет иметь доступ?</param>
         /// <returns>Признак успешности операции.</returns>
-        public async Task<bool> CreateDatabaseAsync
+        public static async Task<bool> CreateDatabaseAsync
             (
+                this IIrbisConnection connection,
                 string database,
                 string description,
                 bool readerAccess = true
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            var query = new Query(this, CommandCode.CreateDatabase);
+            var query = new Query(connection, CommandCode.CreateDatabase);
             query.AddAnsi(database);
             query.AddAnsi(description);
             query.Add(readerAccess ? 1 : 0);
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null || !response.CheckReturnCode())
             {
                 return false;
@@ -322,20 +115,21 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="database">Имя базы данных.</param>
         /// <returns>Признак успешности операции.</returns>
-        public async Task<bool> CreateDictionaryAsync
+        public static async Task<bool> CreateDictionaryAsync
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            database ??= Database;
-            var query = new Query(this, CommandCode.CreateDictionary);
+            database ??= connection.Database;
+            var query = new Query(connection, CommandCode.CreateDictionary);
             query.AddAnsi(database);
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null || !response.CheckReturnCode())
             {
                 return false;
@@ -349,20 +143,21 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="database">Имя удаляемой базы данных.</param>
         /// <returns>Признак успешности операции.</returns>
-        public async Task<bool> DeleteDatabaseAsync
+        public static async Task<bool> DeleteDatabaseAsync
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            database ??= Database;
-            var query = new Query(this, CommandCode.DeleteDatabase);
+            database ??= connection.Database;
+            var query = new Query(connection, CommandCode.DeleteDatabase);
             query.AddAnsi(database);
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null || !response.CheckReturnCode())
             {
                 return false;
@@ -372,110 +167,31 @@ namespace ManagedIrbis
         } // method DeleteDatabaseAsync
 
         /// <summary>
-        /// Отключение от сервера.
-        /// </summary>
-        /// <returns>Признак успешности завершения операции.</returns>
-        public async Task<bool> DisconnectAsync()
-        {
-            if (Connected)
-            {
-                var query = new Query(this, CommandCode.UnregisterClient);
-                query.AddAnsi(Username);
-                try
-                {
-                    await ExecuteAsync(query);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                }
-
-                Connected = false;
-            }
-
-            return true;
-        } // method DisconnectAsync
-
-        /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        public async Task<Response?> ExecuteAsync
-            (
-                Query query
-            )
-        {
-            SetBusy(true);
-            try
-            {
-                if (_cancellation.IsCancellationRequested)
-                {
-                    _cancellation = new CancellationTokenSource();
-                }
-
-                Response? result;
-                try
-                {
-                    if (_debug)
-                    {
-                        query.Debug(Console.Out);
-                    }
-
-                    result = await Socket.TransactAsync(query);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                    return null;
-                }
-
-                if (result is not null)
-                {
-                    if (_debug)
-                    {
-                        result.Debug(Console.Out);
-                    }
-
-                    result.Parse();
-                }
-
-                QueryId++;
-
-                return result;
-            }
-            finally
-            {
-                SetBusy(false);
-            }
-        } // method ExecuteAsync
-
-        /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
         /// </summary>
         /// <param name="command">Код команды.</param>
         /// <param name="args">Опциональные параметры команды
         /// (в кодировке ANSI).</param>
         /// <returns>Ответ сервера.</returns>
-        public async Task<Response?> ExecuteAsync
+        public static async Task<Response?> ExecuteAsync
             (
+                this IIrbisConnection connection,
                 string command,
                 params object[] args
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
 
-            var query = new Query(this, command);
+            var query = new Query(connection, command);
             foreach (var arg in args)
             {
                 query.AddAnsi(arg.ToString());
             }
 
-            var result = await ExecuteAsync(query);
+            var result = await connection.ExecuteAsync(query);
 
             return result;
         } // method ExecuteAsync
@@ -486,24 +202,25 @@ namespace ManagedIrbis
         /// <param name="format">Спецификация формата.</param>
         /// <param name="mfn">MFN записи.</param>
         /// <returns>Результат расформатирования.</returns>
-        public async Task<string?> FormatRecordAsync
+        public static async Task<string?> FormatRecordAsync
             (
+                this IIrbisConnection connection,
                 string format,
                 int mfn
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
 
-            var query = new Query(this, CommandCode.FormatRecord);
-            query.AddAnsi(Database);
+            var query = new Query(connection, CommandCode.FormatRecord);
+            query.AddAnsi(connection.Database);
             var prepared = IrbisFormat.PrepareFormat(format);
             query.AddAnsi(prepared);
             query.Add(1);
             query.Add(mfn);
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null)
             {
                 return null;
@@ -522,53 +239,23 @@ namespace ManagedIrbis
         /// <summary>
         /// Полнотекстовый поиск ИРБИС64+.
         /// </summary>
-        public FullTextResult? FullTextSearch
+        public static async Task<FullTextResult?> FullTextSearchAsync
             (
+                this IIrbisConnection connection,
                 SearchParameters searchParameters,
                 TextParameters textParameters
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
 
-            var query = new ValueQuery(this, CommandCode.NewFulltextSearch);
-            searchParameters.Encode(this, ref query);
-            textParameters.Encode(this, ref query);
-            query.DebugUtf(Console.Out);
-            var response = ExecuteSync(ref query);
-            if (response is null
-                || !response.CheckReturnCode())
-            {
-                return null;
-            }
-
-            var result = new FullTextResult();
-            result.Decode(response);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Полнотекстовый поиск ИРБИС64+.
-        /// </summary>
-        public async Task<FullTextResult?> FullTextSearchAsync
-            (
-                SearchParameters searchParameters,
-                TextParameters textParameters
-            )
-        {
-            if (!CheckConnection())
-            {
-                return null;
-            }
-
-            var query = new Query(this, CommandCode.NewFulltextSearch);
-            searchParameters.Encode(this, query);
-            textParameters.Encode(this, query);
+            var query = new Query(connection, CommandCode.NewFulltextSearch);
+            searchParameters.Encode(connection, query);
+            textParameters.Encode(connection, query);
             //query.DebugUtf(Console.Out);
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null
                 || !response.CheckReturnCode())
             {
@@ -587,13 +274,14 @@ namespace ManagedIrbis
         /// <param name="database">Опциональное имя базы данных
         /// (<c>null</c> означает текущую базу данных).</param>
         /// <returns>Макисмальный MFN.</returns>
-        public async Task<int> GetMaxMfnAsync
+        public static async Task<int> GetMaxMfnAsync
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            database ??= Database;
-            var response = await ExecuteAsync(CommandCode.GetMaxMfn, database);
+            database ??= connection.Database;
+            var response = await connection.ExecuteAsync(CommandCode.GetMaxMfn, database);
 
             return response is null || !response.CheckReturnCode()
                 ? 0
@@ -603,15 +291,18 @@ namespace ManagedIrbis
         /// <summary>
         ///
         /// </summary>
-        public async Task<ServerVersion?> GetServerVersionAsync()
+        public static async Task<ServerVersion?> GetServerVersionAsync
+            (
+                this IIrbisConnection connection
+            )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ServerInfo);
-            var response = await ExecuteAsync(query);
+            var query = new Query(connection, CommandCode.ServerInfo);
+            var response = await connection.ExecuteAsync(query);
             if (response is null)
             {
                 return null;
@@ -624,46 +315,28 @@ namespace ManagedIrbis
             return result;
         } // method GetServerVersionAsync
 
-        /*
-        /// <summary>
-        /// Получение списка баз данных с сервера.
-        /// </summary>
-        /// <param name="fileName">Имя файла со списком баз данных.</param>
-        /// <returns>Массив описаний баз данных.</returns>
-        public async Task<DatabaseInfo[]> ListDatabasesAsync
-            (
-                string fileName
-            )
-        {
-            if (!CheckConnection())
-            {
-                return Array.Empty<DatabaseInfo>();
-            }
-
-            return Array.Empty<DatabaseInfo>();
-        } // method ListDatabasesAsync
-        */
-
         /// <summary>
         /// Получение списка файлов на сервере.
         /// </summary>
-        public async Task<string[]> ListFilesAsync
+        public static async Task<string[]> ListFilesAsync
             (
+                this IIrbisConnection connection,
                 params string[] specifications
             )
         {
-            if (!CheckConnection() || specifications.Length == 0)
+            if (!connection.CheckConnection()
+                || specifications.Length == 0)
             {
                 return Array.Empty<string>();
             }
 
-            var query = new Query(this, CommandCode.ListFiles);
+            var query = new Query(connection, CommandCode.ListFiles);
             foreach (var specification in specifications)
             {
                 query.AddAnsi(specification);
             }
 
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null)
             {
                 return Array.Empty<string>();
@@ -695,15 +368,18 @@ namespace ManagedIrbis
         /// <summary>
         /// Получение списка процессов на сервере.
         /// </summary>
-        public async Task<ProcessInfo[]> ListProcessesAsync()
+        public static async Task<ProcessInfo[]> ListProcessesAsync
+            (
+                this IIrbisConnection connection
+            )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<ProcessInfo>();
             }
 
-            var query = new Query(this, CommandCode.GetProcessList);
-            var response = await ExecuteAsync(query);
+            var query = new Query(connection, CommandCode.GetProcessList);
+            var response = await connection.ExecuteAsync(query);
             if (response is null)
             {
                 return Array.Empty<ProcessInfo>();
@@ -719,107 +395,35 @@ namespace ManagedIrbis
         /// Пустая операция.
         /// </summary>
         /// <returns>Признак успешного завершения операции.</returns>
-        public async Task<bool> NopAsync()
+        public static async Task<bool> NopAsync
+            (
+                this IIrbisConnection connection
+            )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            var response = await ExecuteAsync(CommandCode.Nop);
+            var response = await connection.ExecuteAsync(CommandCode.Nop);
 
             return response is not null
                    && response.CheckReturnCode();
         } // method NopAsync
 
+
         /// <summary>
-        /// Разбор строки подключения.
+        /// Чтение всех терминов с указанным префиксом.
         /// </summary>
-        public void ParseConnectionString
+        /// <param name="prefix"></param>
+        /// <returns></returns>
+        public static async Task<Term[]> ReadAllTermsAsync
             (
-                string? connectionString
-            )
-        {
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                return;
-            }
-
-            var pairs = connectionString.Split
-                (
-                    ';',
-                    StringSplitOptions.RemoveEmptyEntries
-                );
-            foreach (var pair in pairs)
-            {
-                if (!pair.Contains('='))
-                {
-                    continue;
-                }
-
-                var parts = pair.Split('=', 2);
-                var name = parts[0].Trim().ToLowerInvariant();
-                if (string.IsNullOrEmpty(name))
-                {
-                    continue;
-                }
-
-                var value = parts[1].Trim();
-
-                switch (name)
-                {
-                    case "host":
-                    case "server":
-                    case "address":
-                        Host = value;
-                        break;
-
-                    case "port":
-                        Port = ushort.Parse(value);
-                        break;
-
-                    case "user":
-                    case "username":
-                    case "name":
-                    case "login":
-                    case "account":
-                        Username = value;
-                        break;
-
-                    case "password":
-                    case "pwd":
-                    case "secret":
-                        Password = value;
-                        break;
-
-                    case "db":
-                    case "database":
-                    case "base":
-                    case "catalog":
-                        Database = value;
-                        break;
-
-                    case "arm":
-                    case "workstation":
-                        Workstation = value;
-                        break;
-
-                    case "debug":
-                        _debug = true;
-                        break;
-
-                    default:
-                        throw new IrbisException($"Unknown key {name}");
-                }
-            }
-        } // method ParseConnectionString
-
-        public async Task<Term[]> ReadAllTermsAsync
-            (
+                this IIrbisConnection connection,
                 string prefix
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<Term>();
             }
@@ -830,7 +434,7 @@ namespace ManagedIrbis
             var flag = true;
             while (flag)
             {
-                var terms = await ReadTermsAsync(startTerm, 1024);
+                var terms = await connection.ReadTermsAsync(startTerm, 1024);
                 if (terms.Length == 0)
                 {
                     break;
@@ -872,29 +476,30 @@ namespace ManagedIrbis
         /// <summary>
         /// Чтение библиографической записи с сервера.
         /// </summary>
-        public async Task<Record?> ReadRecordAsync
+        public static async Task<Record?> ReadRecordAsync
             (
+                this IIrbisConnection connection,
                 int mfn
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ReadRecord);
-            query.AddAnsi(Database);
+            var query = new Query(connection, CommandCode.ReadRecord);
+            query.AddAnsi(connection.Database);
             query.Add(mfn);
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null
-                || !response.CheckReturnCode(_goodCodesForReadRecord))
+                /* || !response.CheckReturnCode(_goodCodesForReadRecord) */ )
             {
                 return null;
             }
 
             var result = new Record
             {
-                Database = Database
+                Database = connection.Database
             };
             result.Decode(response);
 
@@ -907,20 +512,21 @@ namespace ManagedIrbis
         /// <param name="term">Термин.</param>
         /// <param name="numberOfPostings">Максимальное количество постингов</param>
         /// <returns>Массив прочитанных постингов.</returns>
-        public async Task<TermPosting[]> ReadPostingsAsync
+        public static async Task<TermPosting[]> ReadPostingsAsync
             (
+                this IIrbisConnection connection,
                 string term,
                 int numberOfPostings
             )
         {
             var parameters = new PostingParameters
             {
-                Database = Database,
+                Database = connection.Database,
                 Terms = new[] { term },
                 NumberOfPostings = numberOfPostings
             };
 
-            return await ReadPostingsAsync(parameters);
+            return await connection.ReadPostingsAsync(parameters);
         }
 
         /// <summary>
@@ -928,21 +534,22 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры постингов.</param>
         /// <returns>Массив прочитанных постингов.</returns>
-        public async Task<TermPosting[]> ReadPostingsAsync
+        public static async Task<TermPosting[]> ReadPostingsAsync
             (
+                this IIrbisConnection connection,
                 PostingParameters parameters
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<TermPosting>();
             }
 
-            var query = new Query(this, CommandCode.ReadPostings);
-            parameters.Encode(this, query);
-            var response = await ExecuteAsync(query);
+            var query = new Query(connection, CommandCode.ReadPostings);
+            parameters.Encode(connection, query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null
-                || !response.CheckReturnCode(_goodCodesForReadTerms))
+                /* || !response.CheckReturnCode(_goodCodesForReadTerms) */)
             {
                 return Array.Empty<TermPosting>();
             }
@@ -956,20 +563,21 @@ namespace ManagedIrbis
         /// <param name="startTerm">Параметры терминов.</param>
         /// <param name="numberOfTerms">Максимальное число терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
-        public async Task<Term[]> ReadTermsAsync
+        public static async Task<Term[]> ReadTermsAsync
             (
+                this IIrbisConnection connection,
                 string startTerm,
                 int numberOfTerms
             )
         {
             var parameters = new TermParameters
             {
-                Database = Database,
+                Database = connection.Database,
                 StartTerm = startTerm,
                 NumberOfTerms = numberOfTerms
             };
 
-            return await ReadTermsAsync(parameters);
+            return await connection.ReadTermsAsync(parameters);
         } // method ReadTermsAsync
 
         /// <summary>
@@ -977,12 +585,13 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
-        public async Task<Term[]> ReadTermsAsync
+        public static async Task<Term[]> ReadTermsAsync
             (
+                this IIrbisConnection connection,
                 TermParameters parameters
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<Term>();
             }
@@ -990,11 +599,11 @@ namespace ManagedIrbis
             var command = parameters.ReverseOrder
                 ? CommandCode.ReadTermsReverse
                 : CommandCode.ReadTerms;
-            var query = new Query(this, command);
-            parameters.Encode(this, query);
-            var response = await ExecuteAsync(query);
+            var query = new Query(connection, command);
+            parameters.Encode(connection, query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null
-                || !response.CheckReturnCode(_goodCodesForReadTerms))
+                /* || !response.CheckReturnCode(_goodCodesForReadTerms) */)
             {
                 return Array.Empty<Term>();
             }
@@ -1005,20 +614,21 @@ namespace ManagedIrbis
         /// <summary>
         /// Чтение указанного текстового файла с сервера.
         /// </summary>
-        public async Task<string?> ReadTextFileAsync
+        public static async Task<string?> ReadTextFileAsync
             (
+                this IIrbisConnection connection,
                 string? specification
             )
         {
-            if (!CheckConnection()
+            if (!connection.CheckConnection()
                 || !string.IsNullOrWhiteSpace(specification))
             {
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ReadDocument);
+            var query = new Query(connection, CommandCode.ReadDocument);
             query.AddAnsi(specification);
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null)
             {
                 return null;
@@ -1035,15 +645,16 @@ namespace ManagedIrbis
         /// <param name="database">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        public async Task<bool> ReloadDictionaryAsync
+        public static async Task<bool> ReloadDictionaryAsync
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            var response = await ExecuteAsync
+            var response = await connection.ExecuteAsync
                 (
                     CommandCode.ReloadDictionary,
-                    database ?? Database
+                    database ?? connection.Database
                 );
 
             return response is not null && response.CheckReturnCode();
@@ -1055,15 +666,16 @@ namespace ManagedIrbis
         /// <param name="database">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns></returns>
-        public async Task<bool> ReloadMasterFileAsync
+        public static async Task<bool> ReloadMasterFileAsync
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            var response = await ExecuteAsync
+            var response = await connection.ExecuteAsync
                 (
                     CommandCode.ReloadMasterFile,
-                    database ?? Database
+                    database ?? connection.Database
                 );
 
             return response is not null && response.CheckReturnCode();
@@ -1073,72 +685,35 @@ namespace ManagedIrbis
         /// Асинхронный ерезапуск сервера без утери подключенных клиентов.
         /// </summary>
         /// <returns>Признак успешного завергения операции.</returns>
-        public async Task<bool> RestartServerAsync()
+        public static async Task<bool> RestartServerAsync
+            (
+                this IIrbisConnection connection
+            )
         {
-            var response = await ExecuteAsync(CommandCode.RestartServer);
+            var response = await connection.ExecuteAsync(CommandCode.RestartServer);
 
             return response is not null;
         } // method RestartServerAsync
-
-        /// <summary>
-        /// Восстановление ранее прикрытого с помощью <see cref="Suspend"/>
-        /// соединения.
-        /// </summary>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        public static Connection Restore
-            (
-                string state
-            )
-        {
-            throw new NotImplementedException();
-
-            /*
-            ConnectionSettings settings = ConnectionSettings.Decrypt(state);
-
-            if (ReferenceEquals(settings, null))
-            {
-                throw new IrbisException
-                (
-                    "Decrypted state is null"
-                );
-            }
-
-            var result = new IrbisConnection();
-            settings.ApplyToConnection(result);
-
-            return result;
-            */
-        } // method Restore
-
-        /// <summary>
-        /// Восстановление флага подключения, ранее погашенного
-        /// при помощи <see cref="Suspend"/>.
-        /// </summary>
-        public void Rise()
-        {
-            throw new NotImplementedException();
-        } // method Rise
-
 
         /// <summary>
         /// Расширенный поиск.
         /// </summary>
         /// <param name="parameters">Параметры поиска.</param>
         /// <returns>Массив элементов, описывающих найденные записи.</returns>
-        public async Task<FoundItem[]> SearchAsync
+        public static async Task<FoundItem[]> SearchAsync
             (
+                this IIrbisConnection connection,
                 SearchParameters parameters
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<FoundItem>();
             }
 
-            var query = new Query(this, CommandCode.Search);
-            parameters.Encode(this, query);
-            var response = await ExecuteAsync(query);
+            var query = new Query(connection, CommandCode.Search);
+            parameters.Encode(connection, query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null
                 || !response.CheckReturnCode())
             {
@@ -1153,24 +728,25 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Массив MFN найденных записей.</returns>
-        public async Task<int[]> SearchAsync
+        public static async Task<int[]> SearchAsync
             (
+                this IIrbisConnection connection,
                 string expression
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<int>();
             }
 
-            var query = new Query(this, CommandCode.Search);
+            var query = new Query(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
-                Database = Database,
+                Database = connection.Database,
                 Expression = expression
             };
-            parameters.Encode(this, query);
-            var response = await ExecuteAsync(query);
+            parameters.Encode(connection, query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null
                 || !response.CheckReturnCode())
             {
@@ -1186,25 +762,26 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
-        public async Task<int> SearchCountAsync
+        public static async Task<int> SearchCountAsync
             (
+                this IIrbisConnection connection,
                 string expression
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return -1;
             }
 
-            var query = new Query(this, CommandCode.Search);
+            var query = new Query(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
-                Database = Database,
+                Database = connection.Database,
                 Expression = expression,
                 FirstRecord = 0
             };
-            parameters.Encode(this, query);
-            var response = await ExecuteAsync(query);
+            parameters.Encode(connection, query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null
                 || !response.CheckReturnCode())
             {
@@ -1214,8 +791,16 @@ namespace ManagedIrbis
             return response.ReadInteger();
         } // method SearchCountAsync
 
-        public Task<Record[]> SearchReadAsync
+        /// <summary>
+        /// Поиск записей на сервере.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static Task<Record[]> SearchReadAsync
             (
+                this IIrbisConnection connection,
                 string expression,
                 int limit = 0
             )
@@ -1223,8 +808,15 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method SearchReadAsync
 
-        public Task<Record?> SearchSingleRecordAsync
+        /// <summary>
+        /// Поиск записей на сервере.
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public static Task<Record?> SearchSingleRecordAsync
             (
+                this IIrbisConnection connection,
                 string expression
             )
         {
@@ -1232,32 +824,21 @@ namespace ManagedIrbis
         } // method SearchSingleRecordAsync
 
         /// <summary>
-        /// Временно "закрывает" соединение с сервером
-        /// (на самом деле соединение не разрывается)
-        /// и сериализует его состояние в строку
-        /// с возможностью последующего восстановления.
-        /// </summary>
-        /// <returns></returns>
-        public string Suspend()
-        {
-            throw new NotImplementedException();
-        } // method Suspend
-
-        /// <summary>
         /// Опустошение указанной базы данных.
         /// </summary>
         /// <param name="database">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        public async Task<bool> TruncateDatabaseAsync
+        public static async Task<bool> TruncateDatabaseAsync
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            var response = await ExecuteAsync
+            var response = await connection.ExecuteAsync
                 (
                     CommandCode.EmptyDatabase,
-                    database ?? Database
+                    database ?? connection.Database
                 );
 
             return response is not null && response.CheckReturnCode();
@@ -1269,15 +850,16 @@ namespace ManagedIrbis
         /// <param name="database">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        public async Task<bool> UnlockDatabaseAsync
+        public static async Task<bool> UnlockDatabaseAsync
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            var response = await ExecuteAsync
+            var response = await connection.ExecuteAsync
                 (
                     CommandCode.UnlockDatabase,
-                    database ?? Database
+                    database ?? connection.Database
                 );
 
             return response is not null && response.CheckReturnCode();
@@ -1290,25 +872,26 @@ namespace ManagedIrbis
         /// <param name="database">Имя базы данных.
         /// По умолчанию текущая база данных.</param>
         /// <returns>Признак успешности </returns>
-        public async Task<bool> UnlockRecordsAsync
+        public static async Task<bool> UnlockRecordsAsync
             (
+                this IIrbisConnection connection,
                 IEnumerable<int> mfnList,
                 string? database = default
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            var query = new Query(this, CommandCode.UnlockRecords);
-            query.AddAnsi(database ?? Database);
+            var query = new Query(connection, CommandCode.UnlockRecords);
+            query.AddAnsi(database ?? connection.Database);
             foreach (var mfn in mfnList)
             {
                 query.Add(mfn);
             }
 
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
 
             return response is not null && response.CheckReturnCode();
         } // method UnlockRecordsAsync
@@ -1318,17 +901,18 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="lines">Измененные строки INI-файла.</param>
         /// <returns>Признак успешности завершения операции.</returns>
-        public async Task<bool> UpdateIniFileAsync
+        public static async Task<bool> UpdateIniFileAsync
             (
+                this IIrbisConnection connection,
                 IEnumerable<string> lines
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            var query = new Query(this, CommandCode.UpdateIniFile);
+            var query = new Query(connection, CommandCode.UpdateIniFile);
             foreach (var line in lines)
             {
                 if (!string.IsNullOrWhiteSpace(line))
@@ -1337,7 +921,7 @@ namespace ManagedIrbis
                 }
             }
 
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
 
             return response is not null;
         } // method UpdateIniFileAsync
@@ -1347,23 +931,24 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="userList">Список пользователей.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        public async Task<bool> UpdateUserListAsync
+        public static async Task<bool> UpdateUserListAsync
             (
+                this IIrbisConnection connection,
                 IEnumerable<UserInfo> userList
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            var query = new Query(this, CommandCode.SetUserList);
+            var query = new Query(connection, CommandCode.SetUserList);
             foreach (var user in userList)
             {
                 query.AddAnsi(user.Encode());
             }
 
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
 
             return response is not null;
         } // method UpdateUserListAsync
@@ -1376,26 +961,27 @@ namespace ManagedIrbis
         /// <param name="actualize">Актуализировать запись?</param>
         /// <param name="dontParse">Не разбирать ответ сервера?</param>
         /// <returns>Новый максимальный MFN в базе данных.</returns>
-        public async Task<int> WriteRecordAsync
+        public static async Task<int> WriteRecordAsync
             (
+                this IIrbisConnection connection,
                 Record record,
                 bool lockFlag = false,
                 bool actualize = true,
                 bool dontParse = false
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return 0;
             }
 
-            var query = new Query(this, CommandCode.UpdateRecord);
-            query.AddAnsi(record.Database ?? Database);
+            var query = new Query(connection, CommandCode.UpdateRecord);
+            query.AddAnsi(record.Database ?? connection.Database);
             query.Add(lockFlag ? 1 : 0);
             query.Add(actualize ? 1 : 0);
             query.AddUtf(record.Encode());
 
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null || !response.CheckReturnCode())
             {
                 return 0;
@@ -1404,15 +990,16 @@ namespace ManagedIrbis
             var result = response.ReturnCode;
             if (!dontParse)
             {
-                record.Database ??= Database;
+                record.Database ??= connection.Database;
                 // TODO reparse the record
             }
 
             return result;
         } // method WriteRecordAsync
 
-        public Task<Record[]> WriteRecordsAsync
+        public static Task<Record[]> WriteRecordsAsync
             (
+                this IIrbisConnection connection,
                 Record[] records,
                 bool lockFlag = false,
                 bool actualize = true
@@ -1421,22 +1008,23 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method WriteRecordsAsync
 
-        public async Task<bool> WriteTextFileAsync
+        public static async Task<bool> WriteTextFileAsync
             (
+                this IIrbisConnection connection,
                 params FileSpecification[] specifications
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            var query = new Query(this, CommandCode.ReadDocument);
+            var query = new Query(connection, CommandCode.ReadDocument);
             foreach (var specification in specifications)
             {
                 query.AddAnsi(specification.ToString());
             }
-            var response = await ExecuteAsync(query);
+            var response = await connection.ExecuteAsync(query);
             if (response is null)
             {
                 return false;
@@ -1447,90 +1035,6 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IHandmadeSerializable members
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Host = reader.ReadNullableString()
-                .ThrowIfNull("Host");
-            Port = (ushort) reader.ReadPackedInt32();
+    } // class ConenctionAsyncMethods
 
-            var username = reader.ReadNullableString();
-            if (!string.IsNullOrEmpty(username))
-            {
-                Username = username;
-            }
-
-            var password = reader.ReadNullableString();
-            if (!ReferenceEquals(password, null))
-            {
-                Password = password;
-            }
-
-            Database = reader.ReadNullableString()
-                .ThrowIfNull("Database");
-
-            var workstation = reader.ReadNullableString();
-            if (!string.IsNullOrEmpty(workstation))
-            {
-                Workstation = workstation;
-            }
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(Host)
-                .WritePackedInt32(Port)
-                .WriteNullable(Username)
-                .WriteNullable(Password)
-                .WriteNullable(Database)
-                .WriteNullable(Workstation);
-        } // method SaveTiStream
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable"/>
-        public void Dispose()
-        {
-            if (Connected)
-            {
-                Disconnect();
-            }
-        } // method Dispose
-
-        #endregion
-
-        #region IAsyncDisposable members
-
-        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public async ValueTask DisposeAsync()
-        {
-            await DisconnectAsync();
-        } // method DisposeAsync
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="Object.ToString" />
-        public override string ToString()
-        {
-            var status = Connected ? "[*]" : "[]";
-
-            return $"{Host} {Database} {Username} {status}";
-        } // method ToString
-
-        #endregion
-
-    } // class Connection
-}
+} // namespace ManagedIrbis

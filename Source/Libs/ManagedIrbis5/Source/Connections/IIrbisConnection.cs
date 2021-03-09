@@ -9,19 +9,16 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* IIrbisConnection.cs -- интерфейс подключения для мока
+/* IIrbisConnection.cs -- наиболее общий интерфейс подключения для мока
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Infrastructure.Sockets;
 
 #endregion
 
@@ -30,15 +27,20 @@ using ManagedIrbis.Infrastructure.Sockets;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Интерфейс подключения к серверу ИРБИС64
+    /// Наиболее общий интерфейс подключения к серверу ИРБИС64
     /// для мока.
     /// </summary>
     public interface IIrbisConnection
+        : IDisposable
     {
+        /*
+
         /// <summary>
         /// Fired when <see cref="Busy"/> changed.
         /// </summary>
         event EventHandler? BusyChanged;
+
+        */
 
         /// <summary>
         ///
@@ -80,6 +82,8 @@ namespace ManagedIrbis
         /// </summary>
         int QueryId { get; }
 
+        /*
+
         /// <summary>
         ///
         /// </summary>
@@ -90,30 +94,44 @@ namespace ManagedIrbis
         /// </summary>
         int Interval { get; }
 
+        */
+
         /// <summary>
         ///
         /// </summary>
         bool Connected { get; }
+
+        /*
 
         /// <summary>
         /// Socket.
         /// </summary>
         ClientSocket Socket { get; }
 
+        */
+
         /// <summary>
         /// Busy?
         /// </summary>
         bool Busy { get; }
+
+        /*
 
         /// <summary>
         ///
         /// </summary>
         CancellationToken Cancellation { get; }
 
+        */
+
         /// <summary>
         /// Last error code.
         /// </summary>
         int LastError { get; }
+
+        bool CheckConnection();
+
+        /*
 
         /// <summary>
         /// Актуализация всех неактуализированных записей
@@ -188,6 +206,9 @@ namespace ManagedIrbis
         /// <returns>Признак успешности завершения операции.</returns>
         Task<bool> DisconnectAsync();
 
+        */
+
+
         /// <summary>
         /// Отправка клиентского запроса на сервер
         /// и получение ответа от него.
@@ -198,6 +219,19 @@ namespace ManagedIrbis
             (
                 Query query
             );
+
+        /// <summary>
+        /// Отправка клиентского запроса на сервер
+        /// и получение ответа от него.
+        /// </summary>
+        /// <param name="query">Клиентский запрос.</param>
+        /// <returns>Ответ от сервера.</returns>
+        Response? ExecuteSync
+            (
+                ref ValueQuery query
+            );
+
+        /*
 
         /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
@@ -450,6 +484,8 @@ namespace ManagedIrbis
             (
                 params FileSpecification[] specifications
             );
+
+            */
 
     } // interface IIrbisConnection
 

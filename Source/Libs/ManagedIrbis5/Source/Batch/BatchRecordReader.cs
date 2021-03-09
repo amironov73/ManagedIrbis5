@@ -568,7 +568,7 @@ namespace ManagedIrbis.Batch
 
             if (_ownConnection)
             {
-                Connection.DisconnectAsync().Wait();
+                Connection.Dispose();
             }
 
             yield break;

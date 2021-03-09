@@ -39,7 +39,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public Query
             (
-                Connection connection,
+                IIrbisConnection connection,
                 string commandCode
             )
         {

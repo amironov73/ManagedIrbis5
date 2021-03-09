@@ -28,131 +28,94 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis
 {
     // Синхронная часть соединения
-    partial class Connection
+    public static class ConnectionSyncMethods
     {
         #region Public methods
 
         /// <summary>
-        /// Подключение к серверу ИРБИС64.
+        /// Разбор строки подключения.
         /// </summary>
-        public bool Connect()
-        {
-            if (Connected)
-            {
-                return true;
-            }
-
-            AGAIN: QueryId = 1;
-            ClientId = new Random().Next(100000, 999999);
-
-            var query = new ValueQuery(this, CommandCode.RegisterClient);
-            query.AddAnsi(Username);
-            query.AddAnsi(Password);
-
-            var response = ExecuteSync(ref query);
-            if (ReferenceEquals(response, null))
-            {
-                return false;
-            }
-
-            if (response.GetReturnCode() == -3337)
-            {
-                goto AGAIN;
-            }
-
-            if (response.ReturnCode < 0)
-            {
-                return false;
-            }
-
-            Connected = true;
-            ServerVersion = response.ServerVersion;
-            Interval = response.ReadInteger();
-            // TODO Read INI-file
-
-            return true;
-        } // method Connect
-
-        /// <summary>
-        /// Отключение от сервера.
-        /// </summary>
-        /// <returns>Признак успешности завершения операции.</returns>
-        public bool Disconnect()
-        {
-            if (Connected)
-            {
-                var query = new ValueQuery(this, CommandCode.UnregisterClient);
-                query.AddAnsi(Username);
-                try
-                {
-                    ExecuteSync(ref query);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                }
-
-                Connected = false;
-            }
-
-            return true;
-        } // method Disconnect
-
-        /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        public Response? ExecuteSync
+        public static void ParseConnectionString
             (
-                ref ValueQuery query
+                this IIrbisConnection connection,
+                string? connectionString
             )
         {
-            SetBusy(true);
-            try
+            if (string.IsNullOrEmpty(connectionString))
             {
-                if (_cancellation.IsCancellationRequested)
-                {
-                    _cancellation = new CancellationTokenSource();
-                }
-
-                Response? result;
-                try
-                {
-                    if (_debug)
-                    {
-                        query.Debug(Console.Out);
-                    }
-
-                    result = Socket.TransactSync(ref query);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                    return null;
-                }
-
-                if (ReferenceEquals(result, null))
-                {
-                    return null;
-                }
-
-                if (_debug)
-                {
-                    result.Debug(Console.Out);
-                }
-
-                result.Parse();
-                QueryId++;
-
-                return result;
+                return;
             }
-            finally
+
+            var pairs = connectionString.Split
+                (
+                    ';',
+                    StringSplitOptions.RemoveEmptyEntries
+                );
+            foreach (var pair in pairs)
             {
-                SetBusy(false);
+                if (!pair.Contains('='))
+                {
+                    continue;
+                }
+
+                var parts = pair.Split('=', 2);
+                var name = parts[0].Trim().ToLowerInvariant();
+                if (string.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
+
+                var value = parts[1].Trim();
+
+                switch (name)
+                {
+                    case "host":
+                    case "server":
+                    case "address":
+                        connection.Host = value;
+                        break;
+
+                    case "port":
+                        connection.Port = ushort.Parse(value);
+                        break;
+
+                    case "user":
+                    case "username":
+                    case "name":
+                    case "login":
+                    case "account":
+                        connection.Username = value;
+                        break;
+
+                    case "password":
+                    case "pwd":
+                    case "secret":
+                        connection.Password = value;
+                        break;
+
+                    case "db":
+                    case "database":
+                    case "base":
+                    case "catalog":
+                        connection.Database = value;
+                        break;
+
+                    case "arm":
+                    case "workstation":
+                        connection.Workstation = value;
+                        break;
+
+                    /*
+                    case "debug":
+                        _debug = true;
+                        break;
+                    */
+
+                    default:
+                        throw new IrbisException($"Unknown key {name}");
+                }
             }
-        } // method ExecuteSync
+        } // method ParseConnectionString
 
         /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
@@ -161,24 +124,25 @@ namespace ManagedIrbis
         /// <param name="args">Опциональные параметры команды
         /// (в кодировке ANSI).</param>
         /// <returns>Ответ сервера.</returns>
-        public Response? ExecuteSync
+        public static Response? ExecuteSync
             (
+                this IIrbisConnection connection,
                 string command,
                 params object[] args
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
 
-            var query = new ValueQuery(this, command);
+            var query = new ValueQuery(connection, command);
             foreach (var arg in args)
             {
                 query.AddAnsi(arg?.ToString());
             }
 
-            var result = ExecuteSync(ref query);
+            var result = connection.ExecuteSync(ref query);
 
             return result;
         } // method ExecuteSync
@@ -189,24 +153,25 @@ namespace ManagedIrbis
         /// <param name="format">Спецификация формата.</param>
         /// <param name="mfn">MFN записи.</param>
         /// <returns>Результат расформатирования.</returns>
-        public string? FormatRecord
+        public static string? FormatRecord
             (
+                this IIrbisConnection connection,
                 string format,
                 int mfn
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
 
-            var query = new ValueQuery(this, CommandCode.FormatRecord);
-            query.AddAnsi(Database);
+            var query = new ValueQuery(connection, CommandCode.FormatRecord);
+            query.AddAnsi(connection.Database);
             var prepared = IrbisFormat.PrepareFormat(format);
             query.AddAnsi(prepared);
             query.Add(1);
             query.Add(mfn);
-            var response = ExecuteSync(ref query);
+            var response = connection.ExecuteSync(ref query);
             if (ReferenceEquals(response, null))
             {
                 return null;
@@ -223,25 +188,58 @@ namespace ManagedIrbis
         } // method FormatRecord
 
         /// <summary>
+        /// Полнотекстовый поиск ИРБИС64+.
+        /// </summary>
+        public static FullTextResult? FullTextSearch
+            (
+                this IIrbisConnection connection,
+                SearchParameters searchParameters,
+                TextParameters textParameters
+            )
+        {
+            if (!connection.CheckConnection())
+            {
+                return null;
+            }
+
+            var query = new ValueQuery(connection, CommandCode.NewFulltextSearch);
+            searchParameters.Encode(connection, ref query);
+            textParameters.Encode(connection, ref query);
+            query.DebugUtf(Console.Out);
+            var response = connection.ExecuteSync(ref query);
+            if (response is null
+                || !response.CheckReturnCode())
+            {
+                return null;
+            }
+
+            var result = new FullTextResult();
+            result.Decode(response);
+
+            return result;
+        }
+
+        /// <summary>
         /// Получение максимального MFN для указанной базы данных.
         /// </summary>
         /// <param name="database">Опциональное имя базы данных
         /// (<c>null</c> означает текущую базу данных).</param>
         /// <returns>Макисмальный MFN.</returns>
-        public int GetMaxMfn
+        public static int GetMaxMfn
             (
+                this IIrbisConnection connection,
                 string? database = default
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return 0;
             }
 
-            database ??= Database;
-            var query = new ValueQuery(this, CommandCode.GetMaxMfn);
+            database ??= connection.Database;
+            var query = new ValueQuery(connection, CommandCode.GetMaxMfn);
             query.AddAnsi(database);
-            var response = ExecuteSync(ref query);
+            var response = connection.ExecuteSync(ref query);
             if (ReferenceEquals(response, null))
             {
                 return 0;
@@ -259,14 +257,17 @@ namespace ManagedIrbis
         /// Пустая операция.
         /// </summary>
         /// <returns>Признак успешного завершения операции.</returns>
-        public bool Nop()
+        public static bool Nop
+            (
+                this IIrbisConnection connection
+            )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return false;
             }
 
-            var response = ExecuteSync(CommandCode.Nop);
+            var response = connection.ExecuteSync(CommandCode.Nop);
 
             return !ReferenceEquals(response, null)
                    && response.CheckReturnCode();
@@ -275,33 +276,36 @@ namespace ManagedIrbis
         /// <summary>
         /// Чтение библиографической записи с сервера.
         /// </summary>
-        public Record? ReadRecord
+        public static Record? ReadRecord
             (
+                this IIrbisConnection connection,
                 int mfn
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
 
-            var query = new ValueQuery(this, CommandCode.ReadRecord);
-            query.AddAnsi(Database);
+            var query = new ValueQuery(connection, CommandCode.ReadRecord);
+            query.AddAnsi(connection.Database);
             query.Add(mfn);
-            var response = ExecuteSync(ref query);
+            var response = connection.ExecuteSync(ref query);
             if (response is null)
             {
                 return null;
             }
 
+            /*
             if (!response.CheckReturnCode(_goodCodesForReadRecord))
             {
                 return null;
             }
+            */
 
             var result = new Record
             {
-                Database = Database
+                Database = connection.Database
             };
             result.Decode(response);
 
@@ -314,20 +318,21 @@ namespace ManagedIrbis
         /// <param name="startTerm">Параметры терминов.</param>
         /// <param name="numberOfTerms">Максимальное число терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
-        public Term[] ReadTerms
+        public static Term[] ReadTerms
             (
+                this IIrbisConnection connection,
                 string startTerm,
                 int numberOfTerms
             )
         {
             var parameters = new TermParameters
             {
-                Database = Database,
+                Database = connection.Database,
                 StartTerm = startTerm,
                 NumberOfTerms = numberOfTerms
             };
 
-            return ReadTerms(parameters);
+            return connection.ReadTerms(parameters);
         } // method ReadTerms
 
         /// <summary>
@@ -335,12 +340,13 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
-        public Term[] ReadTerms
+        public static Term[] ReadTerms
             (
+                this IIrbisConnection connection,
                 TermParameters parameters
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<Term>();
             }
@@ -348,18 +354,20 @@ namespace ManagedIrbis
             var command = parameters.ReverseOrder
                 ? CommandCode.ReadTermsReverse
                 : CommandCode.ReadTerms;
-            var query = new ValueQuery(this, command);
-            parameters.Encode(this, ref query);
-            var response = ExecuteSync(ref query);
+            var query = new ValueQuery(connection, command);
+            parameters.Encode(connection, ref query);
+            var response = connection.ExecuteSync(ref query);
             if (response is null)
             {
                 return Array.Empty<Term>();
             }
 
+            /*
             if (!response.CheckReturnCode(_goodCodesForReadTerms))
             {
                 return Array.Empty<Term>();
             }
+            */
 
             return Term.Parse(response);
         } // method ReadTerms
@@ -367,12 +375,13 @@ namespace ManagedIrbis
         /// <summary>
         ///
         /// </summary>
-        public string? ReadTextFile
+        public static string? ReadTextFile
             (
+                this IIrbisConnection connection,
                 string? specification
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return null;
             }
@@ -382,9 +391,9 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new ValueQuery(this, CommandCode.ReadDocument);
+            var query = new ValueQuery(connection, CommandCode.ReadDocument);
             query.AddAnsi(specification);
-            var response = ExecuteSync(ref query);
+            var response = connection.ExecuteSync(ref query);
             if (response is null)
             {
                 return null;
@@ -400,19 +409,20 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры поиска.</param>
         /// <returns>Массив элементов, описывающих найденные записи.</returns>
-        public FoundItem[] Search
+        public static FoundItem[] Search
             (
+                this IIrbisConnection connection,
                 SearchParameters parameters
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<FoundItem>();
             }
 
-            var query = new ValueQuery(this, CommandCode.Search);
-            parameters.Encode(this, ref query);
-            var response = ExecuteSync(ref query);
+            var query = new ValueQuery(connection, CommandCode.Search);
+            parameters.Encode(connection, ref query);
+            var response = connection.ExecuteSync(ref query);
             if (response is null
                 || !response.CheckReturnCode())
             {
@@ -427,24 +437,25 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Массив MFN найденных записей.</returns>
-        public int[] Search
+        public static int[] Search
             (
+                this IIrbisConnection connection,
                 string expression
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return Array.Empty<int>();
             }
 
-            var query = new ValueQuery(this, CommandCode.Search);
+            var query = new ValueQuery(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
-                Database = Database,
+                Database = connection.Database,
                 Expression = expression
             };
-            parameters.Encode(this, ref query);
-            var response = ExecuteSync(ref query);
+            parameters.Encode(connection, ref query);
+            var response = connection.ExecuteSync(ref query);
             if (response is null
                 || !response.CheckReturnCode())
             {
@@ -460,25 +471,26 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
-        public int SearchCount
+        public static int SearchCount
             (
+                this IIrbisConnection connection,
                 string expression
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return -1;
             }
 
-            var query = new ValueQuery(this, CommandCode.Search);
+            var query = new ValueQuery(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
-                Database = Database,
+                Database = connection.Database,
                 Expression = expression,
                 FirstRecord = 0
             };
-            parameters.Encode(this, ref query);
-            var response = ExecuteSync(ref query);
+            parameters.Encode(connection, ref query);
+            var response = connection.ExecuteSync(ref query);
             if (response is null
                 || !response.CheckReturnCode())
             {
@@ -496,26 +508,27 @@ namespace ManagedIrbis
         /// <param name="actualize">Актуализировать запись?</param>
         /// <param name="dontParse">Не разбирать ответ сервера?</param>
         /// <returns>Новый максимальный MFN в базе данных.</returns>
-        public int WriteRecord
+        public static int WriteRecord
             (
+                this IIrbisConnection connection,
                 Record record,
                 bool lockFlag = false,
                 bool actualize = true,
                 bool dontParse = false
             )
         {
-            if (!CheckConnection())
+            if (!connection.CheckConnection())
             {
                 return 0;
             }
 
-            var query = new ValueQuery(this, CommandCode.UpdateRecord);
-            query.AddAnsi(record.Database ?? Database);
+            var query = new ValueQuery(connection, CommandCode.UpdateRecord);
+            query.AddAnsi(record.Database ?? connection.Database);
             query.Add(lockFlag ? 1 : 0);
             query.Add(actualize ? 1 : 0);
             query.AddUtf(record.Encode());
 
-            var response = ExecuteSync(ref query);
+            var response = connection.ExecuteSync(ref query);
             if (response is null || !response.CheckReturnCode())
             {
                 return 0;
@@ -524,7 +537,7 @@ namespace ManagedIrbis
             var result = response.ReturnCode;
             if (!dontParse)
             {
-                record.Database ??= Database;
+                record.Database ??= connection.Database;
                 // TODO reparse the record
             }
 

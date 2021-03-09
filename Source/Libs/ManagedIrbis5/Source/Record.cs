@@ -185,11 +185,15 @@ namespace ManagedIrbis
 
             var first = line.Split('#');
             Mfn = int.Parse(first[0]);
-            Status = (RecordStatus) first[1].SafeToInt32();
+            Status = first.Length == 1
+                ? None
+                : (RecordStatus) first[1].SafeToInt32();
 
             line = response.ReadUtf();
             var second = line.Split('#');
-            Version = int.Parse(second[1]);
+            Version = second.Length == 1
+                ? 0
+                : int.Parse(second[1]);
 
             while (!response.EOT)
             {
