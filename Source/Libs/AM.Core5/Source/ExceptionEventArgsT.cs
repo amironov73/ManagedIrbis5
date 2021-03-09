@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* ExceptionEventArgsT.cs -- информация для события об исключении
+/* ExceptionEventArgsT.cs -- информация об исключении для события
  * Ars Magna project, http://arsmagna.ru
  */
 

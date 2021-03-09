@@ -223,5 +223,7 @@ namespace ManagedIrbis
         }
 
         #endregion
-    }
-}
+
+    } // class DatabaseInfo
+
+} // namespace ManagedIrbis

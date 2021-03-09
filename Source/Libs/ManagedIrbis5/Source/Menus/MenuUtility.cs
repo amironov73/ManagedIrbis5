@@ -25,6 +25,7 @@ using System.Xml.Serialization;
 using AM;
 using AM.Collections;
 
+using ManagedIrbis.Trees;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -40,7 +41,7 @@ namespace ManagedIrbis.Menus
     {
         #region Private members
 
-        private static TreeFile.Item _BuildItem
+        private static TreeLine _BuildLine
             (
                 MenuEntry parent,
                 MenuFile menu
@@ -50,10 +51,10 @@ namespace ManagedIrbis.Menus
                 (
                     "{0}{1}{2}",
                     parent.Code,
-                    TreeFile.Item.Delimiter,
+                    TreeLine.Delimiter,
                     parent.Comment
                 );
-            var result = new TreeFile.Item(value);
+            var result = new TreeLine(value);
             MenuEntry[] children = menu.Entries
                 .Where(v => ReferenceEquals(v.OtherEntry, parent))
                 .OrderBy(v => v.Code)
@@ -61,7 +62,7 @@ namespace ManagedIrbis.Menus
 
             foreach (MenuEntry child in children)
             {
-                var subItem = _BuildItem(child, menu);
+                var subItem = _BuildLine(child, menu);
                 result.Children.Add(subItem);
             }
 
@@ -300,7 +301,7 @@ namespace ManagedIrbis.Menus
             var result = new TreeFile();
             foreach (MenuEntry root in roots)
             {
-                var item = _BuildItem(root, menu);
+                var item = _BuildLine(root, menu);
                 result.Roots.Add(item);
             }
 

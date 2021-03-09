@@ -27,4 +27,8 @@
     <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Source\ManagedIrbis\Trees" />
+  </ItemGroup>
+
 </Project>

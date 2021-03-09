@@ -122,9 +122,9 @@ namespace ManagedIrbis
         /// <param name="database">Имя базы данных.</param>
         /// <returns>Признак успешности операции.</returns>
         Task<bool> ActualizeDatabaseAsync
-        (
-            string? database = default
-        );
+            (
+                string? database = default
+            );
 
         /// <summary>
         /// Актуализация записи с указанным MFN.
@@ -133,10 +133,10 @@ namespace ManagedIrbis
         /// <param name="mfn">MFN, подлежащий актуализации.</param>
         /// <returns>Признак успешности операции.</returns>
         Task<bool> ActualizeRecordAsync
-        (
-            string? database,
-            int mfn
-        );
+            (
+                string? database,
+                int mfn
+            );
 
         /// <summary>
         /// Cancel the current operation.
@@ -156,11 +156,11 @@ namespace ManagedIrbis
         /// <param name="readerAccess">Читатель будет иметь доступ?</param>
         /// <returns>Признак успешности операции.</returns>
         Task<bool> CreateDatabaseAsync
-        (
-            string database,
-            string description,
-            bool readerAccess = true
-        );
+            (
+                string database,
+                string description,
+                bool readerAccess = true
+            );
 
         /// <summary>
         /// Создание словаря в указанной базе данных.
@@ -168,9 +168,9 @@ namespace ManagedIrbis
         /// <param name="database">Имя базы данных.</param>
         /// <returns>Признак успешности операции.</returns>
         Task<bool> CreateDictionaryAsync
-        (
-            string? database = default
-        );
+            (
+                string? database = default
+            );
 
         /// <summary>
         /// Удаление указанной базы данных.
@@ -263,22 +263,22 @@ namespace ManagedIrbis
         /// Разбор строки подключения.
         /// </summary>
         void ParseConnectionString
-        (
-            string? connectionString
-        );
+            (
+                string? connectionString
+            );
 
         Task<Term[]> ReadAllTermsAsync
-        (
-            string prefix
-        );
+            (
+                string prefix
+            );
 
         /// <summary>
         /// Чтение библиографической записи с сервера.
         /// </summary>
         Task<Record?> ReadRecordAsync
-        (
-            int mfn
-        );
+            (
+                int mfn
+            );
 
         /// <summary>
         /// Чтение постингов указанного термина.
@@ -287,10 +287,10 @@ namespace ManagedIrbis
         /// <param name="numberOfPostings">Максимальное количество постингов</param>
         /// <returns>Массив прочитанных постингов.</returns>
         Task<TermPosting[]> ReadPostingsAsync
-        (
-            string term,
-            int numberOfPostings
-        );
+            (
+                string term,
+                int numberOfPostings
+            );
 
         /// <summary>
         /// Чтение постингов указанных терминов.
@@ -298,9 +298,9 @@ namespace ManagedIrbis
         /// <param name="parameters">Параметры постингов.</param>
         /// <returns>Массив прочитанных постингов.</returns>
         Task<TermPosting[]> ReadPostingsAsync
-        (
-            PostingParameters parameters
-        );
+            (
+                PostingParameters parameters
+            );
 
         /// <summary>
         /// Чтение терминов словаря.
@@ -309,10 +309,10 @@ namespace ManagedIrbis
         /// <param name="numberOfTerms">Максимальное число терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
         Task<Term[]> ReadTermsAsync
-        (
-            string startTerm,
-            int numberOfTerms
-        );
+            (
+                string startTerm,
+                int numberOfTerms
+            );
 
         /// <summary>
         /// Чтение терминов словаря.
@@ -320,27 +320,27 @@ namespace ManagedIrbis
         /// <param name="parameters">Параметры терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
         Task<Term[]> ReadTermsAsync
-        (
-            TermParameters parameters
-        );
+            (
+                TermParameters parameters
+            );
 
         /// <summary>
         ///
         /// </summary>
         Task<string?> ReadTextFileAsync
-        (
-            string? specification
-        );
+            (
+                string? specification
+            );
 
         Task<bool> ReloadDictionaryAsync
-        (
-            string? database = default
-        );
+            (
+                string? database = default
+            );
 
         Task<bool> ReloadMasterFileAsync
-        (
-            string? database = default
-        );
+            (
+                string? database = default
+            );
 
         /// <summary>
         /// Перезапуск сервера.
@@ -360,9 +360,9 @@ namespace ManagedIrbis
         /// <param name="parameters">Параметры поиска.</param>
         /// <returns>Массив элементов, описывающих найденные записи.</returns>
         Task<FoundItem[]> SearchAsync
-        (
-            SearchParameters parameters
-        );
+            (
+                SearchParameters parameters
+            );
 
         /// <summary>
         /// Расширенный поиск.
@@ -370,9 +370,9 @@ namespace ManagedIrbis
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Массив MFN найденных записей.</returns>
         Task<int[]> SearchAsync
-        (
-            string expression
-        );
+            (
+                string expression
+            );
 
         /// <summary>
         /// Определение количества записей, удовлетворяющих
@@ -452,4 +452,5 @@ namespace ManagedIrbis
             );
 
     } // interface IIrbisConnection
-}
+
+} // namespace ManagedIrbis

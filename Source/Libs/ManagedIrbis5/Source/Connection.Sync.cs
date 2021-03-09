@@ -532,5 +532,7 @@ namespace ManagedIrbis
         } // method WriteRecord
 
         #endregion
-    }
-}
+
+    } // class Connection
+
+} // namespace ManagedIrbis

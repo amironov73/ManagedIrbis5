@@ -5,9 +5,8 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* Constants.cs -- общие для ИРБИС64 константы
  * Ars Magna project, http://arsmagna.ru
@@ -57,5 +56,7 @@ namespace ManagedIrbis
         public const string ReaderDatabaseList = "dbnam3.mnu";
 
         #endregion
-    }
-}
+
+    } // class Constants
+
+} // namespace ManagedIrbis

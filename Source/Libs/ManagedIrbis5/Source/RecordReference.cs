@@ -10,7 +10,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* RecordReference.cs -- ссылка на запись.
+/* RecordReference.cs -- ссылка на запись
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -39,7 +39,7 @@ namespace ManagedIrbis
     /// Ссылка на запись (например, для сохранения в "кармане").
     /// </summary>
     [XmlRoot("record")]
-    [DebuggerDisplay("MFN={Mfn}, Index={Index}")]
+    [DebuggerDisplay("MFN={" + nameof(Mfn) + "}, Index={" + nameof(Index) +"}")]
     public sealed class RecordReference
         : IHandmadeSerializable,
         IVerifiable
@@ -95,8 +95,6 @@ namespace ManagedIrbis
                 Record record
             )
         {
-            Sure.NotNull(record, nameof(record));
-
             Database = record.Database;
             Mfn = record.Mfn;
             Index = record.FM(903).ThrowIfNull("record.FM(903)");
@@ -116,9 +114,6 @@ namespace ManagedIrbis
                 RecordReference second
             )
         {
-            Sure.NotNull(first, nameof(first));
-            Sure.NotNull(second, nameof(second));
-
             if (first.Mfn != 0)
             {
                 if (first.Mfn != second.Mfn)
@@ -204,11 +199,6 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            // ReSharper disable PossibleMultipleEnumeration
-
-            Sure.NotNull(connection, nameof(connection));
-            Sure.NotNull(references, nameof(references));
-
             var result = new List<Record>();
             foreach (RecordReference reference in references)
             {
@@ -248,9 +238,6 @@ namespace ManagedIrbis
                 string fileName
             )
         {
-            Sure.NotNull(references, nameof(references));
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
-
             references.SaveToFile(fileName);
         } // method SaveToZipFile
 
@@ -264,8 +251,6 @@ namespace ManagedIrbis
                 BinaryReader reader
             )
         {
-            Sure.NotNull(reader, nameof(reader));
-
             Database = reader.ReadNullableString();
             Mfn = reader.ReadPackedInt32();
             Index = reader.ReadNullableString();
@@ -277,8 +262,6 @@ namespace ManagedIrbis
                 BinaryWriter writer
             )
         {
-            Sure.NotNull(writer, nameof(writer));
-
             writer
                 .WriteNullable(Database)
                 .WritePackedInt32(Mfn)
@@ -295,8 +278,7 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            var verifier
-                = new Verifier<RecordReference>(this, throwOnError);
+            var verifier = new Verifier<RecordReference>(this, throwOnError);
 
             verifier
                 .NotNullNorEmpty(Database, nameof(Database))
@@ -315,27 +297,16 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            if (ReferenceEquals(Record, null))
-            {
-                return string.Format
-                    (
-                        "{0}#{1}#{2}",
-                        Database.ToVisibleString(),
-                        Mfn,
-                        Index.ToVisibleString()
-                    );
-            }
+        public override string ToString() => ReferenceEquals(Record, null)
+            ? Database.ToVisibleString()
+              + "#"
+              + Mfn.ToInvariantString()
+              + "#"
+              + Index.ToVisibleString()
 
-            return string.Format
-                (
-                    "{0}{1}{2}",
-                    Database.ToVisibleString(),
-                    IrbisText.IrbisDelimiter,
-                    Record.ToProtocolText()
-                );
-        } // method ToString
+            : Database.ToVisibleString()
+              + IrbisText.IrbisDelimiter
+              + Record.ToProtocolText();
 
         #endregion
 

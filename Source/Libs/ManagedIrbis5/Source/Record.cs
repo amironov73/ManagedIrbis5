@@ -8,6 +8,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Record.cs -- библиографическая запись
@@ -36,34 +38,51 @@ namespace ManagedIrbis
     /// <summary>
     /// Библиографическая запись. Состоит из произвольного количества полей.
     /// </summary>
-    [DebuggerDisplay("[{Database}] MFN={Mfn} ({Version})")]
+    [DebuggerDisplay("[{" + nameof(Database) +
+        "}] MFN={" + nameof(Mfn) + "} ({" + nameof(Version) + "})")]
     public sealed class Record
     {
+        #region Constants
+
+        /// <summary>
+        /// Запись удалена любым способом (логически или физически).
+        /// </summary>
+        private const RecordStatus IsDeleted = LogicallyDeleted | PhysicallyDeleted;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
-        /// Имя базы данных, в которой хранится запись.
+        /// База данных, в которой хранится запись.
+        /// Для вновь созданных записей -- <c>null</c>.
         /// </summary>
         public string? Database { get; set; }
 
         /// <summary>
-        /// MFN записи.
+        /// MFN (порядковый номер в базе данных) записи.
+        /// Для вновь созданных записей равен <c>0</c>.
+        /// Для хранящихся в базе записей нумерация начинается
+        /// с <c>1</c>.
         /// </summary>
         public int Mfn { get; set; }
 
         /// <summary>
-        /// Версия записи.
+        /// Версия записи. Для вновь созданных записей равна <c>0</c>.
+        /// Для хранящихся в базе записей нумерация версий начинается
+        /// с <c>1</c>.
         /// </summary>
         public int Version { get; set; }
 
         /// <summary>
-        /// Статус записи.
+        /// Статус записи. Для вновь созданных записей <c>None</c>.
         /// </summary>
         public RecordStatus Status { get; set; }
 
-        public bool Deleted => (Status &
-            (LogicallyDeleted | PhysicallyDeleted)) != 0;
-
+        /// <summary>
+        /// Признак -- запись помечена как логически удаленная.
+        /// </summary>
+        public bool Deleted => (Status & IsDeleted) != 0;
 
         /// <summary>
         /// Список полей.
@@ -88,15 +107,17 @@ namespace ManagedIrbis
         /// Добавление поля в запись.
         /// </summary>
         /// <returns>
-        /// Свежедобавленное поле.
+        /// Свежедобавленное поле (для цепочечных вызовов).
         /// </returns>
         public Field Add
             (
                 int tag,
-                string? value = null
+                string? value = default
             )
         {
-            var result = new Field {Tag = tag};
+            Sure.Positive(tag, nameof(tag));
+
+            var result = new Field { Tag = tag };
             result.DecodeBody(value);
             Fields.Add(result);
 
@@ -112,6 +133,8 @@ namespace ManagedIrbis
                 string? value
             )
         {
+            Sure.Positive(tag, nameof(tag));
+
             if (!string.IsNullOrEmpty(value))
             {
                 var field = new Field {Tag = tag};
@@ -126,7 +149,7 @@ namespace ManagedIrbis
         /// Очистка записи (удаление всех полей).
         /// </summary>
         /// <returns>
-        /// Очищенную запись.
+        /// Ту же самую, но очищенную запись.
         /// </returns>
         public Record Clear()
         {
@@ -142,7 +165,7 @@ namespace ManagedIrbis
         {
             var result = (Record) MemberwiseClone();
 
-            for (int i = 0; i < result.Fields.Count; i++)
+            for (var i = 0; i < result.Fields.Count; i++)
             {
                 result.Fields[i] = result.Fields[i].Clone();
             }
@@ -190,7 +213,8 @@ namespace ManagedIrbis
                 string delimiter = IrbisText.IrbisDelimiter
             )
         {
-            StringBuilder result = new StringBuilder(512);
+            var result = new StringBuilder(512);
+
             result.Append(Mfn.ToInvariantString())
                 .Append('#')
                 .Append(((int) Status).ToInvariantString())
@@ -201,8 +225,7 @@ namespace ManagedIrbis
 
             foreach (var field in Fields)
             {
-                result.Append(field)
-                    .Append(delimiter);
+                result.Append(field).Append(delimiter);
             }
 
             return result.ToString();
@@ -327,6 +350,8 @@ namespace ManagedIrbis
                 int tag
             )
         {
+            Sure.Positive(tag, nameof(tag));
+
             foreach (var field in Fields)
             {
                 if (field.Tag == tag)
@@ -334,7 +359,7 @@ namespace ManagedIrbis
                     yield return field;
                 }
             }
-        }
+        } // method EnumerateField
 
         /// <summary>
         /// Получение поля с указанной меткой
@@ -342,8 +367,13 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="tag">Искомая метка поля.</param>
         /// <returns>Найденное либо созданное поле.</returns>
-        public Field GetOrAddField(int tag)
+        public Field GetOrAddField
+            (
+                int tag
+            )
         {
+            Sure.Positive(tag, nameof(tag));
+
             foreach (var field in Fields)
             {
                 if (field.Tag == tag)
@@ -368,6 +398,8 @@ namespace ManagedIrbis
                 int tag
             )
         {
+            Sure.Positive(tag, nameof(tag));
+
             Field? field;
             while ((field = GetField(tag)) is not null)
             {
@@ -375,19 +407,17 @@ namespace ManagedIrbis
             }
 
             return this;
-        }
+        } // method RemoveField
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Encode("\n");
-        } // method ToString
+        public override string ToString() => Encode("\n");
 
         #endregion
+
     } // class Record
 
 } // namespace ManagedIrbis

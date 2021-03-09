@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* RecordStatus.cs -- статус записи (флаги)
  * Ars Magna project, http://arsmagna.ru
@@ -24,6 +25,11 @@ namespace ManagedIrbis
     [Flags]
     public enum RecordStatus
     {
+        /// <summary>
+        /// Нет статуса -- запись только что создана.
+        /// </summary>
+        None = 0,
+
         /// <summary>
         /// Запись логически удалена.
         /// </summary>
@@ -68,5 +74,7 @@ namespace ManagedIrbis
         /// Полный текст не актуализирован.
         /// </summary>
         FullTextNotActualized = 256
-    }
-}
+
+    } // enum RecordStatus
+
+} // namespace ManagedIrbis

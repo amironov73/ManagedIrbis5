@@ -5,31 +5,11 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
 /* IrbisPath.cs -- путь к файлам на сервере ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-
-using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Infrastructure.Sockets;
-
-#endregion
-
-#nullable enable
 
 namespace ManagedIrbis
 {
@@ -39,38 +19,42 @@ namespace ManagedIrbis
     public enum IrbisPath
     {
         /// <summary>
-        /// Общесистемный путь
+        /// Общесистемный путь.
         /// </summary>
         System = 0,
 
         /// <summary>
-        /// путь размещения сведений о базах данных сервера ИРБИС64
+        /// Путь размещения сведений о базах данных сервера ИРБИС64.
         /// </summary>
         Data = 1,
 
         /// <summary>
-        /// путь на мастер-файл базы данных
+        /// Путь на мастер-файл базы данных.
         /// </summary>
         MasterFile = 2,
 
         /// <summary>
-        /// путь на словарь базы данных
+        /// Путь на словарь базы данных (как правило, совпадает с
+        /// путем на мастер-файл).
         /// </summary>
         InvertedFile = 3,
 
         /// <summary>
-        /// путь на параметрию базы данных
+        /// Путь на параметрию базы данных.
         /// </summary>
         ParameterFile = 10,
 
         /// <summary>
-        /// Полный текст
+        /// Путь к полным текстам (как правило, полные тексты
+        /// вынесены в отдельную папку или даже на отдельный диск).
         /// </summary>
         FullText = 11,
 
         /// <summary>
-        /// Внутренний ресурс
+        /// Внутренний ресурс.
         /// </summary>
         InternalResource = 12
-    }
-}
+
+    } // enum IrbisPath
+
+} // namespace ManagedIrbis

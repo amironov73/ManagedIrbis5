@@ -5,9 +5,8 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 
 /* RawRecord.cs -- сырая (не разобранная) запись
  * Ars Magna project, http://arsmagna.ru
@@ -26,6 +25,8 @@ using AM;
 
 using ManagedIrbis.Infrastructure;
 
+using static ManagedIrbis.RecordStatus;
+
 #endregion
 
 #nullable enable
@@ -33,72 +34,67 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Raw (not decoded) record.
+    /// Сырая (не разобранная) запись.
     /// </summary>
-    [DebuggerDisplay("[{Database}] MFN={Mfn} ({Version})")]
+    /// <remarks>
+    /// Основной сценарий, ради которых создан класс -- массированная
+    /// выгрузка/загрузка записей из/в ИРБИС.
+    /// </remarks>
+    [DebuggerDisplay("[{" + nameof(Database) + "}] MFN={"
+        + nameof(Mfn) + "} ({" + nameof(Version) + "})")]
     public sealed class RawRecord
     {
         #region Properties
 
         /// <summary>
-        /// Database name.
+        /// База данных, в которой хранится запись.
+        /// Для вновь созданных записей -- <c>null</c>.
         /// </summary>
         public string? Database { get; set; }
 
         /// <summary>
-        /// MFN.
+        /// MFN (порядковый номер в базе данных) записи.
+        /// Для вновь созданных записей равен <c>0</c>.
+        /// Для хранящихся в базе записей нумерация начинается
+        /// с <c>1</c>.
         /// </summary>
         public int Mfn { get; set; }
 
         /// <summary>
-        /// Status.
+        /// Статус записи. Для вновь созданных записей <c>None</c>.
         /// </summary>
         public RecordStatus Status { get; set; }
 
         /// <summary>
-        /// Признак удалённой записи.
+        /// Признак -- запись помечена как логически удаленная.
         /// </summary>
         public bool Deleted
         {
-            get => (Status & RecordStatus.LogicallyDeleted) != 0;
+            get => (Status & LogicallyDeleted) != 0;
             set
             {
                 if (value)
                 {
-                    Status |= RecordStatus.LogicallyDeleted;
+                    Status |= LogicallyDeleted;
                 }
                 else
                 {
-                    Status &= ~RecordStatus.LogicallyDeleted;
+                    Status &= ~LogicallyDeleted;
                 }
             }
-        }
+        } // property Deleted
 
         /// <summary>
-        /// Version.
+        /// Версия записи. Для вновь созданных записей равна <c>0</c>.
+        /// Для хранящихся в базе записей нумерация версий начинается
+        /// с <c>1</c>.
         /// </summary>
         public int Version { get; set; }
 
         /// <summary>
-        /// Lines of text.
+        /// Текстовые строки с полями.
         /// </summary>
-        public List<string>? Fields { get; set; }
-
-        #endregion
-
-        #region Private members
-
-        private static void _AppendIrbisLine
-            (
-                StringBuilder builder,
-                string? delimiter,
-                string format,
-                params object[] args
-            )
-        {
-            builder.AppendFormat(format, args);
-            builder.Append(delimiter);
-        }
+        public List<string> Fields { get; } = new();
 
         #endregion
 
@@ -107,44 +103,24 @@ namespace ManagedIrbis
         /// <summary>
         /// Encode record to text.
         /// </summary>
-        public string EncodeRecord()
-        {
-            return EncodeRecord(IrbisText.IrbisDelimiter);
-        }
-
-        /// <summary>
-        /// Encode record to text.
-        /// </summary>
         public string EncodeRecord
             (
-                string? delimiter
+                string? delimiter = IrbisText.IrbisDelimiter
             )
         {
-            var result = new StringBuilder();
+            var result = new StringBuilder(512);
 
-            _AppendIrbisLine
-                (
-                    result,
-                    delimiter,
-                    "{0}#{1}",
-                    Mfn,
-                    (int)Status
-                );
-            _AppendIrbisLine
-                (
-                    result,
-                    delimiter,
-                    "0#{0}",
-                    Version
-                );
+            result.Append(Mfn.ToInvariantString());
+            result.Append('#');
+            result.Append(((int) Status).ToInvariantString());
+            result.Append(delimiter);
+            result.Append("0#");
+            result.Append(Version.ToInvariantString());
+            result.Append(delimiter);
 
-            if (!ReferenceEquals(Fields, null))
+            foreach (var line in Fields)
             {
-                foreach (var line in Fields)
-                {
-                    result.Append(line);
-                    result.Append(delimiter);
-                }
+                result.Append(line).Append(delimiter);
             }
 
             return result.ToString();
@@ -160,19 +136,17 @@ namespace ManagedIrbis
                 RawRecord record
             )
         {
-            Sure.NotNullNorEmpty(line1, nameof(line1));
-            Sure.NotNullNorEmpty(line2, nameof(line2));
-
             var regex = new Regex(@"^(-?\d+)\#(\d*)?");
             var match = regex.Match(line1);
             record.Mfn = Math.Abs(int.Parse(match.Groups[1].Value));
             if (match.Groups[2].Length > 0)
             {
-                record.Status = (RecordStatus)int.Parse
+                record.Status = (RecordStatus) int.Parse
                     (
                         match.Groups[2].Value
                     );
             }
+
             match = regex.Match(line2);
             if (match.Groups[2].Length > 0)
             {
@@ -190,8 +164,6 @@ namespace ManagedIrbis
                 string text
             )
         {
-            Sure.NotNullNorEmpty(text, nameof(text));
-
             var lines = IrbisText.SplitIrbisToLines(text);
 
             var startOffset = 0;
@@ -203,7 +175,7 @@ namespace ManagedIrbis
             var result = Parse(lines, startOffset);
 
             return result;
-        }
+        } // method Parse
 
         /// <summary>
         /// Parse text lines.
@@ -229,7 +201,6 @@ namespace ManagedIrbis
             var line2 = lines[startOffset + 1];
 
             var result = new RawRecord();
-            result.Fields = new List<string>();
             result.Fields.AddRange(lines.Skip(startOffset + 2));
 
             ParseMfnStatusVersion
@@ -240,18 +211,17 @@ namespace ManagedIrbis
                 );
 
             return result;
-        }
+        } // method Parse
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return EncodeRecord(Environment.NewLine);
-        }
+        public override string ToString() => EncodeRecord(Environment.NewLine);
 
         #endregion
-    }
-}
+
+    } // class RawRecord
+
+} // namespace ManagedIrbis
