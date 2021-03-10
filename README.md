@@ -68,7 +68,7 @@ internal class Program
             WriteLine($"BRIEF: {fileText}");
             WriteLine();
 
-            await connection.DisconnectAsync();
+            await connection.DisposeAsync();
             WriteLine("Successfully disconnected");
         }
         catch (Exception exception)

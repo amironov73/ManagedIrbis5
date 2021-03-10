@@ -17,6 +17,7 @@
 
 #region Using directives
 
+using AM;
 using ManagedIrbis.Infrastructure.Sockets;
 
 using Microsoft.Extensions.Logging;
@@ -48,7 +49,7 @@ namespace ManagedIrbis
         public Connection Build()
         {
             var socket = _socket ?? new PlainTcp4Socket();
-            var result = new Connection(socket);
+            var result = new Connection(socket, Magna.Host.Services);
 
             if (_logger is not null)
             {

@@ -56,7 +56,7 @@
         {
             try
             {
-                await using var connection = ConnectionFactory.Default
+                await using var connection = ConnectionFactory.Shared
                     .CreateConnection();
 
                 connection.Host = args.Length == 0
@@ -106,7 +106,7 @@
                 }
 
                 // Отключаемся от сервера
-                await connection.DisconnectAsync();
+                await connection.DisposeAsync();
                 WriteLine("Successfully disconnected");
             }
             catch (Exception exception)

@@ -72,7 +72,7 @@ class Program
             }
 
             // Отключаемся от сервера
-            await connection.DisconnectAsync();
+            await connection.DisposeAsync();
             WriteLine("Successfully disconnected");
         }
         catch (Exception exception)

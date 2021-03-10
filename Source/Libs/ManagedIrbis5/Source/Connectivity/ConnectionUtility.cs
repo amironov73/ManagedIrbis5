@@ -126,7 +126,7 @@ namespace ManagedIrbis
         /// <exception cref="IrbisException">
         /// Если строка подключения в app.settings не найдена.
         /// </exception>
-        public static Connection GetConnectionFromConfig()
+        public static IIrbisConnection GetConnectionFromConfig()
         {
             var connectionString = GetStandardConnectionString();
             if (string.IsNullOrEmpty(connectionString))

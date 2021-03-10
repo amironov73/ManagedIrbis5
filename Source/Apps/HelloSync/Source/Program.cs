@@ -90,7 +90,7 @@ class Program
             WriteLine($"BRIEF: {fileText}");
             WriteLine();
 
-            connection.Disconnect();
+            connection.Dispose();
             WriteLine("Successfully disconnected");
         }
         catch (Exception exception)

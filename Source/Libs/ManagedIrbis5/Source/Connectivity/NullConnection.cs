@@ -34,6 +34,12 @@ namespace ManagedIrbis
     {
         #region ConnectionBase members
 
+        /// <inheritdoc cref="ISyncConnection.Connect"/>
+        public override bool Connect() => true;
+
+        /// <inheritdoc cref="IAsyncConnection.ConnectAsync"/>
+        public override Task<bool> ConnectAsync() => Task.FromResult(true);
+
         /// <inheritdoc cref="IAsyncConnection.ExecuteAsync"/>
         public override Task<Response?> ExecuteAsync(Query query) =>
             Task.FromResult<Response?>(null);
@@ -41,11 +47,29 @@ namespace ManagedIrbis
         /// <inheritdoc cref="ISyncConnection.ExecuteSync"/>
         public override Response ExecuteSync(ref ValueQuery query) => new();
 
+        #endregion
+
+        #region IDisposable members
+
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public override void Dispose()
         {
             // Nothing to do here
         }
+
+        #endregion
+
+        #region IAsyncDisposable members
+
+        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
+        public override ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+        #endregion
+
+        #region IServiceProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public override object? GetService(Type serviceType) => null;
 
         #endregion
 

@@ -2,15 +2,17 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 
-/* Program.cs -- точка входа в программу
+/* ConnectionFactory.cs -- фабрика подключений к ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using AM;
 
 using ManagedIrbis.Infrastructure.Sockets;
 
@@ -30,23 +32,37 @@ namespace ManagedIrbis
         /// <summary>
         /// Общий экземпляр фабрики подключений.
         /// </summary>
-        public static ConnectionFactory Shared { get; } = new ();
-
-        #endregion
-
-        #region Private members
+        public static ConnectionFactory Shared { get; private set; } = new ();
 
         #endregion
 
         #region Public methods
 
-        public virtual Connection CreateConnection()
+        public virtual IIrbisConnection CreateConnection()
         {
             var socket = new PlainTcp4Socket();
-            var result = new Connection(socket);
+            var result = new Connection(socket, Magna.Host.Services);
 
             return result;
         } // method CreateConnection
+
+
+        /// <summary>
+        /// Замена общего экземпляра фабрики на указанный.
+        /// </summary>
+        /// <param name="newFactory">Экземпляр, который отныне станет общим.
+        /// </param>
+        /// <returns>Предыдущий общий экземпляр.</returns>
+        public static ConnectionFactory Replace
+            (
+                ConnectionFactory newFactory
+            )
+        {
+            var result = Shared;
+            Shared = newFactory;
+
+            return result;
+        } // method Replace
 
         #endregion
 

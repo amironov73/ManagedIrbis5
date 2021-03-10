@@ -10,7 +10,7 @@
 
   using ManagedIrbis
 
-  var connection = ConnectionFactory.Default.CreateConnection();
+  var connection = ConnectionFactory.Shared.CreateConnection();
 
 ============ ======== ============================= ======================
 Поле          Тип      Назначение                    Значение по умолчанию

@@ -32,6 +32,12 @@ namespace ManagedIrbis
     public interface ISyncConnection
         : IBasicConnection
     {
+
+        /// <summary>
+        /// Подключение к серверу ИРБИС64.
+        /// </summary>
+        bool Connect();
+
         /// <summary>
         /// Отправка клиентского запроса на сервер
         /// и получение ответа от него.
@@ -39,9 +45,9 @@ namespace ManagedIrbis
         /// <param name="query">Клиентский запрос.</param>
         /// <returns>Ответ от сервера.</returns>
         Response? ExecuteSync
-        (
-            ref ValueQuery query
-        );
+            (
+                ref ValueQuery query
+            );
 
     } // interface ISyncConnection
 

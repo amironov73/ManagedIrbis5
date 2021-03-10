@@ -29,6 +29,7 @@ using AM.Runtime;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -90,7 +91,8 @@ namespace ManagedIrbis
         /// </summary>
         public Connection
             (
-                ClientSocket socket
+                ClientSocket socket,
+                IServiceProvider provider
             )
         {
             Socket = socket;
@@ -98,6 +100,7 @@ namespace ManagedIrbis
             _cancellation = new CancellationTokenSource();
             Cancellation = _cancellation.Token;
             _logger = Magna.Factory.CreateLogger<Connection>();
+            _provider = provider;
         }
 
         #endregion
@@ -105,6 +108,8 @@ namespace ManagedIrbis
         #region Private members
 
         internal ILogger _logger;
+
+        internal IServiceProvider _provider;
 
         private static readonly int[] _goodCodesForReadRecord = { -201, -600, -602, -603 };
         private static readonly int[] _goodCodesForReadTerms = { -202, -203, -204 };
@@ -140,10 +145,8 @@ namespace ManagedIrbis
             _cancellation.Cancel();
         } // method CancelOperation
 
-        /// <summary>
-        /// Подключение к серверу ИРБИС64.
-        /// </summary>
-        public bool Connect()
+        /// <inheritdoc cref="ISyncConnection.Connect"/>
+        public override bool Connect()
         {
             if (Connected)
             {
@@ -181,10 +184,8 @@ namespace ManagedIrbis
             return true;
         } // method Connect
 
-        /// <summary>
-        /// Подключение к серверу ИРБИС64.
-        /// </summary>
-        public async Task<bool> ConnectAsync()
+        /// <inheritdoc cref="IAsyncConnection.ConnectAsync"/>
+        public override async Task<bool> ConnectAsync()
         {
             if (Connected)
             {
@@ -539,10 +540,21 @@ namespace ManagedIrbis
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public async ValueTask DisposeAsync()
+        public override async ValueTask DisposeAsync()
         {
-            await DisconnectAsync();
+            if (Connected)
+            {
+                await DisconnectAsync();
+            }
         } // method DisposeAsync
+
+        #endregion
+
+        #region IServiceProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public override object? GetService(Type serviceType) =>
+            _provider.GetService(serviceType);
 
         #endregion
 

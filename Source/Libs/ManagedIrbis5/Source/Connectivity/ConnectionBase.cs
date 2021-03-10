@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Threading.Tasks;
 
 using ManagedIrbis.Infrastructure;
@@ -96,6 +97,12 @@ namespace ManagedIrbis
             return Connected;
         } // method CheckConnection
 
+        /// <inheritdoc cref="ISyncConnection.Connect"/>
+        public abstract bool Connect();
+
+        /// <inheritdoc cref="IAsyncConnection.ConnectAsync"/>
+        public abstract Task<bool> ConnectAsync();
+
         /// <summary>
         ///
         /// </summary>
@@ -110,10 +117,26 @@ namespace ManagedIrbis
         /// <returns></returns>
         public abstract Response? ExecuteSync(ref ValueQuery query);
 
-        /// <summary>
-        ///
-        /// </summary>
+        #endregion
+
+        #region IDisposable members
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public abstract void Dispose();
+
+        #endregion
+
+        #region IAsyncDisposable members
+
+        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
+        public abstract ValueTask DisposeAsync();
+
+        #endregion
+
+        #region IServiceProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public abstract object? GetService(Type serviceType);
 
         #endregion
 

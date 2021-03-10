@@ -31,7 +31,9 @@ namespace ManagedIrbis
     /// для мокирования
     /// </summary>
     public interface IBasicConnection
-        : IDisposable
+        : IDisposable,
+        IAsyncDisposable,
+        IServiceProvider
     {
         /// <summary>
         /// Адрес хоста ИРБИС64. Может задаваться как в числовой форме

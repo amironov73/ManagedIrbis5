@@ -32,6 +32,10 @@ namespace ManagedIrbis
     public interface IAsyncConnection
         : IBasicConnection
     {
+        /// <summary>
+        /// Подключение к серверу ИРБИС64.
+        /// </summary>
+        Task<bool> ConnectAsync();
 
         /// <summary>
         /// Отправка клиентского запроса на сервер
