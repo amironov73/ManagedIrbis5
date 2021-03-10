@@ -33,29 +33,19 @@ namespace ManagedIrbis
     {
         #region Properties
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IBasicConnection.Host"/>
         public virtual string Host { get; set; } = "127.0.0.1";
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IBasicConnection.Port"/>
         public virtual ushort Port { get; set; } = 6666;
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IBasicConnection.Username"/>
         public virtual string Username { get; set; } = string.Empty;
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IBasicConnection.Password"/>
         public virtual string Password { get; set; } = string.Empty;
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IBasicConnection.Database"/>
         public virtual string Database { get; set; } = "IBIS";
 
         /// <summary>

@@ -19,7 +19,7 @@ class Program
     {
         try
         {
-            await using var connection = ConnectionFactory.Default
+            await using var connection = ConnectionFactory.Shared
                 .CreateConnection();
 
             connection.Host = args.Length == 0

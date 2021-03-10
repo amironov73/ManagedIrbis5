@@ -123,7 +123,7 @@ namespace ManagedIrbis
         /// <param name="query">Клиентский запрос.</param>
         public void Encode
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 IQuery query
             )
         {
@@ -147,7 +147,7 @@ namespace ManagedIrbis
         /// <param name="query">Клиентский запрос.</param>
         public void Encode
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 ref ValueQuery query
             )
         {

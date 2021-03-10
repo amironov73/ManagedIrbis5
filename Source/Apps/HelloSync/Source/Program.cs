@@ -34,7 +34,7 @@ class Program
     {
         try
         {
-            using var connection = ConnectionFactory.Default
+            using var connection = ConnectionFactory.Shared
                 .CreateConnection();
 
             connection.Host = args.Length == 0

@@ -2,12 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* Workstation.cs -- коды АРМов ИРБИС64.
  * Ars Magna project, http://arsmagna.ru
@@ -16,7 +14,9 @@
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Коды АРМов ИРБИС64.
+    /// Коды АРМ ИРБИС64.
+    /// Незнакомые серверу ИРБИС64 коды АРМ
+    /// приводят к ошибке при регистрации на сервере.
     /// </summary>
     public enum Workstation
         : byte
@@ -65,5 +65,7 @@ namespace ManagedIrbis
         /// Не задан.
         /// </summary>
         None = 0
-    }
-}
+
+    } // enum Workstation
+
+} // namespace ManagedIrbis

@@ -95,19 +95,7 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Port number of the IRBIS server.
         /// </summary>
-        public int ServerPort
-        {
-            get
-            {
-                // coverity[dereference]
-                var result = Convert.ToInt32
-                    (
-                        Main["ServerPort"] ?? "6666"
-                    );
-
-                return result;
-            }
-        }
+        public ushort ServerPort => Convert.ToUInt16(Main["ServerPort"] ?? "6666");
 
         /// <summary>
         /// User login.

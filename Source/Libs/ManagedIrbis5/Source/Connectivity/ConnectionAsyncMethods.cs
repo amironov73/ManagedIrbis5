@@ -492,7 +492,7 @@ namespace ManagedIrbis
             query.Add(mfn);
             var response = await connection.ExecuteAsync(query);
             if (response is null
-                /* || !response.CheckReturnCode(_goodCodesForReadRecord) */ )
+                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadRecord) )
             {
                 return null;
             }
@@ -549,7 +549,7 @@ namespace ManagedIrbis
             parameters.Encode(connection, query);
             var response = await connection.ExecuteAsync(query);
             if (response is null
-                /* || !response.CheckReturnCode(_goodCodesForReadTerms) */)
+                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadTerms))
             {
                 return Array.Empty<TermPosting>();
             }
@@ -603,7 +603,7 @@ namespace ManagedIrbis
             parameters.Encode(connection, query);
             var response = await connection.ExecuteAsync(query);
             if (response is null
-                /* || !response.CheckReturnCode(_goodCodesForReadTerms) */)
+                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadTerms))
             {
                 return Array.Empty<Term>();
             }

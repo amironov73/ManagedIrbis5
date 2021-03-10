@@ -42,7 +42,7 @@ namespace ManagedIrbis.Gbl
         /// Actualize records after processing.
         /// </summary>
         [JsonPropertyName("actualize")]
-        public bool Actualize { get; set; }
+        public bool Actualize { get; set; } = true;
 
         /// <summary>
         /// Process 'autoin.gbl'.
@@ -66,7 +66,7 @@ namespace ManagedIrbis.Gbl
         /// First record MFN.
         /// </summary>
         [JsonPropertyName("firstRecord")]
-        public int FirstRecord { get; set; }
+        public int FirstRecord { get; set; } = 1;
 
         /// <summary>
         /// Provide formal control.
@@ -112,54 +112,37 @@ namespace ManagedIrbis.Gbl
         /// Statements.
         /// </summary>
         [JsonPropertyName("statements")]
-        public NonNullCollection<GblStatement> Statements
-        {
-            get;
-            private set;
-        }
+        public NonNullCollection<GblStatement> Statements { get; private set; } = new();
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public GblSettings()
         {
-            Actualize = true;
-            Autoin = false;
-            FirstRecord = 1;
-            FormalControl = false;
-            MaxMfn = 0;
-            MinMfn = 0;
-            Statements = new NonNullCollection<GblStatement>();
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
-        public GblSettings
-            (
-                IIrbisConnection connection
-            )
-            : this()
-        {
+        /// <param name="connection">Настроенное подключение.</param>
+        public GblSettings (IBasicConnection connection) =>
             Database = connection.Database;
-        }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
+        /// <param name="connection">Настроенное подключение.</param>
+        /// <param name="statements">Операторы ГК.</param>
         public GblSettings
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 IEnumerable<GblStatement> statements
             )
-            : this(connection)
-        {
-            Statements.AddRange(statements);
-        }
+            : this(connection) => Statements.AddRange(statements);
 
         #endregion
 
@@ -191,20 +174,20 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForInterval
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 int minMfn,
                 int maxMfn,
                 IEnumerable<GblStatement> statements
             )
         {
-            GblSettings result = new GblSettings(connection, statements)
+            var result = new GblSettings(connection, statements)
             {
                 MinMfn = minMfn,
                 MaxMfn = maxMfn
             };
 
             return result;
-        }
+        } // method ForInterval
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -212,14 +195,14 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForInterval
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 string database,
                 int minMfn,
                 int maxMfn,
                 IEnumerable<GblStatement> statements
             )
         {
-            GblSettings result = new GblSettings(connection, statements)
+            var result = new GblSettings(connection, statements)
             {
                 Database = database,
                 MinMfn = minMfn,
@@ -227,7 +210,7 @@ namespace ManagedIrbis.Gbl
             };
 
             return result;
-        }
+        } // method ForInterval
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -235,19 +218,19 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForList
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 IEnumerable<int> mfnList,
                 IEnumerable<GblStatement> statements
             )
         {
 
-            GblSettings result = new GblSettings(connection, statements)
+            var result = new GblSettings(connection, statements)
             {
                 MfnList = mfnList.ToArray()
             };
 
             return result;
-        }
+        } // method ForList
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -255,20 +238,20 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForList
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 string database,
                 IEnumerable<int> mfnList,
                 IEnumerable<GblStatement> statements
             )
         {
-            GblSettings result = new GblSettings(connection, statements)
+            var result = new GblSettings(connection, statements)
             {
                 Database = database,
                 MfnList = mfnList.ToArray()
             };
 
             return result;
-        }
+        } // method ForList
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -276,19 +259,19 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForList
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 string database,
                 IEnumerable<int> mfnList
             )
         {
-            GblSettings result = new GblSettings(connection)
+            var result = new GblSettings(connection)
             {
                 Database = database,
                 MfnList = mfnList.ToArray()
             };
 
             return result;
-        }
+        } // method ForList
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -296,18 +279,18 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForSearchExpression
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 string searchExpression,
                 IEnumerable<GblStatement> statements
             )
         {
-            GblSettings result = new GblSettings(connection, statements)
+            var result = new GblSettings(connection, statements)
             {
                 SearchExpression = searchExpression
             };
 
             return result;
-        }
+        } // method ForSearchExpression
 
         /// <summary>
         /// Create <see cref="GblSettings"/>
@@ -315,20 +298,20 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForSearchExpression
             (
-                IIrbisConnection connection,
+                IBasicConnection connection,
                 string database,
                 string searchExpression,
                 IEnumerable<GblStatement> statements
             )
         {
-            GblSettings result = new GblSettings(connection, statements)
+            var result = new GblSettings(connection, statements)
             {
                 Database = database,
                 SearchExpression = searchExpression
             };
 
             return result;
-        }
+        } // method ForSearchExpression
 
         /// <summary>
         /// Set (server) file name.
@@ -338,12 +321,10 @@ namespace ManagedIrbis.Gbl
                 string fileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
-
             FileName = fileName;
 
             return this;
-        }
+        } // method SetFileName
 
         /// <summary>
         /// Set first record and number of records
@@ -362,7 +343,7 @@ namespace ManagedIrbis.Gbl
             NumberOfRecords = numberOfRecords;
 
             return this;
-        }
+        } // method SetRange
 
         /// <summary>
         /// Set search expression.
@@ -372,12 +353,10 @@ namespace ManagedIrbis.Gbl
                 string searchExpression
             )
         {
-            Sure.NotNullNorEmpty(searchExpression, nameof(searchExpression));
-
             SearchExpression = searchExpression;
 
             return this;
-        }
+        } // method SetSearchExpression
 
         /*
 
@@ -404,8 +383,6 @@ namespace ManagedIrbis.Gbl
                 BinaryReader reader
             )
         {
-            Sure.NotNull(reader, nameof(reader));
-
             Actualize = reader.ReadBoolean();
             Autoin = reader.ReadBoolean();
             Database = reader.ReadNullableString();
@@ -426,8 +403,6 @@ namespace ManagedIrbis.Gbl
                 BinaryWriter writer
             )
         {
-            Sure.NotNull(writer, nameof(writer));
-
             writer.Write(Actualize);
             writer.Write(Autoin);
             writer.WriteNullable(Database);
@@ -452,7 +427,7 @@ namespace ManagedIrbis.Gbl
                 bool throwOnError
             )
         {
-            Verifier<GblSettings> verifier = new Verifier<GblSettings>
+            var verifier = new Verifier<GblSettings>
                 (
                     this,
                     throwOnError

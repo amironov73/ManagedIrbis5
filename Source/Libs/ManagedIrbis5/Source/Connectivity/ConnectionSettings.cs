@@ -21,7 +21,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -35,10 +34,10 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis
 {
     /// <summary>
-    /// Настройки для подключения к серверу ИРБИС64.
+    /// Настройки для подключения к серверу ИРБИС64 (для отдельного сохранения).
     /// </summary>
     [XmlRoot("connection")]
     public sealed class ConnectionSettings
@@ -48,22 +47,22 @@ namespace ManagedIrbis.Client
         #region Constants
 
         /// <summary>
-        /// Хост по умолчанию.
+        /// Адрес хоста по умолчанию.
         /// </summary>
         public const string DefaultHost = "127.0.0.1";
 
         /// <summary>
-        /// База данных по умолчанию.
+        /// Имя базы данных по умолчанию.
         /// </summary>
         public const string DefaultDatabase = "IBIS";
 
         /// <summary>
-        /// АРМ по умолчанию.
+        /// Код АРМ по умолчанию.
         /// </summary>
         public const string DefaultWorkstation = "C";
 
         /// <summary>
-        /// Порт по умолчанию.
+        /// Номер порта по умолчанию.
         /// </summary>
         public const int DefaultPort = 6666;
 
@@ -72,23 +71,23 @@ namespace ManagedIrbis.Client
         #region Properties
 
         /// <summary>
-        /// Адрес или имя хоста сервера.
+        /// Адрес или имя хоста сервера ИРБИС64.
         /// </summary>
         /// <remarks>Default value is "127.0.0.1".</remarks>
         [XmlAttribute("host")]
         [JsonPropertyName("host")]
-        public string? Host { get; set; }
+        public string? Host { get; set; } = DefaultHost;
 
         /// <summary>
-        /// Номер порта.
+        /// Номер порта, на котором сервер ИРБИС64 принимает клиентские подключения.
         /// </summary>
         /// <remarks>Default value is 6666.</remarks>
         [XmlAttribute("port")]
         [JsonPropertyName("port")]
-        public int Port { get; set; }
+        public ushort Port { get; set; } = DefaultPort;
 
         /// <summary>
-        /// User logon name.
+        /// Имя (логин) пользователя системы ИРБИС64.
         /// </summary>
         /// <remarks>Default value is <c>null</c>,
         /// so connection can't be made.</remarks>
@@ -97,7 +96,7 @@ namespace ManagedIrbis.Client
         public string? Username { get; set; }
 
         /// <summary>
-        /// User logon password.
+        /// Пароль пользователя системы ИРБИС64.
         /// </summary>
         /// <remarks>Default value is <c>null</c>,
         /// so connection can't be made.</remarks>
@@ -106,27 +105,24 @@ namespace ManagedIrbis.Client
         public string? Password { get; set; }
 
         /// <summary>
-        /// Database name to connect.
+        /// Имя базы данных.
         /// </summary>
         /// <remarks>Default value is "IBIS".
         /// Database with such a name can be
         /// non-existent.
         /// </remarks>
-        [DefaultValue(DefaultDatabase)]
         [XmlAttribute("database")]
         [JsonPropertyName("database")]
-        public string? Database { get; set; }
+        public string? Database { get; set; } = DefaultDatabase;
 
         /// <summary>
         /// Workstation application kind.
         /// </summary>
-        /// <remarks>Default value is
-        /// <see cref="ManagedIrbis.Workstation.Cataloger"/>.
+        /// <remarks>Default value is "C".
         /// </remarks>
-        [DefaultValue(DefaultWorkstation)]
         [XmlAttribute("workstation")]
         [JsonPropertyName("workstation")]
-        public string? Workstation { get; set; }
+        public string? Workstation { get; set; } = DefaultWorkstation;
 
         /// <summary>
         /// Turn on network logging.
@@ -141,6 +137,12 @@ namespace ManagedIrbis.Client
         [XmlAttribute("socket")]
         [JsonPropertyName("socket")]
         public string? SocketTypeName { get; set; }
+
+
+        /// <summary>
+        /// Флаг: включена отладка.
+        /// </summary>
+        public bool Debug { get; set; }
 
         /// <summary>
         /// Retry limit.
@@ -162,30 +164,6 @@ namespace ManagedIrbis.Client
         [XmlAttribute("userdata")]
         [JsonPropertyName("userdata")]
         public string? UserData { get; set; }
-
-        /// <summary>
-        /// Saved "connected" state.
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public bool Connected { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ConnectionSettings()
-        {
-            Host = DefaultHost;
-            Port = DefaultPort;
-            Database = DefaultDatabase;
-            Username = null;
-            Password = null;
-            Workstation = DefaultWorkstation;
-        }
 
         #endregion
 
@@ -232,12 +210,52 @@ namespace ManagedIrbis.Client
         #region Public methods
 
         /// <summary>
+        /// Применение настроек к подключению.
+        /// </summary>
+        /// <param name="connection">Неактивное подключение.</param>
+        public void Apply
+            (
+                IIrbisConnection connection
+            )
+        {
+            if (connection.Connected)
+            {
+                throw new ApplicationException("Already connected");
+            }
+
+            if (!string.IsNullOrEmpty(Host))
+            {
+                connection.Host = Host;
+            }
+
+            connection.Port = Port;
+
+            if (!string.IsNullOrEmpty(Username))
+            {
+                connection.Username = Username;
+            }
+
+            if (!string.IsNullOrEmpty(Password))
+            {
+                connection.Password = Password;
+            }
+
+            if (!string.IsNullOrEmpty(Workstation))
+            {
+                connection.Workstation = Workstation;
+            }
+
+            if (!string.IsNullOrEmpty(Database))
+            {
+                connection.Database = Database;
+            }
+
+        } // method Apply
+
+        /// <summary>
         /// Clone.
         /// </summary>
-        public ConnectionSettings Clone()
-        {
-            return (ConnectionSettings)MemberwiseClone();
-        }
+        public ConnectionSettings Clone() => (ConnectionSettings)MemberwiseClone();
 
         /// <summary>
         /// Decrypt the connection settings.
@@ -253,7 +271,7 @@ namespace ManagedIrbis.Client
                 .ThrowIfNull("RestoreObjectFromMemory");
 
             return result;
-        }
+        } // method Decrypt
 
         /// <summary>
         /// Encode parameters to text representation.
@@ -300,7 +318,7 @@ namespace ManagedIrbis.Client
                 );
 
             return result;
-        }
+        } // method Encode
 
         /// <summary>
         /// Encrypt the connection settings.
@@ -312,30 +330,22 @@ namespace ManagedIrbis.Client
             var result = Convert.ToBase64String(bytes);
 
             return result;
-        }
+        } // method Encrypt
 
         /// <summary>
         /// Construct <see cref="ConnectionSettings"/>
         /// from <see cref="Connection"/>.
         /// </summary>
-        public static ConnectionSettings FromConnection
-            (
-                Connection connection
-            )
-        {
-            var result = new ConnectionSettings
+        public static ConnectionSettings FromConnection(IBasicConnection connection) =>
+            new ()
             {
                 Host = connection.Host,
                 Port = connection.Port,
                 Username = connection.Username,
                 Password = connection.Password,
                 Database = connection.Database,
-                Workstation = connection.Workstation,
-                Connected = connection.Connected
+                Workstation = connection.Workstation
             };
-
-            return result;
-        }
 
         /// <summary>
         /// Get missing elements from the settings.
@@ -348,25 +358,29 @@ namespace ManagedIrbis.Client
             {
                 result |= ConnectionElement.Host;
             }
+
             if (Port == 0)
             {
                 result |= ConnectionElement.Port;
             }
+
             if (string.IsNullOrEmpty(Username))
             {
                 result |= ConnectionElement.Username;
             }
+
             if (string.IsNullOrEmpty(Password))
             {
                 result |= ConnectionElement.Password;
             }
+
             if (string.IsNullOrWhiteSpace(Workstation))
             {
                 result |= ConnectionElement.Workstation;
             }
 
             return result;
-        }
+        } // method GetMissingElements
 
         /// <summary>
         /// Парсинг строки подключения.
@@ -406,24 +420,31 @@ namespace ManagedIrbis.Client
                         break;
 
                     case "port":
-                        Port = int.Parse(value);
+                        Port = ushort.Parse(value);
+                        if (Port <= 0)
+                        {
+                            throw new ArgumentOutOfRangeException("Port=" + Port);
+                        }
                         break;
 
                     case "user":
                     case "username":
                     case "name":
                     case "login":
+                    case "account":
                         Username = value;
                         break;
 
-                    case "pwd":
                     case "password":
+                    case "pwd":
+                    case "secret":
                         Password = value;
                         break;
 
                     case "db":
-                    case "catalog":
                     case "database":
+                    case "base":
+                    case "catalog":
                         Database = value;
                         break;
 
@@ -451,6 +472,10 @@ namespace ManagedIrbis.Client
                         WebCgi = value;
                         break;
 
+                    case "debug":
+                        Debug = true;
+                        break;
+
                     case "userdata":
                     case "data":
                         UserData = value;
@@ -459,31 +484,28 @@ namespace ManagedIrbis.Client
                     default:
                         Magna.Error
                             (
-                                "ConnectionSettings::ParseConnectionString: "
+                                nameof(ConnectionSettings)
+                                + "::" + nameof(ParseConnectionString)
                                 + "unknown parameter: "
                                 + name
                             );
 
-                        var message = $"Unknown parameter: {name}";
-                        throw new ArgumentException(message);
+                        throw new ArgumentException($"Unknown parameter: {name}");
                 }
             }
 
             return this;
-        }
+        } // method ParseConnectionString
 
         #endregion
 
         #region IHandmadeSerializable members
 
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream(BinaryReader reader)
         {
             Host = reader.ReadNullableString();
-            Port = reader.ReadPackedInt32();
+            Port = (ushort)reader.ReadPackedInt32();
             Username = reader.ReadNullableString();
             Password = reader.ReadNullableString();
             Database = reader.ReadNullableString();
@@ -493,14 +515,10 @@ namespace ManagedIrbis.Client
             RetryLimit = reader.ReadPackedInt32();
             WebCgi = reader.ReadNullableString();
             UserData = reader.ReadNullableString();
-            Connected = reader.ReadBoolean();
-        }
+        } // method RestoreFromStream
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream(BinaryWriter writer)
         {
             writer
                 .WriteNullable(Host)
@@ -513,42 +531,37 @@ namespace ManagedIrbis.Client
                 .WriteNullable(SocketTypeName)
                 .WritePackedInt32(RetryLimit)
                 .WriteNullable(WebCgi)
-                .WriteNullable(UserData)
-                .Write(Connected);
-        }
+                .WriteNullable(UserData);
+        } // method SaveToStream
 
         #endregion
 
         #region IVerifiable members
 
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify(bool throwOnError)
         {
-            var verifier
-                = new Verifier<ConnectionSettings>(this, throwOnError);
+            var verifier = new Verifier<ConnectionSettings>(this, throwOnError);
 
             verifier
                 .NotNullNorEmpty(Host, "Host")
-                .Assert(Port > 0 && Port < 0x10000, "Port")
+                .Assert(Port > 0, "Port")
                 .NotNullNorEmpty(Username, "Username")
-                .NotNullNorEmpty(Password, "Password");
+                .NotNullNorEmpty(Password, "Password")
+                .NotNullNorEmpty(Workstation)
+                .NotNullNorEmpty(Database);
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Encode();
-        }
+        public override string ToString() => Encode();
 
         #endregion
-    }
-}
+    } // class ConnectionSettings
+
+} // namespace ManagedIrbis

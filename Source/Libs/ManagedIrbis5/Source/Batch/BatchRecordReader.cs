@@ -178,7 +178,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            Connection = ConnectionFactory.Default.CreateConnection();
+            Connection = ConnectionFactory.Shared.CreateConnection();
             Connection.ParseConnectionString(connectionString);
             _ownConnection = true;
             Database = database;

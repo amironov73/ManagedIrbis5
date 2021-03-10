@@ -162,8 +162,6 @@ namespace ManagedIrbis
                 IIrbisConnection connection
             )
         {
-            Sure.NotNull(connection, "connection");
-
             Verify(true);
 
             /*

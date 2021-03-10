@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Connection.cs -- подключение к серверу ИРБИС64
+/* Connection.cs -- стандартное подключение к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -38,12 +38,11 @@ using Microsoft.Extensions.Logging;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Подключение к серверу ИРБИС64.
+    /// Стандартное одключение к серверу ИРБИС64.
     /// </summary>
     public sealed class Connection
         : ConnectionBase
-        /* IDisposable,
-        IAsyncDisposable,
+        /* IAsyncDisposable,
         IHandmadeSerializable */
     {
         #region Events

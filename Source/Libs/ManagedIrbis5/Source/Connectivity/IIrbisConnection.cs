@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* IIrbisConnection.cs -- наиболее общий интерфейс подключения для мока
+/* IIrbisConnection.cs -- интерфейс подключения для мока
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,11 +27,12 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Наиболее общий интерфейс подключения к серверу ИРБИС64
-    /// для мока.
+    /// Менее общий интерфейс подключения к серверу ИРБИС64.
+    ///
     /// </summary>
     public interface IIrbisConnection
-        : IDisposable
+        : ISyncConnection,
+        IAsyncConnection
     {
         /*
 
@@ -42,45 +43,6 @@ namespace ManagedIrbis
 
         */
 
-        /// <summary>
-        ///
-        /// </summary>
-        string Host { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        ushort Port { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        string Username { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        string Password { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        string Database { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        string Workstation { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        int ClientId { get; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        int QueryId { get; }
 
         /*
 
@@ -96,10 +58,6 @@ namespace ManagedIrbis
 
         */
 
-        /// <summary>
-        ///
-        /// </summary>
-        bool Connected { get; }
 
         /*
 
@@ -110,10 +68,6 @@ namespace ManagedIrbis
 
         */
 
-        /// <summary>
-        /// Busy?
-        /// </summary>
-        bool Busy { get; }
 
         /*
 
@@ -124,12 +78,6 @@ namespace ManagedIrbis
 
         */
 
-        /// <summary>
-        /// Last error code.
-        /// </summary>
-        int LastError { get; }
-
-        bool CheckConnection();
 
         /*
 
@@ -209,27 +157,6 @@ namespace ManagedIrbis
         */
 
 
-        /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        Task<Response?> ExecuteAsync
-            (
-                Query query
-            );
-
-        /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        Response? ExecuteSync
-            (
-                ref ValueQuery query
-            );
 
         /*
 

@@ -33,91 +33,6 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
-        /// Разбор строки подключения.
-        /// </summary>
-        public static void ParseConnectionString
-            (
-                this IIrbisConnection connection,
-                string? connectionString
-            )
-        {
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                return;
-            }
-
-            var pairs = connectionString.Split
-                (
-                    ';',
-                    StringSplitOptions.RemoveEmptyEntries
-                );
-            foreach (var pair in pairs)
-            {
-                if (!pair.Contains('='))
-                {
-                    continue;
-                }
-
-                var parts = pair.Split('=', 2);
-                var name = parts[0].Trim().ToLowerInvariant();
-                if (string.IsNullOrEmpty(name))
-                {
-                    continue;
-                }
-
-                var value = parts[1].Trim();
-
-                switch (name)
-                {
-                    case "host":
-                    case "server":
-                    case "address":
-                        connection.Host = value;
-                        break;
-
-                    case "port":
-                        connection.Port = ushort.Parse(value);
-                        break;
-
-                    case "user":
-                    case "username":
-                    case "name":
-                    case "login":
-                    case "account":
-                        connection.Username = value;
-                        break;
-
-                    case "password":
-                    case "pwd":
-                    case "secret":
-                        connection.Password = value;
-                        break;
-
-                    case "db":
-                    case "database":
-                    case "base":
-                    case "catalog":
-                        connection.Database = value;
-                        break;
-
-                    case "arm":
-                    case "workstation":
-                        connection.Workstation = value;
-                        break;
-
-                    /*
-                    case "debug":
-                        _debug = true;
-                        break;
-                    */
-
-                    default:
-                        throw new IrbisException($"Unknown key {name}");
-                }
-            }
-        } // method ParseConnectionString
-
-        /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
         /// </summary>
         /// <param name="command">Код команды.</param>
@@ -296,12 +211,10 @@ namespace ManagedIrbis
                 return null;
             }
 
-            /*
-            if (!response.CheckReturnCode(_goodCodesForReadRecord))
+            if (!response.CheckReturnCode(ConnectionUtility.GoodCodesForReadRecord))
             {
                 return null;
             }
-            */
 
             var result = new Record
             {
@@ -362,12 +275,10 @@ namespace ManagedIrbis
                 return Array.Empty<Term>();
             }
 
-            /*
-            if (!response.CheckReturnCode(_goodCodesForReadTerms))
+            if (!response.CheckReturnCode(ConnectionUtility.GoodCodesForReadTerms))
             {
                 return Array.Empty<Term>();
             }
-            */
 
             return Term.Parse(response);
         } // method ReadTerms

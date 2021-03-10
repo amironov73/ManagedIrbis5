@@ -15,9 +15,9 @@ namespace UnitTests.ManagedIrbis
         [TestMethod]
         public void ConnectionFactory_CreateConnection_1()
         {
-            Assert.IsNotNull(ConnectionFactory.Default);
+            Assert.IsNotNull(ConnectionFactory.Shared);
 
-            var actual = ConnectionFactory.Default.CreateConnection();
+            var actual = ConnectionFactory.Shared.CreateConnection();
             Assert.IsNotNull(actual);
         }
     }

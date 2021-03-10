@@ -28,9 +28,9 @@ namespace ManagedIrbis
         #region Properties
 
         /// <summary>
-        /// Экземпляр фабрики по умолчанию.
+        /// Общий экземпляр фабрики подключений.
         /// </summary>
-        public static ConnectionFactory Default { get; } = new ();
+        public static ConnectionFactory Shared { get; } = new ();
 
         #endregion
 
