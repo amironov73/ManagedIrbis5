@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ValueStringBuilder.cs -- StringBuilder, оформленный как структура
+/* ValueList.cs -- List<T>, оформленный как структура
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,35 +16,23 @@
 
 using System;
 using System.Buffers;
-using System.Text;
+using System.Collections.Generic;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Text
+namespace AM.Collections
 {
-    //
-    // Вдохновлено кодом из BCL:
-    // https://github.com/dotnet/runtime/blob/main/src/libraries/Common/src/System/Text/ValueStringBuilder.cs
-    //
-
     /// <summary>
-    /// Аналог системного <see cref="StringBuilder"/>, оформленный
-    /// как структура.
+    /// <see cref="List{T}"/>, оформленный как структура.
     /// </summary>
-    public ref struct ValueStringBuilder
+    public ref struct ValueList<T>
     {
         #region Properties
 
-        /// <summary>
-        /// Емкость.
-        /// </summary>
-        public int Capacity => _characters.Length;
+        public int Capacity => _values.Length;
 
-        /// <summary>
-        /// Текущая длина.
-        /// </summary>
         public int Length
         {
             get => _position;
@@ -53,7 +41,7 @@ namespace AM.Text
                 Sure.NonNegative(value, nameof(value));
                 Sure.AssertState
                     (
-                        value <= _characters.Length,
+                        value <= _values.Length,
                         nameof(value)
                     );
                 _position = value;
@@ -63,104 +51,104 @@ namespace AM.Text
         /// <summary>
         /// Сырой буфер.
         /// </summary>
-        public ReadOnlySpan<char> RawCharacters => _characters;
+        public ReadOnlySpan<T> RawBuffer => _values;
 
         /// <summary>
-        /// Достпу по индексу.
+        /// Доступ по индексу.
         /// </summary>
-        public ref char this[int index] => ref _characters[index];
+        public ref T this[int index] => ref _values[index];
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Конструктор/
+        /// Конструктор.
         /// </summary>
-        /// <param name="characters">Начальный буфер.</param>
-        public ValueStringBuilder
+        /// <param name="initialBuffer">Начальный буфер.</param>
+        public ValueList
             (
-                Span<char> characters
+                Span<T> initialBuffer
             )
             : this()
         {
-            _characters = characters;
+            _values = initialBuffer;
         } // constructor
 
         #endregion
 
         #region Private members
 
-        private char[]? _array;
-        private Span<char> _characters;
+        private T[]? _array;
+        private Span<T> _values;
         private int _position;
 
         #endregion
 
         #region Public methods
 
-        public ReadOnlySpan<char> AsSpan() =>
-            _characters.Slice(0, _position);
+        public ReadOnlySpan<T> AsSpan() =>
+            _values.Slice(0, _position);
 
-        public ReadOnlySpan<char> AsSpan(int start) =>
-            _characters.Slice(start, _position - start);
+        public ReadOnlySpan<T> AsSpan(int start) =>
+            _values.Slice(start, _position - start);
 
-        public ReadOnlySpan<char> AsSpan(int start, int length) =>
-            _characters.Slice(start, length);
+        public ReadOnlySpan<T> AsSpan(int start, int length) =>
+            _values.Slice(start, length);
 
         /// <summary>
         /// Добавление одного символа.
         /// </summary>
         public void Append
             (
-                char c
+                T one
             )
         {
-            if (_position == _characters.Length)
+            if (_position == _values.Length)
             {
                 Grow(1);
             }
 
-            _characters[_position] = c;
+            _values[_position] = one;
             ++_position;
-        }
+        } // method Append
 
         /// <summary>
-        /// Добавление спана символов.
+        /// Добавление спана значений.
         /// </summary>
         public void Append
             (
-                ReadOnlySpan<char> text
+                ReadOnlySpan<T> values
             )
         {
-            var newPosition = _position + text.Length;
-            if (newPosition > _characters.Length)
+            var newPosition = _position + values.Length;
+            if (newPosition > _values.Length)
             {
-                Grow(text.Length);
+                Grow(values.Length);
             }
 
-            text.CopyTo(_characters.Slice(_position));
+            values.CopyTo(_values.Slice(_position));
             _position = newPosition;
-        }
+        } // method Append
 
         /// <summary>
         /// Добавление пары спанов.
         /// </summary>
         public void Append
             (
-                ReadOnlySpan<char> text1,
-                ReadOnlySpan<char> text2
+                ReadOnlySpan<T> one,
+                ReadOnlySpan<T> two
             )
         {
-            var delta = text1.Length + text2.Length;
+            var delta = one.Length + two.Length;
             var newPosition = _position + delta;
-            if (newPosition > _characters.Length)
+            if (newPosition > _values.Length)
             {
                 Grow(delta);
             }
 
-            text1.CopyTo(_characters.Slice(_position));
-            text2.CopyTo(_characters.Slice(_position + text1.Length));
+            one.CopyTo(_values.Slice(_position));
+            two.CopyTo(_values.Slice(_position + one.Length));
             _position = newPosition;
         }
 
@@ -169,22 +157,22 @@ namespace AM.Text
         /// </summary>
         public void Append
             (
-                ReadOnlySpan<char> text1,
-                ReadOnlySpan<char> text2,
-                ReadOnlySpan<char> text3
+                ReadOnlySpan<T> one,
+                ReadOnlySpan<T> two,
+                ReadOnlySpan<T> three
             )
         {
-            var delta = text1.Length + text2.Length + text3.Length;
-            var newPosition = _position + delta;
-            if (newPosition > _characters.Length)
+            var delta = one.Length + two.Length + three.Length;
+            int newPosition = _position + delta;
+            if (newPosition > _values.Length)
             {
                 Grow(delta);
             }
 
-            text1.CopyTo(_characters.Slice(_position));
-            text2.CopyTo(_characters.Slice(_position + text1.Length));
-            text3.CopyTo(_characters.Slice(_position + text1.Length
-                + text2.Length));
+            one.CopyTo(_values.Slice(_position));
+            two.CopyTo(_values.Slice(_position + one.Length));
+            three.CopyTo(_values.Slice(_position + one.Length
+                + two.Length));
             _position = newPosition;
         }
 
@@ -197,7 +185,7 @@ namespace AM.Text
             this = default; // для спокойствия
             if (borrowed is not null)
             {
-                ArrayPool<char>.Shared.Return(borrowed);
+                ArrayPool<T>.Shared.Return(borrowed);
             }
         }
 
@@ -209,7 +197,7 @@ namespace AM.Text
                 int capacity
             )
         {
-            if (capacity > _characters.Length)
+            if (capacity > _values.Length)
             {
                 Grow(capacity - _position);
             }
@@ -228,37 +216,35 @@ namespace AM.Text
                     (uint)(_position + additional),
                     (uint)(Capacity * 2)
                 );
-            var borrowed = ArrayPool<char>.Shared.Rent(newCapacity);
-            _characters.Slice(0, _position).CopyTo(borrowed);
+            var borrowed = ArrayPool<T>.Shared.Rent(newCapacity);
+            _values.Slice(0, _position).CopyTo(borrowed);
             if (_array is not null)
             {
-                ArrayPool<char>.Shared.Return(_array);
+                ArrayPool<T>.Shared.Return(_array);
             }
 
-            _characters = _array = borrowed;
+            _values = _array = borrowed;
         }
 
         /// <summary>
-        /// Получение перечислителя.
+        /// Превращение в массив.
         /// </summary>
-        public ReadOnlySpan<char>.Enumerator GetEnumerator() =>
-            AsSpan().GetEnumerator();
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
+        public T[] ToArray()
         {
-            var result = AsSpan().ToString();
+            var result = AsSpan().ToArray();
             Dispose();
 
             return result;
         }
 
+        /// <summary>
+        /// Получение перечислителя.
+        /// </summary>
+        public ReadOnlySpan<T>.Enumerator GetEnumerator() =>
+            AsSpan().GetEnumerator();
+
         #endregion
 
-    } // ref struct ValueStringBuilder
+    } // class ValueList
 
-} // namespace AM.Text
+} // namespace AM.Collections

@@ -5,9 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* TextBuffer.cs -- буфер для вывода текста с отслеживанием позиции
  * Ars Magna project, http://arsmagna.ru
@@ -17,11 +14,6 @@
 
 using System;
 using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Text;
-
-using AM.IO;
 
 #endregion
 
