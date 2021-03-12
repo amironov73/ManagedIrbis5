@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>AM.Windows.DevExpress5</AssemblyName>
+    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.WindowsDesktop.Core" Version="20.2.5" />
+    <PackageReference Include="DevExpress.WindowsDesktop.Win" Version="20.2.5-ctp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+    <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
+    <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
+    <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
+  </ItemGroup>
+
+</Project>
