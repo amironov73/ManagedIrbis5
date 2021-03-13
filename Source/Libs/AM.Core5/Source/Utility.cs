@@ -1493,6 +1493,26 @@ namespace AM
             return result;
         }
 
+        /// <summary>
+        /// Optimal degree of parallelism.
+        /// </summary>
+        public static int OptimalParallelism
+        {
+            get
+            {
+                var result = Math.Min
+                    (
+                        Math.Max
+                            (
+                                Environment.ProcessorCount - 1,
+                                1
+                            ),
+                        8 // TODO choose good number
+                    );
+
+                return result;
+            }
+        } // property OptmimalParallelism
 
         /// <summary>
         /// Упрощенное получение информации о методе.
@@ -1549,5 +1569,7 @@ namespace AM
             => ((MethodCallExpression) expression.Body).Method;
 
         #endregion
-    }
-}
+
+    } // class Utility
+
+} // namespace AM
