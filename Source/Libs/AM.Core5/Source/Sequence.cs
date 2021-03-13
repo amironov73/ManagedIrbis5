@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Sequence.cs -- возня вокруг IEnumerable
@@ -126,6 +127,9 @@ namespace AM
             }
         }
 
+        /// <summary>
+        /// Вычисление максимального значения в последовательности.
+        /// </summary>
         public static T? MaxOrDefault<T>
             (
                 this IEnumerable<T> sequence,
@@ -144,6 +148,9 @@ namespace AM
             return result;
         }
 
+        /// <summary>
+        /// Вычисление максимального значения в последовательности.
+        /// </summary>
         public static T? MaxOrDefault<T>
             (
                 this IEnumerable<T> sequence,
@@ -162,6 +169,9 @@ namespace AM
             return result;
         }
 
+        /// <summary>
+        /// Вычисление максимального значения в последовательности.
+        /// </summary>
         public static TOutput? MaxOrDefault<TInput, TOutput>
             (
                 this IEnumerable<TInput> sequence,
@@ -180,6 +190,9 @@ namespace AM
             return result;
         }
 
+        /// <summary>
+        /// Вычисление максимального значения в последовательности.
+        /// </summary>
         public static TOutput? MaxOrDefault<TInput, TOutput>
             (
                 this IEnumerable<TInput> sequence,

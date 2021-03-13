@@ -87,6 +87,9 @@ namespace AM.Memory
 
         #region Public methods
 
+        /// <summary>
+        /// Возврат в исходное состояние.
+        /// </summary>
         public void Reset()
         {
             _offset = 0;

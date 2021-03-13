@@ -90,10 +90,19 @@ namespace AM
 
         #region Public methods
 
+        /// <summary>
+        /// Прверка: хранится значение первого типа?
+        /// </summary>
         public bool Is1 => _index == 0;
 
+        /// <summary>
+        /// Проверка: хранится значение второго типа?
+        /// </summary>
         public bool Is2 => _index == 1;
 
+        /// <summary>
+        /// Попытка извлечения значения первого типа.
+        /// </summary>
         public bool Try1 (out T1 value)
         {
             if (Is1)
@@ -108,6 +117,9 @@ namespace AM
             return false;
         }
 
+        /// <summary>
+        /// Попытка извлечения значения второго типа.
+        /// </summary>
         public bool Try2 (out T2 value)
         {
             if (Is2)
@@ -122,10 +134,20 @@ namespace AM
             return false;
         }
 
+        /// <summary>
+        /// Получение значения превого типа.
+        /// </summary>
         public T1 As1() => CheckIndex(0)._value1;
 
+        /// <summary>
+        /// Получение значения второго типа.
+        /// </summary>
         public T2 As2() => CheckIndex(1)._value2;
 
+        /// <summary>
+        /// Выполнение действий в зависимости от того,
+        /// какое значение какого типа хранится.
+        /// </summary>
         public void Switch
             (
                 Action<T1> action1,
@@ -144,6 +166,10 @@ namespace AM
             }
         }
 
+        /// <summary>
+        /// Вычисление результата в зависимости от того,
+        /// значение какого типа хранится.
+        /// </summary>
         public TResult Match<TResult>
             (
                 Func<T1, TResult> func1,
@@ -159,12 +185,24 @@ namespace AM
 
         #region Operators
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator OneOf<T1, T2> (T1 value1)  => new OneOf<T1, T2>(value1);
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator OneOf<T1, T2> (T2 value2)  => new OneOf<T1, T2>(value2);
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator T1(OneOf<T1, T2> value) => value.CheckIndex(0)._value1;
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator T2(OneOf<T1, T2> value) => value.CheckIndex(1)._value2;
 
         #endregion
@@ -181,6 +219,10 @@ namespace AM
         #endregion
     }
 
+    /// <summary>
+    /// Контейнер для значения, принадлежащего
+    /// одному из трех указанных типов.
+    /// </summary>
     public class OneOf<T1, T2, T3>
     {
         #region Properties
@@ -245,12 +287,24 @@ namespace AM
 
         #region Public methods
 
+        /// <summary>
+        /// Прверка: хранится значение первого типа?
+        /// </summary>
         public bool Is1 => _index == 0;
 
+        /// <summary>
+        /// Прверка: хранится значение второго типа?
+        /// </summary>
         public bool Is2 => _index == 1;
 
+        /// <summary>
+        /// Прверка: хранится значение третьего типа?
+        /// </summary>
         public bool Is3 => _index == 2;
 
+        /// <summary>
+        /// Попытка извлечения значения первого типа.
+        /// </summary>
         public bool Try1(out T1 value)
         {
             if (Is1)
@@ -264,6 +318,10 @@ namespace AM
 
             return false;
         }
+
+        /// <summary>
+        /// Попытка извлечения значения второго типа.
+        /// </summary>
         public bool Try2 (out T2 value)
         {
             if (Is2)
@@ -278,6 +336,9 @@ namespace AM
             return false;
         }
 
+        /// <summary>
+        /// Попытка извлечения значения третьего типа.
+        /// </summary>
         public bool Try3 (out T3 value)
         {
             if (Is3)
@@ -302,12 +363,27 @@ namespace AM
             return this;
         }
 
+        /// <summary>
+        /// Извлечение значения первого типа.
+        /// </summary>
         public T1 As1() => CheckIndex(0)._value1;
 
+        /// <summary>
+        /// Извлечение значения второго типа.
+        /// </summary>
+        /// <returns></returns>
         public T2 As2() => CheckIndex(1)._value2;
 
+        /// <summary>
+        /// Извлечение значения третьего типа.
+        /// </summary>
+        /// <returns></returns>
         public T3 As3() => CheckIndex(2)._value3;
 
+        /// <summary>
+        /// Выполнение действий в зависимости от того,
+        /// какое значение какого типа хранится.
+        /// </summary>
         public void Switch
             (
                 Action<T1> action1,
@@ -331,6 +407,10 @@ namespace AM
             }
         }
 
+        /// <summary>
+        /// Вычисление результата в зависимости от того,
+        /// значение какого типа хранится.
+        /// </summary>
         public TResult Match<TResult>
             (
                 Func<T1, TResult> func1,
@@ -348,16 +428,34 @@ namespace AM
 
         #region Operators
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator OneOf<T1, T2, T3>(T1 value1) => new OneOf<T1, T2, T3>(value1);
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator OneOf<T1, T2, T3>(T2 value2) => new OneOf<T1, T2, T3>(value2);
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator OneOf<T1, T2, T3>(T3 value3) => new OneOf<T1, T2, T3>(value3);
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator T1(OneOf<T1, T2, T3> value) => value.CheckIndex(0)._value1;
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator T2(OneOf<T1, T2, T3> value) => value.CheckIndex(1)._value2;
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator T3(OneOf<T1, T2, T3> value) => value.CheckIndex(2)._value3;
 
         #endregion
@@ -373,5 +471,7 @@ namespace AM
         };
 
         #endregion
-    }
-}
+
+    } // class OneOf
+
+} // namespace AM

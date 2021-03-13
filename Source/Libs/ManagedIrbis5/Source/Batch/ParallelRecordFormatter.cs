@@ -97,13 +97,13 @@ namespace ManagedIrbis.Batch
 
         #region Private members
 
-        private Task[] _tasks;
+        private Task[]? _tasks;
 
-        private ConcurrentQueue<string> _queue;
+        private ConcurrentQueue<string>? _queue;
 
-        private AutoResetEvent _event;
+        private AutoResetEvent? _event;
 
-        private object _lock;
+        private object? _lock;
 
         private void _Run
             (
@@ -122,11 +122,11 @@ namespace ManagedIrbis.Batch
                 );
             for (int i = 0; i < Parallelism; i++)
             {
-                Task task = new Task
-                (
-                    _Worker,
-                    chunks[i]
-                );
+                var task = new Task
+                    (
+                        _Worker,
+                        chunks[i]
+                    );
                 _tasks[i] = task;
             }
             foreach (Task task in _tasks)
@@ -142,7 +142,7 @@ namespace ManagedIrbis.Batch
             )
         {
             int[] chunk = (int[])state;
-            int first = chunk.GetItem(0, -1);
+            int first = chunk.SafeAt(0, -1);
             int threadId = Thread.CurrentThread.ManagedThreadId;
 
             Magna.Trace
@@ -176,7 +176,8 @@ namespace ManagedIrbis.Batch
                 }
 
             }
-            _event.Set();
+
+            _event?.Set();
 
             Magna.Trace
                 (
@@ -195,8 +196,8 @@ namespace ManagedIrbis.Batch
                 string line
             )
         {
-            _queue.Enqueue(line);
-            _event.Set();
+            _queue?.Enqueue(line);
+            _event?.Set();
         }
 
         private bool _AllDone()
@@ -238,14 +239,17 @@ namespace ManagedIrbis.Batch
                     yield break;
                 }
 
-                string line;
-                while (_queue.TryDequeue(out line))
+                if (_queue is not null)
                 {
-                    yield return line;
+                    while (_queue.TryDequeue(out var line))
+                    {
+                        yield return line;
+                    }
                 }
-                _event.Reset();
 
-                _event.WaitOne(10);
+                _event?.Reset();
+
+                _event?.WaitOne(10);
             }
         }
 
@@ -262,10 +266,13 @@ namespace ManagedIrbis.Batch
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
-            _event.Dispose();
-            foreach (Task task in _tasks)
+            _event?.Dispose();
+            if (_tasks is not null)
             {
-                task.Dispose();
+                foreach (Task task in _tasks)
+                {
+                    task.Dispose();
+                }
             }
         }
 

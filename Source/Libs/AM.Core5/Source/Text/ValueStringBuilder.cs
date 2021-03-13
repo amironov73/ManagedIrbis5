@@ -99,12 +99,21 @@ namespace AM.Text
 
         #region Public methods
 
+        /// <summary>
+        /// Выдача построенного на данный момент значения как спана.
+        /// </summary>
         public ReadOnlySpan<char> AsSpan() =>
             _characters.Slice(0, _position);
 
+        /// <summary>
+        /// Выдача построенного на данный момент значения как спана.
+        /// </summary>
         public ReadOnlySpan<char> AsSpan(int start) =>
             _characters.Slice(start, _position - start);
 
+        /// <summary>
+        /// Выдача построенного на данный момент значения как спана.
+        /// </summary>
         public ReadOnlySpan<char> AsSpan(int start, int length) =>
             _characters.Slice(start, length);
 

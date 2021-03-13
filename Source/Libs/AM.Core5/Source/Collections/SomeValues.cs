@@ -153,15 +153,27 @@ namespace AM.Collections
             return array.Length == 0;
         } // method IsNullOrEmpty
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator SomeValues<T> (T value)
             => new(value);
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator SomeValues<T> (T[] values)
             => new(values);
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator T? (SomeValues<T> values)
             => values.AsSingle();
 
+        /// <summary>
+        /// Оператор неявного преобразования.
+        /// </summary>
         public static implicit operator T[](SomeValues<T> values)
             => values.AsArray();
 

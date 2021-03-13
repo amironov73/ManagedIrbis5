@@ -9,6 +9,8 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
+#pragma warning disable 1591
+
 /* Utf8String.cs -- строка в кодировке UTF-8
  * Ars Magna project, http://arsmagna.ru
  */

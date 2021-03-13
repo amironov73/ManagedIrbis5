@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
@@ -17,11 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.IO;
-using System.Text;
 
 #endregion
 
@@ -41,7 +35,7 @@ namespace AM
         /// <summary>
         /// Аттачменты.
         /// </summary>
-        public List<BinaryAttachment> Attachments { get; } = new ();
+        public List<BinaryAttachment> Attachments { get; }
 
         #endregion
 
@@ -84,6 +78,9 @@ namespace AM
 
         #region Public methods
 
+        /// <summary>
+        /// Прикрепление контента к исключению.
+        /// </summary>
         public ArsMagnaException Attach
             (
                 string name,
@@ -93,8 +90,10 @@ namespace AM
             Attachments.Add(new BinaryAttachment { Name = name, Content = content });
 
             return this;
-        }
+        } // method Attach
 
         #endregion
-    }
-}
+
+    } // class ArsMagnaException
+
+} // namespace AM

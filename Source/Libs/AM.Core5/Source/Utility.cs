@@ -6,7 +6,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Utility.cs -- сборник простых вспомогательных методов.
@@ -44,35 +46,36 @@ namespace AM
         #region Properties
 
         /// <summary>
-        /// Gets the date of next month first day.
+        /// Первый день следующего месяца.
         /// </summary>
-        /// <value>Next month first day.</value>
-        public static DateTime NextMonth => ThisMonth.AddMonths(1);
+        [Pure]
+        public static DateTime BeginningOfNextMonth => BeginningOfTheMonth.AddMonths(1);
 
         /// <summary>
-        /// Gets the date of next year first day.
+        /// Первый день следующего года.
         /// </summary>
-        /// <value>Next year first day.</value>
-        public static DateTime NextYear => ThisYear.AddYears(1);
+        [Pure]
+        public static DateTime BeginningOfNextYear => BeginningOfTheYear.AddYears(1);
 
         /// <summary>
-        /// Gets the date of previous month first day.
+        /// Первый день предыдущего месяца.
         /// </summary>
-        /// <value>Previous month first day.</value>
-        public static DateTime PreviousMonth => ThisMonth.AddMonths(-1);
+        [Pure]
+        public static DateTime BeginningOfPreviousMonth => BeginningOfTheMonth.AddMonths(-1);
 
         /// <summary>
-        /// Gets the date of previous year first day.
+        /// Первый день предыдущего года.
         /// </summary>
-        /// <value>Previous year first day.</value>
-        public static DateTime PreviousYear => ThisYear.AddYears(-1);
+        [Pure]
+        public static DateTime BeginningOfPreviousYear => BeginningOfTheYear.AddYears(-1);
 
         /// <summary>
-        /// Gets the date of current month first day.
+        /// Первый день текущего месяца.
         /// </summary>
-        /// <value>Current month first day.</value>
-        public static DateTime ThisMonth
+        [Pure]
+        public static DateTime BeginningOfTheMonth
         {
+            [DebuggerStepThrough]
             get
             {
                 var today = PlatformAbstractionLayer.Current.Today();
@@ -82,10 +85,10 @@ namespace AM
         }
 
         /// <summary>
-        /// Gets the date of current year first day.
+        /// Первый день текущего года.
         /// </summary>
-        /// <value>Current year first day.</value>
-        public static DateTime ThisYear => new DateTime
+        [Pure]
+        public static DateTime BeginningOfTheYear => new
             (
                 PlatformAbstractionLayer.Current.Today().Year,
                 1,
@@ -93,36 +96,45 @@ namespace AM
             );
 
         /// <summary>
-        /// Gets the date for tomorrow.
+        /// Сегодняшний день.
         /// </summary>
-        /// <value>Tomorrow date.</value>
-        public static DateTime Tomorrow => PlatformAbstractionLayer.Current.Today().AddDays(1.0);
+        [Pure]
+        public static DateTime Today =>
+            PlatformAbstractionLayer.Current.Today();
 
         /// <summary>
-        /// Gets the for yesterday.
+        /// Завтрашний день.
         /// </summary>
-        /// <value>Yesterday date.</value>
-        public static DateTime Yesterday => PlatformAbstractionLayer.Current.Today().AddDays(-1.0);
+        [Pure]
+        public static DateTime Tomorrow => Today.AddDays(1.0);
 
         /// <summary>
-        /// One day.
+        /// Вчерашний день.
         /// </summary>
-        public static TimeSpan OneDay => new TimeSpan(1, 0, 0, 0);
+        [Pure]
+        public static DateTime Yesterday => Today.AddDays(-1.0);
 
         /// <summary>
-        /// One hour.
+        /// Длительность: одни сутки.
         /// </summary>
-        public static TimeSpan OneHour => new TimeSpan(1, 0, 0);
+        [Pure]
+        public static TimeSpan OneDay => new (1, 0, 0, 0);
 
         /// <summary>
-        /// One minute.
+        /// Длительность: один час.
         /// </summary>
-        public static TimeSpan OneMinute => new TimeSpan(0, 1, 0);
+        public static TimeSpan OneHour => new (1, 0, 0);
 
         /// <summary>
-        /// One second.
+        /// Длительность: одна минута.
         /// </summary>
-        public static TimeSpan OneSecond => new TimeSpan(0, 0, 1);
+        public static TimeSpan OneMinute => new (0, 1, 0);
+
+        /// <summary>
+        /// Длительность: одна секунда.
+        /// </summary>
+        [Pure]
+        public static TimeSpan OneSecond => new (0, 0, 1);
 
         /// <summary>
         /// Gets the CP866 (cyrillic) <see cref="Encoding"/>.
@@ -140,7 +152,7 @@ namespace AM
 
                 return _cp866;
             }
-        }
+        } // property Cp866
 
         /// <summary>
         /// Gets the Windows-1251 (cyrillic) <see cref="Encoding"/>.
@@ -158,7 +170,7 @@ namespace AM
 
                 return _windows1251;
             }
-        }
+        } // property Windows1251
 
         #endregion
 
@@ -173,51 +185,31 @@ namespace AM
         /// <summary>
         /// Is digit from 0 to 9?
         /// </summary>
-        public static bool IsArabicDigit
-            (
-                this char c
-            )
-        {
-            return c >= '0' && c <= '9';
-        }
+        [Pure]
+        public static bool IsArabicDigit (this char c) =>
+            c >= '0' && c <= '9';
 
         /// <summary>
         /// Is letter from A to Z or a to z?
         /// </summary>
-        public static bool IsLatinLetter
-            (
-                this char c
-            )
-        {
-            return c >= 'A' && c <= 'Z'
-                   || c >= 'a' && c <= 'z';
-        }
+        [Pure]
+        public static bool IsLatinLetter (this char c) =>
+            c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
 
         /// <summary>
         /// Is digit from 0 to 9
         /// or letter from A to Z or a to z?
         /// </summary>
-        public static bool IsLatinLetterOrArabicDigit
-            (
-                this char c
-            )
-        {
-            return c >= '0' && c <= '9'
-                   || c >= 'A' && c <= 'Z'
-                   || c >= 'a' && c <= 'z';
-        }
+        [Pure]
+        public static bool IsLatinLetterOrArabicDigit (this char c) =>
+            c >= '0' && c <= '9' || c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z';
 
         /// <summary>
         /// Is letter from А to Я or а to я?
         /// </summary>
-        public static bool IsRussianLetter
-            (
-                this char c
-            )
-        {
-            return c >= 'А' && c <= 'я'
-                   || c == 'Ё' || c == 'ё';
-        }
+        [Pure]
+        public static bool IsRussianLetter ( this char c ) =>
+            c >= 'А' && c <= 'я' || c == 'Ё' || c == 'ё';
 
         /// <summary>
         /// Перенаправление стандартного вывода в файл.
@@ -228,16 +220,13 @@ namespace AM
                 Encoding encoding
             )
         {
-            //Code.NotNullNorEmpty(fileName, "fileName");
-            //Code.NotNull(encoding, "encoding");
-
             var stdOutput = new StreamWriter
                 (
                     new FileStream
-                    (
-                        fileName,
-                        FileMode.Create
-                    ),
+                        (
+                            fileName,
+                            FileMode.Create
+                        ),
                     encoding
                 )
             {
@@ -245,7 +234,7 @@ namespace AM
             };
 
             Console.SetOut(stdOutput);
-        }
+        } // method RedirectStandardOutput
 
         /// <summary>
         /// Переключение кодовой страницы вывода консоли.
@@ -255,75 +244,65 @@ namespace AM
                 Encoding encoding
             )
         {
-            // Code.NotNull(encoding, "encoding");
-
-            StreamWriter stdOutput = new StreamWriter
-            (
-                Console.OpenStandardOutput(),
-                encoding
-            )
+            var stdOutput = new StreamWriter
+                (
+                    Console.OpenStandardOutput(),
+                    encoding
+                )
             {
                 AutoFlush = true
             };
             Console.SetOut(stdOutput);
 
-            StreamWriter stdError = new StreamWriter
-            (
-                Console.OpenStandardError(),
-                encoding
-            )
+            var stdError = new StreamWriter
+                (
+                    Console.OpenStandardError(),
+                    encoding
+                )
             {
                 AutoFlush = true
             };
             Console.SetError(stdError);
-        }
+        } // method SetOutputCodePage
 
         /// <summary>
         /// Переключение кодовой страницы вывода консоли.
         /// </summary>
-        public static void SetOutputCodePage
-            (
-                int codePage
-            )
-        {
-            SetOutputCodePage
-            (
-                Encoding.GetEncoding(codePage)
-            );
-        }
+        public static void SetOutputCodePage (int codePage)
+            => SetOutputCodePage(Encoding.GetEncoding(codePage));
 
         /// <summary>
-        /// Detect AppVeyor CI environment.
+        /// Определение среды исполнения: AppVeyor CI.
         /// </summary>
-        public static bool DetectAppVeyor()
-        {
-            return Environment.GetEnvironmentVariable("APPVEYOR") == "True";
-        }
+        [Pure]
+        public static bool DetectAppVeyor() =>
+            Environment.GetEnvironmentVariable("APPVEYOR").SameString("True");
 
         /// <summary>
-        /// Detect generic CI environment.
+        /// Определение среды исполнения: некий CI сервис вообще.
         /// </summary>
-        public static bool DetectCI()
-        {
-            return Environment.GetEnvironmentVariable("CI") == "True";
-        }
+        [Pure]
+        public static bool DetectCI() =>
+            Environment.GetEnvironmentVariable("CI").SameString("True");
 
         /// <summary>
-        /// Detect generic Travis CI environment.
+        /// Определение среды исполнения: Travis CI.
         /// </summary>
-        public static bool DetectTravis()
-        {
-            return Environment.GetEnvironmentVariable("TRAVIS") == "True";
-        }
+        [Pure]
+        public static bool DetectTravis() =>
+            Environment.GetEnvironmentVariable("TRAVIS").SameString("True");
+
+        /// <summary>
+        /// Определение среды исполнения: Github actions.
+        /// </summary>
+        [Pure]
+        public static bool DetecGithubActions() =>
+            Environment.GetEnvironmentVariable("GITHUB_ACTIONS").SameString("True");
 
         /// <summary>
         /// Бросает исключение, если переданное значение равно <c>null</c>,
         /// иначе просто возвращает его.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
         [Pure]
         [DebuggerStepThrough]
         public static T ThrowIfNull<T>
@@ -331,7 +310,7 @@ namespace AM
                 this T? value,
                 string message
             )
-            where T : class
+            where T: class
         {
             Sure.NotNull(message, nameof(message));
 
@@ -348,109 +327,70 @@ namespace AM
             }
 
             return value;
-        }
+        } // method ThrowIfNull
 
         /// <summary>
         /// Бросает исключение, если переданное значение равно <c>null</c>,
         /// иначе просто возвращает его.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <returns></returns>
         [Pure]
         [DebuggerStepThrough]
-        public static T ThrowIfNull<T>
-            (
-                this T? value
-            )
-            where T : class
-        {
-            return ThrowIfNull<T>
-                (
-                    value,
-                    "Null value detected"
-                );
-        }
+        public static T ThrowIfNull<T> (this T? value) where T: class =>
+            ThrowIfNull<T> (value, "Null value detected");
 
         /// <summary>
         /// Превращает объект в видимую строку.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <returns></returns>
         [Pure]
-        public static string ToVisibleString<T>
-            (
-                this T? value
-            )
-            where T : class
-        {
-            var result = value?.ToString();
-
-            if (ReferenceEquals(result, null))
-            {
-                return "(null)";
-            }
-
-            return result;
-        }
+        public static string ToVisibleString<T> (this T? value) where T: class
+            => value?.ToString() ?? "(null)";
 
         /// <summary>
         /// Сравнивает две строки независимо от текущей культуры.
         /// </summary>
-        public static bool EqualInvariant
-            (
-                string? left,
-                string? right
-            )
-        {
-            return CultureInfo.InvariantCulture.CompareInfo.Compare
-                (
-                    left,
-                    right
-                ) == 0;
-        }
+        [Pure]
+        public static bool SameInvariant (string? left, string? right) =>
+            CultureInfo.InvariantCulture.CompareInfo.Compare (left, right) == 0;
 
         /// <summary>
-        /// Gets the first char of the text.
+        /// Безопасное получение первого символа в строке.
         /// </summary>
-        public static char FirstChar
-            (
-                this string? text
-            )
-        {
-            return string.IsNullOrEmpty(text)
-                ? '\0'
-                : text[0];
-        }
+        [Pure]
+        public static char FirstChar (this string? text) =>
+            string.IsNullOrEmpty(text) ? '\0' : text[0];
 
         /// <summary>
-        /// Gets the last char of the text.
+        /// Безопасное получение первого символа в строке.
         /// </summary>
-        public static char LastChar
-            (
-                this string? text
-            )
-        {
-            return string.IsNullOrEmpty(text)
-                ? '\0'
-                : text[^1];
-        }
+        [Pure]
+        public static char FirstChar(this ReadOnlySpan<char> text) =>
+            text.Length == 0 ? '\0' : text[0];
 
         /// <summary>
-        /// Сравнивает символы с точностью до регистра.
+        /// Безопасное получение последнего символа в строке.
+        /// </summary>
+        [Pure]
+        public static char LastChar (this string? text) =>
+            string.IsNullOrEmpty(text) ? '\0' : text[^1];
+
+        /// <summary>
+        /// Безопасное получение последнего символа в строке.
+        /// </summary>
+        [Pure]
+        public static char LastChar(this ReadOnlySpan<char> text) =>
+            text.Length == 0 ? '\0' : text[^1];
+
+
+        /// <summary>
+        /// Сравнивает символы с точностью до регистра
+        /// без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первый символ.</param>
         /// <param name="two">Второй символ.</param>
-        /// <returns>Символы совпадают с точностью до регистра.</returns>
-        public static bool SameChar
-            (
-                this char one,
-                char two
-            )
-        {
-            return char.ToUpperInvariant(one) == char.ToUpperInvariant(two);
-        }
+        /// <returns>Символы совпадают с точностью до регистра?</returns>
+        [Pure]
+        public static bool SameChar (this char one, char two) =>
+            char.ToUpperInvariant(one) == char.ToUpperInvariant(two);
 
         /// <summary>
         /// Сравнивает символы с точностью до регистра.
@@ -459,6 +399,7 @@ namespace AM
         /// <param name="two">Второй символ.</param>
         /// <param name="three">Третий символ.</param>
         /// <returns>Символы совпадают с точностью до регистра.</returns>
+        [Pure]
         public static bool SameChar
             (
                 this char one,
@@ -470,16 +411,18 @@ namespace AM
 
             return one == char.ToUpperInvariant(two)
                 || one == char.ToUpperInvariant(three);
-        }
+        } // method SameChar
 
         /// <summary>
-        /// Сравнивает символы с точностью до регистра.
+        /// Сравнивает символы с точностью до регистра
+        /// без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первый символ.</param>
         /// <param name="two">Второй символ.</param>
         /// <param name="three">Третий символ.</param>
         /// <param name="four">Четвертый символ.</param>
         /// <returns>Символы совпадают с точностью до регистра.</returns>
+        [Pure]
         public static bool SameChar
             (
                 this char one,
@@ -493,15 +436,17 @@ namespace AM
             return one == char.ToUpperInvariant(two)
                 || one == char.ToUpperInvariant(three)
                 || one == char.ToUpperInvariant(four);
-        }
+        } // method SameChar
 
         /// <summary>
-        /// Сравнивает символы с точностью до регистра.
+        /// Сравнивает символы с точностью до регистра
+        /// без учета текущей кульутры.
         /// </summary>
         /// <param name="one">Левая часть.</param>
         /// <param name="array">Правая часть.</param>
         /// <returns>Результат поиска <paramref name="one"/> среди
         /// элементов <paramref name="array"/>.</returns>
+        [Pure]
         public static bool SameChar
             (
                 this char one,
@@ -517,15 +462,17 @@ namespace AM
             }
 
             return false;
-        }
+        } // method SameChar
 
         /// <summary>
-        /// Сравнивает символы с точностью до регистра.
+        /// Сравнивает символы с точностью до регистра
+        /// без учета текущей культуры.
         /// </summary>
         /// <param name="one">Левая часть.</param>
         /// <param name="text">Правая часть.</param>
         /// <returns>Результат поиска <paramref name="one"/> среди
         /// элементов <paramref name="text"/>.</returns>
+        [Pure]
         public static bool SameChar
             (
                 this char one,
@@ -541,98 +488,56 @@ namespace AM
             }
 
             return false;
-        }
+        } // method SameChar
 
         /// <summary>
-        /// Сравнивает строки с точностью до регистра.
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
-        public static bool SameString
-            (
-                this string? one,
-                string? two
-            )
-        {
-            return string.Compare
-                (
-                    one,
-                    two,
-                    StringComparison.OrdinalIgnoreCase
-                ) == 0;
-        } // method SameString
+        [Pure]
+        public static bool SameString (this string? one, string? two) =>
+            string.Compare (one, two, StringComparison.OrdinalIgnoreCase) == 0;
 
         /// <summary>
-        /// Сравнивает строки с точностью до регистра.
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
         /// <param name="three">Третья строка.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
-        public static bool SameString
-            (
-                this string? one,
-                string? two,
-                string? three
-            )
-        {
-            return string.Compare
-                (
-                    one,
-                    two,
-                    StringComparison.OrdinalIgnoreCase
-                ) == 0
-            || string.Compare
-                (
-                    one,
-                    three,
-                    StringComparison.OrdinalIgnoreCase
-                ) == 0;
-        } // method SameString
+        [Pure]
+        public static bool SameString (this string? one, string? two, string? three) =>
+            string.Compare (one, two, StringComparison.OrdinalIgnoreCase) == 0
+            || string.Compare (one, three, StringComparison.OrdinalIgnoreCase) == 0;
 
         /// <summary>
-        /// Сравнивает строки с точностью до регистра.
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
         /// <param name="three">Третья строка.</param>
         /// <param name="four">Четвертая строка.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
-        public static bool SameString
-            (
-                this string? one,
-                string? two,
-                string? three,
-                string? four
-            )
-        {
-            return string.Compare
-                (
-                    one,
-                    two,
-                    StringComparison.OrdinalIgnoreCase
-                ) == 0
-            || string.Compare
-                (
-                    one,
-                    three,
-                    StringComparison.OrdinalIgnoreCase
-                ) == 0
-            || string.Compare
-                (
-                    one,
-                    four,
-                    StringComparison.OrdinalIgnoreCase
-                ) == 0;
-        } // method SameString
+        [Pure]
+        public static bool SameString (this string? one, string? two,
+            string? three, string? four) =>
+            string.Compare (one, two, StringComparison.OrdinalIgnoreCase) == 0
+            || string.Compare (one, three, StringComparison.OrdinalIgnoreCase) == 0
+            || string.Compare (one, four, StringComparison.OrdinalIgnoreCase) == 0;
 
         /// <summary>
-        /// Сравнивает строки с точностью до регистра.
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="array">Строки для сопоставления.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
+        [Pure]
         public static bool SameString
             (
                 this string? one,
@@ -656,11 +561,43 @@ namespace AM
         } // method SameString
 
         /// <summary>
-        /// Сравнивает строки.
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="strings">Строки для сопоставления.</param>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
+        [Pure]
+        public static bool SameString
+            (
+                this string? one,
+                IEnumerable<string?> strings
+            )
+        {
+            foreach (var two in strings)
+            {
+                if (string.Compare
+                    (
+                        one,
+                        two,
+                        StringComparison.OrdinalIgnoreCase
+                    ) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        } // method SameString
+
+        /// <summary>
+        /// Сравнивает строки с учетом регистра символов,
+        /// но без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
         /// <returns>Строки совпадают?</returns>
+        [Pure]
         public static bool SameStringSensitive
             (
                 this string? one,
@@ -676,12 +613,14 @@ namespace AM
         } // method SameStringSensitive
 
         /// <summary>
-        /// Сравнивает строки.
+        /// Сравнивает строки с учетом регистра символов,
+        /// но без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
         /// <param name="three">Третья строка.</param>
         /// <returns>Строки совпадают?</returns>
+        [Pure]
         public static bool SameStringSensitive
             (
                 this string? one,
@@ -704,13 +643,15 @@ namespace AM
         } // method SameStringSensitive
 
         /// <summary>
-        /// Сравнивает строки.
+        /// Сравнивает строки с учетом регистра символов,
+        /// но без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
         /// <param name="three">Третья строка.</param>
         /// <param name="four">Четвертая строка.</param>
         /// <returns>Строки совпадают?</returns>
+        [Pure]
         public static bool SameStringSensitive
             (
                 this string? one,
@@ -740,11 +681,13 @@ namespace AM
         } // method SameStringSensitive
 
         /// <summary>
-        /// Сравнивает строки.
+        /// Сравнивает строки с учетом регистра символов,
+        /// но без учета текущей культуры.
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="array">Строки для сопоставления.</param>
         /// <returns>Строки совпадают?</returns>
+        [Pure]
         public static bool SameStringSensitive
             (
                 this string? one,
@@ -768,18 +711,34 @@ namespace AM
         } // method SameStringSensitive
 
         /// <summary>
-        /// Преобразование числа в строку по правилам инвариантной
-        /// (не зависящей от региона) культуры.
+        /// Сравнивает строки с учетом регистра символов,
+        /// но без учета текущей культуры.
         /// </summary>
-        /// <param name="value">Число для преобразования.</param>
-        /// <returns>Строковое представление числа.</returns>
-        public static string ToInvariantString
+        /// <param name="one">Первая строка.</param>
+        /// <param name="strings">Строки для сопоставления.</param>
+        /// <returns>Строки совпадают?</returns>
+        [Pure]
+        public static bool SameStringSensitive
             (
-                this short value
+                this string? one,
+                IEnumerable<string?> strings
             )
         {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
+            foreach (var two in strings)
+            {
+                if (string.Compare
+                    (
+                        one,
+                        two,
+                        StringComparison.Ordinal
+                    ) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        } // method SameStringSensitive
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -787,13 +746,9 @@ namespace AM
         /// </summary>
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
-        public static string ToInvariantString
-            (
-                this ushort value
-            )
-        {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
+        [Pure]
+        public static string ToInvariantString (this short value) =>
+            value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -801,13 +756,19 @@ namespace AM
         /// </summary>
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
-        public static string ToInvariantString
-            (
-                this int value
-            )
-        {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
+        [Pure]
+        public static string ToInvariantString (this ushort value) =>
+            value.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        /// <param name="value">Число для преобразования.</param>
+        /// <returns>Строковое представление числа.</returns>
+        [Pure]
+        public static string ToInvariantString (this int value) =>
+            value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -936,7 +897,43 @@ namespace AM
         }
 
         /// <summary>
-        /// Determines whether is one of the specified values.
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf<T>(this T value, T first, T second)
+            where T : IComparable<T> =>
+            value.CompareTo(first) == 0
+            || value.CompareTo(second) == 0;
+
+        /// <summary>
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf<T>(this T value, T first, T second,
+            T third)
+            where T : IComparable<T> =>
+            value.CompareTo(first) == 0
+            || value.CompareTo(second) == 0
+            || value.CompareTo(third) == 0;
+
+        /// <summary>
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf<T>(this T value, T first, T second,
+            T third, T fourth)
+            where T : IComparable<T> =>
+            value.CompareTo(first) == 0
+            || value.CompareTo(second) == 0
+            || value.CompareTo(third) == 0
+            || value.CompareTo(fourth) == 0;
+
+        /// <summary>
+        /// Определяет, равен ли данный объект
+        /// любому из перечисленных.
         /// </summary>
         [Pure]
         public static bool IsOneOf<T>
@@ -944,7 +941,7 @@ namespace AM
                 this T value,
                 params T[] array
             )
-            where T : IComparable<T>
+            where T: IComparable<T>
         {
             foreach (var one in array)
             {
@@ -958,17 +955,70 @@ namespace AM
         }
 
         /// <summary>
+        /// Безопасный доступ по индексу.
+        /// </summary>
+        [Pure]
+        public static T? SafeAt<T>
+            (
+                this IList<T?> items,
+                int index,
+                T? defaultValue = default
+            )
+            => index < 0 || index >= items.Count ? defaultValue : items[index];
+
+        /// <summary>
+        /// Безопасный доступ по индексу.
+        /// </summary>
+        [Pure]
+        public static T? SafeAt<T>
+            (
+                this IReadOnlyList<T?> items,
+                int index,
+                T? defaultValue = default
+            )
+            => index < 0 || index >= items.Count ? defaultValue : items[index];
+
+        /// <summary>
+        /// Безопасный доступ по индексу.
+        /// </summary>
+        [Pure]
+        public static T? SafeAt<T>
+            (
+                this T?[] items,
+                int index,
+                T? defaultValue = default
+            )
+            => index < 0 || index >= items.Length ? defaultValue : items[index];
+
+        /// <summary>
+        /// Определяет, равен ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf<T>
+            (
+                this T value,
+                IEnumerable<T> items
+            )
+            where T: IComparable<T>
+        {
+            foreach (var one in items)
+            {
+                if (value.CompareTo(one) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Converts empty string to <c>null</c>.
         /// </summary>
-        public static string? EmptyToNull
-            (
-                this string? value
-            )
-        {
-            return string.IsNullOrEmpty(value)
-                ? null
-                : value;
-        }
+        [Pure]
+        public static string? EmptyToNull (this string? value) =>
+            string.IsNullOrEmpty(value) ? null : value;
 
         /// <summary>
         /// Determines whether given value can be converted to
@@ -1239,59 +1289,36 @@ namespace AM
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
-        public static Task RaiseAsync
-            (
-                this EventHandler? handler,
-                object? sender,
-                EventArgs args
-            )
-        {
-            Task result = Task.Factory.StartNew
-                (
-                    () =>
-                    {
-                        handler?.Invoke(sender, args);
-                    }
-                );
-
-            return result;
-        }
+        public static Task RaiseAsync (this EventHandler? handler, object? sender,
+            EventArgs args) =>
+            Task.Factory
+                .StartNew (() => { handler?.Invoke(sender, args); });
 
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
-        public static Task RaiseAsync
-            (
-                this EventHandler? handler,
-                object? sender
-            )
-        {
-            Task result = Task.Factory.StartNew
-                (
-                    () =>
-                    {
-                        handler?.Invoke(sender, EventArgs.Empty);
-                    }
-                );
-
-            return result;
-        }
+        public static Task RaiseAsync (this EventHandler? handler, object? sender) =>
+            Task.Factory
+                .StartNew (() => { handler?.Invoke(sender, EventArgs.Empty); });
 
         /// <summary>
         /// Is zero-length time span?
         /// </summary>
+        [Pure]
         public static bool IsZero(this TimeSpan timeSpan)
             => TimeSpan.Compare(timeSpan, TimeSpan.Zero) == 0;
 
         /// <summary>
         /// Is zero-length or less?
         /// </summary>
+        [Pure]
         public static bool IsZeroOrLess(this TimeSpan timeSpan)
             => TimeSpan.Compare(timeSpan, TimeSpan.Zero) <= 0;
 
         /// <summary>
         /// Is length of the time span less than zero?
         /// </summary>
+        [Pure]
         public static bool LessThanZero(this TimeSpan timeSpan)
             => TimeSpan.Compare(timeSpan, TimeSpan.Zero) < 0;
 
@@ -1300,6 +1327,7 @@ namespace AM
         /// automatically selecting format
         /// according duration of the span.
         /// </summary>
+        [Pure]
         public static string ToAutoString
             (
                 this TimeSpan span
@@ -1326,6 +1354,7 @@ namespace AM
         /// <summary>
         /// Converts time span using format 'dd:hh:mm:ss'
         /// </summary>
+        [Pure]
         public static string ToDayString
             (
                 this TimeSpan span
@@ -1345,6 +1374,7 @@ namespace AM
         /// <summary>
         /// Converts time span using format 'hh:mm:ss'
         /// </summary>
+        [Pure]
         public static string ToHourString
             (
                 this TimeSpan span
@@ -1363,6 +1393,7 @@ namespace AM
         /// <summary>
         /// Converts time span using format 'mm:ss'
         /// </summary>
+        [Pure]
         public static string ToMinuteString
             (
                 this TimeSpan span
@@ -1384,6 +1415,7 @@ namespace AM
         /// <summary>
         /// Converts time span using format 's.ff'
         /// </summary>
+        [Pure]
         public static string ToSecondString
             (
                 this TimeSpan span
@@ -1399,6 +1431,7 @@ namespace AM
         /// <summary>
         /// Converts time span using format 's'
         /// </summary>
+        [Pure]
         public static string ToWholeSecondsString
             (
                 this TimeSpan span
@@ -1414,6 +1447,7 @@ namespace AM
         /// <summary>
         /// Mangle given text with the escape character.
         /// </summary>
+        [Pure]
         public static string? Mangle
             (
                 string? text,
@@ -1443,6 +1477,7 @@ namespace AM
         /// <summary>
         /// Сравнение двух фрагментов.
         /// </summary>
+        [Pure]
         public static int CompareSpans
             (
                 ReadOnlySpan<byte> first,
@@ -1480,6 +1515,7 @@ namespace AM
         /// <remarks>Пустые строки не удаляются.</remarks>
         /// <param name="text">Текст для разбиения.</param>
         /// <returns>Массив строк.</returns>
+        [Pure]
         public static string[] SplitLines
             (
                 this string text
@@ -1496,6 +1532,7 @@ namespace AM
         /// <summary>
         /// Optimal degree of parallelism.
         /// </summary>
+        [Pure]
         public static int OptimalParallelism
         {
             get
@@ -1517,54 +1554,63 @@ namespace AM
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo(Expression<Action> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo<T>(Expression<Action<T>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo<T1, T2>(Expression<Action<T1, T2>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo<T1, T2, T3>(Expression<Action<T1, T2, T3>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo<T1, T2, T3, T4>(Expression<Action<T1, T2, T3, T4>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo<T>(Expression<Func<T>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo<T1, T2>(Expression<Func<T1, T2>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo<T1, T2, T3>(Expression<Func<T1, T2, T3>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 
         /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
+        [Pure]
         public static MethodInfo GetMethodInfo<T1, T2, T3, T4>(Expression<Func<T1, T2, T3, T4>> expression)
             => ((MethodCallExpression) expression.Body).Method;
 

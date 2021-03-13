@@ -25,6 +25,9 @@ namespace AM
     /// <typeparam name="T">Тип фрагментов.</typeparam>
     public sealed class ChainMemory<T>
     {
+        /// <summary>
+        /// Перечислитель для цепочки фрагментов памяти.
+        /// </summary>
         public struct ChainEnumerator<TT>
         {
             private ChainMemory<TT>? _head;

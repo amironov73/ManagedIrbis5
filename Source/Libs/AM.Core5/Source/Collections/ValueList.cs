@@ -31,8 +31,14 @@ namespace AM.Collections
     {
         #region Properties
 
+        /// <summary>
+        /// Текущая емкость списка.
+        /// </summary>
         public int Capacity => _values.Length;
 
+        /// <summary>
+        /// Текущая длина списка.
+        /// </summary>
         public int Length
         {
             get => _position;
@@ -87,12 +93,21 @@ namespace AM.Collections
 
         #region Public methods
 
+        /// <summary>
+        /// Выдача списка как спана.
+        /// </summary>
         public ReadOnlySpan<T> AsSpan() =>
             _values.Slice(0, _position);
 
+        /// <summary>
+        /// Выдача списка как спана.
+        /// </summary>
         public ReadOnlySpan<T> AsSpan(int start) =>
             _values.Slice(start, _position - start);
 
+        /// <summary>
+        /// Выдача списка как спана.
+        /// </summary>
         public ReadOnlySpan<T> AsSpan(int start, int length) =>
             _values.Slice(start, length);
 
