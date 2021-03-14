@@ -1530,6 +1530,91 @@ namespace AM
         }
 
         /// <summary>
+        /// Содержит ли строка указанную подстроку?
+        /// </summary>
+        public static bool SafeContains (this string? text, string? subtext) =>
+            !string.IsNullOrEmpty(text)
+            && !string.IsNullOrEmpty(subtext)
+            && text.Contains(subtext);
+
+        /// <summary>
+        /// Содержит ли данная строка одну из перечисленных подстрок?
+        /// </summary>
+        public static bool SafeContains
+            (
+                this string? text,
+                string? subtext1,
+                string? subtext2
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(subtext1) && text.Contains(subtext1))
+            {
+                return true;
+            }
+
+            return !string.IsNullOrEmpty(subtext2) && text.Contains(subtext2);
+        }
+
+        /// <summary>
+        /// Содержит ли данная строка одну из перечисленных подстрок?
+        /// </summary>
+        public static bool SafeContains
+            (
+                this string? text,
+                string? subtext1,
+                string? subtext2,
+                string? subtext3
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(subtext1) && text.Contains(subtext1))
+            {
+                return true;
+            }
+
+            if (!string.IsNullOrEmpty(subtext2) && text.Contains(subtext2))
+            {
+                return true;
+            }
+
+            return !string.IsNullOrEmpty(subtext3) && text.Contains(subtext3);
+        }
+
+        /// <summary>
+        /// Содержит ли данная строка одну из перечисленных подстрок?
+        /// </summary>
+        public static bool SafeContains
+            (
+                this string? text,
+                params string?[] subtexts
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return false;
+            }
+
+            foreach (var subtext in subtexts)
+            {
+                if (!string.IsNullOrEmpty(subtext) && text.Contains(subtext))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Optimal degree of parallelism.
         /// </summary>
         [Pure]
