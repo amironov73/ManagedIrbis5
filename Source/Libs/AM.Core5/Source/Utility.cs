@@ -507,6 +507,17 @@ namespace AM
         /// </summary>
         /// <param name="one">Первая строка.</param>
         /// <param name="two">Вторая строка.</param>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
+        [Pure]
+        public static bool SameString(this ReadOnlySpan<char> one, ReadOnlySpan<char> two) =>
+            one.CompareTo(two, StringComparison.OrdinalIgnoreCase) == 0;
+
+        /// <summary>
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
         /// <param name="three">Третья строка.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
         [Pure]
