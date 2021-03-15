@@ -9,13 +9,14 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* IPftFormatter.cs -- интерфейс форматтера PFT.
+/* IPftFormatter.cs -- интерфейс форматтера PFT
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using ManagedIrbis.Client;
 
 #endregion
 
@@ -65,6 +66,11 @@ namespace ManagedIrbis.Pft
             (
                 string source
             );
+
+        /// <summary>
+        /// Установка провайдера.
+        /// </summary>
+        void SetProvider(IrbisProvider contextProvider);
 
     } // interface IPftFormatter
 

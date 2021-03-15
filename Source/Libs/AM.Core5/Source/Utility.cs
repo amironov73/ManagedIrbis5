@@ -983,18 +983,6 @@ namespace AM
         [Pure]
         public static T? SafeAt<T>
             (
-                this IReadOnlyList<T?> items,
-                int index,
-                T? defaultValue = default
-            )
-            => index < 0 || index >= items.Count ? defaultValue : items[index];
-
-        /// <summary>
-        /// Безопасный доступ по индексу.
-        /// </summary>
-        [Pure]
-        public static T? SafeAt<T>
-            (
                 this T?[] items,
                 int index,
                 T? defaultValue = default
