@@ -2,6 +2,9 @@ version: 5.0.0.{build}
 configuration: Debug
 image: Visual Studio 2019
 
+environment:
+  PATH: C:\Python36-x64;C:\Python36-x64\Scripts;%PATH%
+
 init:
   - git config --global core.autocrlf true
 
@@ -16,11 +19,11 @@ dotnet_csproj:
 
 before_build:
 - cmd: choco install miktex
-- cmd: C:\Python36-x64\python -m pip install --upgrade pip
-- cmd: C:\Python36-x64\Scripts\pip install --upgrade pygount sphinx sphinx_rtd_theme
-- cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
-- cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Tests -s cs -N "*.Designer.cs" -F "obj"
-- cmd: C:\Python36-x64\Scripts\pygount -f summary Source/Apps -s cs -N "*.Designer.cs" -F "obj"
+- cmd: python -m pip install --upgrade pip
+- cmd: pip install --upgrade pygount sphinx sphinx_rtd_theme
+- cmd: pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
+- cmd: pygount -f summary Source/Tests -s cs -N "*.Designer.cs" -F "obj"
+- cmd: pygount -f summary Source/Apps -s cs -N "*.Designer.cs" -F "obj"
 - cmd: dotnet --info
 
 build_script:
