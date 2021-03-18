@@ -14,8 +14,6 @@
 
 /* JobObjectInfoType.cs -- limits for JobObject
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 namespace AM.Win32

@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* BiblioDictionary.cs -- 
+/* BiblioDictionary.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,21 +14,17 @@ using AM;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class BiblioDictionary
         : Dictionary<string, DictionaryEntry>
     {
@@ -53,7 +47,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public void Add
             (
-                [NotNull] string title,
+                string title,
                 int reference
             )
         {
@@ -80,7 +74,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public void Dump
             (
-                [NotNull] AbstractOutput output
+                AbstractOutput output
             )
         {
             Code.NotNull(output, "output");

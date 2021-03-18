@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* DictionaryEntry.cs -- 
+/* DictionaryEntry.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,19 +13,16 @@ using System.Text;
 
 using AM.Text;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class DictionaryEntry
     {
         #region Properties
@@ -41,7 +36,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// List of references.
         /// </summary>
-        [NotNull]
         public List<int> References { get; set; }
 
         #endregion

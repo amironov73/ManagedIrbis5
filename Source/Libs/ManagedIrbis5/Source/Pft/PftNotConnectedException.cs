@@ -3,15 +3,12 @@
 
 /* PftNotConnectedException.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 
-using JetBrains.Annotations;
 
 #endregion
 
@@ -21,7 +18,7 @@ namespace ManagedIrbis.Pft
     /// Возникает, когда необходимо обращение к серверу,
     /// а подключение отсутствует.
     /// </summary>
-    [PublicAPI]
+
     public sealed class PftNotConnectedException
         : PftException
     {
@@ -37,7 +34,7 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Constructor.
         /// </summary>
-        public PftNotConnectedException(string message) 
+        public PftNotConnectedException(string message)
             : base(message)
         {
         }
@@ -47,12 +44,12 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftNotConnectedException
             (
-                string message, 
+                string message,
                 Exception innerException
-            ) 
-            : base 
-            ( 
-                message, 
+            )
+            : base
+            (
+                message,
                 innerException
             )
         {

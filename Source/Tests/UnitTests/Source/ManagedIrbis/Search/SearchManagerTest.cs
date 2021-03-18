@@ -2,7 +2,6 @@
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis;
 using ManagedIrbis.Client;

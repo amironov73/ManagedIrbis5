@@ -1,31 +1,31 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
 /* LoggingDriver.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
+using AM;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
     /// Logging driver for report debugging.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class LoggingDriver
         : ReportDriver
     {
@@ -34,7 +34,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Inner driver.
         /// </summary>
-        [NotNull]
         public ReportDriver InnerDriver { get; private set; }
 
         #endregion
@@ -46,11 +45,9 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public LoggingDriver
             (
-                [NotNull] ReportDriver innerDriver
+                ReportDriver innerDriver
             )
         {
-            Code.NotNull(innerDriver, "innerDriver");
-
             InnerDriver = innerDriver;
         }
 
@@ -65,7 +62,7 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            Log.Trace(string.Format
+            Magna.Trace(string.Format
                 (
                     "ReportDriver.BeginCell: {0}",
                     cell
@@ -81,7 +78,7 @@ namespace ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            Log.Trace(string.Format
+            Magna.Trace(string.Format
                 (
                     "ReportDriver.BeginDocument: {0}",
                     report
@@ -97,7 +94,7 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Log.Trace(string.Format
+            Magna.Trace(string.Format
                 (
                     "ReportDriver.BeginRow: {0}",
                     band
@@ -113,7 +110,7 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            Log.Trace(string.Format
+            Magna.Trace(string.Format
                 (
                     "ReportDriver.EndCell: {0}",
                     cell
@@ -129,7 +126,7 @@ namespace ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            Log.Trace(string.Format
+            Magna.Trace(string.Format
                 (
                     "ReportDriver.EndDocument: {0}",
                     report
@@ -145,7 +142,7 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Log.Trace(string.Format
+            Magna.Trace(string.Format
                 (
                     "ReportDriver.EndRow: {0}",
                     band
@@ -161,7 +158,7 @@ namespace ManagedIrbis.Reports
                 string text
             )
         {
-            Log.Trace(string.Format
+            Magna.Trace(string.Format
                 (
                     "ReportDriver.Write: {0}",
                     text

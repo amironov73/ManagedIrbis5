@@ -8,8 +8,6 @@
 
 /* IrbisRestClient.cs -- client for IrbisModule
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #if FW4 || ANDROID
@@ -17,11 +15,8 @@
 #region Using directives
 
 using AM;
-using AM.Logging;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using Newtonsoft.Json;
 
@@ -30,7 +25,6 @@ using ManagedIrbis;
 using ManagedIrbis.Client;
 using ManagedIrbis.Search;
 
-using MoonSharp.Interpreter;
 
 using RestSharp;
 
@@ -41,8 +35,7 @@ namespace RestfulIrbis
     /// <summary>
     /// Client for IrbisModule.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class IrbisRestClient
         : IrbisProvider
     {
@@ -54,7 +47,7 @@ namespace RestfulIrbis
         // ReSharper disable DoNotCallOverridableMethodsInConstructor
         public IrbisRestClient
             (
-                [NotNull] string url
+                string url
             )
         {
             Code.NotNullNorEmpty(url, nameof(url));
@@ -80,11 +73,10 @@ namespace RestfulIrbis
         /// <summary>
         /// Format record by MFN.
         /// </summary>
-        [NotNull]
         public string FormatRecord
             (
                 int mfn,
-                [NotNull] string format
+                string format
             )
         {
             Log.Trace("IrbisRestClient: format record");
@@ -118,8 +110,8 @@ namespace RestfulIrbis
         [ItemNotNull]
         public override string[] FormatRecords
             (
-                [NotNull] int[] mfns,
-                [NotNull] string format
+                int[] mfns,
+                string format
             )
         {
             Log.Trace("IrbisRestClient: format records");
@@ -143,7 +135,7 @@ namespace RestfulIrbis
                 request.AddUrlSegment("format", format);
                 request.AddParameter
                     (
-                        "application/json; charset=utf-8", 
+                        "application/json; charset=utf-8",
                         JsonConvert.SerializeObject(mfns),
                         ParameterType.RequestBody
                     );
@@ -206,8 +198,7 @@ namespace RestfulIrbis
         }
 
         /// <inheritdoc/>
-        [NotNull]
-        public override MarcRecord ReadRecord
+        public override Record ReadRecord
             (
                 int mfn
             )
@@ -227,7 +218,7 @@ namespace RestfulIrbis
 
             var response = _client.Execute(request);
             var result
-                = JsonConvert.DeserializeObject<MarcRecord>
+                = JsonConvert.DeserializeObject<Record>
                 (
                     response.Content
                 );
@@ -236,7 +227,6 @@ namespace RestfulIrbis
         }
 
         /// <inheritdoc/>
-        [NotNull]
         public override SearchScenario[] ReadSearchScenarios()
         {
             Log.Trace("IrbisRestClient: read search scenario");

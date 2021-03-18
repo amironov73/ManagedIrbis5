@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftSyntaxException.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* PftSyntaxException.cs -- исключение, возникающее при разборе PFT-скрипта
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,11 +17,11 @@ using System;
 
 using AM.Text;
 
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft
 {
@@ -52,7 +56,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftSyntaxException
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : this("Unexpected token: " + token)
         {
@@ -63,7 +67,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftSyntaxException
             (
-                [NotNull] PftTokenList tokenList
+                PftTokenList tokenList
             )
             : this
                 (
@@ -78,7 +82,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftSyntaxException
             (
-                [NotNull] PftTokenList tokenList,
+                PftTokenList tokenList,
                 Exception innerException
             )
             : this
@@ -111,7 +115,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftSyntaxException
             (
-                [NotNull] PftToken token,
+                PftToken token,
                 Exception innerException
             )
             : this
@@ -127,7 +131,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftSyntaxException
             (
-                [NotNull] TextNavigator navigator
+                TextNavigator navigator
             )
             : this("Syntax error at: " + navigator)
         {
@@ -138,12 +142,14 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftSyntaxException
             (
-                [NotNull] PftNode node
+                PftNode node
             )
             : this("Syntax error at: " + node)
         {
         }
 
         #endregion
-    }
-}
+
+    } // class PftSyntaxException
+
+} // namespace ManagedIrbis.Pft

@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* MenuChapter.cs -- 
+/* MenuChapter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -17,9 +15,7 @@ using System.Text.RegularExpressions;
 using AM;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
@@ -27,7 +23,6 @@ using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -38,10 +33,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class MenuChapter
         : BiblioChapter
     {
@@ -104,7 +98,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// List of settings.
         /// </summary>
-        [NotNull]
         [JsonProperty("menuSettings")]
         public List<SpecialSettings> MenuSettings { get; private set; }
 
@@ -135,8 +128,8 @@ namespace ManagedIrbis.Biblio
 
         private MenuSubChapter _CreateChapter
             (
-                [NotNull] IPftFormatter formatter,
-                [NotNull] IrbisTreeFile.Item item
+                IPftFormatter formatter,
+                IrbisTreeFile.Item item
             )
         {
             string key = item.Prefix.Trim();
@@ -146,7 +139,7 @@ namespace ManagedIrbis.Biblio
                 );
             string value = item.Suffix;
 
-            MarcRecord record = new MarcRecord();
+            Record record = new Record();
             record.Fields.Add(new RecordField(1, key));
             record.Fields.Add(new RecordField(2, value));
             string title = formatter.FormatRecord(record);
@@ -190,7 +183,7 @@ namespace ManagedIrbis.Biblio
 
         private void _RemoveSubField
             (
-                [NotNull] MarcRecord record,
+                Record record,
                 int tag,
                 char code
             )
@@ -204,7 +197,7 @@ namespace ManagedIrbis.Biblio
 
         private void _BeautifyRecord
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
             // Украшаем запись согласно вкусам библиографов
@@ -285,7 +278,7 @@ namespace ManagedIrbis.Biblio
 
         private void _Fix463
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
             //
@@ -309,7 +302,7 @@ namespace ManagedIrbis.Biblio
 
         private static int _GetYear
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
             string result = record.FM(210, 'd');
@@ -344,7 +337,7 @@ namespace ManagedIrbis.Biblio
 
         private void _GatherSame
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             //
@@ -357,29 +350,29 @@ namespace ManagedIrbis.Biblio
                 return;
             }
 
-            MarcRecord[] allMarked = records.Where(r => r.HaveField(2025)).ToArray();
+            Record[] allMarked = records.Where(r => r.HaveField(2025)).ToArray();
             var grouped = allMarked.GroupBy(r => r.FM(2025));
-            List<MarcRecord> toRemove = new List<MarcRecord>();
+            List<Record> toRemove = new List<Record>();
             foreach (var oneGroup in grouped)
             {
-                MarcRecord[] array = oneGroup.ToArray();
+                Record[] array = oneGroup.ToArray();
                 if (array.Length == 1)
                 {
                     continue;
                 }
 
-                foreach (MarcRecord record in array)
+                foreach (Record record in array)
                 {
                     record.UserData = _GetYear(record);
                 }
 
                 array = array.OrderBy(r => (int) r.UserData).ToArray();
 
-                MarcRecord firstRecord = array[0];
+                Record firstRecord = array[0];
                 RecordCollection same = new RecordCollection();
                 for (int i = 1; i < array.Length; i++)
                 {
-                    MarcRecord record = array[i];
+                    Record record = array[i];
                     record.RemoveField(200);
                     record.RemoveField(922);
                     record.RemoveField(925);
@@ -398,7 +391,7 @@ namespace ManagedIrbis.Biblio
                 firstRecord.UserData = same;
             }
 
-            foreach (MarcRecord recordToRemove in toRemove)
+            foreach (Record recordToRemove in toRemove)
             {
                 records.Remove(recordToRemove);
                 context.Records.Remove(recordToRemove);
@@ -425,7 +418,7 @@ namespace ManagedIrbis.Biblio
             log.WriteLine("Begin gather records {0}", this);
             RecordCollection badRecords = context.BadRecords;
             Records = new RecordCollection();
-            MarcRecord record = null;
+            Record record = null;
 
             try
             {
@@ -441,7 +434,7 @@ namespace ManagedIrbis.Biblio
                     string searchExpression = SearchExpression
                         .ThrowIfNull("SearchExpression");
                     formatter.ParseProgram(searchExpression);
-                    record = new MarcRecord();
+                    record = new Record();
                     searchExpression = formatter.FormatRecord(record);
 
                     int[] found = provider.Search(searchExpression);
@@ -470,7 +463,7 @@ namespace ManagedIrbis.Biblio
                     //for (int i = 0; i < found.Length; i++)
                     //{
                     //    log.Write(".");
-                    //    record = new MarcRecord
+                    //    record = new Record
                     //    {
                     //        Mfn = found[i]
                     //    };

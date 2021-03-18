@@ -4,7 +4,6 @@ using System.IO;
 using AM;
 using AM.Runtime;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

@@ -7,9 +7,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMethodReturnValue.Global
 // ReSharper disable UnusedParameter.Local
 
-/* CellCollection.cs -- коллекция ячеек
+/* CellCollection.cs -- коллекция ячеек отчета
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,6 +28,8 @@ using AM;
 using AM.Runtime;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
@@ -89,7 +92,7 @@ namespace ManagedIrbis.Reports
         {
             ThrowIfReadOnly();
 
-            foreach (ReportCell cell in cells)
+            foreach (var cell in cells)
             {
                 Add(cell);
             }
@@ -100,15 +103,15 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public CellCollection Clone()
         {
-            CellCollection result = new CellCollection
+            var result = new CellCollection
             {
                 Band = Band,
                 Report = Report
             };
 
-            foreach (ReportCell cell in this)
+            foreach (var cell in this)
             {
-                ReportCell clone = cell.Clone();
+                var clone = cell.Clone();
                 clone.Report = Report;
                 result.Add(clone);
             }
@@ -138,7 +141,7 @@ namespace ManagedIrbis.Reports
         {
             ThrowIfReadOnly();
 
-            foreach (ReportCell cell in this)
+            foreach (var cell in this)
             {
                 cell.Band = null;
                 cell.Report = null;
@@ -172,7 +175,7 @@ namespace ManagedIrbis.Reports
 
             if (index >= 0 && index < Count)
             {
-                ReportCell cell  = this[index];
+                var cell  = this[index];
                 if (!ReferenceEquals(cell, null))
                 {
                     cell.Band = null;
@@ -256,11 +259,11 @@ namespace ManagedIrbis.Reports
         /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
         public CellCollection AsReadOnly()
         {
-            CellCollection result = Clone();
+            var result = Clone();
             result.SetReadOnly();
 
             return result;
-        }
+        } // method AsReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
         public void SetReadOnly()
@@ -292,16 +295,16 @@ namespace ManagedIrbis.Reports
                 bool throwOnError
             )
         {
-            Verifier<CellCollection> verifier
+            var verifier
                 = new Verifier<CellCollection>(this, throwOnError);
 
-            foreach (ReportCell cell in this)
+            foreach (var cell in this)
             {
                 verifier.VerifySubObject(cell, "cell");
             }
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
@@ -310,11 +313,11 @@ namespace ManagedIrbis.Reports
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            foreach (ReportCell cell in this)
+            foreach (var cell in this)
             {
                 cell.Dispose();
             }
-        }
+        } // method Dispose
 
         #endregion
 

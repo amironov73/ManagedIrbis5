@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ReportSettings.cs -- 
+/* ReportSettings.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,13 +10,10 @@
 using AM;
 using AM.Collections;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -33,10 +28,9 @@ using AM.Json;
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class ReportSettings
         : IVerifiable
     {
@@ -45,7 +39,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Assemblies to load.
         /// </summary>
-        [NotNull]
         [JsonProperty("assemblies")]
         public NonNullCollection<string> Assemblies
         {
@@ -146,7 +139,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public static ReportSettings LoadFromFile
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             Code.NotNullNorEmpty(fileName, "fileName");

@@ -38,43 +38,36 @@ namespace AM
         /// <summary>
         /// Colon.
         /// </summary>
-        [NotNull]
         public static readonly char[] Colon = { ':' };
 
         /// <summary>
         /// Comma.
         /// </summary>
-        [NotNull]
         public static readonly char[] Comma = { ',' };
 
         /// <summary>
         /// Dot.
         /// </summary>
-        [NotNull]
         public static readonly char[] Dot = { '.' };
 
         /// <summary>
         /// Semicolon.
         /// </summary>
-        [NotNull]
         public static readonly char[] Semicolon = { ';' };
 
         /// <summary>
         /// Space.
         /// </summary>
-        [NotNull]
         public static readonly char[] Space = { ' ' };
 
         /// <summary>
         /// Tab.
         /// </summary>
-        [NotNull]
         public static readonly char[] Tab = { '\t' };
 
         /// <summary>
         /// Pipe sign.
         /// </summary>
-        [NotNull]
         public static readonly char[] Pipe = { '|' };
 
         #endregion

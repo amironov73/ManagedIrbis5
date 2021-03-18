@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* LatexDriver.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* LatexDriver.cs -- драйвер для вывода отчета в формате LaTeX
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,21 +21,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class LatexDriver
         : ReportDriver
     {

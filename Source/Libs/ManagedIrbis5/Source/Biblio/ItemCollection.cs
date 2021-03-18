@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ItemCollection.cs -- 
+/* ItemCollection.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -23,23 +21,19 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class ItemCollection
         : NonNullCollection<BiblioItem>,
         IVerifiable
@@ -52,8 +46,8 @@ namespace ManagedIrbis.Biblio
 
         private static void ReadDigit
             (
-                [NotNull] TextNavigator navigator,
-                [NotNull] StringBuilder text
+                TextNavigator navigator,
+                StringBuilder text
             )
         {
             char c = navigator.PeekChar();
@@ -94,7 +88,7 @@ namespace ManagedIrbis.Biblio
 
         private static bool _IsOfficial
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
             // Официальные документы имеют характер n или 67
@@ -116,7 +110,7 @@ namespace ManagedIrbis.Biblio
 
         private static bool _IsForeign
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
             // У иностранных книг язык не rus
@@ -133,8 +127,8 @@ namespace ManagedIrbis.Biblio
                 BiblioItem y
             )
         {
-            MarcRecord xrec = x.Record;
-            MarcRecord yrec = y.Record;
+            Record xrec = x.Record;
+            Record yrec = y.Record;
             if (!ReferenceEquals(xrec, null) && !ReferenceEquals(yrec, null))
             {
                 // Поднимаем официальные документы

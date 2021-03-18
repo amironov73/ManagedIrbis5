@@ -1,33 +1,26 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftHtmlFormatter.cs -- 
+/* PftHtmlFormatter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using AM.Logging;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Pft
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class PftHtmlFormatter
         : PftFormatter
     {
@@ -36,7 +29,6 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Text separator.
         /// </summary>
-        [NotNull]
         public PftTextSeparator Separator { get; private set; }
 
         #endregion
@@ -56,7 +48,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftHtmlFormatter
             (
-                [NotNull] PftContext context
+                PftContext context
             )
             : base(context)
         {

@@ -3,8 +3,6 @@
 
 /* MenuSubChapter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -19,15 +17,12 @@ using AM.Collections;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json.Linq;
 
@@ -40,8 +35,7 @@ namespace ManagedIrbis.Biblio
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class MenuSubChapter
         : ChapterWithRecords
     {
@@ -96,7 +90,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Get description format from chapter hierarchy.
         /// </summary>
-        [NotNull]
         protected virtual string GetDescriptionFormat()
         {
             BiblioChapter chapter = this;
@@ -128,7 +121,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Get order format from chapter hierarchy.
         /// </summary>
-        [NotNull]
         protected virtual string GetOrderFormat()
         {
             BiblioChapter chapter = this;
@@ -157,10 +149,9 @@ namespace ManagedIrbis.Biblio
                 .ThrowIfNull("MainChapter.Format");
         }
 
-        [NotNull]
         internal static string Enhance
             (
-                [NotNull] string text
+                string text
             )
         {
             string result = text
@@ -187,7 +178,7 @@ namespace ManagedIrbis.Biblio
             Code.NotNull(context, "context");
 
             AbstractOutput log = context.Log;
-            MarcRecord record = null;
+            Record record = null;
 
             log.WriteLine("Begin build items {0}", this);
             Items = new ItemCollection();
@@ -238,7 +229,7 @@ namespace ManagedIrbis.Biblio
                             RecordCollection same = record.UserData as RecordCollection;
                             if (!ReferenceEquals(same, null))
                             {
-                                foreach (MarcRecord oneRecord in same)
+                                foreach (Record oneRecord in same)
                                 {
                                     string desc = formatter.FormatRecord(oneRecord)
                                         .TrimEnd('\u001F');
@@ -368,7 +359,7 @@ namespace ManagedIrbis.Biblio
                             RichText.Encode3(description, UnicodeRange.Russian, "\\f2")
                         ));
 
-                    MarcRecord record = item.Record;
+                    Record record = item.Record;
 
                     // Для отладки: проверить упорядочение
                     if (showOrder)
@@ -386,7 +377,7 @@ namespace ManagedIrbis.Biblio
                         RecordCollection sameBooks = record.UserData as RecordCollection;
                         if (!ReferenceEquals(sameBooks, null))
                         {
-                            foreach (MarcRecord book in sameBooks)
+                            foreach (Record book in sameBooks)
                             {
                                 string text = book.Description;
                                 text = RichText.Encode3(text, UnicodeRange.Russian, "\\f2")

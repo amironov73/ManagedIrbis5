@@ -8,8 +8,6 @@
 
 /* OsmiUtility.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #if !UAP
@@ -21,9 +19,7 @@ using System.Text;
 
 using AM;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Readers;
 
@@ -33,7 +29,6 @@ using Newtonsoft.Json.Linq;
 
 using System.Web;
 using AM.IO;
-using AM.Logging;
 using ManagedIrbis;
 using CM=System.Configuration.ConfigurationManager;
 
@@ -56,8 +51,8 @@ namespace RestfulIrbis.OsmiCards
         [CanBeNull]
         private static JObject FindLabel
             (
-                [NotNull] JObject obj,
-                [NotNull] string label
+                JObject obj,
+                string label
             )
         {
             var result = (JObject) obj["values"].FirstOrDefault
@@ -82,13 +77,12 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Build card for reader.
         /// </summary>
-        [NotNull]
         public static JObject BuildCardForReader
             (
-                [NotNull] JObject templateObject,
-                [NotNull] ReaderInfo reader,
-                [NotNull] string ticket,
-                [NotNull] DicardsConfiguration config
+                JObject templateObject,
+                ReaderInfo reader,
+                string ticket,
+                DicardsConfiguration config
             )
         {
             Code.NotNull(templateObject, nameof(templateObject));
@@ -188,25 +182,22 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Полный путь до <c>dicards.json</c>.
         /// </summary>
-        [NotNull]
         public static string DicardsJson() => PathUtility.MapPath("dicards.json")
             .ThrowIfNull("MapPath (\"dicards.json\")");
 
         /// <summary>
         /// Кодирование URL в UTF-8.
         /// </summary>
-        [NotNull]
-        public static string UrlEncode ([NotNull] string text) =>
+        public static string UrlEncode (string text) =>
             HttpUtility.UrlEncode(text, Encoding.UTF8);
 
         /// <summary>
         /// Получение идентификатора читателя.
         /// </summary>
-        [NotNull]
         public static string GetReaderId
             (
-                [NotNull] MarcRecord record,
-                [NotNull] DicardsConfiguration config
+                Record record,
+                DicardsConfiguration config
             )
         {
             var idTag = config.ReaderId.SafeToInt32(30);
@@ -218,11 +209,10 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Получение идентификатора читателя.
         /// </summary>
-        [NotNull]
         public static string GetReaderId
             (
-                [NotNull] ReaderInfo reader,
-                [NotNull] DicardsConfiguration config
+                ReaderInfo reader,
+                DicardsConfiguration config
             )
         {
             var record = reader.Record.ThrowIfNull("reader.Record");

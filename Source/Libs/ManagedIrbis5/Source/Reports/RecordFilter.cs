@@ -1,40 +1,37 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* RecordFilter.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* RecordFilter.cs -- фильтр для библиографических записей
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
-
-using AM;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Фильтр для библиографических записей.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class RecordFilter
         : IDisposable
     {
@@ -43,30 +40,25 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Provider.
         /// </summary>
-        [NotNull]
         [XmlIgnore]
         [JsonIgnore]
         public IrbisProvider Provider { get; internal set; }
 
         /// <summary>
-        /// 
+        /// Булево выражение для фильтрации записей.
         /// </summary>
-        [CanBeNull]
         [XmlElement("expression")]
-        [JsonProperty("expression")]
-        public string Expression
+        [JsonPropertyName("expression")]
+        public string? Expression
         {
-            get { return _expression; }
+            get => _expression;
             set
             {
-                if (!ReferenceEquals(_formatter, null))
-                {
-                    _formatter.Dispose();
-                }
+                _formatter?.Dispose();
                 _formatter = null;
                 _expression = value;
             }
-        }
+        } // property Expression
 
         #endregion
 
@@ -78,44 +70,39 @@ namespace ManagedIrbis.Reports
         public RecordFilter()
         {
             Provider = new LocalProvider();
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public RecordFilter
             (
-                [NotNull] IrbisProvider provider
+                IrbisProvider provider
             )
         {
-            Code.NotNull(provider, "provider");
-
             Provider = provider;
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public RecordFilter
             (
-                [NotNull] IrbisProvider provider,
-                [NotNull] string expression
+                IrbisProvider provider,
+                string expression
             )
         {
-            Code.NotNull(provider, "provider");
-            Code.NotNullNorEmpty(expression, "expression");
-
             Provider = provider;
             _expression = expression;
-        }
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private string _expression;
+        private string? _expression;
 
-        private PftFormatter _formatter;
+        private IPftFormatter? _formatter;
 
         #endregion
 
@@ -126,20 +113,20 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public bool CheckRecord
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
-            Code.NotNull(record, "record");
-
-            string expression = Expression;
+            var expression = Expression;
             if (string.IsNullOrEmpty(expression))
             {
                 return true;
             }
 
-            string text = null;
+            string? text = null;
 
-            ConnectedClient connected
+            /*
+
+            мфк connected
                 = Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
@@ -160,47 +147,45 @@ namespace ManagedIrbis.Reports
 
                 text = _formatter.FormatRecord(record);
             }
-            bool result = CheckResult(text);
+            */
+
+            var result = CheckResult(text);
 
             return result;
-        }
+        } // method CheckRecord
 
         /// <summary>
         /// Check text result.
         /// </summary>
         public static bool CheckResult
             (
-                [CanBeNull] string text
+                string? text
             )
         {
-            int value;
-            if (!NumericUtility.TryParseInt32(text, out value))
+            if (!int.TryParse(text, out var value))
             {
                 return false;
             }
 
             return value != 0;
-        }
+        } // method checkResult
 
         /// <summary>
         /// Filter records.
         /// </summary>
-        [NotNull]
-        public IEnumerable<MarcRecord> FilterRecords
+        public IEnumerable<Record> FilterRecords
             (
-                [NotNull] IEnumerable<MarcRecord> sourceRecords
+                IEnumerable<Record> sourceRecords
             )
         {
-            Code.NotNull(sourceRecords, "sourceRecords");
-
-            foreach (MarcRecord record in sourceRecords)
+            foreach (var record in sourceRecords)
             {
                 if (CheckRecord(record))
                 {
                     yield return record;
                 }
             }
-        }
+        } // method FilterRecords
 
         #endregion
 
@@ -214,8 +199,10 @@ namespace ManagedIrbis.Reports
                 _formatter.Dispose();
                 _formatter = null;
             }
-        }
+        } // method Dispose
 
         #endregion
-    }
-}
+
+    } // class RecordFilter
+
+} // namespace ManagedIrbis.Reports

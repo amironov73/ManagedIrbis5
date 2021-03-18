@@ -3,8 +3,6 @@
 
 /* ChapterWithDictionary.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -21,20 +19,16 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -45,8 +39,7 @@ namespace ManagedIrbis.Biblio
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class ChapterWithDictionary
         : BiblioChapter
     {
@@ -55,13 +48,11 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Dictionary.
         /// </summary>
-        [NotNull]
         public BiblioDictionary Dictionary { get; private set; }
 
         /// <summary>
         /// Dictionary.
         /// </summary>
-        [NotNull]
         public TermCollection Terms { get; private set; }
 
         /// <summary>
@@ -88,7 +79,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Entries to exclude.
         /// </summary>
-        [NotNull]
         [JsonProperty("exclude")]
         public List<string> ExcludeList { get; private set; }
 
@@ -122,8 +112,8 @@ namespace ManagedIrbis.Biblio
 
         private void _ChapterToTerms
             (
-                [NotNull] BiblioContext context,
-                [NotNull] BiblioChapter chapter
+                BiblioContext context,
+                BiblioChapter chapter
             )
         {
             AbstractOutput log = context.Log;

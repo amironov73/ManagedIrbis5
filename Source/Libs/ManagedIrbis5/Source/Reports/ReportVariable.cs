@@ -1,59 +1,45 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ReportVariable.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+
+/* ReportVariable.cs -- переменная, содержащее некое значение, используемое в отчете
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Переменная, содержащая некое значение, используемое в отчете.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
-    [DebuggerDisplay("{Name}: {Value}")]
+    [DebuggerDisplay("{" + nameof(Name) + "}: {" + nameof(Value) + "}")]
     public sealed class ReportVariable
         : IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Name of the variable.
+        /// Имя переменное (вообще говоря, произвольное).
         /// </summary>
-        [NotNull]
         public string Name { get; set; }
 
         /// <summary>
-        /// Value of the variable.
+        /// Значение переменной (еще более произвольное).
         /// </summary>
-        [CanBeNull]
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         #endregion
 
@@ -64,23 +50,13 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public ReportVariable
             (
-                [NotNull] string name,
-                [CanBeNull] object value
+                string name,
+                object? value
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
             Value = value;
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        } // constructor
 
         #endregion
 
@@ -92,29 +68,24 @@ namespace ManagedIrbis.Reports
                 bool throwOnError
             )
         {
-            Verifier<ReportVariable> verifier
-                = new Verifier<ReportVariable>(this, throwOnError);
+            var verifier = new Verifier<ReportVariable>(this, throwOnError);
 
-            // TODO Add some verification here
+            verifier
+                .NotNullNorEmpty(Name, nameof(Name));
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
         #region Object members
 
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "{0}: {1}",
-                    Name.ToVisibleString(),
-                    Value.ToVisibleString()
-                );
-        }
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString() =>
+            $"{Name.ToVisibleString()}: {Value.ToVisibleString()}";
 
         #endregion
-    }
-}
+
+    } // class ReportVariable
+
+} // namespace ManagedIrbis.Reports

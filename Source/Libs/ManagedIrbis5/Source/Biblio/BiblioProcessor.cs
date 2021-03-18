@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* BiblioProcessor.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* BiblioProcessor.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,30 +26,25 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class BiblioProcessor
     {
         #region Properties
@@ -51,13 +52,11 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Output.
         /// </summary>
-        [NotNull]
         public ReportOutput Output { get; private set; }
 
         /// <summary>
         /// Report.
         /// </summary>
-        [NotNull]
         public IrbisReport Report { get; private set; }
 
         #endregion
@@ -78,11 +77,9 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public BiblioProcessor
             (
-                [NotNull] ReportOutput output
+                ReportOutput output
             )
         {
-            Code.NotNull(output, "output");
-
             Output = output;
             Report = new IrbisReport();
         }
@@ -92,45 +89,39 @@ namespace ManagedIrbis.Biblio
         #region Private members
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         protected virtual void BildDictionaries
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             WriteDelimiter(context);
             BiblioDocument document = context.Document;
             document.BuildDictionaries(context);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         protected virtual void BildItems
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             WriteDelimiter(context);
             BiblioDocument document = context.Document;
             document.BuildItems(context);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         protected virtual void FinalRender
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             AbstractOutput log = context.Log;
             WriteDelimiter(context);
             log.WriteLine("Begin final render");
@@ -161,11 +152,9 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected virtual void GatherRecords
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             WriteDelimiter(context);
             BiblioDocument document = context.Document;
             document.GatherRecords(context);
@@ -176,11 +165,9 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected virtual void GatherTerms
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             WriteDelimiter(context);
             BiblioDocument document = context.Document;
             document.GatherTerms(context);
@@ -191,26 +178,22 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected virtual void NumberItems
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             WriteDelimiter(context);
             BiblioDocument document = context.Document;
             document.NumberItems(context);
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         protected virtual void RenderReport
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             WriteDelimiter(context);
             Report = new IrbisReport();
             BiblioDocument document = context.Document;
@@ -219,7 +202,7 @@ namespace ManagedIrbis.Biblio
 
         private void WriteDelimiter
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -235,14 +218,11 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Get formatter.
         /// </summary>
-        [NotNull]
         public IPftFormatter AcquireFormatter
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             IrbisProvider provider = context.Provider
                 .ThrowIfNull("context.Provider");
             IPftFormatter result = provider.AcquireFormatter()
@@ -260,11 +240,9 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual string BuildDocument
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             BiblioDocument document = context.Document;
             document.Initialize(context);
 
@@ -286,13 +264,10 @@ namespace ManagedIrbis.Biblio
         [CanBeNull]
         public virtual string GetText
             (
-                [NotNull] BiblioContext context,
-                [NotNull] string path
+                BiblioContext context,
+                string path
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNullNorEmpty(path, "path");
-
             AbstractOutput log = context.Log;
             IrbisProvider provider = context.Provider;
 
@@ -335,15 +310,13 @@ namespace ManagedIrbis.Biblio
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public virtual void Initialize
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             AbstractOutput log = context.Log;
             log.WriteLine("Begin initialize the processor");
             context.Processor = this;
@@ -355,13 +328,10 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void ReleaseFormatter
             (
-                [NotNull] BiblioContext context,
-                [NotNull] IPftFormatter formatter
+                BiblioContext context,
+                IPftFormatter formatter
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(formatter, "formatter");
-
             IrbisProvider provider = context.Provider;
             provider.ReleaseFormatter(formatter);
         }

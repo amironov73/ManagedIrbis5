@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ChapterWithErrors.cs -- 
+/* ChapterWithErrors.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,19 +18,15 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -41,10 +35,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class ChapterWithErrors
         : BiblioChapter
     {
@@ -102,13 +95,13 @@ namespace ManagedIrbis.Biblio
                         .ThrowIfNull("processor.GetText");
                     formatter.ParseProgram(briefFormat);
 
-                    foreach (MarcRecord record in badRecords)
+                    foreach (Record record in badRecords)
                     {
                         log.Write(".");
                         string description =
                             "MFN " + record.Mfn + " "
                             + formatter.FormatRecord(record.Mfn);
-                        ParagraphBand band 
+                        ParagraphBand band
                             = new ParagraphBand(description);
                         report.Body.Add(band);
                         report.Body.Add(new ParagraphBand());

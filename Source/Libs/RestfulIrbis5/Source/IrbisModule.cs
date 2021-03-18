@@ -9,8 +9,6 @@
 
 /* IrbisModule.cs -- NancyFX module for IRBIS REST server
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #if FW4
@@ -22,14 +20,11 @@ using System.Linq;
 
 using AM;
 using AM.IO;
-using AM.Logging;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis;
 using ManagedIrbis.Search;
 
-using MoonSharp.Interpreter;
 
 using Nancy;
 
@@ -42,9 +37,8 @@ namespace RestfulIrbis
     /// <summary>
     /// NancyFX module for IRBIS REST server.
     /// </summary>
-    [PublicAPI]
+
     [CLSCompliant(false)]
-    [MoonSharpUserData]
     public class IrbisModule
         : NancyModule
     {
@@ -119,7 +113,7 @@ namespace RestfulIrbis
                 string many = parameters.mfns.ToString().Trim();
                 var mfns = many.Split
                     (
-                        new []{',', ' ', ';'}, 
+                        new []{',', ' ', ';'},
                         StringSplitOptions.RemoveEmptyEntries
                     )
                     .Select
@@ -130,8 +124,8 @@ namespace RestfulIrbis
                 string format = parameters.format;
                 var text = connection.FormatRecords
                     (
-                        database, 
-                        format, 
+                        database,
+                        format,
                         mfns
                     );
 

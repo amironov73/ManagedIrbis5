@@ -228,7 +228,6 @@ namespace ManagedIrbis
         /// <summary>
         /// Convert the collection to JSON.
         /// </summary>
-        [NotNull]
         public string ToJson()
         {
             string result = JArray.FromObject(this).ToString();

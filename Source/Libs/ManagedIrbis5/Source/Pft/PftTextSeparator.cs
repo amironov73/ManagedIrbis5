@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftTextSeparator.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* PftTextSeparator.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,9 +19,6 @@ using System.Text;
 
 using AM.Text;
 
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
 
@@ -24,8 +27,6 @@ namespace ManagedIrbis.Pft
     /// <summary>
     /// <see cref="TextSeparator"/> for PFT.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftTextSeparator
         : TextSeparator
     {
@@ -34,11 +35,7 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Accumulates result text.
         /// </summary>
-        [NotNull]
-        public string Accumulator
-        {
-            get { return _accumulator.ToString(); }
-        }
+        public string Accumulator => _accumulator.ToString();
 
         #endregion
 
@@ -57,8 +54,8 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public PftTextSeparator
             (
-                [NotNull] string open,
-                [NotNull] string close
+                string open,
+                string close
             )
             : base(open, close)
         {

@@ -1,46 +1,37 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ReportContext.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* ReportContext.cs -- контекст, в котором выполняется построение отчета
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 using AM;
 using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Контекст, в котором выполняется построение отчета.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class ReportContext
         : IDisposable,
         IVerifiable
@@ -50,7 +41,7 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Raised on rendering bands.
         /// </summary>
-        public event EventHandler<ReportEventArgs> Rendering;
+        public event EventHandler<ReportEventArgs>? Rendering;
 
         #endregion
 
@@ -59,19 +50,16 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Provider.
         /// </summary>
-        [NotNull]
         public IrbisProvider Provider { get; set; }
 
         /// <summary>
         /// Current record.
         /// </summary>
-        [CanBeNull]
-        public MarcRecord CurrentRecord { get; internal set; }
+        public Record? CurrentRecord { get; internal set; }
 
         /// <summary>
         /// Text driver.
         /// </summary>
-        [NotNull]
         public ReportDriver Driver { get; internal set; }
 
         /// <summary>
@@ -82,27 +70,22 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Records.
         /// </summary>
-        [NotNull]
-        public NonNullCollection<MarcRecord> Records { get; private set; }
+        public NonNullCollection<Record> Records { get; private set; }
 
         /// <summary>
         /// Output.
         /// </summary>
-        [NotNull]
         public ReportOutput Output { get; private set; }
 
         /// <summary>
         /// Variables.
         /// </summary>
-        [NotNull]
         public ReportVariableManager Variables { get; private set; }
 
         /// <summary>
         /// Arbitrary user data.
         /// </summary>
-        [CanBeNull]
-        public object UserData { get; set; }
-
+        public object? UserData { get; set; }
 
         #endregion
 
@@ -113,17 +96,15 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public ReportContext
             (
-                [NotNull] IrbisProvider provider
+                IrbisProvider provider
             )
         {
-            Code.NotNull(provider, "provider");
-
             Variables = new ReportVariableManager();
-            Records = new NonNullCollection<MarcRecord>();
+            Records = new NonNullCollection<Record>();
             Output = new ReportOutput();
             Driver = new PlainTextDriver();
             Provider = provider;
-        }
+        } // constructor
 
         #endregion
 
@@ -134,11 +115,14 @@ namespace ManagedIrbis.Reports
         /// </summary>
         internal void OnRendering()
         {
-            ReportEventArgs eventArgs
-                = new ReportEventArgs(this);
+            var rendering = Rendering;
+            if (rendering is not null)
+            {
+                var eventArgs = new ReportEventArgs(this);
 
-            Rendering.Raise(this, eventArgs);
-        }
+                Rendering.Raise(this, eventArgs);
+            }
+        } // method OnRendering
 
         #endregion
 
@@ -147,59 +131,51 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Clone the context.
         /// </summary>
-        [NotNull]
         public ReportContext Clone()
         {
             ReportContext result = (ReportContext)MemberwiseClone();
 
             return result;
-        }
+        } // method Clone
 
         /// <summary>
         /// Clone the context with new record list.
         /// </summary>
-        [NotNull]
         public ReportContext Clone
             (
-                [NotNull] IEnumerable<MarcRecord> records
+                IEnumerable<Record> records
             )
         {
-            Code.NotNull(records, "records");
-
-            ReportContext result = (ReportContext) MemberwiseClone();
-            result.Records = new NonNullCollection<MarcRecord>();
+            var result = (ReportContext) MemberwiseClone();
+            result.Records = new NonNullCollection<Record>();
             result.Records.AddRange(records);
 
             return result;
-        }
+        } // method Clone
 
         /// <summary>
         /// Push the context.
         /// </summary>
-        [NotNull]
         public ReportContext Push()
         {
-            ReportContext result = (ReportContext) MemberwiseClone();
+            var result = (ReportContext) MemberwiseClone();
             result.Output = new ReportOutput();
 
             return result;
-        }
+        } // method Push
 
         /// <summary>
         /// Set text driver for the context.
         /// </summary>
-        [NotNull]
         public ReportContext SetDriver
             (
-                [NotNull] ReportDriver driver
+                ReportDriver driver
             )
         {
-            Code.NotNull(driver, "driver");
-
             Driver = driver;
 
             return this;
-        }
+        } // method SetDriver
 
         #endregion
 
@@ -209,7 +185,7 @@ namespace ManagedIrbis.Reports
         public void Dispose()
         {
             // TODO Do something here?
-        }
+        } // method Dispose
 
         #endregion
 
@@ -221,20 +197,17 @@ namespace ManagedIrbis.Reports
                 bool throwOnError
             )
         {
-            Verifier<ReportContext> verifier
-                = new Verifier<ReportContext>(this, throwOnError);
+            var verifier = new Verifier<ReportContext>(this, throwOnError);
 
             verifier.VerifySubObject(Variables, "variables");
 
             // TODO Add some verification here
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
-        #region Object members
+    } // class ReportContext
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

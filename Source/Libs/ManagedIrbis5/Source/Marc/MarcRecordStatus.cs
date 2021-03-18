@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* MarcRecordStatus.cs -- код статуса записи в формате ISO 2709
+/* RecordStatus.cs -- код статуса записи в формате ISO 2709
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,7 +16,7 @@ namespace ManagedIrbis.Marc
     /// <summary>
     /// Код статуса записи в формате ISO 2709.
     /// </summary>
-    public enum MarcRecordStatus
+    public enum RecordStatus
     {
         /// <summary>
         /// При изменении записи увеличивается ее уровень.

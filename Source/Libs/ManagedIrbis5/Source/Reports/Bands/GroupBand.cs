@@ -1,90 +1,67 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* GroupBand.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* GroupBand.cs -- полоса отчета с группировкой
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using ManagedIrbis.Pft;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Полоса отчета с группировкой.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class GroupBand
         : CompositeBand
     {
         #region Properties
 
         /// <summary>
-        /// Sort expression.
+        /// Выражение, согласно которому осуществляется группировка.
         /// </summary>
-        [CanBeNull]
         [XmlAttribute("group")]
-        [JsonProperty("group")]
-        public string GroupExpression { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
+        [JsonPropertyName("group")]
+        public string? GroupExpression { get; set; }
 
         #endregion
 
         #region ReportBand members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="CompositeBand.Render" />
         public override void Render
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeRendering(context);
 
-            string expression = GroupExpression;
+            var expression = GroupExpression;
             if (string.IsNullOrEmpty(expression))
             {
                 RenderOnce(context);
             }
             else
             {
+                /*
+
                 int count = context.Records.Count;
 
                 using (PftFormatter formatter
@@ -119,7 +96,7 @@ namespace ManagedIrbis.Reports
                     {
                         string key = group.Key;
 
-                        List<MarcRecord> records = group.Select
+                        List<Record> records = group.Select
                             (
                                 item => context.Records[item.Second]
                             )
@@ -140,9 +117,12 @@ namespace ManagedIrbis.Reports
                     }
 
                     context.Variables.Registry.Remove("group");
+
                 }
+
+                */
             }
-        }
+        } // method Render
 
         #endregion
 
@@ -154,7 +134,7 @@ namespace ManagedIrbis.Reports
                 bool throwOnError
             )
         {
-            Verifier<ReportBand> verifier
+            var verifier
                 = new Verifier<ReportBand>(this, throwOnError);
 
             verifier.Assert(base.Verify(throwOnError));
@@ -162,16 +142,14 @@ namespace ManagedIrbis.Reports
             verifier.NotNullNorEmpty
                 (
                     GroupExpression,
-                    "GroupExpression"
+                    nameof(GroupExpression)
                 );
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
-        #region Public methods
+    } // class GroupBand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

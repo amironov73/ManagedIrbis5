@@ -1,79 +1,60 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* BiblioTerm.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* BiblioTerm.cs -- термин в библиографическом указателе
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using ManagedIrbis.Client;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    /// Термин в библиографическом указателе.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class BiblioTerm
         : IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        [CanBeNull]
-        public TermCollection Dictionary { get; set; }
+        public TermCollection? Dictionary { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        [CanBeNull]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Extended title.
         /// </summary>
-        [CanBeNull]
-        public string Extended { get; set; }
+        public string? Extended { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        [CanBeNull]
-        public string Order { get; set; }
+        public string? Order { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        [CanBeNull]
-        public BiblioItem Item { get; set; }
+        public BiblioItem? Item { get; set; }
 
         #endregion
 
@@ -82,8 +63,7 @@ namespace ManagedIrbis.Biblio
         /// <inheritdoc cref="IVerifiable.Verify" />
         public bool Verify(bool throwOnError)
         {
-            Verifier<BiblioTerm> verifier
-                = new Verifier<BiblioTerm>(this, throwOnError);
+            var verifier = new Verifier<BiblioTerm>(this, throwOnError);
 
             // TODO do something
 

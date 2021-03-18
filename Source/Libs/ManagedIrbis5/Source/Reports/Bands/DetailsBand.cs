@@ -1,82 +1,46 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* DetailsBand.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* DetailsBand.cs -- полоса с детальным представлением данных (повторяющаяся)
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// Details (repeating) band.
+    /// Полоса с детальным представлением данных (повторяющася).
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class DetailsBand
         : ReportBand
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
 
         #region ReportBand members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="ReportBand.Render" />
         public override void Render
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeRendering(context);
 
             RenderAllRecords(context);
 
             OnAfterRendering(context);
-        }
+        } // method Render
 
         #endregion
 
-        #region Object members
+    } // class DetailsBand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

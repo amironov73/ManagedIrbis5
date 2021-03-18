@@ -280,7 +280,7 @@ namespace ManagedIrbis.Biblio
                 return;
             }
 
-            foreach (MarcRecord record in records)
+            foreach (Record record in records)
             {
                 foreach (int tag in tags)
                 {
@@ -298,7 +298,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void GatherTerms
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -322,7 +322,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void GatherRecords
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -346,7 +346,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void Initialize
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -368,7 +368,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void NumberItems
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -395,7 +395,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void Render
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -414,7 +414,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public void Walk
             (
-                [NotNull] Action<BiblioChapter> action
+                Action<BiblioChapter> action
             )
         {
             Code.NotNull(action, "action");

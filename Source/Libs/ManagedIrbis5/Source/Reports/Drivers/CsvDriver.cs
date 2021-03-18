@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* CsvDriver.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* CsvDriver.cs -- драйвер для вывода отчета в формате CSV
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -22,21 +28,15 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class CsvDriver
         : ReportDriver
     {
@@ -45,14 +45,12 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Field separator.
         /// </summary>
-        [CanBeNull]
-        public string Separator = ";";
+        public string? Separator = ";";
 
         /// <summary>
         /// Quotes.
         /// </summary>
-        [CanBeNull]
-        public string Quotes = "\"";
+        public string? Quotes = "\"";
 
         #endregion
 
@@ -77,9 +75,6 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(cell, "cell");
-
             if (!string.IsNullOrEmpty(Quotes))
             {
                 context.Output.Write(Quotes);
@@ -93,9 +88,6 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(cell, "cell");
-
             ReportOutput output = context.Output;
 
             if (!string.IsNullOrEmpty(Quotes))
@@ -116,9 +108,6 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(band, "band");
-
             context.Output.Write(Environment.NewLine);
         }
 
@@ -129,15 +118,10 @@ namespace ManagedIrbis.Reports
                 string text
             )
         {
-            Code.NotNull(context, "context");
-
             context.Output.Write(text);
         }
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

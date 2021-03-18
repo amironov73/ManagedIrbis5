@@ -1,27 +1,32 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* DriverCapability.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* DriverCapability.cs -- возможности, предоставляемые драйвером
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// Capabilities of the <see cref="ReportDriver"/>.
+    /// Возможности, предоставляемые драйвером <see cref="ReportDriver"/>.
     /// </summary>
     [Flags]
-    [PublicAPI]
     public enum DriverCapability
     {
         /// <summary>
@@ -38,7 +43,7 @@ namespace ManagedIrbis.Reports
         /// Font size.
         /// </summary>
         FontSize = 0x0002,
-        
+
         /// <summary>
         /// Bold, Italic, Underline.
         /// </summary>

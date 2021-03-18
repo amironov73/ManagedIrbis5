@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* HtmlDriver.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* HtmlDriver.cs -- драйвер для вывода отчета в формате HTML
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -23,23 +29,13 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using ManagedIrbis.Reports;
-
-using MoonSharp.Interpreter;
-
 #endregion
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Драйвер для вывода отчета в формате HTML.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class HtmlDriver
         : ReportDriver
     {
@@ -73,9 +69,6 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(cell, "cell");
-
             context.Output.Write("<td>");
         }
 
@@ -86,9 +79,6 @@ namespace ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(report, "report");
-
             string table = string.Format
                 (
                     "<table border={0}>",
@@ -105,9 +95,6 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(band, "band");
-
             context.Output.Write("<tr>");
         }
 
@@ -118,9 +105,6 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(cell, "cell");
-
             context.Output.Write("</td>");
         }
 
@@ -131,9 +115,6 @@ namespace ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(report, "report");
-
             ReportOutput output = context.Output;
             output.Write("</table>");
             output.Write(Environment.NewLine);
@@ -146,9 +127,6 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(band, "band");
-
             ReportOutput output = context.Output;
             output.Write("</tr>");
             output.Write(Environment.NewLine);
@@ -161,8 +139,6 @@ namespace ManagedIrbis.Reports
                 string text
             )
         {
-            Code.NotNull(context, "context");
-
             context.Output.Write
                 (
                     HtmlText.Encode(text)
@@ -171,8 +147,5 @@ namespace ManagedIrbis.Reports
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

@@ -130,10 +130,9 @@ namespace UnitTests.ManagedIrbis.ImportExport
             return result;
         }
 
-//        [NotNull]
-//        private static MarcRecord GetRecord2()
+////        private static Record GetRecord2()
 //        {
-//            MarcRecord result = new MarcRecord()
+//            Record result = new Record()
 //                .AddField(new RecordField(1, "RU\\NLR\\bibl\\3415"))
 //                .AddField(new RecordField(5, "20031126124354.0"))
 //                .AddField(new RecordField(10,
@@ -190,7 +189,7 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //
 //            using (Stream stream = File.OpenRead(fileName))
 //            {
-//                MarcRecord record = Iso2709.ReadRecord(stream, IrbisEncoding.Ansi);
+//                Record record = Iso2709.ReadRecord(stream, IrbisEncoding.Ansi);
 //                Assert.IsNotNull(record);
 //                Assert.AreEqual(16, record.Fields.Count);
 //                Assert.AreEqual("Вып. 13.", record.FM(200, 'a'));
@@ -223,7 +222,7 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //
 //            using (Stream stream = File.OpenWrite(fileName))
 //            {
-//                MarcRecord record = GetRecord2();
+//                Record record = GetRecord2();
 //                Iso2709.WriteRecord(record, stream, IrbisEncoding.Ansi);
 //            }
 //

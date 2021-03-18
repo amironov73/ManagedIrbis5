@@ -1,27 +1,26 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ReportAttribute.cs --
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* ReportAttribute.cs -- атрибут, назначаемый элементу отчета
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    ///
+    /// Атрибут, назначаемый элементу отчета
+    /// либо отчету в целом.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class ReportAttribute
     {
         #region Constants
@@ -158,12 +157,12 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Name.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Value.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         #endregion
 
@@ -193,7 +192,7 @@ namespace ManagedIrbis.Reports
         public ReportAttribute
             (
                 string name,
-                object value
+                object? value
             )
         {
             Name = name;
@@ -201,5 +200,7 @@ namespace ManagedIrbis.Reports
         }
 
         #endregion
-    }
-}
+
+    } // class ReportAttribute
+
+} // namespace ManagedIrbis.Reports

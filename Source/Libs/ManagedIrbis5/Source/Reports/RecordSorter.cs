@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* RecordSorter.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* RecordSorter.cs -- сортировщик библиографических записей
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,31 +18,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM.Collections;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
 using ManagedIrbis.Batch;
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Сортировщик библиографических записей.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class RecordSorter
         : IDisposable
     {
@@ -45,26 +45,21 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Provider.
         /// </summary>
-        [NotNull]
         [XmlIgnore]
         [JsonIgnore]
         public IrbisProvider Provider { get; internal set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        [CanBeNull]
         [XmlElement("expression")]
-        [JsonProperty("expression")]
-        public string Expression
+        [JsonPropertyName("expression")]
+        public string? Expression
         {
-            get { return _expression; }
+            get => _expression;
             set
             {
-                if (!ReferenceEquals(_formatter, null))
-                {
-                    _formatter.Dispose();
-                }
+                _formatter?.Dispose();
                 _formatter = null;
                 _expression = value;
             }
@@ -80,36 +75,31 @@ namespace ManagedIrbis.Reports
         public RecordSorter()
         {
             Provider = new LocalProvider();
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public RecordSorter
             (
-                [NotNull] IrbisProvider provider
+                IrbisProvider provider
             )
         {
-            Code.NotNull(provider, "provider");
-
             Provider = provider;
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public RecordSorter
             (
-                [NotNull] IrbisProvider provider,
-                [NotNull] string expression
+                IrbisProvider provider,
+                string expression
             )
         {
-            Code.NotNull(provider, "provider");
-            Code.NotNullNorEmpty(expression, "expression");
-
             Provider = provider;
             _expression = expression;
-        }
+        } // constructor
 
         #endregion
 
@@ -117,7 +107,7 @@ namespace ManagedIrbis.Reports
 
         private string _expression;
 
-        private PftFormatter _formatter;
+        private IPftFormatter? _formatter;
 
         #endregion
 
@@ -126,37 +116,36 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Sort records.
         /// </summary>
-        [NotNull]
-        public List<MarcRecord> SortRecords
+        public List<Record> SortRecords
             (
-                [NotNull] IEnumerable<MarcRecord> sourceRecords
+                IEnumerable<Record> sourceRecords
             )
         {
-            Code.NotNull(sourceRecords, "sourceRecords");
-
-            string expression = Expression;
+            var expression = Expression;
             if (string.IsNullOrEmpty(expression))
             {
                 return sourceRecords.ToList();
             }
 
+            /*
+
             ConnectedClient connected
                 = Provider as ConnectedClient;
-            List<Pair<string, MarcRecord>> list
-                = new List<Pair<string, MarcRecord>>();
+            List<Pair<string, Record>> list
+                = new List<Pair<string, Record>>();
 
             if (!ReferenceEquals(connected, null))
             {
                 IIrbisConnection connection = connected.Connection;
-                foreach (MarcRecord record in sourceRecords)
+                foreach (Record record in sourceRecords)
                 {
                     string formatted = connection.FormatRecord
                         (
                             expression,
                             record
                         );
-                    Pair<string, MarcRecord> pair
-                        = new Pair<string, MarcRecord>
+                    Pair<string, Record> pair
+                        = new Pair<string, Record>
                         (
                             formatted,
                             record
@@ -173,14 +162,14 @@ namespace ManagedIrbis.Reports
                     _formatter.ParseProgram(expression);
                 }
 
-                foreach (MarcRecord record in sourceRecords)
+                foreach (Record record in sourceRecords)
                 {
                     string formatted = _formatter.FormatRecord
                     (
                         record
                     );
-                    Pair<string, MarcRecord> pair
-                        = new Pair<string, MarcRecord>
+                    Pair<string, Record> pair
+                        = new Pair<string, Record>
                         (
                             formatted,
                             record
@@ -198,12 +187,16 @@ namespace ManagedIrbis.Reports
                     )
                 );
 
-            List<MarcRecord> result = list
+            var result = list
                 .Select(pair => pair.Second)
                 .ToList();
 
             return result;
-        }
+
+            */
+
+            throw new NotImplementedException();
+        } // method SortRecords
 
         #endregion
 
@@ -220,5 +213,7 @@ namespace ManagedIrbis.Reports
         }
 
         #endregion
-    }
-}
+
+    } // class RecordSorter
+
+} // namespace ManagedIrbis.Reports

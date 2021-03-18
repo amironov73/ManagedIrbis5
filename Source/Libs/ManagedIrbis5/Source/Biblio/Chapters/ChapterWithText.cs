@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ChapterWithText.cs -- 
+/* ChapterWithText.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -24,13 +22,10 @@ using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -39,10 +34,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class ChapterWithText
         : BiblioChapter
     {

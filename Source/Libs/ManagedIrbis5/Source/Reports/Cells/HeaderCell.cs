@@ -1,65 +1,28 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* HeaderCell.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedType.Global
+
+/* HeaderCell.cs -- ячейка заголовка
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
-
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Ячейка заголовка
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class HeaderCell
         : ReportCell
     {
-        #region Properties
+        #region ReportCell members
 
         #endregion
+    } // class HeaderCell
 
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region Object members
-
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

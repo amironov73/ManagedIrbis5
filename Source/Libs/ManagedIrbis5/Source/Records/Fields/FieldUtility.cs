@@ -296,7 +296,7 @@ namespace ManagedIrbis
         //[ItemNotNull]
         //public static RecordField[] GetField
         //    (
-        //        [NotNull] this RecordFieldCollection fields,
+        //        this RecordFieldCollection fields,
         //        params int[] tags
         //    )
         //{
@@ -838,7 +838,7 @@ namespace ManagedIrbis
         //[CanBeNull]
         //public static string GetFirstFieldValue
         //    (
-        //        [NotNull] this IEnumerable<RecordField> fields,
+        //        this IEnumerable<RecordField> fields,
         //        int tag
         //    )
         //{
@@ -1380,7 +1380,7 @@ namespace ManagedIrbis
         //[NotNull]
         //public static RecordField RemoveSubField
         //    (
-        //        [NotNull] this RecordField field,
+        //        this RecordField field,
         //        char code
         //    )
         //{

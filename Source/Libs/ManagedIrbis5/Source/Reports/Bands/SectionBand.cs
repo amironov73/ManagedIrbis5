@@ -1,45 +1,34 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* GroupBand.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* SectionBand.cs -- полоса, формирующая секцию отчета
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Полоса, формирующая секцию отчета.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class SectionBand
         : ReportBand
     {
@@ -47,27 +36,24 @@ namespace ManagedIrbis.Reports
 
         /// <summary>
         /// Body bands.
-        /// </summary>
-        [NotNull]
+        /// </summary>[NotNull]
         [XmlElement("body")]
-        [JsonProperty("body")]
+        [JsonPropertyName("body")]
         public BandCollection<ReportBand> Body { get; internal set; }
 
         /// <summary>
         /// Footer band.
         /// </summary>
-        [CanBeNull]
         [XmlElement("footer")]
-        [JsonProperty("footer")]
-        public ReportBand Footer { get; set; }
+        [JsonPropertyName("footer")]
+        public ReportBand? Footer { get; set; }
 
         /// <summary>
         /// Header band.
         /// </summary>
-        [CanBeNull]
         [XmlElement("header")]
-        [JsonProperty("header")]
-        public ReportBand Header { get; set; }
+        [JsonPropertyName("header")]
+        public ReportBand? Header { get; set; }
 
         #endregion
 
@@ -79,15 +65,7 @@ namespace ManagedIrbis.Reports
         public SectionBand()
         {
             Body = new BandCollection<ReportBand>();
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        } // constructor
 
         #endregion
 
@@ -99,12 +77,12 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeRendering(context);
 
-            ReportBand header = Header;
-            if (!ReferenceEquals(header, null))
+            // TODO mark section begin
+
+            var header = Header;
+            if (header is not null)
             {
                 context.Index = -1;
                 context.CurrentRecord = null;
@@ -113,21 +91,23 @@ namespace ManagedIrbis.Reports
 
             context.Index = -1;
             context.CurrentRecord = null;
-            foreach (ReportBand band in Body)
+            foreach (var band in Body)
             {
                 band.Render(context);
             }
 
-            ReportBand footer = Footer;
-            if (!ReferenceEquals(footer, null))
+            var footer = Footer;
+            if (footer is not null)
             {
                 context.Index = -1;
                 context.CurrentRecord = null;
                 footer.Render(context);
             }
 
+            // TODO mark section end
+
             OnAfterRendering(context);
-        }
+        } // method Render
 
         #endregion
 
@@ -139,8 +119,7 @@ namespace ManagedIrbis.Reports
                 bool throwOnError
             )
         {
-            Verifier<ReportBand> verifier
-                = new Verifier<ReportBand>(this, throwOnError);
+            var verifier = new Verifier<ReportBand>(this, throwOnError);
 
             verifier.Assert(base.Verify(throwOnError));
 
@@ -148,21 +127,21 @@ namespace ManagedIrbis.Reports
             {
                 verifier.VerifySubObject(Header, "header");
             }
+
             if (!ReferenceEquals(Footer, null))
             {
                 verifier.VerifySubObject(Footer, "footer");
             }
+
             verifier
                 .Assert(Cells.Count == 0, "Cells.Count != 0")
                 .VerifySubObject(Body, "body");
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
-        #region Object members
+    } // class SectionBand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

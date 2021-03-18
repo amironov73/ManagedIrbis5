@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftCell.cs -- 
+/* PftCell.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -21,17 +19,13 @@ using System.Xml.Serialization;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -40,10 +34,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class PftCell
         : ReportCell
     {
@@ -116,11 +109,11 @@ namespace ManagedIrbis.Reports
 
             string result = null;
 
-            ConnectedClient connected 
+            ConnectedClient connected
                 = context.Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
-                MarcRecord record = context.CurrentRecord;
+                Record record = context.CurrentRecord;
                 if (!ReferenceEquals(record, null))
                 {
                     result = connected.FormatRecord

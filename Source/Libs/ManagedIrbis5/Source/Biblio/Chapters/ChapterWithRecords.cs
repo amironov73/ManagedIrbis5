@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ChapterWithRecords.cs -- 
+/* ChapterWithRecords.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -24,13 +22,10 @@ using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -39,10 +34,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class ChapterWithRecords
         : BiblioChapter
     {
@@ -51,13 +45,11 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Records.
         /// </summary>
-        [NotNull]
         public RecordCollection Records { get; private set; }
 
         /// <summary>
         /// Duplicates.
         /// </summary>
-        [NotNull]
         public RecordCollection Duplicates { get; private set; }
 
         #endregion
@@ -80,8 +72,8 @@ namespace ManagedIrbis.Biblio
         [CanBeNull]
         private BiblioItem _FindItem
             (
-                [NotNull] MenuSubChapter chapter,
-                [NotNull] MarcRecord record
+                MenuSubChapter chapter,
+                Record record
             )
         {
             if (!ReferenceEquals(chapter.Items, null))
@@ -114,7 +106,7 @@ namespace ManagedIrbis.Biblio
         [CanBeNull]
         private BiblioItem _FindItem
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
             BiblioChapter rootChapter = this;
@@ -142,13 +134,12 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Format records.
         /// </summary>
-        [NotNull]
         [ItemNotNull]
         public string[] FormatRecords
             (
-                [NotNull] BiblioContext context,
-                [NotNull] int[] mfns,
-                [NotNull] string format
+                BiblioContext context,
+                int[] mfns,
+                string format
             )
         {
             Code.NotNull(context, "context");
@@ -182,8 +173,8 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public string[] FormatRecords
             (
-                [NotNull] BiblioContext context,
-                [NotNull] string format
+                BiblioContext context,
+                string format
             )
         {
             Code.NotNull(context, "context");
@@ -202,7 +193,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected void RenderDuplicates
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             AbstractOutput log = context.Log;
@@ -215,7 +206,7 @@ namespace ManagedIrbis.Biblio
             {
                 List<BiblioItem> items
                     = new List<BiblioItem>(Duplicates.Count);
-                foreach (MarcRecord dublicate in Duplicates)
+                foreach (Record dublicate in Duplicates)
                 {
                     BiblioItem item = _FindItem(dublicate);
                     if (!ReferenceEquals(item, null))

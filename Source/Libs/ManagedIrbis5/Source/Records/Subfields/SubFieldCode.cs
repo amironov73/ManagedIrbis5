@@ -56,7 +56,6 @@ namespace ManagedIrbis
         /// <summary>
         /// <see cref="CharSet"/> of valid codes.
         /// </summary>
-        [NotNull]
         public static CharSet ValidCodes => _validCodes;
 
         #endregion

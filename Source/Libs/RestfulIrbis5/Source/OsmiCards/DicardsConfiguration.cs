@@ -8,9 +8,7 @@
 // ReSharper disable UseNameofExpression
 
 /* DicardsConfiguration.cs -- common DICARDS related configuration
- * Ars Magna project, http://arsmagna.ru 
- * -------------------------------------------------------
- * Status: poor
+ * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
@@ -21,10 +19,7 @@ using System.Text;
 
 using AM;
 using AM.Json;
-using AM.Logging;
-using JetBrains.Annotations;
 
-using CodeJam;
 
 using Newtonsoft.Json;
 
@@ -284,7 +279,7 @@ namespace RestfulIrbis.OsmiCards
         public string CatalogField { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [CanBeNull]
         [JsonProperty("catalogUrl")]
@@ -445,10 +440,9 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Чтение конфигурации из указанного файла.
         /// </summary>
-        [NotNull]
         public static DicardsConfiguration LoadConfiguration
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             Code.NotNullNorEmpty(fileName, nameof(fileName));
@@ -466,7 +460,7 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void SaveConfiguration
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             Code.NotNullNorEmpty(fileName, nameof(fileName));
@@ -532,7 +526,7 @@ namespace RestfulIrbis.OsmiCards
 
         private bool CheckString
             (
-                [NotNull] string name,
+                string name,
                 [CanBeNull] string value
             )
         {

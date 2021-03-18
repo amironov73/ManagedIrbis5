@@ -7,8 +7,6 @@
 
 /* DigestAuthenticator.cs -- костыль, позволяющий аутентифицироваться методом Digest
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #if !UAP
@@ -17,11 +15,8 @@
 
 using System.Net;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using RestSharp;
 using RestSharp.Authenticators;
@@ -33,9 +28,8 @@ namespace RestfulIrbis
     /// <summary>
     /// Authenticator for Digest method.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
-    public class DigestAuthenticator 
+
+    public class DigestAuthenticator
         : IAuthenticator
     {
         #region Properties
@@ -43,13 +37,11 @@ namespace RestfulIrbis
         /// <summary>
         /// User name.
         /// </summary>
-        [NotNull]
         public string UserName { get; }
 
         /// <summary>
         /// Password.
         /// </summary>
-        [NotNull]
         public string Password { get; }
 
         #endregion
@@ -61,8 +53,8 @@ namespace RestfulIrbis
         /// </summary>
         public DigestAuthenticator
             (
-                [NotNull] string username, 
-                [NotNull] string password
+                string username,
+                string password
             )
         {
             Code.NotNull(username, nameof(username));
@@ -85,7 +77,7 @@ namespace RestfulIrbis
         {
             request.Credentials = new NetworkCredential
                 (
-                    UserName, 
+                    UserName,
                     Password
                 );
         }

@@ -1,46 +1,35 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* RtfDriver.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+
+/* RtfDriver.cs -- драйвер для вывода отчета в RTF
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Драйвер для вывода отчета в RTF.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class RtfDriver
         : ReportDriver
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
         #region ReportDriver members
 
         /// <inheritdoc cref="ReportDriver.BeginDocument"/>
@@ -50,19 +39,16 @@ namespace ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(report, "report");
+            var output = context.Output;
 
-            ReportOutput output = context.Output;
-
-            string prologue = Prologue;
+            var prologue = Prologue;
             if (string.IsNullOrEmpty(prologue))
             {
                 prologue = RichText.CommonPrologue;
             }
 
             output.Write(prologue);
-        }
+        } // method BeginDocument
 
         /// <inheritdoc cref="ReportDriver.BeginParagraph" />
         public override void BeginParagraph
@@ -71,12 +57,9 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(band, "band");
-
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write(@"\par\pard\plain ");
-        }
+        } // method BeginParagraph
 
         /// <inheritdoc cref="ReportDriver.EndDocument" />
         public override void EndDocument
@@ -85,12 +68,9 @@ namespace ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(report, "report");
-
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write(@"}");
-        }
+        } // method EndDocument
 
         /// <inheritdoc cref="ReportDriver.BeginCell"/>
         public override void BeginCell
@@ -99,12 +79,9 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(cell, "cell");
-
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write("\\cell ");
-        }
+        } // method BeginCell
 
         /// <inheritdoc cref="ReportDriver.EndRow"/>
         public override void EndRow
@@ -113,12 +90,9 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(band, "band");
-
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write("\\row ");
-        }
+        } // method EndRow
 
         /// <inheritdoc cref="ReportDriver.NewPage" />
         public override void NewPage
@@ -127,11 +101,9 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Code.NotNull(context, "context");
-
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write("\\page ");
-        }
+        } // method NewPage
 
         /// <inheritdoc cref="ReportDriver.Write"/>
         public override void Write
@@ -140,12 +112,10 @@ namespace ManagedIrbis.Reports
                 string text
             )
         {
-            Code.NotNull(context, "text");
-
-            string encoded = RichText.Encode(text, null);
-            ReportOutput output = context.Output;
+            var encoded = RichText.Encode(text, null);
+            var output = context.Output;
             output.Write(encoded);
-        }
+        } // method Write
 
         /// <inheritdoc cref="ReportDriver.WriteServiceText"/>
         public override void WriteServiceText
@@ -154,16 +124,12 @@ namespace ManagedIrbis.Reports
                 string text
             )
         {
-            Code.NotNull(context, "text");
-
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write(text);
-        }
+        } // method WriteServiceText
 
         #endregion
 
-        #region Public methods
+    } // class RtfDriver
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

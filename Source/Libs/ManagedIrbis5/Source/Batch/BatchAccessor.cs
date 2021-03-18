@@ -216,7 +216,7 @@ namespace ManagedIrbis.Batch
             {
                 int mfn = array[0];
 
-                MarcRecord record = Connection.ReadRecord
+                Record record = Connection.ReadRecord
                     (
                         database,
                         mfn,
@@ -227,7 +227,7 @@ namespace ManagedIrbis.Batch
                 return new[] { record };
             }
 
-            using (_records = new BlockingCollection<MarcRecord>(array.Length))
+            using (_records = new BlockingCollection<Record>(array.Length))
             {
                 int[][] slices = array.Slice(1000).ToArray();
 
@@ -235,7 +235,7 @@ namespace ManagedIrbis.Batch
                 {
                     if (slice.Length == 1)
                     {
-                        MarcRecord record = Connection.ReadRecord
+                        Record record = Connection.ReadRecord
                             (
                                 database: database,
                                 mfn: slice[0],
@@ -331,7 +331,7 @@ namespace ManagedIrbis.Batch
                 {
                     if (slice.Length == 1)
                     {
-                        MarcRecord record = Connection.ReadRecord
+                        Record record = Connection.ReadRecord
                             (
                                 database,
                                 slice[0],

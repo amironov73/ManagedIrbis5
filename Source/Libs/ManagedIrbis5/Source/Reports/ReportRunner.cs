@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ReportRunner.cs -- 
+/* ReportRunner.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -24,23 +22,19 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class ReportRunner
     {
         #region Properties
@@ -62,8 +56,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public void RunReport
             (
-                [NotNull] IrbisReport report,
-                [NotNull] ReportSettings settings
+                IrbisReport report,
+                ReportSettings settings
             )
         {
             Code.NotNull(report, "report");

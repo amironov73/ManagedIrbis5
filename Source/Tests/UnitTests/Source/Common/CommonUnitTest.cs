@@ -104,7 +104,7 @@ namespace UnitTests.Common
 
         //protected static string GatherCodes
         //    (
-        //        [NotNull] RecordField field
+        //        RecordField field
         //    )
         //{
         //    char[] codes = field.SubFields.Select(sf => sf.Code)
@@ -116,8 +116,8 @@ namespace UnitTests.Common
 
         //protected static void CompareFields
         //    (
-        //        [NotNull] RecordField expected,
-        //        [NotNull] RecordField actual
+        //        RecordField expected,
+        //        RecordField actual
         //    )
         //{
         //    string expectedCodes = GatherCodes(expected);

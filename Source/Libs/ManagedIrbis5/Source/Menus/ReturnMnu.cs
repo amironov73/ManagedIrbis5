@@ -191,11 +191,10 @@ namespace ManagedIrbis.Menus
 //        /// <summary>
 //        /// Read RETURN.MNU from the provider.
 //        /// </summary>
-//        [NotNull]
-//        public static ReturnMnu FromProvider
+////        public static ReturnMnu FromProvider
 //            (
-//                [NotNull] IrbisProvider provider,
-//                [NotNull] string fileName = DefaultFileName
+//                IrbisProvider provider,
+//                string fileName = DefaultFileName
 //            )
 //        {
 //            Sure.NotNull(provider, nameof(provider));

@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
 /* ReportDriver.cs -- abstract report driver
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,28 +22,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Logging;
-using AM.Runtime;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
     /// Abstract report driver.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public abstract class ReportDriver
         : IDisposable
     {
@@ -54,8 +49,7 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Prologue.
         /// </summary>
-        [CanBeNull]
-        public string Prologue { get; private set; }
+        public string? Prologue { get; private set; }
 
         #endregion
 
@@ -66,7 +60,10 @@ namespace ManagedIrbis.Reports
         /// </summary>
         protected ReportDriver()
         {
-            Log.Trace("ReportDriver::Constructor");
+            Magna.Trace
+                (
+                    nameof(ReportDriver) + "::Constructor"
+                );
         }
 
         #endregion
@@ -82,8 +79,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void BeginCell
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportCell cell
+                ReportContext context,
+                ReportCell cell
             )
         {
             // Nothing to do here
@@ -94,8 +91,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void BeginDocument
             (
-                [NotNull] ReportContext context,
-                [NotNull] IrbisReport report
+                ReportContext context,
+                IrbisReport report
             )
         {
             // Nothing to do here
@@ -106,8 +103,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void BeginParagraph
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportBand band
+                ReportContext context,
+                ReportBand band
             )
         {
             // Nothing to do here
@@ -118,8 +115,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void BeginRow
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportBand band
+                ReportContext context,
+                ReportBand band
             )
         {
             // Nothing to do here
@@ -130,8 +127,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void BeginSection
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportBand band
+                ReportContext context,
+                ReportBand band
             )
         {
             // Nothing to do here
@@ -142,8 +139,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void BeginTable
             (
-                [NotNull] ReportContext context,
-                [NotNull] IrbisReport report
+                ReportContext context,
+                IrbisReport report
             )
         {
             // Nothing to do here
@@ -154,8 +151,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void EndCell
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportCell cell
+                ReportContext context,
+                ReportCell cell
             )
         {
             // Nothing to do here
@@ -166,8 +163,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void EndDocument
             (
-                [NotNull] ReportContext context,
-                [NotNull] IrbisReport report
+                ReportContext context,
+                IrbisReport report
             )
         {
             // Nothing to do here
@@ -178,8 +175,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void EndParagraph
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportBand band
+                ReportContext context,
+                ReportBand band
             )
         {
             // Nothing to do here
@@ -190,8 +187,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void EndRow
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportBand band
+                ReportContext context,
+                ReportBand band
             )
         {
             // Nothing to do here
@@ -202,8 +199,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void EndSection
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportBand band
+                ReportContext context,
+                ReportBand band
             )
         {
             // Nothing to do here
@@ -214,8 +211,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void EndTable
             (
-                [NotNull] ReportContext context,
-                [NotNull] IrbisReport report
+                ReportContext context,
+                IrbisReport report
             )
         {
             // Nothing to do here
@@ -226,8 +223,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void NewPage
             (
-                [NotNull] ReportContext context,
-                [NotNull] ReportBand band
+                ReportContext context,
+                ReportBand band
             )
         {
             // Nothing to do here
@@ -238,7 +235,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void SetPrologue
             (
-                [CanBeNull] string prologue
+                string? prologue
             )
         {
             Prologue = prologue;
@@ -249,8 +246,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void Write
             (
-                [NotNull] ReportContext context,
-                [CanBeNull] string text
+                ReportContext context,
+                string? text
             )
         {
             // Nothing to do here
@@ -261,8 +258,8 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public virtual void WriteServiceText
             (
-                [NotNull] ReportContext context,
-                [CanBeNull] string text
+                ReportContext context,
+                string? text
             )
         {
             // Nothing to do here
@@ -275,7 +272,10 @@ namespace ManagedIrbis.Reports
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public virtual void Dispose()
         {
-            Log.Trace("ReportDriver::Dispose");
+            Magna.Trace
+                (
+                    nameof(ReportDriver) + "::" + nameof(Dispose)
+                );
         }
 
         #endregion

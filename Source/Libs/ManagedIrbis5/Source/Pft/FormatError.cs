@@ -1,28 +1,27 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* FormatError.cs -- format error codes.
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+
+/* FormatError.cs -- коды ошибок PFT-форматтера
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Pft
 {
     /// <summary>
-    /// Format error codes.
-    /// Not used at this moment.
+    /// Коды ошибок PFT-форматтера.
+    /// В данный момент никак не используются.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public static class FormatError
     {
         #region Nested classes

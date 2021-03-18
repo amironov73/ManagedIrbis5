@@ -3,8 +3,6 @@
 
 /* SimpleChapter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -21,20 +19,16 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -47,8 +41,7 @@ namespace ManagedIrbis.Biblio
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class SimpleChapter
         : ChapterWithRecords
     {
@@ -86,7 +79,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Get description format from chapter hierarchy.
         /// </summary>
-        [NotNull]
         protected virtual string GetDescriptionFormat()
         {
             string result = GetProperty<SimpleChapter, string>
@@ -104,7 +96,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Get description format from chapter hierarchy.
         /// </summary>
-        [NotNull]
         protected virtual string GetOrderFormat()
         {
             string result = GetProperty<SimpleChapter, string>
@@ -260,7 +251,7 @@ namespace ManagedIrbis.Biblio
                 for (int i = 0; i < Records.Count; i++)
                 {
                     log.Write(".");
-                    MarcRecord record = Records[i];
+                    Record record = Records[i];
                     string description = formatted[i]
                         .TrimEnd('\u001F');
 
@@ -372,7 +363,7 @@ namespace ManagedIrbis.Biblio
 
             AbstractOutput log = context.Log;
             log.WriteLine("Begin gather records {0}", this);
-            MarcRecord record = null;
+            Record record = null;
 
             try
             {
@@ -388,7 +379,7 @@ namespace ManagedIrbis.Biblio
                     string searchExpression = SearchExpression
                         .ThrowIfNull("SearchExpression");
                     formatter.ParseProgram(searchExpression);
-                    record = new MarcRecord();
+                    record = new Record();
                     searchExpression = formatter.FormatRecord(record);
 
                     int[] found = provider.Search(searchExpression);
@@ -402,7 +393,7 @@ namespace ManagedIrbis.Biblio
                     for (int i = 0; i < found.Length; i++)
                     {
                         log.Write(".");
-                        record = new MarcRecord
+                        record = new Record
                         {
                             Mfn = found[i]
                         };
@@ -482,7 +473,7 @@ namespace ManagedIrbis.Biblio
                             //RichText.Encode3(description, UnicodeRange.Russian, "\\f2")
                         ));
 
-                    MarcRecord record = item.Record;
+                    Record record = item.Record;
 
                     // Для отладки: проверить упорядочение
                     if (showOrder)

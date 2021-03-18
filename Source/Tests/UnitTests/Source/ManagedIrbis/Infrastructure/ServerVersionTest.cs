@@ -138,7 +138,7 @@ namespace UnitTests.ManagedIrbis
 
 //        private void _TestSerialization
 //            (
-//                [NotNull] ServerVersion first
+//                ServerVersion first
 //            )
 //        {
 //            byte[] bytes = first.SaveToMemory();

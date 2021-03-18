@@ -8,8 +8,6 @@
 
 /* OsmiCardsClient.cs -- клиент DiCARDS
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #if FW4
@@ -24,11 +22,8 @@ using System.Text;
 
 using AM;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json.Linq;
 
@@ -45,8 +40,7 @@ namespace RestfulIrbis.OsmiCards
     /// <summary>
     /// Клиент DiCARDS.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class OsmiCardsClient
     {
         #region Properties
@@ -54,7 +48,6 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Connection
         /// </summary>
-        [NotNull]
         public RestClient Connection { get; private set; }
 
         #endregion
@@ -66,9 +59,9 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public OsmiCardsClient
             (
-                [NotNull] string baseUrl,
-                [NotNull] string apiId,
-                [NotNull] string apiKey
+                string baseUrl,
+                string apiId,
+                string apiKey
             )
         {
             Code.NotNullNorEmpty(baseUrl, nameof(baseUrl));
@@ -117,8 +110,8 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void CreateCard
             (
-                [NotNull] string cardNumber,
-                [NotNull] string template
+                string cardNumber,
+                string template
             )
         {
             Code.NotNullNorEmpty(cardNumber, nameof(cardNumber));
@@ -146,9 +139,9 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void CreateCard
             (
-                [NotNull] string cardNumber,
-                [NotNull] string template,
-                [NotNull] string jsonText
+                string cardNumber,
+                string template,
+                string jsonText
             )
         {
             Code.NotNullNorEmpty(cardNumber, nameof(cardNumber));
@@ -176,8 +169,8 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void CreateTemplate
             (
-                [NotNull] string templateName,
-                [NotNull] string jsonText
+                string templateName,
+                string jsonText
             )
         {
             Code.NotNullNorEmpty(templateName, nameof(templateName));
@@ -202,7 +195,7 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void DeleteCard
             (
-                [NotNull] string cardNumber,
+                string cardNumber,
                 bool push
             )
         {
@@ -233,7 +226,7 @@ namespace RestfulIrbis.OsmiCards
         [CanBeNull]
         public OsmiCard GetCardInfo
             (
-                [NotNull] string cardNumber
+                string cardNumber
             )
         {
             Code.NotNullNorEmpty(cardNumber, nameof(cardNumber));
@@ -260,7 +253,7 @@ namespace RestfulIrbis.OsmiCards
         [CanBeNull]
         public JObject GetRawCard
             (
-                [NotNull] string cardNumber
+                string cardNumber
             )
         {
             Code.NotNullNorEmpty(cardNumber, nameof(cardNumber));
@@ -284,7 +277,7 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public string GetCardLink
             (
-                [NotNull] string cardNumber
+                string cardNumber
             )
         {
             Code.NotNullNorEmpty(cardNumber, nameof(cardNumber));
@@ -385,7 +378,7 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public JObject GetTemplateInfo
             (
-                [NotNull] string templateName
+                string templateName
             )
         {
             Code.NotNullNorEmpty(templateName, nameof(templateName));
@@ -465,7 +458,7 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public string[] SearchCards
             (
-                [NotNull] string text
+                string text
             )
         {
             RestRequest request = new RestRequest
@@ -507,8 +500,8 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void SendCardMail
             (
-                [NotNull] string cardNumber,
-                [NotNull] string email
+                string cardNumber,
+                string email
             )
         {
             Code.NotNullNorEmpty(cardNumber, nameof(cardNumber));
@@ -533,8 +526,8 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void SendCardSms
             (
-                [NotNull] string cardNumber,
-                [NotNull] string phoneNumber
+                string cardNumber,
+                string phoneNumber
             )
         {
             Code.NotNullNorEmpty(cardNumber, nameof(cardNumber));
@@ -559,7 +552,7 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void SendPinCode
             (
-                [NotNull] string phoneNumber
+                string phoneNumber
             )
         {
             Code.NotNullNorEmpty(phoneNumber, nameof(phoneNumber));
@@ -581,8 +574,8 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void SendPushMessage
             (
-                [NotNull] string[] cardNumbers,
-                [NotNull] string messageText
+                string[] cardNumbers,
+                string messageText
             )
         {
             Code.NotNull(cardNumbers, nameof(cardNumbers));
@@ -616,8 +609,8 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void SetCardTemplate
             (
-                [NotNull] string cardNumber,
-                [NotNull] string template,
+                string cardNumber,
+                string template,
                 bool push
             )
         {
@@ -649,7 +642,7 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void SetDefaults
             (
-                [NotNull] string newSettings
+                string newSettings
             )
         {
             Code.NotNullNorEmpty(newSettings, nameof(newSettings));
@@ -672,8 +665,8 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void UpdateCard
             (
-                [NotNull] string cardNumber,
-                [NotNull] string jsonText,
+                string cardNumber,
+                string jsonText,
                 bool push
             )
         {
@@ -705,8 +698,8 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public void UpdateTemplate
             (
-                [NotNull] string templateName,
-                [NotNull] string jsonText,
+                string templateName,
+                string jsonText,
                 bool push
             )
         {
@@ -743,10 +736,9 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         /// <param name="groupName">Имя группы</param>
         /// <returns>Массив регистрационных данных.</returns>
-        [NotNull]
         public OsmiRegistrationInfo[] GetRegistrations
             (
-                [NotNull] string groupName
+                string groupName
             )
         {
             Code.NotNullNorEmpty(groupName, nameof(groupName));
@@ -786,7 +778,7 @@ namespace RestfulIrbis.OsmiCards
         /// <param name="numbers">Список серийных номеров карт.</param>
         public void DeleteRegistrations
             (
-                [NotNull] string[] numbers
+                string[] numbers
             )
         {
             Code.NotNull(numbers, nameof(numbers));

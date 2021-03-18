@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ChapterWithStatistics.cs -- 
+/* ChapterWithStatistics.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,18 +18,14 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -40,10 +34,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class ChapterWithStatistics
         : BiblioChapter
     {
@@ -67,8 +60,8 @@ namespace ManagedIrbis.Biblio
 
         private void _ProcessChapter
             (
-                [NotNull] IrbisReport report,
-                [NotNull] BiblioChapter chapter
+                IrbisReport report,
+                BiblioChapter chapter
             )
         {
             ItemCollection items = chapter.Items;

@@ -3,8 +3,6 @@
 
 /* ViafMainHeading.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,9 +10,7 @@
 using AM;
 using AM.Json;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json.Linq;
 
@@ -27,8 +23,7 @@ namespace RestfulIrbis.Viaf
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class ViafMainHeading
     {
         #region Properties
@@ -55,10 +50,9 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         /// Parse the object.
         /// </summary>
-        [NotNull]
         public static ViafMainHeading Parse
             (
-                [NotNull] JObject obj
+                JObject obj
             )
         {
             return new ViafMainHeading
@@ -72,7 +66,6 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         /// Parse the array.
         /// </summary>
-        [NotNull]
         public static ViafMainHeading[] Parse
             (
                 [CanBeNull] JArray array

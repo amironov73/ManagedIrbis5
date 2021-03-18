@@ -56,12 +56,12 @@ namespace ManagedIrbis.Infrastructure
         #region Public methods
 
         ///// <summary>
-        ///// Get GUID from the <see cref="MarcRecord"/>.
+        ///// Get GUID from the <see cref="Record"/>.
         ///// </summary>
         //[CanBeNull]
         //public static string Get
         //    (
-        //        [CanBeNull] MarcRecord record
+        //        [CanBeNull] Record record
         //    )
         //{
         //    if (ReferenceEquals(record, null))
@@ -106,7 +106,7 @@ namespace ManagedIrbis.Infrastructure
         ///// </summary>
         //public static Guid? Parse
         //    (
-        //        MarcRecord record
+        //        Record record
         //    )
         //{
         //    Code.NotNull(record, "record");

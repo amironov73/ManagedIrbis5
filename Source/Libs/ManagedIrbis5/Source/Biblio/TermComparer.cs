@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* TermComparer.cs -- 
+/* TermComparer.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,21 +12,17 @@ using System.Collections.Generic;
 using AM;
 using AM.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public static class TermComparer
     {
         #region Nested classes

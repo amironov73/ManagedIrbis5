@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ReportOutput.cs -- 
+/* ReportOutput.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -22,21 +20,17 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class ReportOutput
     {
         #region Properties
@@ -44,7 +38,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Result text.
         /// </summary>
-        [NotNull]
         public string Text { get { return _buffer.ToString(); } }
 
         #endregion
@@ -72,7 +65,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Clear the output.
         /// </summary>
-        [NotNull]
         public ReportOutput Clear()
         {
             _buffer.Length = 0;
@@ -83,11 +75,10 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Trim end of text.
         /// </summary>
-        [NotNull]
         public ReportOutput TrimEnd()
         {
             int length = _buffer.Length;
-            
+
             while (length != 0)
             {
                 string s = _buffer.ToString(length - 1, 1);
@@ -108,7 +99,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Write text.
         /// </summary>
-        [NotNull]
         public ReportOutput Write
             (
                 string text

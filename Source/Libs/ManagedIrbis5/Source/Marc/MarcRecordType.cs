@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* MarcRecordType.cs -- код типа записи в формате ISO 2709
+/* RecordType.cs -- код типа записи в формате ISO 2709
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,7 +16,7 @@ namespace ManagedIrbis.Marc
     /// <summary>
     /// Код Типа записи в формате ISO 2709.
     /// </summary>
-    public enum MarcRecordType
+    public enum RecordType
     {
         /// <summary>
         /// Текстовый материал.

@@ -3,8 +3,6 @@
 
 /* ViafData.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,11 +10,8 @@
 using AM;
 using AM.Json;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -30,8 +25,7 @@ namespace RestfulIrbis.Viaf
     /// <summary>
     /// Данные о записи VIAF.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class ViafData
     {
         #region Properties
@@ -83,10 +77,9 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         /// Parse the object.
         /// </summary>
-        [NotNull]
         public static ViafData Parse
             (
-                [NotNull] JObject obj
+                JObject obj
             )
         {
             Code.NotNull(obj, "obj");

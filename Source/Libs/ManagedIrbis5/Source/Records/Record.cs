@@ -21,7 +21,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 using AM;
 using AM.Collections;
 
@@ -98,6 +99,15 @@ namespace ManagedIrbis
         /// Признак того, что запись модифицирована.
         /// </summary>
         public bool Modified { get; internal set; }
+
+        /// <summary>
+        /// Произвольные пользовательские данные.
+        /// Данное свойство используется, например,
+        /// при построении отчета.
+        /// </summary>
+        [JsonIgnore]
+        [XmlIgnore]
+        public object? UserData { get; set; }
 
         #endregion
 

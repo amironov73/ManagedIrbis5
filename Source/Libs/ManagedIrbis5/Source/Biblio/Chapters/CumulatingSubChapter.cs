@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* CumulatingSubChapter.cs -- 
+/* CumulatingSubChapter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,19 +18,15 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
@@ -43,8 +37,7 @@ namespace ManagedIrbis.Biblio
     /// <summary>
     /// Сводное описание многотомного издания.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class CumulatingSubChapter
         : MenuSubChapter
     {
@@ -91,7 +84,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Groups.
         /// </summary>
-        [NotNull]
         public List<Multivolume> Groups { get; protected set; }
 
         #endregion
@@ -117,7 +109,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected static void OrderGroup
             (
-                [NotNull] Multivolume bookGroup
+                Multivolume bookGroup
             )
         {
             BiblioItem[] items = bookGroup
@@ -169,7 +161,7 @@ namespace ManagedIrbis.Biblio
 
                 foreach (BiblioItem item in Items)
                 {
-                    MarcRecord record = item.Record
+                    Record record = item.Record
                         .ThrowIfNull("item.Record");
                     string header = formatter.FormatRecord(record.Mfn);
                     if (!string.IsNullOrEmpty(header))
@@ -197,7 +189,7 @@ namespace ManagedIrbis.Biblio
 
                 foreach (Multivolume bookGroup in Groups)
                 {
-                    MarcRecord record = bookGroup.First().Record
+                    Record record = bookGroup.First().Record
                         .ThrowIfNull("bookGroup.Record");
                     string order = formatter.FormatRecord(record.Mfn);
                     if (!string.IsNullOrEmpty(order))
@@ -219,7 +211,7 @@ namespace ManagedIrbis.Biblio
                 BiblioItem item = new BiblioItem
                 {
                     Description = bookGroup.Header,
-                    Record = new MarcRecord(), // TODO ???
+                    Record = new Record(), // TODO ???
                     UserData = bookGroup
                 };
                 bookGroup.Item = item;

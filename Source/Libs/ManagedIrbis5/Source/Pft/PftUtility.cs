@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
 /* PftUtility.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,20 +26,10 @@ using System.Text.RegularExpressions;
 
 using AM;
 using AM.Collections;
-using AM.ConsoleIO;
-using AM.Logging;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
-using ManagedIrbis.Pft.Infrastructure;
-using ManagedIrbis.Pft.Infrastructure.Ast;
-using ManagedIrbis.Search;
-
-using MoonSharp.Interpreter;
 
 #endregion
 
@@ -44,8 +40,6 @@ namespace ManagedIrbis.Pft
     /// <summary>
     /// Utility routines for PFT scripting.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public static class PftUtility
     {
         #region Properties
@@ -119,16 +113,14 @@ namespace ManagedIrbis.Pft
             return result.ToString();
         }
 
-        [NotNull]
-        private static RecordField _ParseLine
+        private static Field _ParseLine
             (
-                [NotNull] string line
+                string line
             )
         {
-            Code.NotNull(line, "line");
 
             StringReader reader = new StringReader(line);
-            RecordField result = new RecordField
+            var result = new Field
             {
                 Value = _ReadTo(reader, '^')
             };
@@ -148,7 +140,7 @@ namespace ManagedIrbis.Pft
                     Code = code,
                     Value = text
                 };
-                result.SubFields.Add(subField);
+                result.Subfields.Add(subField);
             }
 
             return result;
@@ -165,7 +157,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static void AssignField
             (
-                [NotNull] PftContext context,
+                PftContext context,
                 int tag,
                 IndexSpecification index,
                 [CanBeNull] string value
@@ -173,7 +165,7 @@ namespace ManagedIrbis.Pft
         {
             Code.NotNull(context, "context");
 
-            MarcRecord record = context.Record;
+            Record record = context.Record;
             if (ReferenceEquals(record, null))
             {
                 Log.Error
@@ -208,10 +200,10 @@ namespace ManagedIrbis.Pft
             }
 
             string[] lines = value.SplitLines().NonEmptyLines().ToArray();
-            List<RecordField> newFields = new List<RecordField>();
+            var newFields = new List<Field>();
             foreach (string line in lines)
             {
-                RecordField field = ParseField(line);
+                var field = ParseField(line);
                 field.Tag = tag;
                 newFields.Add(field);
             }
@@ -267,7 +259,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static void AssignSubField
             (
-                [NotNull] PftContext context,
+                PftContext context,
                 int tag,
                 IndexSpecification fieldIndex,
                 char code,
@@ -279,7 +271,7 @@ namespace ManagedIrbis.Pft
 
             code = SubFieldCode.Normalize(code);
 
-            MarcRecord record = context.Record;
+            Record record = context.Record;
             if (ReferenceEquals(record, null))
             {
                 Log.Error
@@ -433,10 +425,9 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Compile the program.
         /// </summary>
-        [NotNull]
         public static PftProgram CompileProgram
             (
-                [NotNull] string source
+                string source
             )
         {
             Code.NotNull(source, "source");
@@ -695,8 +686,8 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static void FieldsToText
             (
-                [NotNull] StringBuilder builder,
-                [NotNull] IEnumerable<FieldSpecification> fields
+                StringBuilder builder,
+                IEnumerable<FieldSpecification> fields
             )
         {
             Code.NotNull(builder, "builder");
@@ -719,10 +710,9 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Format for data mode.
         /// </summary>
-        [NotNull]
         public static string FormatDataMode
             (
-                [NotNull] this RecordField field
+                this RecordField field
             )
         {
             Code.NotNull(field, "field");
@@ -757,10 +747,9 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Format for header mode.
         /// </summary>
-        [NotNull]
         public static string FormatHeaderMode
             (
-                [NotNull] this RecordField field
+                this RecordField field
             )
         {
             Code.NotNull(field, "field");
@@ -814,10 +803,9 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Format field according to specified output mode.
         /// </summary>
-        [NotNull]
         public static string FormatField
             (
-                [NotNull] this RecordField field,
+                this RecordField field,
                 PftFieldOutputMode mode,
                 bool uppercase
             )
@@ -1018,10 +1006,10 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool FormatTermLink
             (
-                [NotNull] PftContext context,
+                PftContext context,
                 [CanBeNull] PftNode node,
                 [CanBeNull] string database,
-                [NotNull] TermLink link
+                TermLink link
             )
         {
             Code.NotNull(context, "context");
@@ -1036,7 +1024,7 @@ namespace ManagedIrbis.Pft
                     provider.Database = database;
                 }
 
-                MarcRecord record = provider.ReadRecord(link.Mfn);
+                Record record = provider.ReadRecord(link.Mfn);
                 if (!ReferenceEquals(record, null))
                 {
                     RecordField field = record.Fields.GetField
@@ -1074,11 +1062,10 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Get array item according to specification
         /// </summary>
-        [NotNull]
         public static T[] GetArrayItem<T>
             (
-                [NotNull] PftContext context,
-                [NotNull] T[] array,
+                PftContext context,
+                T[] array,
                 IndexSpecification index
             )
         {
@@ -1107,7 +1094,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static int GetFieldCount
             (
-                [NotNull] PftContext context,
+                PftContext context,
                 params int[] tags
             )
         {
@@ -1115,7 +1102,7 @@ namespace ManagedIrbis.Pft
 
             int result = 0;
 
-            MarcRecord record = context.Record;
+            Record record = context.Record;
             if (!ReferenceEquals(record, null))
             {
                 foreach (int tag in tags)
@@ -1133,17 +1120,16 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Get value of the field.
         /// </summary>
-        [NotNull]
         public static string[] GetFieldValue
             (
-                [NotNull] PftContext context,
+                PftContext context,
                 int tag,
                 IndexSpecification index
             )
         {
             Code.NotNull(context, "context");
 
-            MarcRecord record = context.Record;
+            Record record = context.Record;
             if (ReferenceEquals(record, null))
             {
                 return StringUtility.EmptyArray;
@@ -1174,8 +1160,8 @@ namespace ManagedIrbis.Pft
         [CanBeNull]
         public static string GetFieldValue
             (
-                [NotNull] PftContext context,
-                [NotNull] RecordField field,
+                PftContext context,
+                RecordField field,
                 char subFieldCode,
                 IndexSpecification subFieldRepeat
             )
@@ -1288,7 +1274,6 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Get array of reserved words.
         /// </summary>
-        [NotNull]
         [ItemNotNull]
         public static string[] GetReservedWords()
         {
@@ -1300,10 +1285,9 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Get value of the subfield.
         /// </summary>
-        [NotNull]
         public static string[] GetSubFieldValue
             (
-                [NotNull] PftContext context,
+                PftContext context,
                 int tag,
                 IndexSpecification fieldIndex,
                 char code,
@@ -1312,7 +1296,7 @@ namespace ManagedIrbis.Pft
         {
             Code.NotNull(context, "context");
 
-            MarcRecord record = context.Record;
+            Record record = context.Record;
             if (ReferenceEquals(record, null))
             {
                 Log.Error
@@ -1358,7 +1342,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool IsComplexExpression
             (
-                [NotNull] PftNode node
+                PftNode node
             )
         {
             Code.NotNull(node, "node");
@@ -1382,7 +1366,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool IsComplexExpression
             (
-                [NotNull] IEnumerable<PftNode> nodes
+                IEnumerable<PftNode> nodes
             )
         {
             Code.NotNull(nodes, "nodes");
@@ -1400,8 +1384,8 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool IsNumeric
             (
-                [NotNull] PftContext context,
-                [NotNull] IList<PftNode> nodes
+                PftContext context,
+                IList<PftNode> nodes
             )
         {
             Code.NotNull(context, "context");
@@ -1428,8 +1412,8 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool IsNumeric
             (
-                [NotNull] PftContext context,
-                [NotNull] PftNode node
+                PftContext context,
+                PftNode node
             )
         {
             Code.NotNull(context, "context");
@@ -1460,8 +1444,8 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static void NodesToText
             (
-                [NotNull] StringBuilder builder,
-                [NotNull] IEnumerable<PftNode> nodes
+                StringBuilder builder,
+                IEnumerable<PftNode> nodes
             )
         {
             Code.NotNull(builder, "builder");
@@ -1486,9 +1470,9 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static void NodesToText
             (
-                [NotNull] string delimiter,
-                [NotNull] StringBuilder builder,
-                [NotNull] IEnumerable<PftNode> nodes
+                string delimiter,
+                StringBuilder builder,
+                IEnumerable<PftNode> nodes
             )
         {
             Code.NotNull(builder, "builder");
@@ -1511,10 +1495,9 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Parse the field.
         /// </summary>
-        [NotNull]
         public static RecordField ParseField
             (
-                [NotNull] string line
+                string line
             )
         {
             Code.NotNullNorEmpty(line, "line");
@@ -1554,7 +1537,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool RequiresConnection
             (
-                [NotNull] PftNode node
+                PftNode node
             )
         {
             Code.NotNull(node, "node");
@@ -1578,7 +1561,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool RequiresConnection
             (
-                [NotNull] IEnumerable<PftNode> nodes
+                IEnumerable<PftNode> nodes
             )
         {
             Code.NotNull(nodes, "nodes");
@@ -1679,11 +1662,10 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Set array item according to index specification
         /// </summary>
-        [NotNull]
         public static T[] SetArrayItem<T>
             (
-                [NotNull] PftContext context,
-                [NotNull] T[] array,
+                PftContext context,
+                T[] array,
                 IndexSpecification index,
                 [CanBeNull] T value
             )

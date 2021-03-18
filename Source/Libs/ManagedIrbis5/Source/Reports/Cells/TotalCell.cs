@@ -3,8 +3,6 @@
 
 /* TotalCell.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,11 +18,8 @@ using System.Xml.Serialization;
 using AM;
 using AM.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -33,10 +28,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class TotalCell
         : ReportCell
     {
@@ -166,7 +160,7 @@ namespace ManagedIrbis.Reports
                             {
                                 countNonEmpty++;
                             }
-                            result 
+                            result
                                 = countNonEmpty.ToInvariantString();
                             break;
 

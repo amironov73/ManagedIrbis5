@@ -4,7 +4,6 @@ using System.IO;
 using AM;
 using AM.Runtime;
 
-using JetBrains.Annotations;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -16,7 +15,6 @@ namespace UnitTests.ManagedIrbis.Reports
     public class CellCollectionTest
         : Common.CommonUnitTest
     {
-        [NotNull]
         private ReportCell[] _GetCells()
         {
             return new ReportCell[]
@@ -199,7 +197,7 @@ namespace UnitTests.ManagedIrbis.Reports
 
         private void _TestSerialization
             (
-                [NotNull] CellCollection first
+                CellCollection first
             )
         {
             byte[] bytes = first.SaveToMemory();

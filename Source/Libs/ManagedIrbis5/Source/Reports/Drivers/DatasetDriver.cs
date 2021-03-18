@@ -3,8 +3,6 @@
 
 /* DatasetDriver.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #if CLASSIC || NETCORE
@@ -20,21 +18,17 @@ using System.Threading.Tasks;
 
 using AM;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class DatasetDriver
         : ReportDriver
     {

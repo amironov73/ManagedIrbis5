@@ -363,7 +363,7 @@ namespace ManagedIrbis.Reports
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            foreach (T item in Items)
+            foreach (var item in Items)
             {
                 item.Dispose();
             }

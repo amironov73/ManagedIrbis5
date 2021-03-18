@@ -4,10 +4,15 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable VirtualMemberNeverOverridden.Global
 
 /* ReportBand.cs -- базовый тип для полос отчета
  * Ars Magna project, http://arsmagna.ru
@@ -16,12 +21,7 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 using AM;
@@ -47,12 +47,12 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Raised after rendering.
         /// </summary>
-        public event EventHandler<ReportRenderingEventArgs> AfterRendering;
+        public event EventHandler<ReportRenderingEventArgs>? AfterRendering;
 
         /// <summary>
         /// Raised before rendering.
         /// </summary>
-        public event EventHandler<ReportRenderingEventArgs> BeforeRendering;
+        public event EventHandler<ReportRenderingEventArgs>? BeforeRendering;
 
         #endregion
 
@@ -63,14 +63,14 @@ namespace ManagedIrbis.Reports
         /// </summary>
         [XmlArray("attr")]
         [JsonPropertyName("attr")]
-        public ReportAttributes Attributes { get; private set; }
+        public ReportAttributes Attributes { get; }
 
         /// <summary>
         /// Cells.
         /// </summary>
         [XmlArray("cells")]
         [JsonPropertyName("cells")]
-        public CellCollection Cells { get; private set; }
+        public CellCollection Cells { get; }
 
         /// <summary>
         /// Report.
@@ -79,13 +79,13 @@ namespace ManagedIrbis.Reports
         [JsonIgnore]
         public virtual IrbisReport? Report
         {
-            get { return _report; }
+            get => _report;
             internal set
             {
                 _report = value;
                 Cells.SetReport(value);
             }
-        }
+        } // property Report
 
         /// <summary>
         /// Parent band.
@@ -117,7 +117,7 @@ namespace ManagedIrbis.Reports
             {
                 Band = this
             };
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -132,7 +132,7 @@ namespace ManagedIrbis.Reports
             {
                 Cells.Add(cell);
             }
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -143,31 +143,31 @@ namespace ManagedIrbis.Reports
             )
             : this()
         {
-            foreach (ReportAttribute attribute in attributes)
+            foreach (var attribute in attributes)
             {
                 Attributes.Add(attribute.Name, attribute.Value);
             }
-        }
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private IrbisReport _report;
+        private IrbisReport? _report;
 
         private void _Render
             (
                 ReportContext context
             )
         {
-            ReportDriver driver = context.Driver;
+            var driver = context.Driver;
             driver.BeginRow(context, this);
-            foreach (ReportCell cell in Cells)
+            foreach (var cell in Cells)
             {
                 cell.Render(context);
             }
             driver.EndRow(context, this);
-        }
+        } // method _Render
 
         /// <summary>
         /// Called after <see cref="Render"/>.
@@ -177,10 +177,13 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            ReportRenderingEventArgs eventArgs
-                = new ReportRenderingEventArgs(context);
-            AfterRendering.Raise(this, eventArgs);
-        }
+            var afterRendering = AfterRendering;
+            if (afterRendering is not null)
+            {
+                var eventArgs = new ReportRenderingEventArgs(context);
+                afterRendering.Raise(this, eventArgs);
+            }
+        } // method OnAfterRendering
 
         /// <summary>
         /// Called before <see cref="Render"/>.
@@ -190,12 +193,15 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            ReportRenderingEventArgs eventArgs
-                = new ReportRenderingEventArgs(context);
-            BeforeRendering.Raise(this, eventArgs);
+            var beforeRendering = BeforeRendering;
+            if (beforeRendering is not null)
+            {
+                var eventArgs = new ReportRenderingEventArgs(context);
+                beforeRendering.Raise(this, eventArgs);
 
-            context.OnRendering();
-        }
+                context.OnRendering();
+            }
+        } // method OnBeforeRendering
 
         #endregion
 
@@ -204,10 +210,7 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Clone the band.
         /// </summary>
-        public virtual ReportBand Clone()
-        {
-            return (ReportBand)MemberwiseClone();
-        }
+        public virtual ReportBand Clone() => (ReportBand)MemberwiseClone();
 
         /// <summary>
         /// Render the band.
@@ -222,7 +225,7 @@ namespace ManagedIrbis.Reports
             RenderOnce(context);
 
             OnAfterRendering(context);
-        }
+        } // method Render
 
         /// <summary>
         /// Render the band once (ignore records).
@@ -230,7 +233,7 @@ namespace ManagedIrbis.Reports
         public virtual void RenderOnce
             (
                 ReportContext context,
-                IPftFormatter? formatter
+                IPftFormatter? formatter = default
             )
         {
             context.SetVariables(formatter);
@@ -239,21 +242,11 @@ namespace ManagedIrbis.Reports
             context.CurrentRecord = null;
 
             _Render(context);
-        }
+        } // method RenderOnce
 
         /// <summary>
-        /// Render the band once (ignore records).
-        /// </summary>
-        public void RenderOnce
-            (
-                ReportContext context
-            )
-        {
-            RenderOnce(context, null);
-        }
-
-        /// <summary>
-        ///
+        /// Последовательный рендеринг всех записей,
+        /// доступных в текущем контексте.
         /// </summary>
         public virtual void RenderAllRecords
             (
@@ -263,7 +256,7 @@ namespace ManagedIrbis.Reports
         {
             context.SetVariables(formatter);
 
-            int index = 0;
+            var index = 0;
             foreach (var record in context.Records)
             {
                 context.CurrentRecord = record;
@@ -276,7 +269,7 @@ namespace ManagedIrbis.Reports
 
             context.Index = -1;
             context.CurrentRecord = null;
-        }
+        } // method RenderAllRecords
 
         /// <summary>
         /// Render given index.
@@ -293,27 +286,18 @@ namespace ManagedIrbis.Reports
             context.SetVariables(formatter);
 
             _Render(context);
-        }
+        } // method RenderRecord
 
         /// <summary>
         /// Render given index.
         /// </summary>
-        public void RenderRecord
-            (
-                ReportContext context,
-                int index
-            )
-        {
+        public void RenderRecord(ReportContext context, int index) =>
             RenderRecord(context, null, index);
-        }
 
         /// <summary>
         /// Should serialize <see cref="Attributes"/>?
         /// </summary>
-        public bool ShouldSerializeAttributes()
-        {
-            return Attributes.Count != 0;
-        }
+        public bool ShouldSerializeAttributes() => Attributes.Count != 0;
 
         #endregion
 
@@ -325,14 +309,13 @@ namespace ManagedIrbis.Reports
                 bool throwOnError
             )
         {
-            Verifier<ReportBand> verifier
-                = new Verifier<ReportBand>(this, throwOnError);
+            var verifier = new Verifier<ReportBand>(this, throwOnError);
 
             verifier
                 .VerifySubObject(Attributes, "attributes")
                 .VerifySubObject(Cells, "cells");
 
-            foreach (ReportCell cell in Cells)
+            foreach (var cell in Cells)
             {
                 verifier
                     .ReferenceEquals
@@ -352,7 +335,7 @@ namespace ManagedIrbis.Reports
             // TODO Add some verification
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
@@ -361,14 +344,10 @@ namespace ManagedIrbis.Reports
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public virtual void Dispose()
         {
-            Magna.Trace("ReportBand::Dispose");
+            Magna.Trace(nameof(ReportBand) + "::" + nameof(Dispose));
 
             Cells.Dispose();
-        }
-
-        #endregion
-
-        #region Object members
+        } // method Dispose
 
         #endregion
 

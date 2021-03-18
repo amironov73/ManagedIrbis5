@@ -132,8 +132,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //            byte[] answer = builder.Encode();
 //            IIrbisConnection connection = new IrbisConnection();
 //            ServerResponse response = new ServerResponse(connection, answer, request, true);
-//            MarcRecord record1 = new MarcRecord();
-//            MarcRecord record2 = ProtocolText.ParseResponseForReadRecord(response, record1);
+//            Record record1 = new Record();
+//            Record record2 = ProtocolText.ParseResponseForReadRecord(response, record1);
 //            Assert.AreSame(record1, record2);
 //            Assert.AreEqual(123, record1.Mfn);
 //            Assert.AreEqual(RecordStatus.Last, record1.Status);
@@ -163,8 +163,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //            byte[] answer = builder.Encode();
 //            IIrbisConnection connection = new IrbisConnection();
 //            ServerResponse response = new ServerResponse(connection, answer, request, true);
-//            MarcRecord record1 = new MarcRecord();
-//            MarcRecord record2 = ProtocolText.ParseResponseForReadRecord(response, record1);
+//            Record record1 = new Record();
+//            Record record2 = ProtocolText.ParseResponseForReadRecord(response, record1);
 //            Assert.AreSame(record1, record2);
 //            Assert.AreEqual(123, record1.Mfn);
 //            Assert.AreEqual(RecordStatus.Last, record1.Status);
@@ -192,8 +192,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //            byte[] answer = builder.Encode();
 //            IIrbisConnection connection = new IrbisConnection();
 //            ServerResponse response = new ServerResponse(connection, answer, request, true);
-//            MarcRecord record1 = new MarcRecord();
-//            MarcRecord record2 = ProtocolText.ParseResponseForWriteRecord(response, record1);
+//            Record record1 = new Record();
+//            Record record2 = ProtocolText.ParseResponseForWriteRecord(response, record1);
 //            Assert.AreSame(record1, record2);
 //            Assert.AreEqual(123, record1.Mfn);
 //            Assert.AreEqual(RecordStatus.Last, record1.Status);
@@ -219,8 +219,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //            byte[] answer = builder.Encode();
 //            IIrbisConnection connection = new IrbisConnection();
 //            ServerResponse response = new ServerResponse(connection, answer, request, true);
-//            MarcRecord record1 = new MarcRecord();
-//            MarcRecord record2 = ProtocolText.ParseResponseForWriteRecord(response, record1);
+//            Record record1 = new Record();
+//            Record record2 = ProtocolText.ParseResponseForWriteRecord(response, record1);
 //            Assert.AreSame(record1, record2);
 //            Assert.AreEqual(0, record1.Mfn);
 //        }
@@ -235,8 +235,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //            byte[] answer = builder.Encode();
 //            IIrbisConnection connection = new IrbisConnection();
 //            ServerResponse response = new ServerResponse(connection, answer, request, true);
-//            MarcRecord record1 = new MarcRecord();
-//            MarcRecord record2 = ProtocolText.ParseResponseForWriteRecord(response, record1);
+//            Record record1 = new Record();
+//            Record record2 = ProtocolText.ParseResponseForWriteRecord(response, record1);
 //            Assert.AreSame(record1, record2);
 //            Assert.AreEqual(0, record1.Mfn);
 //        }
@@ -254,8 +254,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //            byte[] answer = builder.Encode();
 //            IIrbisConnection connection = new IrbisConnection();
 //            ServerResponse response = new ServerResponse(connection, answer, request, true);
-//            MarcRecord record1 = new MarcRecord();
-//            MarcRecord record2 = ProtocolText.ParseResponseForWriteRecords(response, record1);
+//            Record record1 = new Record();
+//            Record record2 = ProtocolText.ParseResponseForWriteRecords(response, record1);
 //            Assert.AreSame(record1, record2);
 //            Assert.AreEqual(2, record1.Fields.Count);
 //            Assert.AreEqual(692, record1.Fields[0].Tag);
@@ -279,8 +279,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //            byte[] answer = builder.Encode();
 //            IIrbisConnection connection = new IrbisConnection();
 //            ServerResponse response = new ServerResponse(connection, answer, request, true);
-//            MarcRecord record1 = new MarcRecord();
-//            MarcRecord record2 = ProtocolText.ParseResponseForAllFormat(response, record1);
+//            Record record1 = new Record();
+//            Record record2 = ProtocolText.ParseResponseForAllFormat(response, record1);
 //            Assert.AreSame(record1, record2);
 //            Assert.AreEqual(2, record1.Fields.Count);
 //            Assert.AreEqual(692, record1.Fields[0].Tag);
@@ -298,8 +298,8 @@ namespace UnitTests.ManagedIrbis.ImportExport
 //            byte[] answer = builder.Encode();
 //            IIrbisConnection connection = new IrbisConnection();
 //            ServerResponse response = new ServerResponse(connection, answer, request, true);
-//            MarcRecord record1 = new MarcRecord();
-//            MarcRecord record2 = ProtocolText.ParseResponseForAllFormat(response, record1);
+//            Record record1 = new Record();
+//            Record record2 = ProtocolText.ParseResponseForAllFormat(response, record1);
 //            Assert.IsNull(record2);
 //        }
 

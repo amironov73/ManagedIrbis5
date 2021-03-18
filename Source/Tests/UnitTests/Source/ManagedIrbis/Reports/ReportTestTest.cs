@@ -4,7 +4,6 @@ using System.IO;
 using AM;
 using AM.Runtime;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Reports;
@@ -17,13 +16,11 @@ namespace UnitTests.ManagedIrbis.Reports
     public class ReportTestTest
         : Common.CommonUnitTest
     {
-        [NotNull]
         private string _GetFolder001()
         {
             return Path.Combine(TestDataPath, "Reports\\001");
         }
 
-        [NotNull]
         private string _GetRootFolder()
         {
             return Path.Combine(TestDataPath, "Reports");

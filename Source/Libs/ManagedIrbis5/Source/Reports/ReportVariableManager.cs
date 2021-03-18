@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ReportVariableManager.cs -- 
+/* ReportVariableManager.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,21 +14,17 @@ using System.Linq;
 using AM;
 using AM.Collections;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class ReportVariableManager
         : IVerifiable
     {
@@ -39,7 +33,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Variable registry.
         /// </summary>
-        [NotNull]
         public CaseInsensitiveDictionary<ReportVariable> Registry
         {
             get;
@@ -71,7 +64,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public void DumpVariables
             (
-                [NotNull] TextWriter writer
+                TextWriter writer
             )
         {
             Code.NotNull(writer, "writer");
@@ -88,7 +81,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Get all variables.
         /// </summary>
-        [NotNull]
         public ReportVariable[] GetAllVariables()
         {
             List<ReportVariable> result = new List<ReportVariable>();
@@ -109,7 +101,7 @@ namespace ManagedIrbis.Reports
         [CanBeNull]
         public ReportVariable GetExistingVariable
             (
-                [NotNull] string name
+                string name
             )
         {
             Code.NotNullNorEmpty(name, "name");
@@ -123,10 +115,9 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Get existing or create new variable with given name.
         /// </summary>
-        [NotNull]
         public ReportVariable GetOrCreateVariable
             (
-                [NotNull] string name
+                string name
             )
         {
             Code.NotNullNorEmpty(name, "name");
@@ -144,10 +135,9 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Set the variable value.
         /// </summary>
-        [NotNull]
         public ReportVariable SetVariable
             (
-                [NotNull] string name,
+                string name,
                 [CanBeNull] object value
             )
         {

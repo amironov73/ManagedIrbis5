@@ -1,36 +1,35 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* SortBand.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* SortBand.cs -- полоса отчета с сортировкой
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Полоса отчета с сортировкой.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class SortBand
         : CompositeBand
     {
@@ -39,22 +38,9 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Sort expression.
         /// </summary>
-        [CanBeNull]
         [XmlAttribute("sort")]
-        [JsonProperty("sort")]
-        public string SortExpression { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        [JsonPropertyName("sort")]
+        public string? SortExpression { get; set; }
 
         #endregion
 
@@ -66,32 +52,29 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeRendering(context);
 
-            string expression = SortExpression;
+            var expression = SortExpression;
             if (string.IsNullOrEmpty(expression))
             {
                 RenderOnce(context);
             }
             else
             {
-                List<MarcRecord> list;
+                List<Record> list;
 
-                using (RecordSorter sorter
-                    = new RecordSorter(context.Provider, expression))
+                using (var sorter = new RecordSorter(context.Provider, expression))
                 {
                     list = sorter.SortRecords(context.Records);
                 }
 
-                ReportContext cloneContext = context.Clone(list);
+                var cloneContext = context.Clone(list);
 
                 RenderOnce(cloneContext);
             }
 
             OnAfterRendering(context);
-        }
+        } // method Render
 
         #endregion
 
@@ -103,24 +86,28 @@ namespace ManagedIrbis.Reports
                 bool throwOnError
             )
         {
-            Verifier<ReportBand> verifier
-                = new Verifier<ReportBand>(this, throwOnError);
+            var verifier = new Verifier<ReportBand>(this, throwOnError);
 
             verifier.Assert(base.Verify(throwOnError));
 
             verifier.NotNullNorEmpty
                 (
                     SortExpression,
-                    "SortExpression"
+                    nameof(SortExpression)
                 );
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
         #region Object members
 
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => SortExpression.ToVisibleString();
+
         #endregion
-    }
-}
+
+    } // class SortBand
+
+} // namespace ManagedIrbis.Reports

@@ -48,13 +48,13 @@ namespace UnitTests.ManagedIrbis.Reports
             Assert.IsNotNull(second);
         }
 
-        private List<MarcRecord> _GetRecords()
+        private List<Record> _GetRecords()
         {
-            List<MarcRecord> result = new List<MarcRecord>();
+            List<Record> result = new List<Record>();
 
             for (int i = 0; i < 10; i++)
             {
-                MarcRecord record = new MarcRecord();
+                Record record = new Record();
 
                 record.Fields.Add
                     (

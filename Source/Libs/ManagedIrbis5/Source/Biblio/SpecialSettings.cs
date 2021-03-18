@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* SpecialSettings.cs -- 
+/* SpecialSettings.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,15 +18,11 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -38,10 +32,9 @@ using Newtonsoft.Json.Linq;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
 #if !WINMOBILE && !PocketPC
     [JsonConverter(typeof(SpecialSettingsConverter))]
 #endif
@@ -60,7 +53,7 @@ namespace ManagedIrbis.Biblio
             public override void WriteJson
                 (
                     JsonWriter writer,
-                    object value, 
+                    object value,
                     JsonSerializer serializer
                 )
             {
@@ -119,7 +112,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Dictionary.
         /// </summary>
-        [NotNull]
         public StringDictionary Dictionary { get; private set; }
 
         /// <summary>
@@ -154,7 +146,7 @@ namespace ManagedIrbis.Biblio
         [CanBeNull]
         public string GetSetting
             (
-                [NotNull] string name
+                string name
             )
         {
             Code.NotNull(name, "name");

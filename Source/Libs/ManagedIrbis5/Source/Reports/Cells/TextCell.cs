@@ -1,47 +1,41 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* TextCell.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* TextCell.cs -- ячейка, содержащая статичный текст
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    ///
+    /// Ячейка, содержащая статичный текст.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class TextCell
         : ReportCell
     {
         #region Properties
 
         /// <summary>
-        /// Static text.
+        /// Статичный текст.
         /// </summary>
-        [CanBeNull]
         [XmlAttribute("text")]
-        [JsonProperty("text", NullValueHandling = NullValueHandling.Ignore)]
-        public string Text { get; set; }
+        [JsonPropertyName("text")]
+        public string? Text { get; set; }
 
         #endregion
 
@@ -52,7 +46,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public TextCell()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -63,7 +57,7 @@ namespace ManagedIrbis.Reports
             )
         {
             Text = text;
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -72,10 +66,11 @@ namespace ManagedIrbis.Reports
             (
                 string text,
                 params ReportAttribute[] attributes
-            ) : base(attributes)
+            )
+            : base(attributes)
         {
             Text = text;
-        }
+        } // constructor
 
         #endregion
 
@@ -87,31 +82,26 @@ namespace ManagedIrbis.Reports
         /// <returns></returns>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeText()
-        {
-            return !string.IsNullOrEmpty(Text);
-        }
+        public bool ShouldSerializeText() => !string.IsNullOrEmpty(Text);
 
         #endregion
 
         #region ReportCell members
 
         /// <inheritdoc cref="ReportCell.Compute"/>
-        public override string Compute
+        public override string? Compute
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeCompute(context);
 
-            string result = Text;
+            var result = Text;
 
             OnAfterCompute(context);
 
             return result;
-        }
+        } // method Compute
 
         /// <inheritdoc cref="ReportCell.Render"/>
         public override void Render
@@ -119,16 +109,16 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
+            var text = Compute(context);
 
-            string text = Compute(context);
-
-            ReportDriver driver = context.Driver;
+            var driver = context.Driver;
             driver.BeginCell(context, this);
             driver.Write(context, text);
             driver.EndCell(context, this);
-        }
+        } // method Render
 
         #endregion
-    }
-}
+
+    } // class TextCell
+
+} // namespace ManagedIrbis.Reports

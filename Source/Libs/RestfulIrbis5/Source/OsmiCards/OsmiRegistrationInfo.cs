@@ -8,8 +8,6 @@
 
 /* OsmiRegistrationInfo.cs -- Данные о зарегистрированном пользователе
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -18,11 +16,8 @@ using AM;
 using AM.Json;
 using AM.Net;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -35,8 +30,7 @@ namespace RestfulIrbis.OsmiCards
     /// Данные о зарегистрированном пользователе системы
     /// DiCARDS.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class OsmiRegistrationInfo
         : IVerifiable
     {
@@ -109,10 +103,9 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Декодируем JSON от DiCARDS.
         /// </summary>
-        [NotNull]
         public static OsmiRegistrationInfo FromJson
             (
-                [NotNull] JObject obj
+                JObject obj
             )
         {
             Code.NotNull(obj, "obj");

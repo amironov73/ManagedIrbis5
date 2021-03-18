@@ -119,14 +119,14 @@ namespace ManagedIrbis.Biblio
         /// Find the record with specified MFN.
         /// </summary>
         [CanBeNull]
-        public MarcRecord FindRecord
+        public Record FindRecord
             (
                 int mfn
             )
         {
-            Code.Positive(mfn, "mfn");
+            Sure.Positive(mfn, "mfn");
 
-            MarcRecord result = Records
+            Record result = Records
                 .FirstOrDefault(record => record.Mfn == mfn);
 
             return result;

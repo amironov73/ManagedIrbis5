@@ -3,8 +3,6 @@
 
 /* OsmiTemplate.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,11 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,10 +24,9 @@ using Newtonsoft.Json.Linq;
 namespace RestfulIrbis.OsmiCards
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class OsmiTemplate
     {
         #region Properties
@@ -60,10 +54,9 @@ namespace RestfulIrbis.OsmiCards
         /// Convert <see cref="JObject"/> to
         /// <see cref="OsmiTemplate"/>.
         /// </summary>
-        [NotNull]
         public static OsmiTemplate FromJObject
             (
-                [NotNull] JObject jObject
+                JObject jObject
             )
         {
             Code.NotNull(jObject, "jObject");

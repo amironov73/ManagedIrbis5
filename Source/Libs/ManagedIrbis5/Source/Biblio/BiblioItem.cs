@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* BiblioItem.cs -- 
+/* BiblioItem.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -23,13 +21,10 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -38,10 +33,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class BiblioItem
         : IVerifiable
     {
@@ -54,7 +48,7 @@ namespace ManagedIrbis.Biblio
         public BiblioChapter Chapter { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public int Number { get; set; }
 
@@ -62,7 +56,7 @@ namespace ManagedIrbis.Biblio
         /// Record.
         /// </summary>
         [CanBeNull]
-        public MarcRecord Record { get; set; }
+        public Record Record { get; set; }
 
         /// <summary>
         /// Bibliographical description.
@@ -71,7 +65,7 @@ namespace ManagedIrbis.Biblio
         public string Description { get; set; }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [CanBeNull]
         public string Order { get; set; }
@@ -79,7 +73,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Terms.
         /// </summary>
-        [NotNull]
         public NonNullCollection<BiblioTerm> Terms { get; private set; }
 
         /// <summary>

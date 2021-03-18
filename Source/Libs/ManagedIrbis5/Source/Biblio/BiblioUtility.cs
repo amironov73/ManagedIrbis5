@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* BiblioUtility.cs -- 
+/* BiblioUtility.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -21,15 +19,11 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -38,10 +32,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public static class BiblioUtility
     {
         #region Private members
@@ -52,7 +45,7 @@ namespace ManagedIrbis.Biblio
 
         private static void _AddDot
             (
-                [NotNull] StringBuilder builder,
+                StringBuilder builder,
                 [CanBeNull] string line
             )
         {
@@ -79,10 +72,9 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Add trailing dot to every line in the text.
         /// </summary>
-        [NotNull]
         public static string AddTrailingDot
             (
-                [NotNull] string text
+                string text
             )
         {
             StringBuilder result = new StringBuilder(text.Length + 10);

@@ -124,14 +124,14 @@ namespace ManagedIrbis
 
             connection.ExecuteCommand(command);
 
-            MarcRecord[] found = command.Records
+            Record[] found = command.Records
                 .ThrowIfNull(nameof(command.Records));
             if (found.Length > 1)
             {
                 throw new IrbisException($"Too many records found: {expression}");
             }
 
-            MarcRecord result = found.GetItem(0);
+            Record result = found.GetItem(0);
 
             return result;
 

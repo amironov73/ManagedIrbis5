@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* RecordCollection.cs -- 
+/* RecordCollection.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,27 +18,22 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class RecordCollection
-        : NonNullCollection<MarcRecord>,
+        : NonNullCollection<Record>,
         IVerifiable
     {
         #region Properties
@@ -62,7 +55,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public void SortRecords()
         {
-            MarcRecord[] records = ToArray();
+            Record[] records = ToArray();
 
             Array.Sort(records, RecordComparer.BySortKey());
             Clear();
@@ -82,7 +75,7 @@ namespace ManagedIrbis.Biblio
             Verifier<RecordCollection> verifier
                 = new Verifier<RecordCollection>(this, throwOnError);
 
-            foreach (MarcRecord record in this)
+            foreach (Record record in this)
             {
                 verifier.VerifySubObject(record, "record");
             }

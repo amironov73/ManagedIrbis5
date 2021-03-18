@@ -3,15 +3,12 @@
 
 /* PftSemanticException.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 
-using JetBrains.Annotations;
 
 #endregion
 
@@ -20,7 +17,7 @@ namespace ManagedIrbis.Pft
     /// <summary>
     /// Semantic error occured.
     /// </summary>
-    [PublicAPI]
+
     public sealed class PftSemanticException
         : PftException
     {

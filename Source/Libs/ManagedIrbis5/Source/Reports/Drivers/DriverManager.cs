@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
 /* DriverManager.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,23 +22,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public static class DriverManager
     {
         #region Constants
@@ -79,7 +78,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Registry.
         /// </summary>
-        [NotNull]
         public static Dictionary<string, Type> Registry
         {
             get; private set;
@@ -119,19 +117,15 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Get <see cref="ReportDriver"/> by name.
         /// </summary>
-        [CanBeNull]
-        public static ReportDriver GetDriver
+        public static ReportDriver? GetDriver
             (
-                [NotNull] string name,
+                string name,
                 bool throwOnError
             )
         {
-            Code.NotNull(name, "name");
-
-            Type type;
-            if (!Registry.TryGetValue(name, out type))
+            if (!Registry.TryGetValue(name, out var type))
             {
-                Log.Error
+                Magna.Error
                     (
                         "DriverManager::GetDriver: "
                         + "driver not found: "
@@ -150,8 +144,7 @@ namespace ManagedIrbis.Reports
                 return null;
             }
 
-            ReportDriver result
-                = (ReportDriver) Activator.CreateInstance(type);
+            var result = (ReportDriver) Activator.CreateInstance(type);
 
             return result;
         }

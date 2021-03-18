@@ -116,9 +116,9 @@ namespace ManagedIrbis.Direct
         ///// <summary>
         ///// Decode the record.
         ///// </summary>
-        //public MarcRecord DecodeRecord()
+        //public Record DecodeRecord()
         //{
-        //    MarcRecord result = new MarcRecord
+        //    Record result = new Record
         //    {
         //        Mfn = Leader.Mfn,
         //        Status = (RecordStatus)Leader.Status,
@@ -162,7 +162,7 @@ namespace ManagedIrbis.Direct
         ///// </summary>
         //public static MstRecord64 EncodeRecord
         //    (
-        //        MarcRecord record
+        //        Record record
         //    )
         //{
         //    MstRecordLeader64 leader = new MstRecordLeader64

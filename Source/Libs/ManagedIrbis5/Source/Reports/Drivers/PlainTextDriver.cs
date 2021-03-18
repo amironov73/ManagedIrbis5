@@ -1,42 +1,32 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PlainTextDriver.cs -- 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* PlainTextDriver.cs -- драйвер для вывода отчета в плоский текст
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Драйвер для вывода отчета в плоский текст.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PlainTextDriver
         : ReportDriver
     {
@@ -45,14 +35,12 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Cell delimiter.
         /// </summary>
-        [CanBeNull]
-        public string CellDelimiter { get; set; }
+        public string? CellDelimiter { get; set; }
 
         /// <summary>
         /// Row delimiter.
         /// </summary>
-        [CanBeNull]
-        public string RowDelimiter { get; set; }
+        public string? RowDelimiter { get; set; }
 
         #endregion
 
@@ -65,15 +53,7 @@ namespace ManagedIrbis.Reports
         {
             CellDelimiter = "\t";
             RowDelimiter = Environment.NewLine;
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        } // constructor
 
         #endregion
 
@@ -86,12 +66,9 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(band, "band");
-
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write(Environment.NewLine);
-        }
+        } // method BeginParagraph
 
         /// <inheritdoc cref="ReportDriver.EndRow" />
         public override void EndRow
@@ -100,13 +77,10 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(band, "band");
-
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.TrimEnd();
             output.Write(RowDelimiter);
-        }
+        } // method RowDelimiter
 
         /// <inheritdoc cref="ReportDriver.EndCell" />
         public override void EndCell
@@ -115,11 +89,8 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(cell, "cell");
-
             context.Output.Write(CellDelimiter);
-        }
+        } // method EndCell
 
         /// <inheritdoc cref="ReportDriver.Write" />
         public override void Write
@@ -128,15 +99,11 @@ namespace ManagedIrbis.Reports
                 string text
             )
         {
-            Code.NotNull(context, "context");
-
             context.Output.Write(text);
-        }
+        } // method Write
 
         #endregion
 
-        #region Object members
+    } // class PlainTextDriver
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

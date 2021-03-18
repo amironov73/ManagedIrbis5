@@ -1,10 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* DynamicCell.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedType.Global
+
+/* DynamicCell.cs -- динамическая ячейка
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,21 +16,16 @@ using System;
 
 using AM;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Динамическая ячейка отчета. Рендеринг происходит в обработчике
+    /// события.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class DynamicCell
         : ReportCell
     {
@@ -36,35 +34,49 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Raised on cell computation.
         /// </summary>
-        public event EventHandler<ReportComputeEventArgs> Computation;
+        public event EventHandler<ReportComputeEventArgs>? Computation;
 
         /// <summary>
         /// Raised on cell rendering.
         /// </summary>
-        public event EventHandler<ReportRenderingEventArgs> Rendering;
+        public event EventHandler<ReportRenderingEventArgs>? Rendering;
 
         #endregion
 
         #region ReportCell members
 
         /// <inheritdoc cref="ReportCell.Compute"/>
-        public override string Compute
+        public override string? Compute
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
+            ReportComputeEventArgs? eventArgs = null;
 
             OnBeforeCompute(context);
 
-            ReportComputeEventArgs eventArgs
-                = new ReportComputeEventArgs(context);
-            Computation.Raise(this, eventArgs);
+            var computation = Computation;
+            if (computation is not null)
+            {
+                try
+                {
+                    eventArgs = new ReportComputeEventArgs(context);
+                    computation.Raise(this, eventArgs);
+                }
+                catch (Exception exception)
+                {
+                    Magna.TraceException
+                        (
+                            nameof(DynamicCell) + "::" + nameof(Compute),
+                            exception
+                        );
+                }
+            }
 
             OnAfterCompute(context);
 
-            return eventArgs.Result;
-        }
+            return eventArgs?.Result;
+        } // method Compute
 
         /// <inheritdoc cref="ReportCell.Render" />
         public override void Render
@@ -72,17 +84,31 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            ReportRenderingEventArgs eventArgs
-                = new ReportRenderingEventArgs(context);
-            Rendering.Raise(this, eventArgs);
-        }
+            var rendering = Rendering;
+            if (rendering is not null)
+            {
+                try
+                {
+                    var eventArgs = new ReportRenderingEventArgs(context);
+                    Rendering.Raise(this, eventArgs);
+                }
+                catch (Exception exception)
+                {
+                    Magna.TraceException
+                        (
+                            nameof(DynamicCell) + "::" + nameof(Render),
+                            exception
+                        );
+                }
+            }
+        } // method Render
 
         #endregion
 
         #region Object members
 
         #endregion
-    }
-}
+
+    } // class DynamicCell
+
+} // namespace ManagedIrbis.Reports

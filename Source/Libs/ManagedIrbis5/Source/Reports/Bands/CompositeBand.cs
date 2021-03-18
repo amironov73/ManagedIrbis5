@@ -16,18 +16,10 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 using ManagedIrbis.Pft;
 
@@ -59,22 +51,23 @@ namespace ManagedIrbis.Reports
         [JsonPropertyName("footer")]
         public ReportBand? Footer
         {
-            get { return _footer; }
+            get => _footer;
             set
             {
-                if (!ReferenceEquals(_footer, null))
+                if (_footer is not null)
                 {
                     _footer.Report = null;
                     _footer.Parent = null;
                 }
+
                 _footer = value;
-                if (!ReferenceEquals(_footer, null))
+                if (_footer is not null)
                 {
                     _footer.Report = Report;
                     _footer.Parent = this;
                 }
             }
-        }
+        } // property Footer
 
         /// <summary>
         /// Header band.
@@ -83,41 +76,43 @@ namespace ManagedIrbis.Reports
         [JsonPropertyName("header")]
         public ReportBand? Header
         {
-            get { return _header; }
+            get => _header;
             set
             {
-                if (!ReferenceEquals(_header, null))
+                if (_header is not null)
                 {
                     _header.Report = null;
                     _header.Parent = null;
                 }
+
                 _header = value;
-                if (!ReferenceEquals(_header, null))
+                if (_header is not null)
                 {
                     _header.Report = Report;
                     _header.Parent = this;
                 }
             }
-        }
+        } // property Header
 
         /// <inheritdoc cref="ReportBand.Report"/>
         public override IrbisReport? Report
         {
-            get { return base.Report; }
+            get => base.Report;
             internal set
             {
                 base.Report = value;
-                if (!ReferenceEquals(Header, null))
+                if (Header is not null)
                 {
                     Header.Report = value;
                 }
-                if (!ReferenceEquals(Footer, null))
+
+                if (Footer is not null)
                 {
                     Footer.Report = value;
                 }
                 Body.SetReport(value);
             }
-        }
+        } // property Report
 
         #endregion
 
@@ -129,7 +124,7 @@ namespace ManagedIrbis.Reports
         public CompositeBand()
         {
             Body = new BandCollection<ReportBand>(null, this);
-        }
+        } // constructor
 
         #endregion
 
@@ -137,11 +132,11 @@ namespace ManagedIrbis.Reports
 
         private ReportBand? _footer, _header;
 
-        /// <inheritdoc cref="ReportBand.RenderOnce(ReportContext,PftFormatter)"/>
+        /// <inheritdoc cref="ReportBand.RenderOnce"/>
         public override void RenderOnce
             (
                 ReportContext context,
-                IPftFormatter formatter
+                IPftFormatter? formatter = default
             )
         {
             context.Index = -1;
@@ -149,36 +144,27 @@ namespace ManagedIrbis.Reports
 
             context.SetVariables(formatter);
 
-            if (!ReferenceEquals(Header, null))
-            {
-                Header.Render(context);
-            }
+            Header?.Render(context);
 
             Body.Render(context);
 
-            if (!ReferenceEquals(Footer, null))
-            {
-                Footer.Render(context);
-            }
-        }
+            Footer?.Render(context);
+        } // method RenderOnce
 
         /// <inheritdoc
-        /// cref="ReportBand.RenderAllRecords(ReportContext,PftFormatter)"/>
+        /// cref="ReportBand.RenderAllRecords"/>
         public override void RenderAllRecords
             (
                 ReportContext context,
-                PftFormatter? formatter
+                IPftFormatter? formatter = default
             )
         {
             context.SetVariables(formatter);
 
-            if (!ReferenceEquals(Header, null))
-            {
-                Header.Render(context);
-            }
+            Header?.Render(context);
 
-            int count = context.Records.Count;
-            for (int index = 0; index < count; index++)
+            var count = context.Records.Count;
+            for (var index = 0; index < count; index++)
             {
                 context.Index = index;
                 context.CurrentRecord = context.Records[index];
@@ -186,14 +172,11 @@ namespace ManagedIrbis.Reports
                 Body.Render(context);
             }
 
-            if (!ReferenceEquals(Footer, null))
-            {
-                Footer.Render(context);
-            }
+            Footer?.Render(context);
 
             context.Index = -1;
             context.CurrentRecord = null;
-        }
+        } // method RenderAllRecords
 
         #endregion
 
@@ -279,7 +262,7 @@ namespace ManagedIrbis.Reports
                 .Assert(Cells.Count == 0, "Cells.Count != 0")
                 .VerifySubObject(Body, "body");
 
-            foreach (ReportBand band in Body)
+            foreach (var band in Body)
             {
                 verifier
                     .ReferenceEquals

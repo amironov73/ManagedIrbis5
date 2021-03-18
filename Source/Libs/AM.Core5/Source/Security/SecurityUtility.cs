@@ -63,7 +63,7 @@ namespace AM.Security
         /// Get certificate by the subject.
         public static X509Certificate GetRootCertificate
             (
-                [NotNull] string subject
+                string subject
             )
         {
             Sure.NotNullNorEmpty(subject, nameof(subject));

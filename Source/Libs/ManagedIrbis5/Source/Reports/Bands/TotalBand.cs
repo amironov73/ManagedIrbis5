@@ -1,48 +1,32 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* TotalBand.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* TotalBand.cs -- полоса с подведением итогов
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Полоса с подведением итогов.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class TotalBand
         : ReportBand
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region ReportBand members
 
         #endregion
-    }
-}
+
+    } // class TotalBand
+
+} // namespace ManagedIrbis.Reports

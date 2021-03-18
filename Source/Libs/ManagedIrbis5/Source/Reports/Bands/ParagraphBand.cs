@@ -1,46 +1,25 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ParagraphBand.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* ParagraphBand.cs -- полоса отчета, содержащая параграф текста
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Logging;
-using AM.Runtime;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Полоса отчета, содержащая параграф текста.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class ParagraphBand
         : ReportBand
     {
@@ -49,8 +28,7 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Style name.
         /// </summary>
-        [CanBeNull]
-        public string StyleSpecification { get; set; }
+        public string? StyleSpecification { get; set; }
 
         #endregion
 
@@ -61,28 +39,19 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public ParagraphBand()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public ParagraphBand
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNull(text, "text");
 
             Cells.Add(new SimpleTextCell(text));
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        } // constructor
 
         #endregion
 
@@ -94,23 +63,24 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            ReportDriver driver = context.Driver;
+            var driver = context.Driver;
             driver.BeginParagraph(context, this);
+
             if (!string.IsNullOrEmpty(StyleSpecification))
             {
                 driver.WriteServiceText(context, StyleSpecification);
             }
-            foreach (ReportCell cell in Cells)
+
+            foreach (var cell in Cells)
             {
                 cell.Render(context);
             }
+
             driver.EndParagraph(context, this);
-        }
+        } // method Render
 
         #endregion
 
-        #region Object members
+    } // class ParagraphBand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

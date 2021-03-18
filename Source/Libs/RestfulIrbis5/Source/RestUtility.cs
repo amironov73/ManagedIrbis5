@@ -7,8 +7,6 @@
 
 /* RestUtility.cs -- utility routines for REST support in IRBIS
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #if FW4
@@ -19,11 +17,8 @@ using System;
 using System.IO;
 using System.Text;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Nancy;
 
@@ -38,8 +33,7 @@ namespace RestfulIrbis
     /// <summary>
     /// Utility methods for REST support in IRBIS
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public static class RestUtility
     {
         #region Public methods
@@ -50,7 +44,7 @@ namespace RestfulIrbis
         [CLSCompliant(false)]
         public static T ConvertRequestBody<T>
             (
-                [NotNull] this Request request
+                this Request request
             )
         {
             Code.NotNull(request, nameof(request));
@@ -72,8 +66,8 @@ namespace RestfulIrbis
         /// </summary>
         public static void SetJsonRequestBody
             (
-                [NotNull] this IRestRequest request,
-                [NotNull] string jsonText
+                this IRestRequest request,
+                string jsonText
             )
         {
             Code.NotNull(request, nameof(request));

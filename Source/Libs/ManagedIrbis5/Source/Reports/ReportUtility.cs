@@ -7,6 +7,8 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ReportUtility.cs -- утилиты для работы с отчетами
@@ -16,17 +18,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 using ManagedIrbis.Pft;
 
@@ -41,18 +32,6 @@ namespace ManagedIrbis.Reports
     /// </summary>
     public static class ReportUtility
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
         #region Public methods
 
         /// <summary>
@@ -64,7 +43,7 @@ namespace ManagedIrbis.Reports
                 string? expression
             )
         {
-
+            // TODO сделать получение форматтера через DI
             IPftFormatter result = new PftFormatter();
             result.SetProvider(context.Provider);
             if (!string.IsNullOrEmpty(expression))
@@ -73,10 +52,10 @@ namespace ManagedIrbis.Reports
             }
 
             return result;
-        }
+        } // method GetFormatter
 
         /// <summary>
-        /// List band types.
+        /// Перечисление известных типов полос.
         /// </summary>
         public static Type[] ListBandTypes()
         {
@@ -125,7 +104,7 @@ namespace ManagedIrbis.Reports
             reportObject.Attributes["Height"] = height;
 
             return reportObject;
-        }
+        } // method SetHeight
 
         /// <summary>
         /// Set width of the object.
@@ -139,7 +118,7 @@ namespace ManagedIrbis.Reports
             reportObject.Attributes["Width"] = width;
 
             return reportObject;
-        }
+        } // method SetWidth
 
         /// <summary>
         /// Set variables for <see cref="PftFormatter"/>.
@@ -166,12 +145,10 @@ namespace ManagedIrbis.Reports
 
                 */
             }
-        }
+        } // method SetVariables
 
         #endregion
 
-        #region Object members
+    } // class ReportUtility
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

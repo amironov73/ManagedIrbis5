@@ -1,29 +1,21 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* NewPageBand.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* NewPageBand.cs -- полоса отчета, начинающая новую страницу
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Полоса отчета, начинающая новую страницу.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class NewPageBand
         : ReportBand
     {
@@ -35,13 +27,14 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            ReportDriver driver = context.Driver;
+            var driver = context.Driver;
             driver.NewPage(context, this);
-            // base.Render(context);
-        }
+
+            // базовый метод Render не вызывается!
+        } // method Render
 
         #endregion
-    }
-}
+
+    } // class NewPageBand
+
+} // namespace ManagedIrbis.Reports

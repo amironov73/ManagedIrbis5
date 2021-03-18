@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* MixedChapter.cs -- 
+/* MixedChapter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,20 +18,16 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Fields;
 using ManagedIrbis.Pft;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json;
 
@@ -42,10 +36,9 @@ using Newtonsoft.Json;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class MixedChapter
         : CumulatingSubChapter
     {
@@ -81,7 +74,7 @@ namespace ManagedIrbis.Biblio
             }
 
             AbstractOutput log = context.Log;
-            MarcRecord record = null;
+            Record record = null;
 
             log.WriteLine("Begin build items {0}", this);
             Items = new ItemCollection();
@@ -95,7 +88,7 @@ namespace ManagedIrbis.Biblio
             BiblioProcessor processor = context.Processor
                 .ThrowIfNull("context.Processor");
             IrbisProvider provider = context.Provider;
-            List<MarcRecord> nonSpec = new List<MarcRecord>();
+            List<Record> nonSpec = new List<Record>();
 
             string generalFormat = settings.GetSetting("general");
             string orderFormat = settings.GetSetting("order");
@@ -176,7 +169,7 @@ namespace ManagedIrbis.Biblio
                     .ThrowIfNull("normalFormat");
                 formatter.ParseProgram(normalFormat);
 
-                foreach (MarcRecord rec in nonSpec)
+                foreach (Record rec in nonSpec)
                 {
                     log.Write(".");
                     string description = formatter.FormatRecord(rec)
@@ -245,7 +238,7 @@ namespace ManagedIrbis.Biblio
                 BiblioItem item = new BiblioItem
                 {
                     Description = bookGroup.Header,
-                    Record = new MarcRecord(), // TODO ???
+                    Record = new Record(), // TODO ???
                     UserData = bookGroup
                 };
                 bookGroup.Item = item;

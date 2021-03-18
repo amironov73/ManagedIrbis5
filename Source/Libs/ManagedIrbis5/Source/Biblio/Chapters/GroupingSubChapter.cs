@@ -1,10 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* GroupingSubChapter.cs -- 
+/* GroupingSubChapter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,19 +18,15 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
@@ -43,8 +37,7 @@ namespace ManagedIrbis.Biblio
     /// <summary>
     /// Группировка документов, например, в авторские комплексы.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class GroupingSubChapter
         : MenuSubChapter
     {
@@ -79,7 +72,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Groups.
         /// </summary>
-        [NotNull]
         public List<BookGroup> Groups { get; private set; }
 
         #endregion
@@ -102,8 +94,8 @@ namespace ManagedIrbis.Biblio
 
         private void _OrderGroup
             (
-                [NotNull] BiblioContext context,
-                [NotNull] BookGroup bookGroup
+                BiblioContext context,
+                BookGroup bookGroup
             )
         {
             if (!bookGroup.OtherGroup)
@@ -130,7 +122,7 @@ namespace ManagedIrbis.Biblio
 
                     foreach (BiblioItem item in bookGroup)
                     {
-                        MarcRecord record = item.Record
+                        Record record = item.Record
                             .ThrowIfNull("item.Record");
                         string order = formatter.FormatRecord(record.Mfn);
                         //item.Order = RichText.Decode(order);
@@ -212,7 +204,7 @@ namespace ManagedIrbis.Biblio
 
                 foreach (BiblioItem item in Items)
                 {
-                    MarcRecord record = item.Record
+                    Record record = item.Record
                         .ThrowIfNull("item.Record");
                     string text = formatter.FormatRecord(record.Mfn);
                     if (string.IsNullOrEmpty(text))

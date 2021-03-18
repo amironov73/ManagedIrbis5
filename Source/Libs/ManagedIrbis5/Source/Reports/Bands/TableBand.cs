@@ -1,56 +1,34 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* TableBand.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* TableBand.cs -- полоса отчета, содержащая таблицу
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// Table band.
+    /// Полоса отчета, содержащая таблицу.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class TableBand
         : CompositeBand
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region ReportBand members
 
         /// <inheritdoc cref="CompositeBand.Render" />
@@ -59,24 +37,19 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeRendering(context);
 
-            ReportDriver driver = context.Driver;
-            IrbisReport report = Report
+            var driver = context.Driver;
+            var report = Report
                 .ThrowIfNull("Report not set");
 
             driver.BeginTable(context, report);
 
-            ReportBand header = Header;
-            if (!ReferenceEquals(header, null))
-            {
-                header.RenderOnce(context);
-            }
+            var header = Header;
+            header?.RenderOnce(context);
 
-            int count = context.Records.Count;
-            for (int index = 0; index < count; index++)
+            var count = context.Records.Count;
+            for (var index = 0; index < count; index++)
             {
                 context.Index = index;
                 context.CurrentRecord = context.Records[index];
@@ -84,17 +57,16 @@ namespace ManagedIrbis.Reports
                 Body.Render(context);
             }
 
-            ReportBand footer = Footer;
-            if (!ReferenceEquals(footer, null))
-            {
-                footer.RenderOnce(context);
-            }
+            var footer = Footer;
+            footer?.RenderOnce(context);
 
             driver.EndTable(context, report);
 
             OnAfterRendering(context);
-        }
+        } // method Render
 
         #endregion
-    }
-}
+
+    } // class TableBand
+
+} // namespace ManagedIrbis.Reports

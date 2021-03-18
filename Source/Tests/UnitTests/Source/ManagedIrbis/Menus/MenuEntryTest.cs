@@ -29,7 +29,7 @@ namespace UnitTests.ManagedIrbis.Menus
 
 //        private static void _TestSerialization
 //            (
-//                [NotNull] MenuEntry first
+//                MenuEntry first
 //            )
 //        {
 //            byte[] bytes = first.SaveToMemory();

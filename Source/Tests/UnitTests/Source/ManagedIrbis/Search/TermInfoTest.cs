@@ -2,7 +2,6 @@
 using AM.Runtime;
 using AM.Xml;
 
-using JetBrains.Annotations;
 
 using ManagedIrbis.Search;
 
@@ -23,7 +22,7 @@ namespace UnitTests.ManagedIrbis.Search
 
         private void _TestSerialization
             (
-                [NotNull] TermInfo first
+                TermInfo first
             )
         {
             byte[] bytes = first.SaveToMemory();

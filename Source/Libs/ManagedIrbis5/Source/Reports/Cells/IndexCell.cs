@@ -1,45 +1,30 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* IndexCell.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* IndexCell.cs -- ячейка, формирующая нумерацию строк в отчете
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Ячейка, формирующая нумерацию строк в отчете.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class IndexCell
         : ReportCell
     {
@@ -48,10 +33,9 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Format.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("format")]
+        [JsonPropertyName("format")]
         [XmlAttribute("format")]
-        public string Format { get; set; }
+        public string? Format { get; set; }
 
         #endregion
 
@@ -63,26 +47,18 @@ namespace ManagedIrbis.Reports
         public IndexCell()
         {
             Format = "{Index})";
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public IndexCell
             (
-                [CanBeNull] string format
+                string? format
             )
         {
             Format = format;
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        } // constructor
 
         #endregion
 
@@ -94,18 +70,22 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeCompute(context);
 
-            string result = null;
-            string format = Format;
-            if (!string.IsNullOrEmpty(format))
+            string? result;
+            var format = Format;
+            if (string.IsNullOrEmpty(format))
             {
-                string index = (context.Index + 1)
+                result = (context.Index + 1).ToInvariantString();
+            }
+            else
+            {
+                var index = (context.Index + 1)
                     .ToInvariantString();
-                string total = context.Records.Count
+
+                var total = context.Records.Count
                     .ToInvariantString();
+
                 result = format
                     .Replace("{Index}", index)
                     .Replace("{Total}", total);
@@ -114,7 +94,7 @@ namespace ManagedIrbis.Reports
             OnAfterCompute(context);
 
             return result;
-        }
+        } // method Compute
 
         /// <inheritdoc cref="ReportCell.Render" />
         public override void Render
@@ -122,22 +102,18 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            ReportDriver driver = context.Driver;
+            var driver = context.Driver;
 
             driver.BeginCell(context, this);
 
-            string text = Compute(context);
+            var text = Compute(context);
             driver.Write(context, text);
 
             driver.EndCell(context, this);
-        }
+        } // method Render
 
         #endregion
 
-        #region Object members
+    } // class IndexCell
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

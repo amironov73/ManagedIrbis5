@@ -142,7 +142,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void GatherRecords
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -166,7 +166,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void GatherTerms
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -190,7 +190,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void Initialize
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -210,10 +210,9 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Load the file.
         /// </summary>
-        [NotNull]
         public static BiblioDocument LoadFile
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             Code.NotNullNorEmpty(fileName, "fileName");
@@ -281,7 +280,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void NumberItems
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");
@@ -307,7 +306,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public virtual void RenderItems
             (
-                [NotNull] BiblioContext context
+                BiblioContext context
             )
         {
             Code.NotNull(context, "context");

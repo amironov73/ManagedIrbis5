@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* DynamicBand.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedType.Global
+
+/* DynamicBand.cs -- динамическая полоса отчета
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,21 +17,16 @@ using System;
 
 using AM;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Динамическая полоса отчета. Рендеринг происходит в обработчике
+    /// события.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class DynamicBand
         : ReportBand
     {
@@ -36,49 +35,43 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Raised on band rendering.
         /// </summary>
-        public event EventHandler<ReportRenderingEventArgs> Rendering;
-
-        #endregion
-
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        public event EventHandler<ReportRenderingEventArgs>? Rendering;
 
         #endregion
 
         #region ReportBand members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="ReportBand.Render" />
         public override void Render
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeRendering(context);
 
-            ReportRenderingEventArgs eventArgs
-                = new ReportRenderingEventArgs(context);
-            Rendering.Raise(this, eventArgs);
+            var rendering = Rendering;
+            if (rendering is not null)
+            {
+                try
+                {
+                    var eventArgs = new ReportRenderingEventArgs(context);
+                    rendering.Raise(this, eventArgs);
+                }
+                catch (Exception exception)
+                {
+                    Magna.TraceException
+                        (
+                            nameof(DynamicBand) + "::" + nameof(Render),
+                            exception
+                        );
+                }
+            }
 
             OnAfterRendering(context);
-        }
+        } // method
 
         #endregion
 
-        #region Object members
+    } // class DynamicBand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

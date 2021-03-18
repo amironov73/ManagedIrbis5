@@ -3,29 +3,23 @@
 
 /* ReportEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 
-using CodeJam;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 #endregion
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public sealed class ReportEventArgs
         : EventArgs
     {
@@ -34,7 +28,6 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Context.
         /// </summary>
-        [NotNull]
         public ReportContext Context { get; private set; }
 
         #endregion
@@ -46,7 +39,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public ReportEventArgs
             (
-                [NotNull] ReportContext context
+                ReportContext context
             )
         {
             Code.NotNull(context, "context");

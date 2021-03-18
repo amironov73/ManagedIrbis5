@@ -3,17 +3,13 @@
 
 /* ViafSource.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
 
-using JetBrains.Annotations;
 
-using MoonSharp.Interpreter;
 
 using Newtonsoft.Json.Linq;
 
@@ -26,8 +22,7 @@ namespace RestfulIrbis.Viaf
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
+
     public class ViafSource
     {
         #region Properties
@@ -49,10 +44,9 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         /// Parse the object.
         /// </summary>
-        [NotNull]
         public static ViafSource Parse
             (
-                [NotNull] JObject obj
+                JObject obj
             )
         {
             return new ViafSource
@@ -65,7 +59,6 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         /// Parse the array.
         /// </summary>
-        [NotNull]
         public static ViafSource[] Parse
             (
                 [CanBeNull] JArray array

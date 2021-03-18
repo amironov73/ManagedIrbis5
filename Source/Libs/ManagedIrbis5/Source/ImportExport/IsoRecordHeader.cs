@@ -33,12 +33,12 @@ namespace ManagedIrbis.ImportExport
         /// <summary>
         /// Статус записи.
         /// </summary>
-        public MarcRecordStatus RecordStatus { get; set; }
+        public RecordStatus RecordStatus { get; set; }
 
         /// <summary>
         /// Тип записи.
         /// </summary>
-        public MarcRecordType RecordType { get; set; }
+        public RecordType RecordType { get; set; }
 
         /// <summary>
         /// Библиографический указатель.
@@ -92,8 +92,8 @@ namespace ManagedIrbis.ImportExport
         {
             var result = new IsoRecordHeader
             {
-                RecordStatus = MarcRecordStatus.New,
-                RecordType = MarcRecordType.Text,
+                RecordStatus = RecordStatus.New,
+                RecordType = RecordType.Text,
                 BibliographicalIndex = MarcBibliographicalIndex.Monograph,
                 BibliographicalLevel = MarcBibliographicalLevel.Unknown,
                 CatalogingRules = MarcCatalogingRules.NotConforming,
@@ -113,8 +113,8 @@ namespace ManagedIrbis.ImportExport
         {
             var result = new IsoRecordHeader
             {
-                RecordStatus = (MarcRecordStatus) text[0],
-                RecordType = (MarcRecordType) text[1],
+                RecordStatus = (RecordStatus) text[0],
+                RecordType = (RecordType) text[1],
                 BibliographicalIndex = (MarcBibliographicalIndex) text[2],
                 BibliographicalLevel = (MarcBibliographicalLevel) text[3],
                 CatalogingRules = (MarcCatalogingRules)text[4],
@@ -135,8 +135,8 @@ namespace ManagedIrbis.ImportExport
         {
             var result = new IsoRecordHeader
             {
-                RecordStatus = (MarcRecordStatus) bytes[offset],
-                RecordType = (MarcRecordType) bytes[offset + 1],
+                RecordStatus = (RecordStatus) bytes[offset],
+                RecordType = (RecordType) bytes[offset + 1],
                 BibliographicalIndex = (MarcBibliographicalIndex) bytes[offset + 2],
                 BibliographicalLevel = (MarcBibliographicalLevel) bytes[offset + 3],
                 CatalogingRules = (MarcCatalogingRules) bytes[offset + 4],
