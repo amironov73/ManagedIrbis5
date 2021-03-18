@@ -1,17 +1,25 @@
-using ManagedIrbis;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using ManagedIrbis.Magazines;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+// ReSharper disable CheckNamespace
+// ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable IdentifierTypo
+// ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable StringLiteralTypo
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Magazines
 {
     [TestClass]
     public class BindingSpecificationTest
+        : CommonMagazineTest
     {
         [TestMethod]
         public void BindingSpecification_Construction_1()
         {
-            BindingSpecification specification = new BindingSpecification();
+            var specification = new BindingSpecification();
             Assert.IsNull(specification.MagazineIndex);
             Assert.IsNull(specification.Year);
             Assert.IsNull(specification.IssueNumbers);

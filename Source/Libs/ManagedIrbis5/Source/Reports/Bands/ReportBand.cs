@@ -30,6 +30,8 @@ using ManagedIrbis.Pft;
 
 #endregion
 
+#nullable enable
+
 namespace ManagedIrbis.Reports
 {
     /// <summary>

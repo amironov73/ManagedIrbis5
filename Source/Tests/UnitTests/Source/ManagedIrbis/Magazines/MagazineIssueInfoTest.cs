@@ -1,81 +1,86 @@
-﻿using AM.Json;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using AM.Json;
 using AM.Runtime;
 using AM.Xml;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis;
 using ManagedIrbis.Magazines;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+// ReSharper disable CheckNamespace
+// ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable IdentifierTypo
+// ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable StringLiteralTypo
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Magazines
 {
     [TestClass]
     public class MagazineIssueInfoTest
+        : CommonMagazineTest
     {
-        [NotNull]
-        private MarcRecord _GetIssueWithoutArticles()
+        private Record _GetIssueWithoutArticles()
         {
-            MarcRecord result = new MarcRecord();
-            result.Fields.Add(RecordField.Parse(920, "NJP"));
-            result.Fields.Add(RecordField.Parse(907, "^CКТ^A20171027^BМануйловаТС"));
-            result.Fields.Add(RecordField.Parse(933, "Ш620"));
-            result.Fields.Add(RecordField.Parse(903, "Ш620/1992/12"));
-            result.Fields.Add(RecordField.Parse(934, "1992"));
-            result.Fields.Add(RecordField.Parse(936, "12"));
-            result.Fields.Add(RecordField.Parse(999, "0000000"));
-            result.Fields.Add(RecordField.Parse(463, "^wШ620/1992/Подшивка № 10028 июль-дек. (7-12)"));
-            result.Fields.Add(RecordField.Parse(907, "^CРЖ^A20171027^Bmiron"));
-            result.Fields.Add(RecordField.Parse(910, "^Ap^b1^c?^dФП^pШ620/1992/Подшивка № 10028 июль-дек. (7-12)^iП10028"));
-            result.Fields.Add(RecordField.Parse(905, "^D1^F2^S1^21"));
+            var result = new Record();
+            result.Fields.Add(Parse(920, "NJP"));
+            result.Fields.Add(Parse(907, "^CКТ^A20171027^BМануйловаТС"));
+            result.Fields.Add(Parse(933, "Ш620"));
+            result.Fields.Add(Parse(903, "Ш620/1992/12"));
+            result.Fields.Add(Parse(934, "1992"));
+            result.Fields.Add(Parse(936, "12"));
+            result.Fields.Add(Parse(999, "0000000"));
+            result.Fields.Add(Parse(463, "^wШ620/1992/Подшивка № 10028 июль-дек. (7-12)"));
+            result.Fields.Add(Parse(907, "^CРЖ^A20171027^Bmiron"));
+            result.Fields.Add(Parse(910, "^Ap^b1^c?^dФП^pШ620/1992/Подшивка № 10028 июль-дек. (7-12)^iП10028"));
+            result.Fields.Add(Parse(905, "^D1^F2^S1^21"));
 
             return result;
         }
 
-        [NotNull]
-        private MarcRecord _GetIssueWithArticles()
+        private Record _GetIssueWithArticles()
         {
-            MarcRecord result = new MarcRecord();
-            result.Fields.Add(RecordField.Parse(920, "NJ"));
-            result.Fields.Add(RecordField.Parse(907, "^CРЖ^A20170913^BБудаговскаянв"));
-            result.Fields.Add(RecordField.Parse(933, "О174142"));
-            result.Fields.Add(RecordField.Parse(903, "О174142/2017/102"));
-            result.Fields.Add(RecordField.Parse(934, "2017"));
-            result.Fields.Add(RecordField.Parse(936, "102"));
-            result.Fields.Add(RecordField.Parse(931, "^C13-19 сентября^!20170919"));
-            result.Fields.Add(RecordField.Parse(907, "^CРЖ^A20170914^Bпанюшкинатн"));
-            result.Fields.Add(RecordField.Parse(907, "^CРЖ^A20170915^BНаумочкинаММ"));
-            result.Fields.Add(RecordField.Parse(951, "^Aregional_2017_102.pdf^TПолный текст^N28^H01^120170915^216636304"));
-            result.Fields.Add(RecordField.Parse(6629, "EL"));
-            result.Fields.Add(RecordField.Parse(907, "^CFT^A20170915^Bkudelya"));
-            result.Fields.Add(RecordField.Parse(907, "^CПК^A20171004^BКурчинскаяЛН"));
-            result.Fields.Add(RecordField.Parse(907, "^CПК^A20171006^BКурчинскаяЛН"));
-            result.Fields.Add(RecordField.Parse(922, "^FОрлова Е.^?Елена^CМиссионерский стан на ангинской земле^41, 16^0a-фот. цв.^GЕ. Орлова"));
-            result.Fields.Add(RecordField.Parse(922, "^FЮдин Ю.^?Юрий^CСергей Левченко: \"Форсайт Байкальского региона\" должен стать ежегодным^42^0a-фот.^GЮ. Юдин"));
-            result.Fields.Add(RecordField.Parse(922, "^FМихайлов Ю.^?Юрий^CЗдоровье всего дороже^42^0a-фот.^GЮ. Михайлов"));
-            result.Fields.Add(RecordField.Parse(922, "^FИлошваи А.^?Артем^CВеликий сын нашей страны^43^0a-фот.^GА. Илошваи"));
-            result.Fields.Add(RecordField.Parse(922, "^FБагаев Ю.^?Юрий^CВыбор сделан^44^0a-фот.^GЮ. Багаев"));
-            result.Fields.Add(RecordField.Parse(922, "^FЮдин Ю.^?Юрий^CИнновации для развития Приангарья^44^GЮ. Юдин"));
-            result.Fields.Add(RecordField.Parse(922, "^FВиговская А.^?Анна^CГубернаторская оценка^45^0a-фот.^GА. Виговская"));
-            result.Fields.Add(RecordField.Parse(922, "^FАндреева О.^?Ольга^CЕвродрова - альтернативное топливо^46^0a-фот.^GО. Андреева"));
-            result.Fields.Add(RecordField.Parse(922, "^FШагунова Л.^?Людмила^CСделано у нас^47^0a-фот.^GЛ. Шагунова"));
-            result.Fields.Add(RecordField.Parse(922, "^FМамонтова Ю.^?Юлия^CСледствие вели прокуроры^48^0a-фот.^GЮ. Мамонтова"));
-            result.Fields.Add(RecordField.Parse(922, "^FШагунова Л.^?Людмила^CСуглан для северян^410^0a-фот.^GЛ. Шагунова"));
-            result.Fields.Add(RecordField.Parse(922, "^FОрлова Е.^?Елена^CЗвезды вновь на Байкале^412^0a-фот.^GЕ. Орлова"));
-            result.Fields.Add(RecordField.Parse(922, "^FВиговская А.^?Анна^C\"Омулевая бочка\" в подарок к юбилею^412^0a-фот.^GА. Виговская"));
-            result.Fields.Add(RecordField.Parse(922, "^FЛаврентьев Ю. В.^?Юрий Васильевич^2Белых Е.^,Екатерина^S570 беседовала^CНаши цели благодарны, наши помыслы чисты!^413^0a-фот.^GЮ. В. Лаврентьев ; беседовала Е. Белых"));
-            result.Fields.Add(RecordField.Parse(922, "^FШагунова Л.^?Людмила^CКитай становится ближе^413^0a-фот.^GЛ. Шагунова"));
-            result.Fields.Add(RecordField.Parse(922, "^FИванишина Н.^?Наталья^CМастер-универсал^414^0a-фот.^GН. Иванишина"));
-            result.Fields.Add(RecordField.Parse(922, "^FЮдин Ю.^?Юрий^CАфинское золото Федора Балтуева^415^0a-фот.^GЮ. Юдин"));
-            result.Fields.Add(RecordField.Parse(922, "^FЮдин Ю.^?Юрий^CПамятник водолазам ВОВ открылся в Слюдянке^416^0a-фот. цв.^GЮ. Юдин"));
-            result.Fields.Add(RecordField.Parse(910, "^A0^B1^FМОЭ^C20170913^DФ403^E"));
-            result.Fields.Add(RecordField.Parse(910, "^A0^B2^FМОЭ^C20170913^DФ304^E"));
-            result.Fields.Add(RecordField.Parse(910, "^A0^B3^FМОЭ^C20170913^DФ304^E"));
-            result.Fields.Add(RecordField.Parse(910, "^A0^B4^FМОЭ^DФ104^U^C20170914"));
-            result.Fields.Add(RecordField.Parse(910, "^A0^B5^DЭБ^G2017^H^E^C20170915"));
-            result.Fields.Add(RecordField.Parse(905, "^D1^J1^S1^21"));
-            result.Fields.Add(RecordField.Parse(999, "1"));
+            var result = new Record();
+            result.Fields.Add(Parse(920, "NJ"));
+            result.Fields.Add(Parse(907, "^CРЖ^A20170913^BБудаговскаянв"));
+            result.Fields.Add(Parse(933, "О174142"));
+            result.Fields.Add(Parse(903, "О174142/2017/102"));
+            result.Fields.Add(Parse(934, "2017"));
+            result.Fields.Add(Parse(936, "102"));
+            result.Fields.Add(Parse(931, "^C13-19 сентября^!20170919"));
+            result.Fields.Add(Parse(907, "^CРЖ^A20170914^Bпанюшкинатн"));
+            result.Fields.Add(Parse(907, "^CРЖ^A20170915^BНаумочкинаММ"));
+            result.Fields.Add(Parse(951, "^Aregional_2017_102.pdf^TПолный текст^N28^H01^120170915^216636304"));
+            result.Fields.Add(Parse(6629, "EL"));
+            result.Fields.Add(Parse(907, "^CFT^A20170915^Bkudelya"));
+            result.Fields.Add(Parse(907, "^CПК^A20171004^BКурчинскаяЛН"));
+            result.Fields.Add(Parse(907, "^CПК^A20171006^BКурчинскаяЛН"));
+            result.Fields.Add(Parse(922, "^FОрлова Е.^?Елена^CМиссионерский стан на ангинской земле^41, 16^0a-фот. цв.^GЕ. Орлова"));
+            result.Fields.Add(Parse(922, "^FЮдин Ю.^?Юрий^CСергей Левченко: \"Форсайт Байкальского региона\" должен стать ежегодным^42^0a-фот.^GЮ. Юдин"));
+            result.Fields.Add(Parse(922, "^FМихайлов Ю.^?Юрий^CЗдоровье всего дороже^42^0a-фот.^GЮ. Михайлов"));
+            result.Fields.Add(Parse(922, "^FИлошваи А.^?Артем^CВеликий сын нашей страны^43^0a-фот.^GА. Илошваи"));
+            result.Fields.Add(Parse(922, "^FБагаев Ю.^?Юрий^CВыбор сделан^44^0a-фот.^GЮ. Багаев"));
+            result.Fields.Add(Parse(922, "^FЮдин Ю.^?Юрий^CИнновации для развития Приангарья^44^GЮ. Юдин"));
+            result.Fields.Add(Parse(922, "^FВиговская А.^?Анна^CГубернаторская оценка^45^0a-фот.^GА. Виговская"));
+            result.Fields.Add(Parse(922, "^FАндреева О.^?Ольга^CЕвродрова - альтернативное топливо^46^0a-фот.^GО. Андреева"));
+            result.Fields.Add(Parse(922, "^FШагунова Л.^?Людмила^CСделано у нас^47^0a-фот.^GЛ. Шагунова"));
+            result.Fields.Add(Parse(922, "^FМамонтова Ю.^?Юлия^CСледствие вели прокуроры^48^0a-фот.^GЮ. Мамонтова"));
+            result.Fields.Add(Parse(922, "^FШагунова Л.^?Людмила^CСуглан для северян^410^0a-фот.^GЛ. Шагунова"));
+            result.Fields.Add(Parse(922, "^FОрлова Е.^?Елена^CЗвезды вновь на Байкале^412^0a-фот.^GЕ. Орлова"));
+            result.Fields.Add(Parse(922, "^FВиговская А.^?Анна^C\"Омулевая бочка\" в подарок к юбилею^412^0a-фот.^GА. Виговская"));
+            result.Fields.Add(Parse(922, "^FЛаврентьев Ю. В.^?Юрий Васильевич^2Белых Е.^,Екатерина^S570 беседовала^CНаши цели благодарны, наши помыслы чисты!^413^0a-фот.^GЮ. В. Лаврентьев ; беседовала Е. Белых"));
+            result.Fields.Add(Parse(922, "^FШагунова Л.^?Людмила^CКитай становится ближе^413^0a-фот.^GЛ. Шагунова"));
+            result.Fields.Add(Parse(922, "^FИванишина Н.^?Наталья^CМастер-универсал^414^0a-фот.^GН. Иванишина"));
+            result.Fields.Add(Parse(922, "^FЮдин Ю.^?Юрий^CАфинское золото Федора Балтуева^415^0a-фот.^GЮ. Юдин"));
+            result.Fields.Add(Parse(922, "^FЮдин Ю.^?Юрий^CПамятник водолазам ВОВ открылся в Слюдянке^416^0a-фот. цв.^GЮ. Юдин"));
+            result.Fields.Add(Parse(910, "^A0^B1^FМОЭ^C20170913^DФ403^E"));
+            result.Fields.Add(Parse(910, "^A0^B2^FМОЭ^C20170913^DФ304^E"));
+            result.Fields.Add(Parse(910, "^A0^B3^FМОЭ^C20170913^DФ304^E"));
+            result.Fields.Add(Parse(910, "^A0^B4^FМОЭ^DФ104^U^C20170914"));
+            result.Fields.Add(Parse(910, "^A0^B5^DЭБ^G2017^H^E^C20170915"));
+            result.Fields.Add(Parse(905, "^D1^J1^S1^21"));
+            result.Fields.Add(Parse(999, "1"));
 
             return result;
         }
@@ -83,7 +88,7 @@ namespace UnitTests.ManagedIrbis.Magazines
         [TestMethod]
         public void MagazineIssueInfo_Construction_1()
         {
-            MagazineIssueInfo issue = new MagazineIssueInfo();
+            var issue = new MagazineIssueInfo();
             Assert.IsNull(issue.Articles);
             Assert.IsNull(issue.Description);
             Assert.IsNull(issue.DocumentCode);
@@ -101,55 +106,57 @@ namespace UnitTests.ManagedIrbis.Magazines
         [TestMethod]
         public void MagazienIssueInfo_Parse_1()
         {
-            MarcRecord record = _GetIssueWithoutArticles();
-            MagazineIssueInfo issue = MagazineIssueInfo.Parse(record);
-            Assert.IsNotNull(issue.Articles);
-            Assert.AreEqual(0, issue.Articles.Length);
+            var record = _GetIssueWithoutArticles();
+            var issue = MagazineIssueInfo.Parse(record);
+            Assert.IsNotNull(issue!.Articles);
+            Assert.AreEqual(0, issue.Articles!.Length);
             Assert.IsNotNull(issue.Exemplars);
-            Assert.AreEqual(1, issue.Exemplars.Length);
+            Assert.AreEqual(1, issue.Exemplars!.Length);
         }
 
         [TestMethod]
         public void MagazienIssueInfo_Parse_2()
         {
-            MarcRecord record = _GetIssueWithArticles();
-            MagazineIssueInfo issue = MagazineIssueInfo.Parse(record);
-            Assert.IsNotNull(issue.Articles);
-            Assert.AreEqual(18, issue.Articles.Length);
+            var record = _GetIssueWithArticles();
+            var issue = MagazineIssueInfo.Parse(record);
+            Assert.IsNotNull(issue!.Articles);
+            Assert.AreEqual(18, issue.Articles!.Length);
             Assert.IsNotNull(issue.Exemplars);
-            Assert.AreEqual(5, issue.Exemplars.Length);
+            Assert.AreEqual(5, issue.Exemplars!.Length);
         }
 
         private void _TestSerialization_1
             (
-                [NotNull] MagazineIssueInfo first
+                MagazineIssueInfo first
             )
         {
-            byte[] bytes = first.SaveToMemory();
-            MagazineIssueInfo second = bytes.RestoreObjectFromMemory<MagazineIssueInfo>();
-            Assert.AreEqual(first.Mfn, second.Mfn);
+            var bytes = first.SaveToMemory();
+            var second = bytes.RestoreObjectFromMemory<MagazineIssueInfo>();
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Mfn, second!.Mfn);
             Assert.AreEqual(first.Description, second.Description);
             Assert.AreEqual(first.DocumentCode, second.DocumentCode);
             Assert.AreEqual(first.MagazineCode, second.MagazineCode);
             Assert.AreEqual(first.Number, second.Number);
             Assert.AreEqual(first.Volume, second.Volume);
             Assert.AreEqual(first.Year, second.Year);
-            if (!ReferenceEquals(first.Articles, null))
+            if (first.Articles is not null)
             {
-                Assert.IsNotNull(second.Articles);
-                Assert.AreEqual(first.Articles.Length, second.Articles.Length);
+                Assert.IsNotNull(second!.Articles);
+                Assert.AreEqual(first.Articles.Length, second.Articles!.Length);
             }
-            if (!ReferenceEquals(first.Exemplars, null))
+
+            if (first.Exemplars is not null)
             {
                 Assert.IsNotNull(second.Exemplars);
-                Assert.AreEqual(first.Exemplars.Length, second.Exemplars.Length);
+                Assert.AreEqual(first.Exemplars.Length, second.Exemplars!.Length);
             }
         }
 
         [TestMethod]
         public void MagazineIssueInfo_Serialization_1()
         {
-            MagazineIssueInfo issue = new MagazineIssueInfo();
+            var issue = new MagazineIssueInfo();
             _TestSerialization_1(issue);
 
             issue = MagazineIssueInfo.Parse(_GetIssueWithoutArticles());
@@ -162,7 +169,7 @@ namespace UnitTests.ManagedIrbis.Magazines
         [TestMethod]
         public void MagazineIssueInfo_ToXml_1()
         {
-            MagazineIssueInfo issue = new MagazineIssueInfo();
+            var issue = new MagazineIssueInfo();
             Assert.AreEqual("<issue />", XmlUtility.SerializeShort(issue));
 
             issue = MagazineIssueInfo.Parse(_GetIssueWithoutArticles());
@@ -175,7 +182,7 @@ namespace UnitTests.ManagedIrbis.Magazines
         [TestMethod]
         public void MagazineIssueInfo_ToJson_1()
         {
-            MagazineIssueInfo issue = new MagazineIssueInfo();
+            var issue = new MagazineIssueInfo();
             Assert.AreEqual("{}", JsonUtility.SerializeShort(issue));
 
             issue = MagazineIssueInfo.Parse(_GetIssueWithoutArticles());
@@ -188,7 +195,7 @@ namespace UnitTests.ManagedIrbis.Magazines
         [TestMethod]
         public void MagazineIssueInfo_Verify_1()
         {
-            MagazineIssueInfo issue = new MagazineIssueInfo();
+            var issue = new MagazineIssueInfo();
             Assert.IsFalse(issue.Verify(false));
 
             issue = MagazineIssueInfo.Parse(_GetIssueWithoutArticles());

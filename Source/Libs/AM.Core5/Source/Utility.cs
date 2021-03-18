@@ -336,7 +336,7 @@ namespace AM
         [Pure]
         [DebuggerStepThrough]
         public static T ThrowIfNull<T> (this T? value) where T: class =>
-            ThrowIfNull<T> (value, "Null value detected");
+            ThrowIfNull (value, "Null value detected");
 
         /// <summary>
         /// Превращает объект в видимую строку.
@@ -1634,6 +1634,109 @@ namespace AM
                 return result;
             }
         } // property OptmimalParallelism
+
+        /// <summary>
+        /// Выбирает первую не пустую среди перечисленных строк.
+        /// </summary>
+        public static string NonEmpty
+            (
+                string? first,
+                string? second
+            )
+            => !string.IsNullOrEmpty(first) ? first
+                : !string.IsNullOrEmpty(second) ? second
+                : throw new ArgumentNullException();
+
+        /// <summary>
+        /// Выбирает первую не пустую среди перечисленных строк.
+        /// </summary>
+        public static string NonEmpty
+            (
+                string? first,
+                string? second,
+                string? third
+            )
+            => !string.IsNullOrEmpty(first) ? first
+                : !string.IsNullOrEmpty(second) ? second
+                : !string.IsNullOrEmpty(third) ? third
+                : throw new ArgumentNullException();
+
+        /// <summary>
+        /// Выбирает первую не пустую среди перечисленных строк.
+        /// </summary>
+        public static string NonEmpty
+            (
+                string? first,
+                string? second,
+                string? third,
+                string? fourth
+            )
+            => !string.IsNullOrEmpty(first) ? first
+                : !string.IsNullOrEmpty(second) ? second
+                : !string.IsNullOrEmpty(third) ? third
+                : !string.IsNullOrEmpty(fourth) ? fourth
+                : throw new ArgumentNullException();
+
+        /// <summary>
+        /// Выбирает первую не пустую среди перечисленных строк.
+        /// </summary>
+        public static string NonEmpty
+            (
+                IEnumerable<string?> strings
+            )
+        {
+            foreach (var one in strings)
+            {
+                if (!string.IsNullOrEmpty(one))
+                {
+                    return one;
+                }
+            }
+
+            throw new ArgumentNullException();
+        }
+
+        /// <summary>
+        /// Выбирает первый не пустой спан среди перечисленных.
+        /// </summary>
+        public static ReadOnlySpan<T> NonEmpty<T>
+            (
+                ReadOnlySpan<T> first,
+                ReadOnlySpan<T> second
+            )
+            => !first.IsEmpty ? first
+                : !second.IsEmpty ? second
+                : throw new ArgumentOutOfRangeException();
+
+        /// <summary>
+        /// Выбирает первый не пустой спан среди перечисленных.
+        /// </summary>
+        public static ReadOnlySpan<T> NonEmpty<T>
+            (
+                ReadOnlySpan<T> first,
+                ReadOnlySpan<T> second,
+                ReadOnlySpan<T> third
+            )
+            => !first.IsEmpty ? first
+                : !second.IsEmpty ? second
+                : !third.IsEmpty ? third
+                : throw new ArgumentOutOfRangeException();
+
+        /// <summary>
+        /// Выбирает первый не пустой спан среди перечисленных.
+        /// </summary>
+        public static ReadOnlySpan<T> NonEmpty<T>
+            (
+                ReadOnlySpan<T> first,
+                ReadOnlySpan<T> second,
+                ReadOnlySpan<T> third,
+                ReadOnlySpan<T> fourth
+            )
+            => !first.IsEmpty ? first
+                : !second.IsEmpty ? second
+                : !third.IsEmpty ? third
+                : !fourth.IsEmpty ? fourth
+                : throw new ArgumentOutOfRangeException();
 
         /// <summary>
         /// Упрощенное получение информации о методе.

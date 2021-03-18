@@ -1,35 +1,33 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ConditionalBand.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+
+/* ConditionalBand.cs -- условная полоса отчета
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using ManagedIrbis.Pft;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    /// 
+    /// Условная полоса отчета. Ее рендеринг определяется неким условием,
+    /// сформулированным вне этой полосы.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class ConditionalBand
         : CompositeBand
     {
@@ -38,22 +36,9 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Conditional expression (PFT).
         /// </summary>
-        [CanBeNull]
         [XmlAttribute("condition")]
-        [JsonProperty("condition")]
-        public string ConditionalExpression { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        [JsonPropertyName("condition")]
+        public string? ConditionalExpression { get; set; }
 
         #endregion
 
@@ -65,9 +50,7 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            string expression = ConditionalExpression;
+            var expression = ConditionalExpression;
 
             if (string.IsNullOrEmpty(expression))
             {
@@ -75,6 +58,8 @@ namespace ManagedIrbis.Reports
             }
             else
             {
+                /*
+
                 using (PftFormatter formatter
                     = context.GetFormatter(expression))
                 {
@@ -84,9 +69,13 @@ namespace ManagedIrbis.Reports
                         base.Render(context);
                     }
                 }
+
+                */
             }
-        }
+        } // method Render
 
         #endregion
-    }
-}
+
+    } // class ConditionalBand
+
+} // namespace ManagedIrbis.Reports

@@ -6,8 +6,9 @@ using AM;
 using AM.Collections;
 
 // ReSharper disable CheckNamespace
-// ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
 
 #nullable enable
 
@@ -30,9 +31,9 @@ namespace UnitTests.AM
         public void ArrayUtility_ChangeType_1()
         {
             string[] source = { "1", "2", "3" };
-            object[] target = ArrayUtility.ChangeType<string, object>(source);
+            var target = ArrayUtility.ChangeType<string, object>(source);
             Assert.AreEqual(source.Length, target.Length);
-            for (int i = 0; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
                 Assert.IsTrue
                     (
@@ -45,9 +46,9 @@ namespace UnitTests.AM
         public void ArrayUtility_ChangeType_2()
         {
             string[] source = { "1", "2", "3" };
-            object[] target = ArrayUtility.ChangeType<object>(source);
+            var target = ArrayUtility.ChangeType<object>(source);
             Assert.AreEqual(source.Length, target.Length);
-            for (int i = 0; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
                 Assert.IsTrue
                     (
@@ -81,9 +82,9 @@ namespace UnitTests.AM
         public void ArrayUtility_Convert_1()
         {
             int[] source = { 1, 2, 3 };
-            short[] target = ArrayUtility.Convert<int, short>(source);
+            var target = ArrayUtility.Convert<int, short>(source);
             Assert.AreEqual(source.Length, target.Length);
-            for (int i = 0; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
                 Assert.IsTrue
                     (
@@ -95,9 +96,9 @@ namespace UnitTests.AM
         [TestMethod]
         public void ArrayUtility_Create_1()
         {
-            int[] array = ArrayUtility.Create(10, 235);
+            var array = ArrayUtility.Create(10, 235);
             Assert.AreEqual(10, array.Length);
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 Assert.AreEqual(235, array[i]);
             }
@@ -117,7 +118,7 @@ namespace UnitTests.AM
         public void ArrayUtility_GetSpan_1()
         {
             int[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            int[] actual = array.GetSpan(3, 4);
+            var actual = array.GetSpan(3, 4);
             int[] expected = { 4, 5, 6, 7 };
             CollectionAssert.AreEqual(expected, actual);
 
@@ -134,7 +135,7 @@ namespace UnitTests.AM
         public void ArrayUtility_GetSpan_2()
         {
             int[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            int[] actual = array.GetSpan(3);
+            var actual = array.GetSpan(3);
             int[] expected = { 4, 5, 6, 7, 8, 9, 10 };
             CollectionAssert.AreEqual(expected, actual);
 
@@ -147,8 +148,8 @@ namespace UnitTests.AM
         public void ArrayUtility_GetSpan_3()
         {
             int[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            int[] actual = array.GetSpan(300);
-            int[] expected = new int[0];
+            var actual = array.GetSpan(300);
+            var expected = new int[0];
             CollectionAssert.AreEqual(expected, actual);
         }
 
@@ -156,8 +157,8 @@ namespace UnitTests.AM
         public void ArrayUtility_GetSpan_4()
         {
             int[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            int[] actual = array.GetSpan(300, 10);
-            int[] expected = new int[0];
+            var actual = array.GetSpan(300, 10);
+            var expected = new int[0];
             CollectionAssert.AreEqual(expected, actual);
         }
 
@@ -183,7 +184,7 @@ namespace UnitTests.AM
         {
             int[] array1 = { 1, 2, 3 };
             int[] array2 = { 5, 6, 7 };
-            int[] result = ArrayUtility.Merge(array1, array2);
+            var result = ArrayUtility.Merge(array1, array2);
             Assert.AreEqual(6, result.Length);
             Assert.AreEqual(1, result[0]);
             Assert.AreEqual(2, result[1]);
@@ -197,7 +198,7 @@ namespace UnitTests.AM
         public void ArrayUtility_Merge_2()
         {
             int[] array1 = { 1, 2, 3 };
-            int[] result = ArrayUtility.Merge(array1);
+            var result = ArrayUtility.Merge(array1);
             Assert.AreEqual(array1.Length, result.Length);
             Assert.AreEqual(array1[0], result[0]);
             Assert.AreEqual(array1[1], result[1]);
@@ -207,7 +208,7 @@ namespace UnitTests.AM
         [TestMethod]
         public void ArrayUtility_Merge_3()
         {
-            int[] result = ArrayUtility.Merge<int>();
+            var result = ArrayUtility.Merge<int>();
             Assert.AreEqual(0, result.Length);
         }
 
@@ -221,7 +222,7 @@ namespace UnitTests.AM
         [TestMethod]
         public void ArrayUtility_SafeLength_1()
         {
-            int[]? array = new int[0];
+            var array = new int[0];
             Assert.AreEqual(0, ArrayUtility.SafeLength(array));
             array = new[] { 1, 2, 3 };
             Assert.AreEqual(3, ArrayUtility.SafeLength(array));
@@ -233,9 +234,9 @@ namespace UnitTests.AM
         public void ArrayUtility_ToString_1()
         {
             int[] array = { 1, 2, 3 };
-            string[] lines = ArrayUtility.ToString(array);
+            var lines = ArrayUtility.ToString(array);
             Assert.AreEqual(array.Length, lines.Length);
-            for (int i = 0; i < array.Length; i++)
+            for (var i = 0; i < array.Length; i++)
             {
                 Assert.AreEqual
                     (
@@ -249,7 +250,7 @@ namespace UnitTests.AM
         public void ArrayUtility_ToString_2()
         {
             string?[] array = {"one", null, "three"};
-            string[] lines = ArrayUtility.ToString(array);
+            var lines = ArrayUtility.ToString(array);
             Assert.AreEqual(3, lines.Length);
             Assert.AreEqual("one", lines[0]);
             Assert.AreEqual("(null)", lines[1]);
@@ -259,14 +260,14 @@ namespace UnitTests.AM
         [TestMethod]
         public void ArrayUtility_Clone_1()
         {
-            MyClass[] source = new MyClass[3];
-            for (int i = 0; i < source.Length; i++)
+            var source = new MyClass[3];
+            for (var i = 0; i < source.Length; i++)
             {
                 source[i] = new MyClass { Value = i };
             }
-            MyClass[] target = ArrayUtility.Clone(source);
+            var target = ArrayUtility.Clone(source);
             Assert.AreEqual(source.Length, target.Length);
-            for (int i = 0; i < source.Length; i++)
+            for (var i = 0; i < source.Length; i++)
             {
                 Assert.AreEqual(source[i].Value, target[i].Value);
             }
@@ -284,49 +285,49 @@ namespace UnitTests.AM
         [TestMethod]
         public void ArrayUtility_SplitArray_1()
         {
-            int[] mainArray = {1, 2, 3, 4, 5, 6, 7};
-            int[][] splitted = ArrayUtility.SplitArray(mainArray, 1);
-            Assert.AreEqual(1, splitted.Length);
-            Assert.AreEqual(mainArray.Length, splitted[0].Length);
+            int[] mainArray = { 1, 2, 3, 4, 5, 6, 7 };
+            var split = ArrayUtility.SplitArray(mainArray, 1);
+            Assert.AreEqual(1, split.Length);
+            Assert.AreEqual(mainArray.Length, split[0].Length);
 
-            splitted = ArrayUtility.SplitArray(mainArray, 2);
-            Assert.AreEqual(2, splitted.Length);
-            Assert.AreEqual(4, splitted[0].Length);
-            Assert.AreEqual(3, splitted[1].Length);
+            split = ArrayUtility.SplitArray(mainArray, 2);
+            Assert.AreEqual(2, split.Length);
+            Assert.AreEqual(4, split[0].Length);
+            Assert.AreEqual(3, split[1].Length);
 
-            splitted = ArrayUtility.SplitArray(mainArray, 3);
-            Assert.AreEqual(3, splitted.Length);
-            Assert.AreEqual(3, splitted[0].Length);
-            Assert.AreEqual(3, splitted[1].Length);
-            Assert.AreEqual(1, splitted[2].Length);
+            split = ArrayUtility.SplitArray(mainArray, 3);
+            Assert.AreEqual(3, split.Length);
+            Assert.AreEqual(3, split[0].Length);
+            Assert.AreEqual(3, split[1].Length);
+            Assert.AreEqual(1, split[2].Length);
 
-            splitted = ArrayUtility.SplitArray(mainArray, 4);
-            Assert.AreEqual(4, splitted.Length);
-            Assert.AreEqual(2, splitted[0].Length);
-            Assert.AreEqual(2, splitted[1].Length);
-            Assert.AreEqual(2, splitted[2].Length);
-            Assert.AreEqual(1, splitted[3].Length);
+            split = ArrayUtility.SplitArray(mainArray, 4);
+            Assert.AreEqual(4, split.Length);
+            Assert.AreEqual(2, split[0].Length);
+            Assert.AreEqual(2, split[1].Length);
+            Assert.AreEqual(2, split[2].Length);
+            Assert.AreEqual(1, split[3].Length);
 
-            splitted = ArrayUtility.SplitArray(mainArray, 7);
-            Assert.AreEqual(7, splitted.Length);
-            Assert.AreEqual(1, splitted[0].Length);
-            Assert.AreEqual(1, splitted[1].Length);
-            Assert.AreEqual(1, splitted[2].Length);
-            Assert.AreEqual(1, splitted[3].Length);
-            Assert.AreEqual(1, splitted[4].Length);
-            Assert.AreEqual(1, splitted[5].Length);
-            Assert.AreEqual(1, splitted[6].Length);
+            split = ArrayUtility.SplitArray(mainArray, 7);
+            Assert.AreEqual(7, split.Length);
+            Assert.AreEqual(1, split[0].Length);
+            Assert.AreEqual(1, split[1].Length);
+            Assert.AreEqual(1, split[2].Length);
+            Assert.AreEqual(1, split[3].Length);
+            Assert.AreEqual(1, split[4].Length);
+            Assert.AreEqual(1, split[5].Length);
+            Assert.AreEqual(1, split[6].Length);
 
-            splitted = ArrayUtility.SplitArray(mainArray, 8);
-            Assert.AreEqual(8, splitted.Length);
-            Assert.AreEqual(1, splitted[0].Length);
-            Assert.AreEqual(1, splitted[1].Length);
-            Assert.AreEqual(1, splitted[2].Length);
-            Assert.AreEqual(1, splitted[3].Length);
-            Assert.AreEqual(1, splitted[4].Length);
-            Assert.AreEqual(1, splitted[5].Length);
-            Assert.AreEqual(1, splitted[6].Length);
-            Assert.AreEqual(0, splitted[7].Length);
+            split = ArrayUtility.SplitArray(mainArray, 8);
+            Assert.AreEqual(8, split.Length);
+            Assert.AreEqual(1, split[0].Length);
+            Assert.AreEqual(1, split[1].Length);
+            Assert.AreEqual(1, split[2].Length);
+            Assert.AreEqual(1, split[3].Length);
+            Assert.AreEqual(1, split[4].Length);
+            Assert.AreEqual(1, split[5].Length);
+            Assert.AreEqual(1, split[6].Length);
+            Assert.AreEqual(0, split[7].Length);
         }
     }
 }
