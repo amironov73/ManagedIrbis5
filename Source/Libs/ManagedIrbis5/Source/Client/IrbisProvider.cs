@@ -19,6 +19,7 @@
 #endregion
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Pft;
 
 #nullable enable
 
@@ -48,6 +49,9 @@ namespace ManagedIrbis.Client
 
         public abstract TermLink[] ExactSearchTrimLinks(string term, int i);
 
+        public abstract void ReleaseFormatter(IPftFormatter formatter);
+
+        public abstract void Dispose();
     } // class IrbisProvider
 
 } // namespace ManagedIrbis.Client

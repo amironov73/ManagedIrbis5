@@ -4,27 +4,31 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
-/* FlcConstants.cs -- formal control related constants
+/* FlcConstants.cs -- константы, связанные с формальным контролем
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace ManagedIrbis.Flc
 {
     /// <summary>
-    /// Formal control related constants.
+    /// Константы, связанные с формальным контролем записей.
     /// </summary>
     public static class FlcConstants
     {
         #region Constants
 
         /// <summary>
-        /// Check record update or creation.
+        /// Имя сценария по умолчанию, запускаемого при создании
+        /// или обновлении записи на сервере.
         /// </summary>
         public const string DbnFlc = "@dbnflc";
 
         /// <summary>
-        /// Check record deletion.
+        /// Имя сценария по умолчанию, запускаемого перед удалением
+        /// записи из базы данных.
         /// </summary>
         public const string DelFlc = "@delflc";
 

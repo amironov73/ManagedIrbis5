@@ -18,6 +18,7 @@
 using System;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Pft;
 
 #endregion
 
@@ -31,6 +32,26 @@ namespace ManagedIrbis.Client
     public class LocalProvider
         : IrbisProvider
     {
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public LocalProvider()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public LocalProvider(string rootPath)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         #region IrbisProvider members
 
         public override string ReadFile(FileSpecification file) =>
@@ -43,6 +64,12 @@ namespace ManagedIrbis.Client
             throw new NotImplementedException();
 
         public override TermLink[] ExactSearchTrimLinks(string term, int i) =>
+            throw new NotImplementedException();
+
+        public override void ReleaseFormatter(IPftFormatter formatter) =>
+            throw new NotImplementedException();
+
+        public override void Dispose() =>
             throw new NotImplementedException();
 
         #endregion

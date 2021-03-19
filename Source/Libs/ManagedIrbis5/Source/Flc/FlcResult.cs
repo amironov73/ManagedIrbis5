@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* FlcResult.cs -- result of formal checking
+/* FlcResult.cs -- результат формально-логической проверки записи
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +29,7 @@ using AM.Runtime;
 namespace ManagedIrbis.Flc
 {
     /// <summary>
-    /// Result of formal checking.
+    /// Результат формально-логической проверки записи.
     /// </summary>
     [XmlRoot("flc-result")]
     public sealed class FlcResult
@@ -165,10 +165,7 @@ namespace ManagedIrbis.Flc
         /// Should serialize the <see cref="Messages"/> collection?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeMessages()
-        {
-            return Messages.Count != 0;
-        }
+        public bool ShouldSerializeMessages() => Messages.Count != 0;
 
         #endregion
 
@@ -180,12 +177,10 @@ namespace ManagedIrbis.Flc
                 BinaryReader reader
             )
         {
-            Sure.NotNull(reader, "reader");
-
             Status = (FlcStatus)reader.ReadPackedInt32();
             Messages.Clear();
             Messages.AddRange(reader.ReadStringArray());
-        }
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -193,8 +188,6 @@ namespace ManagedIrbis.Flc
                 BinaryWriter writer
             )
         {
-            Sure.NotNull(writer, "writer");
-
             writer
                 .WritePackedInt32((int)Status)
                 .WriteArray(Messages.ToArray());
@@ -205,15 +198,10 @@ namespace ManagedIrbis.Flc
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            if (Messages.Count == 0)
-            {
-                return $"Status: {Status}, No messages";
-            }
-
-            return $"Status: {Status}, Messages: {string.Join(Environment.NewLine, Messages)}";
-        } // method ToString
+        public override string ToString() =>
+            Messages.Count == 0
+                ? $"Status: {Status}, no messages"
+                : $"Status: {Status}: {string.Join(Environment.NewLine, Messages)}";
 
         #endregion
 

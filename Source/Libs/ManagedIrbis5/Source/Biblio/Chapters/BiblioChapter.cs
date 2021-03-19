@@ -74,12 +74,14 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         ///
         /// </summary>
-        public ItemCollection Items { get; protected internal set; }
+        [JsonIgnore]
+        public ItemCollection? Items { get; protected internal set; }
 
         /// <summary>
         /// Whether the chapter is for service purpose?
         /// </summary>
-        public virtual bool IsServiceChapter { get { return false; } }
+        [JsonIgnore]
+        public virtual bool IsServiceChapter => false;
 
         /// <summary>
         /// Special settings associated with the chapter
@@ -115,7 +117,7 @@ namespace ManagedIrbis.Biblio
                 string text
             )
         {
-            StringBuilder result = new StringBuilder(text);
+            var result = new StringBuilder(text);
             result.Replace("[", string.Empty);
             result.Replace("]", string.Empty);
             result.Replace("\"", string.Empty);
@@ -135,13 +137,13 @@ namespace ManagedIrbis.Biblio
             )
             where TChapter : BiblioChapter
         {
-            BiblioChapter chapter = this;
+            var chapter = this;
             while (!ReferenceEquals(chapter, null))
             {
-                TChapter subChapter = chapter as TChapter;
+                var subChapter = chapter as TChapter;
                 if (!ReferenceEquals(subChapter, null))
                 {
-                    TResult result = func(subChapter);
+                    var result = func(subChapter);
                     if (!ReferenceEquals(result, null))
                     {
                         return result;
@@ -162,7 +164,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            foreach (BiblioChapter child in Children)
+            foreach (var child in Children)
             {
                 if (child.Active)
                 {
@@ -179,9 +181,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
 
             if (!string.IsNullOrEmpty(Title))
@@ -306,7 +308,7 @@ namespace ManagedIrbis.Biblio
             AbstractOutput log = context.Log;
             log.WriteLine("Begin gather terms {0}", this);
 
-            foreach (BiblioChapter child in Children)
+            foreach (var child in Children)
             {
                 if (child.Active)
                 {
@@ -330,7 +332,7 @@ namespace ManagedIrbis.Biblio
             AbstractOutput log = context.Log;
             log.WriteLine("Begin gather records {0}", this);
 
-            foreach (BiblioChapter child in Children)
+            foreach (var child in Children)
             {
                 if (child.Active)
                 {
@@ -354,7 +356,7 @@ namespace ManagedIrbis.Biblio
             AbstractOutput log = context.Log;
             log.WriteLine("Begin initialize {0}", this);
 
-            foreach (BiblioChapter child in Children)
+            foreach (var child in Children)
             {
                 // Give the chapter a chance
                 child.Initialize(context);
@@ -371,19 +373,17 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            ItemCollection items = Items;
+            var items = Items;
 
             if (!ReferenceEquals(items, null))
             {
-                foreach (BiblioItem item in items)
+                foreach (var item in items)
                 {
                     item.Number = ++context.ItemCount;
                 }
             }
 
-            foreach (BiblioChapter child in Children)
+            foreach (var child in Children)
             {
                 child.NumberItems(context);
             }
@@ -420,7 +420,7 @@ namespace ManagedIrbis.Biblio
             Code.NotNull(action, "action");
 
             action(this);
-            foreach (BiblioChapter child in Children)
+            foreach (var child in Children)
             {
                 child.Walk(action);
             }
