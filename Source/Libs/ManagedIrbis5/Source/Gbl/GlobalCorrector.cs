@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* GlobalCorrector.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status:poor
  */
 
 #region Using directives
@@ -14,15 +18,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Gbl
 {
@@ -30,8 +29,6 @@ namespace ManagedIrbis.Gbl
     /// Обёртка для облегчения выполнения глобальной корректировки
     /// порциями (например, по 100 записей за раз).
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class GlobalCorrector
     {
         #region Events
@@ -49,13 +46,11 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Connection.
         /// </summary>
-        [NotNull]
-        public IrbisConnection Connection { get; private set; }
+        public IIrbisConnection Connection { get; private set; }
 
         /// <summary>
         /// Database name.
         /// </summary>
-        [NotNull]
         public string Database { get; private set; }
 
         /// <summary>
@@ -88,7 +83,6 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Result.
         /// </summary>
-        [NotNull]
         public GblResult Result { get; private set; }
 
         #endregion
@@ -100,7 +94,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GlobalCorrector
             (
-                [NotNull] IrbisConnection connection
+                IIrbisConnection connection
             )
             : this
             (
@@ -133,21 +127,21 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GlobalCorrector
             (
-                IrbisConnection connection,
+                IIrbisConnection connection,
                 string database,
                 int chunkSize
             )
         {
             if (chunkSize < 1)
             {
-                Log.Error
+                Magna.Error
                     (
                         "GlobalCorrector::Constructor: "
                         + "chunkSize="
                         + chunkSize
                     );
 
-                throw new ArgumentOutOfRangeException("chunkSize");
+                throw new ArgumentOutOfRangeException(nameof(chunkSize));
             }
 
             Connection = connection;
@@ -169,18 +163,13 @@ namespace ManagedIrbis.Gbl
         /// Create the <see cref="GlobalCorrector"/>
         /// from <see cref="GblSettings"/>.
         /// </summary>
-        [NotNull]
         public static GlobalCorrector FromSettings
             (
-                [NotNull] IrbisConnection connection,
-                [NotNull] GblSettings settings
+                IIrbisConnection connection,
+                GblSettings settings
             )
         {
-            Code.NotNull(connection, "connection");
-            Code.NotNull(settings, "settings");
-
-            GlobalCorrector result
-                = new GlobalCorrector(connection)
+            var result = new GlobalCorrector(connection)
             {
                 Database = settings.Database ?? connection.Database,
                 Actualize = settings.Actualize,
@@ -194,31 +183,29 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Обработать интервал записей.
         /// </summary>
-        [NotNull]
         public GblResult ProcessInterval
             (
                 int minMfn,
                 int maxMfn,
-                [NotNull] GblStatement[] statements
+                GblStatement[] statements
             )
         {
-            Code.NotNull(statements, "statements");
             if (minMfn <= 0)
             {
-                Log.Error
+                Magna.Error
                     (
                         "GlobalCorrector::ProcessInterval: "
                         + "minMfn="
                         + minMfn
                     );
 
-                throw new ArgumentOutOfRangeException("minMfn");
+                throw new ArgumentOutOfRangeException(nameof(minMfn));
             }
 
-            int limit = Connection.GetMaxMfn() - 1;
+            var limit = Connection.GetMaxMfn() - 1;
             if (minMfn > limit)
             {
-                Log.Error
+                Magna.Error
                     (
                         "GlobalCorrector::ProcessInterval: "
                         + "minMfn="
@@ -227,12 +214,12 @@ namespace ManagedIrbis.Gbl
                         + limit
                     );
 
-                throw new ArgumentOutOfRangeException("minMfn");
+                throw new ArgumentOutOfRangeException(nameof(minMfn));
             }
             maxMfn = Math.Min(maxMfn, limit);
             if (minMfn > maxMfn)
             {
-                Log.Error
+                Magna.Error
                     (
                         "GlobalCorrector::ProcessInterval: "
                         + "minMfn="
@@ -241,7 +228,7 @@ namespace ManagedIrbis.Gbl
                         + maxMfn
                     );
 
-                throw new ArgumentOutOfRangeException("minMfn");
+                throw new ArgumentOutOfRangeException(nameof(minMfn));
             }
 
             if (statements.Length == 0)
@@ -254,16 +241,16 @@ namespace ManagedIrbis.Gbl
             Result = GblResult.GetEmptyResult();
             Result.RecordsSupposed = maxMfn - minMfn + 1;
 
-            int startMfn = minMfn;
+            var startMfn = minMfn;
 
             while (startMfn <= maxMfn)
             {
-                int amount = Math.Min
+                var amount = Math.Min
                     (
                         maxMfn - startMfn + 1,
                         ChunkSize
                     );
-                int endMfn = startMfn + amount - 1;
+                var endMfn = startMfn + amount - 1;
 
                 try
                 {
@@ -288,7 +275,7 @@ namespace ManagedIrbis.Gbl
                 }
                 catch (Exception exception)
                 {
-                    Log.TraceException
+                    Magna.TraceException
                         (
                             "GlobalCorrector::ProcessInterval",
                             exception
@@ -311,22 +298,18 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Обработать явно (вручную) заданное множество записей.
         /// </summary>
-        [NotNull]
         public GblResult ProcessRecordset
             (
-                [NotNull] IEnumerable<int> recordset,
-                [NotNull] GblStatement[] statements
+                IEnumerable<int> recordset,
+                GblStatement[] statements
             )
         {
-            Code.NotNull(recordset, "recordset");
-            Code.NotNull(statements, "statements");
-
             if (statements.Length == 0)
             {
                 return GblResult.GetEmptyResult();
             }
 
-            List<int> list = recordset.ToList();
+            var list = recordset.ToList();
             if (list.Count == 0)
             {
                 return GblResult.GetEmptyResult();
@@ -363,7 +346,7 @@ namespace ManagedIrbis.Gbl
                 }
                 catch (Exception exception)
                 {
-                    Log.TraceException
+                    Magna.TraceException
                         (
                             "GlobalCorrector::ProcessRecordset",
                             exception
@@ -383,23 +366,19 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Обработать результат поиска.
         /// </summary>
-        [NotNull]
         public GblResult ProcessSearchResult
             (
-            [NotNull] string searchExpression,
-            [NotNull] GblStatement[] statements
+                string searchExpression,
+                GblStatement[] statements
             )
         {
-            Code.NotNullNorEmpty(searchExpression, "searchExpression");
-            Code.NotNull(statements, "statements");
-
             if (statements.Length == 0)
             {
                 Result = GblResult.GetEmptyResult();
                 return Result;
             }
 
-            int[] found = Connection.Search(searchExpression);
+            var found = Connection.Search(searchExpression);
             if (found.Length == 0)
             {
                 Result = GblResult.GetEmptyResult();
@@ -416,20 +395,18 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Обработать базу данных в целом.
         /// </summary>
-        [NotNull]
         public GblResult ProcessWholeDatabase
             (
-                [NotNull] GblStatement[] statements
+                GblStatement[] statements
             )
         {
-            Code.NotNull(statements, "statements");
             if (statements.Length == 0)
             {
                 Result = GblResult.GetEmptyResult();
                 return Result;
             }
 
-            int maxMfn = Connection.GetMaxMfn() - 1;
+            var maxMfn = Connection.GetMaxMfn() - 1;
             return ProcessInterval
                 (
                     1,
@@ -442,15 +419,12 @@ namespace ManagedIrbis.Gbl
         /// Convert <see cref="GlobalCorrector"/>
         /// to <see cref="GblSettings"/>.
         /// </summary>
-        [NotNull]
         public GblSettings ToSettings
             (
-                [NotNull] IEnumerable<GblStatement> statements
+                IEnumerable<GblStatement> statements
             )
         {
-            Code.NotNull(statements, "statements");
-
-            GblSettings result = new GblSettings
+            var result = new GblSettings
                 (
                     Connection,
                     statements

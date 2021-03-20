@@ -21,7 +21,7 @@ using System.Xml.Serialization;
 
 using AM;
 
-using ManagedIrbis.Fields;
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mapping;
 
 #endregion

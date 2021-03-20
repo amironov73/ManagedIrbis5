@@ -6,7 +6,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* IrbisGuid.cs -- GUID-поле в записях
@@ -55,72 +57,63 @@ namespace ManagedIrbis.Infrastructure
 
         #region Public methods
 
-        ///// <summary>
-        ///// Get GUID from the <see cref="Record"/>.
-        ///// </summary>
-        //[CanBeNull]
-        //public static string Get
-        //    (
-        //        [CanBeNull] Record record
-        //    )
-        //{
-        //    if (ReferenceEquals(record, null))
-        //    {
-        //        return null;
-        //    }
+        /// <summary>
+        /// Get GUID from the <see cref="Record"/>.
+        /// </summary>
+        public static string? Get
+            (
+                Record? record
+            )
+        {
+            if (ReferenceEquals(record, null))
+            {
+                return null;
+            }
 
-        //    string text = record.FM(Tag);
-        //    if (string.IsNullOrEmpty(text))
-        //    {
-        //        return null;
-        //    }
+            var text = record.FM(Tag);
+            if (string.IsNullOrEmpty(text))
+            {
+                return null;
+            }
 
-        //    Guid guid = Parse(text);
+            var guid = Parse(text);
 
-        //    return StringUtility.ToUpperInvariant(guid.ToString("D"));
-        //}
+            // TODO почему тут "D" ?
 
-        ///// <summary>
-        ///// Create new GUID in IRBIS64 format.
-        ///// </summary>
-        //public static string NewGuid()
-        //{
-        //    return StringUtility.ToUpperInvariant(Guid.NewGuid().ToString("B"));
-        //}
+            return guid.ToString("D").ToUpperInvariant();
+        } // method Get
+
+        /// <summary>
+        /// Create new GUID in IRBIS64 format.
+        /// </summary>
+        // TODO почему тут "B" ?
+        public static string NewGuid() =>
+            Guid.NewGuid().ToString("B").ToUpperInvariant();
 
         /// <summary>
         /// Parse the text.
         /// </summary>
-        public static Guid Parse
+        public static Guid Parse (string text) => Guid.Parse(text);
+
+        /// <summary>
+        /// Parse the record.
+        /// </summary>
+        public static Guid? Parse
             (
-                string text
+                Record record
             )
         {
-            // Sure.NotNullNorEmpty(text, nameof(text));
+            var text = record.FM(Tag);
+            if (string.IsNullOrEmpty(text))
+            {
+                return null;
+            }
 
-            return Guid.Parse(text);
-        }
-
-        ///// <summary>
-        ///// Parse the record.
-        ///// </summary>
-        //public static Guid? Parse
-        //    (
-        //        Record record
-        //    )
-        //{
-        //    Code.NotNull(record, "record");
-
-        //    string text = record.FM(Tag);
-
-        //    if (string.IsNullOrEmpty(text))
-        //    {
-        //        return null;
-        //    }
-
-        //    return Parse(text);
-        //}
+            return Parse(text);
+        } // method Parse
 
         #endregion
-    }
-}
+
+    } // class IrbisGuid
+
+} // namespace ManagedIrbis.Infrastructure

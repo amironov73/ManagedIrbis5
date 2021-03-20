@@ -88,12 +88,10 @@ namespace ManagedIrbis.Gbl
             Sure.NotNull(text, nameof(text));
 
             XmlSerializer serializer = new XmlSerializer(typeof(GblFile));
-            using (StringReader reader = new StringReader(text))
-            {
-                var result = (GblFile?) serializer.Deserialize(reader);
+            using StringReader reader = new StringReader(text);
+            var result = (GblFile?) serializer.Deserialize(reader);
 
-                return result.ThrowIfNull("result");
-            }
+            return result.ThrowIfNull("result");
         }
 
         //=================================================
@@ -107,9 +105,6 @@ namespace ManagedIrbis.Gbl
                 IEnumerable<GblNode> nodes
             )
         {
-            Sure.NotNull(builder, nameof(builder));
-            Sure.NotNull(nodes, nameof(nodes));
-
             bool first = true;
             foreach (GblNode node in nodes.NonNullItems())
             {

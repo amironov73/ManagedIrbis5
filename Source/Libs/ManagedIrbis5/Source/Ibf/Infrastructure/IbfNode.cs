@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* IbfNode.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* IbfNode.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,26 +19,19 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Ibf.Infrastructure
 {
@@ -44,10 +41,8 @@ namespace ManagedIrbis.Ibf.Infrastructure
     //
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class IbfNode
         : IHandmadeSerializable,
         IVerifiable
@@ -57,11 +52,10 @@ namespace ManagedIrbis.Ibf.Infrastructure
         /// <summary>
         /// Arbitrary user data.
         /// </summary>
-        [CanBeNull]
         [XmlIgnore]
         [JsonIgnore]
         [Browsable(false)]
-        public object UserData { get; set; }
+        public object? UserData { get; set; }
 
         #endregion
 
@@ -76,7 +70,7 @@ namespace ManagedIrbis.Ibf.Infrastructure
         /// </summary>
         protected virtual void OnAfterExecution
             (
-                [NotNull] IbfContext context
+                IbfContext context
             )
         {
             // Nothing to do here yet
@@ -87,7 +81,7 @@ namespace ManagedIrbis.Ibf.Infrastructure
         /// </summary>
         protected virtual void OnBeforeExecution
             (
-                [NotNull] IbfContext context
+                IbfContext context
             )
         {
             // Nothing to do here yet
@@ -102,11 +96,9 @@ namespace ManagedIrbis.Ibf.Infrastructure
         /// </summary>
         public virtual void Execute
             (
-                [NotNull] IbfContext context
+                IbfContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeExecution(context);
 
             // Nothing to do here yet
@@ -124,16 +116,14 @@ namespace ManagedIrbis.Ibf.Infrastructure
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
         }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
+        public virtual void SaveToStream
             (
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
         }
 
         #endregion
@@ -158,7 +148,7 @@ namespace ManagedIrbis.Ibf.Infrastructure
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            string result = GetType().Name;
+            var result = GetType().Name;
             if (result.StartsWith("Ibf"))
             {
                 result = result.Substring(3);

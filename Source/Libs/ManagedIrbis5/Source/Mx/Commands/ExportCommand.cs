@@ -69,10 +69,10 @@ namespace ManagedIrbis.Mx.Commands
 
         /// <inheritdoc cref="MxCommand.Execute" />
         public override bool Execute
-        (
-            MxExecutive executive,
-            MxArgument[] arguments
-        )
+            (
+                MxExecutive executive,
+                MxArgument[] arguments
+            )
         {
             OnBeforeExecute();
 

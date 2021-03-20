@@ -1,10 +1,16 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftP.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,28 +22,21 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftP
         : PftCondition
     {
@@ -46,8 +45,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Field.
         /// </summary>
-        [CanBeNull]
-        public PftField Field { get; set; }
+        public PftField? Field { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -72,7 +70,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // Nothing to do here
 
-                Log.Error
+                Magna.Error
                     (
                         "PftP::Children: "
                         + "set value="
@@ -97,7 +95,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftP
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
@@ -108,11 +106,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftP
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNull(text, "text");
-
             // TODO support for G
             Field = new PftV(text);
         }
@@ -149,11 +145,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Limit text.
         /// </summary>
-        [CanBeNull]
-        public static string LimitText
+        public static string? LimitText
             (
-                [NotNull] FieldSpecification field,
-                [CanBeNull] string text
+                FieldSpecification field,
+                string? text
             )
         {
             if (string.IsNullOrEmpty(text))
@@ -187,16 +182,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public static bool HaveGlobal
             (
-                [NotNull] PftContext context,
-                [NotNull] FieldSpecification specification,
+                PftContext context,
+                FieldSpecification specification,
                 int number,
                 int index
             )
         {
-            Code.NotNull(context, "context");
-
-            RecordField[] fields = context.Globals.Get(number);
-            RecordField field = fields.GetOccurrence(index);
+            var fields = context.Globals.Get(number);
+            var field = fields.GetOccurrence(index);
             if (!ReferenceEquals(field, null))
             {
                 char code = specification.SubField;
@@ -231,21 +224,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public static bool HaveRepeat
             (
-                [NotNull] MarcRecord record,
+                Record record,
                 int tag,
                 char code,
                 int index
             )
         {
-            Code.NotNull(record, "record");
-
             if (tag == IrbisGuid.Tag)
             {
                 // Поле GUID всегда считается отсуствующим
                 return false;
             }
 
-            RecordField field = record.Fields.GetField
+            var field = record.Fields.GetField
                 (
                     tag,
                     index
@@ -318,7 +309,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Field.Command == 'g')
             {
-                int number = NumericUtility.ParseInt32(Field.Tag.ThrowIfNull());
+                int number = FastNumber.ParseInt32(Field.Tag.ThrowIfNull());
                 compiler
                     .WriteIndent()
                     .WriteLine
@@ -403,7 +394,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (ReferenceEquals(Field, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftP::Execute: "
                         + "Field not specified"
@@ -413,13 +404,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             string tag = Field.Tag.ThrowIfNull("Field.Tag");
-            MarcRecord record = context.Record;
+            var record = context.Record;
             int index = context.Index;
 
             if (Field.Command == 'g')
             {
-                int number = NumericUtility.ParseInt32(tag);
-                RecordField[] fields = context.Globals.Get(number);
+                int number = FastNumber.ParseInt32(tag);
+                var fields = context.Globals.Get(number);
                 Value = HaveGlobal
                     (
                         context,
@@ -459,7 +450,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftP::Execute: "
                         + "unexpected command: "
@@ -519,29 +510,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer
                 .SingleSpace()
                 .Write("p(");
-            if (!ReferenceEquals(Field, null))
-            {
-                Field.PrettyPrint(printer);
-            }
+            Field?.PrettyPrint(printer);
             printer.Write(')');
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return "p(" + Field + ")";
-        }
+        public override string ToString() => "p(" + Field + ")";
 
         #endregion
     }

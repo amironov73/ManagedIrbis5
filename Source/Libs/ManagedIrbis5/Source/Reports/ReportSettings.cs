@@ -1,29 +1,28 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ReportSettings.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System.Text.Json.Serialization;
+
 using AM;
 using AM.Collections;
-
-
-
+using AM.Json;
 using ManagedIrbis.Client;
 
-
-using Newtonsoft.Json;
-
-#if !WINMOBILE
-
-using AM.Json;
-
-#endif
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
@@ -39,83 +38,70 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Assemblies to load.
         /// </summary>
-        [JsonProperty("assemblies")]
-        public NonNullCollection<string> Assemblies
-        {
-            get; private set;
-        }
+        [JsonPropertyName("assemblies")]
+        public NonNullCollection<string> Assemblies { get; private set; }
 
         /// <summary>
         /// Name of the <see cref="ReportDriver"/>.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("driver", NullValueHandling = NullValueHandling.Ignore)]
-        public string DriverName { get; set; }
+        [JsonPropertyName("driver")]
+        public string? DriverName { get; set; }
 
         /// <summary>
         /// Settings for driver.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("driverSettings", NullValueHandling = NullValueHandling.Ignore)]
-        public string DriverSettings { get; set; }
+        [JsonPropertyName("driverSettings")]
+        public string? DriverSettings { get; set; }
 
         /// <summary>
         /// Record filter.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("filter", NullValueHandling = NullValueHandling.Ignore)]
-        public string Filter { get; set; }
+        [JsonPropertyName("filter")]
+        public string? Filter { get; set; }
 
         /// <summary>
         /// Output file name.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("outputFile", NullValueHandling = NullValueHandling.Ignore)]
-        public string OutputFile { get; set; }
+        [JsonPropertyName("outputFile")]
+        public string? OutputFile { get; set; }
 
         /// <summary>
         /// Page settings.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("pageSettings", NullValueHandling = NullValueHandling.Ignore)]
-        public string PageSettings { get; set; }
+        [JsonPropertyName("pageSettings")]
+        public string? PageSettings { get; set; }
 
         /// <summary>
         /// Printer to send report to.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("printer", NullValueHandling = NullValueHandling.Ignore)]
-        public string PrinterName { get; set; }
+        [JsonPropertyName("printer")]
+        public string? PrinterName { get; set; }
 
         /// <summary>
         /// Name of <see cref="IrbisProvider"/>.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("providerName", NullValueHandling = NullValueHandling.Ignore)]
-        public string ProviderName { get; set; }
+        [JsonPropertyName("providerName")]
+        public string? ProviderName { get; set; }
 
         /// <summary>
         /// Settings for provider.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("providerSettings", NullValueHandling = NullValueHandling.Ignore)]
-        public string ProviderSettings { get; set; }
+        [JsonPropertyName("providerSettings")]
+        public string? ProviderSettings { get; set; }
 
         /// <summary>
         /// Register <see cref="ReportDriver"/>
         /// before report building.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("registerDriver", NullValueHandling = NullValueHandling.Ignore)]
-        public string RegisterDriver { get; set; }
+        [JsonPropertyName("registerDriver")]
+        public string? RegisterDriver { get; set; }
 
         /// <summary>
         /// <see cref="IrbisProvider"/> to register
         /// before report building.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("registerProvider", NullValueHandling = NullValueHandling.Ignore)]
-        public string RegisterProvider { get; set; }
+        [JsonPropertyName("registerProvider")]
+        public string? RegisterProvider { get; set; }
 
         #endregion
 
@@ -142,18 +128,8 @@ namespace ManagedIrbis.Reports
                 string fileName
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
-
-#if WINMOBILE
-
-            ReportSettings result = new ReportSettings();
-
-#else
-
             ReportSettings result = JsonUtility
                 .ReadObjectFromFile<ReportSettings>(fileName);
-
-#endif
 
             return result;
         }
@@ -168,8 +144,7 @@ namespace ManagedIrbis.Reports
                 bool throwOnError
             )
         {
-            Verifier<ReportSettings> verifier
-                = new Verifier<ReportSettings>(this, throwOnError);
+            var verifier = new Verifier<ReportSettings>(this, throwOnError);
 
             verifier
                 .NotNull(Assemblies, "Assemblies")
