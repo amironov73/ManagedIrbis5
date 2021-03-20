@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftParser.Parallel.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -18,6 +24,8 @@ using AM;
 using ManagedIrbis.Pft.Infrastructure.Ast;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -50,7 +58,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     break;
 
                 default:
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::ParseParallel: "
                             + "unexpected token="
@@ -100,7 +108,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (_inGroup)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseParallelGroup: "
                         + "nested group detected"

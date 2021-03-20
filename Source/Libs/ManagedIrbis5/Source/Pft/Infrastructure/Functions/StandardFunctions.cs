@@ -1,28 +1,32 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* StandardFunctions.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 using AM;
-using AM.Logging;
 using AM.Text;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -55,7 +59,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                     foreach (string body in lines)
                     {
-                        RecordField field = RecordFieldUtility.Parse(tag, body);
+                        var field = RecordFieldUtility.Parse(tag, body);
                         context.Record.Fields.Add(field);
                     }
                 }
@@ -66,7 +70,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Bold(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringValue(arguments, 0);
+            var expression = context.GetStringValue(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
                 context.Write(node, "<b>" + expression + "</b>");
@@ -75,22 +79,27 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         //=================================================
 
-        private static void Cat(PftContext context, PftNode node, PftNode[] arguments)
+        private static void Cat
+            (
+                PftContext context,
+                PftNode node,
+                PftNode[] arguments
+            )
         {
             //
             // TODO: add some caching
             //
 
-            string expression = context.GetStringValue(arguments, 0);
+            var expression = context.GetStringValue(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-                FileSpecification specification = new FileSpecification
-                    (
-                        IrbisPath.MasterFile,
-                        context.Provider.Database,
-                        expression
-                    );
-                string source = context.Provider.ReadFile
+                var specification = new FileSpecification
+                    {
+                        Path = IrbisPath.MasterFile,
+                        Database = context.Provider.Database,
+                        FileName = expression
+                    };
+                var source = context.Provider.ReadFile
                     (
                         specification
                     );
@@ -120,10 +129,10 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             else
             {
-                string expression = context.GetStringArgument(arguments, 0);
+                var expression = context.GetStringArgument(arguments, 0);
                 if (!string.IsNullOrEmpty(expression))
                 {
-                    if (NumericUtility.TryParseInt32(expression, out code))
+                    if (int.TryParse(expression, out code))
                     {
                         c = (char)code;
                         context.Write(node, c.ToString());
@@ -136,48 +145,36 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void CommandLine(PftContext context, PftNode node, PftNode[] arguments)
         {
-#if DESKTOP || NETCORE || ANDROID
-
             context.Write(node, Environment.CommandLine);
-
-#endif
         }
 
         private static void COut(PftContext context, PftNode node, PftNode[] arguments)
         {
-#if DESKTOP || NETCORE || ANDROID
-
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
                 Console.Write(expression);
             }
-
-#endif
         }
 
         //=================================================
 
         private static void Debug(PftContext context, PftNode node, PftNode[] arguments)
         {
-#if CLASSIC || NETCORE || ANDROID
-
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
                 global::System.Diagnostics.Debug.WriteLine(expression);
             }
-
-#endif
         }
 
         //=================================================
 
         private static void DelField(PftContext context, PftNode node, PftNode[] arguments)
         {
-            MarcRecord record = context.Record;
+            var record = context.Record;
 
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression)
                 && !ReferenceEquals(record, null))
             {
@@ -189,7 +186,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         2
                     );
                 string tag = parts[0];
-                RecordField[] fields = record.Fields.GetField(tag.SafeToInt32());
+                var fields = record.Fields.GetField(tag.SafeToInt32());
 
                 if (parts.Length == 2)
                 {
@@ -200,7 +197,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     }
                     else
                     {
-                        if (!NumericUtility.TryParseInt32(repeatText, out repeat))
+                        if (!int.TryParse(repeatText, out repeat))
                         {
                             return;
                         }
@@ -210,14 +207,14 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (repeat < 0)
                 {
-                    foreach (RecordField field in fields)
+                    foreach (var field in fields)
                     {
                         record.Fields.Remove(field);
                     }
                 }
                 else
                 {
-                    RecordField field = fields.GetOccurrence(repeat);
+                    var field = fields.GetOccurrence(repeat);
                     if (!ReferenceEquals(field, null))
                     {
                         record.Fields.Remove(field);
@@ -230,7 +227,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Error(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
                 context.Output.Error.WriteLine(expression);
@@ -251,7 +248,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             string expression = context.GetStringArgument(arguments, 0);
             string message = expression ?? string.Empty;
 
-            Log.Fatal
+            Magna.Critical
                 (
                     "StandardFunctions::Fatal: "
                     + "message="
@@ -265,10 +262,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void GetEnv(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-                string result = context.Provider.PlatformAbstraction
+                var result = context.Provider.PlatformAbstraction
                     .GetEnvironmentVariable(expression);
                 context.Write(node, result);
             }
@@ -380,7 +377,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             if (number != null)
             {
                 int mfn = (int)number;
-                MarcRecord record = context.Provider
+                var record = context.Provider
                     .ReadRecord(mfn);
 
                 if (ReferenceEquals(record, null))
@@ -429,7 +426,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void NOcc(PftContext context, PftNode node, PftNode[] arguments)
         {
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null))
             {
                 context.Write(node, "0");
@@ -493,7 +490,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 FieldSpecification specification = new FieldSpecification();
                 specification.Parse(expression);
-                MarcRecord record = context.Record;
+                var record = context.Record;
                 if (!ReferenceEquals(record, null))
                 {
                     int count = record.Fields.GetField(specification.Tag).Length;
@@ -774,7 +771,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Tags(PftContext context, PftNode node, PftNode[] arguments)
         {
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
                 string[] tags = record.Fields.Select
@@ -797,7 +794,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         .ToArray();
                 }
 
-                string output = StringUtility.Join
+                string output = string.Join
                     (
                         Environment.NewLine,
                         tags
@@ -812,23 +809,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             DateTime today = context.Provider.PlatformAbstraction.Today();
 
-#if CLASSIC || NETCORE || ANDROID
-
             string expression = context.GetStringArgument(arguments, 0);
             string output = string.IsNullOrEmpty(expression)
                 ? today.ToShortDateString()
                 : today.ToString(expression);
-
-#else
-
-            // TODO Implement properly
-
-            string expression = context.GetStringArgument(arguments, 0);
-            string output = string.IsNullOrEmpty(expression)
-                ? today.ToString()
-                : today.ToString(expression);
-
-#endif
 
             context.Write(node, output);
         }

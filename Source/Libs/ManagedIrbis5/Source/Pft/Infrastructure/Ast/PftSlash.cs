@@ -1,55 +1,47 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftSlash.cs -- переход на новую строку
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System.Diagnostics;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     /// Команда / приводит к размещению последующих данных
     /// с начала следующей строки.
-    /// Однако подряд расположенные команды /, 
+    /// Однако подряд расположенные команды /,
     /// хотя и являются синтаксически правильными,
     /// но имеют тот же смысл, что и одна команда /,
     /// т.е.команда / никогда не создает пустых строк.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftSlash
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection
-        {
-            get { return false; }
-        }
+        public override bool RequiresConnection => false;
 
         #endregion
 
@@ -67,11 +59,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftSlash
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Slash);
         }
 
@@ -132,21 +123,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            return "/";
-        }
+        public override string ToString() => "/";
 
         #endregion
     }

@@ -1,33 +1,32 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftC.cs -- табуляция в указанную позицию строки
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.IO;
 
 using AM;
 using AM.IO;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
@@ -36,24 +35,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// Перемещает виртуальный курсор в n-ю позицию строки
     /// (табуляция в указанную позицию строки).
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftC
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection
-        {
-            get { return false; }
-        }
+        public override bool RequiresConnection => false;
 
         /// <summary>
         /// Новая позиция курсора.
@@ -87,11 +78,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftC
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.C);
 
             try
@@ -103,7 +93,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftC::Constructor",
                         exception
@@ -270,21 +260,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="PftNode.ToString" />
-        public override string ToString()
-        {
-            return "c" + NewPosition.ToInvariantString();
-        }
+        public override string ToString() => "c" + NewPosition.ToInvariantString();
 
         #endregion
     }

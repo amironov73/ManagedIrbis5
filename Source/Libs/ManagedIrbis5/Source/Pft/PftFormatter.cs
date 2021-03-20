@@ -38,28 +38,28 @@ namespace ManagedIrbis.Pft
 
         #region IPftFormatter members
 
-        public bool SupportsExtendedSyntax { get; }
+        public virtual bool SupportsExtendedSyntax { get; }
         public object Context { get; }
-        public string FormatRecord(Record? record) =>
+        public virtual string FormatRecord(Record? record) =>
             throw new System.NotImplementedException();
 
-        public string FormatRecord(int mfn) =>
+        public virtual string FormatRecord(int mfn) =>
             throw new System.NotImplementedException();
 
-        public string[] FormatRecords(int[] mfns) =>
+        public virtual string[] FormatRecords(int[] mfns) =>
             throw new System.NotImplementedException();
 
-        public void ParseProgram(string source) =>
+        public virtual void ParseProgram(string source) =>
             throw new System.NotImplementedException();
 
-        public void SetProvider(IrbisProvider contextProvider) =>
+        public virtual void SetProvider(IrbisProvider contextProvider) =>
             throw new System.NotImplementedException();
 
         #endregion
 
         #region IDisposable members
 
-        public void Dispose() => throw new System.NotImplementedException();
+        public virtual void Dispose() => throw new System.NotImplementedException();
 
         #endregion
 

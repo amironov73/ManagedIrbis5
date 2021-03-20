@@ -1,44 +1,41 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftVariableReference.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftVariableReference
         : PftNumeric
     {
@@ -47,8 +44,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Name of the variable.
         /// </summary>
-        [CanBeNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Index.
@@ -61,10 +57,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public char SubFieldCode { get; set; }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -82,11 +75,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftVariableReference
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
         }
 
@@ -95,12 +86,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftVariableReference
             (
-                [NotNull] string name,
+                string name,
                 int index
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
             Index = IndexSpecification.GetLiteral(index);
         }
@@ -110,12 +99,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftVariableReference
             (
-                [NotNull] string name,
+                string name,
                 char code
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
             SubFieldCode = code;
         }
@@ -125,11 +112,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftVariableReference
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Variable);
 
             string text = token.Text.ThrowIfNull("token.Text");
@@ -170,16 +156,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             return result.ToString();
         }
 
-        [NotNull]
-        private static RecordField _ParseLine
+        private static Field _ParseLine
             (
-                [NotNull] string line
+                string line
             )
         {
-            Code.NotNull(line, "line");
-
-            StringReader reader = new StringReader(line);
-            RecordField result = new RecordField
+            var reader = new StringReader(line);
+            var result = new Field
             {
                 Value = _ReadTo(reader, '^')
             };
@@ -199,7 +182,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     Code = code,
                     Value = text
                 };
-                result.SubFields.Add(subField);
+                result.Subfields.Add(subField);
             }
 
             return result;
@@ -214,23 +197,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public static double DoVariable
             (
-                [NotNull] PftContext context,
-                [NotNull] PftNode node,
-                [NotNull] string name,
+                PftContext context,
+                PftNode node,
+                string name,
                 IndexSpecification index,
                 char subField
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNullNorEmpty(name, "name");
-
             double result = 0.0;
 
-            PftVariable variable
-                = context.Variables.GetExistingVariable(name);
+            var variable = context.Variables.GetExistingVariable(name);
             if (ReferenceEquals(variable, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftVariableReference::DoVariable: "
                         + "unknown variable="
@@ -269,16 +248,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                     if (subField != SubField.NoCode)
                     {
-                        List<string> list = new List<string>();
+                        var list = new List<string>();
 
                         foreach (string line in lines)
                         {
-                            RecordField field = _ParseLine(line);
-                            string text = field.GetFirstSubFieldValue
+                            var field = _ParseLine(line);
+                            var text = field.GetFirstSubFieldValue
                                 (
                                     subField
                                 );
-                            list.Add(text);
+                            if (text is not null)
+                            {
+                                list.Add(text);
+                            }
                         }
 
                         lines = list.ToArray();
@@ -294,18 +276,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
                     if (subField != SubField.NoCode)
                     {
-                        string[] lines = output.SplitLines();
+                        var lines = output.SplitLines();
 
-                        List<string> list = new List<string>();
+                        var list = new List<string>();
 
                         foreach (string line in lines)
                         {
-                            RecordField field = _ParseLine(line);
-                            string text = field.GetFirstSubFieldValue
+                            var field = _ParseLine(line);
+                            var text = field.GetFirstSubFieldValue
                                 (
                                     subField
                                 );
-                            list.Add(text);
+                            if (text is not null)
+                            {
+                                list.Add(text);
+                            }
                         }
 
                         lines = list.ToArray();
@@ -461,11 +446,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 

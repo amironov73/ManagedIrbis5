@@ -1,28 +1,26 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftBreak.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
-
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
+using AM;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
@@ -73,18 +71,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftBreak
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         #endregion
 
@@ -102,11 +95,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftBreak
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Break);
         }
 
@@ -190,7 +182,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 if (PftConfig.BreakImmediate)
                 {
-                    Log.Trace
+                    Magna.Trace
                         (
                             "PftBreak::Execute: "
                             + "break inside the group"
@@ -199,7 +191,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     throw new PftBreakException(this);
                 }
 
-                PftNode possibleCondition = Parent;
+                var possibleCondition = Parent;
                 if (possibleCondition is PftConditionalStatement)
                 {
                     //PftNode possibleGroup = condition.Parent;
@@ -221,7 +213,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 // Это не группа, а оператор for
                 // или что-нибудь в этом роде
 
-                Log.Trace
+                Magna.Trace
                     (
                         "PftBreak::Execute: "
                         + "break outside the group"
@@ -246,11 +238,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 

@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftConditionAndOr.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -17,26 +21,21 @@ using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Logging;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftConditionAndOr
         : PftCondition
     {
@@ -45,20 +44,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Left operand.
         /// </summary>
-        [CanBeNull]
-        public PftCondition LeftOperand { get; set; }
+        public PftCondition? LeftOperand { get; set; }
 
         /// <summary>
         /// Operation.
         /// </summary>
-        [CanBeNull]
-        public string Operation { get; set; }
+        public string? Operation { get; set; }
 
         /// <summary>
         /// Right operand.
         /// </summary>
-        [CanBeNull]
-        public PftCondition RightOperand { get; set; }
+        public PftCondition? RightOperand { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -88,7 +84,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // Nothing to do here
 
-                Log.Error
+                Magna.Error
                     (
                         "PftConditionAndOr::Children: "
                         + "set value="
@@ -233,7 +229,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            LeftOperand 
+            LeftOperand
                 = (PftCondition) PftSerializer.DeserializeNullable(reader);
             Operation = reader.ReadNullableString();
             RightOperand
@@ -250,7 +246,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (ReferenceEquals(LeftOperand, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftConditionAndOr::Execute: "
                         + "LeftOperand not set"
@@ -266,7 +262,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 if (string.IsNullOrEmpty(Operation))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftConditionAndOr::Execute: "
                             + "Operation not set"
@@ -288,7 +284,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 }
                 else
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftConditionAndOr::Execute: "
                             + "unexpected operation="

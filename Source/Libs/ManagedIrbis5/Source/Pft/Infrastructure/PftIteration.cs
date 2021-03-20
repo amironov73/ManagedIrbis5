@@ -1,7 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftIteration.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftIteration.cs -- итерация для for/foreach и т. п.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -10,12 +16,13 @@
 using System;
 using System.Threading.Tasks;
 
-using AM.Collections;
-
+using AM;
 
 using ManagedIrbis.Pft.Infrastructure.Ast;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -90,7 +97,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftIteration::_Run",
                         exception
@@ -99,10 +106,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 Exception = exception;
             }
         }
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 
@@ -119,10 +122,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Object members
 
         /// <see cref="object.ToString"/>
-        public override string ToString()
-        {
-            return Index.ToString();
-        }
+        public override string ToString() => Index.ToString();
 
         #endregion
     }

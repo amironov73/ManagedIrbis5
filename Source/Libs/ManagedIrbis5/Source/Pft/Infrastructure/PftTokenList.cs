@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftTokenList.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -13,18 +19,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-
-
-
+using AM;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// List of tokens.
     /// </summary>
-
     public sealed class PftTokenList
     {
         #region Properties
@@ -128,9 +133,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 TextWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
-
             writer.WriteLine
                 (
                     "Total tokens: {0}",
@@ -153,7 +155,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (!result)
             {
-                Log.Trace
+                Magna.Trace
                     (
                         "PftTokenList::MoveNext: "
                         + "end of list"
@@ -171,7 +173,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             int newPosition = _position + 1;
             if (newPosition >= _tokens.Length)
             {
-                Log.Trace
+                Magna.Trace
                     (
                         "PftTokenList::Peek: "
                         + "end of list"
@@ -195,7 +197,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             if (newPosition < 0
                 || newPosition >= _tokens.Length)
             {
-                Log.Trace
+                Magna.Trace
                     (
                         "PftTokenList::Peek: "
                         + "end of list"
@@ -214,7 +216,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             if (!MoveNext())
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftTokenList::RequreNext: "
                         + "no next token"
@@ -237,7 +239,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             RequireNext();
             if (Current.Kind != kind)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftTokenList::RequireNext: "
                         + "expected="
@@ -270,8 +272,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int position
             )
         {
-            Code.Nonnegative(position, "position");
-
             _position = position;
 
             return this;
@@ -288,14 +288,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get segment (span) of the token list.
         /// </summary>
-        [CanBeNull]
-        public PftTokenList Segment
+        public PftTokenList? Segment
             (
                 PftTokenKind[] stop
             )
         {
-            Code.NotNull(stop, "stop");
-
             int savePosition = _position;
             int foundPosition = -1;
 
@@ -337,8 +334,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get segment (span) of the token list.
         /// </summary>
-        [CanBeNull]
-        internal PftTokenList Segment
+        internal PftTokenList? Segment
             (
                 TokenPair[] pairs,
                 PftTokenKind[] open,
@@ -346,11 +342,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftTokenKind[] stop
             )
         {
-            Code.NotNull(pairs, "pairs");
-            Code.NotNull(open, "open");
-            Code.NotNull(close, "close");
-            Code.NotNull(stop, "stop");
-
             int savePosition = _position;
             int foundPosition = -1;
 
@@ -390,7 +381,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             stack.Verify();
             if (foundPosition < 0)
             {
-                Log.Trace
+                Magna.Trace
                     (
                         "PftTokenList::Segment: "
                         + "not found"
@@ -419,18 +410,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get segment (span) of the token list.
         /// </summary>
-        [CanBeNull]
-        public PftTokenList Segment
+        public PftTokenList? Segment
             (
                 PftTokenKind[] open,
                 PftTokenKind[] close,
                 PftTokenKind[] stop
             )
         {
-            Code.NotNull(open, "open");
-            Code.NotNull(close, "close");
-            Code.NotNull(stop, "stop");
-
             int savePosition = _position;
             int foundPosition = -1;
 
@@ -469,7 +455,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (level != 0)
             {
-                Log.Error
+                Magna.Error
                 (
                     "PftTokenList::Segment: "
                     + "unbalanced="
@@ -480,7 +466,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             if (foundPosition < 0)
             {
-                Log.Trace
+                Magna.Trace
                     (
                         "PftTokenList::Segment: "
                         + "not found"
@@ -514,9 +500,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int howMany
             )
         {
-            Code.Positive(howMany, "howMany");
-
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             int index = _position - howMany;
             if (index < 0)
             {

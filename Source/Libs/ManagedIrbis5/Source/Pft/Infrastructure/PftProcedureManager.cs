@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftProcedureManager.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -13,17 +19,15 @@ using AM;
 using AM.Collections;
 using AM.IO;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// Procedure manager.
     /// </summary>
-
     public sealed class PftProcedureManager
     {
         #region Properties
@@ -60,8 +64,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             int count = reader.ReadPackedInt32();
             for (int i = 0; i < count; i++)
             {
@@ -80,36 +82,22 @@ namespace ManagedIrbis.Pft.Infrastructure
             (
                 PftContext context,
                 string name,
-                [CanBeNull] string argument
+                string? argument
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNullNorEmpty(name, "name");
-
-            PftProcedure procedure = FindProcedure(name);
-            if (!ReferenceEquals(procedure, null))
-            {
-                procedure.Execute
-                    (
-                        context,
-                        argument
-                    );
-            }
+            var procedure = FindProcedure(name);
+            procedure?.Execute(context, argument);
         }
 
         /// <summary>
         /// Find specified procedure.
         /// </summary>
-        [CanBeNull]
-        public PftProcedure FindProcedure
+        public PftProcedure? FindProcedure
             (
                 string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            PftProcedure result;
-            Registry.TryGetValue(name, out result);
+            Registry.TryGetValue(name, out PftProcedure? result);
 
             return result;
         }
@@ -122,10 +110,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            PftProcedure result;
-            Registry.TryGetValue(name, out result);
+            Registry.TryGetValue(name, out PftProcedure? result);
 
             return !ReferenceEquals(result, null);
         }
@@ -138,8 +123,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer.WritePackedInt32(Registry.Count);
             foreach (PftProcedure procedure in Registry.Values)
             {

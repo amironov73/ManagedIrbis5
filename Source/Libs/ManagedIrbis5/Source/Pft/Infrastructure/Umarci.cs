@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* Umarci.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -12,10 +18,9 @@ using System;
 using AM;
 using AM.Collections;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -96,7 +101,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Find action for specified expression.
         /// </summary>
-        public static Action<PftContext, PftNode, string> FindAction
+        public static Action<PftContext, PftNode, string>? FindAction
             (
                 ref string expression
             )
@@ -182,7 +187,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            RecordField field = context.Record.Fields
+            var field = context.Record.Fields
                 .GetField(tag.SafeToInt32(), context.Index);
             if (ReferenceEquals(field, null))
             {
@@ -237,7 +242,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            RecordField field = context.Record.Fields
+            var field = context.Record.Fields
                 .GetField(tag.SafeToInt32(), context.Index);
             if (ReferenceEquals(field, null))
             {
@@ -308,7 +313,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            RecordField field = context.Record.Fields
+            var field = context.Record.Fields
                 .GetField(tag.SafeToInt32(), context.Index);
             if (ReferenceEquals(field, null))
             {
@@ -420,7 +425,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 code = parts[1].ToCharArray().GetOccurrence(0);
             }
 
-            RecordField field = context.Record.Fields
+            var field = context.Record.Fields
                 .GetField(tag.SafeToInt32(), context.Index);
             if (ReferenceEquals(field, null))
             {
@@ -468,7 +473,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            RecordField field = record.Fields.GetField
+            var field = record.Fields.GetField
                 (
                     tag.SafeToInt32(),
                     context.Index
@@ -542,12 +547,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string expression
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(node, "node");
-
             if (string.IsNullOrEmpty(expression))
             {
-                Log.Trace
+                Magna.Trace
                     (
                         "Umarci::Execute: "
                         + "empty expression"
@@ -556,12 +558,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            Action<PftContext, PftNode, string> action
-                = FindAction(ref expression);
-
+            var action = FindAction(ref expression);
             if (ReferenceEquals(action, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "Umarci::Execute: "
                         + "unknown action="

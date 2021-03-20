@@ -1,10 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftFunctionManager.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,23 +18,16 @@ using System;
 using System.Collections.Generic;
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// Function manager.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftFunctionManager
     {
         #region Properties
@@ -37,20 +35,18 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Function registry.
         /// </summary>
-        [NotNull]
-        public Dictionary<string, FunctionDescriptor> Registry { get; private set; }
+        public Dictionary<string, FunctionDescriptor> Registry { get; }
+            = new(StringComparer.InvariantCultureIgnoreCase);
 
         /// <summary>
         /// Builtin functions.
         /// </summary>
-        [NotNull]
-        public static PftFunctionManager BuiltinFunctions { get; private set; }
+        public static PftFunctionManager BuiltinFunctions { get; } = new();
 
         /// <summary>
         /// User defined functions.
         /// </summary>
-        [NotNull]
-        public static PftFunctionManager UserFunctions { get; private set; }
+        public static PftFunctionManager UserFunctions { get; } = new();
 
         #endregion
 
@@ -61,21 +57,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         static PftFunctionManager()
         {
-            BuiltinFunctions = new PftFunctionManager();
-            UserFunctions = new PftFunctionManager();
-
             StandardFunctions.Register();
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PftFunctionManager()
-        {
-            Registry = new Dictionary<string, FunctionDescriptor>
-                (
-                    StringComparer.CurrentCultureIgnoreCase
-                );
         }
 
         #endregion
@@ -89,16 +71,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Quick add the function.
         /// </summary>
-        [NotNull]
         public PftFunctionManager Add
             (
-                [NotNull] string name,
-                [NotNull] PftFunction function
+                string name,
+                PftFunction function
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            FunctionDescriptor descriptor = new FunctionDescriptor
+            var descriptor = new FunctionDescriptor
             {
                 Name = name,
                 Function = function
@@ -114,22 +93,16 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public static void ExecuteFunction
             (
-                [NotNull] string name,
-                [NotNull] PftContext context,
-                [NotNull] PftNode node,
-                [NotNull] PftNode[] arguments
+                string name,
+                PftContext context,
+                PftNode node,
+                PftNode[] arguments
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-            Code.NotNull(context, "context");
-            Code.NotNull(node, "node");
-            Code.NotNull(arguments, "arguments");
-
-            FunctionDescriptor descriptor;
             if (!UserFunctions.Registry.TryGetValue
                 (
                     name,
-                    out descriptor
+                    out FunctionDescriptor? descriptor
                 ))
             {
                 if (!BuiltinFunctions.Registry.TryGetValue
@@ -138,7 +111,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         out descriptor
                     ))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftFunctionManager::ExecuteFunction: "
                             + "unknown function="
@@ -153,7 +126,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 }
             }
 
-            descriptor.Function
+            descriptor.Function?.Invoke
                 (
                     context,
                     node,
@@ -164,16 +137,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Find specified function.
         /// </summary>
-        [CanBeNull]
-        public FunctionDescriptor FindFunction
+        public FunctionDescriptor? FindFunction
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            FunctionDescriptor result;
-            Registry.TryGetValue(name, out result);
+            Registry.TryGetValue(name, out FunctionDescriptor? result);
 
             return result;
         }
@@ -183,11 +152,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public bool HaveFunction
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             return Registry.ContainsKey(name);
         }
 
@@ -196,16 +163,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public void RegisterFunction
             (
-                [NotNull] string name,
-                [NotNull] PftFunction function
+                string name,
+                PftFunction function
             )
         {
-            Code.NotNullNorEmpty(name,"name");
-            Code.NotNull(function, "function");
-
-            if (name.OneOf(PftUtility.GetReservedWords()))
+            if (name.IsOneOf(PftUtility.GetReservedWords()))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftFunctionManager::RegisterFunction: "
                         + "reserved word="
@@ -217,7 +181,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (HaveFunction(name))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftFunctionManager::RegisterFunction: "
                         + "already registered: "

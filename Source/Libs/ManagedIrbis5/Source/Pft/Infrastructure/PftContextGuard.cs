@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftContextGuard.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -10,17 +16,15 @@
 using System;
 using System.Diagnostics;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     ///
     /// </summary>
-
     [DebuggerDisplay("{ChildContext}")]
     public struct PftContextGuard
         : IDisposable
@@ -50,8 +54,6 @@ namespace ManagedIrbis.Pft.Infrastructure
             )
             : this()
         {
-            Code.NotNull(parentContext, "parentContext");
-
             ParentContext = parentContext;
             ChildContext = parentContext.Push();
         }

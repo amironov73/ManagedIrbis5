@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftParser.Arith.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -18,12 +24,9 @@ using AM;
 using AM.IO;
 using AM.Text;
 
-
-
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -52,7 +55,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 );
             if (ReferenceEquals(newTokens, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseArithmetic: "
                         + "syntax error"
@@ -128,7 +131,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             if (Tokens.IsEof)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseValue: "
                         + "unexpected end of stream"

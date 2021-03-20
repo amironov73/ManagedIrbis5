@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftParser.Infrastructure.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -19,12 +25,9 @@ using AM.Collections;
 using AM.IO;
 using AM.Text;
 
-
-
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -93,8 +96,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
         }
 
-        [CanBeNull]
-        private PftNode NestedContext
+        private PftNode? NestedContext
             (
                 PftTokenList newTokens,
                 Func<PftNode> function
@@ -122,8 +124,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Create next AST node from token list.
         /// </summary>
-        [CanBeNull]
-        public PftNode Get
+        public PftNode? Get
             (
                 Dictionary<PftTokenKind, Func<PftNode>> map,
                 PftTokenKind[] expectedTokens
@@ -137,7 +138,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 Func<PftNode> function;
                 if (!map.TryGetValue(token.Kind, out function))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::Get: "
                             + "don't know to handle token="
@@ -284,7 +285,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return result;
             }
 
-            Log.Error
+            Magna.Error
                 (
                     "PftParser::ParseNext: "
                     + "can't get build node"

@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftSerializer.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,25 +20,19 @@ using System.IO.Compression;
 
 using AM;
 using AM.IO;
-using AM.Logging;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Serialization
 {
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public static class PftSerializer
     {
         #region Private members
@@ -47,16 +45,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
 
         private static int _CurrentVersion()
         {
-            int result =
-#if !UAP
-
-                IrbisConnection.ClientVersion.Revision;
-
-#else
-
-                2300;
-
-#endif
+            int result =  Connection.ClientVersion.Revision;
 
             return result;
         }
@@ -68,26 +57,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// <summary>
         /// Deserialize the node.
         /// </summary>
-        [NotNull]
         public static PftNode Deserialize
             (
-                [NotNull] BinaryReader reader
+                BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             byte code = reader.ReadByte();
             TypeMap mapping = TypeMap.FindCode(code);
 
             if (ReferenceEquals(mapping, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftSerializer::Deserialize: "
                         + "unknown code="
                         + code
                     );
-                Log.Error
+                Magna.Error
                     (
                         "PftSerializer::Deserialize: "
                         + "offset="
@@ -109,24 +95,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftSerializer::Deserialize",
                         exception
                     );
-                Log.Error
+                Magna.Error
                     (
                         "PftSerializer::Deserialize: "
                         + "can't create instance of "
                         + mapping.Type.AssemblyQualifiedName
                     );
-                Log.Error
+                Magna.Error
                     (
                         "PftSerializer::Deserialize: "
                         + "problem with code="
                         + code
                     );
-                Log.Error
+                Magna.Error
                     (
                         "PftSerializer::Deserialize: "
                         + "offset="
@@ -150,13 +136,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void Deserialize
             (
-                [NotNull] BinaryReader reader,
-                [NotNull] ICollection<PftNode> nodes
+                BinaryReader reader,
+                ICollection<PftNode> nodes
             )
         {
-            Code.NotNull(reader, "reader");
-            Code.NotNull(nodes, "nodes");
-
             int count = reader.ReadPackedInt32();
             for (int i = 0; i < count; i++)
             {
@@ -168,16 +151,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// <summary>
         /// Deserialize nullable node.
         /// </summary>
-        [CanBeNull]
-        public static PftNode DeserializeNullable
+        public static PftNode? DeserializeNullable
             (
-                [NotNull] BinaryReader reader
+                BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             bool flag = reader.ReadBoolean();
-            PftNode result = flag
+            var result = flag
                 ? Deserialize(reader)
                 : null;
 
@@ -187,24 +167,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// <summary>
         /// Restore the program from the byte array.
         /// </summary>
-        [NotNull]
         public static PftNode FromMemory
             (
-                [NotNull] byte[] bytes
+                byte[] bytes
             )
         {
-            Code.NotNull(bytes, "bytes");
-
-            PftNode result;
             MemoryStream memory = new MemoryStream(bytes);
 
-            using (DeflateStream compressor
-                = new DeflateStream(memory, CompressionMode.Decompress))
-            using (BinaryReader reader
-                = new BinaryReader(compressor, IrbisEncoding.Utf8))
-            {
-                result = Read(reader);
-            }
+            using var compressor
+                = new DeflateStream(memory, CompressionMode.Decompress);
+            using var reader
+                = new BinaryReader(compressor, IrbisEncoding.Utf8);
+                PftNode result = Read(reader);
 
             return result;
         }
@@ -212,26 +186,25 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// <summary>
         /// Read the AST from the stream.
         /// </summary>
-        [NotNull]
         public static PftNode Read
             (
-                [NotNull] BinaryReader reader
+                BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             byte[] signature = new byte[4];
             reader.Read(signature, 0, 4);
             if (ArrayUtility.Compare(signature, _signature) != 0)
             {
                 throw new IrbisException();
             }
+
             int actualVersion = reader.ReadInt32();
             int expectedVersion = _CurrentVersion();
             if (actualVersion != expectedVersion)
             {
                 throw new IrbisException();
             }
+
             /*int offset = */ reader.ReadInt32();
             //reader.BaseStream.Position = offset;
             PftNode result = Deserialize(reader);
@@ -244,22 +217,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static PftNode Read
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
+            using var stream = File.OpenRead(fileName);
+            using var compressor
+                = new DeflateStream(stream, CompressionMode.Decompress);
+            using var reader
+                = new BinaryReader(compressor, IrbisEncoding.Utf8);
+            var result = Read(reader);
 
-            using (Stream stream = File.OpenRead(fileName))
-
-            using (DeflateStream compressor
-                = new DeflateStream(stream, CompressionMode.Decompress))
-            using (BinaryReader reader
-                = new BinaryReader(compressor, IrbisEncoding.Utf8))
-            {
-                PftNode result = Read(reader);
-
-                return result;
-            }
+            return result;
         }
 
         /// <summary>
@@ -267,13 +235,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void Save
             (
-                [NotNull] PftNode rootNode,
-                [NotNull] BinaryWriter writer
+                PftNode rootNode,
+                BinaryWriter writer
             )
         {
-            Code.NotNull(rootNode, "rootNode");
-            Code.NotNull(writer, "writer");
-
             writer.Write(_signature);
             int version = _CurrentVersion();
             writer.Write(version);
@@ -286,13 +251,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void Save
             (
-                [NotNull] PftNode rootNode,
-                [NotNull] string fileName
+                PftNode rootNode,
+                string fileName
             )
         {
-            Code.NotNull(rootNode, "rootNode");
-            Code.NotNullNorEmpty(fileName, "fileName");
-
             using (Stream stream = File.Create(fileName))
 
             using (DeflateStream compressor
@@ -309,26 +271,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void Serialize
             (
-                [NotNull] BinaryWriter writer,
-                [NotNull] PftNode node
+                BinaryWriter writer,
+                PftNode node
             )
         {
-            Code.NotNull(writer, "writer");
-            Code.NotNull(node, "node");
-
             Type nodeType = node.GetType();
             TypeMap mapping = TypeMap.FindType(nodeType);
 
             if (ReferenceEquals(mapping, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftSerializer::Serialize: "
                         + "unknown node type="
                         + nodeType.AssemblyQualifiedName
                     );
                 PftNodeInfo nodeInfo = node.GetNodeInfo();
-                Log.Error
+                Magna.Error
                     (
                         nodeInfo.ToString()
                     );
@@ -350,13 +309,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void Serialize
             (
-                [NotNull] BinaryWriter writer,
-                [NotNull] ICollection<PftNode> nodes
+                BinaryWriter writer,
+                ICollection<PftNode> nodes
             )
         {
-            Code.NotNull(writer, "writer");
-            Code.NotNull(nodes, "nodes");
-
             writer.WritePackedInt32(nodes.Count);
             foreach (PftNode node in nodes)
             {
@@ -369,12 +325,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void SerializeNullable
             (
-                [NotNull] BinaryWriter writer,
-                [CanBeNull] PftNode node
+                BinaryWriter writer,
+                PftNode? node
             )
         {
-            Code.NotNull(writer, "writer");
-
             if (ReferenceEquals(node, null))
             {
                 writer.Write(false);
@@ -389,14 +343,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// <summary>
         /// Save the program to byte array.
         /// </summary>
-        [NotNull]
         public static byte[] ToMemory
             (
-                [NotNull] PftNode rootNode
+                PftNode rootNode
             )
         {
-            Code.NotNull(rootNode, "rootNode");
-
             // TODO Think about MemoryManager.GetMemoryStream
             MemoryStream memory = new MemoryStream();
 

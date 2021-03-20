@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftMask.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -8,13 +14,9 @@
 #region Using directives
 
 using System.Linq;
-
 using AM;
 using AM.Collections;
 using AM.Text;
-
-
-
 
 #endregion
 
@@ -126,10 +128,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string specification
             )
         {
-            Code.NotNull(specification, "specification");
-
             Alternatives = new NonNullCollection<string>();
-            string[] parts = StringUtility.SplitString(specification, "|");
+            string[] parts = Utility.SplitString(specification, "|");
             Alternatives.AddRange(parts);
         }
 
@@ -145,8 +145,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            Code.NotNull(text, "text");
-
             Mask[] masks = Alternatives.Select(_ => new Mask(_)).ToArray();
             TextNavigator navigator = new TextNavigator(text);
 

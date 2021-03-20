@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftProgram.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -8,25 +14,21 @@
 #region Using directives
 
 using System.IO;
-
+using AM;
 using AM.Text.Output;
-
-
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-
 #endregion
 
-// ReSharper disable VirtualMemberCallInConstructor
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// AST root node.
     /// </summary>
-
     public class PftProgram
         : PftNode
     {
@@ -101,8 +103,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
             try
             {
                 context.Procedures = Procedures;
@@ -112,7 +112,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 // It was break operator
 
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftProgram::Execute",
                         exception
@@ -127,7 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 // It was exit operator
 
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftProgram::Execute",
                         exception

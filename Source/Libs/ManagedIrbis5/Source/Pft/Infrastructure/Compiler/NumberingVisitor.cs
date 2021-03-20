@@ -1,19 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* NumberingVisitor.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* NumberingVisitor.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Walking;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
@@ -22,7 +26,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
     {
         #region Properties
 
-        [NotNull]
         public NodeDictionary Dictionary { get; private set; }
 
         public int LastId { get; private set; }
@@ -33,7 +36,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
         public NumberingVisitor
             (
-                [NotNull] NodeDictionary dictionary,
+                NodeDictionary dictionary,
                 int start
             )
         {

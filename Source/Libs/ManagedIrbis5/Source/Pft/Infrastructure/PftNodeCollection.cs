@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftNodeCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -11,19 +17,16 @@ using System.Collections.ObjectModel;
 using System.Text;
 
 using AM.Collections;
-using AM.Text;
-
-
-
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class PftNodeCollection
         : NonNullCollection<PftNode>
     {
@@ -32,8 +35,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Parent node.
         /// </summary>
-        [CanBeNull]
-        public PftNode Parent { get; internal set; }
+        public PftNode? Parent { get; internal set; }
 
         #endregion
 
@@ -44,7 +46,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftNodeCollection
             (
-                [CanBeNull] PftNode parent
+                PftNode? parent
             )
         {
             Parent = parent;
@@ -71,11 +73,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public void Optimize()
         {
-            PftNode[] array = ToArray();
+            var array = ToArray();
 
             foreach (PftNode node in array)
             {
-                PftNode optimized = node.Optimize();
+                var optimized = node.Optimize();
 
                 if (!ReferenceEquals(node, optimized))
                 {
@@ -115,8 +117,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode item
             )
         {
-            Code.NotNull(item, "item");
-
             if (!ReferenceEquals(item.Parent, null))
             {
                 if (!ReferenceEquals(item.Parent, Parent))
@@ -136,8 +136,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode item
             )
         {
-            Code.NotNull(item, "item");
-
             if (!ReferenceEquals(item.Parent, null))
             {
                 if (!ReferenceEquals(item.Parent, Parent))
@@ -178,10 +176,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             PftUtility.NodesToText(result, this);
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion

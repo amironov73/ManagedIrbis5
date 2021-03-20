@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftTest.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,27 +19,19 @@ using System.IO;
 using AM;
 using AM.ConsoleIO;
 using AM.IO;
-using AM.Logging;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Client;
-using ManagedIrbis.ImportExport;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Testing
 {
     /// <summary>
     /// Single test for PFT formatting.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftTest
     {
         #region Constants
@@ -67,13 +63,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Provider.
         /// </summary>
-        [CanBeNull]
-        public IrbisProvider Provider { get; set; }
+        public IrbisProvider? Provider { get; set; }
 
         /// <summary>
         /// Folder name.
         /// </summary>
-        [NotNull]
         public string Folder { get; private set; }
 
         #endregion
@@ -85,11 +79,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public PftTest
             (
-                [NotNull] string folder
+                string folder
             )
         {
-            Code.NotNullNorEmpty(folder, "folder");
-
             Folder = Path.GetFullPath(folder);
         }
 
@@ -118,11 +110,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public static bool IsDirectoryContainsTest
             (
-                [NotNull] string directory
+                string directory
             )
         {
-            Code.NotNullNorEmpty(directory, "directory");
-
             bool result =
                 File.Exists(Path.Combine(directory, DescriptionFileName))
                 && File.Exists(Path.Combine(directory, RecordFileName))
@@ -136,7 +126,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public PftTestResult Run
             (
-                [NotNull] string name
+                string name
             )
         {
             PftTestResult result = new PftTestResult
@@ -265,7 +255,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftTest::Run",
                         exception

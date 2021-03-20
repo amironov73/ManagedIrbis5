@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* StandardFunctions.Objects.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -19,20 +23,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Pft.Infrastructure.Ast;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -53,74 +47,49 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Create object of given type.
         /// </summary>
-        [NotNull]
         internal static OuterObject CreateObject
             (
-                [NotNull] string className
+                string className
             )
         {
-            Code.NotNullNorEmpty(className, "className");
-
-#if WINMOBILE || PocketPC
-
-            Log.Error
-                (
-                    "StandardFunctions::CreateObject: "
-                    + "not implemented"
-                );
-
-            throw new NotImplementedException();
-
-#else
-
-            Type type = Type.GetType(className, true, true)
+            var type = Type.GetType(className, true, true)
                 .ThrowIfNull("Type.GetType");
-            string name = Guid.NewGuid().ToString("N");
-            OuterObject result 
+            var name = Guid.NewGuid().ToString("N");
+            var result
                 = (OuterObject) Activator.CreateInstance(type, name);
             result.IncreaseCounter();
 
             RegisterObject(result);
 
             return result;
-
-#endif
         }
 
         /// <summary>
         /// Get object by the name.
         /// </summary>
-        [CanBeNull]
-        internal static OuterObject GetObject
+        internal static OuterObject? GetObject
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            OuterObject result;
-            Objects.TryGetValue(name, out result);
+            Objects.TryGetValue(name, out var result);
 
             return result;
         }
 
         internal static void RegisterObject
             (
-                [NotNull] OuterObject obj
+                OuterObject obj
             )
         {
-            Code.NotNull(obj, "obj");
-
             Objects.Add(obj.Name, obj);
         }
 
         internal static void UnregisterObject
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Objects.Remove(name);
         }
 
@@ -130,15 +99,15 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void CallObject(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string objName = context.GetStringArgument(arguments, 0);
-            string methodName = context.GetStringArgument(arguments, 1);
+            var objName = context.GetStringArgument(arguments, 0);
+            var methodName = context.GetStringArgument(arguments, 1);
             if (!string.IsNullOrEmpty(objName)
                 && !string.IsNullOrEmpty(methodName))
             {
-                List<string> callParameters = new List<string>();
-                for (int i = 2; i < arguments.Length; i++)
+                var callParameters = new List<string>();
+                for (var i = 2; i < arguments.Length; i++)
                 {
-                    string arg = context.GetStringArgument(arguments, i);
+                    var arg = context.GetStringArgument(arguments, i);
                     if (ReferenceEquals(arg, null))
                     {
                         break;
@@ -146,7 +115,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     callParameters.Add(arg);
                 }
 
-                OuterObject obj = GetObject(objName);
+                var obj = GetObject(objName);
                 if (!ReferenceEquals(obj, null))
                 {
                     obj.CallMethod
@@ -163,10 +132,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void CloseObject(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string name = context.GetStringArgument(arguments, 0);
+            var name = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(name))
             {
-                OuterObject obj = GetObject(name);
+                var obj = GetObject(name);
                 if (!ReferenceEquals(obj, null))
                 {
                     if (obj.DecreaseCounter() <= 0)
@@ -179,10 +148,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void CreateObject(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string className = context.GetStringArgument(arguments, 0);
+            var className = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(className))
             {
-                OuterObject obj = CreateObject(className);
+                var obj = CreateObject(className);
 
                 context.Write(node, obj.Name);
             }
@@ -190,10 +159,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void OpenObject(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string name = context.GetStringArgument(arguments, 0);
+            var name = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(name))
             {
-                OuterObject obj = GetObject(name);
+                var obj = GetObject(name);
                 if (!ReferenceEquals(obj, null))
                 {
                     obj.IncreaseCounter();

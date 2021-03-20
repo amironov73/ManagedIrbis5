@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftNode.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -17,18 +23,14 @@ using AM;
 using AM.Collections;
 using AM.IO;
 
-
-
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 using ManagedIrbis.Pft.Infrastructure.Walking;
 
-
 #endregion
 
-// ReSharper disable ConvertIfStatementToNullCoalescingExpression
-// ReSharper disable DoNotCallOverridableMethodsInConstructor
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -47,12 +49,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Вызывается непосредственно перед выполнением.
         /// </summary>
-        public event EventHandler<PftDebugEventArgs> BeforeExecution;
+        public event EventHandler<PftDebugEventArgs>? BeforeExecution;
 
         /// <summary>
         /// Вызывается непосредственно после выполнения.
         /// </summary>
-        public event EventHandler<PftDebugEventArgs> AfterExecution;
+        public event EventHandler<PftDebugEventArgs>? AfterExecution;
 
         #endregion
 
@@ -61,8 +63,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Parent node.
         /// </summary>
-        [CanBeNull]
-        public PftNode Parent { get; internal set; }
+        public PftNode? Parent { get; internal set; }
 
         /// <summary>
         /// Breakpoint.
@@ -106,8 +107,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Text.
         /// </summary>
-        [CanBeNull]
-        public virtual string Text { get; set; }
+        public virtual string? Text { get; set; }
 
         /// <summary>
         /// Whether the node is complex expression?
@@ -127,8 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Help for the node.
         /// </summary>
-        [CanBeNull]
-        public virtual string Help { get { return null; } }
+        public virtual string? Help { get { return null; } }
 
         /// <summary>
         /// Whether the node requires server connection to evaluate.
@@ -159,8 +158,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftToken token
             )
         {
-            Code.NotNull(token, "token");
-
             LineNumber = token.Line;
             Column = token.Column;
             Text = token.Text;
@@ -270,17 +267,17 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         protected void OnAfterExecution
             (
-                [CanBeNull] PftContext context
+                PftContext? context
             )
         {
             var handler = AfterExecution;
-            if (handler != null)
+            if (handler is not null)
             {
-                PftDebugEventArgs eventArgs = new PftDebugEventArgs
-                    (
-                        context,
-                        this
-                    );
+                var eventArgs = new PftDebugEventArgs
+                {
+                    Context = context,
+                    Node = this
+                };
                 handler(this, eventArgs);
             }
 
@@ -288,11 +285,11 @@ namespace ManagedIrbis.Pft.Infrastructure
                 && !ReferenceEquals(context, null)
                 && !ReferenceEquals(context.Debugger, null))
             {
-                PftDebugEventArgs eventArgs = new PftDebugEventArgs
-                    (
-                        context,
-                        this
-                    );
+                var eventArgs = new PftDebugEventArgs
+                    {
+                        Context = context,
+                        Node = this
+                    };
                 context.Debugger.Activate(eventArgs);
             }
         }
@@ -302,17 +299,17 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         protected void OnBeforeExecution
             (
-                [CanBeNull] PftContext context
+                PftContext? context
             )
         {
             var handler = BeforeExecution;
-            if (handler != null)
+            if (handler is not null)
             {
-                PftDebugEventArgs eventArgs = new PftDebugEventArgs
-                    (
-                        context,
-                        this
-                    );
+                var eventArgs = new PftDebugEventArgs
+                    {
+                        Context = context,
+                        Node = this
+                    };
                 handler(this, eventArgs);
             }
 
@@ -352,7 +349,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         protected internal virtual bool ShouldSerializeChildren()
         {
-            PftNodeCollection children = Children as PftNodeCollection;
+            var children = Children as PftNodeCollection;
 
             return !ReferenceEquals(children, null);
         }
@@ -393,8 +390,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftVisitor visitor
             )
         {
-            Code.NotNull(visitor, "visitor");
-
             if (!visitor.VisitNode(this))
             {
                 return false;
@@ -419,8 +414,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftCompiler compiler
             )
         {
-            Code.NotNull(compiler, "compiler");
-
             bool flag = ShouldSerializeChildren();
             if (flag)
             {
@@ -462,8 +455,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         /// <typeparam name="T">Type of parent to find.</typeparam>
         /// <returns>Found parent node or <c>null</c>.</returns>
-        [CanBeNull]
-        public PftNode FindParent<T>()
+        public PftNode? FindParent<T>()
         {
             PftNode candidate = Parent;
 
@@ -575,13 +567,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// Считается, что непосредственный родитель имеет уровень 0.
         /// </param>
         /// <returns>Найденный родительский узел либо <c>null</c>.</returns>
-        [CanBeNull]
-        public PftNode GetParent
+        public PftNode? GetParent
             (
                 int level
             )
         {
-            PftNode node = this;
+            PftNode? node = this;
 
             while (!ReferenceEquals(node, null))
             {
@@ -605,10 +596,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// это означает, что данный узел и всех
         /// его потомков можно безболезненно удалить.
         /// </remarks>
-        [CanBeNull]
-        public virtual PftNode Optimize()
+        public virtual PftNode? Optimize()
         {
-            PftNodeCollection children = Children as PftNodeCollection;
+            var children = Children as PftNodeCollection;
             if (!ReferenceEquals(children, null))
             {
                 children.Optimize();
@@ -645,8 +635,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftPrettyPrinter printer
             )
         {
-            Code.NotNull(printer, "printer");
-
             if (ShouldSerializeChildren())
             {
                 printer.WriteNodes(Children);
@@ -739,7 +727,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             foreach (PftNode child in Children)
             {

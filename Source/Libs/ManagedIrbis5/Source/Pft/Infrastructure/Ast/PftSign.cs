@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftSign.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,34 +18,25 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftSign
         : PftNumeric
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -59,11 +54,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftSign
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Sign);
         }
 
@@ -72,11 +66,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftSign
             (
-                [NotNull] PftNumeric value
+                PftNumeric value
             )
         {
-            Code.NotNull(value, "value");
-
             Children.Add(value);
         }
 
@@ -90,11 +82,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            PftNumeric child = Children.FirstOrDefault() as PftNumeric;
-            if (ReferenceEquals(child, null))
-            {
-                throw new PftCompilerException();
-            }
+            var child = Children.FirstOrDefault() as PftNumeric
+                ?? throw new PftCompilerException();
 
             child.Compile(compiler);
 
@@ -125,7 +114,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            PftNumeric child = Children.FirstOrDefault() as PftNumeric;
+            var child = Children.FirstOrDefault() as PftNumeric;
             if (!ReferenceEquals(child, null))
             {
                 child.Execute(context);
@@ -150,10 +139,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -162,13 +148,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("sign(");
-            PftNode child = Children.FirstOrDefault();
+            var child = Children.FirstOrDefault();
             if (!ReferenceEquals(child, null))
             {
                 result.Append(child);
             }
+
             result.Append(')');
 
             return result.ToString();

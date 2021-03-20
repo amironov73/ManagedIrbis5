@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* FileObject.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* FileObject.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,11 +17,11 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
-using CodeJam;
-
-using JetBrains.Annotations;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -44,13 +48,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public FileObject
             (
-                [NotNull] string fileName,
+                string fileName,
                 bool writeMode,
                 bool appendMode
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
-
             FileName = fileName;
             WriteMode = writeMode;
             AppendMode = appendMode;
@@ -93,9 +95,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         #region Private members
 
-        private readonly StreamReader _reader;
+        private readonly StreamReader? _reader;
 
-        private readonly StreamWriter _writer;
+        private readonly StreamWriter? _writer;
 
         #endregion
 
@@ -103,35 +105,31 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         public string ReadAll()
         {
-            string result = _reader.ReadToEnd();
+            var result = _reader?.ReadToEnd();
 
-            return result;
+            return result ?? string.Empty;
         }
 
-        public string ReadLine()
+        public string? ReadLine()
         {
-            string result = _reader.ReadLine();
+            var result = _reader?.ReadLine();
 
             return result;
         }
 
         public void Write
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNull(text, "text");
-
-            _writer.Write(text);
+            _writer?.Write(text);
         }
 
         public void WriteLine
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNull(text, "text");
-
             _writer.WriteLine(text);
         }
 

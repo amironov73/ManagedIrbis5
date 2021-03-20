@@ -18,6 +18,8 @@
 
 #endregion
 
+using AM.PlatformAbstraction;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 
@@ -34,6 +36,11 @@ namespace ManagedIrbis.Client
         /// Текущая база данных.
         /// </summary>
         public string? Database { get; set; }
+
+        /// <summary>
+        /// Слой платформенной абстракции.
+        /// </summary>
+        public abstract PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
         /// <summary>
         /// Чтение файла с сервера.

@@ -1,6 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftProcedure.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -13,19 +20,17 @@ using System.IO;
 using AM;
 using AM.IO;
 
-
-
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// Procedure.
     /// </summary>
-
     public sealed class PftProcedure
         : ICloneable
     {
@@ -39,8 +44,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Procedure name.
         /// </summary>
-        [CanBeNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         #endregion
 
@@ -68,8 +72,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             Name = reader.ReadNullableString();
             PftSerializer.Deserialize(reader, Body);
         }
@@ -80,21 +82,16 @@ namespace ManagedIrbis.Pft.Infrastructure
         public void Execute
             (
                 PftContext context,
-                [CanBeNull] string argument
+                string? argument
             )
         {
-            Code.NotNull(context, "context");
-
-            using (PftContextGuard guard = new PftContextGuard(context))
-            {
-                PftContext nested = guard.ChildContext;
-                nested.Output = context.Output;
-                PftVariableManager variables
-                    = new PftVariableManager(context.Variables);
-                variables.SetVariable("arg", argument);
-                nested.SetVariables(variables);
-                nested.Execute(Body);
-            }
+            using PftContextGuard guard = new PftContextGuard(context);
+            var nested = guard.ChildContext;
+            nested.Output = context.Output;
+            var variables = new PftVariableManager(context.Variables);
+            variables.SetVariable("arg", argument);
+            nested.SetVariables(variables);
+            nested.Execute(Body);
         }
 
         /// <summary>
@@ -105,8 +102,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer.WriteNullable(Name);
             PftSerializer.Serialize(writer, Body);
         }

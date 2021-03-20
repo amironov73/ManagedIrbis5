@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* HtmlDriver.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* HtmlDriver.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -22,21 +26,15 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Text
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class HtmlDriver
         : TextDriver
     {
@@ -56,7 +54,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// </summary>
         public HtmlDriver
             (
-                [NotNull] PftOutput output
+                PftOutput output
             )
             : base(output)
         {
@@ -69,7 +67,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         #endregion
 
         #region Public methods
-        
+
         #endregion
 
         #region TextDriver members

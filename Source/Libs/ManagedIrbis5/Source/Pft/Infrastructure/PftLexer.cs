@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftLexer.cs -- lexer for PFT.
  * Ars Magna project, http://arsmagna.ru
  */
@@ -16,12 +22,9 @@ using AM;
 using AM.Collections;
 using AM.Text;
 
-
-
-
 #endregion
 
-// ReSharper disable ConvertClosureToMethodGroup
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -35,13 +38,11 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private TextNavigator _navigator;
 
-        // ReSharper disable once InconsistentNaming
         private static char[] Integer =
             {
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
             };
 
-        // ReSharper disable once InconsistentNaming
         private static char[] Identifier =
             {
                 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
@@ -65,7 +66,6 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private int Column { get { return _navigator.Column; } }
 
-        // ReSharper disable once InconsistentNaming
         private bool IsEOF { get { return _navigator.IsEOF; } }
 
         private int Line { get { return _navigator.Line; } }
@@ -82,8 +82,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             return _navigator.ReadCharNoCrLf();
         }
 
-        [CanBeNull]
-        private FieldSpecification ReadField()
+        private FieldSpecification? ReadField()
         {
             FieldSpecification result = new FieldSpecification();
 
@@ -99,8 +98,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result;
         }
 
-        [CanBeNull]
-        private string ReadIdentifier()
+        private string? ReadIdentifier()
         {
             if (IsEOF)
             {
@@ -166,8 +164,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result.ToString();
         }
 
-        [CanBeNull]
-        private string ReadInteger()
+        private string? ReadInteger()
         {
             StringBuilder result = new StringBuilder();
 
@@ -193,8 +190,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result.ToString();
         }
 
-        [CanBeNull]
-        private string ReadFloat()
+        private string? ReadFloat()
         {
             StringBuilder result = new StringBuilder();
 
@@ -324,7 +320,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     Column
                 );
 
-            Log.Error
+            Magna.Error
                 (
                     "PftLexer::ThrowSyntax: "
                     + message
@@ -345,9 +341,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            Code.NotNull(text, "text");
-
-            LocalList<PftToken> result = new LocalList<PftToken>();
+            var result = new List<PftToken>();
             _navigator = new TextNavigator(text);
 
             while (!IsEOF)

@@ -1,7 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* IndexSpecification.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* IndexSpecification.cs -- спецификация индекса для поля/подполя
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,16 +19,14 @@ using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Text;
-
-
 
 using ManagedIrbis.Pft.Infrastructure.Ast;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -60,14 +64,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Index specified by expression.
         /// </summary>
-        [CanBeNull]
-        public string Expression { get; set; }
+        public string? Expression { get; set; }
 
         /// <summary>
         /// Compiled <see cref="Expression" />.
         /// </summary>
-        [CanBeNull]
-        public PftNumeric Program { get; set; }
+        public PftNumeric? Program { get; set; }
 
         #endregion
 
@@ -180,8 +182,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             Kind = (IndexKind)reader.ReadPackedInt32();
             Literal = reader.ReadPackedInt32();
             Expression = reader.ReadNullableString();
@@ -260,8 +260,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer
                 .WritePackedInt32((int)Kind)
                 .WritePackedInt32(Literal)
@@ -278,7 +276,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return string.Empty;
             }
 
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append('[');
             switch (Kind)
             {
@@ -308,7 +306,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             result.Append(']');
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion
@@ -333,7 +331,8 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="ICloneable.Clone" />
         public object Clone()
         {
-            IndexSpecification result = (IndexSpecification)MemberwiseClone();
+            // TODO сделать ручное копирование?
+            var result = (IndexSpecification)MemberwiseClone();
 
             // Reset the program
             result.Program = null;
@@ -350,12 +349,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             if (Kind == IndexKind.Literal)
             {
-                return string.Format
-                    (
-                        "{0}: {1}",
-                        Kind,
-                        Literal
-                    );
+                return $"{Kind}: {Literal}";
             }
 
             if (Kind != IndexKind.Expression)
@@ -363,15 +357,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return Kind.ToString();
             }
 
-            return string.Format
-                (
-                    "{0}: {1}",
-                    Kind,
-                    Expression
-                );
+            return $"{Kind}: {Expression}";
         }
 
         #endregion
-    }
-}
+
+    } // class IndexSpecification
+
+} // ManagedIrbis.Pft.Infrastructure
 

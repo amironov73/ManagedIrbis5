@@ -1,39 +1,39 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftContext.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftContext.cs -- контекст, в котором исполняется PFT-скрипт
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 using AM;
 using AM.Text;
 
-
-
 using ManagedIrbis.Client;
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-
-using Newtonsoft.Json;
-
 #endregion
 
-// ReSharper disable ConvertIfStatementToNullCoalescingExpression
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// Контекст форматирования
+    /// Контекст, в котором исполняется PFT-скрипт
     /// </summary>
-
     public sealed class PftContext
         : MarshalByRefObject,
         IDisposable
@@ -53,13 +53,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Родительский контекст.
         /// </summary>
-        public PftContext Parent { get { return _parent; } }
+        public PftContext? Parent { get { return _parent; } }
 
         /// <summary>
         /// Текущая форматируемая запись.
         /// </summary>
-        [CanBeNull]
-        public Record Record { get; set; }
+        public Record? Record { get; set; }
 
         /// <summary>
         /// Alternative record (for nested context).
@@ -97,8 +96,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Текущая группа (если есть).
         /// </summary>
-        [CanBeNull]
-        public PftGroup CurrentGroup { get; set; }
+        public PftGroup? CurrentGroup { get; set; }
 
         /// <summary>
         /// Номер повторения в текущей группе.
@@ -118,8 +116,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Текущее обрабатываемое поле записи, если есть.
         /// </summary>
-        [CanBeNull]
-        public PftField CurrentField { get; set; }
+        public PftField? CurrentField { get; set; }
 
         #endregion
 
@@ -151,8 +148,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Debugger (if attached).
         /// </summary>
-        [CanBeNull]
-        public PftDebugger Debugger { get; set; }
+        public PftDebugger? Debugger { get; set; }
 
         /// <summary>
         /// Post processing flags.
@@ -178,10 +174,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext
             (
-                [CanBeNull] PftContext parent
+                PftContext? parent
             )
         {
-            Log.Trace("PftContext::Constructor");
+            Magna.Trace("PftContext::Constructor");
 
             _parent = parent;
 
@@ -189,7 +185,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 ? new LocalProvider()
                 : parent.Provider;
 
-            PftOutput parentBuffer = ReferenceEquals(parent, null)
+            var parentBuffer = ReferenceEquals(parent, null)
                 ? null
                 : parent.Output;
 
@@ -237,10 +233,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         #region Private members
 
-        // ReSharper disable InconsistentNaming
-        private readonly PftContext _parent;
-
-        // ReSharper restore InconsistentNaming
+        private readonly PftContext? _parent;
 
         #endregion
 
@@ -254,17 +247,15 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
-            Log.Trace("PftContext::ActivateDebugger");
+            Magna.Trace("PftContext::ActivateDebugger");
 
             if (!ReferenceEquals(Debugger, null))
             {
-                PftDebugEventArgs args = new PftDebugEventArgs
-                    (
-                        this,
-                        node
-                    );
+                var args = new PftDebugEventArgs
+                    {
+                        Context = this,
+                        Node = node
+                    };
                 Debugger.Activate(args);
             }
         }
@@ -275,7 +266,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext ClearAll()
         {
-            Log.Trace("PftContext::ClearAll");
+            Magna.Trace("PftContext::ClearAll");
 
             Output.ClearText();
             Output.ClearError();
@@ -289,7 +280,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext ClearText()
         {
-            Log.Trace("PftContext::ClearText");
+            Magna.Trace("PftContext::ClearText");
 
             Output.ClearText();
 
@@ -305,10 +296,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int count
             )
         {
-            Code.NotNull(action, "action");
-            Code.Nonnegative(count, "count");
-
-            Log.Trace("PftContext::DoRepeatableAction");
+            Magna.Trace("PftContext::DoRepeatableAction");
 
             count = Math.Min(count, PftConfig.MaxRepeat);
 
@@ -345,18 +333,14 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode node
             )
         {
-            Code.NotNull(node, "node");
+            Magna.Trace("PftContext::Evaluate");
 
-            Log.Trace("PftContext::Evaluate");
+            using PftContextGuard guard = new PftContextGuard(this);
+            var copy = guard.ChildContext;
+            node.Execute(copy);
+            string result = copy.ToString();
 
-            using (PftContextGuard guard = new PftContextGuard(this))
-            {
-                PftContext copy = guard.ChildContext;
-                node.Execute(copy);
-                string result = copy.ToString();
-
-                return result;
-            }
+            return result;
         }
 
         /// <summary>
@@ -367,21 +351,17 @@ namespace ManagedIrbis.Pft.Infrastructure
                 IEnumerable<PftNode> items
             )
         {
-            Code.NotNull(items, "items");
+            Magna.Trace("PftContext::Evaluate");
 
-            Log.Trace("PftContext::Evaluate");
-
-            using (PftContextGuard guard = new PftContextGuard(this))
+            using PftContextGuard guard = new PftContextGuard(this);
+            var copy = guard.ChildContext;
+            foreach (var node in items)
             {
-                PftContext copy = guard.ChildContext;
-                foreach (PftNode node in items)
-                {
-                    node.Execute(copy);
-                }
-                string result = copy.ToString();
-
-                return result;
+                node.Execute(copy);
             }
+            string result = copy.ToString();
+
+            return result;
         }
 
         /// <summary>
@@ -389,10 +369,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public void Execute
             (
-                [CanBeNull] IEnumerable<PftNode> nodes
+                IEnumerable<PftNode>? nodes
             )
         {
-            Log.Trace("PftContext::Execute");
+            Magna.Trace("PftContext::Execute");
 
             if (!ReferenceEquals(nodes, null))
             {
@@ -460,16 +440,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get boolean argument value.
         /// </summary>
-        [CanBeNull]
         public bool? GetBooleanArgument
             (
                 PftNode[] arguments,
                 int index
             )
         {
-            Code.NotNull(arguments, "arguments");
-
-            PftNode node = arguments.GetOccurrence(index);
+            var node = arguments.GetOccurrence(index);
             if (ReferenceEquals(node, null))
             {
                 return null;
@@ -486,8 +463,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     result = boolVal;
                 }
-                int intVal;
-                if (NumericUtility.TryParseInt32(text, out intVal))
+
+                if (int.TryParse(text, out var intVal))
                 {
                     result = intVal != 0;
                 }
@@ -506,16 +483,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get numeric argument value.
         /// </summary>
-        [CanBeNull]
         public double? GetNumericArgument
             (
                 PftNode[] arguments,
                 int index
             )
         {
-            Code.NotNull(arguments, "arguments");
-
-            PftNode node = arguments.GetOccurrence(index);
+            var node = arguments.GetOccurrence(index);
             if (ReferenceEquals(node, null))
             {
                 return null;
@@ -523,12 +497,11 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             double? result = null;
 
-            PftNumeric numeric = node as PftNumeric;
+            var numeric = node as PftNumeric;
             if (ReferenceEquals(numeric, null))
             {
-                string text = GetStringArgument(arguments, index);
-                double val;
-                if (NumericUtility.TryParseDouble(text, out val))
+                var text = GetStringArgument(arguments, index);
+                if (double.TryParse(text, out var val))
                 {
                     result = val;
                 }
@@ -547,15 +520,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get string argument value.
         /// </summary>
-        [CanBeNull]
-        public string GetStringArgument
+        public string? GetStringArgument
             (
                 PftNode[] arguments,
                 int index
             )
         {
-            Code.NotNull(arguments, "arguments");
-
             PftNode node = arguments.GetOccurrence(index);
             if (ReferenceEquals(node, null))
             {
@@ -572,15 +542,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get string argument value.
         /// </summary>
-        [CanBeNull]
-        public string GetStringValue
+        public string? GetStringValue
             (
                 PftNode[] arguments,
                 int index
             )
         {
-            Code.NotNull(arguments, "arguments");
-
             string result = GetStringArgument(arguments, index);
             if (!string.IsNullOrEmpty(result))
             {
@@ -640,8 +607,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 IrbisProvider provider
             )
         {
-            Code.NotNull(provider, "provider");
-
             Provider = provider;
         }
 
@@ -654,8 +619,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftVariableManager variables
             )
         {
-            Code.NotNull(variables, "variables");
-
             Variables = variables;
         }
 
@@ -664,8 +627,8 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext Write
             (
-                [CanBeNull] PftNode node,
-                [CanBeNull] string output
+                PftNode? node,
+                string? output
             )
         {
             if (!string.IsNullOrEmpty(output))
@@ -682,8 +645,8 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext WriteAndSetFlag
             (
-                [CanBeNull] PftNode node,
-                [CanBeNull] string output
+                PftNode? node,
+                string? output
             )
         {
             if (!string.IsNullOrEmpty(output))
@@ -701,8 +664,8 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext WriteLine
             (
-                [CanBeNull] PftNode node,
-                [CanBeNull] string value
+                PftNode? node,
+                string? value
             )
         {
             if (!string.IsNullOrEmpty(value))
@@ -718,7 +681,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext WriteLine
             (
-                [CanBeNull] PftNode node
+                PftNode? node
             )
         {
             Output.WriteLine();
@@ -733,7 +696,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
-            Log.Trace("PftContext::Dispose");
+            Magna.Trace("PftContext::Dispose");
 
             Provider.Dispose();
         }

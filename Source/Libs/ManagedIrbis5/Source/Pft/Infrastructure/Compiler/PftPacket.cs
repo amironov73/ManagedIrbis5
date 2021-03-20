@@ -1,37 +1,34 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftPacket.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftPacket.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using AM;
-using CodeJam;
-
-using JetBrains.Annotations;
-
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public abstract class PftPacket
         : MarshalByRefObject
     {
@@ -40,14 +37,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Context.
         /// </summary>
-        [NotNull]
         public PftContext Context { get; private set; }
 
         /// <summary>
         /// Current field (if any).
         /// </summary>
-        [CanBeNull]
-        public FieldSpecification CurrentField { get; set; }
+        public FieldSpecification? CurrentField { get; set; }
 
         /// <summary>
         /// In group?
@@ -57,8 +52,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Breakpoints.
         /// </summary>
-        [NotNull]
-        public Dictionary<int, object> Breakpoints { get; private set; }
+        public Dictionary<int, object> Breakpoints { get; } = new();
 
         #endregion
 
@@ -69,13 +63,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected PftPacket
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
             Context = context;
-            Breakpoints = new Dictionary<int, object>();
         }
 
         #endregion
@@ -87,10 +78,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected void CallDebugger()
         {
-            PftDebugger debugger = Context.Debugger;
+            var debugger = Context.Debugger;
             if (!ReferenceEquals(debugger, null))
             {
-                PftDebugEventArgs eventArgs = new PftDebugEventArgs
+                var eventArgs = new PftDebugEventArgs
                     (
                         Context,
                         null
@@ -104,11 +95,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public bool CanOutput
             (
-                [NotNull] FieldSpecification specification,
-                [CanBeNull] string value
+                FieldSpecification specification,
+                string? value
             )
         {
-            bool result = !string.IsNullOrEmpty(value);
+            var result = !string.IsNullOrEmpty(value);
             if (specification.Command == 'n')
             {
                 result = !result;
@@ -137,7 +128,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected void DoConditionalLiteral
             (
-                [CanBeNull] string literalText,
+                string? literalText,
                 FieldSpecification field,
                 bool isSuffix
             )
@@ -147,13 +138,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 return;
             }
 
-            bool flag = isSuffix
+            var flag = isSuffix
                 ? IsLastRepeat(field)
                 : IsFirstRepeat(field);
 
             if (flag)
             {
-                string value = GetValue(field);
+                var value = GetValue(field);
 
                 if (CanOutput(field, value))
                 {
@@ -173,9 +164,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected void DoField
             (
-                [NotNull] FieldSpecification field,
-                [CanBeNull] Action leftHand,
-                [CanBeNull] Action rightHand
+                FieldSpecification field,
+                Action? leftHand,
+                Action? rightHand
             )
         {
             if (ReferenceEquals(Context.Record, null))
@@ -185,7 +176,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
             CurrentField = field;
 
-            char command = field.Command;
+            var command = field.Command;
 
             if (command == 'v')
             {
@@ -203,18 +194,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             }
             else if (command == 'd')
             {
-                string value = GetValue(field);
+                var value = GetValue(field);
                 if (!string.IsNullOrEmpty(value))
                 {
-                    leftHand.SafeCall();
+                    leftHand?.Invoke();
                 }
             }
             else if (command == 'n')
             {
-                string value = GetValue(field);
+                var value = GetValue(field);
                 if (string.IsNullOrEmpty(value))
                 {
-                    leftHand.SafeCall();
+                    leftHand?.Invoke();
                 }
             }
 
@@ -223,18 +214,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
         private void DoFieldD
             (
-                [NotNull] FieldSpecification field,
-                [CanBeNull] Action leftHand
+                FieldSpecification field,
+                Action? leftHand
             )
         {
         }
 
         private void DoFieldG
             (
-                [CanBeNull] RecordField field,
-                [NotNull] FieldSpecification spec,
-                [CanBeNull] Action leftHand,
-                [CanBeNull] Action rightHand
+                Field? field,
+                FieldSpecification spec,
+                Action? leftHand,
+                Action? rightHand
             )
         {
             if (ReferenceEquals(field, null))
@@ -242,7 +233,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 return;
             }
 
-            leftHand.SafeCall();
+            leftHand?.Invoke();
 
             // TODO implement properly
 
@@ -259,19 +250,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             Context.OutputFlag = true;
             Context.VMonitor = true;
 
-            rightHand.SafeCall();
+            rightHand?.Invoke();
         }
 
         private void DoFieldV
             (
-                [NotNull] FieldSpecification field,
-                [CanBeNull] Action leftHand,
-                [CanBeNull] Action rightHand
+                FieldSpecification field,
+                Action? leftHand,
+                Action? rightHand
             )
         {
-            leftHand.SafeCall();
+            leftHand?.Invoke();
 
-            string value = GetValue(field);
+            var value = GetValue(field);
             if (!string.IsNullOrEmpty(value))
             {
                 if (Context.UpperMode)
@@ -287,7 +278,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 Context.VMonitor = true;
             }
 
-            rightHand.SafeCall();
+            rightHand?.Invoke();
         }
 
         /// <summary>
@@ -296,12 +287,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         protected void DoGlobal
             (
                 int index,
-                [NotNull] FieldSpecification spec,
-                [CanBeNull] Action leftHand,
-                [CanBeNull] Action rightHand
+                FieldSpecification spec,
+                Action? leftHand,
+                Action? rightHand
             )
         {
-            RecordField[] fields = Context.Globals.Get(index);
+            var fields = Context.Globals.Get(index);
             if (fields.Length == 0)
             {
                 return;
@@ -309,7 +300,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
             if (InGroup)
             {
-                RecordField field = fields.GetOccurrence(Context.Index);
+                var field = fields.GetOccurrence(Context.Index);
                 DoFieldG(field, spec, leftHand, rightHand);
             }
             else
@@ -323,10 +314,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 {
                     Context.OutputFlag = false;
 
-                    RecordField field = fields.GetOccurrence(Context.Index);
+                    var field = fields.GetOccurrence(Context.Index);
                     DoFieldG(field, spec, leftHand, rightHand);
 
-                    if (!Context.OutputFlag || Context.BreakFlag) //-V3022
+                    if (!Context.OutputFlag || Context.BreakFlag)
                     {
                         break;
                     }
@@ -341,7 +332,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected void DoGroup
             (
-                [NotNull] Action action
+                Action action
             )
         {
             InGroup = true;
@@ -355,19 +346,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected void DoRepeatableLiteral
             (
-                [CanBeNull] string text,
-                [NotNull] FieldSpecification field,
+                string? text,
+                FieldSpecification field,
                 bool isPrefix,
                 bool plus
             )
         {
-            bool flag = field.Command == 'g'
+            var flag = field.Command == 'g'
                 ? HaveGlobal(field)
                 : HaveField(field);
 
             if (flag)
             {
-                string value = GetValue(field);
+                var value = GetValue(field);
 
                 flag = CanOutput(field, value);
             }
@@ -393,7 +384,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
         private void DoRepeatableAction
             (
-                [NotNull] Action action
+                Action action
             )
         {
             for
@@ -419,34 +410,26 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Evaluate as string.
         /// </summary>
-        [CanBeNull]
-        protected string Evaluate
+        protected string? Evaluate
             (
-                [NotNull] Action action
+                Action action
             )
         {
-            Code.NotNull(action, "action");
+            using var guard = new PftContextGuard(Context);
+            Context = guard.ChildContext;
+            action();
+            var result = Context.ToString();
+            Context = guard.ParentContext;
 
-            using (PftContextGuard guard = new PftContextGuard(Context))
-            {
-                Context = guard.ChildContext;
-                action();
-                string result = Context.ToString();
-                Context = guard.ParentContext;
-
-                return result;
-            }
+            return result;
         }
 
-        [CanBeNull]
-        private string GetValue
+        private string? GetValue
             (
-                [NotNull] FieldSpecification spec
+                FieldSpecification spec
             )
         {
-            // ReSharper disable once PossibleNullReferenceException
-
-            RecordField field = spec.Command == 'g'
+            var field = spec.Command == 'g'
                 ? Context.Globals.Get(spec.Tag).GetOccurrence(Context.Index)
                 : Context.Record.Fields.GetField(spec.Tag, Context.Index);
             if (ReferenceEquals(field, null))
@@ -454,7 +437,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 return null;
             }
 
-            string result = PftUtility.GetFieldValue
+            var result = PftUtility.GetFieldValue
                 (
                     Context,
                     field,
@@ -473,8 +456,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 int newPosition
             )
         {
-            int current = Context.Output.GetCaretPosition();
-            int delta = newPosition - current;
+            var current = Context.Output.GetCaretPosition();
+            var delta = newPosition - current;
             if (delta > 0)
             {
                 Context.Write
@@ -499,12 +482,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected bool HaveField
             (
-                [NotNull] FieldSpecification spec
+                FieldSpecification spec
             )
         {
-            // ReSharper disable once PossibleNullReferenceException
-
-            RecordField field = Context.Record.Fields.GetField
+            var field = Context.Record.Fields.GetField
                 (
                     spec.Tag,
                     Context.Index
@@ -518,12 +499,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected bool HaveGlobal
             (
-                [NotNull] FieldSpecification spec
+                FieldSpecification spec
             )
         {
-            // ReSharper disable once PossibleNullReferenceException
-
-            RecordField field = Context.Globals.Get(spec.Tag)
+            var field = Context.Globals.Get(spec.Tag)
                 .GetOccurrence(Context.Index);
 
             return !ReferenceEquals(field, null);
@@ -542,7 +521,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected bool IsFirstRepeat
             (
-                [NotNull] FieldSpecification field
+                FieldSpecification field
             )
         {
             return Context.Index == 0;
@@ -553,12 +532,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         protected bool IsLastRepeat
             (
-                [NotNull] FieldSpecification field
+                FieldSpecification field
             )
         {
             // ReSharper disable once PossibleNullReferenceException
 
-            int count = Context.Record.Fields.GetFieldCount(field.Tag);
+            var count = Context.Record.Fields.GetFieldCount(field.Tag);
 
             return Context.Index >= count - 1;
         }
@@ -566,10 +545,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Start evaluate.
         /// </summary>
-        [NotNull]
         protected PftContext StartEvaluate()
         {
-            PftContext result = Context;
+            var result = Context;
             Context = new PftContext(result);
 
             return result;
@@ -578,15 +556,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// End evaluate.
         /// </summary>
-        [NotNull]
         protected string EndEvaluate
             (
-                [NotNull] PftContext previousContext
+                PftContext previousContext
             )
         {
-            Code.NotNull(previousContext, "previousContext");
-
-            string result = Context.ToString();
+            var result = Context.ToString();
             Context = previousContext;
 
             return result;
@@ -599,10 +574,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Execute the packet agains the record.
         /// </summary>
-        [NotNull]
         public virtual string Execute
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
             Context.ClearAll();

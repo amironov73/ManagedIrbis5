@@ -1,6 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* Unifor.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -12,19 +19,17 @@ using System;
 using AM;
 using AM.Collections;
 
-
-
 using ManagedIrbis.Pft.Infrastructure.Unifors;
 
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// Unifor.
     /// </summary>
-
     public sealed class Unifor
         : IFormatExit
     {
@@ -226,7 +231,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             int bestMatch = 0;
             Action<PftContext, PftNode, string> result = null;
 
-            StringComparison comparison = StringUtility.GetCaseInsensitiveComparison();
+            var comparison = StringComparison.OrdinalIgnoreCase;
             foreach (string key in keys)
             {
                 if (key.Length > bestMatch
@@ -262,11 +267,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (string.IsNullOrEmpty(expression))
             {
-                Log.Error
+                Magna.Error
                     (
                         "Unifor::Execute: "
                         + "empty expression: "
@@ -291,7 +294,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (ReferenceEquals(action, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "Unifor::Execute: "
                         + "unknown action="

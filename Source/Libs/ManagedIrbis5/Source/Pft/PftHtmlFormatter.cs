@@ -1,26 +1,31 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftHtmlFormatter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-
-
+using AM;
 
 using ManagedIrbis.Pft.Infrastructure;
 
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft
 {
     /// <summary>
     ///
     /// </summary>
-
     public class PftHtmlFormatter
         : PftFormatter
     {
@@ -29,7 +34,7 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Text separator.
         /// </summary>
-        public PftTextSeparator Separator { get; private set; }
+        public PftTextSeparator Separator { get; }
 
         #endregion
 
@@ -65,11 +70,9 @@ namespace ManagedIrbis.Pft
                 string source
             )
         {
-            Code.NotNull(source, "source");
-
             if (Separator.SeparateText(source))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftHtmlFormatter::ParseProgram: "
                         + "can't separate text"

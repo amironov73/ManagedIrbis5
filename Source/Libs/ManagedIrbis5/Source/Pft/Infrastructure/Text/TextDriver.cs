@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* TextDriver.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* TextDriver.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -22,21 +26,15 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Text
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public abstract class TextDriver
     {
         #region Properties
@@ -44,13 +42,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Name of the driver.
         /// </summary>
-        [NotNull]
-        public virtual string Name { get { return "None"; } }
+        public virtual string Name => "None";
 
         /// <summary>
         /// Output.
         /// </summary>
-        [NotNull]
         public PftOutput Output { get; private set; }
 
         #endregion
@@ -62,17 +58,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// </summary>
         protected TextDriver
             (
-                [NotNull] PftOutput output
+                PftOutput output
             )
         {
-            Code.NotNull(output, "output");
-
             Output = output;
         }
-
-        #endregion
-
-        #region Private members
 
         #endregion
 
@@ -81,10 +71,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Bold face.
         /// </summary>
-        [NotNull]
         public virtual TextDriver Bold
             (
-                [NotNull] string text
+                string text
             )
         {
             return this;
@@ -93,10 +82,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Italic.
         /// </summary>
-        [NotNull]
         public virtual TextDriver Italic
             (
-                [NotNull] string text
+                string text
             )
         {
             return this;
@@ -105,7 +93,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// New paragraph.
         /// </summary>
-        [NotNull]
         public virtual TextDriver NewParagraph()
         {
             return this;
@@ -114,18 +101,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Underline.
         /// </summary>
-        [NotNull]
         public virtual TextDriver Underline
             (
-                [NotNull] string text
+                string text
             )
         {
             return this;
         }
-
-        #endregion
-
-        #region Object members
 
         #endregion
     }

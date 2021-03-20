@@ -1,31 +1,27 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftCondition.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
-
-using AM.Logging;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     /// Условие
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public abstract class PftCondition
         : PftBoolean
     {
@@ -43,7 +39,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         protected PftCondition
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {

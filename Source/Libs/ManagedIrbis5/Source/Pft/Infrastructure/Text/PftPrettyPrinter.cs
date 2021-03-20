@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftPrettyPrinter.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftPrettyPrinter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,24 +17,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
+using AM;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Text
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftPrettyPrinter
         : IDisposable
     {
@@ -64,14 +61,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         {
             get
             {
-                StringBuilder builder = _writer.GetStringBuilder();
+                var builder = _writer.GetStringBuilder();
 
                 if (builder.Length == 0)
                 {
                     return '\0';
                 }
 
-                char result = builder[builder.Length - 1];
+                var result = builder[builder.Length - 1];
 
                 return result;
             }
@@ -109,12 +106,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
 
         private void _RecalculateColumn()
         {
-            StringBuilder builder = _writer.GetStringBuilder();
+            var builder = _writer.GetStringBuilder();
 
-            int pos = builder.Length - 1;
+            var pos = builder.Length - 1;
             while (pos >= 0)
             {
-                char chr = builder[pos];
+                var chr = builder[pos];
                 if (chr == '\r' || chr == '\n')
                 {
                     break;
@@ -132,7 +129,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Decrease the <see cref="Level"/>.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter DecreaseLevel()
         {
             Level--;
@@ -207,12 +203,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// </summary>
         public bool EatNewLine()
         {
-            StringBuilder builder = _writer.GetStringBuilder();
+            var builder = _writer.GetStringBuilder();
 
             bool result = false, flag = false;
             while (builder.Length > 0 && !result)
             {
-                char chr = builder[builder.Length - 1];
+                var chr = builder[builder.Length - 1];
                 if (chr == '\n' || chr == '\r')
                 {
                     builder.Length--;
@@ -237,12 +233,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// </summary>
         public bool EatWhitespace()
         {
-            StringBuilder builder = _writer.GetStringBuilder();
+            var builder = _writer.GetStringBuilder();
 
             bool result = false, flag = false;
             while (builder.Length > 0 && !result)
             {
-                char chr = builder[builder.Length - 1];
+                var chr = builder[builder.Length - 1];
                 if (char.IsWhiteSpace(chr))
                 {
                     builder.Length--;
@@ -265,20 +261,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Get current line.
         /// </summary>
-        [NotNull]
         public string GetCurrentLine()
         {
-            StringBuilder builder = _writer.GetStringBuilder();
+            var builder = _writer.GetStringBuilder();
 
             if (builder.Length == 0)
             {
                 return string.Empty;
             }
 
-            int index = builder.Length - 1;
+            var index = builder.Length - 1;
             while (index >= 0)
             {
-                char chr = builder[index];
+                var chr = builder[index];
                 if (chr == '\r' || chr == '\n')
                 {
                     index++;
@@ -290,7 +285,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
             {
                 index = 0;
             }
-            int length = builder.Length - index;
+            var length = builder.Length - index;
 
             return builder.ToString(index, length);
         }
@@ -298,7 +293,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Increase the <see cref="Level"/>.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter IncreaseLevel()
         {
             Level++;
@@ -309,11 +303,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Add one space if needed.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter SingleSpace()
         {
-            char chr = LastCharacter;
-            if (chr != ' ' && chr != '\n' && chr != '\r' 
+            var chr = LastCharacter;
+            if (chr != ' ' && chr != '\n' && chr != '\r'
                 && chr != '(' && chr != '\0')
             {
                 Write(' ');
@@ -325,7 +318,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write the text.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter Write
             (
                 char chr
@@ -347,15 +339,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write the text.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter Write
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (!string.IsNullOrEmpty(text))
             {
-                foreach (char c in text)
+                foreach (var c in text)
                 {
                     Write(c);
                 }
@@ -367,15 +358,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write the object.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter Write
             (
-                [CanBeNull] object obj
+                object? obj
             )
         {
             if (!ReferenceEquals(obj, null))
             {
-                string text = obj.ToString();
+                var text = obj.ToString();
                 Write(text);
             }
 
@@ -385,16 +375,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write the formatted text.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter Write
             (
-                [NotNull] string format,
+                string format,
                 params object[] args
             )
         {
-            Code.NotNull(format, "format");
-
-            string text = string.Format(format, args);
+            var text = string.Format(format, args);
             Write(text);
 
             return this;
@@ -403,12 +390,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write the indent.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteIndent()
         {
-            for (int i = 0; i < Level; i++)
+            for (var i = 0; i < Level; i++)
             {
-                for (int j = 0; j < IndentWidth; j++)
+                for (var j = 0; j < IndentWidth; j++)
                 {
                     Write(' ');
                 }
@@ -420,10 +406,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write indent if needed.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteIndentIfNeeded()
         {
-            int delta = IndentWidth * Level - Column;
+            var delta = IndentWidth * Level - Column;
             while (delta > 0)
             {
                 Write(' ');
@@ -436,7 +421,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write newline.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteLine()
         {
             Write(Environment.NewLine);
@@ -447,10 +431,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write the text.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteLine
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (!string.IsNullOrEmpty(text))
@@ -465,15 +448,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write the object.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteLine
             (
-                [CanBeNull] object obj
+                object? obj
             )
         {
             if (!ReferenceEquals(obj, null))
             {
-                string text = obj.ToString();
+                var text = obj.ToString();
                 WriteLine(text);
             }
 
@@ -483,16 +465,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write the formatted text.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteLine
             (
-                [NotNull] string format,
+                string format,
                 params object[] args
             )
         {
-            Code.NotNull(format, "format");
-
-            string text = string.Format(format, args);
+            var text = string.Format(format, args);
             WriteLine(text);
 
             return this;
@@ -501,7 +480,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write new line if needed.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteLineIfNeeded()
         {
             if (Column > RightBorder)
@@ -515,15 +493,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write nodes.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteNodes
             (
-                [NotNull] IList<PftNode> nodes
+                IList<PftNode> nodes
             )
         {
-            Code.NotNull(nodes, "nodes");
-
-            foreach (PftNode node in nodes)
+            foreach (var node in nodes)
             {
                 WriteIndentIfNeeded();
                 node.PrettyPrint(this);
@@ -536,17 +511,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Write nodes.
         /// </summary>
-        [NotNull]
         public PftPrettyPrinter WriteNodes
             (
-                [NotNull] string delimiter,
-                [NotNull] IList<PftNode> nodes
+                string delimiter,
+                IList<PftNode> nodes
             )
         {
-            Code.NotNull(nodes, "nodes");
-
-            bool first = true;
-            foreach (PftNode node in nodes)
+            var first = true;
+            foreach (var node in nodes)
             {
                 if (!first)
                 {
@@ -583,7 +555,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         {
             if (Level != 0)
             {
-                Log.Warn
+                Magna.Warning
                     (
                         "PftPrettyPrinter::ToString: "
                         + "Level="

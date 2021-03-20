@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftAssignment.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -17,28 +21,21 @@ using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftAssignment
         : PftNode
     {
@@ -52,8 +49,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Variable name.
         /// </summary>
-        [CanBeNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Index.
@@ -88,11 +84,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftAssignment
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
         }
 
@@ -102,12 +96,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public PftAssignment
             (
                 bool isNumeric,
-                [NotNull] string name,
+                string name,
                 params PftNode[] body
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             IsNumeric = isNumeric;
             Name = name;
             foreach (PftNode node in body)
@@ -121,7 +113,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftAssignment
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
@@ -136,7 +128,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         // Ignore IsNumeric setting
         private bool HandleDirectAssignment
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
             //
@@ -147,8 +139,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Children.Count == 1)
             {
-                PftVariableReference reference = Children.First()
-                    as PftVariableReference;
+                var reference = Children.First() as PftVariableReference;
                 if (!ReferenceEquals(reference, null))
                 {
                     PftVariable donor;
@@ -231,8 +222,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftCompilerException();
             }
 
-            string actionName = null;
-            IndexInfo index = null;
+            string? actionName = null;
+            IndexInfo? index = null;
 
             compiler.CompileNodes(Children);
             if (!IsNumeric)
@@ -431,12 +422,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.AppendFormat("${0}{1}=", Name, Index.ToText());
             PftUtility.NodesToText(result, Children);
             result.Append(';');
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion

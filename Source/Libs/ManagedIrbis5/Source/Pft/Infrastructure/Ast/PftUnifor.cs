@@ -1,42 +1,39 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftUnifor.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     /// Unifor.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftUnifor
         : PftNode
     {
@@ -45,8 +42,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Name.
         /// </summary>
-        [CanBeNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         #endregion
 
@@ -64,12 +60,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftUnifor
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
-
             Name = token.Text;
         }
 
@@ -78,12 +72,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftUnifor
             (
-                [NotNull] string name,
+                string name,
                 params PftNode[] body
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
             foreach (PftNode child in body)
             {
@@ -200,9 +192,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        public override PftNode? Optimize()
         {
-            PftNodeCollection children = (PftNodeCollection)Children;
+            var children = (PftNodeCollection)Children;
             children.Optimize();
 
             if (children.Count == 0)
@@ -240,11 +232,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -253,14 +241,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            StringBuilder result = new StringBuilder();
             result.Append('&');
             result.Append(Name);
             result.Append('(');
             PftUtility.NodesToText(result, Children);
             result.Append(')');
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion

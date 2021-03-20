@@ -1,6 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftParser.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -13,10 +20,9 @@ using System.Linq;
 using AM;
 using AM.Collections;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -50,7 +56,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftTokenList tokens
             )
         {
-            Code.NotNull(tokens, "tokens");
             Tokens = tokens;
 
             _procedures = new PftProcedureManager();
@@ -73,7 +78,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             PftField field = ParseField();
             if (field.Command != 'v' && field.Command != 'g')
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseA: "
                         + "bad field specified"
@@ -167,7 +172,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     result.Children.Add(node);
                     if (!Tokens.IsEof)
                     {
-                        Log.Error
+                        Magna.Error
                             (
                                 "PftParser::ParseAssignment: "
                                 + "garbage detected"
@@ -308,7 +313,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (!ok)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseEat: "
                         + "syntax error"
@@ -354,7 +359,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 );
             if (Tokens.IsEof)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseF: "
                         + "unexpected end of stream"
@@ -367,7 +372,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 if (Tokens.Current.Kind != PftTokenKind.Comma)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::ParseF: "
                             + "syntax error"
@@ -380,7 +385,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 result.Argument2 = ParseNumber();
                 if (Tokens.IsEof)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::ParseF: "
                             + "unexpected end of stream"
@@ -393,7 +398,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     if (Tokens.Current.Kind != PftTokenKind.Comma)
                     {
-                        Log.Error
+                        Magna.Error
                             (
                                 "PftParser::ParseF: "
                                 + "syntax error"
@@ -408,7 +413,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             if (Tokens.IsEof)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseF: "
                         + "unexpected end of stream"
@@ -419,7 +424,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (Tokens.Current.Kind != PftTokenKind.RightParenthesis)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseF: "
                         + "syntax error"
@@ -448,7 +453,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 || Tokens.Current.Kind != PftTokenKind.Comma
                )
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseF2: "
                         + "syntax error"
@@ -815,7 +820,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (_inGroup)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseGroup: "
                         + "nested group detected"
@@ -865,7 +870,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             else
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseHave: "
                         + "syntax error"
@@ -921,7 +926,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         break;
 
                     default:
-                        Log.Error
+                        Magna.Error
                             (
                                 "PftParser::ParseLocal: "
                                 + "unexpected token="
@@ -1008,7 +1013,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             PftField field = ParseField();
             if (ReferenceEquals(field, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseP: "
                         + "field not set"
@@ -1039,7 +1044,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (_inProcedure)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseProc: "
                         + "nested procedure detected"
@@ -1050,7 +1055,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (_inLoop)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseProc: "
                         + "procedure inside loop detected"
@@ -1061,7 +1066,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (_inGroup)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseProc: "
                         + "procedure inside group detected"
@@ -1084,9 +1089,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 string name = procedure.Name
                     .ThrowIfNull("procedure.Name");
-                if (name.OneOf(PftUtility.GetReservedWords()))
+                if (name.IsOneOf(PftUtility.GetReservedWords()))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::ParseProc: "
                             + "reserved word="
@@ -1102,7 +1107,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                    || PftFunctionManager.UserFunctions.HaveFunction(name)
                    )
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::ParseProc: "
                             + "already have function: "
@@ -1117,7 +1122,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (!ReferenceEquals(_procedures.FindProcedure(name), null))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::ParseProc: "
                             + "already have procedure: "
@@ -1272,7 +1277,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 if (_inAssignment)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::ParseVariable: "
                             + "nested assignment detected"
@@ -1300,7 +1305,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         );
                     if (ReferenceEquals(tokens, null))
                     {
-                        Log.Error
+                        Magna.Error
                             (
                                 "PftParser::ParseVariable: "
                                 + "unclosed assignment"
@@ -1453,7 +1458,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                                     .ThrowIfNull("token.Text")
                             ))
                         {
-                            Log.Error
+                            Magna.Error
                                 (
                                     "PftParser::ParseWith: "
                                     + "field not specified"
@@ -1469,7 +1474,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         break;
 
                     default:
-                        Log.Error
+                        Magna.Error
                             (
                                 "PftParser::ParseWith: "
                                 + "unexpected token="
@@ -1492,8 +1497,6 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             return result;
         }
-
-
 
         //=================================================
 

@@ -226,7 +226,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            Field = (PftField) PftSerializer.DeserializeNullable(reader);
+            Field = (PftField?) PftSerializer.DeserializeNullable(reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />

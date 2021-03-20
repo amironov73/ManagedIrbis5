@@ -1,7 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* FormatExit.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* FormatExit.cs -- форматный выход
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -10,17 +18,15 @@
 using AM;
 using AM.Collections;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// Umarci.
+    /// Форматный выход.
     /// </summary>
-
     public static class FormatExit
     {
         #region Properties
@@ -59,18 +65,14 @@ namespace ManagedIrbis.Pft.Infrastructure
         public static void Execute
             (
                 PftContext context,
-                [CanBeNull] PftNode node,
+                PftNode? node,
                 string name,
-                [CanBeNull] string expression
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNullNorEmpty(name, "name");
-
-            IFormatExit format;
-            if (!Registry.TryGetValue(name, out format))
+            if (!Registry.TryGetValue(name, out IFormatExit? format))
             {
-                Log.Error
+                Magna.Error
                     (
                         "FormatExit::Execute: "
                         + "unknown name="

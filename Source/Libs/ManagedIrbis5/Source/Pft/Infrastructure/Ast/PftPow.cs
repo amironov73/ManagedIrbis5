@@ -1,41 +1,38 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftPow.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
+using AM;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftPow
         : PftNumeric
     {
@@ -44,14 +41,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// X.
         /// </summary>
-        [CanBeNull]
-        public PftNumeric X { get; set; }
+        public PftNumeric? X { get; set; }
 
         /// <summary>
         /// Y.
         /// </summary>
-        [CanBeNull]
-        public PftNumeric Y { get; set; }
+        public PftNumeric? Y { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -79,14 +74,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             protected set
             {
                 // Nothing to do here
+
+                Magna.Error
+                    (
+                        "PftPow::Children: "
+                        + "set value="
+                        + value.ToVisibleString()
+                    );
             }
         }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -108,7 +107,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Pow);
         }
 
@@ -121,9 +119,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 [NotNull] PftNumeric y
             )
         {
-            Code.NotNull(x, "x");
-            Code.NotNull(y, "y");
-
             X = x;
             Y = y;
         }
@@ -132,7 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -207,8 +202,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            X = (PftNumeric) PftSerializer.DeserializeNullable(reader);
-            Y = (PftNumeric) PftSerializer.DeserializeNullable(reader);
+            X = (PftNumeric?) PftSerializer.DeserializeNullable(reader);
+            Y = (PftNumeric?) PftSerializer.DeserializeNullable(reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -294,11 +289,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 

@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftCompiler.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -20,31 +24,12 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft.Infrastructure.Ast;
-
-#if !WINMOBILE
-
-using Microsoft.CSharp;
-
-#endif
-
-using MoonSharp.Interpreter;
-
-#if CLASSIC || NETCORE
-
-using System.CodeDom.Compiler;
-
-#endif
 
 #endregion
 
@@ -53,8 +38,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftCompiler
     {
         #region Constants
@@ -71,19 +54,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Provider.
         /// </summary>
-        [NotNull]
         public IrbisProvider Provider { get; private set; }
 
-        [NotNull]
         internal FieldDictionary Fields { get; private set; }
 
-        [NotNull]
         internal NodeDictionary Nodes { get; private set; }
 
-        [NotNull]
         internal IndexDictionary Indexes { get; private set; }
 
-        [NotNull]
         internal TextWriter Output { get; private set; }
 
         /// <summary>
@@ -99,7 +77,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Path to store compiled assemblies.
         /// </summary>
-        public NonNullValue<string> OutputPath { get; set; }
+        public string OutputPath { get; set; }
 
         /// <summary>
         /// Keep source.
@@ -114,13 +92,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// References.
         /// </summary>
-        [NotNull]
         public NonNullCollection<string> References { get; private set; }
 
         /// <summary>
         /// Usings.
         /// </summary>
-        [NotNull]
         public NonNullCollection<string> Usings { get; private set; }
 
         #endregion

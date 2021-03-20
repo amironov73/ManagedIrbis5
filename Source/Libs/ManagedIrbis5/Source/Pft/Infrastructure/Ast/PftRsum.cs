@@ -1,10 +1,16 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftRsum.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,30 +22,20 @@ using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
 
-// ReSharper disable CommentTypo
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftRsum
         : PftNumeric
     {
@@ -48,7 +44,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Name of the function.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         #endregion
 
@@ -66,11 +62,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRsum
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
         }
 
@@ -79,14 +73,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRsum
             (
-                [NotNull] string name,
+                string name,
                 params PftNode[] children
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
-            foreach (PftNode node in children)
+            foreach (var node in children)
             {
                 Children.Add(node);
             }
@@ -97,16 +89,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRsum
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
-
             Name = token.Text;
             if (string.IsNullOrEmpty(Name))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftRsum::Constructor: "
                         + "Name="
@@ -228,53 +218,52 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!string.IsNullOrEmpty(Name))
             {
-                using (PftContextGuard guard = new PftContextGuard(context))
+                using var guard = new PftContextGuard(context);
+
+                // ibatrak
+                // Оказывается, функции RMIN, RMAX, RAVR и RSUM игнорируют
+                // состояние повторяющейся группы.
+                // То есть, если туда передается поле, то в параметры передается
+                // выражение, слепленное из всех повторений
+                // Ровно так, если бы поле выводилось без повторяющейся группы.
+                // А повторяющаяся группа будет просто играть роль цикла.
+
+                // TODO добавить этот глюк в компилируемый код
+
+                var nestedContext = guard.ChildContext;
+                nestedContext.Reset();
+
+                string text = nestedContext.Evaluate(Children);
+                double[] values = PftUtility.ExtractNumericValues(text);
+                if (values.Length != 0)
                 {
-                    // ibatrak
-                    // Оказывается, функции RMIN, RMAX, RAVR и RSUM игнорируют
-                    // состояние повторяющейся группы.
-                    // То есть, если туда передается поле, то в параметры передается
-                    // выражение, слепленное из всех повторений
-                    // Ровно так, если бы поле выводилось без повторяющейся группы.
-                    // А повторяющаяся группа будет просто играть роль цикла.
-
-                    // TODO добавить этот глюк в компилируемый код
-
-                    PftContext nestedContext = guard.ChildContext;
-                    nestedContext.Reset();
-
-                    string text = nestedContext.Evaluate(Children);
-                    double[] values = PftUtility.ExtractNumericValues(text);
-                    if (values.Length != 0)
+                    switch (Name)
                     {
-                        switch (Name)
-                        {
-                            case "rsum":
-                                Value = values.Sum();
-                                break;
+                        case "rsum":
+                            Value = values.Sum();
+                            break;
 
-                            case "rmin":
-                                Value = values.Min();
-                                break;
+                        case "rmin":
+                            Value = values.Min();
+                            break;
 
-                            case "rmax":
-                                Value = values.Max();
-                                break;
+                        case "rmax":
+                            Value = values.Max();
+                            break;
 
-                            case "ravr":
-                                Value = values.Average();
-                                break;
+                        case "ravr":
+                            Value = values.Average();
+                            break;
 
-                            default:
-                                Log.Error
-                                    (
-                                        "PftRsum::Execute: "
-                                        + "unexpected function name="
-                                        + Name.ToVisibleString()
-                                    );
+                        default:
+                            Magna.Error
+                            (
+                                "PftRsum::Execute: "
+                                + "unexpected function name="
+                                + Name.ToVisibleString()
+                            );
 
-                                throw new PftSyntaxException(this);
-                        }
+                            throw new PftSyntaxException(this);
                     }
                 }
             }
@@ -322,13 +311,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append(Name);
             result.Append('(');
             PftUtility.NodesToText(result, Children);
             result.Append(')');
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion

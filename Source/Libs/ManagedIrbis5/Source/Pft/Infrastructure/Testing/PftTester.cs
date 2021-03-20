@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftTester.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,31 +20,21 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using AM;
 using AM.Collections;
 using AM.ConsoleIO;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Testing
 {
     /// <summary>
     /// Test for PFT formatting.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftTester
     {
         #region Properties
@@ -48,25 +42,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Provider.
         /// </summary>
-        [NotNull]
         public IrbisProvider Provider { get; private set; }
 
         /// <summary>
         /// Folder name.
         /// </summary>
-        [NotNull]
         public string Folder { get; private set; }
 
         /// <summary>
         /// Tests.
         /// </summary>
-        [NotNull]
         public NonNullCollection<PftTest> Tests { get; private set; }
 
         /// <summary>
         /// Results.
         /// </summary>
-        [NotNull]
         public NonNullCollection<PftTestResult> Results { get; private set; }
 
         #endregion
@@ -78,11 +68,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public PftTester
             (
-                [NotNull] string folder
+                string folder
             )
         {
-            Code.NotNullNorEmpty(folder, "folder");
-
             Provider = new LocalProvider();
             Folder = folder;
             Tests = new NonNullCollection<PftTest>();
@@ -105,13 +93,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
             string[] directories = Directory.GetDirectories
                 (
                     Folder,
-                    "*"
-
-#if !PocketPC && !WINMOBILE
-
-                    , SearchOption.AllDirectories
-
-#endif
+                    "*",
+                    SearchOption.AllDirectories
                 );
 
             foreach (string subDir in directories)
@@ -127,14 +110,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Run the test.
         /// </summary>
-        public PftTestResult RunTest
+        public PftTestResult? RunTest
             (
-                [NotNull] PftTest test
+                PftTest test
             )
         {
-            Code.NotNull(test, "test");
-
-            PftTestResult result = null;
+            PftTestResult? result = null;
 
             string name = Path.GetFileName(test.Folder);
 
@@ -169,7 +150,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftTester::RunTest",
                         exception
@@ -193,8 +174,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
             foreach (PftTest test in Tests)
             {
                 test.Provider = Provider;
-                PftTestResult result = RunTest(test);
-                if (result != null)
+                var result = RunTest(test);
+                if (result is not null)
                 {
                     Results.Add(result);
                 }
@@ -206,11 +187,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public void SetEnvironment
             (
-                [NotNull] IrbisProvider provider
+                IrbisProvider provider
             )
         {
-            Code.NotNull(provider, "provider");
-
             Provider = provider;
         }
 
@@ -219,12 +198,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public void WriteResults
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
-
-#if !PocketPC && !WINMOBILE
+            /*
 
             using (StreamWriter writer = new StreamWriter
                 (
@@ -241,7 +218,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 writer.Write(text);
             }
 
-#endif
+            */
         }
 
         #endregion

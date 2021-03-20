@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftConditionalStatement.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -17,28 +21,21 @@ using System.IO;
 using System.Text;
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftConditionalStatement
         : PftNode
     {
@@ -47,8 +44,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Condition
         /// </summary>
-        [CanBeNull]
-        public PftCondition Condition { get; set; }
+        public PftCondition? Condition { get; set; }
 
         /// <summary>
         /// Else branch.
@@ -86,7 +82,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             protected set
             {
                 // Nothing to do here
-                Log.Error
+
+                Magna.Error
                     (
                         "PftConditionalStatement::Children: "
                         + "set value="
@@ -123,7 +120,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.If);
 
             ElseBranch = new PftNodeCollection(this);
@@ -140,8 +136,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : this()
         {
-            Code.NotNull(condition, "condition");
-
             Condition = condition;
             foreach (PftNode node in thenBranch)
             {
@@ -153,7 +147,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -265,7 +259,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
         {
             base.Deserialize(reader);
-            Condition = (PftCondition)PftSerializer.DeserializeNullable(reader);
+            Condition = (PftCondition?)PftSerializer.DeserializeNullable(reader);
             PftSerializer.Deserialize(reader, ThenBranch);
             PftSerializer.Deserialize(reader, ElseBranch);
         }
@@ -280,7 +274,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (ReferenceEquals(Condition, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftConditionalStatement::Execute: "
                         + "Condition not set"
@@ -292,7 +286,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             if (ThenBranch.Count == 0
                 && ElseBranch.Count == 0)
             {
-                Log.Warn
+                Magna.Warning
                     (
                         "PftConditionalStatement::Execute: "
                         + "Empty Then and Else branches"
@@ -366,11 +360,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.Optimize"/>
-        public override PftNode Optimize()
+        public override PftNode? Optimize()
         {
             if (!ReferenceEquals(Condition, null))
             {
-                Condition = (PftCondition) Condition.Optimize();
+                Condition = (PftCondition?) Condition.Optimize();
             }
             ThenBranch.Optimize();
             ElseBranch.Optimize();

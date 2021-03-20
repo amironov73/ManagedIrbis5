@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftParser.Field.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -19,12 +25,9 @@ using AM.Collections;
 using AM.IO;
 using AM.Text;
 
-
-
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -108,7 +111,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             if (string.IsNullOrEmpty(token.Text))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseField: "
                         + "empty field"
@@ -121,7 +124,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 = (FieldSpecification)token.UserData;
             if (ReferenceEquals(specification, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftParser::ParseField: "
                         + "missing field specification"
@@ -154,7 +157,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     break;
 
                 default:
-                    Log.Error
+                    Magna.Error
                         (
                             "PftParser::ParseField: "
                             + "unexpected token="
@@ -194,7 +197,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     {
                         if (plus)
                         {
-                            Log.Error
+                            Magna.Error
                                 (
                                     "PftParser::ParseField: "
                                     + "PLUS not allowed here"

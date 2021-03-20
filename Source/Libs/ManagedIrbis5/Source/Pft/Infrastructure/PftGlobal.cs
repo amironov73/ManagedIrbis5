@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftGlobal.cs -- global variable
  * Ars Magna project, http://arsmagna.ru
  */
@@ -16,17 +22,15 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// Global variable.
     /// </summary>
-
     [DebuggerDisplay("{Number} {ToString()}")]
     public sealed class PftGlobal
         : IHandmadeSerializable
@@ -36,21 +40,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Number of the variable.
         /// </summary>
-        public int Number
-        {
-            get { return _number; }
-            set
-            {
-                Code.Positive(value, "value");
-
-                _number = value;
-            }
-        }
+        public int Number { get; set; }
 
         /// <summary>
         /// Fields.
         /// </summary>
-        public NonNullCollection<RecordField> Fields { get; private set; }
+        public NonNullCollection<Field> Fields { get; private set; } = new();
 
         #endregion
 
@@ -61,7 +56,6 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftGlobal()
         {
-            Fields = new NonNullCollection<RecordField>();
         }
 
         /// <summary>
@@ -71,7 +65,6 @@ namespace ManagedIrbis.Pft.Infrastructure
             (
                 int number
             )
-            : this()
         {
             Number = number;
         }
@@ -84,7 +77,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int number,
                 string text
             )
-            : this()
         {
             Number = number;
             Parse(text);
@@ -93,8 +85,6 @@ namespace ManagedIrbis.Pft.Infrastructure
         #endregion
 
         #region Private members
-
-        private int _number;
 
         private static string _ReadTo
             (
@@ -131,7 +121,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftGlobal Parse
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (!string.IsNullOrEmpty(text))
@@ -158,10 +148,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string line
             )
         {
-            Code.NotNull(line, "line");
-
-            StringReader reader = new StringReader(line);
-            RecordField field = new RecordField(Number.ToInvariantString());
+            var reader = new StringReader(line);
+            var field = new Field { Tag = Number };
             Fields.Add(field);
             field.Value = _ReadTo(reader, '^');
 
@@ -180,7 +168,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     Code = code,
                     Value = text
                 };
-                field.SubFields.Add(subField);
+                field.Subfields.Add(subField);
             }
 
             return this;
@@ -196,9 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
-            _number = reader.ReadPackedInt32();
+            Number = reader.ReadPackedInt32();
             reader.ReadCollection(Fields);
         }
 
@@ -208,10 +194,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
+            /*
 
             writer.WritePackedInt32(Number);
             writer.WriteCollection(Fields);
+
+            */
         }
 
         #endregion
@@ -221,11 +209,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             bool first = true;
 
-            foreach (RecordField field in Fields)
+            foreach (var field in Fields)
             {
                 if (!first)
                 {

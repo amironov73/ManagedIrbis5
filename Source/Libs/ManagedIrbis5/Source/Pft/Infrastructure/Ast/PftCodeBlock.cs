@@ -1,30 +1,20 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftCodeBlock.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using ManagedIrbis.Infrastructure;
+using AM;
 using ManagedIrbis.Pft.Infrastructure.Text;
-
-using MoonSharp.Interpreter;
-
-#if CLASSIC || NETCORE
-
-using System.Reflection;
-
-#endif
 
 #endregion
 
@@ -33,18 +23,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftCodeBlock
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -62,11 +47,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftCodeBlock
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
             Text = text;
         }
 
@@ -75,16 +58,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftCodeBlock
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.TripleCurly);
 
             if (string.IsNullOrEmpty(token.Text))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftCodeBlock::Constructor: "
                         + "token text not set"
@@ -173,10 +155,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Object members
 
         /// <inheritdoc cref="object.ToString()" />
-        public override string ToString()
-        {
-            return "{{{" + Text + "}}}";
-        }
+        public override string ToString() => "{{{" + Text + "}}}";
 
         #endregion
     }

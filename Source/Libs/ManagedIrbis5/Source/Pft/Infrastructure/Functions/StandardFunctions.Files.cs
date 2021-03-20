@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* StandardFunctions.Files.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,11 +17,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -37,11 +39,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         internal static void CloseFile
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
-
             string fullPath = GetFullPath(fileName);
 
             FileObject file;
@@ -52,14 +52,11 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
         }
 
-        [NotNull]
         internal static string GetFullPath
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
-
             string result = Path.GetFullPath(fileName);
 
             return result;
@@ -67,7 +64,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         internal static bool HaveOpenFile
             (
-                [CanBeNull] string fileName
+                string? fileName
             )
         {
             if (string.IsNullOrEmpty(fileName))
@@ -80,16 +77,13 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result;
         }
 
-        [NotNull]
         private static string OpenInternal
             (
-                [NotNull] string fileName,
+                string fileName,
                 bool write,
                 bool append
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
-
             string fullPath = GetFullPath(fileName);
             if (HaveOpenFile(fileName))
             {
@@ -102,10 +96,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             return fullPath;
         }
 
-        [NotNull]
         internal static string OpenAppend
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             string result = OpenInternal(fileName, true, true);
@@ -113,10 +106,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result;
         }
 
-        [NotNull]
         internal static string OpenRead
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             string result = OpenInternal(fileName, false, false);
@@ -124,10 +116,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result;
         }
 
-        [NotNull]
         internal static string OpenWrite
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             string result = OpenInternal(fileName, true, false);
@@ -135,10 +126,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result;
         }
 
-        [NotNull]
         internal static string ReadAll
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             string fullPath = GetFullPath(fileName);
@@ -153,10 +143,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             return string.Empty;
         }
 
-        [NotNull]
         internal static string ReadLine
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             string fullPath = GetFullPath(fileName);
@@ -173,8 +162,8 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         internal static void Write
             (
-                [NotNull] string fileName,
-                [NotNull] string text
+                string fileName,
+                string text
             )
         {
             string fullPath = GetFullPath(fileName);
@@ -187,13 +176,12 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         internal static void WriteLine
             (
-                [NotNull] string fileName,
-                [NotNull] string text
+                string fileName,
+                string text
             )
         {
             string fullPath = GetFullPath(fileName);
-            FileObject file;
-            if (Files.TryGetValue(fullPath, out file))
+            if (Files.TryGetValue(fullPath, out FileObject? file))
             {
                 file.WriteLine(text);
             }

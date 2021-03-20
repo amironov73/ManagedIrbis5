@@ -1,12 +1,19 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftGlobalManager.cs -- global variable manager
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,10 +22,9 @@ using AM;
 using AM.IO;
 using AM.Runtime;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -41,12 +47,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// в строковом представлении. Если такой переменной нет,
         /// возвращается пустая строка.
         /// </summary>
-        public string this[int index]
+        public string? this[int index]
         {
                 get
             {
-                Code.Positive(index, "index");
-
                 PftGlobal result;
 
                 return Registry.TryGetValue(index, out result)
@@ -55,8 +59,6 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             set
             {
-                Code.Positive(index, "index");
-
                 if (ReferenceEquals(value, null))
                 {
                     Registry.Remove(index);
@@ -114,11 +116,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         public PftGlobalManager Add
             (
                 int index,
-                [CanBeNull] string text
+                string? text
             )
         {
-            Code.Positive(index, "index");
-
             this[index] = text;
 
             return this;
@@ -130,11 +130,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         public PftGlobalManager Append
             (
                 int index,
-                [CanBeNull] string text
+                string? text
             )
         {
-            Code.Positive(index, "index");
-
             if (!string.IsNullOrEmpty(text))
             {
                 PftGlobal variable = _GetOrCreate(index);
@@ -168,8 +166,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int index
             )
         {
-            Code.Positive(index, "index");
-
             Registry.Remove(index);
 
             return this;
@@ -178,22 +174,19 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get fields for global variable with specified index.
         /// </summary>
-        public RecordField[] Get
+        public Field[] Get
             (
                 int index
             )
         {
-            Code.Positive(index, "index");
-
-            PftGlobal variable;
-            if (Registry.TryGetValue(index, out variable))
+            if (Registry.TryGetValue(index, out PftGlobal? variable))
             {
                 return variable.Fields
                     .Select(f => f.Clone())
                     .ToArray();
             }
 
-            return RecordFieldUtility.EmptyArray;
+            return Array.Empty<Field>();
         }
 
         /// <summary>
@@ -223,11 +216,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         public void Set
             (
                 int index,
-                [CanBeNull] IEnumerable<RecordField> fields
+                IEnumerable<Field>? fields
             )
         {
-            Code.Positive(index, "index");
-
             if (ReferenceEquals(fields, null))
             {
                 Delete(index);
@@ -235,7 +226,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            RecordField[] array = fields.ToArray();
+            var array = fields.ToArray();
             if (array.Length == 0)
             {
                 Delete(index);
@@ -243,7 +234,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            PftGlobal variable = _GetOrCreate(index);
+            var variable = _GetOrCreate(index);
             variable.Fields.Clear();
             variable.Fields.AddRange(array);
         }
@@ -258,8 +249,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             Clear();
             PftGlobal[] values = reader.ReadArray<PftGlobal>();
             foreach (PftGlobal value in values)
@@ -274,8 +263,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             PftGlobal[] values = GetAllVariables();
             writer.WriteArray(values);
         }

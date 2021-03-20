@@ -26,14 +26,18 @@ using System.Text.RegularExpressions;
 
 using AM;
 using AM.Collections;
+using AM.ConsoleIO;
 using AM.Text;
 
 
 using ManagedIrbis.Client;
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Pft.Infrastructure;
+using ManagedIrbis.Pft.Infrastructure.Ast;
 
 #endregion
 
-// ReSharper disable ConvertClosureToMethodGroup
+#nullable enable
 
 namespace ManagedIrbis.Pft
 {
@@ -160,15 +164,13 @@ namespace ManagedIrbis.Pft
                 PftContext context,
                 int tag,
                 IndexSpecification index,
-                [CanBeNull] string value
+                string value
             )
         {
-            Code.NotNull(context, "context");
-
-            Record record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftUtility::AssignField: "
                         + "record not set"
@@ -177,7 +179,7 @@ namespace ManagedIrbis.Pft
                 return;
             }
 
-            RecordField[] fields = record.Fields.GetField(tag);
+            var fields = record.Fields.GetField(tag);
 
             if (string.IsNullOrEmpty(value))
             {
@@ -210,7 +212,7 @@ namespace ManagedIrbis.Pft
 
             if (index.Kind == IndexKind.None)
             {
-                foreach (RecordField field in fields)
+                foreach (var field in fields)
                 {
                     record.Fields.Remove(field);
                 }
@@ -264,17 +266,15 @@ namespace ManagedIrbis.Pft
                 IndexSpecification fieldIndex,
                 char code,
                 IndexSpecification subfieldIndex,
-                [CanBeNull] string value
+                string? value
             )
         {
-            Code.NotNull(context, "context");
-
             code = SubFieldCode.Normalize(code);
 
-            Record record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftUtility::AssignSubField: "
                         + "record not set"
@@ -283,7 +283,7 @@ namespace ManagedIrbis.Pft
                 return;
             }
 
-            RecordField[] fields = record.Fields.GetField(tag);
+            var fields = record.Fields.GetField(tag);
 
             if (ReferenceEquals(value, null))
             {
@@ -296,7 +296,7 @@ namespace ManagedIrbis.Pft
             {
                 int i = fieldIndex.ComputeValue(context, fields);
 
-                RecordField field = fields.GetOccurrence(i);
+                var field = fields.GetOccurrence(i);
                 if (ReferenceEquals(field, null))
                 {
                     return;
@@ -305,26 +305,26 @@ namespace ManagedIrbis.Pft
                 fields = new[] { field };
             }
 
-            string[] lines = value.SplitLines()
+            var lines = value.SplitLines()
                 .NonEmptyLines()
                 .ToArray();
-            List<SubField> newSubFields = new List<SubField>();
+            var newSubFields = new List<SubField>();
             foreach (string line in lines)
             {
-                SubField subField = new SubField(code, line);
+                var subField = new SubField { Code = code, Value = line };
                 newSubFields.Add(subField);
             }
 
             int current = 0;
-            foreach (RecordField field in fields)
+            foreach (var field in fields)
             {
-                SubField[] subFields = field.GetSubField(code);
+                var subfields = field.GetSubField(code);
 
                 if (subfieldIndex.Kind == IndexKind.None)
                 {
-                    foreach (SubField subField in subFields)
+                    foreach (var subField in subfields)
                     {
-                        field.SubFields.Remove(subField);
+                        field.Subfields.Remove(subField);
                     }
 
                     if (current < newSubFields.Count)
@@ -332,27 +332,27 @@ namespace ManagedIrbis.Pft
                         SubField newSubField = newSubFields[current];
                         if (!ReferenceEquals(newSubField, null))
                         {
-                            field.SubFields.Add(newSubField);
+                            field.Subfields.Add(newSubField);
                         }
                     }
                     current++;
                 }
                 else
                 {
-                    int i = subfieldIndex.ComputeValue(context, subFields);
+                    int i = subfieldIndex.ComputeValue(context, subfields);
 
                     if (i >= subFields.Length)
                     {
-                        field.SubFields.AddRange(newSubFields);
+                        field.Subfields.AddRange(newSubFields);
                     }
                     else
                     {
-                        int position = field.SubFields.IndexOf(subFields[i]);
-                        field.SubFields[i].Value = newSubFields[0].Value;
+                        int position = field.Subfields.IndexOf(subFields[i]);
+                        field.Subfields[i].Value = newSubFields[0].Value;
 
                         for (int j = 1; j < newSubFields.Count; j++)
                         {
-                            field.SubFields.Insert
+                            field.Subfields.Insert
                                 (
                                     position + j,
                                     newSubFields[j]
@@ -368,18 +368,17 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Clone nodes.
         /// </summary>
-        [CanBeNull]
-        public static PftNodeCollection CloneNodes
+        public static PftNodeCollection? CloneNodes
             (
-                [CanBeNull] this PftNodeCollection nodes,
-                [CanBeNull] PftNode parent
+                this PftNodeCollection? nodes,
+                PftNode? parent
             )
         {
-            PftNodeCollection result = null;
+            PftNodeCollection? result = null;
 
             if (ReferenceEquals(nodes, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftUtility::CloneNodes: "
                         + "nodes are null"
@@ -406,8 +405,8 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static int CompareStrings
             (
-                [CanBeNull] string first,
-                [CanBeNull] string second
+                string? first,
+                string? second
             )
         {
             int result = string.Compare
@@ -430,14 +429,12 @@ namespace ManagedIrbis.Pft
                 string source
             )
         {
-            Code.NotNull(source, "source");
-
-            PftProgram result = ProgramCache.GetProgram(source);
+            var result = ProgramCache.GetProgram(source);
             if (ReferenceEquals(result, null))
             {
-                PftLexer lexer = new PftLexer();
-                PftTokenList tokens = lexer.Tokenize(source);
-                PftParser parser = new PftParser(tokens);
+                var lexer = new PftLexer();
+                var tokens = lexer.Tokenize(source);
+                var parser = new PftParser(tokens);
                 result = parser.Parse();
                 ProgramCache.AddProgram(source, result);
             }
@@ -452,8 +449,8 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool ContainsSubString
             (
-                [CanBeNull] string outer,
-                [CanBeNull] string inner
+                string? outer,
+                string? inner
             )
         {
             if (string.IsNullOrEmpty(inner))
@@ -492,8 +489,8 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static bool ContainsSubStringSensitive
             (
-                [CanBeNull] string outer,
-                [CanBeNull] string inner
+                string? outer,
+                string? inner
             )
         {
             if (string.IsNullOrEmpty(inner))
@@ -529,7 +526,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static double ExtractNumericValue
             (
-                [CanBeNull] string input
+                string? input
             )
         {
             if (string.IsNullOrEmpty(input))
@@ -537,7 +534,7 @@ namespace ManagedIrbis.Pft
                 return 0.0;
             }
 
-            Match match = Regex.Match
+            var match = Regex.Match
                 (
                     input,
                     "[-]?[0-9]*[\\.]?[0-9]*"
@@ -548,18 +545,6 @@ namespace ManagedIrbis.Pft
             }
 
             string value = match.Value;
-            double result;
-
-#if WINMOBILE || PocketPC
-
-            NumericUtility.TryParseDouble
-                (
-                    value,
-                    out result
-                );
-
-#else
-
             double.TryParse
                 (
                     value,
@@ -568,10 +553,8 @@ namespace ManagedIrbis.Pft
                     | NumberStyles.AllowExponent
                     | NumberStyles.Float,
                     CultureInfo.InvariantCulture,
-                    out result
+                    out var result
                 );
-
-#endif
 
             return result;
         }
@@ -583,7 +566,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static double[] ExtractNumericValues
             (
-                [CanBeNull] string input
+                string? input
             )
         {
             if (string.IsNullOrEmpty(input))
@@ -599,21 +582,6 @@ namespace ManagedIrbis.Pft
                 );
             foreach (Match match in matches)
             {
-                double value;
-
-#if WINMOBILE || PocketPC
-
-                if (NumericUtility.TryParseDouble
-                    (
-                        match.Value,
-                        out value
-                    ))
-                {
-                    result.Add(value);
-                }
-
-#else
-
                 if (double.TryParse
                     (
                         match.Value,
@@ -622,13 +590,11 @@ namespace ManagedIrbis.Pft
                         | NumberStyles.AllowExponent
                         | NumberStyles.Float,
                         CultureInfo.InvariantCulture,
-                        out value
+                        out var value
                     ))
                 {
                     result.Add(value);
                 }
-
-#endif
             }
 
             return result.ToArray();
@@ -641,17 +607,17 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static string[] ExtractWords
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (string.IsNullOrEmpty(text))
             {
-                return StringUtility.EmptyArray;
+                return Array.Empty<string>();
             }
 
-            List<string> result = new List<string>();
-            TextNavigator navigator = new TextNavigator(text);
-            StringBuilder builder = new StringBuilder();
+            var result = new List<string>();
+            var navigator = new TextNavigator(text);
+            var builder = new StringBuilder();
             char c;
             while ((c = navigator.ReadChar()) != '\0')
             {
@@ -690,9 +656,6 @@ namespace ManagedIrbis.Pft
                 IEnumerable<FieldSpecification> fields
             )
         {
-            Code.NotNull(builder, "builder");
-            Code.NotNull(fields, "fields");
-
             bool first = true;
             foreach (FieldSpecification field in fields.NonNullItems())
             {
@@ -712,11 +675,9 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static string FormatDataMode
             (
-                this RecordField field
+                this Field field
             )
         {
-            Code.NotNull(field, "field");
-
             string result = FormatHeaderMode(field);
 
             if (!result.EndsWith(".")
@@ -749,15 +710,13 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static string FormatHeaderMode
             (
-                this RecordField field
+                this Field field
             )
         {
-            Code.NotNull(field, "field");
-
             StringBuilder result = new StringBuilder();
 
             result.Append(field.Value);
-            foreach (SubField subField in field.SubFields)
+            foreach (SubField subField in field.Subfields)
             {
                 string delimiter = ". ";
                 char code = char.ToLower(subField.Code);
@@ -805,13 +764,11 @@ namespace ManagedIrbis.Pft
         /// </summary>
         public static string FormatField
             (
-                this RecordField field,
+                this Field field,
                 PftFieldOutputMode mode,
                 bool uppercase
             )
         {
-            Code.NotNull(field, "field");
-
             string result;
 
             switch (mode)
@@ -829,7 +786,7 @@ namespace ManagedIrbis.Pft
                     break;
 
                 default:
-                    Log.Error
+                    Magna.Error
                         (
                             "PftUtiltity::FormatField: "
                             + "unexpected data mode="
@@ -918,19 +875,12 @@ namespace ManagedIrbis.Pft
             switch (decimalPoints)
             {
                 case 0:
-#if WINMOBILE
-
-                    value = Math.Round(value, decimalPoints);
-
-#else
-
                     value = Math.Round
                         (
                             value,
                             decimalPoints,
                             MidpointRounding.ToEven
                         );
-#endif
                     break;
 
                 //case 1:
@@ -981,7 +931,7 @@ namespace ManagedIrbis.Pft
                 //// ReSharper restore CompareOfFloatsByEqualityOperator
             }
 
-            string format = useE
+            var format = useE
                 ? string.Format("E{0}", minLength)
                 : string.Format("F{0}", decimalPoints);
 
@@ -1007,16 +957,13 @@ namespace ManagedIrbis.Pft
         public static bool FormatTermLink
             (
                 PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string database,
+                PftNode? node,
+                string? database,
                 TermLink link
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(link, "link");
-
-            IrbisProvider provider = context.Provider;
-            string saveDatabase = provider.Database;
+            var provider = context.Provider;
+            var saveDatabase = provider.Database;
             try
             {
                 if (!string.IsNullOrEmpty(database))
@@ -1027,7 +974,7 @@ namespace ManagedIrbis.Pft
                 Record record = provider.ReadRecord(link.Mfn);
                 if (!ReferenceEquals(record, null))
                 {
-                    RecordField field = record.Fields.GetField
+                    var field = record.Fields.GetField
                         (
                             link.Tag,
                             link.Occurrence - 1
@@ -1069,9 +1016,6 @@ namespace ManagedIrbis.Pft
                 IndexSpecification index
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(array, "array");
-
             if (index.Kind == IndexKind.None)
             {
                 return array;
@@ -1098,11 +1042,8 @@ namespace ManagedIrbis.Pft
                 params int[] tags
             )
         {
-            Code.NotNull(context, "context");
-
             int result = 0;
-
-            Record record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
                 foreach (int tag in tags)
@@ -1127,15 +1068,13 @@ namespace ManagedIrbis.Pft
                 IndexSpecification index
             )
         {
-            Code.NotNull(context, "context");
-
-            Record record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null))
             {
-                return StringUtility.EmptyArray;
+                return Array.Empty<string>();
             }
 
-            RecordField[] fields = record.Fields.GetField(tag);
+            var fields = record.Fields.GetField(tag);
             string[] result = fields.Select
                 (
                     field => field.ToText()
@@ -1157,19 +1096,15 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Get value of the field.
         /// </summary>
-        [CanBeNull]
-        public static string GetFieldValue
+        public static string? GetFieldValue
             (
                 PftContext context,
-                RecordField field,
+                Field field,
                 char subFieldCode,
                 IndexSpecification subFieldRepeat
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(field, "field");
-
-            string result = null;
+            string? result = null;
 
             if (subFieldCode == SubField.NoCode)
             {
@@ -1274,7 +1209,6 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Get array of reserved words.
         /// </summary>
-        [ItemNotNull]
         public static string[] GetReservedWords()
         {
             return _reservedWords;
@@ -1294,23 +1228,21 @@ namespace ManagedIrbis.Pft
                 IndexSpecification subfieldIndex
             )
         {
-            Code.NotNull(context, "context");
-
-            Record record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftUtility::GetSubFieldValue: "
                         + "record not set"
                     );
 
-                return StringUtility.EmptyArray;
+                return Array.Empty<string>();
             }
 
             code = SubFieldCode.Normalize(code);
 
-            RecordField[] fields = record.Fields.GetField(tag);
+            var fields = record.Fields.GetField(tag);
             fields = GetArrayItem
                 (
                     context,
@@ -1345,8 +1277,6 @@ namespace ManagedIrbis.Pft
                 PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
             if (node.ComplexExpression)
             {
                 return true;
@@ -1369,8 +1299,6 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            Code.NotNull(nodes, "nodes");
-
             bool result = nodes.Any(item => IsComplexExpression(item));
 
             return result;
@@ -1388,9 +1316,6 @@ namespace ManagedIrbis.Pft
                 IList<PftNode> nodes
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(nodes, "nodes");
-
             if (nodes.Count == 0
                 || nodes.Count > 1)
             {
@@ -1416,10 +1341,7 @@ namespace ManagedIrbis.Pft
                 PftNode node
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(node, "node");
-
-            PftVariableReference reference = node as PftVariableReference;
+            var reference = node as PftVariableReference;
             if (!ReferenceEquals(reference, null)
                 && !ReferenceEquals(reference.Name, null))
             {
@@ -1448,9 +1370,6 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            Code.NotNull(builder, "builder");
-            Code.NotNull(nodes, "nodes");
-
             bool first = true;
             foreach (PftNode node in nodes.NonNullItems())
             {
@@ -1475,9 +1394,6 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            Code.NotNull(builder, "builder");
-            Code.NotNull(nodes, "nodes");
-
             bool first = true;
             foreach (PftNode node in nodes.NonNullItems())
             {
@@ -1495,13 +1411,11 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Parse the field.
         /// </summary>
-        public static RecordField ParseField
+        public static Field ParseField
             (
                 string line
             )
         {
-            Code.NotNullNorEmpty(line, "line");
-
             return _ParseLine(line);
         }
 
@@ -1512,13 +1426,12 @@ namespace ManagedIrbis.Pft
         /// <see cref="PftConditionalLiteral"/>,
         /// <see cref="PftRepeatableLiteral"/>.
         /// </summary>
-        [CanBeNull]
-        public static string PrepareText
+        public static string? PrepareText
             (
-                [CanBeNull] string text
+                string? text
             )
         {
-            string result = text;
+            var result = text;
 
             if (!string.IsNullOrEmpty(text))
             {
@@ -1540,8 +1453,6 @@ namespace ManagedIrbis.Pft
                 PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
             if (node.RequiresConnection)
             {
                 return true;
@@ -1564,8 +1475,6 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            Code.NotNull(nodes, "nodes");
-
             bool result = nodes.Any(item => RequiresConnection(item));
 
             return result;
@@ -1576,10 +1485,9 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Extract substring in safe manner.
         /// </summary>
-        [CanBeNull]
-        internal static string SafeSubString
+        internal static string? SafeSubString
             (
-                [CanBeNull] string text,
+                string? text,
                 int offset,
                 int length
             )
@@ -1618,7 +1526,7 @@ namespace ManagedIrbis.Pft
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftUtility::SafeSubString",
                         exception
@@ -1641,7 +1549,7 @@ namespace ManagedIrbis.Pft
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftUtility::SafeSubString",
                         exception
@@ -1667,12 +1575,9 @@ namespace ManagedIrbis.Pft
                 PftContext context,
                 T[] array,
                 IndexSpecification index,
-                [CanBeNull] T value
+                T? value
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(array, "array");
-
             if (index.Kind == IndexKind.None)
             {
                 array = new[] { value };

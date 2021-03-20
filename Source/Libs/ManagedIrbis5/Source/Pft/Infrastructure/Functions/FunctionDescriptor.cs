@@ -1,29 +1,29 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* FunctionDescriptor.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* FunctionDescriptor.cs -- описатель функции в PFT-скрипте
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
 
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// Function descriptor.
+    /// Описатель функции в PFT-скрипте.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class FunctionDescriptor
     {
         #region Properties
@@ -31,36 +31,29 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Function name.
         /// </summary>
-        [CanBeNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Description.
         /// </summary>
-        [CanBeNull]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Signature specification.
         /// </summary>
-        [CanBeNull]
-        public FunctionParameter[] Signature { get; set; }
+        public FunctionParameter[]? Signature { get; set; }
 
         /// <summary>
         /// Function itself.
         /// </summary>
-        [CanBeNull]
-        public PftFunction Function { get; set; }
+        public PftFunction? Function { get; set; }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Name.ToVisibleString();
-        }
+        public override string ToString() => Name.ToVisibleString();
 
         #endregion
     }

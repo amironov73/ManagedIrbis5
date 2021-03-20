@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftConditionalLiteral.cs -- условный литерал
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,19 +17,15 @@ using System;
 using System.IO;
 
 using AM;
-using AM.Logging;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
@@ -38,8 +38,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// Условные  литералы заключаются в двойные кавычки ("),
     /// например, "Заглавие: ".
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftConditionalLiteral
         : PftNode
     {
@@ -73,12 +71,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftConditionalLiteral
             (
-                [NotNull] string text,
+                string text,
                 bool isSuffix
             )
         {
-            Code.NotNull(text, "text");
-
             Text = text;
             IsSuffix = isSuffix;
         }
@@ -88,12 +84,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftConditionalLiteral
             (
-                [NotNull] PftToken token,
+                PftToken token,
                 bool isSuffix
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.ConditionalLiteral);
 
             IsSuffix = isSuffix;
@@ -104,7 +99,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftConditionLiteral::Constructor",
                         exception
@@ -120,15 +115,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         private void _Execute
             (
-                [NotNull] PftContext context,
-                [NotNull] PftField field
+                PftContext context,
+                PftField field
             )
         {
             string value = field.GetValue(context);
 
             if (field.CanOutput(value))
             {
-                string text = Text;
+                var text = Text;
                 if (context.UpperMode
                     && !ReferenceEquals(text, null))
                 {
@@ -213,7 +208,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            PftField field = context.CurrentField;
+            var field = context.CurrentField;
             if (!ReferenceEquals(field, null))
             {
                 if (IsSuffix)
@@ -236,7 +231,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        public override PftNode? Optimize()
         {
             if (string.IsNullOrEmpty(Text))
             {
@@ -278,10 +273,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return '"' + Text + '"';
-        }
+        public override string ToString() => '"' + Text + '"';
 
         #endregion
     }

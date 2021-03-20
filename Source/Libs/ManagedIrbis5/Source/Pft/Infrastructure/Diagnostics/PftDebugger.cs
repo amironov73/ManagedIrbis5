@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftDebugger.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftDebugger.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -22,21 +26,15 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Diagnostics
 {
     /// <summary>
     /// Debugger for PFT.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public abstract class PftDebugger
     {
         #region Properties
@@ -44,7 +42,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Diagnostics
         /// <summary>
         /// Context.
         /// </summary>
-        [NotNull]
         public PftContext Context { get; private set; }
 
         #endregion
@@ -56,11 +53,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Diagnostics
         /// </summary>
         protected PftDebugger
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
             Context = context;
         }
 

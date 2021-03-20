@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* VirtualChildren.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -14,17 +20,15 @@ using System.Linq;
 
 using AM;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// Virtual children for <see cref="PftNode"/>.
     /// </summary>
-
     public sealed class VirtualChildren
         : IList<PftNode>
     {
@@ -33,7 +37,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Fired on <see cref="GetEnumerator()"/> call.
         /// </summary>
-        public event EventHandler Enumeration;
+        public event EventHandler? Enumeration;
 
         #endregion
 
@@ -65,8 +69,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 IEnumerable<PftNode> children
             )
         {
-            Code.NotNull(children, "children");
-
             _children = children.ToArray();
         }
 
@@ -96,7 +98,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode item
             )
         {
-            Log.Error
+            Magna.Error
                 (
                     "VirtualChildren::Add: "
                     + "not applicable"
@@ -108,7 +110,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="ICollection{T}.Clear" />
         public void Clear()
         {
-            Log.Error
+            Magna.Error
                 (
                     "VirtualChildren::Clear: "
                     + "not applicable"
@@ -142,7 +144,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode item
             )
         {
-            Log.Error
+            Magna.Error
                 (
                     "VirtualChildren::Remove: "
                     + "not applicable"
@@ -153,16 +155,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
 
         /// <inheritdoc cref="ICollection{T}.Count" />
-        public int Count
-        {
-            get { return _children.Length; }
-        }
+        public int Count => _children.Length;
 
         /// <inheritdoc cref="ICollection{T}.IsReadOnly" />
-        public bool IsReadOnly
-        {
-            get { return true; }
-        }
+        public bool IsReadOnly => true;
 
         /// <inheritdoc cref="IList{T}.IndexOf" />
         public int IndexOf
@@ -180,7 +176,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode item
             )
         {
-            Log.Error
+            Magna.Error
                 (
                     "VirtualChildren::Insert: "
                     + "not applicable"
@@ -195,7 +191,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int index
             )
         {
-            Log.Error
+            Magna.Error
                 (
                     "VirtualChildren::RemoveAt: "
                     + "not applicable"
@@ -207,13 +203,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="IList{T}.this" />
         public PftNode this[int index]
         {
-            get
-            {
-                return _children[index];
-            }
+            get => _children[index];
             set
             {
-                Log.Error
+                Magna.Error
                     (
                         "VirtualList::Indexer: "
                         + "set value="

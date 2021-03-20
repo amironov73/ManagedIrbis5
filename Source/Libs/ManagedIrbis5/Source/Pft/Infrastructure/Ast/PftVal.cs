@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftVal.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,14 +19,12 @@ using System.Text;
 
 using AM;
 
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
@@ -74,10 +76,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     //
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftVal
         : PftNumeric
     {
@@ -107,7 +107,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftVal
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
@@ -181,7 +181,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!_valueAlreadySpecified)
             {
-                PftNumeric numeric = Children.FirstOrDefault() as PftNumeric;
+                var numeric = Children.FirstOrDefault() as PftNumeric;
                 if (!ReferenceEquals(numeric, null))
                 {
                     numeric.Execute(context);

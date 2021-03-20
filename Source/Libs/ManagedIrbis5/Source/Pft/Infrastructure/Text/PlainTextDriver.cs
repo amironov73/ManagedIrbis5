@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PlainTextDriver.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PlainTextDriver.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -22,21 +26,15 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Text
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PlainTextDriver
         : TextDriver
     {
@@ -45,7 +43,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// <summary>
         /// Name of the driver.
         /// </summary>
-        public override string Name { get { return "Plain text"; } }
+        public override string Name => "Plain text";
 
         #endregion
 
@@ -56,20 +54,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
         /// </summary>
         public PlainTextDriver
             (
-                [NotNull] PftOutput output
+                PftOutput output
             )
             : base(output)
         {
         }
 
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-        
         #endregion
 
         #region TextDriver members
@@ -117,8 +107,5 @@ namespace ManagedIrbis.Pft.Infrastructure.Text
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

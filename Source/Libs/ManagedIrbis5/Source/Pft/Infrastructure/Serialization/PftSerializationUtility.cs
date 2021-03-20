@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftSerializationUtility.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftSerializationUtility.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,21 +19,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Serialization
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public static class PftSerializationUtility
     {
         #region Public methods
@@ -39,13 +37,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void CompareLists
             (
-                [NotNull] IList<PftNode> left,
-                [NotNull] IList<PftNode> right
+                IList<PftNode> left,
+                IList<PftNode> right
             )
         {
-            Code.NotNull(left, "left");
-            Code.NotNull(right, "right");
-
             if (left.Count != right.Count)
             {
                 throw new PftSyntaxException();
@@ -66,13 +61,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void CompareLists
             (
-                [NotNull] IList<FieldSpecification> left,
-                [NotNull] IList<FieldSpecification> right
+                IList<FieldSpecification> left,
+                IList<FieldSpecification> right
             )
         {
-            Code.NotNull(left, "left");
-            Code.NotNull(right, "right");
-
             if (left.Count != right.Count)
             {
                 throw new PftSyntaxException();
@@ -92,8 +84,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void CompareNodes
             (
-                [CanBeNull] PftNode left,
-                [CanBeNull] PftNode right
+                PftNode? left,
+                PftNode? right
             )
         {
             bool result;
@@ -127,14 +119,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static bool CompareStrings
             (
-                [CanBeNull] string left,
-                [CanBeNull] string right
+                string? left,
+                string? right
             )
         {
             if (ReferenceEquals(left, null))
             {
                 return ReferenceEquals(right, null);
             }
+
             if (ReferenceEquals(right, null))
             {
                 return false;
@@ -148,13 +141,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         /// </summary>
         public static void VerifyDeserializedProgram
             (
-                [NotNull] PftProgram ethalon,
-                [NotNull] PftProgram deserialized
+                PftProgram ethalon,
+                PftProgram deserialized
             )
         {
-            Code.NotNull(ethalon, "ethalon");
-            Code.NotNull(deserialized, "deserialized");
-
             ethalon.CompareNode(deserialized);
         }
 

@@ -1,40 +1,38 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftConditionNot.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
 using AM;
-using AM.Logging;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftConditionNot
         : PftCondition
     {
@@ -43,8 +41,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Inner condition
         /// </summary>
-        [CanBeNull]
-        public PftCondition InnerCondition { get; set; }
+        public PftCondition? InnerCondition { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -70,7 +67,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // Nothing to do here
 
-                Log.Error
+                Magna.Error
                     (
                         "PftConditionNot::Children: "
                         + "set value="
@@ -120,7 +117,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(InnerCondition, null))
             {
-                result.InnerCondition 
+                result.InnerCondition
                     = (PftCondition) InnerCondition.Clone();
             }
 
@@ -195,7 +192,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (ReferenceEquals(InnerCondition, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftConditionNot::Execute: "
                         + "InnerCondition not set"

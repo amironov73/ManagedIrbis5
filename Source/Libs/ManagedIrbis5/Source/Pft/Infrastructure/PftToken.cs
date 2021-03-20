@@ -51,14 +51,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Token text.
         /// </summary>
-        [CanBeNull]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
         /// Arbitrary user data.
         /// </summary>
-        [CanBeNull]
-        public object UserData { get; set; }
+        public object? UserData { get; set; }
 
         #endregion
 
@@ -102,7 +100,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             if (Kind != kind)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftToken::MustBe: "
                         + "expecting="
@@ -127,8 +125,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             Column = reader.ReadPackedInt32();
             Kind = (PftTokenKind) reader.ReadPackedInt32();
             Line = reader.ReadPackedInt32();
@@ -141,8 +137,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer
                 .WritePackedInt32(Column)
                 .WritePackedInt32((int) Kind)

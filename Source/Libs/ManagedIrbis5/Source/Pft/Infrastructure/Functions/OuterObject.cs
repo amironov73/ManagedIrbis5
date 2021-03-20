@@ -1,30 +1,29 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* OuterObject.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* OuterObject.cs -- внешний (по отношению к PFT-скрипту) объект
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
 
+#nullable enable
+
 namespace ManagedIrbis.Pft.Infrastructure
 {
+    /// <summary>
+    /// Внешний (по отношению к PFT-скрипту) объект.
+    /// </summary>
     abstract class OuterObject
         : IDisposable
     {
@@ -38,7 +37,6 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Name of the object.
         /// </summary>
-        [NotNull]
         public string Name { get; private set; }
 
         #endregion
@@ -51,11 +49,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <param name="name">Name of the object.</param>
         protected OuterObject
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
         }
 
@@ -70,16 +66,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Call method of the object.
         /// </summary>
-        [CanBeNull]
-        public virtual object CallMethod
+        public virtual object? CallMethod
             (
-                [NotNull] string methodName,
-                [NotNull] object[] parameters
+                string methodName,
+                object[] parameters
             )
         {
-            Code.NotNullNorEmpty(methodName, "methodName");
-            Code.NotNull(parameters, "parameters");
-
             // Nothing to do here
 
             return null;

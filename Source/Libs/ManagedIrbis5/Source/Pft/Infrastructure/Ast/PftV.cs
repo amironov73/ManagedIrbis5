@@ -1,32 +1,30 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftV.cs -- ссылка на поле
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     /// Ссылка на поле.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftV
         : PftField
     {
@@ -48,15 +46,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftV
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
-            FieldSpecification specification = new FieldSpecification();
+            var specification = new FieldSpecification();
             if (!specification.Parse(text))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftV::Constructor: "
                         + "text="
@@ -74,15 +70,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftV
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.V);
 
-            FieldSpecification specification
-                = ((FieldSpecification)token.UserData)
+            var specification = ((FieldSpecification?)token.UserData)
                 .ThrowIfNull("token.UserData");
             Apply(specification);
         }
@@ -96,9 +90,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 char code
             )
         {
-            Code.Positive(tag, "tag");
-
-            FieldSpecification specification = new FieldSpecification(tag, code)
+            var specification = new FieldSpecification(tag, code)
                 {
                     Command = 'v'
                 };
@@ -113,9 +105,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 int tag
             )
         {
-            Code.Positive(tag, "tag");
-
-            FieldSpecification specification = new FieldSpecification(tag)
+            var specification = new FieldSpecification(tag)
             {
                 Command = 'v'
             };
@@ -130,7 +120,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         private void _Execute
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
             try
@@ -178,12 +168,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public int GetCount
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null)
                 || string.IsNullOrEmpty(Tag))
             {
@@ -226,7 +214,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 if (!ReferenceEquals(context.CurrentField, null))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "PftV::Execute: "
                             + "nested field detected"
