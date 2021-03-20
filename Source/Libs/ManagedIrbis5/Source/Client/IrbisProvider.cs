@@ -49,6 +49,8 @@ namespace ManagedIrbis.Client
 
         public abstract TermLink[] ExactSearchTrimLinks(string term, int i);
 
+        public abstract string FormatRecord(Record record, string format);
+
         public abstract void ReleaseFormatter(IPftFormatter formatter);
 
         public abstract void Dispose();

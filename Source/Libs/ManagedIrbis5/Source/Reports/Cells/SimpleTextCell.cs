@@ -1,30 +1,26 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* SimpleTextCell.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* SimpleTextCell.cs -- простая текстовая ячейка отчета
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-
-
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    ///
+    /// Простая текстовая ячейка отчета.
     /// </summary>
-
     public sealed class SimpleTextCell
         : TextCell
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -32,7 +28,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public SimpleTextCell()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -43,36 +39,26 @@ namespace ManagedIrbis.Reports
             )
             : base(text)
         {
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        } // constructor
 
         #endregion
 
         #region ReportCell members
 
         /// <inheritdoc cref="TextCell.Compute"/>
-        public override string Compute
+        public override string? Compute
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeCompute(context);
 
-            string result = Text;
+            var result = Text;
 
             OnAfterCompute(context);
 
             return result;
-        }
+        } // method Compute
 
         /// <inheritdoc cref="TextCell.Render" />
         public override void Render
@@ -80,17 +66,13 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            string text = Compute(context);
+            var text = Compute(context);
 
             context.Output.Write(text);
-        }
+        } // method Render
 
         #endregion
 
-        #region Object members
+    } // class SimpleTextCell
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

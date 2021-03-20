@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MxExecutive.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -10,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,23 +30,19 @@ using AM.Collections;
 using AM.ConsoleIO;
 using AM.IO;
 using AM.Json;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Client;
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mx.Commands;
 using ManagedIrbis.Mx.Infrastructrure;
 using ManagedIrbis.Pft.Infrastructure;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx
 {
@@ -52,44 +57,37 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Context.
         /// </summary>
-        [NotNull]
         public PftContext Context { get; internal set; }
 
         /// <summary>
         /// Console.
         /// </summary>
-        [NotNull]
         public IMxConsole MxConsole { get; set; }
 
         /// <summary>
         /// Palette.
         /// </summary>
-        [NotNull]
         public MxPalette Palette { get; set; }
 
         /// <summary>
         /// Client.
         /// </summary>
-        [NotNull]
         public IrbisProvider Provider { get; internal set; }
 
         /// <summary>
         /// Commands.
         /// </summary>
-        [NotNull]
         public NonNullCollection<MxCommand> Commands { get; private set; }
 
         /// <summary>
         /// Format.
         /// </summary>
-        [CanBeNull]
-        public string DescriptionFormat { get; set; }
+        public string? DescriptionFormat { get; set; }
 
         /// <summary>
         /// Order expression.
         /// </summary>
-        [CanBeNull]
-        public string OrderFormat { get; set; }
+        public string? OrderFormat { get; set; }
 
         /// <summary>
         /// Search limit.
@@ -99,7 +97,6 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Records.
         /// </summary>
-        [NotNull]
         public NonNullCollection<MxRecord> Records { get; private set; }
 
         /// <summary>
@@ -115,25 +112,21 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Search history.
         /// </summary>
-        [NotNull]
         public Stack<string> History { get; private set; }
 
         /// <summary>
         /// Stack of databases.
         /// </summary>
-        [NotNull]
         public Stack<string> Databases { get; private set; }
 
         /// <summary>
         /// List of modules.
         /// </summary>
-        [NotNull]
         public List<MxModule> Modules { get; private set; }
 
         /// <summary>
         /// List of handlers.
         /// </summary>
-        [NotNull]
         public List<MxHandler> Handlers { get; private set; }
 
         /// <summary>
@@ -143,20 +136,12 @@ namespace ManagedIrbis.Mx
         {
             get
             {
-#if CLASSIC || NETCORE
+                var assembly = typeof(MxExecutive).Assembly;
+                var result = assembly.GetName().Version;
 
-                Assembly assembly = typeof(MxExecutive).Assembly;
-                Version result = assembly.GetName().Version;
-
-                return result;
-
-#else
-
-                return new Version (1, 0);
-
-#endif
+                return result ?? new Version(0, 0);
             }
-        }
+        } // property Version
 
         #endregion
 
@@ -194,8 +179,6 @@ namespace ManagedIrbis.Mx
 
         private StringBuilder _output;
 
-#if !WINMOBILE && !PocketPC
-
         private void _CancelKeyPress
             (
                 object sender,
@@ -204,8 +187,6 @@ namespace ManagedIrbis.Mx
         {
             StopFlag = true;
         }
-
-#endif
 
         private void _CreateStandardCommands()
         {
@@ -385,7 +366,7 @@ namespace ManagedIrbis.Mx
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "MxExecutive::_ExecuteLine",
                         exception
@@ -403,8 +384,7 @@ namespace ManagedIrbis.Mx
             return result;
         }
 
-        [CanBeNull]
-        private MxCommand _FindCommand
+        private MxCommand? _FindCommand
             (
                 string name
             )
@@ -459,10 +439,9 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public bool ExecuteFile
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
 
             string text = FileUtility.ReadAllText(fileName, IrbisEncoding.Utf8);
             bool result = ExecuteLine(text);
@@ -475,7 +454,7 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public bool ExecuteLine
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (string.IsNullOrEmpty(text))
@@ -499,8 +478,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Get collected output.
         /// </summary>
-        [CanBeNull]
-        public string GetOutput()
+        public string? GetOutput()
         {
             if (ReferenceEquals(_output, null))
             {
@@ -513,14 +491,13 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Форматирование на сервере.
         /// </summary>
-        [NotNull]
         public string FormatRemote
             (
-                [NotNull] string source
+                string source
             )
         {
-            MarcRecord record = new MarcRecord();
-            string result = Provider.FormatRecord(record, source)
+            var record = new Record();
+            var result = Provider.FormatRecord(record, source)
                           ?? string.Empty;
 
             return result;
@@ -529,7 +506,6 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Get specified command.
         /// </summary>
-        [NotNull]
         public T GetCommand<T>()
             where T : MxCommand
         {
@@ -552,14 +528,11 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Get specified command.
         /// </summary>
-        [CanBeNull]
-        public MxCommand GetCommand
+        public MxCommand? GetCommand
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             return Commands.FirstOrDefault(c => c.Name.SameString(name));
         }
 
@@ -568,17 +541,9 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public void LoadModule
             (
-                [NotNull] string modulePath
+                string modulePath
             )
         {
-            Code.NotNullNorEmpty(modulePath, "modulePath");
-
-#if UAP || WINMOBILE || PocketPC
-
-            throw new NotImplementedException();
-
-#else
-
             string extension = Path.GetExtension(modulePath);
             if (string.IsNullOrEmpty(extension))
             {
@@ -607,14 +572,11 @@ namespace ManagedIrbis.Mx
             MxModule module = (MxModule)Activator.CreateInstance(type);
             module.Initialize(this);
             Modules.Add(module);
-
-#endif
         }
 
         /// <summary>
         /// Read one line.
         /// </summary>
-        [NotNull]
         public string ReadLine()
         {
             ConsoleColor saveColor = MxConsole.ForegroundColor;
@@ -634,15 +596,11 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public void Repl()
         {
-#if !WINMOBILE && !PocketPC && !UAP
-
             Console.CancelKeyPress += _CancelKeyPress;
             Console.Title = string.Format
                 (
                     "mx64 v{0}", Version
                 );
-
-#endif
 
             while (!StopFlag)
             {
@@ -657,7 +615,7 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public void WriteError
             (
-                [NotNull] string text
+                string text
             )
         {
             WriteLine(Palette.Error, text);
@@ -668,7 +626,7 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public void WriteLine
             (
-                [NotNull] string text
+                string text
             )
         {
             MxConsole.Write(text);
@@ -681,7 +639,7 @@ namespace ManagedIrbis.Mx
         public void WriteLine
             (
                 ConsoleColor color,
-                [NotNull] string text
+                string text
             )
         {
             ConsoleColor saveColor = MxConsole.ForegroundColor;
@@ -702,7 +660,7 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public void WriteMessage
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (string.IsNullOrEmpty(text))
@@ -727,7 +685,7 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public void WriteOutput
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (!string.IsNullOrEmpty(text))

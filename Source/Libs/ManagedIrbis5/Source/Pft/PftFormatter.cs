@@ -23,6 +23,19 @@ namespace ManagedIrbis.Pft
     public class PftFormatter
         : IPftFormatter
     {
+        #region Construction
+
+        public PftFormatter()
+        {
+        }
+
+        public PftFormatter(object context)
+        {
+            Context = context;
+        }
+
+        #endregion
+
         #region IPftFormatter members
 
         public bool SupportsExtendedSyntax { get; }

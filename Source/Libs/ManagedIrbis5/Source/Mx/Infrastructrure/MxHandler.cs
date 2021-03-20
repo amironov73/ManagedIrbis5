@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MxHandler.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -18,19 +26,12 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Infrastructrure
 {
@@ -45,7 +46,6 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// <summary>
         /// Prefix.
         /// </summary>
-        [NotNull]
         public abstract string Prefix { get; }
 
         #endregion
@@ -65,10 +65,9 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// </summary>
         public virtual void Initialize
             (
-                [NotNull] MxExecutive executive
+                MxExecutive executive
             )
         {
-            Code.NotNull(executive, "executive");
         }
 
         /// <summary>
@@ -76,8 +75,8 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// </summary>
         public abstract void Parse
             (
-                [NotNull] MxExecutive executive,
-                [CanBeNull] string commandLine
+                MxExecutive executive,
+                string? commandLine
             );
 
         /// <summary>
@@ -85,10 +84,9 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// </summary>
         public virtual void BeginOutput
             (
-                [NotNull] MxExecutive executive
+                MxExecutive executive
             )
         {
-            Code.NotNull(executive, "executive");
         }
 
         /// <summary>
@@ -96,8 +94,8 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// </summary>
         public abstract void HandleOutput
             (
-                [NotNull] MxExecutive executive,
-                [CanBeNull] string output
+                MxExecutive executive,
+                string? output
             );
 
         /// <summary>
@@ -105,10 +103,9 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// </summary>
         public virtual void EndOutput
             (
-                [NotNull] MxExecutive executive
+                MxExecutive executive
             )
         {
-            Code.NotNull(executive, "executive");
         }
 
         #endregion

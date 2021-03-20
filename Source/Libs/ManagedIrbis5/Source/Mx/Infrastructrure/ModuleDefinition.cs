@@ -1,19 +1,25 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ModuleDefinition.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Infrastructrure
 {
@@ -27,26 +33,26 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// <summary>
         /// Name.
         /// </summary>
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
 
         /// <summary>
         /// Description.
         /// </summary>
-        [JsonProperty("description")]
-        public string Description { get; set; }
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
 
         /// <summary>
         /// Class name.
         /// </summary>
-        [JsonProperty("class")]
-        public string ClassName { get; set; }
+        [JsonPropertyName("class")]
+        public string? ClassName { get; set; }
 
         /// <summary>
         /// Assembly path.
         /// </summary>
-        [JsonProperty("assembly")]
-        public string AssemblyPath { get; set; }
+        [JsonPropertyName("assembly")]
+        public string? AssemblyPath { get; set; }
 
         #endregion
     }

@@ -765,11 +765,27 @@ namespace AM
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
+        [Pure]
+        public static string ToInvariantString (this short value, string format) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
         [Pure]
         public static string ToInvariantString (this ushort value) =>
             value.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this ushort value, string format) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -785,15 +801,9 @@ namespace AM
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
-        /// <param name="value">Число для преобразования.</param>
-        /// <returns>Строковое представление числа.</returns>
-        public static string ToInvariantString
-            (
-                this uint value
-            )
-        {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
+        [Pure]
+        public static string ToInvariantString (this int value, string format) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -801,13 +811,17 @@ namespace AM
         /// </summary>
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
-        public static string ToInvariantString
-            (
-                this long value
-            )
-        {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
+        [Pure]
+        public static string ToInvariantString ( this uint value ) =>
+            value.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString ( this uint value, string format ) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
@@ -815,24 +829,89 @@ namespace AM
         /// </summary>
         /// <param name="value">Число для преобразования.</param>
         /// <returns>Строковое представление числа.</returns>
-        public static string ToInvariantString
-            (
-                this ulong value
-            )
-        {
-            return value.ToString(CultureInfo.InvariantCulture);
-        }
+        [Pure]
+        public static string ToInvariantString (this long value) =>
+            value.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this long value, string format) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        /// <param name="value">Число для преобразования.</param>
+        /// <returns>Строковое представление числа.</returns>
+        [Pure]
+        public static string ToInvariantString (this ulong value) =>
+            value.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this ulong value, string format) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this float value) =>
+            value.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this float value, string format) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this double value) =>
+            value.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this double value, string format) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this decimal value) =>
+            value.ToString(CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Преобразование числа в строку по правилам инвариантной
+        /// (не зависящей от региона) культуры.
+        /// </summary>
+        [Pure]
+        public static string ToInvariantString (this decimal value, string format) =>
+            value.ToString(format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Register required encoding providers.
         /// </summary>
-        public static void RegisterEncodingProviders()
-        {
-            Encoding.RegisterProvider
-                (
-                    CodePagesEncodingProvider.Instance
-                );
-        }
+        public static void RegisterEncodingProviders() =>
+            Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
         /// <summary>
         /// Безопасное преобразование строки в целое.
@@ -862,7 +941,7 @@ namespace AM
             }
 
             return result;
-        }
+        } // method SafeToInt32
 
         /// <summary>
         /// Безопасное преобразование строки в целое.
@@ -884,7 +963,7 @@ namespace AM
             }
 
             return result;
-        }
+        } // method SafeToInt32
 
         /// <summary>
         /// Безопасное преобразование строки в целое.
@@ -905,7 +984,7 @@ namespace AM
             }
 
             return result;
-        }
+        } // method SafeToInt32
 
         /// <summary>
         /// Определяет, равен ли ли данный объект
@@ -963,7 +1042,7 @@ namespace AM
             }
 
             return false;
-        }
+        } // method IsOneOf
 
         /// <summary>
         /// Безопасный доступ по индексу.
@@ -1010,7 +1089,7 @@ namespace AM
             }
 
             return false;
-        }
+        } // method IsOneOf
 
         /// <summary>
         /// Converts empty string to <c>null</c>.
@@ -1035,8 +1114,8 @@ namespace AM
         {
             if (!ReferenceEquals(value, null))
             {
-                Type sourceType = value.GetType();
-                Type targetType = typeof(T);
+                var sourceType = value.GetType();
+                var targetType = typeof(T);
 
                 if (ReferenceEquals(targetType, sourceType))
                 {
@@ -1048,19 +1127,19 @@ namespace AM
                     return true;
                 }
 
-                IConvertible? convertible = value as IConvertible;
+                var convertible = value as IConvertible;
                 if (!ReferenceEquals(convertible, null))
                 {
                     return true; // ???
                 }
 
-                TypeConverter converterFrom = TypeDescriptor.GetConverter(value);
+                var converterFrom = TypeDescriptor.GetConverter(value);
                 if (converterFrom.CanConvertTo(targetType))
                 {
                     return true;
                 }
 
-                TypeConverter converterTo = TypeDescriptor.GetConverter(targetType);
+                var converterTo = TypeDescriptor.GetConverter(targetType);
                 if (converterTo.CanConvertFrom(sourceType))
                 {
                     return true;
@@ -1068,7 +1147,7 @@ namespace AM
             }
 
             return false;
-        }
+        } // method CanConvertTo
 
         /// <summary>
         /// Converts given value to the specified type.
@@ -1122,7 +1201,7 @@ namespace AM
             }
 
             throw new ArsMagnaException();
-        }
+        } // method ConvertTo
 
         /// <summary>
         /// Converts given object to boolean value.
@@ -1732,11 +1811,34 @@ namespace AM
                 ReadOnlySpan<T> third,
                 ReadOnlySpan<T> fourth
             )
-            => !first.IsEmpty ? first
+            =>
+                !first.IsEmpty ? first
                 : !second.IsEmpty ? second
                 : !third.IsEmpty ? third
                 : !fourth.IsEmpty ? fourth
                 : throw new ArgumentOutOfRangeException();
+
+        /// <summary>
+        /// Удаляет в строке начальный и конечный символ кавычек.
+        /// </summary>
+        public static string Unquote
+            (
+                this string text,
+                char quoteChar = '"'
+            )
+        {
+            var length = text.Length;
+            if (length > 1)
+            {
+                if (text[0] == quoteChar
+                    && text[length - 1] == quoteChar)
+                {
+                    text = text.Substring(1, length - 2);
+                }
+            }
+
+            return text;
+        } // method Unquote
 
         /// <summary>
         /// Упрощенное получение информации о методе.

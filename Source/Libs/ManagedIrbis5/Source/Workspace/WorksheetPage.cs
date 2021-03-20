@@ -45,23 +45,20 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Имя страницы.
         /// </summary>
-        [CanBeNull]
         [XmlElement("name")]
-        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
 
         /// <summary>
         /// Элементы страницы.
         /// </summary>
-        [NotNull]
         [XmlElement("item")]
-        [JsonProperty("items")]
+        [JsonPropertyName("items")]
         public NonNullCollection<WorksheetItem> Items { get; private set; }
 
         /// <summary>
         /// Arbitrary user data.
         /// </summary>
-        [CanBeNull]
         [XmlIgnore]
         [JsonIgnore]
         [Browsable(false)]
@@ -88,11 +85,9 @@ namespace ManagedIrbis.Workspace
         /// </summary>
         public void Encode
             (
-                [NotNull] TextWriter writer
+                TextWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             foreach (WorksheetItem item in Items)
             {
                 item.Encode(writer);
@@ -102,17 +97,14 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Разбор потока.
         /// </summary>
-        [NotNull]
         public static WorksheetPage ParseStream
             (
-                [NotNull] TextReader reader,
-                [NotNull] string name,
+                TextReader reader,
+                string name,
                 int count
             )
         {
-            Code.NotNull(reader, "reader");
-
-            WorksheetPage result = new WorksheetPage
+            var result = new WorksheetPage
             {
                 Name = name
             };
@@ -156,8 +148,6 @@ namespace ManagedIrbis.Workspace
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer.WriteNullable(Name);
             writer.Write(Items);
         }

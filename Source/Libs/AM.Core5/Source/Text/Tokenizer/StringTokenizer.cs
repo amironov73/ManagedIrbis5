@@ -372,11 +372,13 @@ namespace AM.Text.Tokenizer
             {
                 return _CreateToken(TokenKind.EOF);
             }
+
             if (c == '\r')
             {
                 ReadChar();
                 goto BEGIN;
             }
+
             if (c == '\n')
             {
                 ReadChar();
@@ -389,6 +391,7 @@ namespace AM.Text.Tokenizer
                 }
                 goto BEGIN;
             }
+
             if (char.IsWhiteSpace(c))
             {
                 result = _ReadWhitespace();
@@ -398,18 +401,22 @@ namespace AM.Text.Tokenizer
                 }
                 goto BEGIN;
             }
+
             if (char.IsDigit(c)||c=='.')
             {
                 return _ReadNumber();
             }
+
             if (c == '"' || c == '\'')
             {
                 return _ReadString();
             }
+
             if (_IsWord(c))
             {
                 return _ReadWord();
             }
+
             if (_IsSymbol(c))
             {
                 return _ReadSymbol();

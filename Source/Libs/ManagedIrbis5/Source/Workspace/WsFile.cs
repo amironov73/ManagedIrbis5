@@ -18,6 +18,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
@@ -47,18 +48,16 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Имя рабочего листа.
         /// </summary>
-        [CanBeNull]
         [XmlAttribute("name")]
-        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonPropertyName("name")]
         public string? Name { get; set; }
 
         /// <summary>
         /// Страницы рабочего листа.
         /// </summary>
-        [NotNull]
         [XmlArray("pages")]
         [XmlArrayItem("page")]
-        [JsonProperty("pages")]
+        [JsonPropertyName("pages")]
         public NonNullCollection<WorksheetPage> Pages { get; private set; }
 
         #endregion
@@ -80,36 +79,32 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Разбор потока.
         /// </summary>
-        [NotNull]
         public static WsFile ParseStream
             (
-                [NotNull] TextReader reader
+                TextReader reader
             )
         {
-            Code.NotNull(reader, "reader");
+            var result = new WsFile();
+            var count = int.Parse(reader.RequireLine());
 
-            WsFile result = new WsFile();
+            var pairs = new Pair<string, int>[count];
 
-            int count = int.Parse(reader.RequireLine());
-
-            Pair<string, int>[] pairs = new Pair<string, int>[count];
-
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                string name = reader.ReadLine();
+                var name = reader.ReadLine();
                 pairs[i] = new Pair<string, int>(name);
             }
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                string text = reader.ReadLine().ThrowIfNull("text");
-                int length = int.Parse(text);
+                var text = reader.ReadLine().ThrowIfNull("text");
+                var length = int.Parse(text);
                 pairs[i].Second = length;
             }
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                string name = pairs[i].First.ThrowIfNull("name");
-                WorksheetPage page = WorksheetPage.ParseStream
+                var name = pairs[i].First.ThrowIfNull("name");
+                var page = WorksheetPage.ParseStream
                     (
                         reader,
                         name,
@@ -124,17 +119,13 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Read from server.
         /// </summary>
-        [CanBeNull]
-        public static WsFile ReadFromServer
+        public static WsFile? ReadFromServer
             (
-                [NotNull] IrbisProvider provider,
-                [NotNull] FileSpecification specification
+                IrbisProvider provider,
+                FileSpecification specification
             )
         {
-            Code.NotNull(provider, "provider");
-            Code.NotNull(specification, "specification");
-
-            string content = provider.ReadFile(specification);
+            var content = provider.ReadFile(specification);
             if (string.IsNullOrEmpty(content))
             {
                 return null;
@@ -142,26 +133,26 @@ namespace ManagedIrbis.Workspace
 
             WsFile result;
 
-            using (StringReader reader = new StringReader(content))
+            using (var reader = new StringReader(content))
             {
                 result = ParseStream(reader);
                 result.Name = specification.FileName;
             }
 
-            for (int i = 0; i < result.Pages.Count; )
+            for (var i = 0; i < result.Pages.Count; )
             {
-                WorksheetPage page = result.Pages[i];
-                string name = page.Name.ThrowIfNull("page.Name");
+                var page = result.Pages[i];
+                var name = page.Name.ThrowIfNull("page.Name");
                 if (name.StartsWith("@"))
                 {
-                    string extension = Path.GetExtension(specification.FileName);
-                    FileSpecification nestedSpecification = new FileSpecification
-                        (
-                            specification.Path,
-                            specification.Database,
-                            name.Substring(1) + extension
-                        );
-                    WsFile nestedFile = ReadFromServer
+                    var extension = Path.GetExtension(specification.FileName);
+                    var nestedSpecification = new FileSpecification
+                        {
+                            Path = specification.Path,
+                            Database = specification.Database,
+                            FileName = name.Substring(1) + extension
+                        };
+                    var nestedFile = ReadFromServer
                         (
                             provider,
                             nestedSpecification
@@ -174,7 +165,7 @@ namespace ManagedIrbis.Workspace
                     else
                     {
                         result.Pages.RemoveAt(i);
-                        for (int j = 0; j < nestedFile.Pages.Count; j++)
+                        for (var j = 0; j < nestedFile.Pages.Count; j++)
                         {
                             result.Pages.Insert
                                 (
@@ -196,39 +187,34 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Fixup nested worksheets for local file.
         /// </summary>
-        [NotNull]
         public static WsFile FixupLocalFile
             (
-                [NotNull] string fileName,
-                [NotNull] Encoding encoding,
-                [NotNull] WsFile wsFile
+                string fileName,
+                Encoding encoding,
+                WsFile wsFile
             )
         {
-            Code.NotNull(fileName, "fileName");
-            Code.NotNull(encoding, "encoding");
-            Code.NotNull(wsFile, "wsFile");
-
-            for (int i = 0; i < wsFile.Pages.Count; )
+            for (var i = 0; i < wsFile.Pages.Count; )
             {
-                WorksheetPage page = wsFile.Pages[i];
-                string name = page.Name.ThrowIfNull("page.Name");
+                var page = wsFile.Pages[i];
+                var name = page.Name.ThrowIfNull("page.Name");
                 if (name.StartsWith("@"))
                 {
-                    string directory = Path.GetDirectoryName(fileName)
-                        ?? string.Empty;
-                    string extension = Path.GetExtension(fileName);
-                    string nestedName = Path.Combine
+                    var directory = Path.GetDirectoryName(fileName)
+                                    ?? string.Empty;
+                    var extension = Path.GetExtension(fileName);
+                    var nestedName = Path.Combine
                         (
                             directory,
                             name.Substring(1) + extension
                         );
-                    WsFile nestedFile = ReadLocalFile
+                    var nestedFile = ReadLocalFile
                         (
                             nestedName,
                             encoding
                         );
                     wsFile.Pages.RemoveAt(i);
-                    for (int j = 0; j < nestedFile.Pages.Count; j++)
+                    for (var j = 0; j < nestedFile.Pages.Count; j++)
                     {
                         wsFile.Pages.Insert
                             (
@@ -249,27 +235,19 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Считывание из локального файла.
         /// </summary>
-        [NotNull]
         public static WsFile ReadLocalFile
             (
-                [NotNull] string fileName,
-                [NotNull] Encoding encoding
+                string fileName,
+                Encoding encoding
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
-            Code.NotNull(encoding, "encoding");
-
-            WsFile result;
-
-            using (StreamReader reader = TextReaderUtility.OpenRead
+            using var reader = TextReaderUtility.OpenRead
                 (
                     fileName,
                     encoding
-                ))
-            {
-                result = ParseStream(reader);
-                result.Name = Path.GetFileName(fileName);
-            }
+                );
+            var result = ParseStream(reader);
+            result.Name = Path.GetFileName(fileName);
 
             return result;
         }
@@ -277,10 +255,9 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Считывание из локального файла.
         /// </summary>
-        [NotNull]
         public static WsFile ReadLocalFile
             (
-                [NotNull] string fileName
+                string fileName
             )
         {
             return ReadLocalFile
@@ -333,9 +310,9 @@ namespace ManagedIrbis.Workspace
                 bool throwOnError
             )
         {
-            Verifier<WsFile> verifier = new Verifier<WsFile>(this, throwOnError);
+            var verifier = new Verifier<WsFile>(this, throwOnError);
 
-            foreach (WorksheetPage page in Pages)
+            foreach (var page in Pages)
             {
                 verifier.VerifySubObject(page, "page");
             }

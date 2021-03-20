@@ -4,30 +4,21 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
-/* TokenStream.cs --
+/* TokenStream.cs -- поток токенов
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#endregion
 
 #nullable enable
 
 namespace AM.Text.Tokenizer
 {
     /// <summary>
-    /// Stream of tokens.
+    /// Поток токенов.
     /// </summary>
     public sealed class TokenStream
     {
@@ -37,28 +28,20 @@ namespace AM.Text.Tokenizer
         /// Current token.
         /// </summary>
         /// <remarks><c>null</c> on end of stream.</remarks>
-        public Token? Current
-        {
-            get
-            {
-                return _position == _tokens.Length
-                    ? null
-                    : _tokens[_position];
-            }
-        }
+        public Token? Current =>
+            _position == _tokens.Length
+                ? null
+                : _tokens[_position];
 
         /// <summary>
         /// Has next token?
         /// </summary>
-        public bool HasNext
-        {
-            get { return _position + 1 < _tokens.Length; }
-        }
+        public bool HasNext => _position + 1 < _tokens.Length;
 
         /// <summary>
         /// Position in the stream.
         /// </summary>
-        public int Position { get { return _position; } }
+        public int Position => _position;
 
         #endregion
 
@@ -90,7 +73,7 @@ namespace AM.Text.Tokenizer
 
         #region Private members
 
-        private Token[] _tokens;
+        private readonly Token[] _tokens;
         private int _position;
 
         #endregion
@@ -130,5 +113,7 @@ namespace AM.Text.Tokenizer
         }
 
         #endregion
-    }
-}
+
+    } // class TokenStream
+
+} // namespace AM.Text.Tokenizer

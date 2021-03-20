@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* BangCommand.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -20,15 +28,12 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Pft.Infrastructure;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {
@@ -81,11 +86,11 @@ namespace ManagedIrbis.Mx.Commands
 
             if (!string.IsNullOrEmpty(source))
             {
-                PftContext context = executive.Context;
+                var context = executive.Context;
                 context.ClearAll();
-                PftFormatter formatter = new PftFormatter(context);
+                var formatter = new PftFormatter(context);
                 formatter.ParseProgram(source);
-                string output = formatter.FormatRecord(new MarcRecord());
+                string output = formatter.FormatRecord(new Record());
                 executive.WriteLine(output);
             }
 

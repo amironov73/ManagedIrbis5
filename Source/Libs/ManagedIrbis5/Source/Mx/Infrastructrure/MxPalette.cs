@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MxPalette.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -8,14 +16,11 @@
 #region Using directives
 
 using System;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Infrastructrure
 {
@@ -29,31 +34,31 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// <summary>
         /// Фон.
         /// </summary>
-        [JsonProperty("background")]
+        [JsonPropertyName("background")]
         public ConsoleColor Background { get; set; }
 
         /// <summary>
         /// Цвет символов по умолчанию.
         /// </summary>
-        [JsonProperty("foreground")]
+        [JsonPropertyName("foreground")]
         public ConsoleColor Foreground { get; set; }
 
         /// <summary>
         /// Вводимые пользователем команды.
         /// </summary>
-        [JsonProperty("command")]
+        [JsonPropertyName("command")]
         public ConsoleColor Command { get; set; }
 
         /// <summary>
         /// Служебные сообщения.
         /// </summary>
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public ConsoleColor Message { get; set; }
 
         /// <summary>
         /// Сообщения об ошибках.
         /// </summary>
-        [JsonProperty("error")]
+        [JsonPropertyName("error")]
         public ConsoleColor Error { get; set; }
 
         #endregion
@@ -63,7 +68,6 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// <summary>
         /// Палитра по умолчанию.
         /// </summary>
-        [NotNull]
         public static MxPalette GetDefaultPalette()
         {
             return new MxPalette

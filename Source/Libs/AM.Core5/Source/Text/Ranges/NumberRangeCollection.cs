@@ -117,15 +117,12 @@ namespace AM.Text.Ranges
         /// <summary>
         /// Добавление диапазона в набор.
         /// </summary>
-        [NotNull]
         public NumberRangeCollection Add
             (
-                [NotNull] string startAndStop
+                string startAndStop
             )
         {
-            Code.NotNullNorEmpty(startAndStop, "startAndStop");
-
-            NumberRangeCollection result = Add
+            var result = Add
                 (
                     new NumberRange(startAndStop)
                 );
@@ -140,11 +137,9 @@ namespace AM.Text.Ranges
         /// <returns></returns>
         public bool Contains
             (
-                [NotNull] NumberText number
+                NumberText number
             )
         {
-            Code.NotNull(number, "number");
-
             bool result = _items.Any
                 (
                     item => item.Contains(number)
@@ -156,19 +151,16 @@ namespace AM.Text.Ranges
         /// <summary>
         /// Parse the text representation
         /// </summary>
-        [NotNull]
         public static NumberRangeCollection Parse
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
-            TextNavigator navigator = new TextNavigator(text);
+            var navigator = new TextNavigator(text);
             navigator.SkipWhile(NumberRange.Delimiters);
             if (navigator.IsEOF)
             {
-                Log.Error
+                Magna.Error
                     (
                         "NumberRangeCollection::Parse: "
                         + "unexpected end of stream"
@@ -188,11 +180,11 @@ namespace AM.Text.Ranges
                 }
 
                 string start = navigator
-                    .ReadUntil(NumberRange.DelimitersOrMinus);
+                    .ReadUntil(NumberRange.DelimitersOrMinus).ToString();
                 NumberRange range;
                 if (string.IsNullOrEmpty(start))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "NumberRangeCollection::Parse: "
                             + "empty Start clause"
@@ -200,16 +192,17 @@ namespace AM.Text.Ranges
 
                     throw new FormatException();
                 }
+
                 navigator.SkipWhitespace();
                 if (navigator.PeekChar() == '-')
                 {
                     navigator.ReadChar();
                     navigator.SkipWhitespace();
                     string stop = navigator
-                        .ReadUntil(NumberRange.Delimiters);
+                        .ReadUntil(NumberRange.Delimiters).ToString();
                     if (string.IsNullOrEmpty(stop))
                     {
-                        Log.Error
+                        Magna.Error
                             (
                                 "NumberRangeCollection::Parse: "
                                 + "empty Stop clause"
@@ -233,16 +226,12 @@ namespace AM.Text.Ranges
         /// <summary>
         /// Кумуляция (сжатие).
         /// </summary>
-        [NotNull]
         public static NumberRangeCollection Cumulate
             (
-                [NotNull] List<NumberText> numbers
+                List<NumberText> numbers
             )
         {
-            Code.NotNull(numbers, "numbers");
-
-            NumberRangeCollection result
-                = new NumberRangeCollection();
+            var result = new NumberRangeCollection();
 
             if (numbers.Count != 0)
             {
@@ -284,15 +273,12 @@ namespace AM.Text.Ranges
         /// <summary>
         /// Кумуляция (сжатие).
         /// </summary>
-        [NotNull]
         public static NumberRangeCollection Cumulate
             (
-                [NotNull] IEnumerable<string> texts
+                IEnumerable<string> texts
             )
         {
-            Code.NotNull(texts, "texts");
-
-            List<NumberText> numbers = texts
+            var numbers = texts
                 .Select(text => new NumberText(text))
                 .ToList();
 
@@ -357,8 +343,6 @@ namespace AM.Text.Ranges
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             _items.Clear();
             int count = reader.ReadPackedInt32();
             for (int i = 0; i < count; i++)
@@ -377,8 +361,6 @@ namespace AM.Text.Ranges
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer.WritePackedInt32(_items.Count);
             for (int i = 0; i < _items.Count; i++)
             {

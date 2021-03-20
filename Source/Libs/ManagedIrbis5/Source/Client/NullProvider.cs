@@ -6,45 +6,40 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
-/* ReportEventArgs.cs --
+/* NullProvider.cs -- null provider used for testing
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Reports
+namespace ManagedIrbis.Client
 {
     /// <summary>
-    ///
+    /// Null provider used for testing.
     /// </summary>
-    public sealed class ReportEventArgs
-        : EventArgs
+    public sealed class NullProvider
+        : IrbisProvider
     {
-        #region Properties
-
-        /// <summary>
-        /// Context.
-        /// </summary>
-        public ReportContext Context { get; }
-
-        #endregion
-
         #region Construction
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ReportEventArgs (ReportContext context) => Context = context;
+        public NullProvider()
+        {
+            Database = "IBIS";
+        }
 
         #endregion
 
-    } // class ReportEventArgs
+    } // class NullProvider
 
-} // namespace ManagedIrbis.Reports
+} // namespace ManagedIrbis.Client

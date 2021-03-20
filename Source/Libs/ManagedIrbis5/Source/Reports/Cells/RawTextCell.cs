@@ -1,30 +1,26 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* RawTextCell.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-
-
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class RawTextCell
         : TextCell
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -47,32 +43,22 @@ namespace ManagedIrbis.Reports
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region ReportCell
 
         /// <inheritdoc cref="TextCell.Compute"/>
-        public override string Compute
+        public override string? Compute
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeCompute(context);
 
-            string result = Text;
+            var result = Text;
 
             OnAfterCompute(context);
 
             return result;
-        }
+        } // method Compute
 
         /// <inheritdoc cref="TextCell.Render" />
         public override void Render
@@ -80,20 +66,15 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            string text = Compute(context);
-
-            ReportDriver driver = context.Driver;
+            var text = Compute(context);
+            var driver = context.Driver;
             driver.BeginCell(context, this);
             context.Output.Write(text);
             driver.EndCell(context, this);
-        }
+        } // method Render
 
         #endregion
 
-        #region Object members
+    } // class RawTextCell
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

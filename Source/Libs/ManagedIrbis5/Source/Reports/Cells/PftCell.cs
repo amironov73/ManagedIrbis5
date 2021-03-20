@@ -1,54 +1,46 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftCell.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftCell.cs -- ячейка с PFT-форматированием
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
-
-
-using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    ///
+    /// Ячейка с PFT-форматированием.
     /// </summary>
-
     public class PftCell
         : ReportCell
     {
         #region Properties
 
         /// <summary>
-        /// Script text.
+        /// PFT-скрипт.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("text")]
+        [JsonPropertyName("text")]
         [XmlAttribute("text")]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         #endregion
 
@@ -76,7 +68,7 @@ namespace ManagedIrbis.Reports
 
         #region Private members
 
-        private PftFormatter _formatter;
+        private PftFormatter? _formatter;
 
         #endregion
 
@@ -87,18 +79,16 @@ namespace ManagedIrbis.Reports
         #region ReportCell members
 
         /// <inheritdoc cref="ReportCell.Compute"/>
-        public override string Compute
+        public override string? Compute
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            Log.Trace("PftCell::Compute");
+            Magna.Trace("PftCell::Compute");
 
             OnBeforeCompute(context);
 
-            string text = Text;
+            var text = Text;
 
             if (string.IsNullOrEmpty(text))
             {
@@ -107,13 +97,15 @@ namespace ManagedIrbis.Reports
                 return null;
             }
 
-            string result = null;
+            string? result = null;
+
+            /*
 
             ConnectedClient connected
                 = context.Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
-                Record record = context.CurrentRecord;
+                var record = context.CurrentRecord;
                 if (!ReferenceEquals(record, null))
                 {
                     result = connected.FormatRecord
@@ -137,8 +129,11 @@ namespace ManagedIrbis.Reports
 
                 OnAfterCompute(context);
             }
+
+            */
+
             return result;
-        }
+        } // method Compute
 
         /// <inheritdoc cref="ReportCell.Render" />
         public override void Render
@@ -146,11 +141,9 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
+            Magna.Trace("PftCell::Render");
 
-            Log.Trace("PftCell::Render");
-
-            string text = Text;
+            var text = Text;
 
             if (string.IsNullOrEmpty(text))
             {
@@ -159,13 +152,13 @@ namespace ManagedIrbis.Reports
                 return;
             }
 
-            ReportDriver driver = context.Driver;
-            string formatted = Compute(context);
+            var driver = context.Driver;
+            var formatted = Compute(context);
 
             driver.BeginCell(context, this);
             driver.Write(context, formatted);
             driver.EndCell(context, this);
-        }
+        } // method Render
 
         #endregion
 
@@ -176,17 +169,12 @@ namespace ManagedIrbis.Reports
         {
             base.Dispose();
 
-            if (!ReferenceEquals(_formatter, null))
-            {
-                _formatter.Dispose();
-                _formatter = null;
-            }
-        }
+            _formatter?.Dispose();
+            _formatter = null;
+        } // method Dispose
 
         #endregion
 
-        #region Object members
+    } // class PftCell
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Reports

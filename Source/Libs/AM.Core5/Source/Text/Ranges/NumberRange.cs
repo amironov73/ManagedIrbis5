@@ -33,7 +33,7 @@ namespace AM.Text.Ranges
     /// <summary>
     /// Range of numbers containing non-numeric fragments.
     /// </summary>
-    [DebuggerDisplay("{Start} - {Stop}")]
+    [DebuggerDisplay("{" + nameof(Start) + "} - {" + nameof(Stop) +"}")]
     public sealed class NumberRange
         : IEnumerable<NumberText>,
         IHandmadeSerializable,
@@ -45,18 +45,12 @@ namespace AM.Text.Ranges
         /// <summary>
         /// Delimiters.
         /// </summary>
-        public static char[] Delimiters
-        {
-            get { return _delimiters; }
-        }
+        public static char[] Delimiters => _delimiters;
 
         /// <summary>
         /// Delimiters or minus sign.
         /// </summary>
-        public static char[] DelimitersOrMinus
-        {
-            get { return _delimitersOrMinus; }
-        }
+        public static char[] DelimitersOrMinus => _delimitersOrMinus;
 
         /// <summary>
         /// Start value.
@@ -127,14 +121,12 @@ namespace AM.Text.Ranges
         /// </summary>
         public bool Contains
             (
-                [NotNull] NumberText number
+                NumberText number
             )
         {
-            Code.NotNull(number, "number");
-
             if (ReferenceEquals(Start, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "NumberRange::Contains: "
                         + "start is null"
@@ -145,7 +137,7 @@ namespace AM.Text.Ranges
 
             if (ReferenceEquals(Stop, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "NumberRange::Contains: "
                         + "stop is null"
@@ -161,20 +153,17 @@ namespace AM.Text.Ranges
         /// <summary>
         /// Parse text representation.
         /// </summary>
-        [NotNull]
         public static NumberRange Parse
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
-            TextNavigator navigator = new TextNavigator(text);
+            var navigator = new TextNavigator(text);
 
             navigator.SkipWhile(Delimiters);
             if (navigator.IsEOF)
             {
-                Log.Error
+                Magna.Error
                     (
                         "NumberRange::Parse: "
                         + "unexpected end of text"
@@ -184,10 +173,10 @@ namespace AM.Text.Ranges
             }
 
             NumberRange result;
-            string start = navigator.ReadUntil(DelimitersOrMinus);
+            string start = navigator.ReadUntil(DelimitersOrMinus).ToString();
             if (string.IsNullOrEmpty(start))
             {
-                Log.Error
+                Magna.Error
                     (
                         "NumberRange::Parse: "
                         + "start sequence not found"
@@ -201,10 +190,10 @@ namespace AM.Text.Ranges
             {
                 navigator.ReadChar();
                 navigator.SkipWhitespace();
-                string stop = navigator.ReadUntil(DelimitersOrMinus);
+                string stop = navigator.ReadUntil(DelimitersOrMinus).ToString();
                 if (string.IsNullOrEmpty(stop))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "NumberRange::Parse: "
                             + "stop sequence not found"
@@ -223,7 +212,7 @@ namespace AM.Text.Ranges
 
             if (!navigator.IsEOF)
             {
-                Log.Error
+                Magna.Error
                     (
                         "NumberRange::Parse: "
                         + "garbage behind range"
@@ -240,15 +229,13 @@ namespace AM.Text.Ranges
         /// </summary>
         public void For
             (
-                [NotNull] Action<NumberText> action
+                Action<NumberText> action
             )
         {
-            Code.NotNull(action, "action");
-
             // ReSharper disable NotResolvedInText
             if (ReferenceEquals(Start, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "NumberRange::Parse: "
                         + "start is null"
@@ -259,7 +246,7 @@ namespace AM.Text.Ranges
 
             if (ReferenceEquals(Stop, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "NumberRange::Parse: "
                         + "stop is null"
@@ -365,8 +352,6 @@ namespace AM.Text.Ranges
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             Start = reader.RestoreNullable<NumberText>();
             Stop = reader.RestoreNullable<NumberText>();
         }
@@ -377,8 +362,6 @@ namespace AM.Text.Ranges
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer
                 .WriteNullable(Start)
                 .WriteNullable(Stop);
@@ -394,8 +377,6 @@ namespace AM.Text.Ranges
                 NumberRange other
             )
         {
-            Code.NotNull(other, "other");
-
             if (ReferenceEquals(Start, null)
                 || ReferenceEquals(Stop, null))
             {

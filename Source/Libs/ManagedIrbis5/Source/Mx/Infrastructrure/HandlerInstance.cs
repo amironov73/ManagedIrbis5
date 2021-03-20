@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* HandlerInstance.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -18,19 +26,12 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Infrastructrure
 {
@@ -44,7 +45,6 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// <summary>
         /// Handler.
         /// </summary>
-        [NotNull]
         public MxHandler Handler { get; private set; }
 
         #endregion
@@ -56,11 +56,9 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// </summary>
         public HandlerInstance
             (
-                [NotNull] MxHandler handler
+                MxHandler handler
             )
         {
-            Code.NotNull(handler, "handler");
-
             Handler = handler;
         }
 

@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ConnectCommand.cs -- connect to the server
  * Ars Magna project, http://arsmagna.ru
  */
@@ -20,13 +28,11 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
 using ManagedIrbis.Client;
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {
@@ -61,15 +67,12 @@ namespace ManagedIrbis.Mx.Commands
         /// <summary>
         /// Initialize the provider.
         /// </summary>
-        [NotNull]
         public static IrbisProvider InitializeProvider
             (
-                [NotNull] string argument
+                string argument
             )
         {
-            Code.NotNull(argument, "argument");
-
-            IrbisProvider result = ProviderManager.GetAndConfigureProvider(argument);
+            var result = ProviderManager.GetAndConfigureProvider(argument);
 
             return result;
         }
@@ -111,10 +114,6 @@ namespace ManagedIrbis.Mx.Commands
 
             return true;
         }
-
-        #endregion
-
-        #region Object members
 
         #endregion
     }

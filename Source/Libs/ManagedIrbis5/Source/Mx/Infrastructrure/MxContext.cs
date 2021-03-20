@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MxContext.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -18,19 +26,12 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Infrastructrure
 {
@@ -44,13 +45,11 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// <summary>
         /// Executive.
         /// </summary>
-        [NotNull]
         public MxExecutive Executive { get; private set; }
 
         /// <summary>
         /// Handlers.
         /// </summary>
-        [NotNull]
         public List<HandlerInstance> Handlers { get; private set; }
 
         #endregion
@@ -62,27 +61,14 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// </summary>
         public MxContext
             (
-                [NotNull] MxExecutive executive
+                MxExecutive executive
             )
         {
-            Code.NotNull(executive, "executive");
-
             Handlers = new List<HandlerInstance>();
             Executive = executive;
         }
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region Object members
-
-        #endregion
     }
 }

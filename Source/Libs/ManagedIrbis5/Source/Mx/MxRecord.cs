@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MxRecord.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -20,13 +28,9 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx
 {
@@ -45,8 +49,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Database name.
         /// </summary>
-        [CanBeNull]
-        public string Database { get; set; }
+        public string? Database { get; set; }
 
         /// <summary>
         /// MFN.
@@ -56,32 +59,27 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Record index (field 903, if any).
         /// </summary>
-        [CanBeNull]
-        public string Index { get; set; }
+        public string? Index { get; set; }
 
         /// <summary>
         /// Record itself.
         /// </summary>
-        [CanBeNull]
-        public MarcRecord Record { get; set; }
+        public Record? Record { get; set; }
 
         /// <summary>
         /// Bibliographic description.
         /// </summary>
-        [CanBeNull]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// For sorting.
         /// </summary>
-        [CanBeNull]
-        public string Order { get; set; }
+        public string? Order { get; set; }
 
         /// <summary>
         /// Arbitrary user data.
         /// </summary>
-        [CanBeNull]
-        public object UserData { get; set; }
+        public object? UserData { get; set; }
 
         #endregion
     }

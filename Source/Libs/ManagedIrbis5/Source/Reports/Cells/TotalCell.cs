@@ -1,36 +1,36 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* TotalCell.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.Text;
 
-
-
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
     ///
     /// </summary>
-
     public class TotalCell
         : ReportCell
     {
@@ -39,34 +39,30 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Band index.
         /// </summary>
-        [JsonProperty("band")]
+        [JsonPropertyName("band")]
         [XmlAttribute("band")]
         public int BandIndex { get; set; }
 
         /// <summary>
         /// Cell index.
         /// </summary>
-        [JsonProperty("cell")]
+        [JsonPropertyName("cell")]
         [XmlAttribute("cell")]
-        public int CellIndex
-        {
-            get; set;
-        }
+        public int CellIndex { get; set; }
 
         /// <summary>
         /// Function.
         /// </summary>
-        [JsonProperty("function")]
+        [JsonPropertyName("function")]
         [XmlAttribute("function")]
         public TotalFunction Function { get; set; }
 
         /// <summary>
         /// Format.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("format")]
+        [JsonPropertyName("format")]
         [XmlAttribute("format")]
-        public string Format { get; set; }
+        public string? Format { get; set; }
 
         #endregion
 
@@ -102,7 +98,7 @@ namespace ManagedIrbis.Reports
                 int bandIndex,
                 int cellIndex,
                 TotalFunction function,
-                [CanBeNull] string format
+                string? format
             )
         {
             BandIndex = bandIndex;
@@ -116,26 +112,21 @@ namespace ManagedIrbis.Reports
         #region Private members
 
         /// <inheritdoc cref="ReportCell.Compute"/>
-        public override string Compute
+        public override string? Compute
             (
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
             OnBeforeCompute(context);
 
-            ReportBand band = Band
-                .ThrowIfNull("Band not set");
-            CompositeBand parent = (CompositeBand) band.Parent
-                .ThrowIfNull("Parent not set");
+            var band = Band.ThrowIfNull("Band not set");
+            var parent = (CompositeBand) band.Parent.ThrowIfNull("Parent not set");
             band = parent.Body[BandIndex];
-            ReportCell cell = band.Cells[CellIndex];
-            string format = Format;
+            var cell = band.Cells[CellIndex];
+            var format = Format;
 
-            string result = null;
-
-            int count = context.Records.Count;
+            string? result = null;
+            var count = context.Records.Count;
 
             if (Function == TotalFunction.Count)
             {
@@ -143,15 +134,15 @@ namespace ManagedIrbis.Reports
             }
             else
             {
-                int countNonEmpty = 0;
+                var countNonEmpty = 0;
                 double accumulator = 0;
 
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     context.Index = i;
                     context.CurrentRecord = context.Records[i];
 
-                    string value = cell.Compute(context);
+                    var value = cell.Compute(context);
 
                     switch (Function)
                     {
@@ -195,28 +186,12 @@ namespace ManagedIrbis.Reports
                             break;
 
                         case TotalFunction.Sum:
-                            double number;
-                            if (NumericUtility.TryParseDouble
-                                (
-                                    value,
-                                    out number
-                                ))
+                            if (double.TryParse (value, out var number))
                             {
                                 accumulator += number;
-                                if (string.IsNullOrEmpty(format))
-                                {
-                                    result = accumulator
-                                        .ToInvariantString();
-                                }
-                                else
-                                {
-                                    result = accumulator
-                                        .ToString
-                                        (
-                                            format,
-                                            CultureInfo.InvariantCulture
-                                        );
-                                }
+                                result = string.IsNullOrEmpty(format)
+                                    ? accumulator.ToInvariantString()
+                                    : accumulator.ToInvariantString(format);
                             }
                             break;
                     }
@@ -237,21 +212,15 @@ namespace ManagedIrbis.Reports
                 ReportContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            ReportDriver driver = context.Driver;
+            var driver = context.Driver;
 
             driver.BeginCell(context, this);
 
-            string text = Compute(context);
+            var text = Compute(context);
             driver.Write(context, text);
 
             driver.EndCell(context, this);
         }
-
-        #endregion
-
-        #region Public methods
 
         #endregion
     }

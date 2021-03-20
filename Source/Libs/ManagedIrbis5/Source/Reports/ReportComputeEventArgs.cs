@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
 /* ReportComputeEventArgs.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -9,17 +15,15 @@
 
 using System;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class ReportComputeEventArgs
         : EventArgs
     {
@@ -28,13 +32,12 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Context.
         /// </summary>
-        public ReportContext Context { get; private set; }
+        public ReportContext Context { get; }
 
         /// <summary>
         /// Result.
         /// </summary>
-        [CanBeNull]
-        public string Result { get; set; }
+        public string? Result { get; set; }
 
         #endregion
 
@@ -43,16 +46,11 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ReportComputeEventArgs
-            (
-                ReportContext context
-            )
-        {
-            Code.NotNull(context, "context");
-
+        public ReportComputeEventArgs (ReportContext context) =>
             Context = context;
-        }
 
         #endregion
-    }
-}
+
+    } // class ReportComputeEventArgs
+
+} // namespace ManagedIrbis.Reports

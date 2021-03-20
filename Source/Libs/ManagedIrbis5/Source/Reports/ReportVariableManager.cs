@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ReportVariableManager.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -14,17 +20,15 @@ using System.Linq;
 using AM;
 using AM.Collections;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Reports
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class ReportVariableManager
         : IVerifiable
     {
@@ -33,27 +37,7 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Variable registry.
         /// </summary>
-        public CaseInsensitiveDictionary<ReportVariable> Registry
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ReportVariableManager()
-        {
-            Registry = new CaseInsensitiveDictionary<ReportVariable>();
-        }
-
-        #endregion
-
-        #region Private members
+        public CaseInsensitiveDictionary<ReportVariable> Registry { get; } = new();
 
         #endregion
 
@@ -67,8 +51,6 @@ namespace ManagedIrbis.Reports
                 TextWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             var keys = Registry.Keys.OrderBy(key => key);
             foreach (string key in keys)
             {
@@ -98,16 +80,12 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Get existing variable with the specified name.
         /// </summary>
-        [CanBeNull]
-        public ReportVariable GetExistingVariable
+        public ReportVariable? GetExistingVariable
             (
                 string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            ReportVariable result;
-            Registry.TryGetValue(name, out result);
+            Registry.TryGetValue(name, out var result);
 
             return result;
         }
@@ -120,9 +98,7 @@ namespace ManagedIrbis.Reports
                 string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            ReportVariable result = GetExistingVariable(name);
+            var result = GetExistingVariable(name);
             if (ReferenceEquals(result, null))
             {
                 result = new ReportVariable(name, null);
@@ -138,12 +114,10 @@ namespace ManagedIrbis.Reports
         public ReportVariable SetVariable
             (
                 string name,
-                [CanBeNull] object value
+                object? value
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            ReportVariable result = GetOrCreateVariable(name);
+            var result = GetOrCreateVariable(name);
             result.Value = value;
 
             return result;

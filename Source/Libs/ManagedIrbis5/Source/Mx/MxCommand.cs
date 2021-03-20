@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MxCommand.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -20,13 +28,9 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx
 {
@@ -55,7 +59,6 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Main name of the command.
         /// </summary>
-        [NotNull]
         public string Name { get; private set; }
 
         #endregion
@@ -77,11 +80,9 @@ namespace ManagedIrbis.Mx
         /// </summary>
         protected MxCommand
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
         }
 
@@ -114,11 +115,9 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public virtual void Initialize
             (
-                [NotNull] MxExecutive executive
+                MxExecutive executive
             )
         {
-            Code.NotNull(executive, "executive");
-
             // Nothing to do here
         }
 
@@ -127,13 +126,10 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public virtual bool Execute
             (
-                [NotNull] MxExecutive executive,
-                [NotNull] MxArgument[] arguments
+                MxExecutive executive,
+                MxArgument[] arguments
             )
         {
-            Code.NotNull(executive, "executive");
-            Code.NotNull(arguments, "arguments");
-
             OnBeforeExecute();
 
             executive.WriteLine("Connect");
@@ -146,8 +142,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Help message.
         /// </summary>
-        [CanBeNull]
-        public virtual string GetShortHelp()
+        public virtual string? GetShortHelp()
         {
             return null;
         }
@@ -155,8 +150,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Help message.
         /// </summary>
-        [CanBeNull]
-        public virtual string GetLongHelp()
+        public virtual string? GetLongHelp()
         {
             return null;
         }
@@ -166,7 +160,7 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public virtual bool RecognizeLine
             (
-                [NotNull] string line
+                string line
             )
         {
             return false;

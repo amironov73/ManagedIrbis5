@@ -214,7 +214,7 @@ namespace ManagedIrbis.Workspace
         {
             Tag = reader.RequireLine().EmptyToNull();
             Title = reader.RequireLine().Trim().EmptyToNull();
-            Repeatable = int.Parse(reader.RequireLine()) != 0;
+            Repeatable = FastNumber.ParseInt32(reader.RequireLine()) != 0;
             Help = reader.RequireLine().Trim().EmptyToNull();
             EditMode = reader.RequireLine().EmptyToNull();
             InputInfo = reader.RequireLine().EmptyToNull();
@@ -223,6 +223,32 @@ namespace ManagedIrbis.Workspace
             DefaultValue = reader.RequireLine().Trim().EmptyToNull();
             Reserved = reader.RequireLine().Trim().EmptyToNull();
         } // method Decode
+
+        /// <summary>
+        /// Разбор потока.
+        /// </summary>
+        public static WorksheetItem ParseStream
+            (
+                TextReader reader
+            )
+        {
+            WorksheetItem result = new WorksheetItem
+            {
+                Tag = reader.RequireLine().EmptyToNull(),
+                Title = reader.RequireLine().Trim().EmptyToNull(),
+                Repeatable = FastNumber.ParseInt32(reader.RequireLine()) != 0,
+                Help = reader.RequireLine().Trim().EmptyToNull(),
+                EditMode = reader.RequireLine().EmptyToNull(),
+                InputInfo = reader.RequireLine().EmptyToNull(),
+                FormalVerification = reader.RequireLine().Trim().EmptyToNull(),
+                Hint = reader.RequireLine().Trim().EmptyToNull(),
+                DefaultValue = reader.RequireLine().Trim().EmptyToNull(),
+                Reserved = reader.RequireLine().Trim().EmptyToNull()
+
+            };
+
+            return result;
+        } // method ParseStream
 
         #endregion
 

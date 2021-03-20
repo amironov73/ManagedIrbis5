@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* FileAppendHandler.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -18,21 +26,14 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.Logging;
 using AM.Runtime;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Mx.Infrastructrure;
 
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Handlers
 {
@@ -58,8 +59,7 @@ namespace ManagedIrbis.Mx.Handlers
 
         #region Private members
 
-        [CanBeNull]
-        private StreamWriter _writer;
+        private StreamWriter? _writer;
 
         #endregion
 

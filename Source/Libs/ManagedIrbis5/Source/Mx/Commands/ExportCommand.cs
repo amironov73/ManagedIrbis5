@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ExportCommand.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -19,14 +27,11 @@ using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Runtime;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-using ManagedIrbis.ImportExport;
-using MoonSharp.Interpreter;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {
@@ -84,7 +89,7 @@ namespace ManagedIrbis.Mx.Commands
                 {
                     foreach (MxRecord mxRecord in executive.Records)
                     {
-                        MarcRecord record = executive.Provider.ReadRecord(mxRecord.Mfn);
+                        var record = executive.Provider.ReadRecord(mxRecord.Mfn);
                         if (!ReferenceEquals(record, null))
                         {
                             string text = record.ToPlainText();

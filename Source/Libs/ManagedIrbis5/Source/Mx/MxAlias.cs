@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MxAlias.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -12,7 +20,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -21,15 +29,10 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 using AM.Text;
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx
 {
@@ -47,18 +50,16 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Name.
         /// </summary>
-        [CanBeNull]
         [XmlAttribute("name")]
-        [JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
-        public string Name { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
 
         /// <summary>
         /// Value.
         /// </summary>
-        [CanBeNull]
         [XmlAttribute("value")]
-        [JsonProperty("value", NullValueHandling = NullValueHandling.Ignore)]
-        public string Value { get; set; }
+        [JsonPropertyName("value")]
+        public string? Value { get; set; }
 
         #endregion
 
@@ -76,13 +77,10 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public MxAlias
             (
-                [CanBeNull] string name,
-                [CanBeNull] string value
+                string? name,
+                string? value
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-            Code.NotNullNorEmpty(value, "value");
-
             Name = name;
             Value = value;
         }
@@ -98,17 +96,13 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Parse the line.
         /// </summary>
-        [NotNull]
-        [MustUseReturnValue]
         public static MxAlias Parse
             (
-                [NotNull] string line
+                string line
             )
         {
-            Code.NotNullNorEmpty(line, "line");
-
-            TextNavigator navigator = new TextNavigator(line);
-            string name = navigator.ReadUntil('=');
+            var navigator = new TextNavigator(line);
+            string name = navigator.ReadUntil('=').ToString();
             if (string.IsNullOrEmpty(name))
             {
                 throw new IrbisException();
@@ -122,7 +116,7 @@ namespace ManagedIrbis.Mx
             {
                 throw new IrbisException();
             }
-            string value = navigator.GetRemainingText();
+            string value = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(value))
             {
                 throw new IrbisException();
@@ -148,8 +142,6 @@ namespace ManagedIrbis.Mx
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             Name = reader.ReadNullableString();
             Value = reader.ReadNullableString();
         }
@@ -160,8 +152,6 @@ namespace ManagedIrbis.Mx
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer
                 .WriteNullable(Name)
                 .WriteNullable(Value);
@@ -193,7 +183,7 @@ namespace ManagedIrbis.Mx
         /// <inheritdoc cref="IEquatable{T}.Equals(T)" />
         public bool Equals
             (
-                MxAlias other
+                MxAlias? other
             )
         {
             if (ReferenceEquals(other, null))
@@ -212,19 +202,20 @@ namespace ManagedIrbis.Mx
         /// <inheritdoc cref="object.Equals(object)" />
         public override bool Equals
             (
-                object obj
+                object? obj
             )
         {
             if (ReferenceEquals(obj, null))
             {
                 return false;
             }
+
             if (ReferenceEquals(obj, this))
             {
                 return true;
             }
-            MxAlias alias = obj as MxAlias;
-            if (ReferenceEquals(alias, null))
+
+            if (!(obj is MxAlias alias))
             {
                 return false;
             }
@@ -241,10 +232,8 @@ namespace ManagedIrbis.Mx
         }
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Name.ToVisibleString() + "=" + Value.ToVisibleString();
-        }
+        public override string ToString() =>
+            Name.ToVisibleString() + "=" + Value.ToVisibleString();
 
         #endregion
     }
