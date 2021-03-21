@@ -47,6 +47,11 @@ namespace ManagedIrbis.Client
 
         public override bool Connected { get; }
 
+        public override IPftFormatter AcquireFormatter()
+        {
+            throw new NotImplementedException();
+        }
+
         public override void Configure(string configurationString)
         {
         }

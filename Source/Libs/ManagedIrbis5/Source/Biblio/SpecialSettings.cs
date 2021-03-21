@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* SpecialSettings.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -21,13 +27,9 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-
-
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
@@ -35,14 +37,10 @@ namespace ManagedIrbis.Biblio
     ///
     /// </summary>
 
-#if !WINMOBILE && !PocketPC
     [JsonConverter(typeof(SpecialSettingsConverter))]
-#endif
     public sealed class SpecialSettings
     {
         #region Nested classes
-
-#if !WINMOBILE && !PocketPC
 
         class SpecialSettingsConverter
             : JsonConverter
@@ -103,8 +101,6 @@ namespace ManagedIrbis.Biblio
             #endregion
         }
 
-#endif
-
         #endregion
 
         #region Properties
@@ -117,8 +113,7 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Name.
         /// </summary>
-        [CanBeNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         #endregion
 
@@ -143,24 +138,17 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Get setting with specified name.
         /// </summary>
-        [CanBeNull]
-        public string GetSetting
+        public string? GetSetting
             (
                 string name
             )
         {
-            Code.NotNull(name, "name");
-
-            string result;
-            Dictionary.TryGetValue(name, out result);
+            Dictionary.TryGetValue(name, out var result);
 
             return result;
         }
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

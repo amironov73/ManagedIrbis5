@@ -1,6 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ChapterCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -8,16 +16,15 @@
 #region Using directives
 
 using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.Collections;
 
-
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
@@ -34,16 +41,12 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Parent.
         /// </summary>
-        [CanBeNull]
         [XmlIgnore]
         [JsonIgnore]
-        public BiblioChapter Parent
+        public BiblioChapter? Parent
         {
-            get { return _parent; }
-            internal set
-            {
-                SetParent(value);
-            }
+            get => _parent;
+            internal set => SetParent(value);
         }
 
         #endregion
@@ -62,7 +65,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public ChapterCollection
             (
-                [CanBeNull] BiblioChapter parent
+                BiblioChapter? parent
             )
         {
             Parent = parent;
@@ -72,11 +75,11 @@ namespace ManagedIrbis.Biblio
 
         #region Private members
 
-        private BiblioChapter _parent;
+        private BiblioChapter? _parent;
 
         internal void SetParent
             (
-                BiblioChapter parent
+                BiblioChapter? parent
             )
         {
             _parent = parent;

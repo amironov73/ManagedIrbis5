@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforS.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,9 +16,9 @@
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -83,17 +87,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Add
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                string text = navigator.ReadInteger();
-                int delta;
-                if (NumericUtility.TryParseInt32(text, out delta))
+                var navigator = new TextNavigator(expression);
+                string text = navigator.ReadInteger().ToString();
+                if (Utility.TryParseInt32(text, out var delta))
                 {
                     //ibatrak при значении 0 - сбросить счетчик
                     if (delta == 0)
@@ -105,7 +108,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         context.UniversalCounter += delta;
                     }
                 }
-                char c = navigator.ReadChar();
+                var c = navigator.ReadChar();
                 if (c == 'A' || c == 'a')
                 {
                     Arabic(context, node, expression);
@@ -122,12 +125,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Arabic
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            string output = context.UniversalCounter.ToInvariantString();
+            var output = context.UniversalCounter.ToInvariantString();
             context.WriteAndSetFlag(node, output);
         }
 
@@ -136,9 +139,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Clear
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             context.UniversalCounter = 0;
@@ -149,16 +152,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Roman
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             //
             // Attention: original IRBIS ignores &uf('SX')
             //
 
-            string output = ToRoman(context.UniversalCounter);
+            var output = ToRoman(context.UniversalCounter);
             context.WriteAndSetFlag(node, output);
         }
 

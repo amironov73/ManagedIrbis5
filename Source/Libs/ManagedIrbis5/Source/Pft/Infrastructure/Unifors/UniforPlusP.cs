@@ -1,24 +1,26 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusP.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusP.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
-using AM.Logging;
 using AM.Text;
-
-using JetBrains.Annotations;
-
-using ManagedIrbis.Client;
-using ManagedIrbis.Search;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -42,9 +44,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetPosting
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -52,9 +54,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = StringUtility.SplitString
+            string[] parts = expression.Split
                 (
-                    expression,
                     CommonSeparators.Comma,
                     2
                 );
@@ -62,16 +63,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 return;
             }
-            char command = parts[0].FirstChar();
-            string startTerm = parts[1];
+
+            var command = parts[0].FirstChar();
+            var startTerm = parts[1];
             if (string.IsNullOrEmpty(startTerm))
             {
                 return;
             }
 
             startTerm = IrbisText.ToUpper(startTerm).ThrowIfNull();
-            IrbisProvider provider = context.Provider;
-            TermParameters parameters = new TermParameters
+            var provider = context.Provider;
+            var parameters = new TermParameters
             {
                 Database = provider.Database,
                 StartTerm = startTerm,
@@ -88,13 +90,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 return;
             }
-            TermLink[] links = provider.ExactSearchLinks(termText);
+            var links = provider.ExactSearchLinks(termText);
             if (links.Length < 1)
             {
                 return;
             }
 
-            TermLink link = links[0];
+            var link = links[0];
             string output = null;
             switch (command)
             {
@@ -114,7 +116,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     break;
 
                 default:
-                    Log.Warn
+                    Magna.Warning
                         (
                             "UniforPlusP::GetPosting: "
                           + "unknown command=" + command

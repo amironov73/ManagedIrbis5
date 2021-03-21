@@ -22,7 +22,6 @@ using AM;
 using AM.IO;
 
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
 #endregion
 
@@ -42,13 +41,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
             0x21, 0x41, 0x53, 0x54
         };
 
-
-        private static int _CurrentVersion()
-        {
-            int result =  Connection.ClientVersion.Revision;
-
-            return result;
-        }
+        private static int _CurrentVersion() =>
+            Connection.ClientVersion.Revision;
 
         #endregion
 
@@ -62,8 +56,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 BinaryReader reader
             )
         {
-            byte code = reader.ReadByte();
-            TypeMap mapping = TypeMap.FindCode(code);
+            var code = reader.ReadByte();
+            var mapping = TypeMap.FindCode(code);
 
             if (ReferenceEquals(mapping, null))
             {
@@ -140,10 +134,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 ICollection<PftNode> nodes
             )
         {
-            int count = reader.ReadPackedInt32();
-            for (int i = 0; i < count; i++)
+            var count = reader.ReadPackedInt32();
+            for (var i = 0; i < count; i++)
             {
-                PftNode node = Deserialize(reader);
+                var node = Deserialize(reader);
                 nodes.Add(node);
             }
         }
@@ -156,7 +150,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 BinaryReader reader
             )
         {
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             var result = flag
                 ? Deserialize(reader)
                 : null;
@@ -172,13 +166,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 byte[] bytes
             )
         {
-            MemoryStream memory = new MemoryStream(bytes);
+            var memory = new MemoryStream(bytes);
 
             using var compressor
                 = new DeflateStream(memory, CompressionMode.Decompress);
             using var reader
                 = new BinaryReader(compressor, IrbisEncoding.Utf8);
-                PftNode result = Read(reader);
+                var result = Read(reader);
 
             return result;
         }
@@ -191,15 +185,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 BinaryReader reader
             )
         {
-            byte[] signature = new byte[4];
+            var signature = new byte[4];
             reader.Read(signature, 0, 4);
             if (ArrayUtility.Compare(signature, _signature) != 0)
             {
                 throw new IrbisException();
             }
 
-            int actualVersion = reader.ReadInt32();
-            int expectedVersion = _CurrentVersion();
+            var actualVersion = reader.ReadInt32();
+            var expectedVersion = _CurrentVersion();
             if (actualVersion != expectedVersion)
             {
                 throw new IrbisException();
@@ -207,7 +201,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
 
             /*int offset = */ reader.ReadInt32();
             //reader.BaseStream.Position = offset;
-            PftNode result = Deserialize(reader);
+            var result = Deserialize(reader);
 
             return result;
         }
@@ -240,7 +234,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
             )
         {
             writer.Write(_signature);
-            int version = _CurrentVersion();
+            var version = _CurrentVersion();
             writer.Write(version);
             writer.Write(12);
             Serialize(writer, rootNode);
@@ -257,9 +251,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         {
             using (Stream stream = File.Create(fileName))
 
-            using (DeflateStream compressor
+            using (var compressor
                 = new DeflateStream(stream, CompressionMode.Compress))
-            using (BinaryWriter writer
+            using (var writer
                 = new BinaryWriter(compressor, IrbisEncoding.Utf8))
             {
                 Save(rootNode, writer);
@@ -275,8 +269,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 PftNode node
             )
         {
-            Type nodeType = node.GetType();
-            TypeMap mapping = TypeMap.FindType(nodeType);
+            var nodeType = node.GetType();
+            var mapping = TypeMap.FindType(nodeType);
 
             if (ReferenceEquals(mapping, null))
             {
@@ -286,7 +280,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                         + "unknown node type="
                         + nodeType.AssemblyQualifiedName
                     );
-                PftNodeInfo nodeInfo = node.GetNodeInfo();
+                var nodeInfo = node.GetNodeInfo();
                 Magna.Error
                     (
                         nodeInfo.ToString()
@@ -314,7 +308,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
             )
         {
             writer.WritePackedInt32(nodes.Count);
-            foreach (PftNode node in nodes)
+            foreach (var node in nodes)
             {
                 Serialize(writer, node);
             }
@@ -349,11 +343,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
             )
         {
             // TODO Think about MemoryManager.GetMemoryStream
-            MemoryStream memory = new MemoryStream();
+            var memory = new MemoryStream();
 
-            using (DeflateStream compressor
+            using (var compressor
                 = new DeflateStream(memory, CompressionMode.Compress))
-            using (BinaryWriter writer
+            using (var writer
                 = new BinaryWriter(compressor, IrbisEncoding.Utf8))
             {
                 Save(rootNode, writer);

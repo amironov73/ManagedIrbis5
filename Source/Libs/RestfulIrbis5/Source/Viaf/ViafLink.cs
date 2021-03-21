@@ -1,6 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ViafLink.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -10,20 +17,15 @@
 using AM;
 using AM.Json;
 
-
-
-using Newtonsoft.Json.Linq;
-
 #endregion
 
-// ReSharper disable StringLiteralTypo
+#nullable enable
 
 namespace RestfulIrbis.Viaf
 {
     /// <summary>
     ///
     /// </summary>
-
     public class ViafLink
     {
         #region Properties
@@ -31,17 +33,17 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         ///
         /// </summary>
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        public string S { get; set; }
+        public string? S { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        public string Sid { get; set; }
+        public string? Sid { get; set; }
 
         #endregion
 
@@ -68,7 +70,7 @@ namespace RestfulIrbis.Viaf
         /// </summary>
         public static ViafLink[] Parse
             (
-                [CanBeNull] JArray array
+                JArray? array
             )
         {
             if (ReferenceEquals(array, null))

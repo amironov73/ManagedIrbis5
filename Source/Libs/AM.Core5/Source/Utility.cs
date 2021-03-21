@@ -178,9 +178,328 @@ namespace AM
 
         private static Encoding? _cp866, _windows1251;
 
+        private static readonly char[] _whitespace = { ' ', '\t', '\r', '\n' };
+
         #endregion
 
         #region Public methods
+
+                /// <summary>
+        /// Состоит ли строка только из указанного символа.
+        /// </summary>
+        public static bool ConsistOf
+            (
+                this string? value,
+                char c
+            )
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (char c1 in value)
+            {
+                if (c1 != c)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Состоит ли строка только из указанных символов.
+        /// </summary>
+        public static bool ConsistOf
+            (
+                this string? value,
+                params char[] array
+            )
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (char c in value)
+            {
+                if (Array.IndexOf(array, c) < 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Определяет, состоит ли строка только из цифр.
+        /// </summary>
+        public static bool ConsistOfDigits
+            (
+                this string? value,
+                int startIndex,
+                int endIndex
+            )
+        {
+            if (string.IsNullOrEmpty(value)
+                || startIndex >= value.Length)
+            {
+                return false;
+            }
+
+            endIndex = Math.Min(endIndex, value.Length);
+            for (int i = startIndex; i < endIndex; i++)
+            {
+                if (!char.IsDigit(value[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Определяет, состоит ли строка только из цифр.
+        /// </summary>
+        public static bool ConsistOfDigits
+            (
+                this string? value
+            )
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (char c in value)
+            {
+                if (!char.IsDigit(c))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Содержит ли строка любой из перечисленных символов.
+        /// </summary>
+        public static bool ContainsAnySymbol
+            (
+                this string? text,
+                params char[] symbols
+            )
+        {
+            if (!string.IsNullOrEmpty(text))
+            {
+                foreach (char c in text)
+                {
+                    if (symbols.Contains(c))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the text contains specified character.
+        /// </summary>
+        /// <remarks>
+        /// For portable library.
+        /// </remarks>
+        public static bool ContainsCharacter
+            (
+                this string? text,
+                char symbol
+            )
+        {
+            if (!string.IsNullOrEmpty(text))
+            {
+                foreach (char c in text)
+                {
+                    if (c == symbol)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Строка содержит пробельные символы?
+        /// </summary>
+        public static bool ContainsWhitespace
+            (
+                this string? text
+            )
+        {
+            return text.ContainsAnySymbol(_whitespace);
+        }
+
+        /// <summary>
+        /// Count of given substrings in the text.
+        /// </summary>
+        public static int CountSubstrings
+            (
+                this string? text,
+                string? substring
+            )
+        {
+            int result = 0;
+
+            if (!string.IsNullOrEmpty(text)
+                && !string.IsNullOrEmpty(substring))
+            {
+                int length = substring.Length;
+                int offset = 0;
+
+                while (true)
+                {
+                    int index = text.IndexOf
+                        (
+                            substring,
+                            offset,
+                            StringComparison.OrdinalIgnoreCase
+                        );
+                    if (index < 0)
+                    {
+                        break;
+                    }
+                    result++;
+                    offset = index + length;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Содержит ли перечень строк указанную строку
+        /// (с точностью до регистра символов)?
+        /// </summary>
+        public static bool ContainsNoCase
+            (
+                this IEnumerable<string> lines,
+                string line
+            )
+        {
+            foreach (string one in lines)
+            {
+                if (SameString(one, line))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Безопасное извлечение подстроки (не должно бросаться
+        /// исключениями, разве что при нехватке памяти).
+        /// </summary>
+        public static string? SafeSubstring
+            (
+                this string? text,
+                int offset,
+                int width
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
+            var length = text.Length;
+            if (offset < 0
+                || offset >= length
+                || width <= 0)
+            {
+                return string.Empty;
+            }
+
+            if (offset + width > length)
+            {
+                width = length - offset;
+            }
+            if (width <= 0)
+            {
+                return string.Empty;
+            }
+
+            var result = text.Substring(offset, width);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Безопасное извлечение подстроки (не должно бросаться
+        /// исключениями вообще никогда).
+        /// </summary>
+        public static ReadOnlySpan<char> SafeSubSpan
+            (
+                this ReadOnlySpan<char> text,
+                int offset,
+                int width
+            )
+        {
+            if (text.IsEmpty)
+            {
+                return text;
+            }
+
+            var length = text.Length;
+            if (offset < 0
+                || offset >= length
+                || width <= 0)
+            {
+                return string.Empty;
+            }
+
+            if (offset + width > length)
+            {
+                width = length - offset;
+            }
+            if (width <= 0)
+            {
+                return string.Empty;
+            }
+
+            var result = text.Slice(offset, width);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Changes the encoding of given string from one to other.
+        /// </summary>
+        public static string ChangeEncoding
+            (
+                Encoding fromEncoding,
+                Encoding toEncoding,
+                string value
+            )
+        {
+            if (fromEncoding.Equals(toEncoding))
+            {
+                return value;
+            }
+
+            byte[] bytes = fromEncoding.GetBytes(value);
+            string result = toEncoding.GetString (bytes);
+
+            return result;
+        }
 
         /// <summary>
         /// Is digit from 0 to 9?
@@ -985,6 +1304,183 @@ namespace AM
 
             return result;
         } // method SafeToInt32
+
+        /// <summary>
+        /// Безопасное преобразование строки
+        /// в число с плавающей точкой.
+        /// </summary>
+        public static double SafeToDouble
+            (
+                this string? text,
+                double defaultValue = default
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return defaultValue;
+            }
+
+            if (!TryParseDouble(text, out var result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Безопасное преобразование строки в денежный тип.
+        /// </summary>
+        public static decimal SafeToDecimal
+            (
+                this string? text,
+                decimal defaultValue = default
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return defaultValue;
+            }
+
+            if (!decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseInt16(string? text, out short result) =>
+            short.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseInt16(ReadOnlySpan<char> text, out short result) =>
+            short.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseInt32(string? text, out int result) =>
+            int.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseInt32(ReadOnlySpan<char> text, out int result) =>
+            int.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseInt64(string? text, out long result) =>
+            long.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseInt64(ReadOnlySpan<char> text, out long result) =>
+            long.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseUInt16(string? text, out ushort result) =>
+            ushort.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseUInt16(ReadOnlySpan<char> text, out ushort result) =>
+            ushort.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseUInt32(string? text, out uint result) =>
+            uint.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseUInt32(ReadOnlySpan<char> text, out uint result) =>
+            uint.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseUInt64(string? text, out ulong result) =>
+            ulong.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseUInt64(ReadOnlySpan<char> text, out ulong result) =>
+            ulong.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseDouble(string? text, out double result) =>
+            double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseDouble(ReadOnlySpan<char> text, out double result) =>
+            double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseSingle(string? text, out float result) =>
+            float.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseSingle(ReadOnlySpan<char> text, out float result) =>
+            float.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseDecimal(string? text, out decimal result) =>
+            decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseDecimal(ReadOnlySpan<char> text, out decimal result) =>
+            decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseDateTime(string? text, out DateTime result) =>
+            DateTime.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseDateTime(ReadOnlySpan<char> text, out DateTime result) =>
+            DateTime.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseDateTime(string? text, string? format, out DateTime result) =>
+            DateTime.TryParseExact(text, format, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result);
+
+        /// <summary>
+        /// Сокращение для TryParse.
+        /// </summary>
+        public static bool TryParseDateTime(ReadOnlySpan<char> text, ReadOnlySpan<char> format, out DateTime result) =>
+            DateTime.TryParseExact(text, format, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out result);
 
         /// <summary>
         /// Определяет, равен ли ли данный объект
@@ -1817,6 +2313,41 @@ namespace AM
                 : !third.IsEmpty ? third
                 : !fourth.IsEmpty ? fourth
                 : throw new ArgumentOutOfRangeException();
+
+        /// <summary>
+        /// Trim lines.
+        /// </summary>
+        public static IEnumerable<string> TrimLines
+            (
+                this IEnumerable<string?> lines
+            )
+        {
+            foreach (var line in lines)
+            {
+                if (!ReferenceEquals(line, null))
+                {
+                    yield return line.Trim();
+                }
+            }
+        } // method TrimLines
+
+        /// <summary>
+        /// Trim lines.
+        /// </summary>
+        public static IEnumerable<string> TrimLines
+            (
+                this IEnumerable<string?> lines,
+                params char[] characters
+            )
+        {
+            foreach (var line in lines)
+            {
+                if (!ReferenceEquals(line, null))
+                {
+                    yield return line.Trim(characters);
+                }
+            }
+        } // method TrimLines
 
         /// <summary>
         /// Удаляет в строке начальный и конечный символ кавычек.

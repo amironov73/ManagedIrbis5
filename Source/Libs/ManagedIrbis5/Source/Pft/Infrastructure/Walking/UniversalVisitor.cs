@@ -1,31 +1,29 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniversalVisitor.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniversalVisitor.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Walking
 {
     /// <summary>
     /// Context for AST visitor.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class UniversalVisitor
         : PftVisitor
     {
@@ -34,7 +32,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Walking
         /// <summary>
         /// Visit the node.
         /// </summary>
-        public event Action<VisitorContext> Visitor;
+        public event Action<VisitorContext>? Visitor;
 
         #endregion
 
@@ -43,7 +41,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Walking
         /// <summary>
         /// Some arbitrary user data (optional).
         /// </summary>
-        public object UserData { get; set; }
+        public object? UserData { get; set; }
 
         #endregion
 
@@ -55,12 +53,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Walking
                 PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
-            Action<VisitorContext> visitor = Visitor;
+            var visitor = Visitor;
             if (!ReferenceEquals(visitor, null))
             {
-                VisitorContext context = new VisitorContext(this, node);
+                var context = new VisitorContext(this, node);
                 visitor(context);
 
                 return context.Result;

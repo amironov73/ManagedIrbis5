@@ -21,6 +21,7 @@
 using AM.PlatformAbstraction;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
 
 #nullable enable
@@ -77,6 +78,10 @@ namespace ManagedIrbis.Client
         public abstract Record ReadRecord(int mfn);
 
         public abstract void Dispose();
+
+        public abstract IPftFormatter AcquireFormatter();
+
+        public abstract MenuFile? ReadMenuFile(FileSpecification specification);
     } // class IrbisProvider
 
 } // namespace ManagedIrbis.Client

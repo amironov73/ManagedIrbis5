@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -56,6 +57,17 @@ namespace ManagedIrbis
         #endregion
 
         #region Properties
+
+        // TODO Implement properly
+
+        /// <summary>
+        /// Версия клиента.
+        /// </summary>
+        public static readonly Version ClientVersion = Assembly
+                .GetExecutingAssembly()
+                .GetName()
+                .Version
+            ?? throw new ApplicationException("ClientVersion not defined");
 
         /// <summary>
         ///

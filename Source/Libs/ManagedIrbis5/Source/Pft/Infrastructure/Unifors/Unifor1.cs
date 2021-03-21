@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* Unifor1.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,11 +18,11 @@ using System;
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
-// ReSharper disable RedundantAssignment
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -54,9 +58,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void GetElement
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression)
@@ -65,55 +69,55 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
+            var navigator = new TextNavigator(expression);
 
-            int index = context.Index;
+            var index = context.Index;
             if (navigator.PeekChar() == '*')
             {
                 navigator.ReadChar();
             }
             else
             {
-                string indexText = navigator.ReadInteger();
+                var indexText = navigator.ReadInteger().ToString();
                 if (string.IsNullOrEmpty(indexText))
                 {
                     return;
                 }
-                if (!NumericUtility.TryParseInt32(indexText, out index))
+                if (!Utility.TryParseInt32(indexText, out index))
                 {
                     return;
                 }
             }
 
-            char mode = navigator.ReadChar();
-            char left = navigator.ReadChar();
-            char right = navigator.ReadChar();
-            char question = navigator.ReadChar();
+            var mode = navigator.ReadChar();
+            var left = navigator.ReadChar();
+            var right = navigator.ReadChar();
+            var question = navigator.ReadChar();
             if (question != '?')
             {
                 return;
             }
 
-            char command = navigator.ReadChar();
+            var command = navigator.ReadChar();
             if (command != 'v'
                 && command != 'V')
             {
                 return;
             }
 
-            string tagText = navigator.ReadInteger();
+            var tagText = navigator.ReadInteger().ToString();
             if (string.IsNullOrEmpty(tagText))
             {
                 return;
             }
-            int tag = NumericUtility.ParseInt32(tagText);
+            var tag = Utility.SafeToInt32(tagText);
             if (tag == IrbisGuid.Tag)
             {
                 // Поле GUID не выводится
                 return;
             }
 
-            char code = SubField.NoCode;
+            var code = SubField.NoCode;
             if (navigator.PeekChar() == '^')
             {
                 navigator.ReadChar();
@@ -128,8 +132,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             if (navigator.PeekChar() == '*')
             {
                 navigator.ReadChar();
-                string offsetText = navigator.ReadInteger();
-                if (!NumericUtility.TryParseInt32(offsetText, out offset))
+                var offsetText = navigator.ReadInteger().ToString();
+                if (!Utility.TryParseInt32(offsetText, out offset))
                 {
                     return;
                 }
@@ -137,14 +141,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             if (navigator.PeekChar() == '.')
             {
                 navigator.ReadChar();
-                string lengthText = navigator.ReadInteger();
-                if (!NumericUtility.TryParseInt32(lengthText, out length))
+                var lengthText = navigator.ReadInteger().ToString();
+                if (!Utility.TryParseInt32(lengthText, out length))
                 {
                     return;
                 }
             }
 
-            int repeat = 0;
+            var repeat = 0;
             if (navigator.PeekChar() == '#')
             {
                 navigator.ReadChar();
@@ -154,8 +158,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 }
                 else
                 {
-                    string repeatText = navigator.ReadInteger();
-                    if (!NumericUtility.TryParseInt32(repeatText, out repeat))
+                    var repeatText = navigator.ReadInteger().ToString();
+                    if (!Utility.TryParseInt32(repeatText, out repeat))
                     {
                         return;
                     }
@@ -163,14 +167,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
             repeat = repeat - 1;
 
-            RecordField field = context.Record
+            var field = context.Record
                 .Fields.GetField(tag, repeat);
             if (ReferenceEquals(field, null))
             {
                 return;
             }
 
-            string text = code == SubField.NoCode
+            var text = code == SubField.NoCode
                 ? field.ToText()
                 : field.GetFirstSubFieldValue(code);
             if (string.IsNullOrEmpty(text))
@@ -188,7 +192,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             string output = null;
 
-            string[] items = text.Split(left, right);
+            var items = text.Split(left, right);
             if (mode == 'R' || mode == 'r')
             {
                 output = items.GetOccurrence(index);

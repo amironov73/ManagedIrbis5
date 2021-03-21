@@ -1,6 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* SimpleChapter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -8,40 +15,26 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
 using AM.Text.Output;
-
-
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-
-using Newtonsoft.Json;
-
 #endregion
 
-// ReSharper disable ForCanBeConvertedToForeach
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public class SimpleChapter
         : ChapterWithRecords
     {
@@ -50,27 +43,20 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Filter.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("search")]
-        public string SearchExpression { get; set; }
+        [JsonPropertyName("search")]
+        public string? SearchExpression { get; set; }
 
         /// <summary>
         /// Format.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("format")]
-        public string Format { get; set; }
+        [JsonPropertyName("format")]
+        public string? Format { get; set; }
 
         /// <summary>
         /// Order.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("order")]
-        public string Order { get; set; }
-
-        #endregion
-
-        #region Construction
+        [JsonPropertyName("order")]
+        public string? Order { get; set; }
 
         #endregion
 
@@ -220,9 +206,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin build items {0}", this);
 
             BiblioProcessor processor = context.Processor
@@ -359,11 +343,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin gather records {0}", this);
-            Record record = null;
+            Record? record = null;
 
             try
             {
@@ -431,9 +413,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
             BiblioProcessor processor = context.Processor
@@ -443,11 +423,7 @@ namespace ManagedIrbis.Biblio
 
 
             bool showOrder =
-#if WINMOBILE || PocketPC
-                false;
-#else
                 context.Document.CommonSettings.Value<bool?>("showOrder") ?? false;
-#endif
 
             if (Records.Count != 0
                 || Duplicates.Count != 0

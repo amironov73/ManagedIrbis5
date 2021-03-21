@@ -102,6 +102,16 @@ namespace ManagedIrbis
         public bool Modified { get; internal set; }
 
         /// <summary>
+        /// Индекс документа (поле 920).
+        /// </summary>
+        public string? Index { get; set; }
+
+        /// <summary>
+        /// Ключ для сортировки записей.
+        /// </summary>
+        public string? SortKey { get; set; }
+
+        /// <summary>
         /// Произвольные пользовательские данные.
         /// Данное свойство используется, например,
         /// при построении отчета.

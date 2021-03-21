@@ -10,31 +10,23 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#if !UAP
-
 #region Using directives
 
 using System.Linq;
 using System.Text;
+using System.Web;
 
 using AM;
+using AM.IO;
 
-
-
+using ManagedIrbis;
 using ManagedIrbis.Readers;
 
-using Newtonsoft.Json.Linq;
-
-#if !ANDROID && !UAP && !NETCORE
-
-using System.Web;
-using AM.IO;
-using ManagedIrbis;
 using CM=System.Configuration.ConfigurationManager;
 
-#endif
-
 #endregion
+
+#nullable enable
 
 namespace RestfulIrbis.OsmiCards
 {
@@ -48,21 +40,20 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Ищем метку в карточке.
         /// </summary>
-        [CanBeNull]
-        private static JObject FindLabel
+        private static JObject? FindLabel
             (
                 JObject obj,
                 string label
             )
         {
-            var result = (JObject) obj["values"].FirstOrDefault
+            var result = (JObject?) obj["values"].FirstOrDefault
                 (
                     b => b["label"].Value<string>() == label
                 );
 
             if (ReferenceEquals(result, null))
             {
-                Log.Info($"Block not found {label}");
+                Magna.Info($"Block not found {label}");
             }
 
             return result;
@@ -71,8 +62,6 @@ namespace RestfulIrbis.OsmiCards
         #endregion
 
         #region Public methods
-
-#if !ANDROID && !UAP && !NETCORE
 
         /// <summary>
         /// Build card for reader.
@@ -85,15 +74,12 @@ namespace RestfulIrbis.OsmiCards
                 DicardsConfiguration config
             )
         {
-            Code.NotNull(templateObject, nameof(templateObject));
-            Code.NotNull(reader, nameof(reader));
-
             var name = reader.FamilyName.ThrowIfNull("name");
             var fio = reader.FullName.ThrowIfNull("fio");
 
             var result = (JObject) templateObject.DeepClone();
 
-            JObject block = null;
+            JObject? block = null;
             if (!string.IsNullOrEmpty(config.FioField))
             {
                 block = FindLabel(result, config.FioField);
@@ -113,7 +99,7 @@ namespace RestfulIrbis.OsmiCards
                 var cabinetUrl = config.CabinetUrl;
                 if (string.IsNullOrEmpty(cabinetUrl))
                 {
-                    Log.Debug("BuildCardForReader: cabinerUrl not specified!");
+                    Magna.Debug("BuildCardForReader: cabinerUrl not specified!");
                 }
                 else
                 {
@@ -136,7 +122,7 @@ namespace RestfulIrbis.OsmiCards
                 var catalogUrl = config.CatalogUrl;
                 if (string.IsNullOrEmpty(catalogUrl))
                 {
-                    Log.Debug("BuildCardForReader: catalogUrl not specified!");
+                    Magna.Debug("BuildCardForReader: catalogUrl not specified!");
                 }
                 else
                 {
@@ -168,10 +154,9 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Убираем '-empty-'.
         /// </summary>
-        [CanBeNull]
-        public static string NullForEmpty
+        public static string? NullForEmpty
             (
-                [CanBeNull] this string value
+                this string? value
             )
         {
             return value.SameString("-empty-")
@@ -221,10 +206,6 @@ namespace RestfulIrbis.OsmiCards
             return result;
         }
 
-#endif
-
         #endregion
     }
 }
-
-#endif

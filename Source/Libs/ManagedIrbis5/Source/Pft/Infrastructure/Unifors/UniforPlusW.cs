@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusW.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusW.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,11 +19,9 @@ using System.Text.RegularExpressions;
 using AM;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -48,9 +50,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Increment
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -60,9 +62,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             // ibatrak
             // если в строке больше, чем 1 символ #, лишние части отбрасываются
-            string[] parts = StringUtility.SplitString
+            string[] parts = expression.Split
                 (
-                    expression,
                     CommonSeparators.NumberSign,
                     StringSplitOptions.None
                 );
@@ -76,29 +77,25 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string output = Increment(parts[1]);
+            var output = Increment(parts[1]);
             context.WriteAndSetFlag(node, output);
         }
 
-        [NotNull]
         public static string Increment
             (
-                [NotNull] string input
+                string input
             )
         {
-            Code.NotNull(input, "input");
-
             input = input.ToUpperInvariant();
-            string result = input;
-            Regex regex = new Regex("(-)?([\\d]+)");
-            MatchCollection matches = regex.Matches(input);
+            var result = input;
+            var regex = new Regex("(-)?([\\d]+)");
+            var matches = regex.Matches(input);
             if (matches.Count == 1)
             {
-                int number;
-                Match match = matches[0];
+                var match = matches[0];
 
                 if (!match.Groups[1].Success
-                    && NumericUtility.TryParseInt32(match.Groups[2].Value, out number))
+                    && Utility.TryParseInt32(match.Groups[2].Value, out var number))
                 {
                     result = input.Substring(0, match.Index)
                              + unchecked (number + 1).ToInvariantString()

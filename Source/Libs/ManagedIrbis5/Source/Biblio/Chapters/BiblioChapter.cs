@@ -16,16 +16,10 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 using AM;
-
 using ManagedIrbis.Reports;
 
 #endregion
@@ -303,9 +297,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin gather terms {0}", this);
 
             foreach (var child in Children)
@@ -327,9 +319,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin gather records {0}", this);
 
             foreach (var child in Children)
@@ -351,9 +341,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin initialize {0}", this);
 
             foreach (var child in Children)
@@ -398,9 +386,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render items {0}", this);
 
             RenderTitle(context);
@@ -417,8 +403,6 @@ namespace ManagedIrbis.Biblio
                 Action<BiblioChapter> action
             )
         {
-            Code.NotNull(action, "action");
-
             action(this);
             foreach (var child in Children)
             {

@@ -14,6 +14,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -40,24 +41,23 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void AddField(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression)
                 && !ReferenceEquals(context.Record, null))
             {
-                string[] parts = StringUtility.SplitString
+                var parts = expression.Split
                     (
-                        expression,
                         CommonSeparators.NumberSign,
                         2
                     );
                 if (parts.Length == 2)
                 {
-                    string tag = parts[0];
-                    string text = parts[1];
-                    string[] lines = text.SplitLines()
+                    var tag = parts[0];
+                    var text = parts[1];
+                    var lines = text.SplitLines()
                         .NonEmptyLines().ToArray();
 
-                    foreach (string body in lines)
+                    foreach (var body in lines)
                     {
                         var field = RecordFieldUtility.Parse(tag, body);
                         context.Record.Fields.Add(field);
@@ -114,13 +114,13 @@ namespace ManagedIrbis.Pft.Infrastructure
             int code;
             char c;
 
-            PftFunctionCall call = (PftFunctionCall)node;
+            var call = (PftFunctionCall)node;
             if (call.Arguments.Count == 0)
             {
                 return;
             }
 
-            PftNumeric numeric = call.Arguments[0] as PftNumeric;
+            var numeric = call.Arguments[0] as PftNumeric;
             if (!ReferenceEquals(numeric, null))
             {
                 code = (int)numeric.Value;
@@ -178,19 +178,18 @@ namespace ManagedIrbis.Pft.Infrastructure
             if (!string.IsNullOrEmpty(expression)
                 && !ReferenceEquals(record, null))
             {
-                int repeat = -1;
-                string[] parts = StringUtility.SplitString
+                var repeat = -1;
+                var parts = expression.Split
                     (
-                        expression,
                         CommonSeparators.NumberSign,
                         2
                     );
-                string tag = parts[0];
+                var tag = parts[0];
                 var fields = record.Fields.GetField(tag.SafeToInt32());
 
                 if (parts.Length == 2)
                 {
-                    string repeatText = parts[1];
+                    var repeatText = parts[1];
                     if (repeatText == "*")
                     {
                         repeat = fields.Length - 1;
@@ -245,8 +244,8 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Fatal(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
-            string message = expression ?? string.Empty;
+            var expression = context.GetStringArgument(arguments, 0);
+            var message = expression ?? string.Empty;
 
             Magna.Critical
                 (
@@ -275,10 +274,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void HtmlEscape(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-                string result = HtmlText.Encode(expression);
+                var result = HtmlText.Encode(expression);
                 context.Write(node, result);
             }
         }
@@ -287,7 +286,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Include(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
                 Unifors.Unifor6.ExecuteNestedFormat
@@ -303,9 +302,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Insert(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string text = context.GetStringValue(arguments, 0);
-            double? index = context.GetNumericArgument(arguments, 1);
-            string value = context.GetStringValue(arguments, 2);
+            var text = context.GetStringValue(arguments, 0);
+            var index = context.GetNumericArgument(arguments, 1);
+            var value = context.GetStringValue(arguments, 2);
 
             if (!ReferenceEquals(text, null)
                 && index.HasValue
@@ -313,7 +312,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                )
             {
                 string result;
-                int offset = (int) index.Value;
+                var offset = (int) index.Value;
 
                 if (offset <= 0)
                 {
@@ -336,12 +335,12 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void IOcc(PftContext context, PftNode node, PftNode[] arguments)
         {
-            int index = context.Index;
+            var index = context.Index;
             if (!ReferenceEquals(context.CurrentGroup, null))
             {
                 index++;
             }
-            string text = index.ToInvariantString();
+            var text = index.ToInvariantString();
             context.Write(node, text);
         }
 
@@ -349,7 +348,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Italic(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringValue(arguments, 0);
+            var expression = context.GetStringValue(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
                 context.Write(node, "<i>" + expression + "</i>");
@@ -360,11 +359,11 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Len(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringValue(arguments, 0);
-            int size = string.IsNullOrEmpty(expression)
+            var expression = context.GetStringValue(arguments, 0);
+            var size = string.IsNullOrEmpty(expression)
                 ? 0
                 : expression.Length;
-            string text = size.ToInvariantString();
+            var text = size.ToInvariantString();
             context.Write(node, text);
         }
 
@@ -372,11 +371,11 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void LoadRecord(PftContext context, PftNode node, PftNode[] arguments)
         {
-            double? number = context.GetNumericArgument(arguments, 0);
-            double? level = context.GetNumericArgument(arguments, 1);
+            var number = context.GetNumericArgument(arguments, 0);
+            var level = context.GetNumericArgument(arguments, 1);
             if (number != null)
             {
-                int mfn = (int)number;
+                var mfn = (int)number;
                 var record = context.Provider
                     .ReadRecord(mfn);
 
@@ -388,7 +387,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     if (level == null)
                     {
-                        PftContext ctx = context;
+                        var ctx = context;
                         while (!ReferenceEquals(ctx, null))
                         {
                             ctx.Record = record;
@@ -397,9 +396,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                     }
                     else
                     {
-                        int limit = (int)level.Value;
-                        int count = 0;
-                        PftContext ctx = context;
+                        var limit = (int)level.Value;
+                        var count = 0;
+                        var ctx = context;
                         while (!ReferenceEquals(ctx, null)
                             && count < limit)
                         {
@@ -418,7 +417,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void MachineName(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string machineName = context.Provider.PlatformAbstraction.GetMachineName();
+            var machineName = context.Provider.PlatformAbstraction.GetMachineName();
             context.Write(node, machineName);
         }
 
@@ -433,14 +432,14 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            int result = 0;
+            var result = 0;
 
             if (arguments.Length != 0)
             {
-                double? value = context.GetNumericArgument(arguments, 0);
+                var value = context.GetNumericArgument(arguments, 0);
                 if (value.HasValue)
                 {
-                    int tag = (int) value;
+                    var tag = (int) value;
                     result = record.Fields.GetFieldCount(tag);
                 }
             }
@@ -452,9 +451,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                         .Where(field => field.Command == 'v' || field.Command == 'V')
                         .ToArray();
 
-                    foreach (PftV field in fields)
+                    foreach (var field in fields)
                     {
-                        int count = record.Fields.GetField(field.Tag.SafeToInt32()).Length;
+                        var count = record.Fields.GetField(field.Tag.SafeToInt32()).Length;
                         if (count > result)
                         {
                             result = count;
@@ -463,7 +462,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 }
             }
 
-            string text = result.ToInvariantString();
+            var text = result.ToInvariantString();
             context.Write(node, text);
         }
 
@@ -471,10 +470,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Now(PftContext context, PftNode node, PftNode[] arguments)
         {
-            DateTime now = context.Provider.PlatformAbstraction.Now();
+            var now = context.Provider.PlatformAbstraction.Now();
 
-            string expression = context.GetStringArgument(arguments, 0);
-            string output = string.IsNullOrEmpty(expression)
+            var expression = context.GetStringArgument(arguments, 0);
+            var output = string.IsNullOrEmpty(expression)
                 ? now.ToString(CultureInfo.CurrentCulture)
                 : now.ToString(expression);
 
@@ -485,16 +484,16 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void NPost(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-                FieldSpecification specification = new FieldSpecification();
+                var specification = new FieldSpecification();
                 specification.Parse(expression);
                 var record = context.Record;
                 if (!ReferenceEquals(record, null))
                 {
-                    int count = record.Fields.GetField(specification.Tag).Length;
-                    string text = count.ToInvariantString();
+                    var count = record.Fields.GetField(specification.Tag).Length;
+                    var text = count.ToInvariantString();
                     context.Write(node, text);
                 }
             }
@@ -504,7 +503,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void OsVersion(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string result = context.Provider.PlatformAbstraction.OsVersion().ToString();
+            var result = context.Provider.PlatformAbstraction.OsVersion().ToString();
 
             context.Write(node, result);
         }
@@ -513,9 +512,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void PadLeft(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string text = context.GetStringValue(arguments, 0);
-            double? width = context.GetNumericArgument(arguments, 1);
-            string padding = context.GetStringValue(arguments, 2);
+            var text = context.GetStringValue(arguments, 0);
+            var width = context.GetNumericArgument(arguments, 1);
+            var padding = context.GetStringValue(arguments, 2);
 
             if (ReferenceEquals(text, null)
                 || !width.HasValue)
@@ -523,13 +522,13 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            char pad = ' ';
+            var pad = ' ';
             if (!string.IsNullOrEmpty(padding))
             {
                 pad = padding[0];
             }
 
-            string output = text.PadLeft
+            var output = text.PadLeft
                 (
                     (int)width.Value,
                     pad
@@ -541,9 +540,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void PadRight(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string text = context.GetStringValue(arguments, 0);
-            double? width = context.GetNumericArgument(arguments, 1);
-            string padding = context.GetStringValue(arguments, 2);
+            var text = context.GetStringValue(arguments, 0);
+            var width = context.GetNumericArgument(arguments, 1);
+            var padding = context.GetStringValue(arguments, 2);
 
             if (ReferenceEquals(text, null)
                 || !width.HasValue)
@@ -551,13 +550,13 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            char pad = ' ';
+            var pad = ' ';
             if (!string.IsNullOrEmpty(padding))
             {
                 pad = padding[0];
             }
 
-            string output = text.PadRight
+            var output = text.PadRight
                 (
                     (int)width.Value,
                     pad
@@ -569,25 +568,25 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Remove(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string text = context.GetStringValue(arguments, 0);
-            double? index = context.GetNumericArgument(arguments, 1);
-            double? count = context.GetNumericArgument(arguments, 2);
+            var text = context.GetStringValue(arguments, 0);
+            var index = context.GetNumericArgument(arguments, 1);
+            var count = context.GetNumericArgument(arguments, 2);
 
             if (!ReferenceEquals(text, null)
                 && index.HasValue
                 && count.HasValue
                )
             {
-                int length = text.Length;
-                int offset = (int) index.Value;
-                int c = (int) count.Value;
+                var length = text.Length;
+                var offset = (int) index.Value;
+                var c = (int) count.Value;
 
                 if (offset >= 0
                     && c >= 0
                     && offset + c < length
                    )
                 {
-                    string result = text.Remove(offset, c);
+                    var result = text.Remove(offset, c);
                     context.Write(node, result);
                 }
             }
@@ -597,9 +596,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Replace(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string text = context.GetStringValue(arguments, 0);
-            string oldValue = context.GetStringValue(arguments, 1);
-            string newValue = context.GetStringValue(arguments, 2);
+            var text = context.GetStringValue(arguments, 0);
+            var oldValue = context.GetStringValue(arguments, 1);
+            var newValue = context.GetStringValue(arguments, 2);
 
             if (ReferenceEquals(text, null)
                 || ReferenceEquals(oldValue, null)
@@ -608,7 +607,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string output = text.Replace(oldValue, newValue);
+            var output = text.Replace(oldValue, newValue);
             context.Write(node, output);
         }
 
@@ -616,10 +615,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void RtfEscape(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-                string result = RichText.Encode(expression, UnicodeRange.Russian);
+                var result = RichText.Encode(expression, UnicodeRange.Russian);
                 context.Write(node, result);
             }
         }
@@ -628,18 +627,18 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Search(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-                int[] foundMfns = context.Provider.Search(expression);
+                var foundMfns = context.Provider.Search(expression);
                 if (foundMfns.Length != 0)
                 {
-                    string[] foundLines = foundMfns.Select
+                    var foundLines = foundMfns.Select
                         (
                             item => item.ToInvariantString()
                         )
                         .ToArray();
-                    string output = string.Join
+                    var output = string.Join
                         (
                             Environment.NewLine,
                             foundLines
@@ -653,11 +652,11 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Size(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
-            int size = string.IsNullOrEmpty(expression)
+            var expression = context.GetStringArgument(arguments, 0);
+            var size = string.IsNullOrEmpty(expression)
                 ? 0
                 : expression.SplitLines().Length;
-            string text = size.ToInvariantString();
+            var text = size.ToInvariantString();
             context.Write(node, text);
         }
 
@@ -665,13 +664,13 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Sort(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (string.IsNullOrEmpty(expression))
             {
                 return;
             }
 
-            string[] lines = expression.SplitLines()
+            var lines = expression.SplitLines()
                 .NonEmptyLines().ToArray();
             lines = NumberText.Sort(lines).ToArray();
             context.Write
@@ -689,8 +688,8 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Split(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string text = context.GetStringArgument(arguments, 0);
-            string separator = context.GetStringArgument(arguments, 1);
+            var text = context.GetStringArgument(arguments, 0);
+            var separator = context.GetStringArgument(arguments, 1);
 
             if (ReferenceEquals(text, null)
                 || ReferenceEquals(separator, null))
@@ -698,8 +697,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string[] lines = StringUtility.SplitString(text, separator);
-            string output = string.Join(Environment.NewLine, lines);
+            var lines = text.Split(separator);
+            var output = string.Join(Environment.NewLine, lines);
             context.Write(node, output);
         }
 
@@ -707,9 +706,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Substring(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string text = context.GetStringArgument(arguments, 0);
-            double? offset = context.GetNumericArgument(arguments, 1);
-            double? length = context.GetNumericArgument(arguments, 2);
+            var text = context.GetStringArgument(arguments, 0);
+            var offset = context.GetNumericArgument(arguments, 1);
+            var length = context.GetNumericArgument(arguments, 2);
 
             if (ReferenceEquals(text, null)
                 || !offset.HasValue
@@ -730,11 +729,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void System(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-#if CLASSIC || DESKTOP
-
                 // TODO use PlatformAbstractionLayer
 
                 string comspec = Environment.GetEnvironmentVariable("comspec")
@@ -762,8 +759,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     context.Write(node, output);
                 }
-
-#endif
             }
         }
 
@@ -774,7 +769,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                string[] tags = record.Fields.Select
+                var tags = record.Fields.Select
                     (
                         field => field.Tag
                     )
@@ -783,10 +778,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                     .Select(tag => tag.ToInvariantString())
                     .ToArray();
 
-                string expression = context.GetStringArgument(arguments, 0);
+                var expression = context.GetStringArgument(arguments, 0);
                 if (!string.IsNullOrEmpty(expression))
                 {
-                    Regex regex = new Regex(expression);
+                    var regex = new Regex(expression);
                     tags = tags.Where
                         (
                             tag => regex.IsMatch(tag)
@@ -794,7 +789,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         .ToArray();
                 }
 
-                string output = string.Join
+                var output = string.Join
                     (
                         Environment.NewLine,
                         tags
@@ -807,10 +802,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Today(PftContext context, PftNode node, PftNode[] arguments)
         {
-            DateTime today = context.Provider.PlatformAbstraction.Today();
+            var today = context.Provider.PlatformAbstraction.Today();
 
-            string expression = context.GetStringArgument(arguments, 0);
-            string output = string.IsNullOrEmpty(expression)
+            var expression = context.GetStringArgument(arguments, 0);
+            var output = string.IsNullOrEmpty(expression)
                 ? today.ToShortDateString()
                 : today.ToString(expression);
 
@@ -821,10 +816,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void ToLower(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = IrbisText.ToLower(expression);
+                var output = IrbisText.ToLower(expression);
                 context.Write(node, output);
             }
         }
@@ -833,10 +828,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void ToUpper(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = IrbisText.ToUpper(expression);
+                var output = IrbisText.ToUpper(expression);
                 context.Write(node, output);
             }
         }
@@ -860,7 +855,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Trim(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
                 context.Write(node, expression.Trim());
@@ -871,7 +866,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Warn(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string expression = context.GetStringArgument(arguments, 0);
+            var expression = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(expression))
             {
                 context.Output.Warning.WriteLine(expression);

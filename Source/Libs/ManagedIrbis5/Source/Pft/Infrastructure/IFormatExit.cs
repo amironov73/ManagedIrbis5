@@ -1,29 +1,21 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* IFormatExit.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* IFormatExit.cs -- интерфейс форматного выхода
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// General format exit
+    /// Интерфейс форматного выхода.
     /// </summary>
-
     public interface IFormatExit
     {
         /// <summary>
@@ -37,8 +29,8 @@ namespace ManagedIrbis.Pft.Infrastructure
         void Execute
             (
                 PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftNode? node,
+                string? expression
             );
     }
 }

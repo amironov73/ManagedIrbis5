@@ -25,7 +25,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AM;
-
+using AM.Text.Output;
 using ManagedIrbis.Client;
 using ManagedIrbis.Reports;
 
@@ -62,7 +62,7 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Log.
         /// </summary>
-        public IConsole Log { get; private set; }
+        public AbstractOutput Log { get; private set; }
 
         /// <summary>
         /// Count of <see cref="BiblioItem"/>s.
@@ -95,7 +95,7 @@ namespace ManagedIrbis.Biblio
             (
                 BiblioDocument document,
                 IrbisProvider provider,
-                IConsole log
+                AbstractOutput log
             )
         {
             Document = document;
@@ -118,15 +118,14 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Find the record with specified MFN.
         /// </summary>
-        [CanBeNull]
-        public Record FindRecord
+        public Record? FindRecord
             (
                 int mfn
             )
         {
             Sure.Positive(mfn, "mfn");
 
-            Record result = Records
+            var result = Records
                 .FirstOrDefault(record => record.Mfn == mfn);
 
             return result;

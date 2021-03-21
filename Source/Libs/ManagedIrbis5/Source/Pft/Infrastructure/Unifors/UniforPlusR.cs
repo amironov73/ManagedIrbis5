@@ -1,17 +1,17 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusR.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusR.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
- #region Using directives
-
-using JetBrains.Annotations;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -41,17 +41,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void TrimAtLastDot
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                int position = expression.LastIndexOf('.');
+                var position = expression.LastIndexOf('.');
                 if (position >= 0)
                 {
-                    string output = expression.Substring(0, position);
+                    var output = expression.Substring(0, position);
                     context.WriteAndSetFlag(node, output);
                 }
             }

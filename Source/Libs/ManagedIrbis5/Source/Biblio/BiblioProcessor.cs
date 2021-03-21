@@ -29,15 +29,14 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text.Output;
 
-
-
 using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
@@ -205,9 +204,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine(new string('=', 70));
         }
 
@@ -223,9 +220,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            IrbisProvider provider = context.Provider
+            var provider = context.Provider
                 .ThrowIfNull("context.Provider");
-            IPftFormatter result = provider.AcquireFormatter()
+            var result = provider.AcquireFormatter()
                 .ThrowIfNull("provider.AcquireFormatter");
 
             //PftContext pftContext = new PftContext(null);
@@ -261,8 +258,7 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Get text.
         /// </summary>
-        [CanBeNull]
-        public virtual string GetText
+        public virtual string? GetText
             (
                 BiblioContext context,
                 string path
@@ -277,11 +273,8 @@ namespace ManagedIrbis.Biblio
                 string fileName;
                 if (path.StartsWith("*"))
                 {
-#if !WINMOBILE && !PocketPC
-
                     fileName = path.Substring(1);
                     result = File.ReadAllText(fileName, IrbisEncoding.Ansi);
-#endif
                 }
                 //else if (path.StartsWith("@"))
                 //{
@@ -338,8 +331,5 @@ namespace ManagedIrbis.Biblio
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

@@ -9,26 +9,22 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#if !UAP
-
 #region Using directives
 
 using System.Net;
-
-
-
 
 using RestSharp;
 using RestSharp.Authenticators;
 
 #endregion
 
+#nullable enable
+
 namespace RestfulIrbis
 {
     /// <summary>
     /// Authenticator for Digest method.
     /// </summary>
-
     public class DigestAuthenticator
         : IAuthenticator
     {
@@ -57,9 +53,6 @@ namespace RestfulIrbis
                 string password
             )
         {
-            Code.NotNull(username, nameof(username));
-            Code.NotNull(password, nameof(password));
-
             UserName = username;
             Password = password;
         }
@@ -85,5 +78,3 @@ namespace RestfulIrbis
         #endregion
     }
 }
-
-#endif

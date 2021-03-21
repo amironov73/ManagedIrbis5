@@ -148,14 +148,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             JObject obj = new JObject();
 
-            foreach (int tag in tags)
+            foreach (var tag in tags)
             {
                 JObject tagObj = new JObject();
                 obj.Add(tag.ToInvariantString(), tagObj);
 
                 RecordField[] fields = record.Fields.GetField(tag);
 
-                for (int i = 0; i < fields.Length; i++)
+                for (var i = 0; i < fields.Length; i++)
                 {
                     JObject fieldObj = new JObject();
                     tagObj.Add
@@ -177,14 +177,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 }
             }
 
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             builder.AppendLine("0");
             builder.AppendFormat("{0}#0", record.Mfn);
             builder.AppendLine();
             builder.AppendFormat("0#{0}", record.Version);
             builder.AppendLine();
 
-            string output = builder + obj.ToString(Formatting.Indented);
+            var output = builder + obj.ToString(Formatting.Indented);
             context.WriteAndSetFlag(node, output);
 
 #endif

@@ -388,7 +388,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public string GetProcessedOutput()
         {
-            string result = Output.Text;
+            string? result = Output.Text;
 
             if ((PostProcessing & PftCleanup.Rtf) != 0)
             {

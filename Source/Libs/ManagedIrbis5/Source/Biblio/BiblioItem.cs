@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* BiblioItem.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -13,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using AM;
@@ -21,21 +28,15 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-
-
-using ManagedIrbis.Client;
-
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class BiblioItem
         : IVerifiable
     {
@@ -44,8 +45,7 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Chapter the item belongs to.
         /// </summary>
-        [CanBeNull]
-        public BiblioChapter Chapter { get; set; }
+        public BiblioChapter? Chapter { get; set; }
 
         /// <summary>
         ///
@@ -55,20 +55,17 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Record.
         /// </summary>
-        [CanBeNull]
-        public Record Record { get; set; }
+        public Record? Record { get; set; }
 
         /// <summary>
         /// Bibliographical description.
         /// </summary>
-        [CanBeNull]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [CanBeNull]
-        public string Order { get; set; }
+        public string? Order { get; set; }
 
         /// <summary>
         /// Terms.
@@ -78,9 +75,8 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Arbitrary user data.
         /// </summary>
-        [CanBeNull]
         [JsonIgnore]
-        public object UserData { get; set; }
+        public object? UserData { get; set; }
 
         #endregion
 
@@ -119,12 +115,12 @@ namespace ManagedIrbis.Biblio
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append(Order);
             result.AppendLine();
             result.Append(Description);
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion

@@ -1,56 +1,38 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ChapterWithStatistics.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-using AM.Text.Output;
-
-
 
 using ManagedIrbis.Reports;
 
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class ChapterWithStatistics
         : BiblioChapter
     {
         #region Properties
 
         /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
-        public override bool IsServiceChapter
-        {
-            get { return true; }
-        }
-
-        #endregion
-
-        #region Construction
+        public override bool IsServiceChapter => true;
 
         #endregion
 
@@ -64,25 +46,25 @@ namespace ManagedIrbis.Biblio
                 BiblioChapter chapter
             )
         {
-            ItemCollection items = chapter.Items;
+            var items = chapter.Items;
             if (!ReferenceEquals(items, null))
             {
-                int count = items.Count;
+                var count = items.Count;
                 if (!chapter.IsServiceChapter)
                 {
-                    string text = string.Format
+                    var text = string.Format
                     (
                         "{0}\\tab\\~ {{\\b {1}}}",
                         chapter.Title,
                         count
                     );
-                    ParagraphBand band = new ParagraphBand(text);
+                    var band = new ParagraphBand(text);
                     report.Body.Add(band);
                     _total += count;
                 }
             }
 
-            foreach (BiblioChapter child in chapter.Children)
+            foreach (var child in chapter.Children)
             {
                 _ProcessChapter(report, child);
             }
@@ -102,16 +84,14 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render {0}", this);
-            BiblioDocument document = context.Document;
-            BiblioProcessor processor = context.Processor
+            var document = context.Document;
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
-            RecordCollection badRecords = context.BadRecords;
+            var badRecords = context.BadRecords;
 
             RenderTitle(context);
 
@@ -126,7 +106,7 @@ namespace ManagedIrbis.Biblio
                     );
                 report.Body.Add(new ParagraphBand(text));
             }
-            foreach (BiblioChapter chapter in document.Chapters)
+            foreach (var chapter in document.Chapters)
             {
                 _ProcessChapter(report, chapter);
             }
@@ -145,8 +125,5 @@ namespace ManagedIrbis.Biblio
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

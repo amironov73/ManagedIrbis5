@@ -1,21 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlus0.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System.Text;
 
-using JetBrains.Annotations;
-
-using ManagedIrbis.ImportExport;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -47,15 +49,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void FormatAll
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                StringBuilder output = new StringBuilder();
+                var output = new StringBuilder();
                 output.AppendLine("0");
                 output.AppendLine(string.Format
                     (

@@ -1,15 +1,25 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ViafSuggestResult.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 #endregion
+
+#nullable enable
 
 namespace RestfulIrbis.Viaf
 {
@@ -23,98 +33,98 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("term")]
-        public string Term { get; set; }
+        [JsonPropertyName("term")]
+        public string? Term { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("displayForm")]
-        public string DisplayForm { get; set; }
+        [JsonPropertyName("displayForm")]
+        public string? DisplayForm { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("nametype")]
-        public string NameType { get; set; }
+        [JsonPropertyName("nametype")]
+        public string? NameType { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("lc")]
-        public string Lc { get; set; }
+        [JsonPropertyName("lc")]
+        public string? Lc { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("dnb")]
-        public string Dnb { get; set; }
+        [JsonPropertyName("dnb")]
+        public string? Dnb { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("selibr")]
-        public string Selibr { get; set; }
+        [JsonPropertyName("selibr")]
+        public string? Selibr { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("bav")]
-        public string Bav { get; set; }
+        [JsonPropertyName("bav")]
+        public string? Bav { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("bnf")]
-        public string Bnf { get; set; }
+        [JsonPropertyName("bnf")]
+        public string? Bnf { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("iccu")]
-        public string Iccu { get; set; }
+        [JsonPropertyName("iccu")]
+        public string? Iccu { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("bne")]
-        public string Bne { get; set; }
+        [JsonPropertyName("bne")]
+        public string? Bne { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("nkc")]
-        public string Nkc { get; set; }
+        [JsonPropertyName("nkc")]
+        public string? Nkc { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("ptbnp")]
-        public string Ptbnp { get; set; }
+        [JsonPropertyName("ptbnp")]
+        public string? Ptbnp { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("swnl")]
-        public string Swnl { get; set; }
+        [JsonPropertyName("swnl")]
+        public string? Swnl { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("viafid")]
-        public string ViafId { get; set; }
+        [JsonPropertyName("viafid")]
+        public string? ViafId { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("score")]
-        public string Score { get; set; }
+        [JsonPropertyName("score")]
+        public string? Score { get; set; }
 
         /// <summary>
         ///
         /// </summary>
-        [JsonProperty("recordID")]
-        public string RecordId { get; set; }
+        [JsonPropertyName("recordID")]
+        public string? RecordId { get; set; }
 
         #endregion
     }

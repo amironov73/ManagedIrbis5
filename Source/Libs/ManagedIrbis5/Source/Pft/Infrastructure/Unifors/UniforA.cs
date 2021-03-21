@@ -1,23 +1,26 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforA.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
+using AM;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -50,13 +53,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetFieldRepeat
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (string.IsNullOrEmpty(expression))
             {
                 return;
@@ -64,10 +65,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             try
             {
-                MarcRecord record = context.Record;
+                var record = context.Record;
                 if (!ReferenceEquals(record, null))
                 {
-                    FieldSpecification specification = new FieldSpecification();
+                    var specification = new FieldSpecification();
                     if (specification.ParseUnifor(expression)
                         && specification.FieldRepeat.Kind != IndexKind.None)
                     {
@@ -75,10 +76,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         {
                             // Поле GUID пропускается
 
-                            FieldReference reference = new FieldReference();
+                            var reference = new FieldReference();
                             reference.Apply(specification);
 
-                            string result = reference.Format(record);
+                            var result = reference.Format(record);
                             if (!string.IsNullOrEmpty(result))
                             {
                                 context.WriteAndSetFlag(node, result);
@@ -90,7 +91,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "UniforA::GetFieldRepeat",
                         exception

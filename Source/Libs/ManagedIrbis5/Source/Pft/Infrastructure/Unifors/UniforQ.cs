@@ -1,19 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforQ.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforQ.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -30,10 +34,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     //
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public static class UniforQ
     {
         #region Public methods
@@ -43,15 +45,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ToLower
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
 
-                string output = IrbisText.ToLower(expression);
+                var output = IrbisText.ToLower(expression);
 
                 context.WriteAndSetFlag(node, output);
             }

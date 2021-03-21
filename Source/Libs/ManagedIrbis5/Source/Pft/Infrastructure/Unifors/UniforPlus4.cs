@@ -1,10 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlus4.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,12 +18,12 @@ using System;
 using System.Linq;
 
 using AM;
-using AM.Logging;
 using AM.Text;
-
-using JetBrains.Annotations;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -53,9 +58,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void GetField
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -63,23 +68,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                char command = navigator.ReadChar();
-                char order = navigator.ReadChar();
+                var navigator = new TextNavigator(expression);
+                var command = char.ToUpperInvariant(navigator.ReadChar());
+                var order = char.ToUpperInvariant(navigator.ReadChar());
                 if (command == TextNavigator.EOF
                     || order == TextNavigator.EOF)
                 {
                     return;
                 }
 
-                command = CharUtility.ToUpperInvariant(command);
-                order = CharUtility.ToUpperInvariant(order);
-
                 // Поле GUID пропускается
-                RecordField[] workingFields = record.Fields
+                var workingFields = record.Fields
                         .Where(field => field.Tag != IrbisGuid.Tag)
                     .ToArray();
                 if (order != '0')
@@ -87,14 +89,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     Array.Sort(workingFields, FieldComparer.ByTag());
                 }
 
-                int index = context.Index;
-                RecordField currentField = workingFields.GetOccurrence(index);
+                var index = context.Index;
+                var currentField = workingFields.GetOccurrence(index);
                 if (ReferenceEquals(currentField, null))
                 {
                     return;
                 }
 
-                string output = null;
+                string? output = null;
 
                 switch (command)
                 {
@@ -107,16 +109,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         break;
 
                     case 'N':
-                        int fieldIndex = record.Fields.IndexOf(currentField) + 1;
+                        var fieldIndex = record.Fields.IndexOf(currentField) + 1;
                         output = fieldIndex.ToInvariantString();
                         break;
 
                     default:
-                        Log.Warn
+                        Magna.Warning
                             (
                                 "UniforPlus4::GetField: "
                                 + "unknown command="
-                                + command.ToVisibleString()
+                                + command
                             );
                         break;
                 }

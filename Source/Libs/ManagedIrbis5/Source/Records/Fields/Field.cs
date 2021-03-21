@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.Text.Json.Serialization;
 
 using AM;
 using AM.IO;
@@ -119,6 +120,12 @@ namespace ManagedIrbis
         /// Запись, которой принадлежит поле.
         /// </summary>
         public Record? Record { get; internal set; }
+
+        /// <summary>
+        /// Пустое ли поле?
+        /// </summary>
+        [JsonIgnore]
+        public bool IsEmpty => string.IsNullOrEmpty(Value) && Subfields.Count == 0;
 
         #endregion
 

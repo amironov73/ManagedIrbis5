@@ -1,22 +1,25 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforG.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforG.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using AM.Logging;
+using AM;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -58,23 +61,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetPart
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                char code = navigator.ReadChar();
-                char symbol = navigator.ReadChar();
-                string text = navigator.GetRemainingText();
+                var navigator = new TextNavigator(expression);
+                var code = navigator.ReadChar();
+                var symbol = navigator.ReadChar();
+                string text = navigator.GetRemainingText().ToString();
                 if (!string.IsNullOrEmpty(text))
                 {
                     int firstOffset, lastOffset;
-                    string output = null;
+                    string? output = null;
 
                     switch (symbol)
                     {
@@ -179,7 +180,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                             break;
 
                         default:
-                            Log.Error
+                            Magna.Error
                                 (
                                     "Unifor::GetPart: "
                                     + "unexpected code="

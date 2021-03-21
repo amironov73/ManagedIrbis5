@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* BiblioUtility.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -22,19 +28,15 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-
-
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public static class BiblioUtility
     {
         #region Private members
@@ -46,7 +48,7 @@ namespace ManagedIrbis.Biblio
         private static void _AddDot
             (
                 StringBuilder builder,
-                [CanBeNull] string line
+                string? line
             )
         {
             if (!string.IsNullOrEmpty(line))
@@ -56,7 +58,7 @@ namespace ManagedIrbis.Biblio
                 if (!string.IsNullOrEmpty(line))
                 {
                     char lastChar = line.LastChar();
-                    if (!lastChar.OneOf(_delimiters)
+                    if (!lastChar.IsOneOf(_delimiters)
                         && !_commandRegex.IsMatch(line))
                     {
                         builder.Append('.');
@@ -82,13 +84,13 @@ namespace ManagedIrbis.Biblio
             string line;
             while (!navigator.IsEOF)
             {
-                line = navigator.ReadTo("\\par");
+                line = navigator.ReadTo("\\par").ToString();
                 if (ReferenceEquals(line, null))
                 {
                     break;
                 }
 
-                string recent = navigator.RecentText(4);
+                string recent = navigator.RecentText(4).ToString();
                 bool par = false;
                 if (recent == "\\par")
                 {
@@ -110,7 +112,7 @@ namespace ManagedIrbis.Biblio
                 }
             }
 
-            line = navigator.GetRemainingText();
+            line = navigator.GetRemainingText().ToString();
             _AddDot(result, line);
 
             return result.ToString();

@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforI.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforI.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,11 +17,9 @@ using AM;
 using AM.IO;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -42,27 +44,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetIniFileEntry
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = StringUtility.SplitString
+                string[] parts = expression.Split
                     (
-                        expression,
                         CommonSeparators.Comma,
                         3
                     );
 
                 if (parts.Length >= 2)
                 {
-                    string section = parts[0];
-                    string parameter = parts[1];
-                    string defaultValue = parts.Length > 2
+                    var section = parts[0];
+                    var parameter = parts[1];
+                    var defaultValue = parts.Length > 2
                         ? parts[2]
                         : null;
 
@@ -70,7 +69,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         && !string.IsNullOrEmpty(parameter))
                     {
                         string result;
-                        using (IniFile iniFile
+                        using (var iniFile
                             = context.Provider.GetUserIniFile())
                         {
                             result = iniFile.GetValue

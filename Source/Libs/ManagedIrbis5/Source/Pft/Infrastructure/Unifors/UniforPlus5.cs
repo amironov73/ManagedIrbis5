@@ -1,10 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlus5.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,15 +17,14 @@
 using System.IO;
 
 using AM;
-using AM.Logging;
 using AM.Text;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -55,9 +59,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void GetMenuEntry
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             // ibatrak
@@ -67,21 +71,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
-            char command = CharUtility.ToUpperInvariant(navigator.ReadChar());
+            var navigator = new TextNavigator(expression);
+            char command = char.ToUpperInvariant(navigator.ReadChar());
             if (command != 'T' && command != 'F')
             {
-                Log.Warn
+                Magna.Warning
                     (
                         "UniforPlus5::GetMenuEntry: "
                         + "unknown command="
-                        + command.ToVisibleString()
+                        + command
                     );
 
                 return;
             }
 
-            string fileName = navigator.GetRemainingText();
+            string fileName = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(fileName))
             {
                 return;
@@ -89,23 +93,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             FileSpecification specification;
             string output = null;
-            int index = context.Index;
+            var index = context.Index;
 
-            string extension = StringUtility.ToUpperInvariant(Path.GetExtension(fileName));
+            var extension = Path.GetExtension(fileName).ToUpperInvariant();
             if (extension != ".MNU")
             {
                 specification = new FileSpecification
-                    (
-                        IrbisPath.System,
-                        fileName
-                    );
-                string text = context.Provider.ReadFile(specification);
+                    {
+                        Path = IrbisPath.System,
+                        FileName = fileName
+                    };
+                var text = context.Provider.ReadFile(specification);
                 if (!string.IsNullOrEmpty(text))
                 {
-                    string[] lines = text.SplitLines();
-                    for (int i = 0; i < lines.Length; i++)
+                    var lines = text.SplitLines();
+                    for (var i = 0; i < lines.Length; i++)
                     {
-                        string value = lines[i];
+                        var value = lines[i];
                         if (string.IsNullOrEmpty(value))
                         {
                             break;
@@ -123,11 +127,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 // .MNU
                 specification = new FileSpecification
-                    (
-                        IrbisPath.MasterFile,
-                        context.Provider.Database,
-                        fileName
-                    );
+                    {
+                        Path = IrbisPath.MasterFile,
+                        Database = context.Provider.Database,
+                        FileName = fileName
+                    };
                 MenuFile menu = context.Provider.ReadMenuFile(specification);
                 if (ReferenceEquals(menu, null))
                 {

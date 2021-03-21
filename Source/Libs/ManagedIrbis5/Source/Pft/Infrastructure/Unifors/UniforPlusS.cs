@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlusS.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,9 +17,9 @@ using System.Text.RegularExpressions;
 
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -78,21 +82,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     {
         #region Private members
 
-        private static string _FirstEvaluator
-            (
-                [NotNull] Match match
-            )
-        {
-            return match.Groups["first"].Value;
-        }
+        private static string _FirstEvaluator ( Match match ) =>
+            match.Groups["first"].Value;
 
-        private static string _SecondEvaluator
-            (
-                [NotNull] Match match
-            )
-        {
-            return match.Groups["second"].Value;
-        }
+        private static string _SecondEvaluator ( Match match ) =>
+            match.Groups["second"].Value;
 
         #endregion
 
@@ -101,18 +95,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// <summary>
         /// Декодирование конструкции &lt;=&gt;.
         /// </summary>
-        [CanBeNull]
         public static string DecodeTitle
             (
-                [CanBeNull]string expression
+                string? expression
             )
         {
-            string result = string.Empty;
+            var result = string.Empty;
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                char index = navigator.ReadChar();
-                string input = navigator.GetRemainingText();
+                var navigator = new TextNavigator(expression);
+                var index = navigator.ReadChar();
+                string input = navigator.GetRemainingText().ToString();
                 if (!string.IsNullOrEmpty(input))
                 {
                     MatchEvaluator evaluator = _SecondEvaluator;
@@ -138,14 +131,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void DecodeTitle
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = DecodeTitle(expression);
+                var output = DecodeTitle(expression);
                 context.WriteAndSetFlag(node, output);
             }
         }

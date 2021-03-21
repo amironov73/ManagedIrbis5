@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* RecordCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -21,17 +27,15 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class RecordCollection
         : NonNullCollection<Record>,
         IVerifiable
@@ -85,8 +89,5 @@ namespace ManagedIrbis.Biblio
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

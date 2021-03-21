@@ -1,43 +1,36 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* CumulatingSubChapter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 using AM.Text;
-using AM.Text.Output;
-
-
 
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-
 #endregion
 
-// ReSharper disable ForCanBeConvertedToForeach
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     /// Сводное описание многотомного издания.
     /// </summary>
-
     public class CumulatingSubChapter
         : MenuSubChapter
     {
@@ -54,20 +47,17 @@ namespace ManagedIrbis.Biblio
             /// <summary>
             /// Header part.
             /// </summary>
-            [CanBeNull]
-            public string Header { get; set; }
+            public string? Header { get; set; }
 
             /// <summary>
             /// Order
             /// </summary>
-            [CanBeNull]
-            public string Order { get; set; }
+            public string? Order { get; set; }
 
             /// <summary>
             /// Item.
             /// </summary>
-            [CanBeNull]
-            public BiblioItem Item { get; set; }
+            public BiblioItem? Item { get; set; }
 
             /// <summary>
             /// Single.
@@ -129,8 +119,6 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             base.BuildItems(context);
 
             SpecialSettings settings = Settings;
@@ -147,7 +135,7 @@ namespace ManagedIrbis.Biblio
                 return;
             }
 
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin grouping {0}", this);
 
             BiblioProcessor processor = context.Processor
@@ -168,7 +156,7 @@ namespace ManagedIrbis.Biblio
                     {
                         header = header.Trim();
                     }
-                    Multivolume bookGroup = Groups.FirstOrDefault
+                    var bookGroup = Groups.FirstOrDefault
                         (
                             g => g.Header == header
                         );
@@ -228,9 +216,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
             BiblioProcessor processor = context.Processor
@@ -239,11 +225,7 @@ namespace ManagedIrbis.Biblio
                 .ThrowIfNull("processor.Report");
 
             bool showOrder =
-#if WINMOBILE || PocketPC
-                false;
-#else
                 context.Document.CommonSettings.Value<bool?>("showOrder") ?? false;
-#endif
 
             RenderTitle(context);
 

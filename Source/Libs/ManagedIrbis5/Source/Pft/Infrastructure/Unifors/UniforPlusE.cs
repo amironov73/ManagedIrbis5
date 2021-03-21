@@ -1,19 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusE.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusE.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -41,18 +45,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetFieldIndex
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null)
                 && !string.IsNullOrEmpty(expression))
             {
-                string[] parts = expression.Split('#');
-                int tag = parts[0].SafeToInt32();
-                string occText = parts.Length > 1
+                var parts = expression.Split('#');
+                var tag = parts[0].SafeToInt32();
+                var occText = parts.Length > 1
                     ? parts[1]
                     : "1";
                 int occ;
@@ -66,17 +70,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 }
                 else
                 {
-                    if (!NumericUtility.TryParseInt32(occText, out occ))
+                    if (!Utility.TryParseInt32(occText, out occ))
                     {
                         return;
                     }
                     occ--;
                 }
-                RecordField field = record.Fields.GetField(tag, occ);
+
+                var field = record.Fields.GetField(tag, occ);
                 if (!ReferenceEquals(field, null))
                 {
-                    int index = record.Fields.IndexOf(field) + 1;
-                    string output = index.ToInvariantString();
+                    var index = record.Fields.IndexOf(field) + 1;
+                    var output = index.ToInvariantString();
                     context.WriteAndSetFlag(node, output);
                 }
             }

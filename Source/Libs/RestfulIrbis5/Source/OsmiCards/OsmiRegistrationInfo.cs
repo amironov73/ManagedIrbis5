@@ -1,6 +1,7 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
@@ -12,17 +13,14 @@
 
 #region Using directives
 
+using System.Text.Json.Serialization;
+
 using AM;
-using AM.Json;
 using AM.Net;
 
-
-
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 #endregion
+
+#nullable enable
 
 namespace RestfulIrbis.OsmiCards
 {
@@ -39,62 +37,62 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Номер карты.
         /// </summary>
-        [JsonProperty("serialNo")]
-        public string SerialNumber { get; set; }
+        [JsonPropertyName("serialNo")]
+        public string? SerialNumber { get; set; }
 
         /// <summary>
         /// Имя.
         /// </summary>
-        [JsonProperty("Name")]
-        public string Name { get; set; }
+        [JsonPropertyName("Name")]
+        public string? Name { get; set; }
 
         /// <summary>
         /// Отчество.
         /// </summary>
-        [JsonProperty("Middlename")]
-        public string MiddleName { get; set; }
+        [JsonPropertyName("Middlename")]
+        public string? MiddleName { get; set; }
 
         /// <summary>
         /// Отчество.
         /// </summary>
-        [JsonProperty("Surname")]
-        public string Surname { get; set; }
+        [JsonPropertyName("Surname")]
+        public string? Surname { get; set; }
 
         /// <summary>
         /// Пол.
         /// </summary>
-        [JsonProperty("Sex")]
-        public string Gender { get; set; }
+        [JsonPropertyName("Sex")]
+        public string? Gender { get; set; }
 
         /// <summary>
         /// Дата рождения.
         /// </summary>
-        [JsonProperty("birthdate")]
-        public string BirthDate { get; set; }
+        [JsonPropertyName("birthdate")]
+        public string? BirthDate { get; set; }
 
         /// <summary>
         /// Электронная почта.
         /// </summary>
-        [JsonProperty("Email")]
-        public string Email { get; set; }
+        [JsonPropertyName("Email")]
+        public string? Email { get; set; }
 
         /// <summary>
         /// Телефон.
         /// </summary>
-        [JsonProperty("Phone")]
-        public string Phone { get; set; }
+        [JsonPropertyName("Phone")]
+        public string? Phone { get; set; }
 
         /// <summary>
         /// Телефон подтвержден?
         /// </summary>
-        [JsonProperty("PhoneCheck")]
-        public string PhoneCheck { get; set; }
+        [JsonPropertyName("PhoneCheck")]
+        public string? PhoneCheck { get; set; }
 
         /// <summary>
         /// Оферта подтверждена?
         /// </summary>
-        [JsonProperty("OfertaCheck")]
-        public string OfertaCheck { get; set; }
+        [JsonPropertyName("OfertaCheck")]
+        public string? OfertaCheck { get; set; }
 
         #endregion
 
@@ -108,8 +106,6 @@ namespace RestfulIrbis.OsmiCards
                 JObject obj
             )
         {
-            Code.NotNull(obj, "obj");
-
             var result = new OsmiRegistrationInfo
             {
                 Name = obj.GetString("Имя").NullForEmpty(),

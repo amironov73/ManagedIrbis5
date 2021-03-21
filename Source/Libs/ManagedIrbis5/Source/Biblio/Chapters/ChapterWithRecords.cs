@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ChapterWithRecords.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -22,21 +28,18 @@ using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-
-
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public class ChapterWithRecords
         : BiblioChapter
     {
@@ -69,8 +72,7 @@ namespace ManagedIrbis.Biblio
 
         #region Private members
 
-        [CanBeNull]
-        private BiblioItem _FindItem
+        private BiblioItem? _FindItem
             (
                 MenuSubChapter chapter,
                 Record record
@@ -103,8 +105,7 @@ namespace ManagedIrbis.Biblio
             return null;
         }
 
-        [CanBeNull]
-        private BiblioItem _FindItem
+        private BiblioItem? _FindItem
             (
                 Record record
             )
@@ -134,7 +135,6 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Format records.
         /// </summary>
-        [ItemNotNull]
         public string[] FormatRecords
             (
                 BiblioContext context,
@@ -142,30 +142,23 @@ namespace ManagedIrbis.Biblio
                 string format
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNull(mfns, "mfns");
-            Code.NotNullNorEmpty(format, "format");
-
             if (mfns.Length == 0)
             {
-                return StringUtility.EmptyArray;
+                return Array.Empty<string>();
             }
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
 
-            using (IPftFormatter formatter
-                = processor.AcquireFormatter(context))
+            using var formatter = processor.AcquireFormatter(context);
+            formatter.ParseProgram(format);
+            string[] formatted = formatter.FormatRecords(mfns);
+            if (formatted.Length != mfns.Length)
             {
-                formatter.ParseProgram(format);
-                string[] formatted = formatter.FormatRecords(mfns);
-                if (formatted.Length != mfns.Length)
-                {
-                    throw new IrbisException();
-                }
-
-                return formatted;
+                throw new IrbisException();
             }
+
+            return formatted;
         }
 
         /// <summary>
@@ -177,11 +170,7 @@ namespace ManagedIrbis.Biblio
                 string format
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNullNorEmpty(format, "format");
-
-            RecordCollection records = Records
-                .ThrowIfNull("Records");
+            var records = Records .ThrowIfNull(nameof(Records));
             int[] mfns = records.Select(r => r.Mfn).ToArray();
             string[] result = FormatRecords(context, mfns, format);
 
@@ -196,7 +185,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             BiblioProcessor processor = context.Processor
                 .ThrowIfNull("context.Processor");
             IrbisReport report = processor.Report
@@ -249,12 +238,5 @@ namespace ManagedIrbis.Biblio
 
         #endregion
 
-        #region Public methods
-
-        #endregion
-
-        #region Object members
-
-        #endregion
     }
 }

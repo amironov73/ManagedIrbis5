@@ -1,25 +1,25 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusX.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusX.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 
-using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
-using ManagedIrbis.Client;
-using ManagedIrbis.Search;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -43,9 +43,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void SearchIncrement
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             //
@@ -59,9 +59,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             // если в строке больше, чем 1 символ #, лишние части отбрасываются
-            string[] parts = StringUtility.SplitString
+            string[] parts = expression.Split
                 (
-                    expression,
                     CommonSeparators.NumberSign,
                     StringSplitOptions.None
                 );
@@ -70,20 +69,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string term = parts[0];
+            var term = parts[0];
             if (string.IsNullOrEmpty(term))
             {
                 return;
             }
-            int result = 0;
+            var result = 0;
             while (true)
             {
-                IrbisProvider provider = context.Provider;
+                var provider = context.Provider;
 
                 // имитация NextTerm, поиск, начиная с указанного термина
                 // с подхватом следующего
                 // ищем по 10 терминов, чтобы меньше дергать базу
-                TermParameters parameters = new TermParameters
+                var parameters = new TermParameters
                 {
                     Database = provider.Database,
                     StartTerm = term,
@@ -94,7 +93,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 {
                     break;
                 }
-                for (int i = 0; i < terms.Length; i++)
+                for (var i = 0; i < terms.Length; i++)
                 {
                     result = string.CompareOrdinal(terms[i].Text, parts[0]);
                     term = terms[i].Text;
@@ -115,7 +114,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(parts[1]))
             {
-                string output = UniforPlusW.Increment(parts[1]);
+                var output = UniforPlusW.Increment(parts[1]);
                 context.WriteAndSetFlag(node, output);
             }
         }

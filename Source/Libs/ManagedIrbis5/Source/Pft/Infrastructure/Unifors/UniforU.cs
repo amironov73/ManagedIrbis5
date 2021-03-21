@@ -1,27 +1,31 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforU.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 using AM;
-using AM.Logging;
 using AM.Text;
 using AM.Text.Ranges;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -50,26 +54,25 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Check
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = StringUtility.SplitString
+                string[] parts = expression.Split
                     (
-                        expression,
                         CommonSeparators.Comma,
                         2
                     );
                 if (parts.Length == 2)
                 {
-                    string issue = parts[0];
-                    string cumulated = parts[1];
+                    var issue = parts[0];
+                    var cumulated = parts[1];
 
-                    bool result = Check(issue, cumulated);
-                    string output = result ? "1" : "0";
+                    var result = Check(issue, cumulated);
+                    var output = result ? "1" : "0";
                     context.Write(node, output);
                 }
             }
@@ -81,13 +84,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static bool Check
             (
-                [NotNull] string issue,
-                [NotNull] string cumulated
+                string issue,
+                string cumulated
             )
         {
-            NumberRangeCollection collection = NumberRangeCollection.Parse(cumulated);
-            NumberText number = new NumberText(issue);
-            bool result = collection.Contains(number);
+            var collection = NumberRangeCollection.Parse(cumulated);
+            var number = new NumberText(issue);
+            var result = collection.Contains(number);
 
             return result;
         }
@@ -95,25 +98,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// <summary>
         /// Cumulate the magazine issues.
         /// </summary>
-        [NotNull]
         public static string Cumulate
             (
-                [NotNull] string issues
+                string issues
             )
         {
             try
             {
-                NumberRangeCollection collection = NumberRangeCollection.Parse(issues);
-                List<NumberText> numbers = collection
+                var collection = NumberRangeCollection.Parse(issues);
+                var numbers = collection
                     .Distinct()
                     .ToList();
-                NumberRangeCollection result = NumberRangeCollection.Cumulate(numbers);
+                var result = NumberRangeCollection.Cumulate(numbers);
 
                 return result.ToString();
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "UniforU::Cumulate",
                         exception
@@ -128,14 +130,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Cumulate
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = Cumulate(expression);
+                var output = Cumulate(expression);
                 context.WriteAndSetFlag(node, output);
             }
         }
@@ -143,16 +145,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// <summary>
         /// Decumulate the magazine issues.
         /// </summary>
-        [NotNull]
         public static string Decumulate
             (
-                [NotNull] string issues
+                string issues
             )
         {
-            NumberRangeCollection collection = NumberRangeCollection.Parse(issues);
-            StringBuilder result = new StringBuilder();
-            bool first = true;
-            foreach (NumberText number in collection)
+            var collection = NumberRangeCollection.Parse(issues);
+            var result = new StringBuilder();
+            var first = true;
+            foreach (var number in collection)
             {
                 if (!first)
                 {
@@ -170,14 +171,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Decumulate
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = Decumulate(expression);
+                var output = Decumulate(expression);
                 context.WriteAndSetFlag(node, output);
             }
         }

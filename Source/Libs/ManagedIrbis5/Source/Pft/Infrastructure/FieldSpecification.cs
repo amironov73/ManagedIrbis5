@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* FieldSpecification -- field/subfield specification.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -16,12 +22,11 @@ using AM;
 using AM.IO;
 using AM.Text;
 
-
-
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -42,8 +47,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Embedded field tag.
         /// </summary>
-        [CanBeNull]
-        public string Embedded { get; set; }
+        public string? Embedded { get; set; }
 
         /// <summary>
         /// Красная строка.
@@ -88,20 +92,17 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Tag specification.
         /// </summary>
-        [CanBeNull]
-        public string TagSpecification { get; set; }
+        public string? TagSpecification { get; set; }
 
         /// <summary>
         /// Subfield specification.
         /// </summary>
-        [CanBeNull]
-        public string SubFieldSpecification { get; set; }
+        public string? SubFieldSpecification { get; set; }
 
         /// <summary>
         /// Unparsed field specification.
         /// </summary>
-        [CanBeNull]
-        public string RawText { get; set; }
+        public string? RawText { get; set; }
 
         /// <summary>
         ///
@@ -132,8 +133,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            Code.NotNull(text, "text");
-
             if (!Parse(text))
             {
                 throw new IrbisException();
@@ -149,8 +148,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 char code
             )
         {
-            Code.Positive(tag, "tag");
-
             Tag = tag;
             SubField = code;
         }
@@ -163,8 +160,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int tag
             )
         {
-            Code.Positive(tag, "tag");
-
             Tag = tag;
         }
 
@@ -185,7 +180,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             text = text.Trim();
             if (string.IsNullOrEmpty(text))
             {
-                Log.Error
+                Magna.Error
                     (
                         "FieldSpecification::_ParseIndex: "
                         + "text="
@@ -218,8 +213,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             else
             {
-                int index;
-                if (NumericUtility.TryParseInt32(text, out index))
+                if (Utility.TryParseInt32(text, out var index))
                 {
                     result.Kind = IndexKind.Literal;
                     result.Literal = index;
@@ -247,9 +241,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 FieldSpecification right
             )
         {
-            Code.NotNull(left, "left");
-            Code.NotNull(right, "right");
-
             bool result = left.Command == right.Command
                 && PftSerializationUtility.CompareStrings
                     (
@@ -293,8 +284,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryReader reader
             )
         {
-            Code.NotNull(reader, "reader");
-
             Command = reader.ReadChar();
             Embedded = reader.ReadNullableString();
             FirstLine = reader.ReadPackedInt32();
@@ -319,9 +308,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
-            TextNavigator navigator = new TextNavigator(text);
+            var navigator = new TextNavigator(text);
 
             return Parse(navigator);
         }
@@ -334,10 +321,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 TextNavigator navigator
             )
         {
-            Code.NotNull(navigator, "navigator");
-
             int start = navigator.Position;
-            TextPosition saved = navigator.SavePosition();
+            var saved = navigator.SavePosition();
             char c = navigator.ReadChar();
             StringBuilder builder = new StringBuilder();
 
@@ -377,10 +362,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                         _openChars,
                         _closeChars,
                         _stopChars
-                    );
+                    ).ToString();
                 if (ReferenceEquals(text, null))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::Parse: "
                             + "unclosed ["
@@ -392,7 +377,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 text = text.Trim();
                 if (string.IsNullOrEmpty(text))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::Parse: "
                             + "empty []"
@@ -423,7 +408,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     navigator.ReadCharNoCrLf();
                     builder.Append(c);
                 }
-                Tag = NumericUtility.ParseInt32(builder.ToString());
+                Tag = builder.ToString().SafeToInt32();
             }
 
             navigator.SkipWhitespace();
@@ -471,10 +456,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                         _openChars,
                         _closeChars,
                         _stopChars
-                    );
+                    ).ToString();
                 if (ReferenceEquals(text, null))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::Parse: "
                             + "unclosed ["
@@ -512,7 +497,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                             _openChars,
                             _closeChars,
                             _stopChars
-                        );
+                        ).ToString();
                     if (ReferenceEquals(text, null))
                     {
                         SubField = c;
@@ -521,7 +506,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     {
                         if (string.IsNullOrEmpty(text))
                         {
-                            Log.Error
+                            Magna.Error
                                 (
                                     "FieldSpecification::Parse: "
                                     + "empty subfield specification"
@@ -539,11 +524,11 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     if (!SubFieldCode.IsValidCode(c))
                     {
-                        Log.Error
+                        Magna.Error
                             (
                                 "FieldSpecification::Parse: "
                                 + "unexpected code="
-                                + c.ToVisibleString()
+                                + c
                             );
 
                         throw new PftSyntaxException(navigator);
@@ -566,10 +551,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                             _openChars,
                             _closeChars,
                             _stopChars
-                        );
+                        ).ToString();
                     if (ReferenceEquals(text, null))
                     {
-                        Log.Error
+                        Magna.Error
                             (
                                 "FieldSpecification::Parse: "
                                 + "unclosed ["
@@ -616,7 +601,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (builder.Length == 0)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification: "
                             + "empty offset"
@@ -654,7 +639,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (builder.Length == 0)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::Parse: "
                             + "empty length"
@@ -671,7 +656,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (navigator.PeekChar() == '*')
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::Parse: "
                             + "offset after length"
@@ -700,11 +685,11 @@ namespace ManagedIrbis.Pft.Infrastructure
                     }
                     if (!c.IsArabicDigit())
                     {
-                        Log.Error
+                        Magna.Error
                             (
                                 "FieldSpecification::Parse: "
                                 + "unexpected character="
-                                + c.ToVisibleString()
+                                + c
                             );
 
                         throw new PftSyntaxException(navigator);
@@ -715,7 +700,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (builder.Length == 0)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::Parse: "
                             + "empty paragraph indent"
@@ -735,7 +720,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             DONE:
             int length = navigator.Position - start;
-            RawText = navigator.Substring(start, length);
+            RawText = navigator.Substring(start, length).ToString();
 
             return true;
         }
@@ -748,9 +733,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
+            var navigator = new TextNavigator(text);
 
-            TextNavigator navigator = new TextNavigator(text);
             return ParseShort(navigator);
         }
 
@@ -762,10 +746,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 TextNavigator navigator
             )
         {
-            Code.NotNull(navigator, "navigator");
-
             int start = navigator.Position;
-            TextPosition saved = navigator.SavePosition();
+            var saved = navigator.SavePosition();
             char c = navigator.ReadChar();
             StringBuilder builder = new StringBuilder();
 
@@ -803,7 +785,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 navigator.ReadChar();
                 builder.Append(c);
             }
-            Tag = NumericUtility.ParseInt32(builder.ToString());
+            Tag = builder.ToString().SafeToInt32();
 
             navigator.SkipWhitespace();
             c = navigator.PeekChar();
@@ -813,7 +795,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 navigator.ReadChar();
                 if (navigator.IsEOF)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::ParseShort: "
                             + "unexpected end of stream"
@@ -825,11 +807,11 @@ namespace ManagedIrbis.Pft.Infrastructure
                 c = navigator.ReadChar();
                 if (!SubFieldCode.IsValidCode(c))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::ParseShort: "
                             + "unexpected code="
-                            + c.ToVisibleString()
+                            + c
                         );
 
                     throw new PftSyntaxException(navigator);
@@ -841,7 +823,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             } // c == '^'
 
             int length = navigator.Position - start;
-            RawText = navigator.Substring(start, length);
+            RawText = navigator.Substring(start, length).ToString();
 
             return true;
         }
@@ -854,9 +836,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
-            TextNavigator navigator = new TextNavigator(text);
+            var navigator = new TextNavigator(text);
 
             return ParseUnifor(navigator);
         }
@@ -869,10 +849,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 TextNavigator navigator
             )
         {
-            Code.NotNull(navigator, "navigator");
-
             int start = navigator.Position;
-            TextPosition saved = navigator.SavePosition();
+            var saved = navigator.SavePosition();
             char c = navigator.ReadChar();
             StringBuilder builder = new StringBuilder();
 
@@ -905,7 +883,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 navigator.ReadChar();
                 builder.Append(c);
             }
-            Tag = NumericUtility.ParseInt32(builder.ToString());
+            Tag = builder.ToString().SafeToInt32();
 
             // now c is peeked char
 
@@ -914,7 +892,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 navigator.ReadChar();
                 if (navigator.IsEOF)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::ParseUnifor: "
                             + "unexpected end of stream"
@@ -926,11 +904,11 @@ namespace ManagedIrbis.Pft.Infrastructure
                 c = navigator.ReadChar();
                 if (!SubFieldCode.IsValidCode(c))
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::ParseUnifor: "
                             + "unexpected code="
-                            + c.ToVisibleString()
+                            + c
                         );
 
                     throw new PftSyntaxException(navigator);
@@ -960,7 +938,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (builder.Length == 0)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification: "
                             + "empty offset"
@@ -997,7 +975,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (builder.Length == 0)
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::Parse: "
                             + "empty length"
@@ -1014,7 +992,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (navigator.PeekChar() == '*')
                 {
-                    Log.Error
+                    Magna.Error
                         (
                             "FieldSpecification::Parse: "
                             + "offset after length"
@@ -1044,10 +1022,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                     {
                         navigator.ReadChar();
                     }
-                    string indexText = navigator.ReadInteger();
+                    string indexText = navigator.ReadInteger().ToString();
                     if (string.IsNullOrEmpty(indexText))
                     {
-                        Log.Error
+                        Magna.Error
                         (
                             "FieldSpecification::ParseUnifor: "
                             + "empty index"
@@ -1071,7 +1049,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
 
             int length = navigator.Position - start;
-            RawText = navigator.Substring(start, length);
+            RawText = navigator.Substring(start, length).ToString();
 
             return true;
         }
@@ -1084,8 +1062,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             writer.Write(Command);
             writer.WriteNullable(Embedded);
             writer.WritePackedInt32(FirstLine);

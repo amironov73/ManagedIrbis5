@@ -1,27 +1,28 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforK.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforK.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 
-using AM.Collections;
 using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -48,30 +49,28 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetAuthorSign
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                string menuName = navigator.ReadUntil('\\', '!');
+                var navigator = new TextNavigator(expression);
+                string menuName = navigator.ReadUntil('\\', '!').ToString();
                 if (string.IsNullOrEmpty(menuName))
                 {
                     return;
                 }
 
-                char separator = navigator.ReadChar();
+                var separator = navigator.ReadChar();
                 if (separator != '\\'
                     && separator != '!')
                 {
                     return;
                 }
 
-                string text = navigator.GetRemainingText();
+                string text = navigator.GetRemainingText().ToString();
                 if (string.IsNullOrEmpty(text))
                 {
                     return;
@@ -85,13 +84,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     return;
                 }
 
-                FileSpecification specification = new FileSpecification
-                    (
-                        IrbisPath.MasterFile,
-                        context.Provider.Database,
-                        menuName
-                    );
-                MenuFile menu = context.Provider.ReadMenuFile
+                var specification = new FileSpecification
+                    {
+                        Path = IrbisPath.MasterFile,
+                        Database = context.Provider.Database,
+                        FileName = menuName
+                    };
+                var menu = context.Provider.ReadMenuFile
                     (
                         specification
                     );
@@ -105,11 +104,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     // Точнее в irbis64.dll делается приведение
                     // к верхнему регистру, но в C# можно сравнивать и так
 
-                    string output = null;
-                    MenuEntry entry = null;
-                    StringComparer comparer = StringComparer.OrdinalIgnoreCase;
-                    NonNullCollection<MenuEntry> entries = menu.Entries;
-                    for (int i = 0; i < entries.Count; i++)
+                    string? output = null;
+                    MenuEntry? entry = null;
+                    var comparer = StringComparer.OrdinalIgnoreCase;
+                    var entries = menu.Entries;
+                    for (var i = 0; i < entries.Count; i++)
                     {
                         if (comparer.Compare(text, entries[i].Comment) < 0)
                         {

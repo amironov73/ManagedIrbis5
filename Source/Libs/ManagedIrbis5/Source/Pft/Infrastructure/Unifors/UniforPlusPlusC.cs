@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusPlusC.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusPlusC.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,17 +16,17 @@
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
 using ManagedIrbis.Client;
 using ManagedIrbis.Fields;
 
 #endregion
 
+#nullable enable
+
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
     //
-    // Создана служба ГЛОБАЛЬНЫХ СЧЕТЧИКОВ 
+    // Создана служба ГЛОБАЛЬНЫХ СЧЕТЧИКОВ
     //
     // Служба ГЛОБАЛЬНЫХ СЧЕТЧИКОВ предназначена для ведения
     // глобальных (т.е. действующих в рамках системы в целом)
@@ -65,7 +69,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // Шаблон АИ-***/1
     // Значения счетчика: АИ-000/1, АИ-001/1, АИ-100/1 и т.п.
     //
-    // Шаблон **** 
+    // Шаблон ****
     // Значения счетчика: 0000, 0020, 0100, 9999 и т.п.
     //
     // Шаблон С/*
@@ -73,14 +77,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     //
     // Для чтения и изменения значения глобального счетчика
     // служит форматный выход языка форматирования ИРБИС
-    // следующего вида: 
+    // следующего вида:
     //
-    // &uf(‘++C<index>#<value>’) 
+    // &uf(‘++C<index>#<value>’)
     //
-    // где: 
-    // <index> - индекс глобального счетчика 
+    // где:
+    // <index> - индекс глобального счетчика
     // <value> - управляющая часть, которая может принимать
-    // следующие значения: 
+    // следующие значения:
     // * пустота (т.е отсутствовать) - в этом случае форматный
     // выход возвращает текущее значение глобального счетчика;
     // * целое число (возможно отрицательное) - в этом случае
@@ -120,7 +124,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // 1. В БД COUNT создаем описания двух глобальных счетчиков.
     //
     // Для студентов:
-    // #1: 01 
+    // #1: 01
     // #2: C-000000
     // #3: C-******
     //
@@ -149,7 +153,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // В этом случае возникает проблема: как в процессе отладки
     // (редактирования формата) сохранить НЕИЗМЕННЫМ значение
     // соответствующего глобального счетчика. Сделать это можно,
-    // если добавить (в Редакторе форматов) следующие конструкции: 
+    // если добавить (в Редакторе форматов) следующие конструкции:
     //
     // &uf(‘+7W1#’,&uf(‘++C01#’)) ... <редактируемый формат> ... &uf(‘++C01#!’,g1)
     //
@@ -159,7 +163,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     //
     // Что же касается установки конкретного значения числовой части
     // глобального счетчика (например, 999), то это можно сделать
-    // следующим образом: 
+    // следующим образом:
     //
     // &uf(‘++C01#!’), &uf(‘++C01#999’)
     //
@@ -170,9 +174,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void WorkWithGlobalCounter
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -180,14 +184,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
-            string index = navigator.ReadUntil('#');
+            var navigator = new TextNavigator(expression);
+            string index = navigator.ReadUntil('#').ToString();
             if (string.IsNullOrEmpty(index))
             {
                 return;
             }
 
-            IrbisProvider provider = context.Provider;
+            var provider = context.Provider;
 
             // TODO implement INI-file handling
             //string name = provider.GetIniValue("MAIN", "GlobCountNAME", "Count");
@@ -200,7 +204,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            char command = '\0';
+            var command = '\0';
             string value = null;
             string output = null;
             if (navigator.ReadChar() == '#')

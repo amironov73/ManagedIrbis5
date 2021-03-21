@@ -1,19 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforEqual.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -52,9 +56,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void CompareWithMask
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -62,25 +66,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
-            char delimiter = navigator.ReadChar();
+            var navigator = new TextNavigator(expression);
+            var delimiter = navigator.ReadChar();
             if (delimiter == TextNavigator.EOF)
             {
                 return;
             }
 
-            string maskSpecifiaction = navigator.ReadUntil(delimiter);
+            string maskSpecifiaction = navigator.ReadUntil(delimiter).ToString();
             if (ReferenceEquals(maskSpecifiaction, null)
                 || navigator.ReadChar() == TextNavigator.EOF)
             {
                 return;
             }
 
-            string text = navigator.GetRemainingText() ?? string.Empty;
-
-            PftMask mask = new PftMask(maskSpecifiaction);
-            bool result = mask.Match(text);
-            string output = result ? "1" : "0";
+            string text = navigator.GetRemainingText().ToString();
+            var mask = new PftMask(maskSpecifiaction);
+            var result = mask.Match(text);
+            var output = result ? "1" : "0";
             context.WriteAndSetFlag(node, output);
         }
 

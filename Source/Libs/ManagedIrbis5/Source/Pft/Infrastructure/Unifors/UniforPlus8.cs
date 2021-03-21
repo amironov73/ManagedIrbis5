@@ -71,8 +71,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
-            bool winApi = false;
+            var navigator = new TextNavigator(expression);
+            var winApi = false;
             if (navigator.PeekChar() == '*')
             {
                 winApi = true;
@@ -95,7 +95,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             string input = navigator.GetRemainingText()
                 ?? string.Empty;
 
-            MethodResult result = MethodRunner.RunMethod
+            var result = MethodRunner.RunMethod
                 (
                     dllName,
                     methodName,

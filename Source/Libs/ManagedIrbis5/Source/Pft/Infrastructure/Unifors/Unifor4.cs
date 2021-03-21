@@ -1,18 +1,20 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* Unifor4.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
 using AM.Text;
-
-using JetBrains.Annotations;
 
 #endregion
 
@@ -52,12 +54,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void FormatPreviousVersion
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
                 if (string.IsNullOrEmpty(expression))
@@ -66,19 +68,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     // пустое выражение означает
                     // "количество предыдущих версий"
 
-                    string output = (record.Version - 1).ToInvariantString();
+                    var output = (record.Version - 1).ToInvariantString();
                     context.WriteAndSetFlag(node, output);
 
                     return;
                 }
 
 
-                int mfn = record.Mfn;
+                var mfn = record.Mfn;
                 if (mfn != 0 && record.Version > 1)
                 {
-                    int version = context.Index;
+                    var version = context.Index;
 
-                    TextNavigator navigator = new TextNavigator(expression);
+                    var navigator = new TextNavigator(expression);
                     if (navigator.PeekChar() == '*')
                     {
                         version = 0;
@@ -86,7 +88,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     }
                     if (navigator.PeekChar() != ',')
                     {
-                        string versionText = navigator.ReadInteger();
+                        var versionText = navigator.ReadInteger().ToString();
                         if (string.IsNullOrEmpty(versionText))
                         {
                             return;
@@ -100,7 +102,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         navigator.ReadChar(); // eat the comma
                     }
 
-                    string format = navigator.GetRemainingText();
+                    var format = navigator.GetRemainingText().ToString();
                     if (string.IsNullOrEmpty(format))
                     {
                         return;
@@ -113,9 +115,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                     record = context.Provider.ReadRecordVersion(mfn, version);
 
-                    using (PftContextGuard guard = new PftContextGuard(context))
+                    using (var guard = new PftContextGuard(context))
                     {
-                        PftContext nestedContext = guard.ChildContext;
+                        var nestedContext = guard.ChildContext;
                         nestedContext.Record = record;
 
                         // ibatrak
@@ -124,10 +126,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                         // TODO some caching
 
-                        PftProgram program = PftUtility.CompileProgram(format);
+                        var program = PftUtility.CompileProgram(format);
                         program.Execute(nestedContext);
 
-                        string output = nestedContext.Text;
+                        var output = nestedContext.Text;
                         context.Write(node, output);
                     }
                 }

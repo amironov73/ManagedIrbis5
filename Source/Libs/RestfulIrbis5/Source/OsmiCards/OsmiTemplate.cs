@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* OsmiTemplate.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -10,23 +16,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-
-
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 #endregion
+
+#nullable enable
 
 namespace RestfulIrbis.OsmiCards
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class OsmiTemplate
     {
         #region Properties
@@ -34,9 +35,8 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Values.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("values")]
-        public OsmiValue[] Values { get; set; }
+        [JsonPropertyName("values")]
+        public OsmiValue[]? Values { get; set; }
 
         #endregion
 
@@ -59,9 +59,9 @@ namespace RestfulIrbis.OsmiCards
                 JObject jObject
             )
         {
-            Code.NotNull(jObject, "jObject");
+            var result = new OsmiTemplate();
 
-            OsmiTemplate result = new OsmiTemplate();
+            // TODO implement
 
             return result;
         }

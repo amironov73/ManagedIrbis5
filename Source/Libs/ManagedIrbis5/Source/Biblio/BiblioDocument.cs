@@ -145,9 +145,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin gather records");
 
             foreach (BiblioChapter chapter in Chapters)
@@ -169,9 +167,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin gather terms");
 
             foreach (BiblioChapter chapter in Chapters)
@@ -193,9 +189,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin initialize the document");
 
             foreach (BiblioChapter chapter in Chapters)
@@ -215,14 +209,6 @@ namespace ManagedIrbis.Biblio
                 string fileName
             )
         {
-            Code.NotNullNorEmpty(fileName, "fileName");
-
-#if WINMOBILE || PocketPC
-
-            throw new NotSupportedException();
-
-#else
-
             string contents = File.ReadAllText
                 (
                     fileName,
@@ -242,21 +228,7 @@ namespace ManagedIrbis.Biblio
             JsonSerializer serializer = new JsonSerializer
             {
                 TypeNameHandling = TypeNameHandling.Objects,
-#if ANDROID
-
-                TypeNameAssemblyFormat = json::System.Runtime
-                    .Serialization.Formatters
-                    .FormatterAssemblyStyle.Simple
-
-#elif NETCORE
-
-                // TODO fix it
-                // TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-
-#else
                 TypeNameAssemblyFormat = FormatterAssemblyStyle.Simple
-
-#endif
             };
 
             BiblioDocument result = obj.ToObject<BiblioDocument>
@@ -271,8 +243,6 @@ namespace ManagedIrbis.Biblio
             result.CommonSettings = common;
 
             return result;
-
-#endif
         }
 
         /// <summary>
@@ -283,9 +253,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin number items");
             context.ItemCount = 0;
 
@@ -309,9 +277,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render items");
 
             foreach (BiblioChapter chapter in Chapters)
@@ -343,10 +309,6 @@ namespace ManagedIrbis.Biblio
 
             return verifier.Result;
         }
-
-        #endregion
-
-        #region Object members
 
         #endregion
 

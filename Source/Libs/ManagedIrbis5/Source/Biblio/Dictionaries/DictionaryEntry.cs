@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* DictionaryEntry.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -11,18 +17,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using AM.Text;
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class DictionaryEntry
     {
         #region Properties
@@ -30,8 +33,7 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Title.
         /// </summary>
-        [CanBeNull]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// List of references.
@@ -65,7 +67,7 @@ namespace ManagedIrbis.Biblio
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append(Title);
             result.Append(' ');
             int[] refs = References.ToArray();
@@ -81,7 +83,7 @@ namespace ManagedIrbis.Biblio
                 first = false;
             }
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion

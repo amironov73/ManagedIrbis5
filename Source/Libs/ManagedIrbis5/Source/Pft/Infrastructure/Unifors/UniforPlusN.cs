@@ -1,19 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusN.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusN.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -38,14 +42,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetFieldCount
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            int tag = expression.SafeToInt32();
-            int count = 0;
-            MarcRecord record = context.Record;
+            var tag = expression.SafeToInt32();
+            var count = 0;
+            var record = context.Record;
 
             if (!ReferenceEquals(record, null)
                 && tag > 0)
@@ -53,7 +57,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 count = record.Fields.GetFieldCount(tag);
             }
 
-            string output = count.ToInvariantString();
+            var output = count.ToInvariantString();
             context.WriteAndSetFlag(node, output);
         }
 

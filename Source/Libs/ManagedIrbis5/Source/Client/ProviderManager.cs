@@ -19,7 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+
 using AM;
+using AM.Configuration;
 using AM.Parameters;
 
 #endregion
@@ -117,7 +119,7 @@ namespace ManagedIrbis.Client
                 name = Default;
             }
 
-            string assemblyParameter
+            var assemblyParameter
                 = parameters.GetParameter("Assembly", null)
                 ?? parameters.GetParameter("Assemblies", null);
             if (!string.IsNullOrEmpty(assemblyParameter))
@@ -129,20 +131,20 @@ namespace ManagedIrbis.Client
                 }
             }
 
-            string typeName
+            var typeName
                 = parameters.GetParameter("Register", null)
                   ?? parameters.GetParameter("Type", null);
             if (!string.IsNullOrEmpty(typeName))
             {
-                Type type = Type.GetType(typeName, true);
-                string shortName = type.Name;
+                var type = Type.GetType(typeName, true).ThrowIfNull();
+                var shortName = type.Name;
                 if (!Registry.ContainsKey(shortName))
                 {
                     Registry.Add(shortName, type);
                 }
             }
 
-            IrbisProvider result = GetProvider(name, true)
+            var result = GetProvider(name, true)
                 .ThrowIfNull();
             result.Configure(configurationString);
 
@@ -158,8 +160,7 @@ namespace ManagedIrbis.Client
                 bool throwOnError
             )
         {
-            Type? type;
-            if (!Registry.TryGetValue(name, out type))
+            if (!Registry.TryGetValue(name, out var type))
             {
                 Magna.Error
                     (
@@ -209,8 +210,8 @@ namespace ManagedIrbis.Client
         /// </summary>
         public static IrbisProvider GetPreconfiguredProvider()
         {
-            string configurationString
-                = AM.Configuration.ConfigurationUtility.GetString
+            var configurationString
+                = ConfigurationUtility.GetString
                 (
                     "IrbisProvider"
                 );

@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforH.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforH.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,11 +16,9 @@
 using AM;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -54,19 +56,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ExtractAngleBrackets
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
+                var navigator = new TextNavigator(expression);
                 while (navigator.SkipTo('<'))
                 {
-                    string chunk = navigator.ReadTo('>');
+                    string chunk = navigator.ReadTo('>').ToString();
 
                     if (chunk.LastChar() == '>')
                     {

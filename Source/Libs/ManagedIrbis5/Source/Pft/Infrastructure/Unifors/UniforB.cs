@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforJ.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforB.cs -- выдача библиографической свертки документа
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,9 +18,9 @@ using System.Text;
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -81,9 +85,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Convolution
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             // Берётся первая буква последнего слова, затем первая
@@ -101,25 +105,25 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
+            var navigator = new TextNavigator(expression);
             string[] words = navigator.SplitToWords(_GoodCharacters);
             if (words.Length == 0)
             {
                 return;
             }
 
-            StringBuilder output = new StringBuilder(MaxLength);
+            var output = new StringBuilder(MaxLength);
 
-            for (int charOffset = 0; ; charOffset++)
+            for (var charOffset = 0; ; charOffset++)
             {
                 if (output.Length == MaxLength)
                 {
                     break;
                 }
 
-                bool flag = false;
+                var flag = false;
                 for (
-                        int wordIndex = words.Length - 1;
+                        var wordIndex = words.Length - 1;
                         wordIndex >= 0;
                         wordIndex--
                     )
@@ -127,7 +131,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     if (charOffset < words[wordIndex].Length)
                     {
                         flag = true;
-                        char c = CharUtility.ToUpperInvariant
+                        char c = char.ToUpperInvariant
                         (
                             words[wordIndex][charOffset]
                         );

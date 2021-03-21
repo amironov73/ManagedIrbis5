@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusBackslash.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusBackslash.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,14 +16,11 @@
 using System;
 using System.Text;
 
-using AM;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -56,18 +57,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ConvertBackslashes
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                char command = navigator.ReadChar();
-                string text = navigator.GetRemainingText();
+                var navigator = new TextNavigator(expression);
+                var command = navigator.ReadChar();
+                string text = navigator.GetRemainingText().ToString();
                 if (string.IsNullOrEmpty(text))
                 {
                     return;
@@ -79,7 +78,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     return;
                 }
 
-                bool ok = command == '1';
+                var ok = command == '1';
                 navigator = new TextNavigator(text);
                 while (!navigator.IsEOF)
                 {
@@ -89,8 +88,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         break;
                     }
 
-                    string chunk = navigator.ReadWhile('\\').ThrowIfNull();
-                    int length = chunk.Length;
+                    string chunk = navigator.ReadWhile('\\').ToString();
+                    var length = chunk.Length;
                     if (command == '1')
                     {
                         // схлапывание удвоенных
@@ -118,24 +117,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     return;
                 }
 
-                StringBuilder result = new StringBuilder(text.Length);
+                var result = new StringBuilder(text.Length);
                 navigator = new TextNavigator(text);
                 while (!navigator.IsEOF)
                 {
-                    string chunk = navigator.ReadUntil('\\');
+                    string chunk = navigator.ReadUntil('\\').ToString();
                     result.Append(chunk);
                     if (navigator.PeekChar() != '\\')
                     {
                         break;
                     }
 
-                    chunk = navigator.ReadWhile('\\').ThrowIfNull();
-                    int length = chunk.Length;
+                    chunk = navigator.ReadWhile('\\').ToString();
+                    var length = chunk.Length;
                     if (command == '1')
                     {
                         // схлапывание удвоенных
                         length = Math.Max(length / 2, 1);
-                        for (int i = 0; i < length; i++)
+                        for (var i = 0; i < length; i++)
                         {
                             result.Append('\\');
                         }
@@ -143,7 +142,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     else
                     {
                         // удвоение
-                        for (int i = 0; i < length; i++)
+                        for (var i = 0; i < length; i++)
                         {
                             result.Append('\\');
                             result.Append('\\');

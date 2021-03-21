@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforE.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,11 +16,9 @@
 using AM;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -39,7 +41,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         internal static string GetFirstWords
             (
-                [CanBeNull] string text,
+                string? text,
                 int wordCount
             )
         {
@@ -61,8 +63,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return text;
             }
 
-            int end = positions[wordCount];
-            string result = text.Substring(0, end);
+            var end = positions[wordCount];
+            var result = text.Substring(0, end);
 
             return result;
         }
@@ -76,26 +78,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetFirstWords
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                string countText = navigator.ReadChar().ToString();
+                var navigator = new TextNavigator(expression);
+                var countText = navigator.ReadChar().ToString();
                 if (countText == "0")
                 {
                     countText = "10";
                 }
-                int wordCount;
-                if (NumericUtility.TryParseInt32(countText, out wordCount))
+
+                if (Utility.TryParseInt32(countText, out var wordCount))
                 {
                     string text = navigator.GetRemainingText();
-                    string output = GetFirstWords(text, wordCount);
+                    var output = GetFirstWords(text, wordCount);
                     context.WriteAndSetFlag(node, output);
                 }
             }

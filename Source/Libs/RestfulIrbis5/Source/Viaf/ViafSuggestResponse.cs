@@ -1,15 +1,24 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ViafSuggestResponse.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 #endregion
+
+#nullable enable
 
 namespace RestfulIrbis.Viaf
 {
@@ -21,13 +30,13 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         /// Query.
         /// </summary>
-        [JsonProperty("query")]
-        public string Query { get; set; }
+        [JsonPropertyName("query")]
+        public string? Query { get; set; }
 
         /// <summary>
         /// Results.
         /// </summary>
-        [JsonProperty("result")]
-        public ViafSuggestResult[] SuggestResults { get; set; }
+        [JsonPropertyName("result")]
+        public ViafSuggestResult[]? SuggestResults { get; set; }
     }
 }

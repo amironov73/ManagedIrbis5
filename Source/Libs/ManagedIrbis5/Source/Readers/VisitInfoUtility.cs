@@ -48,7 +48,7 @@ namespace ManagedIrbis.Readers
         {
             var result = readers.SelectMany
                 (
-                    reader => reader.Visits
+                    reader => reader.Visits ?? Array.Empty<VisitInfo>()
                 )
                 .ToArray();
 
@@ -87,7 +87,7 @@ namespace ManagedIrbis.Readers
                 (
                     loan => !loan.IsVisit
                             && !loan.IsReturned
-                            && date.SafeCompare(loan.DateExpectedString) >= 0
+                            && string.CompareOrdinal(date, loan.DateExpectedString) >= 0
                 )
                 .ToArray();
 
@@ -107,7 +107,7 @@ namespace ManagedIrbis.Readers
                 (
                     loan => !loan.IsVisit
                             && !loan.IsReturned
-                            && deadline.SafeCompare(loan.DateExpectedString) >= 0
+                            && string.CompareOrdinal(deadline, loan.DateExpectedString) >= 0
                 )
                 .ToArray();
 
@@ -128,12 +128,12 @@ namespace ManagedIrbis.Readers
                 (
                     loan =>
                     {
-                        string date = loan.DateExpectedString;
+                        var date = loan.DateExpectedString;
 
                         return !loan.IsVisit
-                            && !loan.IsReturned
-                            && date.SafeCompare(fromDeadline) >= 0
-                            && date.SafeCompare(toDeadline) <= 0;
+                               && !loan.IsReturned
+                               && string.CompareOrdinal(date, fromDeadline) >= 0
+                               && string.CompareOrdinal(date, toDeadline) <= 0;
                     }
                 )
                 .ToArray();
@@ -210,9 +210,9 @@ namespace ManagedIrbis.Readers
                 (
                     visit =>
                     {
-                        string given = visit.DateGivenString;
-                        return given.SafeCompare(date1) >= 0
-                               && given.SafeCompare(date2) <= 0;
+                        var given = visit.DateGivenString;
+                        return string.CompareOrdinal(given, date1) >= 0
+                               && string.CompareOrdinal(given, date2) <= 0;
                     }
                 )
                 .ToArray();
@@ -232,7 +232,7 @@ namespace ManagedIrbis.Readers
             var date1 = IrbisDate.ConvertDateToString(date);
             var result = visits.Where
                 (
-                    visit => visit.DateGivenString.SafeCompare(date1) == 0
+                    visit => string.CompareOrdinal(visit.DateGivenString, date1) == 0
                 )
                 .ToArray();
 

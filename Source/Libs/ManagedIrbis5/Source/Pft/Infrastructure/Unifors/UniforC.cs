@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforC.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforC.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,13 +16,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Identifiers;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -46,20 +48,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void CheckIsbn
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expresion
+                PftContext context,
+                PftNode? node,
+                string? expresion
             )
         {
-            Code.NotNull(context, "context");
-
             // Пустой ISBN считается правильным
-            string output = "1";
+            var output = "1";
 
             if (!string.IsNullOrEmpty(expresion))
             {
-                List<char> digits = new List<char>(expresion.Length);
-                foreach (char c in expresion)
+                var digits = new List<char>(expresion.Length);
+                foreach (var c in expresion)
                 {
                     if (PftUtility.DigitsX.Contains(c))
                     {

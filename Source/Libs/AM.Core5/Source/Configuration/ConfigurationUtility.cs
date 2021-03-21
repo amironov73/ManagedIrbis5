@@ -17,7 +17,6 @@
 
 using System;
 using System.Configuration;
-using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -39,15 +38,7 @@ namespace AM.Configuration
     {
         #region Private members
 
-        private static IFormatProvider _FormatProvider
-        {
-            get
-            {
-                return CultureInfo.InvariantCulture;
-            }
-        }
-
-        private static byte[] _additionalEntropy = {2, 12, 85, 0, 6};
+        private static readonly byte[] _additionalEntropy = {2, 12, 85, 0, 6};
 
         #endregion
 
@@ -56,17 +47,8 @@ namespace AM.Configuration
         /// <summary>
         /// Application.exe.config file name with full path.
         /// </summary>
-        public static string ConfigFileName
-        {
-            get
-            {
-                return string.Concat
-                    (
-                        Utility.ExecutableFileName,
-                        ".config"
-                    );
-            }
-        }
+        public static string ConfigFileName =>
+            string.Concat(Utility.ExecutableFileName, ".config");
 
         /// <summary>
         /// Декодирование конфигурационной строки, если она закодирована или зашифрована.
@@ -74,9 +56,9 @@ namespace AM.Configuration
         /// <param name="possiblyEncrypted">Строка конфигурации.</param>
         /// <param name="password">Пароль. Если null, то используется пароль по умолчанию.</param>
         /// <returns>Расшифрованная строка конфигурации.</returns>
-        public static string DecryptString
+        public static string? DecryptString
             (
-                string possiblyEncrypted,
+                string? possiblyEncrypted,
                 string? password
             )
         {
@@ -119,18 +101,14 @@ namespace AM.Configuration
                 params string[] candidates
             )
         {
-#if !DROID && !ANDROID && !UAP
-
             foreach (string candidate in candidates.NonEmptyLines())
             {
-                string setting = CM.AppSettings[candidate];
+                var setting = CM.AppSettings[candidate];
                 if (!string.IsNullOrEmpty(setting))
                 {
                     return setting;
                 }
             }
-
-#endif
 
             return null;
         }
@@ -140,25 +118,19 @@ namespace AM.Configuration
         /// </summary>
         public static bool GetBoolean
             (
-                [NotNull] string key,
-                bool defaultValue
+                string key,
+                bool defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
-
-            return defaultValue;
-#else
-
             bool result = defaultValue;
-            string s = CM.AppSettings[key];
+            string? s = CM.AppSettings[key];
+
             if (!string.IsNullOrEmpty(s))
             {
-                result = ConversionUtility.ToBoolean(s);
+                result = Utility.ToBoolean(s);
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
@@ -166,54 +138,37 @@ namespace AM.Configuration
         /// </summary>
         public static short GetInt16
             (
-                [NotNull] string key,
-                short defaultValue
+                string key,
+                short defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            short result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseInt16(s, out result))
+            if (!Utility.TryParseInt16(s, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
         /// Get unsigned 16-bit integer.
         /// </summary>
-        [CLSCompliant(false)]
         public static ushort GetUInt16
             (
-                [NotNull] string key,
-                ushort defaultValue
+                string key,
+                ushort defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            ushort result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseUInt16(s, out result))
+            if (!Utility.TryParseUInt16(s, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
@@ -222,55 +177,38 @@ namespace AM.Configuration
         /// </summary>
         public static int GetInt32
             (
-                [NotNull] string key,
-                int defaultValue
+                string key,
+                int defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            int result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseInt32(s, out result))
+            if (!Utility.TryParseInt32(s, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
         /// Get unsigned 32-bit integer value
         /// from application configuration.
         /// </summary>
-        [CLSCompliant (false)]
         public static uint GetUInt32
             (
-                [NotNull] string key,
-                uint defaultValue
+                string key,
+                uint defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            uint result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseUInt32(s, out result))
+            if (!Utility.TryParseUInt32(s, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
@@ -279,55 +217,38 @@ namespace AM.Configuration
         /// </summary>
         public static long GetInt64
             (
-                [NotNull] string key,
-                long defaultValue
+                string key,
+                long defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            long result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseInt64(s, out result))
+            if (!Utility.TryParseInt64(s, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
         /// Get usingned 64-bit integer value
         /// from application configuration.
         /// </summary>
-        [CLSCompliant(false)]
         public static ulong GetUInt64
             (
-                [NotNull] string key,
-                ulong defaultValue
+                string key,
+                ulong defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            ulong result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseUInt64(s, out result))
+            if (!Utility.TryParseUInt64(s, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
@@ -335,26 +256,18 @@ namespace AM.Configuration
         /// </summary>
         public static float GetSingle
             (
-                [NotNull] string key,
-                float defaultValue
+                string key,
+                float defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            float result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseFloat(s, out result))
+            if (!Utility.TryParseSingle(s, out float result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
@@ -362,26 +275,18 @@ namespace AM.Configuration
         /// </summary>
         public static double GetDouble
             (
-                [NotNull] string key,
-                double defaultValue
+                string key,
+                double defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            double result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseDouble(s, out result))
+            if (!Utility.TryParseDouble(s, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
@@ -389,47 +294,31 @@ namespace AM.Configuration
         /// </summary>
         public static decimal GetDecimal
             (
-                [NotNull] string key,
-                decimal defaultValue
+                string key,
+                decimal defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            string? s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            decimal result;
-            string s = CM.AppSettings[key];
-
-            if (!NumericUtility.TryParseDecimal(s, out result))
+            if (!Utility.TryParseDecimal(s, out var result))
             {
                 result = defaultValue;
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
         /// Get string value from application configuration.
         /// </summary>
-        [CanBeNull]
-        public static string GetString
+        public static string? GetString
             (
-                [NotNull] string key,
-                [CanBeNull] string defaultValue
+                string key,
+                string? defaultValue = default
             )
         {
-            Code.NotNullNorEmpty(key, "key");
-
-#if DROID || ANDROID || UAP
-
-            return defaultValue;
-#else
-
-            string result = defaultValue;
-            string s = CM.AppSettings[key];
+            string? result = defaultValue;
+            string? s = CM.AppSettings[key];
 
             if (!string.IsNullOrEmpty(s))
             {
@@ -437,30 +326,20 @@ namespace AM.Configuration
             }
 
             return result;
-
-#endif
         }
 
         /// <summary>
         /// Get string value from application configuration.
         /// </summary>
-        [CanBeNull]
-        public static string GetString
+        public static string? GetString
             (
-                [NotNull] string key,
-                [CanBeNull] string defaultValue,
-                [CanBeNull] string password
+                string key,
+                string? defaultValue,
+                string? password
             )
         {
-            Code.NotNullNorEmpty(key, "key");
-
-#if DROID || ANDROID || UAP
-
-            return defaultValue;
-#else
-
-            string result = defaultValue;
-            string s = CM.AppSettings[key];
+            string? result = defaultValue;
+            string? s = CM.AppSettings[key];
 
             if (!string.IsNullOrEmpty(s))
             {
@@ -470,38 +349,21 @@ namespace AM.Configuration
             result = DecryptString(result, password);
 
             return result;
-
-#endif
         }
 
         /// <summary>
         /// Get string value from application configuration.
         /// </summary>
-        [CanBeNull]
-        public static string GetString
-            (
-                [NotNull] string key
-            )
-        {
-            return GetString(key, null);
-        }
-
-        /// <summary>
-        /// Get string value from application configuration.
-        /// </summary>
-        [NotNull]
         public static string RequireString
             (
-                [NotNull] string key
+                string key
             )
         {
-            Code.NotNullNorEmpty(key, "key");
-
-            string result = GetString(key, null);
+            var result = GetString(key);
 
             if (ReferenceEquals(result, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "ConfigurationUtility::RequireString: "
                         + "key '"
@@ -523,12 +385,11 @@ namespace AM.Configuration
         /// </summary>
         public static bool HasKey
             (
-                [NotNull] string key
+                string key
             )
         {
-            Code.NotNullNorEmpty(key, "key");
-
             var keys = CM.AppSettings.Keys;
+
             return keys.Cast<string>().Contains(key);
         }
 
@@ -537,12 +398,10 @@ namespace AM.Configuration
         /// </summary>
         public static void ThrowKeyNotSet
             (
-                [NotNull] string key
+                string key
             )
         {
-            Code.NotNullNorEmpty(key, "key");
-
-            Log.Error
+            Magna.Error
                 (
                     "ConfigurationUtility::RequireKey: "
                     + "key '"
@@ -561,11 +420,9 @@ namespace AM.Configuration
         /// </summary>
         public static void RequireKey
             (
-                [NotNull] string key
+                string key
             )
         {
-            Code.NotNullNorEmpty(key, "key");
-
             if (!HasKey(key))
             {
                 ThrowKeyNotSet(key);
@@ -577,13 +434,12 @@ namespace AM.Configuration
         /// </summary>
         public static int RequireInt32
             (
-                [NotNull] string key
+                string key
             )
         {
-            Code.NotNullNorEmpty(key, "key");
-
             RequireKey(key);
-            return GetInt32(key, 0);
+
+            return GetInt32(key);
         }
 
         /// <summary>
@@ -591,46 +447,30 @@ namespace AM.Configuration
         /// </summary>
         public static DateTime GetDateTime
             (
-                [NotNull] string key,
-                DateTime defaultValue
+                string key,
+                DateTime defaultValue = default
             )
         {
-#if DROID || ANDROID || UAP
+            var s = CM.AppSettings[key];
 
-            return defaultValue;
-#else
-
-            string s = CM.AppSettings[key];
-
-            if (!string.IsNullOrEmpty(s))
+            if (!Utility.TryParseDateTime(s, out var result))
             {
-                defaultValue = DateTime.Parse
-                    (
-                        s,
-                        _FormatProvider
-                    );
+                result = defaultValue;
             }
 
-            return defaultValue;
-
-#endif
+            return result;
         }
 
         /// <summary>
         /// Добавляет указанное значение.
         /// </summary>
-        [NotNull]
         public static KeyValueConfigurationCollection SetValue
             (
                 this KeyValueConfigurationCollection collection,
-                [NotNull] string key,
-                [NotNull] string value
+                string key,
+                string value
             )
         {
-            Code.NotNull(collection, "collection");
-            Code.NotNullNorEmpty(key, "key");
-            Code.NotNull(value, "value");
-
             var element = collection[key];
             if (ReferenceEquals(element, null))
             {
@@ -649,18 +489,11 @@ namespace AM.Configuration
         /// <remarks>
         /// Very naive data protection against kiddy hackers.
         /// </remarks>
-        [NotNull]
         public static string Protect
             (
-                [CanBeNull] string text
+                string? text
             )
         {
-#if UAP || WINMOBILE || POCKETPC
-
-            return text ?? string.Empty;
-
-#else
-
             if (string.IsNullOrEmpty(text))
             {
                 return string.Empty;
@@ -675,25 +508,16 @@ namespace AM.Configuration
                             DataProtectionScope.LocalMachine
                         )
                 );
-
-#endif
         }
 
         /// <summary>
         /// Decrypt the text.
         /// </summary>
-        [NotNull]
         public static string Unprotect
             (
-                [CanBeNull] string text
+                string? text
             )
         {
-#if UAP || WINMOBILE || POCKETPC
-
-            return text ?? string.Empty;
-
-#else
-
             if (string.IsNullOrEmpty(text))
             {
                 return string.Empty;
@@ -708,8 +532,6 @@ namespace AM.Configuration
                             DataProtectionScope.LocalMachine
                         )
                 );
-
-#endif
         }
 
         #endregion

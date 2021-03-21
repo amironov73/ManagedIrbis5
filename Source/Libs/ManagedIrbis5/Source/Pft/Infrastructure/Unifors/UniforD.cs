@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforD.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,11 +18,9 @@ using System;
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
-using ManagedIrbis.Search;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -53,9 +55,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void FormatDocumentDB
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -63,11 +65,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
+            var navigator = new TextNavigator(expression);
 
             TermLink[] links = null;
 
-            string database = navigator.ReadUntil(',');
+            string database = navigator.ReadUntil(',').ToString();
             if (string.IsNullOrEmpty(database))
             {
                 database = context.Provider.Database;
@@ -85,8 +87,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                 navigator.ReadChar();
                 int mfn;
-                string mfnText = navigator.ReadInteger();
-                if (!NumericUtility.TryParseInt32(mfnText, out mfn))
+                string mfnText = navigator.ReadInteger().ToString();
+                if (!Utility.TryParseInt32(mfnText, out mfn))
                 {
                     return;
                 }
@@ -94,15 +96,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
             else
             {
-                char delimiter = navigator.ReadChar();
-                string query = navigator.ReadUntil(delimiter);
+                var delimiter = navigator.ReadChar();
+                string query = navigator.ReadUntil(delimiter).ToString();
                 if (string.IsNullOrEmpty(query))
                 {
                     return;
                 }
                 navigator.ReadChar();
 
-                string saveDatabase = context.Provider.Database;
+                var saveDatabase = context.Provider.Database;
                 try
                 {
                     context.Provider.Database = database;
@@ -126,7 +128,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string format = navigator.GetRemainingText();
+            string format = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(format))
             {
                 return;
@@ -154,23 +156,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                 // TODO some caching
 
-                PftProgram program = PftUtility.CompileProgram(format);
+                var program = PftUtility.CompileProgram(format);
 
-                using (PftContextGuard guard = new PftContextGuard(context))
+                using (var guard = new PftContextGuard(context))
                 {
-                    PftContext nestedContext = guard.ChildContext;
+                    var nestedContext = guard.ChildContext;
 
                     // ibatrak
                     // формат вызывается в контексте без повторений
                     nestedContext.Reset();
 
-                    string saveDatabase = nestedContext.Provider.Database;
+                    var saveDatabase = nestedContext.Provider.Database;
                     try
                     {
                         nestedContext.Provider.Database = database;
                         nestedContext.Output = context.Output;
-                        int mfn = found[0];
-                        MarcRecord record = nestedContext.Provider.ReadRecord(mfn);
+                        var mfn = found[0];
+                        var record = nestedContext.Provider.ReadRecord(mfn);
                         if (!ReferenceEquals(record, null))
                         {
                             nestedContext.Record = record;

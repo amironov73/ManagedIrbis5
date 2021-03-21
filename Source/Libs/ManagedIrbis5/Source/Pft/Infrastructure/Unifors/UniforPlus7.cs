@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlus7.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -17,9 +21,9 @@ using System.Text;
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -31,12 +35,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         private static bool _Contains
             (
-                [NotNull] IEnumerable<RecordField> fields,
-                [NotNull] RecordField oneField
+                IEnumerable<Field> fields,
+                Field oneField
             )
         {
             string text = oneField.ToText();
-            foreach (RecordField field in fields)
+            foreach (var field in fields)
             {
                 if (field.ToText() == text)
                 {
@@ -68,24 +72,22 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void AppendGlobal
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = StringUtility.SplitString
+                string[] parts = expression.Split
                     (
-                        expression,
                         CommonSeparators.NumberSign,
                         2
                     );
 
                 if (parts.Length == 2)
                 {
-                    int index;
-                    if (NumericUtility.TryParseInt32(parts[0], out index))
+                    if (Utility.TryParseInt32(parts[0], out var index))
                     {
                         context.Globals.Append(index, parts[1]);
                     }
@@ -108,9 +110,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void ClearGlobals
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             context.Globals.Clear();
@@ -130,9 +132,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void DistinctGlobal
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             // &uf('+7')
@@ -142,12 +144,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(expression))
             {
-                int index;
-                if (NumericUtility.TryParseInt32(expression, out index))
+                if (Utility.TryParseInt32(expression, out var index))
                 {
-                    RecordField[] fields = context.Globals.Get(index);
-                    List<RecordField> result = new List<RecordField>();
-                    foreach (RecordField field in fields)
+                    Field[] fields = context.Globals.Get(index);
+                    List<Field> result = new List<Field>();
+                    foreach (Field field in fields)
                     {
                         if (!_Contains(result, field))
                         {
@@ -173,9 +174,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void MultiplyGlobals
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             // &uf('+7')
@@ -186,21 +187,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = expression.Split('#');
+                var parts = expression.Split('#');
                 if (parts.Length != 2)
                 {
                     return;
                 }
 
-                int firstIndex, secondIndex;
-                if (!NumericUtility.TryParseInt32(parts[0], out firstIndex)
-                    || !NumericUtility.TryParseInt32(parts[1], out secondIndex))
+                if (!Utility.TryParseInt32(parts[0], out var firstIndex)
+                    || !Utility.TryParseInt32(parts[1], out var secondIndex))
                 {
                     return;
                 }
-                RecordField[] first = context.Globals.Get(firstIndex);
-                RecordField[] second = context.Globals.Get(secondIndex);
-                RecordField[] result = first.Where
+
+                var first = context.Globals.Get(firstIndex);
+                var second = context.Globals.Get(secondIndex);
+                var result = first.Where
                     (
                         one => _Contains(second, one)
                     )
@@ -233,41 +234,40 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void ReadGlobal
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = StringUtility.SplitString
+                string[] parts = expression.Split
                     (
-                        expression,
                         CommonSeparators.NumberSign,
                         2
                     );
 
-                string indexText = parts[0];
-                bool haveRepeat = !ReferenceEquals(context.CurrentGroup, null);
-                int repeat = context.Index;
+                var indexText = parts[0];
+                var haveRepeat = !ReferenceEquals(context.CurrentGroup, null);
+                var repeat = context.Index;
                 if (parts.Length == 2)
                 {
-                    string repeatText = parts[1];
-                    if (!NumericUtility.TryParseInt32(repeatText, out repeat))
+                    var repeatText = parts[1];
+                    if (!Utility.TryParseInt32(repeatText, out repeat))
                     {
                         return;
                     }
                     haveRepeat = true;
                     repeat--;
                 }
-                int index;
-                if (NumericUtility.TryParseInt32(indexText, out index))
+
+                if (Utility.TryParseInt32(indexText, out var index))
                 {
-                    RecordField[] fields = context.Globals.Get(index);
+                    var fields = context.Globals.Get(index);
 
                     if (haveRepeat)
                     {
-                        RecordField field = fields.GetOccurrence(repeat);
+                        var field = fields.GetOccurrence(repeat);
                         if (!ReferenceEquals(field, null))
                         {
                             string output = field.ToText();
@@ -276,9 +276,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     }
                     else
                     {
-                        StringBuilder output = new StringBuilder();
-                        bool first = true;
-                        foreach (RecordField field in fields)
+                        var output = new StringBuilder();
+                        var first = true;
+                        foreach (Field field in fields)
                         {
                             if (!first)
                             {
@@ -307,9 +307,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void SortGlobal
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             // &uf('+7')
@@ -319,10 +319,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(expression))
             {
-                int index;
-                if (NumericUtility.TryParseInt32(expression, out index))
+                if (Utility.TryParseInt32(expression, out var index))
                 {
-                    RecordField[] fields = context.Globals.Get(index);
+                    Field[] fields = context.Globals.Get(index);
                     Array.Sort
                         (
                             fields,
@@ -352,9 +351,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void SubstractGlobals
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             // &uf('+7')
@@ -365,20 +364,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = expression.Split('#');
+                var parts = expression.Split('#');
                 if (parts.Length != 2)
                 {
                     return;
                 }
-                int firstIndex, secondIndex;
-                if (!NumericUtility.TryParseInt32(parts[0], out firstIndex)
-                    || !NumericUtility.TryParseInt32(parts[1], out secondIndex))
+
+                if (!Utility.TryParseInt32(parts[0], out var firstIndex)
+                    || !Utility.TryParseInt32(parts[1], out var secondIndex))
                 {
                     return;
                 }
-                RecordField[] first = context.Globals.Get(firstIndex);
-                RecordField[] second = context.Globals.Get(secondIndex);
-                RecordField[] result = first.Where
+
+                var first = context.Globals.Get(firstIndex);
+                var second = context.Globals.Get(secondIndex);
+                var result = first.Where
                     (
                         one => !_Contains(second, one)
                     )
@@ -401,9 +401,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void UnionGlobals
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             // &uf('+7')
@@ -414,21 +414,22 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = expression.Split('#');
+                var parts = expression.Split('#');
                 if (parts.Length != 2)
                 {
                     return;
                 }
-                int firstIndex, secondIndex;
-                if (!NumericUtility.TryParseInt32(parts[0], out firstIndex)
-                    || !NumericUtility.TryParseInt32(parts[1], out secondIndex))
+
+                if (!Utility.TryParseInt32(parts[0], out var firstIndex)
+                    || !Utility.TryParseInt32(parts[1], out var secondIndex))
                 {
                     return;
                 }
-                RecordField[] first = context.Globals.Get(firstIndex);
-                RecordField[] second = context.Globals.Get(secondIndex);
-                List<RecordField> result = new List<RecordField>(second);
-                foreach (RecordField field in first)
+
+                var first = context.Globals.Get(firstIndex);
+                var second = context.Globals.Get(secondIndex);
+                var result = new List<Field>(second);
+                foreach (Field field in first)
                 {
                     if (!_Contains(result, field))
                     {
@@ -460,25 +461,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void WriteGlobal
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
 
-                string[] parts = StringUtility.SplitString
+                string[] parts = expression.Split
                     (
-                        expression,
                         CommonSeparators.NumberSign,
                         2
                     );
 
                 if (parts.Length == 2)
                 {
-                    int index;
-                    if (NumericUtility.TryParseInt32(parts[0], out index))
+                    if (Utility.TryParseInt32(parts[0], out var index))
                     {
                         context.Globals.Add(index, parts[1]);
                     }

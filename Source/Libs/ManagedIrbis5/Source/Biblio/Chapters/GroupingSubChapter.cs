@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* GroupingSubChapter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -9,28 +15,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-using AM.Text.Output;
 
-
-
-using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
-
 
 #endregion
 
-// ReSharper disable ForCanBeConvertedToForeach
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
@@ -54,8 +47,7 @@ namespace ManagedIrbis.Biblio
             /// <summary>
             /// Name.
             /// </summary>
-            [CanBeNull]
-            public string Name { get; set; }
+            public string? Name { get; set; }
 
             /// <summary>
             /// Group for "other" records.
@@ -100,38 +92,38 @@ namespace ManagedIrbis.Biblio
         {
             if (!bookGroup.OtherGroup)
             {
-                SpecialSettings settings = Settings;
+                var settings = Settings;
                 if (ReferenceEquals(settings, null))
                 {
                     return;
                 }
-                string orderFormat = settings.GetSetting("groupedOrder");
+                var orderFormat = settings.GetSetting("groupedOrder");
                 if (string.IsNullOrEmpty(orderFormat))
                 {
                     return;
                 }
 
-                BiblioProcessor processor = context.Processor
+                var processor = context.Processor
                     .ThrowIfNull("context.Processor");
-                using (IPftFormatter formatter
+                using (var formatter
                     = processor.AcquireFormatter(context))
                 {
                     orderFormat = processor.GetText(context, orderFormat)
                         .ThrowIfNull("orderFormat");
                     formatter.ParseProgram(orderFormat);
 
-                    foreach (BiblioItem item in bookGroup)
+                    foreach (var item in bookGroup)
                     {
-                        Record record = item.Record
+                        var record = item.Record
                             .ThrowIfNull("item.Record");
-                        string order = formatter.FormatRecord(record.Mfn);
+                        var order = formatter.FormatRecord(record.Mfn);
                         //item.Order = RichText.Decode(order);
                         item.Order = order;
                     }
                 }
             }
 
-            BiblioItem[] items = bookGroup
+            var items = bookGroup
                 .OrderBy(item => item.Order)
                 .ToArray();
             bookGroup.Clear();
@@ -152,78 +144,73 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             base.BuildItems(context);
 
-            SpecialSettings settings = Settings;
+            var settings = Settings;
             if (ReferenceEquals(settings, null))
             {
                 return;
             }
 
-            string allValues = settings.GetSetting("values");
+            var allValues = settings.GetSetting("values");
             if (string.IsNullOrEmpty(allValues))
             {
                 return;
             }
 
-            string[] values = StringUtility
-                .SplitString(allValues, ";")
-                .NonEmptyLines()
-                .ToArray();
+            var values = allValues.Split(';', StringSplitOptions.RemoveEmptyEntries);
             if (values.Length == 0)
             {
                 return;
             }
 
-            string groupBy = settings.GetSetting("groupBy");
+            var groupBy = settings.GetSetting("groupBy");
             if (string.IsNullOrEmpty(groupBy))
             {
                 return;
             }
 
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin grouping {0}", this);
 
-            string otherName = settings.GetSetting("others");
-            BookGroup others = new BookGroup
+            var otherName = settings.GetSetting("others");
+            var others = new BookGroup
             {
                 Name = otherName,
                 OtherGroup = true
             };
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            using (IPftFormatter formatter
+            using (var formatter
                 = processor.AcquireFormatter(context))
             {
                 groupBy = processor.GetText(context, groupBy)
                     .ThrowIfNull("groupBy");
                 formatter.ParseProgram(groupBy);
 
-                foreach (BiblioItem item in Items)
+                foreach (var item in Items)
                 {
-                    Record record = item.Record
+                    var record = item.Record
                         .ThrowIfNull("item.Record");
-                    string text = formatter.FormatRecord(record.Mfn);
+                    var text = formatter.FormatRecord(record.Mfn);
                     if (string.IsNullOrEmpty(text))
                     {
                         continue;
                     }
-                    string[] keys = text.Trim()
+                    var keys = text.Trim()
                         .Split(_lineDelimiters)
                         .TrimLines()
                         .NonEmptyLines()
                         .Distinct()
                         .ToArray();
-                    bool found = false;
-                    foreach (string key in keys)
+                    var found = false;
+                    foreach (var key in keys)
                     {
-                        string theKey = key;
-                        if (theKey.OneOf(values))
+                        var theKey = key;
+                        if (theKey.IsOneOf(values))
                         {
-                            BookGroup bookGroup = Groups.FirstOrDefault
+                            var bookGroup = Groups.FirstOrDefault
                                 (
                                     g => g.Name == theKey
                                 );
@@ -250,7 +237,7 @@ namespace ManagedIrbis.Biblio
             }
 
             Groups = Groups.OrderBy(x => x.Name).ToList();
-            foreach (BookGroup bookGroup in Groups)
+            foreach (var bookGroup in Groups)
             {
                 _OrderGroup(context, bookGroup);
             }
@@ -266,11 +253,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            foreach (BookGroup bookGroup in Groups)
+            foreach (var bookGroup in Groups)
             {
-                foreach (BiblioItem item in bookGroup)
+                foreach (var item in bookGroup)
                 {
                     item.Number = ++context.ItemCount;
                 }
@@ -283,25 +268,23 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
 
             RenderTitle(context);
 
-            foreach (BookGroup bookGroup in Groups)
+            foreach (var bookGroup in Groups)
             {
-                string name = bookGroup.Name;
+                var name = bookGroup.Name;
                 log.WriteLine(name);
 
                 report.Body.Add(new ParagraphBand());
-                string groupTitle =
+                var groupTitle =
                     "{\\b "
                     + name
                     + "\\b0}";
@@ -313,12 +296,12 @@ namespace ManagedIrbis.Biblio
                 report.Body.Add(band);
                 report.Body.Add(new ParagraphBand());
 
-                for (int i = 0; i < bookGroup.Count; i++)
+                for (var i = 0; i < bookGroup.Count; i++)
                 {
                     log.Write(".");
-                    BiblioItem item = bookGroup[i];
-                    int number = item.Number;
-                    string description = item.Description
+                    var item = bookGroup[i];
+                    var number = item.Number;
+                    var description = item.Description
                         .ThrowIfNull("item.Description");
 
                     band = new ParagraphBand

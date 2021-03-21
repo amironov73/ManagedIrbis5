@@ -1,42 +1,34 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ChapterWithText.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-using AM.Text.Output;
-
-
 
 using ManagedIrbis.Reports;
 
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public class ChapterWithText
         : BiblioChapter
     {
@@ -45,29 +37,17 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Text.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("text")]
-        public string Text { get; set; }
+        [JsonPropertyName("text")]
+        public string? Text { get; set; }
 
         /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
-        public override bool IsServiceChapter
-        {
-            get { return true; }
-        }
-
-        #endregion
-
-        #region Construction
+        public override bool IsServiceChapter => true;
 
         #endregion
 
         #region Private members
 
-        private static char[] _lineDelimiters = { '\r', '\n' };
-
-        #endregion
-
-        #region Public methods
+        private static readonly char[] _lineDelimiters = { '\r', '\n' };
 
         #endregion
 
@@ -79,29 +59,27 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
 
 
             RenderTitle(context);
 
-            string text = Text;
+            var text = Text;
             if (!string.IsNullOrEmpty(text))
             {
                 text = processor.GetText(context, text);
                 if (!string.IsNullOrEmpty(text))
                 {
-                    string[] lines = text.Split(_lineDelimiters)
+                    var lines = text.Split(_lineDelimiters)
                         .NonEmptyLines()
                         .ToArray();
-                    foreach (string line in lines)
+                    foreach (var line in lines)
                     {
                         ReportBand band = new ParagraphBand();
                         report.Body.Add(band);

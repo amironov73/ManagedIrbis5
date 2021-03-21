@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* Unifor0.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,10 +17,11 @@ using System.Text;
 
 using AM;
 using AM.Text;
-
-using JetBrains.Annotations;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -57,20 +62,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void FormatAll
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                StringBuilder builder = new StringBuilder();
-                int fieldCount = 0;
-                int dataSize = 0;
-                int recordSize = 32; // Размер заголовка записи
-                Encoding encoding = IrbisEncoding.Utf8;
-                foreach (RecordField field in record.Fields)
+                var builder = new StringBuilder();
+                var fieldCount = 0;
+                var dataSize = 0;
+                var recordSize = 32; // Размер заголовка записи
+                var encoding = IrbisEncoding.Utf8;
+                foreach (var field in record.Fields)
                 {
                     if (field.Tag == IrbisGuid.Tag)
                     {
@@ -84,7 +89,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     }
                     fieldCount++;
 
-                    int tag = field.Tag;
+                    var tag = field.Tag;
                     builder
                         .Append("\\b #")
                         .Append(FastNumber.Int32ToString(tag))
@@ -92,8 +97,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         .Append(FastNumber.Int32ToString(field.Repeat))
                         .Append(":_\\b0 ");
 
-                    string text = field.ToText();
-                    int byteCount = encoding.GetByteCount(text);
+                    var text = field.ToText();
+                    var byteCount = encoding.GetByteCount(text);
                     dataSize += byteCount;
                     recordSize += 12; // Размер заголовка поля
                     recordSize += byteCount; // Размер данных поля

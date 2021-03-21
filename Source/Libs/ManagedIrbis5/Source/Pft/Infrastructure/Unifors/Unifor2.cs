@@ -1,23 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* Unifor2.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* Unifor2.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
 
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -45,14 +45,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetMaxMfn
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
-            int width = 10;
+            var width = 10;
             if (!string.IsNullOrEmpty(expression))
             {
                 width = expression.SafeToInt32(0);
@@ -62,9 +60,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 width = 10;
             }
 
-            string output = (context.Provider.GetMaxMfn() + 1)
+            var output = (context.Provider.GetMaxMfn() + 1)
                 .ToInvariantString();
-            int length = output.Length;
+            var length = output.Length;
             if (width < length)
             {
                 if (width <= 0)

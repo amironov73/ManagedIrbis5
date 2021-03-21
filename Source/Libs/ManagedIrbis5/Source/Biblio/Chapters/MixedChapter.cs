@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MixedChapter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -28,36 +34,18 @@ using ManagedIrbis.Client;
 using ManagedIrbis.Fields;
 using ManagedIrbis.Pft;
 
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public class MixedChapter
         : CumulatingSubChapter
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region BiblioChapter members
 
         /// <inheritdoc cref="MenuSubChapter.BuildItems" />
@@ -66,15 +54,13 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             if (Records.Count == 0)
             {
                 return;
             }
 
-            AbstractOutput log = context.Log;
-            Record record = null;
+            var log = context.Log;
+            Record? record = null;
 
             log.WriteLine("Begin build items {0}", this);
             Items = new ItemCollection();
@@ -112,7 +98,7 @@ namespace ManagedIrbis.Biblio
                 for (int i = 0; i < Records.Count; i++)
                 {
                     record = Records[i];
-                    BookInfo bookInfo = new BookInfo(provider, record);
+                    var bookInfo = new BookInfo(provider, record);
                     if (bookInfo.Worksheet != "SPEC")
                     {
                         nonSpec.Add(record);
@@ -125,12 +111,14 @@ namespace ManagedIrbis.Biblio
                     {
                         header = header.Trim();
                     }
-                    BiblioItem item = new BiblioItem
+
+                    var item = new BiblioItem
                     {
                         Record = record,
                         Chapter = this
                     };
-                    Multivolume bookGroup = Groups.FirstOrDefault
+
+                    var bookGroup = Groups.FirstOrDefault
                         (
                             g => g.Header == header
                         );

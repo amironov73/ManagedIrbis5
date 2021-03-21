@@ -1,6 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* Unifor3.cs --
  * Ars Magna project, http://arsmagna.ru
  * -------------------------------------------------------
@@ -14,9 +21,9 @@ using System.Globalization;
 
 using AM;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -93,11 +100,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             "july", "august", "september", "october", "november", "december"
         };
 
-        [CanBeNull]
-        private static string _GetMonthName
+        private static string? _GetMonthName
             (
-                [NotNull] string expression,
-                [NotNull][ItemNotNull] string[] table
+                string expression,
+                string[] table
             )
         {
             int index;
@@ -107,7 +113,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return null;
             }
 
-            if (!NumericUtility.TryParseInt32(expression.Substring(1), out index))
+            if (!Utility.TryParseInt32(expression.Substring(1), out index))
             {
                 return null;
             }
@@ -121,10 +127,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             return table[index];
         }
 
-        [CanBeNull]
-        private static string _AddDate
+        private static string? _AddDate
             (
-                [NotNull] string expression,
+                string expression,
                 bool changeSign
             )
         {
@@ -133,28 +138,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return null;
             }
 
-            string dateString = expression.Substring(1, 8);
-
-            DateTime date;
-
-#if WINMOBILE || PocketPC
-
-            try
-            {
-                date = DateTime.ParseExact
-                    (
-                        dateString,
-                        "yyyyMMdd",
-                        null,
-                        DateTimeStyles.None
-                    );
-            }
-            catch
-            {
-                return null;
-            }
-
-#else
+            var dateString = expression.Substring(1, 8);
 
             if (!DateTime.TryParseExact
                 (
@@ -162,17 +146,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     "yyyyMMdd",
                     null,
                     DateTimeStyles.None,
-                    out date
+                    out var date
                 ))
             {
                 return null;
             }
 
-#endif
-
-            string deltaString = expression.Substring(10);
+            var deltaString = expression.Substring(10);
             int delta;
-            if (!NumericUtility.TryParseInt32(deltaString, out delta))
+            if (!Utility.TryParseInt32(deltaString, out delta))
             {
                 return null;
             }
@@ -185,14 +167,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             return date.ToString("yyyyMMdd");
         }
 
-        [CanBeNull]
-        private static string _ToJulianDate
+        private static string? _ToJulianDate
             (
-                [NotNull] string expression
+                string expression
             )
         {
-#if CLASSIC || NETCORE || ANDROID || UAP
-
             if (expression.Length < 9)
             {
                 return null;
@@ -212,18 +191,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             return DateTimeUtility.FromJulianDate(date);
-
-#else
-
-            return null;
-
-#endif
         }
 
-        [NotNull]
         private static string _FromDelphiDate
             (
-                [NotNull] string expression
+                string expression
             )
         {
             //
@@ -237,12 +209,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             //
             // Most CLX objects represent date and time values using a TDateTime value.
             // In Delphi, TDateTime is a type that maps to a Double.
-            // In C++, the TDateTime class corresponds to the Delphi TDateTime type. 
-            // 
+            // In C++, the TDateTime class corresponds to the Delphi TDateTime type.
+            //
             // The integral part of a Delphi TDateTime value is the number of days
             // that have passed since 12/30/1899. The fractional part of the
-            // TDateTime value is fraction of a 24 hour day that has elapsed. 
-            // 
+            // TDateTime value is fraction of a 24 hour day that has elapsed.
+            //
             // Following are some examples of TDateTime values and their corresponding
             // dates and times:
             //
@@ -270,21 +242,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             // subtract 693594.0 from the Delphi 1.0 date.
             //
 
-#if WINMOBILE || PocketPC
-
-            throw new NotImplementedException();
-
-#else
-
             expression = expression.Substring(1);
-            double days = expression.SafeToDouble(0);
-            DateTime result = new DateTime(1899, 12, 30)
+            var days = expression.SafeToDouble(0);
+            var result = new DateTime(1899, 12, 30)
                 .AddDays(Math.Truncate(days))
                 .AddDays(Math.Abs(days - Math.Truncate(days)));
 
             return result.ToString("yyyyMMdd HHmmss");
-
-#endif
         }
 
         #endregion
@@ -296,16 +260,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void PrintDate
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             expression = expression ?? string.Empty;
 
-            char secondChar = expression.FirstChar();
+            var secondChar = expression.FirstChar();
             string format;
-            DateTime now = context.Provider.PlatformAbstraction.Now();
+            var now = context.Provider.PlatformAbstraction.Now();
             switch (secondChar)
             {
                 case '\0':
@@ -386,7 +350,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(format))
             {
-                string output = string.Format(format, now);
+                var output = string.Format(format, now);
                 context.WriteAndSetFlag(node, output);
             }
         }

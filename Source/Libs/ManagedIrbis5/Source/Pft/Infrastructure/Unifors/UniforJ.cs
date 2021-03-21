@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforJ.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,9 +16,9 @@
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -37,9 +41,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void GetTermRecordCountDB
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -47,9 +51,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
+            var navigator = new TextNavigator(expression);
 
-            string database = navigator.ReadUntil(',');
+            string database = navigator.ReadUntil(',').ToString();
             if (string.IsNullOrEmpty(database))
             {
                 database = context.Provider.Database;
@@ -60,19 +64,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string term = navigator.GetRemainingText();
+            string term = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(term))
             {
                 return;
             }
 
-            string saveDatabase = context.Provider.Database;
+            var saveDatabase = context.Provider.Database;
             try
             {
                 context.Provider.Database = database;
 
-                int[] found = context.Provider.Search(term);
-                string output = found.Length.ToInvariantString();
+                var found = context.Provider.Search(term);
+                var output = found.Length.ToInvariantString();
                 context.WriteAndSetFlag(node, output);
             }
             finally

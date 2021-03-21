@@ -49,17 +49,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string result = expression;
+                var result = expression;
 
                 if (expression.Contains("<"))
                 {
-                    StringBuilder builder = new StringBuilder(expression.Length);
-                    TextNavigator navigator = new TextNavigator(expression);
+                    var builder = new StringBuilder(expression.Length);
+                    var navigator = new TextNavigator(expression);
                     while (!navigator.IsEOF)
                     {
                         string text = navigator.ReadUntil('<');
                         builder.Append(text);
-                        char c = navigator.ReadChar();
+                        var c = navigator.ReadChar();
                         if (c != '<')
                         {
                             break;

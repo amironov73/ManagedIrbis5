@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforF.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforF.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,11 +18,9 @@ using System.Text.RegularExpressions;
 using AM;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -43,7 +45,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         static string GetLastWords
             (
-                [CanBeNull] string text,
+                string? text,
                 int wordCount
             )
         {
@@ -67,8 +69,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return text;
             }
 
-            int end = positions[wordCount];
-            string result = text.Substring
+            var end = positions[wordCount];
+            var result = text.Substring
                 (
                     end,
                     text.Length - end
@@ -87,22 +89,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetLastWords
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                string countText = navigator.ReadChar().ToString();
-                int wordCount;
-                if (NumericUtility.TryParseInt32(countText, out wordCount))
+                var navigator = new TextNavigator(expression);
+                var countText = navigator.ReadChar().ToString();
+
+                if (Utility.TryParseInt32(countText, out var wordCount))
                 {
-                    string text = navigator.GetRemainingText();
-                    string output = GetLastWords(text, wordCount);
+                    string text = navigator.GetRemainingText().ToString();
+                    var output = GetLastWords(text, wordCount);
                     context.WriteAndSetFlag(node, output);
                 }
             }

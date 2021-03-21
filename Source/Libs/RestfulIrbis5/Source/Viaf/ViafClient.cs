@@ -4,42 +4,39 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* ViafClient.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
-#if !UAP
-
 #region Using directives
 
-
-
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using AM;
 
 using RestSharp;
 
 #endregion
 
-// ReSharper disable StringLiteralTypo
+#nullable enable
 
 namespace RestfulIrbis.Viaf
 {
     //
-    // VIAF (����. Virtual International Authority File - �����������
-    // ������������� ������������ ����) - ����������� �������
-    // �������������� ������������ �������� (���������� � �������������
-    // � �� �������). � ���������� ������� ����������� ���������
-    // ���������� ������� ���������, � ��� ����� �������� ������������
-    // ����������, ���������� ��������� ���.
+    // VIAF (англ. Virtual International Authority File - Виртуальный
+    // международный авторитетный файл) - виртуальный каталог
+    // международного нормативного контроля (информации о произведениях
+    // и их авторах). В разработке проекта участвовало несколько
+    // крупнейших мировых библиотек, в том числе Немецкая национальная
+    // библиотека, Библиотека Конгресса США.
     //
-    // VIAF �������� ������������ ���������� �������� �������������.
-    // ��� ���������� ������ ���������� ������������ ��������� � �����������
-    // ���������� ������������ ������������ ������� (OCLC).
-    // ������ ��� ����������� �������� ������������ �����������
-    // � ����������� ��������� ���. ������ ������� � 2000 ����.
+    // VIAF является международно признанной системой классификации.
+    // Это совместный проект нескольких национальных библиотек и управляется
+    // Онлайновым компьютерным библиотечным центром (OCLC).
+    // Проект был инициирован Немецкой национальной библиотекой
+    // и Библиотекой Конгресса США. Проект основан в 2000 году.
     //
 
     /// <summary>
@@ -64,7 +61,6 @@ namespace RestfulIrbis.Viaf
         /// </summary>
         public RestClient Connection { get; private set; }
 
-
         #endregion
 
         #region Construction
@@ -85,9 +81,7 @@ namespace RestfulIrbis.Viaf
                 string baseUrl
             )
         {
-            Log.Trace($"ViafClient: constructor: {baseUrl}");
-
-            Code.NotNullNorEmpty(baseUrl, nameof(baseUrl));
+            Magna.Trace($"ViafClient: constructor: {baseUrl}");
 
             Connection = new RestClient(baseUrl);
         }
@@ -104,9 +98,7 @@ namespace RestfulIrbis.Viaf
                 string name
             )
         {
-            Log.Trace("ViafClient: get suggestions");
-
-            Code.NotNullNorEmpty(name, nameof(name));
+            Magna.Trace("ViafClient: get suggestions");
 
             var request = new RestRequest("/viaf/AutoSuggest?query={name}");
             request.AddUrlSegment("name", name);
@@ -125,9 +117,7 @@ namespace RestfulIrbis.Viaf
                 string recordId
             )
         {
-            Log.Trace("ViafClient: get authority cluster data");
-
-            Code.NotNullNorEmpty(recordId, nameof(recordId));
+            Magna.Trace("ViafClient: get authority cluster data");
 
             var request = new RestRequest("/viaf/{id}/");
             request.AddUrlSegment("id", recordId);
@@ -142,5 +132,3 @@ namespace RestfulIrbis.Viaf
         #endregion
     }
 }
-
-#endif

@@ -1,32 +1,25 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* BiblioFilter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-
-
-
-using Newtonsoft.Json;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
@@ -42,35 +35,20 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Expression for record formatting.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("format")]
-        public string FormatExpression { get; set; }
+        [JsonPropertyName("format")]
+        public string? FormatExpression { get; set; }
 
         /// <summary>
         /// Expression for record selection.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("select")]
-        public string SelectExpression { get; set; }
+        [JsonPropertyName("select")]
+        public string? SelectExpression { get; set; }
 
         /// <summary>
         /// Expression for record sorting.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("sort")]
-        public string SortExpression { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        [JsonPropertyName("sort")]
+        public string? SortExpression { get; set; }
 
         #endregion
 
@@ -82,7 +60,7 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            Verifier<BiblioFilter> verifier
+            var verifier
                 = new Verifier<BiblioFilter>(this, throwOnError);
 
             // TODO do something
@@ -92,8 +70,5 @@ namespace ManagedIrbis.Biblio
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

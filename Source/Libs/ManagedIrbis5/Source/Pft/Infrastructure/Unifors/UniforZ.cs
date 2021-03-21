@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforZ.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforZ.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,9 +18,9 @@ using System.Linq;
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -94,8 +98,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         private static void _ProcessField
             (
-                [NotNull] MarcRecord record,
-                [NotNull] RecordField field
+                Record record,
+                Field field
             )
         {
             field.SetSubField('A', "0");
@@ -104,15 +108,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 return;
             }
-            TextNavigator navigator = new TextNavigator(specification);
-            string countText = navigator.ReadUntil('/');
+            var navigator = new TextNavigator(specification);
+            string countText = navigator.ReadUntil('/').ToString();
             if (string.IsNullOrEmpty(countText))
             {
                 navigator.ReadChar();
                 field.SetSubField('B', navigator.GetRemainingText());
                 return;
             }
-            int count = countText.SafeToInt32();
+            var count = countText.SafeToInt32();
 
             if (count <= 0)
             {
@@ -125,7 +129,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string inventoryText = navigator.GetRemainingText();
+            string inventoryText = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(inventoryText))
             {
                 inventoryText = "1";
@@ -133,14 +137,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             NumberText inventory = inventoryText;
 
             string barcodeText = field.GetFirstSubFieldValue('H');
-            NumberText barcode = string.IsNullOrEmpty(barcodeText)
+            var barcode = string.IsNullOrEmpty(barcodeText)
                 ? null
                 : new NumberText(barcodeText);
 
-            bool first = true;
+            var first = true;
             while (count > 0)
             {
-                RecordField current = field;
+                var current = field;
                 if (!first)
                 {
                     current = field.Clone();
@@ -166,19 +170,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void GenerateExemplars
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                RecordField[] fields = record.Fields
+                var fields = record.Fields
                     .GetField(910)
                     .GetField('A', "R")
                     .ToArray();
-                foreach (RecordField field in fields)
+                foreach (var field in fields)
                 {
                     _ProcessField(record, field);
                 }

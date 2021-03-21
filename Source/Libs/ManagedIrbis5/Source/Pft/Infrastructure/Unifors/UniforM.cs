@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforM.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,9 +18,9 @@ using System.Linq;
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -44,23 +48,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         class FieldToSort
         {
-            public RecordField Field { get; set; }
+            public Field Field { get; set; }
 
             public string Text { get; set; }
         }
 
         static void SortField
             (
-                [NotNull] MarcRecord record,
+                Record record,
                 int tag,
                 char code,
                 bool descending
             )
         {
-            RecordField[] found = record.Fields.GetField(tag);
-            FieldToSort[] fields = new FieldToSort[found.Length];
+            var found = record.Fields.GetField(tag);
+            var fields = new FieldToSort[found.Length];
 
-            for (int i = 0; i < found.Length; i++)
+            for (var i = 0; i < found.Length; i++)
             {
                 fields[i] = new FieldToSort
                 {
@@ -97,29 +101,29 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void Sort
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression)
                 && !ReferenceEquals(context.Record, null))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                char direction = char.ToLower(navigator.ReadChar());
+                var navigator = new TextNavigator(expression);
+                var direction = char.ToLower(navigator.ReadChar());
                 if (direction != 'i' && direction != 'd')
                 {
                     return;
                 }
 
-                string tagText = navigator.ReadUntil('^');
+                string tagText = navigator.ReadUntil('^').ToString();
                 if (string.IsNullOrEmpty(tagText))
                 {
                     return;
                 }
 
-                int tag = NumericUtility.ParseInt32(tagText);
-                char code = '\0';
+                int tag = tagText.SafeToInt32();
+                var code = '\0';
                 if (!navigator.IsEOF)
                 {
                     navigator.ReadChar();

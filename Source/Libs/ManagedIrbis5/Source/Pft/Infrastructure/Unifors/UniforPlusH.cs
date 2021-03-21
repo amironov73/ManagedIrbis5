@@ -1,23 +1,26 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusH.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusH.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-
-using AM.Logging;
-
-using JetBrains.Annotations;
+using AM;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -40,9 +43,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Take3Of4
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -50,14 +53,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            Encoding encoding = IrbisEncoding.Utf8;
-            byte[] bytes = encoding.GetBytes(expression);
-            List<byte> list = new List<byte>();
-            int length = bytes.Length < 3
+            var encoding = IrbisEncoding.Utf8;
+            var bytes = encoding.GetBytes(expression);
+            var list = new List<byte>();
+            var length = bytes.Length < 3
                 ? 0
                 : unchecked((bytes.Length + 3) / 4);
             list.Add((byte)('0' + length));
-            for (int i = 0; i < bytes.Length; i++)
+            for (var i = 0; i < bytes.Length; i++)
             {
                 if (i % 4 != 3)
                 {
@@ -67,13 +70,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             try
             {
-                byte[] bytes2 = list.ToArray();
-                string output = encoding.GetString(bytes2, 0, bytes2.Length);
+                var bytes2 = list.ToArray();
+                var output = encoding.GetString(bytes2, 0, bytes2.Length);
                 context.WriteAndSetFlag(node, output);
             }
             catch (Exception exception)
             {
-                Log.TraceException("UniforPlusH::Take3Of4", exception);
+                Magna.TraceException
+                    (
+                        "UniforPlusH::Take3Of4",
+                        exception
+                    );
             }
         }
 

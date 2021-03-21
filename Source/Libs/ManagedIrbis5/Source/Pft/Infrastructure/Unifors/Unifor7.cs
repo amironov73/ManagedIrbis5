@@ -1,22 +1,25 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* Unifor7.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM.Text;
 
-using JetBrains.Annotations;
-
 using ManagedIrbis.Client;
-using ManagedIrbis.Search;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -55,18 +58,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     {
         #region Private members
 
-        [NotNull]
         private static TermLink[] ExtractLinks
             (
-                [NotNull] IrbisProvider provider,
-                [NotNull] string term
+                IrbisProvider provider,
+                string term
             )
         {
             TermLink[] result;
 
             if (term.EndsWith("$"))
             {
-                string start = term.Substring(0, term.Length - 1);
+                var start = term.Substring(0, term.Length - 1);
                 result = provider.ExactSearchTrimLinks(start, 100);
             }
             else
@@ -83,9 +85,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void FormatDocuments
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -93,23 +95,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
-            string database = navigator.ReadUntil(',');
+            var navigator = new TextNavigator(expression);
+            string database = navigator.ReadUntil(',').ToString();
             if (navigator.ReadChar() == TextNavigator.EOF)
             {
                 return;
             }
-            IrbisProvider provider = context.Provider;
+            var provider = context.Provider;
             if (string.IsNullOrEmpty(database))
             {
                 database = provider.Database;
             }
-            char delimiter = navigator.ReadChar();
+            var delimiter = navigator.ReadChar();
             if (delimiter == TextNavigator.EOF)
             {
                 return;
             }
-            string term = navigator.ReadUntil(delimiter);
+            string term = navigator.ReadUntil(delimiter).ToString();
             if (string.IsNullOrEmpty(term))
             {
                 return;
@@ -119,7 +121,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 return;
             }
-            string format = navigator.GetRemainingText();
+            string format = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(format))
             {
                 return;
@@ -133,8 +135,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             if (format == "*")
             {
                 provider.Database = database;
-                TermLink[] links = ExtractLinks(provider, term);
-                foreach (TermLink link in links)
+                var links = ExtractLinks(provider, term);
+                foreach (var link in links)
                 {
                     if (PftUtility.FormatTermLink
                         (
@@ -151,30 +153,30 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string previousDatabase = provider.Database;
+            var previousDatabase = provider.Database;
             try
             {
                 provider.Database = database;
-                TermLink[] links = ExtractLinks(provider, term);
-                int[] found = TermLink.ToMfn(links);
+                var links = ExtractLinks(provider, term);
+                var found = TermLink.ToMfn(links);
                 if (found.Length != 0)
                 {
                     // TODO some caching
 
-                    PftProgram program = PftUtility.CompileProgram(format);
+                    var program = PftUtility.CompileProgram(format);
 
-                    using (PftContextGuard guard = new PftContextGuard(context))
+                    using (var guard = new PftContextGuard(context))
                     {
-                        PftContext nestedContext = guard.ChildContext;
+                        var nestedContext = guard.ChildContext;
 
                         // ibatrak
                         // формат вызывается в контексте без повторений
                         nestedContext.Reset();
 
                         nestedContext.Output = context.Output;
-                        foreach (int mfn in found)
+                        foreach (var mfn in found)
                         {
-                            MarcRecord record = nestedContext.Provider.ReadRecord(mfn);
+                            var record = nestedContext.Provider.ReadRecord(mfn);
                             if (!ReferenceEquals(record, null))
                             {
                                 nestedContext.Record = record;

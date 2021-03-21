@@ -1,10 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforP.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,11 +17,12 @@
 using System;
 
 using AM;
-using AM.Logging;
 
-using JetBrains.Annotations;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -48,28 +54,28 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void UniqueField
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
                 try
                 {
-                    MarcRecord record = context.Record;
+                    var record = context.Record;
                     if (!ReferenceEquals(record, null))
                     {
                         // ibatrak
                         // ИРБИС игнорирует код команды в спецификации,
                         // все работает как v
-                        char command = expression[0];
+                        var command = expression[0];
                         if (command != 'v' && command != 'V')
                         {
                             expression = "v" + expression.Substring(1);
                         }
 
-                        FieldSpecification specification = new FieldSpecification();
+                        var specification = new FieldSpecification();
                         if (specification.ParseUnifor(expression))
                         {
                             if (specification.Tag == IrbisGuid.Tag)
@@ -78,15 +84,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                                 return;
                             }
 
-                            FieldReference reference = new FieldReference();
+                            var reference = new FieldReference();
                             reference.Apply(specification);
 
-                            string[] array = reference.GetUniqueValues(record);
-                            string result = null;
+                            var array = reference.GetUniqueValues(record);
+                            string? result = null;
                             switch (reference.FieldRepeat.Kind)
                             {
                                 case IndexKind.None:
-                                    result = StringUtility.Join(",", array);
+                                    result = string.Join(",", array);
                                     break;
 
                                 case IndexKind.Literal:
@@ -121,7 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 }
                 catch (Exception exception)
                 {
-                    Log.TraceException
+                    Magna.TraceException
                         (
                             "UniforP::UniqueField",
                             exception

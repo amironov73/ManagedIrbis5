@@ -1,29 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftVisitor.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftVisitor.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Walking
 {
     /// <summary>
     /// Context for AST visitor.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class VisitorContext
     {
         #region Properties
@@ -31,13 +25,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Walking
         /// <summary>
         /// Visitor.
         /// </summary>
-        [NotNull]
         public PftVisitor Visitor { get; private set; }
 
         /// <summary>
         /// Node.
         /// </summary>
-        [NotNull]
         public PftNode Node { get; private set; }
 
         /// <summary>
@@ -54,13 +46,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Walking
         /// </summary>
         public VisitorContext
             (
-                [NotNull] PftVisitor visitor,
-                [NotNull] PftNode node
+                PftVisitor visitor,
+                PftNode node
             )
         {
-            Code.NotNull(visitor, "visitor");
-            Code.NotNull(node, "node");
-
             Visitor = visitor;
             Node = node;
             Result = true;

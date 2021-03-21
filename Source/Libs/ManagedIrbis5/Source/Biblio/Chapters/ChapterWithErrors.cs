@@ -1,62 +1,34 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ChapterWithErrors.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-using AM.Text.Output;
 
-
-
-using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class ChapterWithErrors
         : BiblioChapter
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region BiblioChapter members
 
         /// <inheritdoc cref="BiblioChapter.Render" />
@@ -65,43 +37,41 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
-            RecordCollection badRecords = context.BadRecords;
-            BiblioProcessor processor = context.Processor
+            var badRecords = context.BadRecords;
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
 
             RenderTitle(context);
 
             if (badRecords.Count != 0)
             {
-                ParagraphBand title = new ParagraphBand
+                var title = new ParagraphBand
                     (
                         "Следующие записи не входят ни в один раздел"
                     );
                 report.Body.Add(title);
                 report.Body.Add(new ParagraphBand());
 
-                using (IPftFormatter formatter
+                using (var formatter
                     = processor.AcquireFormatter(context))
                 {
-                    string briefFormat = processor
+                    var briefFormat = processor
                         .GetText(context, "*brief.pft")
                         .ThrowIfNull("processor.GetText");
                     formatter.ParseProgram(briefFormat);
 
-                    foreach (Record record in badRecords)
+                    foreach (var record in badRecords)
                     {
                         log.Write(".");
-                        string description =
+                        var description =
                             "MFN " + record.Mfn + " "
                             + formatter.FormatRecord(record.Mfn);
-                        ParagraphBand band
+                        var band
                             = new ParagraphBand(description);
                         report.Body.Add(band);
                         report.Body.Add(new ParagraphBand());
@@ -117,10 +87,6 @@ namespace ManagedIrbis.Biblio
 
             log.WriteLine("End render {0}", this);
         }
-
-        #endregion
-
-        #region Object members
 
         #endregion
     }

@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ItemCollection.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -21,19 +27,15 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
-
-
-using ManagedIrbis.Client;
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class ItemCollection
         : NonNullCollection<BiblioItem>,
         IVerifiable
@@ -58,10 +60,9 @@ namespace ManagedIrbis.Biblio
             }
         }
 
-        [CanBeNull]
-        private static string _TrimOrder
+        private static string? _TrimOrder
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (string.IsNullOrEmpty(text))
@@ -69,8 +70,8 @@ namespace ManagedIrbis.Biblio
                 return text;
             }
 
-            StringBuilder result = new StringBuilder();
-            TextNavigator navigator = new TextNavigator(text);
+            var result = new StringBuilder();
+            var navigator = new TextNavigator(text);
             ReadDigit(navigator, result);
             ReadDigit(navigator, result);
             ReadDigit(navigator, result);
@@ -93,7 +94,7 @@ namespace ManagedIrbis.Biblio
         {
             // Официальные документы имеют характер n или 67
 
-            string[] character =
+            string?[] character =
             {
                 record.FM(900, 'c'),
                 record.FM(900, '2'),

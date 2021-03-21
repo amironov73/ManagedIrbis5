@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlusPlus0.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,9 +18,11 @@ using System.Text;
 
 using AM;
 
-using JetBrains.Annotations;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -42,29 +48,31 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void FormatAll
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            List<int> tagsToSkip = new List<int> { 953 };
+            var tagsToSkip = new List<int> { 953 };
             if (!string.IsNullOrEmpty(expression))
             {
-                foreach (string item in StringUtility.SplitString(expression, ","))
+                foreach (string item in expression.Split(','))
                 {
-                    int tag;
-                    if (NumericUtility.TryParseInt32(item, out tag))
+                    if (Utility.TryParseInt32(item, out var tag))
                     {
-                        tagsToSkip.Add(tag);
+                        if (tag > 0)
+                        {
+                            tagsToSkip.Add(tag);
+                        }
                     }
                 }
             }
 
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                StringBuilder output = new StringBuilder();
-                foreach (RecordField field in record.Fields)
+                var output = new StringBuilder();
+                foreach (var field in record.Fields)
                 {
                     if (field.Tag == IrbisGuid.Tag)
                     {
@@ -82,12 +90,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         continue;
                     }
 
-                    string fieldValue = field.Value;
+                    var fieldValue = field.Value;
                     if (!string.IsNullOrEmpty(fieldValue))
                     {
                         output.Append(fieldValue);
                     }
-                    foreach (SubField subField in field.SubFields)
+
+                    foreach (SubField subField in field.Subfields)
                     {
                         output.Append(" ");
                         output.Append(subField.Value);

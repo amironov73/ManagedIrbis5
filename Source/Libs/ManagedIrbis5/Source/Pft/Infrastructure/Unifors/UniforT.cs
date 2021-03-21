@@ -1,7 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforT.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforT.cs --
  * Ars Magna project, http://arsmagna.ru
  * -------------------------------------------------------
  * Status: poor
@@ -12,9 +19,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -38,8 +45,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     {
         #region Private members
 
-        private static readonly Dictionary<char, string> _transliterator
-            = new Dictionary<char, string>
+        private static readonly Dictionary<char, string> _transliterator = new()
             {
                 {'а', "a"},  {'б', "b"},    {'в', "v"},  {'г', "g"},  {'д', "d"},
                 {'е', "e"},  {'ё', "io"},   {'ж', "zh"}, {'з', "z"},  {'и', "i"},
@@ -66,9 +72,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Transliterate
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             //
@@ -77,13 +83,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(expression))
             {
-                StringBuilder result = new StringBuilder();
+                var result = new StringBuilder();
 
-                for (int index = 1; index < expression.Length; index++)
+                for (var index = 1; index < expression.Length; index++)
                 {
-                    char c = expression[index];
-                    string s;
-                    if (_transliterator.TryGetValue(c, out s))
+                    var c = expression[index];
+                    if (_transliterator.TryGetValue(c, out var s))
                     {
                         result.Append(s);
                     }

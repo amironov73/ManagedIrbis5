@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ChapterWithDictionary.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -14,7 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 using AM;
 using AM.Collections;
@@ -23,23 +29,18 @@ using AM.Runtime;
 using AM.Text;
 using AM.Text.Output;
 
-
-
-using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-
-using Newtonsoft.Json;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public class ChapterWithDictionary
         : BiblioChapter
     {
@@ -58,35 +59,29 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// OrderBy expression.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("orderBy")]
-        public string OrderByClause { get; set; }
+        [JsonPropertyName("orderBy")]
+        public string? OrderByClause { get; set; }
 
         /// <summary>
         /// Select expression.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("select")]
-        public string SelectClause { get; set; }
+        [JsonPropertyName("select")]
+        public string? SelectClause { get; set; }
 
         /// <summary>
         /// Extended format.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("extended")]
-        public string ExtendedFormat { get; set; }
+        [JsonPropertyName("extended")]
+        public string? ExtendedFormat { get; set; }
 
         /// <summary>
         /// Entries to exclude.
         /// </summary>
-        [JsonProperty("exclude")]
+        [JsonPropertyName("exclude")]
         public List<string> ExcludeList { get; private set; }
 
         /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
-        public override bool IsServiceChapter
-        {
-            get { return true; }
-        }
+        public override bool IsServiceChapter => true;
 
         #endregion
 
@@ -252,9 +247,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin build dictionary {0}", this);
 
             foreach (BiblioTerm term in Terms)
@@ -277,9 +270,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin gather terms {0}", this);
 
             if (Active)
@@ -311,9 +302,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
             BiblioProcessor processor = context.Processor

@@ -1581,17 +1581,35 @@ namespace AM.Text
                 : _text.Slice(offset, length);
         }
 
+        /// <summary>
+        /// Временная заглушка.
+        /// </summary>
+        public char PeekCharNoCrLf() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Временная заглушка.
+        /// </summary>
+        public char ReadCharNoCrLf() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Временная заглушка.
+        /// </summary>
+        public int SavePosition() => throw new NotImplementedException();
+
+        /// <summary>
+        /// Временная заглушка.
+        /// </summary>
+        public void RestorePosition(int saved) => throw new NotImplementedException();
+
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
         [Pure]
-        public override string ToString()
-        {
-            return $"Line={Line}, Column={Column}";
-        }
+        public override string ToString() => $"Line={Line}, Column={Column}";
 
         #endregion
+
     }
 }

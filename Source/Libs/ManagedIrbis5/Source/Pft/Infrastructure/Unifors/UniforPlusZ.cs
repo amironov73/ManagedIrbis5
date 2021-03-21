@@ -1,17 +1,25 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforPlusZ.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforPlusZ.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using AM.Text;
+using AM;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -20,13 +28,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // Преобразование символов и кодовой страницы ANSI в OEM и обратно
     //
 
-    class UniforPlusZ
+    /// <summary>
+    ///
+    /// </summary>
+    static class UniforPlusZ
     {
         public static void AnsiToOem
             (
                 PftContext context,
-                PftNode node,
-                string expression
+                PftNode? node,
+                string? expression
             )
         {
             // ibatrak
@@ -36,26 +47,26 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             if (!ReferenceEquals(expression, null)
                 && expression.Length > 1)
             {
-                char command = expression[0];
-                string text = expression.Substring(1);
+                var command = expression[0];
+                var text = expression.Substring(1);
 
                 switch (command)
                 {
                     case '0':
-                        text = EncodingUtility.ChangeEncoding
+                        text = Utility.ChangeEncoding
                             (
-                                text,
                                 IrbisEncoding.Ansi,
-                                IrbisEncoding.Oem
+                                IrbisEncoding.Oem,
+                                text
                             );
                         break;
 
                     case '1':
-                        text = EncodingUtility.ChangeEncoding
+                        text = Utility.ChangeEncoding
                             (
-                                text,
                                 IrbisEncoding.Oem,
-                                IrbisEncoding.Ansi
+                                IrbisEncoding.Ansi,
+                                text
                             );
                         break;
                 }

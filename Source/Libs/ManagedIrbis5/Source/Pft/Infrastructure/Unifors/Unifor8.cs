@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* Unifor8.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -17,13 +21,11 @@ using System.Text;
 using AM;
 using AM.Text;
 
-using JetBrains.Annotations;
-
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Search;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -52,9 +54,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void FormatWithFst
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
 
@@ -63,10 +65,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            IrbisProvider provider = context.Provider;
-            string[] parts = StringUtility.SplitString
+            var provider = context.Provider;
+            string[] parts = expression.Split
                 (
-                    expression,
                     CommonSeparators.Comma,
                     2
                 );
@@ -75,7 +76,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string database = parts[0];
+            var database = parts[0];
             if (string.IsNullOrEmpty(database))
             {
                 database = provider.Database;
@@ -86,18 +87,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            int mfn = 0;
-            string query = null;
+            var mfn = 0;
+            string? query = null;
             if (parts[1].StartsWith("@"))
             {
-                parts = StringUtility.SplitString
+                parts = parts[1].Split
                     (
-                        parts[1],
                         CommonSeparators.Comma,
                         4
                     );
-                string mfnText = parts[0].Substring(1);
-                if (!NumericUtility.TryParseInt32(mfnText, out mfn)
+                var mfnText = parts[0].Substring(1);
+                if (!Utility.TryParseInt32(mfnText, out mfn)
                     || mfn <= 0)
                 {
                     return;
@@ -105,18 +105,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
             else
             {
-                string separator = parts[1].Substring(0, 1);
+                var separator = parts[1].Substring(0, 1);
                 if (string.IsNullOrEmpty(separator))
                 {
                     return;
                 }
-                int index = parts[1].IndexOf
+                var index = parts[1].IndexOf
                     (
                         separator,
-                        1
-#if !UAP
-                        , StringComparison.InvariantCulture
-#endif
+                        1,
+                        StringComparison.InvariantCulture
                     );
                 if (index < 0)
                 {
@@ -124,9 +122,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 }
 
                 query = parts[1].Substring(1, index - 1); //-V3057
-                parts = StringUtility.SplitString
+                parts = parts[1].Substring(index + 1).Split
                     (
-                        parts[1].Substring(index + 1),
                         CommonSeparators.Comma,
                         4
                     );
@@ -137,33 +134,33 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string fstName = parts[1];
+            var fstName = parts[1];
             // если FST не задана, берем имя БД
             if (string.IsNullOrEmpty(fstName))
             {
                 fstName = provider.Database;
             }
-            string tagStr = parts[2];
-            string methodStr = parts[3];
+            var tagStr = parts[2];
+            var methodStr = parts[3];
             // тег может быть пустым, не числом или 0, значит по тегу не фильтровать
-            int tag = tagStr.SafeToInt32();
+            var tag = tagStr.SafeToInt32();
             int method;
 
             // метод может быть 0
-            if (!NumericUtility.TryParseInt32(methodStr, out method)
+            if (!Utility.TryParseInt32(methodStr, out method)
                 || method < 0)
             {
                 return;
             }
 
-            string saveDatabase = provider.Database;
+            var saveDatabase = provider.Database;
             provider.Database = database;
 
             try
             {
                 if (mfn == 0)
                 {
-                    TermParameters parameters = new TermParameters
+                    var parameters = new TermParameters
                     {
                         StartTerm = query.TrimEnd('$'),
                         NumberOfTerms = 1
@@ -174,7 +171,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         return;
                     }
 
-                    TermLink[] postings = provider.ExactSearchLinks(terms[0].Text);
+                    var postings = provider.ExactSearchLinks(terms[0].Text);
                     if (postings.Length == 0)
                     {
                         return;
@@ -188,30 +185,30 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     fstName += ".FST";
                 }
 
-                MarcRecord record = provider.ReadRecord(mfn);
+                var record = provider.ReadRecord(mfn);
                 if (ReferenceEquals(record, null))
                 {
                     return;
                 }
 
-                FileSpecification specification = new FileSpecification
+                var specification = new FileSpecification
                 {
                     Database = database,
                     Path = IrbisPath.InternalResource,
                     FileName = fstName
                 };
-                string fstContent = provider.ReadFile(specification);
+                var fstContent = provider.ReadFile(specification);
                 if (string.IsNullOrEmpty(fstContent))
                 {
                     return;
                 }
 
                 // разбор FST напрямую без чтения вложенных файлов и поддержки формата IFS
-                string[] lines = fstContent.SplitLines();
-                List<string> formatLines = new List<string>();
-                for (int i = 0; i < lines.Length; i++)
+                var lines = fstContent.SplitLines();
+                var formatLines = new List<string>();
+                for (var i = 0; i < lines.Length; i++)
                 {
-                    string line = lines[i];
+                    var line = lines[i];
                     parts = StringUtility.SplitString
                         (
                             line.TrimStart(),
@@ -246,24 +243,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 // после вызова этого unifor в главном контексте сбрасываются флаги постобработки
                 context.GetRootContext().PostProcessing = PftCleanup.None;
 
-                StringBuilder builder = new StringBuilder();
-                List<string> seen = new List<string>();
-                for (int i = 0; i < formatLines.Count; i++)
+                var builder = new StringBuilder();
+                var seen = new List<string>();
+                for (var i = 0; i < formatLines.Count; i++)
                 {
-                    using (PftContextGuard guard = new PftContextGuard(context))
+                    using (var guard = new PftContextGuard(context))
                     {
                         // формат вызывается в контексте без повторений
                         // делаем аналогично RepGroup
                         // создаем копию контекста со ссылкой на тот же буфер
                         // в копии сбрасываем состояние повторяющейся группы и работаем через него
                         // текстовый буфер восстанавливаем, так как он один и тот же
-                        PftContext nestedContext = guard.ChildContext;
+                        var nestedContext = guard.ChildContext;
                         nestedContext.Record = record;
                         nestedContext.Reset();
-                        string format = formatLines[i];
-                        PftProgram program = PftUtility.CompileProgram(format);
+                        var format = formatLines[i];
+                        var program = PftUtility.CompileProgram(format);
                         program.Execute(nestedContext);
-                        string formatted = nestedContext.Text;
+                        var formatted = nestedContext.Text;
                         formatted = formatted.Trim(CommonSeparators.NewLineAndPercent);
                         string[] subLines = StringUtility.SplitString
                             (
@@ -271,7 +268,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                                 CommonSeparators.NewLineAndPercent,
                                 StringSplitOptions.RemoveEmptyEntries
                             );
-                        foreach (string subLine in subLines)
+                        foreach (var subLine in subLines)
                         {
                             if (seen.Contains(subLine))
                             {

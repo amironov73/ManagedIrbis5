@@ -1,25 +1,27 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforK.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using AM.Logging;
+using AM;
 using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -54,23 +56,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetMenuEntry
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode node,
+                string? expression
             )
         {
-            Code.NotNull(context, "context");
-
             if (!string.IsNullOrEmpty(expression))
             {
-                TextNavigator navigator = new TextNavigator(expression);
-                string menuName = navigator.ReadUntil('\\', '!', '|');
+                var navigator = new TextNavigator(expression);
+                string menuName = navigator.ReadUntil('\\', '!', '|').ToString();
                 if (string.IsNullOrEmpty(menuName))
                 {
                     return;
                 }
 
-                char separator = navigator.ReadChar();
+                var separator = navigator.ReadChar();
                 if (separator != '\\'
                     && separator != '!'
                     && separator != '|')
@@ -78,29 +78,32 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     return;
                 }
 
-                string key = navigator.GetRemainingText();
+                string key = navigator.GetRemainingText().ToString();
                 if (string.IsNullOrEmpty(key))
                 {
                     return;
                 }
 
-                FileSpecification specification = new FileSpecification
-                    (
-                        IrbisPath.MasterFile,
-                        context.Provider.Database,
-                        menuName
-                    );
-                MenuFile menu = context.Provider.ReadMenuFile
+                var specification = new FileSpecification
+                    {
+                        Path = IrbisPath.MasterFile,
+                        Database = context.Provider.Database,
+                        FileName = menuName
+                    };
+                var menu = context.Provider.ReadMenuFile
                     (
                         specification
                     );
                 if (ReferenceEquals(menu, null))
                 {
-                    Log.Warn("Missing menu file: " + specification);
+                    Magna.Warning
+                        (
+                            "Missing menu file: " + specification
+                        );
                 }
                 else
                 {
-                    string output = null;
+                    string? output = null;
 
                     switch (separator)
                     {

@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* OsmiImage.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -10,18 +16,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using AM;
 
-
-
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 #endregion
+
+#nullable enable
 
 namespace RestfulIrbis.OsmiCards
 {
@@ -36,28 +38,25 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Image type: logo, strip etc.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("imgType")]
-        public string ImageType { get; set; }
+        [JsonPropertyName("imgType")]
+        public string? ImageType { get; set; }
 
         /// <summary>
         /// Description.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("imgDescription")]
-        public string Description { get; set; }
+        [JsonPropertyName("imgDescription")]
+        public string? Description { get; set; }
 
         /// <summary>
         /// Identifier.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("imgId")]
-        public string Id { get; set; }
+        [JsonPropertyName("imgId")]
+        public string? Id { get; set; }
 
         /// <summary>
         /// Usage count.
         /// </summary>
-        [JsonProperty("usageCount")]
+        [JsonPropertyName("usageCount")]
         public int UsageCount { get; set; }
 
         #endregion
@@ -81,9 +80,7 @@ namespace RestfulIrbis.OsmiCards
                 JObject jObject
             )
         {
-            Code.NotNull(jObject, "jObject");
-
-            OsmiImage value = jObject.ToObject<OsmiImage>();
+            var value = jObject.ToObject<OsmiImage>();
 
             return value;
         }

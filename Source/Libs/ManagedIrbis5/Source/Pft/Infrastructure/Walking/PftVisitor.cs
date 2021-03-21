@@ -1,33 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftVisitor.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftVisitor.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Walking
 {
     /// <summary>
     /// Abstract AST visitor.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public abstract class PftVisitor
     {
         #region Public methods
@@ -40,7 +30,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Walking
         /// </returns>
         public abstract bool VisitNode
             (
-                [NotNull] PftNode node
+                PftNode node
             );
 
         #endregion

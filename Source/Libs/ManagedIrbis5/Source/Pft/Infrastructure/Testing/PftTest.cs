@@ -22,6 +22,7 @@ using AM.IO;
 using AM.Text;
 
 using ManagedIrbis.Client;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -145,7 +146,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 string descriptionFile = GetFullName(DescriptionFileName);
                 if (File.Exists(descriptionFile))
                 {
-                    string description = FileUtility.ReadAllText
+                    string description = File.ReadAllText
                         (
                             descriptionFile,
                             IrbisEncoding.Utf8
@@ -164,7 +165,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                         );
                 }
 
-                MarcRecord record = PlainText.ReadOneRecord
+                var record = PlainText.ReadOneRecord
                     (
                         recordFile,
                         IrbisEncoding.Utf8
@@ -173,7 +174,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 record.Mfn = 1; // TODO some other value?
 
                 string pftFile = GetFullName(InputFileName);
-                string input = FileUtility.ReadAllText
+                string input = File.ReadAllText
                     (
                         pftFile,
                         IrbisEncoding.Utf8
@@ -204,10 +205,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 //ConsoleInput.WriteLine();
 
                 string expectedFile = GetFullName(ExpectedFileName);
-                string expected = null;
+                string? expected = null;
                 if (File.Exists(expectedFile))
                 {
-                    expected = FileUtility.ReadAllText
+                    expected = File.ReadAllText
                         (
                             expectedFile,
                             IrbisEncoding.Utf8
@@ -221,7 +222,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                     .ThrowIfNull("Provider");
 
                 string output;
-                using (PftFormatter formatter = new PftFormatter
+                using (var formatter = new PftFormatter
                 {
                     Program = program
                 })

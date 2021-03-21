@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforL.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,14 +16,12 @@
 using System;
 
 using AM;
-using AM.Logging;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
-using ManagedIrbis.Search;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -43,9 +45,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void ContinueTerm
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -53,10 +55,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            expression = StringUtility.ToUpperInvariant(expression);
+            expression = expression.ToUpperInvariant();
 
-            IrbisProvider provider = context.Provider;
-            TermParameters parameters = new TermParameters
+            var provider = context.Provider;
+            var parameters = new TermParameters
             {
                 Database = provider.Database,
                 StartTerm = expression,
@@ -70,7 +72,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "UniforL::ContinueTerm",
                         exception
@@ -95,7 +97,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string result = firstTerm.Substring(expression.Length);
+            var result = firstTerm.Substring(expression.Length);
             context.WriteAndSetFlag(node, result);
         }
 

@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MenuChapter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -11,11 +17,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Text.Json.Serialization;
 
 using AM;
 using AM.Text.Output;
-
-
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
@@ -23,19 +28,15 @@ using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-
-using Newtonsoft.Json;
-
 #endregion
 
-// ReSharper disable ForCanBeConvertedToForeach
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public class MenuChapter
         : BiblioChapter
     {
@@ -44,61 +45,55 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Format.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("format")]
-        public string Format { get; set; }
+        [JsonPropertyName("format")]
+        public string? Format { get; set; }
 
         /// <summary>
         /// Leaf nodes only can contain records.
         /// </summary>
-        [JsonProperty("leafOnly")]
+        [JsonPropertyName("leafOnly")]
         public bool LeafOnly { get; set; }
 
         /// <summary>
         /// Menu name.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("menuName")]
-        public string MenuName { get; set; }
+        [JsonPropertyName("menuName")]
+        public string? MenuName { get; set; }
 
         /// <summary>
         /// Order.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("orderBy")]
-        public string OrderBy { get; set; }
+        [JsonPropertyName("orderBy")]
+        public string? OrderBy { get; set; }
 
         /// <summary>
         /// Record selector.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("recordSelector")]
-        public string RecordSelector { get; set; }
+        [JsonPropertyName("recordSelector")]
+        public string? RecordSelector { get; set; }
 
         /// <summary>
         /// Search expression.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("search")]
-        public string SearchExpression { get; set; }
+        [JsonPropertyName("search")]
+        public string? SearchExpression { get; set; }
 
         /// <summary>
         /// Title format.
         /// </summary>
-        [CanBeNull]
-        [JsonProperty("titleFormat")]
-        public string TitleFormat { get; set; }
+        [JsonPropertyName("titleFormat")]
+        public string? TitleFormat { get; set; }
 
         /// <summary>
         /// Records.
         /// </summary>
-        [CanBeNull]
-        public RecordCollection Records { get; private set; }
+        [JsonIgnore]
+        public RecordCollection? Records { get; private set; }
 
         /// <summary>
         /// List of settings.
         /// </summary>
-        [JsonProperty("menuSettings")]
+        [JsonPropertyName("menuSettings")]
         public List<SpecialSettings> MenuSettings { get; private set; }
 
         /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
@@ -133,16 +128,16 @@ namespace ManagedIrbis.Biblio
             )
         {
             string key = item.Prefix.Trim();
-            SpecialSettings settings = MenuSettings.FirstOrDefault
+            var settings = MenuSettings.FirstOrDefault
                 (
                     s => s.Name == key
                 );
             string value = item.Suffix;
 
-            Record record = new Record();
+            var record = new Record();
             record.Fields.Add(new RecordField(1, key));
             record.Fields.Add(new RecordField(2, value));
-            string title = formatter.FormatRecord(record);
+            var title = formatter.FormatRecord(record);
 
             string className = null;
             if (!ReferenceEquals(settings, null))
@@ -161,7 +156,7 @@ namespace ManagedIrbis.Biblio
                 {
                     className = "ManagedIrbis.Biblio." + className;
                 }
-                Type type = Type.GetType(className, true)
+                var type = Type.GetType(className, true)
                     .ThrowIfNull("Type.GetType");
                 result = (MenuSubChapter)Activator.CreateInstance(type);
             }
@@ -173,7 +168,7 @@ namespace ManagedIrbis.Biblio
 
             foreach (IrbisTreeFile.Item child in item.Children)
             {
-                MenuSubChapter subChapter
+                var subChapter
                     = _CreateChapter(formatter, child);
                 result.Children.Add(subChapter);
             }
@@ -188,8 +183,8 @@ namespace ManagedIrbis.Biblio
                 char code
             )
         {
-            RecordField[] fields = record.Fields.GetField(tag);
-            foreach (RecordField field in fields)
+            var fields = record.Fields.GetField(tag);
+            foreach (var field in fields)
             {
                 field.RemoveSubField(code);
             }
@@ -202,14 +197,14 @@ namespace ManagedIrbis.Biblio
         {
             // Украшаем запись согласно вкусам библиографов
 
-            foreach (RecordField field in record.Fields)
+            foreach (var field in record.Fields)
             {
                 if (!string.IsNullOrEmpty(field.Value))
                 {
                     field.Value = MenuSubChapter.Enhance(field.Value);
                 }
 
-                foreach (SubField subField in field.SubFields)
+                foreach (var subField in field.Subfields)
                 {
                     if (!string.IsNullOrEmpty(subField.Value))
                     {
@@ -224,7 +219,7 @@ namespace ManagedIrbis.Biblio
             // Сведения об автографах
             record.RemoveField(391);
 
-            string worksheet = record.FM(920);
+            var worksheet = record.FM(920);
             if (!worksheet.SameString("ASP"))
             {
                 return;
@@ -241,8 +236,8 @@ namespace ManagedIrbis.Biblio
             record.RemoveField(391);
 
             // Из аннотаций брать только первое повторение
-            RecordField[] annotations = record.Fields.GetField(331);
-            for (int i = 1; i < annotations.Length; i++)
+            var annotations = record.Fields.GetField(331);
+            for (var i = 1; i < annotations.Length; i++)
             {
                 record.Fields.Remove(annotations[i]);
             }
@@ -252,20 +247,20 @@ namespace ManagedIrbis.Biblio
 
         private void _FixDate
             (
-                [CanBeNull] SubField subField
+                SubField? subField
             )
         {
             if (!ReferenceEquals(subField, null))
             {
-                string value = subField.Value;
+                var value = subField.Value;
                 if (!string.IsNullOrEmpty(value))
                 {
 
-                    Match match = _regex463.Match(value);
+                    var match = _regex463.Match(value);
                     if (match.Success)
                     {
 
-                        string date = match.Groups["date"].Value;
+                        var date = match.Groups["date"].Value;
                         if (!string.IsNullOrEmpty(date)
                             && date.Contains(" "))
                         {
@@ -289,13 +284,13 @@ namespace ManagedIrbis.Biblio
             // Пусть библиографы правят сами, ручками
             //
 
-            RecordField[] fields = record.Fields.GetField(463);
-            foreach (RecordField field in fields)
+            var fields = record.Fields.GetField(463);
+            foreach (var field in fields)
             {
-                SubField subField = field.SubFields.GetFirstSubField('h');
+                var subField = field.Subfields.GetFirstSubField('h');
                 _FixDate(subField);
 
-                subField = field.SubFields.GetFirstSubField('v');
+                subField = field.Subfields.GetFirstSubField('v');
                 _FixDate(subField);
             }
         }
@@ -305,7 +300,7 @@ namespace ManagedIrbis.Biblio
                 Record record
             )
         {
-            string result = record.FM(210, 'd');
+            var result = record.FM(210, 'd');
             if (string.IsNullOrEmpty(result))
             {
                 result = record.FM(461, 'h');
@@ -327,7 +322,7 @@ namespace ManagedIrbis.Biblio
                 return 0;
             }
 
-            Match match = Regex.Match(result, @"\d{4}");
+            var match = Regex.Match(result, @"\d{4}");
             if (match.Success)
             {
                 result = match.Value;
@@ -344,35 +339,35 @@ namespace ManagedIrbis.Biblio
             // Собираем вместе записи с одинаковым полем 2025
             //
 
-            RecordCollection records = Records;
+            var records = Records;
             if (ReferenceEquals(records, null))
             {
                 return;
             }
 
-            Record[] allMarked = records.Where(r => r.HaveField(2025)).ToArray();
+            var allMarked = records.Where(r => r.HaveField(2025)).ToArray();
             var grouped = allMarked.GroupBy(r => r.FM(2025));
-            List<Record> toRemove = new List<Record>();
+            var toRemove = new List<Record>();
             foreach (var oneGroup in grouped)
             {
-                Record[] array = oneGroup.ToArray();
+                var array = oneGroup.ToArray();
                 if (array.Length == 1)
                 {
                     continue;
                 }
 
-                foreach (Record record in array)
+                foreach (var record in array)
                 {
                     record.UserData = _GetYear(record);
                 }
 
                 array = array.OrderBy(r => (int) r.UserData).ToArray();
 
-                Record firstRecord = array[0];
-                RecordCollection same = new RecordCollection();
-                for (int i = 1; i < array.Length; i++)
+                var firstRecord = array[0];
+                var same = new RecordCollection();
+                for (var i = 1; i < array.Length; i++)
                 {
-                    Record record = array[i];
+                    var record = array[i];
                     record.RemoveField(200);
                     record.RemoveField(922);
                     record.RemoveField(925);
@@ -391,7 +386,7 @@ namespace ManagedIrbis.Biblio
                 firstRecord.UserData = same;
             }
 
-            foreach (Record recordToRemove in toRemove)
+            foreach (var recordToRemove in toRemove)
             {
                 records.Remove(recordToRemove);
                 context.Records.Remove(recordToRemove);
@@ -412,37 +407,35 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin gather records {0}", this);
-            RecordCollection badRecords = context.BadRecords;
+            var badRecords = context.BadRecords;
             Records = new RecordCollection();
             Record record = null;
 
             try
             {
-                BiblioProcessor processor = context.Processor
+                var processor = context.Processor
                     .ThrowIfNull("context.Processor");
-                using (IPftFormatter formatter
+                using (var formatter
                     = processor.AcquireFormatter(context))
                 {
-                    IrbisProvider provider = context.Provider;
-                    RecordCollection records = Records
+                    var provider = context.Provider;
+                    var records = Records
                         .ThrowIfNull("Records");
 
-                    string searchExpression = SearchExpression
+                    var searchExpression = SearchExpression
                         .ThrowIfNull("SearchExpression");
                     formatter.ParseProgram(searchExpression);
                     record = new Record();
                     searchExpression = formatter.FormatRecord(record);
 
-                    int[] found = provider.Search(searchExpression);
+                    var found = provider.Search(searchExpression);
                     log.WriteLine("Found: {0} record(s)", found.Length);
 
                     log.Write("Reading records");
 
-                    for (int i = 0; i < found.Length; i++)
+                    for (var i = 0; i < found.Length; i++)
                     {
                         log.Write(".");
                         record = provider.ReadRecord(found[i]);
@@ -475,47 +468,47 @@ namespace ManagedIrbis.Biblio
 
                     CleanRecords(context, records);
 
-                    Dictionary<string, MenuSubChapter> dictionary
+                    var dictionary
                         = new Dictionary<string, MenuSubChapter>();
                     Action<BiblioChapter> action = chapter =>
                     {
-                        MenuSubChapter subChapter = chapter as MenuSubChapter;
+                        var subChapter = chapter as MenuSubChapter;
                         if (!ReferenceEquals(subChapter, null))
                         {
-                            string key = subChapter.Key
+                            var key = subChapter.Key
                                 .ThrowIfNull("subChapter.Key");
                             dictionary.Add(key, subChapter);
                         }
                     };
                     Walk(action);
 
-                    string recordSelector = RecordSelector
+                    var recordSelector = RecordSelector
                         .ThrowIfNull("RecordSelector");
                     formatter.ParseProgram(recordSelector);
                     log.Write("Distributing records");
 
-                    int[] mfns = records.Select(r => r.Mfn).ToArray();
-                    string[] formatted = formatter.FormatRecords(mfns);
+                    var mfns = records.Select(r => r.Mfn).ToArray();
+                    var formatted = formatter.FormatRecords(mfns);
                     if (formatted.Length != mfns.Length)
                     {
                         throw new IrbisException();
                     }
 
-                    for (int i = 0; i < records.Count; i++)
+                    for (var i = 0; i < records.Count; i++)
                     {
                         log.Write(".");
 
                         record = records[i];
                         //string key
                         //    = formatter.FormatRecord(record);
-                        string key = formatted[i];
+                        var key = formatted[i];
                         if (string.IsNullOrEmpty(key))
                         {
                             badRecords.Add(record);
                         }
                         else
                         {
-                            string[] keys = key.Trim()
+                            var keys = key.Trim()
                                 .Split(_lineDelimiters)
                                 .TrimLines()
                                 .NonEmptyLines()
@@ -540,7 +533,7 @@ namespace ManagedIrbis.Biblio
                                 }
                             }
 
-                            foreach (string nextKey in keys.Skip(1))
+                            foreach (var nextKey in keys.Skip(1))
                             {
                                 MenuSubChapter subChapter;
                                 if (dictionary
@@ -564,14 +557,14 @@ namespace ManagedIrbis.Biblio
 
                 // Do we really need this?
 
-                foreach (BiblioChapter child in Children)
+                foreach (var child in Children)
                 {
                     child.GatherRecords(context);
                 }
             }
             catch (Exception exception)
             {
-                string message = string.Format
+                var message = string.Format
                     (
                         "Exception: {0}",
                         exception
@@ -603,7 +596,7 @@ namespace ManagedIrbis.Biblio
         {
             Code.NotNull(context, "context");
 
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine
                 (
                     "End initialize {0}: {1}",
@@ -612,11 +605,11 @@ namespace ManagedIrbis.Biblio
                 );
             try
             {
-                string menuName = MenuName.ThrowIfNull("MenuName");
+                var menuName = MenuName.ThrowIfNull("MenuName");
 
-                IrbisProvider provider = context.Provider;
+                var provider = context.Provider;
 
-                FileSpecification specification = new FileSpecification
+                var specification = new FileSpecification
                     (
                         IrbisPath.MasterFile,
                         provider.Database,
@@ -631,18 +624,18 @@ namespace ManagedIrbis.Biblio
 
                 // Create Formatter
 
-                BiblioProcessor processor = context.Processor
+                var processor = context.Processor
                     .ThrowIfNull("context.Processor");
-                using (IPftFormatter formatter
+                using (var formatter
                     = processor.AcquireFormatter(context))
                 {
-                    string titleFormat = TitleFormat
+                    var titleFormat = TitleFormat
                         .ThrowIfNull("TitleFormat");
                     formatter.ParseProgram(titleFormat);
 
                     foreach (IrbisTreeFile.Item root in tree.Roots)
                     {
-                        MenuSubChapter chapter
+                        var chapter
                             = _CreateChapter(formatter, root);
                         Children.Add(chapter);
                     }
@@ -650,7 +643,7 @@ namespace ManagedIrbis.Biblio
                     processor.ReleaseFormatter(context, formatter);
                 }
 
-                foreach (BiblioChapter chapter in Children)
+                foreach (var chapter in Children)
                 {
                     chapter.Initialize(context);
                 }
@@ -675,7 +668,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
 
             processor.Report.Body.Add(new NewPageBand());

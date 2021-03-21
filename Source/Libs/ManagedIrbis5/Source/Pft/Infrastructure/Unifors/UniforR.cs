@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforR.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforR.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,9 +17,9 @@ using System.Globalization;
 
 using AM;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -42,33 +46,33 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void RandomNumber
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-            int length = 6;
+            var length = 6;
             if (!string.IsNullOrEmpty(expression))
             {
-                NumericUtility.TryParseInt32(expression, out length);
+                Utility.TryParseInt32(expression, out length);
             }
             if (length <= 0 || length > 9)
             {
                 return;
             }
 
-            int maxValue = 1;
-            for (int i = 0; i < length; i++)
+            var maxValue = 1;
+            for (var i = 0; i < length; i++)
             {
                 maxValue = maxValue * 10;
             }
 
-            int result = context.Provider
+            var result = context.Provider
                 .PlatformAbstraction
                 .GetRandomGenerator()
                 .Next(maxValue);
-            string format = new string('0', length);
-            string output = result.ToString(format, CultureInfo.InvariantCulture);
+            var format = new string('0', length);
+            var output = result.ToString(format, CultureInfo.InvariantCulture);
             context.WriteAndSetFlag(node, output);
         }
 

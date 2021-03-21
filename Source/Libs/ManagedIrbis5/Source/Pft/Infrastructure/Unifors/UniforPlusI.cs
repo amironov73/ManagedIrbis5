@@ -1,19 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlusI.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -62,9 +66,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void BuildLink
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             // TODO implement properly
@@ -74,18 +78,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            TextNavigator navigator = new TextNavigator(expression);
-            char delimiter = navigator.ReadChar();
-            string firstPart = navigator.ReadUntil(delimiter);
+            var navigator = new TextNavigator(expression);
+            var delimiter = navigator.ReadChar();
+            string firstPart = navigator.ReadUntil(delimiter).ToString();
             if (string.IsNullOrEmpty(firstPart)
                 || navigator.ReadChar() != delimiter)
             {
                 return;
             }
 
-            string title = navigator.GetRemainingText();
+            string title = navigator.GetRemainingText().ToString();
 
-            string output = string.Format
+            var output = string.Format
                 (
                     "</>{{\v {0}}}{1}{{\v}}",
                     firstPart,

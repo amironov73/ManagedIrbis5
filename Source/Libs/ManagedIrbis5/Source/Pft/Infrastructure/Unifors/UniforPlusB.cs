@@ -46,13 +46,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 long sum = 0;
                 unchecked
                 {
-                    for (int i = 0; i < bytes.Length; i++)
+                    for (var i = 0; i < bytes.Length; i++)
                     {
                         sum += bytes[i];
                     }
                 }
 
-                string output = sum.ToInvariantString();
+                var output = sum.ToInvariantString();
                 context.WriteAndSetFlag(node, output);
             }
         }

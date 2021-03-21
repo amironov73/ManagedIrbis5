@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* BiblioDictionary.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -14,17 +20,15 @@ using AM;
 using AM.Text;
 using AM.Text.Output;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class BiblioDictionary
         : Dictionary<string, DictionaryEntry>
     {
@@ -51,10 +55,7 @@ namespace ManagedIrbis.Biblio
                 int reference
             )
         {
-            Code.NotNullNorEmpty(title, "title");
-
-            DictionaryEntry entry;
-            if (!TryGetValue(title, out entry))
+            if (!TryGetValue(title, out var entry))
             {
                 entry = new DictionaryEntry
                 {
@@ -77,8 +78,6 @@ namespace ManagedIrbis.Biblio
                 AbstractOutput output
             )
         {
-            Code.NotNull(output, "output");
-
             string[] keys = NumberText.Sort(Keys).ToArray();
             foreach (string key in keys)
             {

@@ -1,10 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforY.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,11 +20,11 @@ using System.Text;
 using AM;
 using AM.Collections;
 
-using JetBrains.Annotations;
-
 using ManagedIrbis.Fields;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -42,31 +47,28 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// <summary>
         /// Вспомогательный метод.
         /// </summary>
-        [NotNull]
         public static string FreeExemplars
             (
-                [NotNull] MarcRecord record
+                Record record
             )
         {
             ExemplarInfo[] exemplars = ExemplarInfo.Parse(record);
-            DictionaryCounterInt32<string> counter
+            var counter
                 = new DictionaryCounterInt32<string>();
 
-            foreach (ExemplarInfo exemplar in exemplars)
+            foreach (var exemplar in exemplars)
             {
-                string place = exemplar.Place ?? string.Empty;
+                var place = exemplar.Place ?? string.Empty;
 
                 switch (exemplar.Status)
                 {
                     case ExemplarStatus.Summary:
                     case ExemplarStatus.BiblioNet:
-                        string amountText = exemplar.Amount;
-                        int amount;
-                        if (NumericUtility.TryParseInt32(amountText, out amount))
+                        var amountText = exemplar.Amount;
+                        if (Utility.TryParseInt32(amountText, out var amount))
                         {
-                            string onHandText = exemplar.OnHand;
-                            int onHand;
-                            if (NumericUtility.TryParseInt32(onHandText, out onHand))
+                            var onHandText = exemplar.OnHand;
+                            if (Utility.TryParseInt32(onHandText, out var onHand))
                             {
                                 amount -= onHand;
                             }
@@ -80,12 +82,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 }
             }
 
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
-            bool first = true;
-            foreach (string key in counter.Keys.OrderBy(_ => _))
+            var first = true;
+            foreach (var key in counter.Keys.OrderBy(_ => _))
             {
-                int value = counter[key];
+                var value = counter[key];
                 if (!first)
                 {
                     result.Append(", ");
@@ -114,7 +116,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!ReferenceEquals(context.Record, null))
             {
-                string output = FreeExemplars(context.Record);
+                var output = FreeExemplars(context.Record);
                 context.WriteAndSetFlag(node, output);
             }
         }

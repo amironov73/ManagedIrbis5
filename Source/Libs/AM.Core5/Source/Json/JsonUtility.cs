@@ -310,6 +310,32 @@ namespace AM.Json
             return result;
         }
 
+        /// <summary>
+        /// Временная заглушка.
+        /// </summary>
+        public static T ReadObjectFromFile<T>
+            (
+                string fileName
+            )
+        {
+            // TODO implement
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// Временная заглушка.
+        /// </summary>
+        public static void SaveObjectToFile
+            (
+                object obj,
+                string fileName
+            )
+        {
+            // TODO implement
+            throw new System.NotImplementedException();
+        }
+
         #endregion
+
     }
 }
