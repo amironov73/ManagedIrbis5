@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ListUsersCommands.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -20,18 +26,13 @@ using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Reflection;
-using AM.Runtime;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {

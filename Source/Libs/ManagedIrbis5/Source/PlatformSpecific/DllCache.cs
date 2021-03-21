@@ -1,13 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* DllCache.cs -- 
- * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
- */
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
-#if CLASSIC || NETCORE || ANDROID
+/* DllCache.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
 
 #region Using directives
 
@@ -25,21 +27,15 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.PlatformSpecific
 {
     /// <summary>
     /// DLL cache.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     [ExcludeFromCodeCoverage]
     public static class DllCache
     {
@@ -48,13 +44,11 @@ namespace ManagedIrbis.PlatformSpecific
         /// <summary>
         /// DLL registry.
         /// </summary>
-        [NotNull]
         public static Dictionary<string, DynamicLibrary> DllRegistry { get; private set; }
 
         /// <summary>
         /// Delegate registry.
         /// </summary>
-        [NotNull]
         public static Dictionary<Pair<string, string>, Delegate> DelegateRegistry
         {
             get;
@@ -90,11 +84,9 @@ namespace ManagedIrbis.PlatformSpecific
         /// </summary>
         public static void FreeLibrary
             (
-                [NotNull] string libraryName
+                string libraryName
             )
         {
-            Code.NotNullNorEmpty(libraryName, "libraryName");
-
             lock (_sync)
             {
                 DynamicLibrary library;
@@ -110,18 +102,13 @@ namespace ManagedIrbis.PlatformSpecific
         /// <summary>
         /// Get delegate for given function from dynamic library.
         /// </summary>
-        [NotNull]
         public static Delegate CreateDelegate
             (
-                [NotNull] string libraryName,
-                [NotNull] string functionName,
-                [NotNull] Type type
+                string libraryName,
+                string functionName,
+                Type type
             )
         {
-            Code.NotNullNorEmpty(libraryName, "libraryName");
-            Code.NotNullNorEmpty(functionName, "functionName");
-            Code.NotNull(type, "type");
-
             DynamicLibrary library = LoadLibrary(libraryName);
             Pair<string, string> key = new Pair<string, string>
                 (
@@ -145,14 +132,11 @@ namespace ManagedIrbis.PlatformSpecific
         /// <summary>
         /// Load dynamic library.
         /// </summary>
-        [NotNull]
         public static DynamicLibrary LoadLibrary
             (
-                [NotNull] string libraryName
+                string libraryName
             )
         {
-            Code.NotNullNorEmpty(libraryName, "libraryName");
-
             DynamicLibrary result;
 
             lock (_sync)
@@ -170,5 +154,3 @@ namespace ManagedIrbis.PlatformSpecific
         #endregion
     }
 }
-
-#endif

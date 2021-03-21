@@ -18,6 +18,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -422,6 +423,11 @@ namespace ManagedIrbis
 
             return this;
         } // method RemoveField
+
+        public string ToPlainText()
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 

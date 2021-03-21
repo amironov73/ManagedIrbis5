@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* SortCommand.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -20,13 +26,9 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {
@@ -52,14 +54,6 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region MxCommand members
 
         /// <inheritdoc cref="MxCommand.Execute" />
@@ -71,7 +65,7 @@ namespace ManagedIrbis.Mx.Commands
         {
             OnBeforeExecute();
 
-            string argument = null;
+            string? argument = null;
             if (arguments.Length != 0)
             {
                 argument = arguments[0].Text;

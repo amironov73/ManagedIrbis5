@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* MethodRunner.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,11 +17,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
+using AM;
 
 #endregion
 
@@ -45,22 +45,16 @@ namespace ManagedIrbis.PlatformSpecific
         /// </summary>
         public static MethodResult RunMethod
             (
-                [NotNull] string dllName,
-                [NotNull] string methodName,
+                string dllName,
+                string methodName,
                 bool winApi,
-                [NotNull] string input
+                string input
             )
         {
-            Code.NotNullNorEmpty(dllName, "dllName");
-            Code.NotNullNorEmpty(methodName, "methodName");
-            Code.NotNull(input, "input");
-
             MethodResult result = new MethodResult
             {
                 Input = input
             };
-
-#if CLASSIC || DESKTOP
 
             StringBuilder buffer = new StringBuilder(BufferSize);
             buffer.Append(input); // ???
@@ -107,14 +101,12 @@ namespace ManagedIrbis.PlatformSpecific
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "MethodRunner::RunMethod",
                         exception
                     );
             }
-
-#endif
 
             return result;
 

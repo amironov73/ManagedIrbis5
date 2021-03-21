@@ -1,37 +1,34 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftHave.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
 using System.IO;
 
 using AM.IO;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftHave
         : PftCondition
     {
@@ -40,20 +37,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Variable reference.
         /// </summary>
-        [CanBeNull]
-        public PftVariableReference Variable { get; set; }
+        public PftVariableReference? Variable { get; set; }
 
         /// <summary>
         /// Function or procedure name.
         /// </summary>
-        [CanBeNull]
-        public string Identifier { get; set; }
+        public string? Identifier { get; set; }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -71,11 +63,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftHave
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Have);
         }
 
@@ -84,12 +75,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftHave
             (
-                [NotNull] string name,
+                string name,
                 bool variable
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             if (variable)
             {
                 Variable = new PftVariableReference(name);
@@ -150,7 +139,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            Variable = (PftVariableReference)
+            Variable = (PftVariableReference?)
                 PftSerializer.DeserializeNullable(reader);
             Identifier = reader.ReadNullableString();
         }
@@ -165,7 +154,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             Value = false;
 
-            string name;
+            string? name;
 
             if (!ReferenceEquals(Variable, null))
             {
@@ -230,11 +219,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 

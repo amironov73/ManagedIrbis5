@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* InfoCommand.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -21,15 +27,11 @@ using AM.IO;
 using AM.Reflection;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Client;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {
@@ -39,10 +41,6 @@ namespace ManagedIrbis.Mx.Commands
     public sealed class InfoCommand
         : MxCommand
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -52,14 +50,6 @@ namespace ManagedIrbis.Mx.Commands
             : base("info")
         {
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 
@@ -80,22 +70,26 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            ConnectedClient connected = executive.Provider as ConnectedClient;
+            var connected = executive.Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
                 IIrbisConnection connection = connected.Connection;
-                ServerStat serverStat = connection.GetServerStat();
+                var serverStat = connection.GetServerStat();
                 //executive.WriteLine(serverStat.ToString());
 
-                Tablefier tablefier = new Tablefier();
-                string[] properties =
+                var clients = serverStat.RunningClients;
+                if (clients is not null)
                 {
-                    "IPAddress", "Name", "ID", "Workstation", "Registered",
-                    "Acknowledged", "LastCommand", "CommandNumber"
-                };
-                string output = tablefier.Print(serverStat.RunningClients, properties)
-                    .TrimEnd();
-                executive.WriteLine(output);
+                    var tablefier = new Tablefier();
+                    string[] properties =
+                    {
+                        "IPAddress", "Name", "ID", "Workstation", "Registered",
+                        "Acknowledged", "LastCommand", "CommandNumber"
+                    };
+                    var output = tablefier.Print(clients, properties)
+                        .TrimEnd();
+                    executive.WriteLine(output);
+                }
             }
 
             OnAfterExecute();
@@ -105,8 +99,6 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
+    } // class InfoCommand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Mx.Commands

@@ -1,13 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* DynamicLibrary.cs -- 
- * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
- */
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
-#if CLASSIC || NETCORE || ANDROID
+/* DynamicLibrary.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
 
 #region Using directives
 
@@ -16,23 +18,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.PlatformSpecific
 {
     /// <summary>
     /// Dynamic library (DLL) of Windows.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     [ExcludeFromCodeCoverage]
     public class DynamicLibrary
         : IDisposable
@@ -57,7 +52,6 @@ namespace ManagedIrbis.PlatformSpecific
         /// <summary>
         /// Library name.
         /// </summary>
-        [NotNull]
         public string LibraryName { get; private set; }
 
         #endregion
@@ -69,12 +63,10 @@ namespace ManagedIrbis.PlatformSpecific
         /// </summary>
         public DynamicLibrary
             (
-                [NotNull] string libraryName
+                string libraryName
             )
         {
-            Code.NotNullNorEmpty(libraryName, "libraryName");
-
-            Log.Trace
+            Magna.Trace
                 (
                     "DynamicLibrary::Constructor: "
                     + "name="
@@ -88,7 +80,7 @@ namespace ManagedIrbis.PlatformSpecific
             {
                 int errorCode = Marshal.GetLastWin32Error();
 
-                Log.Error
+                Magna.Error
                     (
                         "DynamicLibrary::Constructor: "
                         + "error="
@@ -148,7 +140,7 @@ namespace ManagedIrbis.PlatformSpecific
         /// or GetModuleHandleEx function returns this handle.
         /// </param>
         /// <returns>If the function succeeds, the return value is nonzero.
-        /// If the function fails, the return value is zero. 
+        /// If the function fails, the return value is zero.
         /// To get extended error information, call the GetLastError function.
         /// </returns>
         /// <remarks>See https://msdn.microsoft.com/en-us/library/windows/desktop/ms683152(v=vs.85).aspx
@@ -195,17 +187,13 @@ namespace ManagedIrbis.PlatformSpecific
         /// <summary>
         /// Create delegate for specified function.
         /// </summary>
-        [NotNull]
         public Delegate CreateDelegate
             (
-                [NotNull] string functionName,
-                [NotNull] Type type
+                string functionName,
+                Type type
             )
         {
-            Code.NotNullNorEmpty(functionName, "functionName");
-            Code.NotNull(type, "type");
-
-            Log.Trace
+            Magna.Trace
                 (
                     "DynamicLibrary::CreateDelegate: "
                     + "function="
@@ -219,7 +207,7 @@ namespace ManagedIrbis.PlatformSpecific
                 );
             if (address == IntPtr.Zero)
             {
-                Log.Error
+                Magna.Error
                     (
                         "DynamicLibrary::CreateDelegate: "
                         + "can't find function="
@@ -245,7 +233,7 @@ namespace ManagedIrbis.PlatformSpecific
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            Log.Trace
+            Magna.Trace
                 (
                     "DynamicLibrary::Dispose: "
                     + "name="
@@ -259,5 +247,3 @@ namespace ManagedIrbis.PlatformSpecific
         #endregion
     }
 }
-
-#endif

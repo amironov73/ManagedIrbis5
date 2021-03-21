@@ -7,52 +7,46 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* NopCommand.cs --
+/* MemberOrderAttribute.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Mx.Commands
+namespace AM.Reflection
 {
     /// <summary>
     ///
     /// </summary>
-    public sealed class NopCommand
-        : MxCommand
+    public sealed class MemberOrderAttribute
+        : Attribute
     {
+        #region Properties
+
+        /// <summary>
+        /// Index.
+        /// </summary>
+        public int Index { get; private set; }
+
+        #endregion
+
         #region Construction
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public NopCommand()
-            : base("Nop")
-        {
-        }
-
-        #endregion
-
-        #region MxCommand members
-
-        /// <inheritdoc cref="MxCommand.Execute" />
-        public override bool Execute
+        public MemberOrderAttribute
             (
-                MxExecutive executive,
-                MxArgument[] arguments
+                int index
             )
         {
-            OnBeforeExecute();
-
-            executive.WriteMessage("Nop");
-
-            OnAfterExecute();
-
-            return true;
+            Index = index;
         }
 
         #endregion

@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftFieldAssignment.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -17,28 +21,20 @@ using System.IO;
 using System.Text;
 
 using AM;
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftFieldAssignment
         : PftNode
     {
@@ -47,8 +43,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Field.
         /// </summary>
-        [CanBeNull]
-        public PftField Field { get; set; }
+        public PftField? Field { get; set; }
 
         /// <summary>
         /// Expression.
@@ -80,7 +75,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // Nothing to do here
 
-                Log.Error
+                Magna.Error
                     (
                         "PftFieldAssignment::Children: "
                         + "set value="
@@ -121,8 +116,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 [NotNull] string fieldSpec
             )
         {
-            Code.NotNullNorEmpty(fieldSpec, "fieldSpec");
-
             Field = new PftV(fieldSpec);
             Expression = new PftNodeCollection(this);
         }
@@ -136,8 +129,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 params PftNode[] bodyNodes
             )
         {
-            Code.NotNullNorEmpty(fieldSpec, "fieldSpec");
-
             Field = new PftV(fieldSpec);
             Expression = new PftNodeCollection(this);
             Expression.AddRange(bodyNodes);
@@ -160,7 +151,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -231,7 +222,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             PftField field = Field;
             if (ReferenceEquals(field, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftFieldAssignment::Execute: "
                         + "field not set"
@@ -242,7 +233,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             string fieldTag = field.Tag;
             if (string.IsNullOrEmpty(fieldTag))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftFieldAssignment::Execute: "
                         + "field tag not set"
@@ -364,13 +355,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append(Field);
             result.Append('=');
             PftUtility.NodesToText(result, Expression);
             result.Append(';');
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion

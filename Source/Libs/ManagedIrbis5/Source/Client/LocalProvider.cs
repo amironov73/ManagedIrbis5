@@ -16,7 +16,7 @@
 #region Using directives
 
 using System;
-
+using AM.PlatformAbstraction;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 
@@ -54,6 +54,13 @@ namespace ManagedIrbis.Client
 
         #region IrbisProvider members
 
+        public override bool Connected { get; }
+
+        public override void Configure(string configurationString) =>
+            throw new NotImplementedException();
+
+        public override PlatformAbstractionLayer PlatformAbstraction { get; set; }
+
         public override string ReadFile(FileSpecification file) =>
             throw new NotImplementedException();
 
@@ -66,7 +73,28 @@ namespace ManagedIrbis.Client
         public override TermLink[] ExactSearchTrimLinks(string term, int i) =>
             throw new NotImplementedException();
 
+        public override string FormatRecord(Record record, string format) =>
+            throw new NotImplementedException();
+
+        public override int GetMaxMfn() =>
+            throw new NotImplementedException();
+
+        public override ServerVersion GetServerVersion() =>
+            throw new NotImplementedException();
+
+        public override string[] FormatRecords(int[] mfns, string format) =>
+            throw new NotImplementedException();
+
+        public override string[] ListFiles(FileSpecification specification) =>
+            throw new NotImplementedException();
+
+        public override bool NoOp() =>
+            throw new NotImplementedException();
+
         public override void ReleaseFormatter(IPftFormatter formatter) =>
+            throw new NotImplementedException();
+
+        public override Record ReadRecord(int mfn) =>
             throw new NotImplementedException();
 
         public override void Dispose() =>

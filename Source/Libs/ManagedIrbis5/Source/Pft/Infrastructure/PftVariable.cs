@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftVariable.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -11,17 +17,15 @@ using System.Text;
 
 using AM;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class PftVariable
     {
         #region Events
@@ -43,8 +47,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Имя переменной.
         /// </summary>
-        [CanBeNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Признак числовой переменной.
@@ -81,8 +84,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 bool isNumeric
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
             IsNumeric = isNumeric;
         }
@@ -96,8 +97,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 double numericValue
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
             IsNumeric = true;
             NumericValue = numericValue;
@@ -112,8 +111,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string stringValue
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Name = name;
             StringValue = stringValue;
         }

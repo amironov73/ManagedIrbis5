@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ListDbCommand.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -22,15 +28,11 @@ using AM.IO;
 using AM.Reflection;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Client;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {
@@ -56,14 +58,6 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region MxCommand members
 
         /// <inheritdoc cref="MxCommand.Execute" />
@@ -81,19 +75,19 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            string pattern = null;
+            string? pattern = null;
             if (arguments.Length != 0)
             {
                 pattern = arguments[0].Text;
             }
 
-            ConnectedClient connected = executive.Provider as ConnectedClient;
+            var connected = executive.Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
-                IIrbisConnection connection = connected.Connection;
-                DatabaseInfo[] databases = connection.ListDatabases("dbnam1.mnu")
+                var connection = connected.Connection;
+                var databases = connection.ListDatabases("dbnam1.mnu")
                     .OrderBy(db => db.Name).ToArray();
-                List<DatabaseInfo> list = new List<DatabaseInfo>();
+                var list = new List<DatabaseInfo>();
                 foreach (DatabaseInfo db in databases)
                 {
                     if (!string.IsNullOrEmpty(pattern)
@@ -108,8 +102,8 @@ namespace ManagedIrbis.Mx.Commands
                     list.Add(db);
                 }
 
-                Tablefier tablefier = new Tablefier();
-                string output = tablefier.Print(list, "Name", "Description")
+                var tablefier = new Tablefier();
+                var output = tablefier.Print(list, "Name", "Description")
                     .TrimEnd();
                 executive.WriteLine(output);
             }

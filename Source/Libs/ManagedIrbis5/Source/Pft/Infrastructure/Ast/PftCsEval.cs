@@ -1,30 +1,21 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftCsEval.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Text;
-
-using MoonSharp.Interpreter;
-
-#if CLASSIC ||NETCORE
-
-using System.Reflection;
-
-#endif
 
 #endregion
 
@@ -33,8 +24,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// <summary>
     /// Исполнение динамического C#-формата.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftCsEval
         : PftNode
     {
@@ -62,11 +51,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftCsEval
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.CsEval);
         }
 

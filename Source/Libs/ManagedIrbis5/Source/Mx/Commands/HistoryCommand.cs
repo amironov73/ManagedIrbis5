@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* HistoryCommand.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -20,13 +26,9 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {
@@ -92,10 +94,9 @@ namespace ManagedIrbis.Mx.Commands
             }
             else
             {
-                int index;
-                if (NumericUtility.TryParseInt32(command, out index))
+                if (int.TryParse(command, out var index))
                 {
-                    string argument = history.GetOccurrence
+                    var argument = history.GetOccurrence
                         (
                             history.Length - index
                         );
@@ -105,14 +106,14 @@ namespace ManagedIrbis.Mx.Commands
                     }
                     else
                     {
-                        SearchCommand searchCommand = executive.Commands
+                        var searchCommand = executive.Commands
                             .OfType<SearchCommand>().FirstOrDefault();
                         if (!ReferenceEquals(searchCommand, null))
                         {
                             executive.WriteLine(argument);
                             MxArgument[] newArguments =
                             {
-                                new MxArgument {Text = argument}
+                                new MxArgument { Text = argument }
                             };
                             searchCommand.Execute(executive, newArguments);
                             executive.History.Pop();

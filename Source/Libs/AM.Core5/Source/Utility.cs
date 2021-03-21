@@ -1841,6 +1841,20 @@ namespace AM
         } // method Unquote
 
         /// <summary>
+        /// Имя исполняемого процесса (с путями).
+        /// </summary>
+        public static string ExecutableFileName
+        {
+            get
+            {
+                var process = Process.GetCurrentProcess();
+                var module = process.MainModule;
+
+                return module?.FileName ?? throw new ApplicationException();
+            }
+        }
+
+        /// <summary>
         /// Упрощенное получение информации о методе.
         /// </summary>
         [Pure]

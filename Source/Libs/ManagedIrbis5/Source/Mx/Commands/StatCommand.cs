@@ -16,17 +16,8 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 using AM.Text;
 
 using ManagedIrbis.Client;
@@ -43,10 +34,6 @@ namespace ManagedIrbis.Mx.Commands
     public sealed class StatCommand
         : MxCommand
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -56,14 +43,6 @@ namespace ManagedIrbis.Mx.Commands
             : base("stat")
         {
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 
@@ -84,13 +63,13 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            string lastSearch = null;
+            string? lastSearch = null;
             if (executive.History.Count != 0)
             {
                 lastSearch = executive.History.Peek();
             }
 
-            ConnectedClient client = executive.Provider as ConnectedClient;
+            var client = executive.Provider as ConnectedClient;
             if (ReferenceEquals(client, null))
             {
                 return true;
@@ -98,7 +77,7 @@ namespace ManagedIrbis.Mx.Commands
 
             IIrbisConnection connection = client.Connection;
 
-            string text = null;
+            string? text = null;
             if (arguments.Length != 0)
             {
                 text = arguments[0].Text;
@@ -108,20 +87,15 @@ namespace ManagedIrbis.Mx.Commands
                 return true;
             }
 
-            string[] parts = StringUtility.SplitString
-                (
-                    text,
-                    CommonSeparators.Comma,
-                    StringSplitOptions.None
-                );
-            StatDefinition.Item item = new StatDefinition.Item
+            var parts = text.Split(CommonSeparators.Comma, StringSplitOptions.None);
+            var item = new StatDefinition.Item
             {
                 Field = parts.GetOccurrence(0),
                 Length = parts.GetOccurrence(1).SafeToInt32(10),
                 Count = parts.GetOccurrence(2).SafeToInt32(1000),
                 Sort = (StatDefinition.SortMethod) parts.GetOccurrence(3).SafeToInt32()
             };
-            StatDefinition definition = new StatDefinition
+            var definition = new StatDefinition
             {
                 SearchQuery = lastSearch,
                 Items = { item },
@@ -140,8 +114,6 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
+    } // class StatCommand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Mx.Commands

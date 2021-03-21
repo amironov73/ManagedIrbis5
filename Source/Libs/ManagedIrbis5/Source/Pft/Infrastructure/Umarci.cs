@@ -176,11 +176,12 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 return;
             }
-            int repeat;
-            if (!NumericUtility.TryParseInt32(parts[2], out repeat))
+
+            if (!int.TryParse(parts[2], out var repeat))
             {
                 return;
             }
+
             repeat--;
             if (repeat < 0)
             {
@@ -193,7 +194,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 return;
             }
-            string text = field.GetSubFieldValue(code[0], repeat);
+
+            var text = field.GetSubFieldValue(code[0], repeat);
             if (!string.IsNullOrEmpty(text))
             {
                 context.Write(node, text);

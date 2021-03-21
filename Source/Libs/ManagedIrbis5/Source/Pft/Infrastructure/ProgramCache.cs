@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ProgramCache.cs -- simple cache for PFT scripts.
  * Ars Magna project, http://arsmagna.ru
  */
@@ -10,9 +16,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -55,9 +61,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftProgram program
             )
         {
-            Code.NotNull(sourceText, "sourceText");
-            Code.NotNull(program, "program");
-
             lock (Registry)
             {
                 Registry[sourceText] = program;
@@ -78,10 +81,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get program for the text.
         /// </summary>
-        [CanBeNull]
-        public static PftProgram GetProgram
+        public static PftProgram? GetProgram
             (
-                [CanBeNull] string sourceText
+                string? sourceText
             )
         {
             if (string.IsNullOrEmpty(sourceText))
@@ -91,8 +93,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             lock (Registry)
             {
-                PftProgram result;
-                Registry.TryGetValue(sourceText, out result);
+                Registry.TryGetValue(sourceText, out PftProgram? result);
 
                 return result;
             }

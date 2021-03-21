@@ -1,36 +1,33 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftFirst.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
 using AM;
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
@@ -42,24 +39,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// <example>
     /// f(first(v910^d='ЧЗ'),0,0)
     /// </example>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftFirst
         : PftNumeric
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         /// <summary>
         /// Condition
         /// </summary>
-        [CanBeNull]
-        public PftCondition InnerCondition { get; set; }
+        public PftCondition? InnerCondition { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -86,7 +77,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // Nothing to do here
 
-                Log.Error
+                Magna.Error
                     (
                         "PftFirst::Children: "
                         + "set value="
@@ -115,7 +106,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.First);
         }
 
@@ -127,8 +117,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 [NotNull] PftCondition condition
             )
         {
-            Code.NotNull(condition, "condition");
-
             InnerCondition = condition;
         }
 
@@ -136,7 +124,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -183,7 +171,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             base.Deserialize(reader);
 
             InnerCondition
-                = (PftCondition) PftSerializer.DeserializeNullable(reader);
+                = (PftCondition?) PftSerializer.DeserializeNullable(reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -194,7 +182,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             if (!ReferenceEquals(context.CurrentGroup, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftFirst::Execute: "
                         + "nested group detected"
@@ -274,10 +262,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer
                 .SingleSpace()
                 .Write("first(");
-            if (!ReferenceEquals(InnerCondition, null))
-            {
-                InnerCondition.PrettyPrint(printer);
-            }
+            InnerCondition?.PrettyPrint(printer);
             printer.Write(')');
         }
 
@@ -293,11 +278,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -306,12 +287,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append("first(");
             PftUtility.NodesToText(result, Children);
             result.Append(')');
 
-            return StringBuilderCache.GetStringAndRelease(result);
+            return result.ToString();
         }
 
         #endregion

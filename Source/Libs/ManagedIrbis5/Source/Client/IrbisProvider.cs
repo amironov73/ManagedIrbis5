@@ -37,7 +37,11 @@ namespace ManagedIrbis.Client
         /// </summary>
         public string? Database { get; set; }
 
+        public abstract bool Connected { get; }
+
         /// <summary>
+        public abstract void Configure(string configurationString);
+
         /// Слой платформенной абстракции.
         /// </summary>
         public abstract PlatformAbstractionLayer PlatformAbstraction { get; set; }
@@ -58,7 +62,19 @@ namespace ManagedIrbis.Client
 
         public abstract string FormatRecord(Record record, string format);
 
+        public abstract int GetMaxMfn();
+
+        public abstract ServerVersion GetServerVersion();
+
+        public abstract string[] FormatRecords(int[] mfns, string format);
+
+        public abstract string[] ListFiles(FileSpecification specification);
+
+        public abstract bool NoOp();
+
         public abstract void ReleaseFormatter(IPftFormatter formatter);
+
+        public abstract Record ReadRecord(int mfn);
 
         public abstract void Dispose();
     } // class IrbisProvider

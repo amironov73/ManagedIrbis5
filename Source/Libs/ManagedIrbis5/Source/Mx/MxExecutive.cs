@@ -261,7 +261,7 @@ namespace ManagedIrbis.Mx
         {
             navigator.SkipWhitespace();
 
-            string line = navigator.ReadLine();
+            string line = navigator.ReadLine().ToString();
             if (string.IsNullOrEmpty(line))
             {
                 return true;
@@ -305,20 +305,15 @@ namespace ManagedIrbis.Mx
             line = line.Trim();
             detectedHandlers.Reverse();
 
-            string[] parts = StringUtility.SplitString
-                (
-                    line,
-                    CommonSeparators.SpaceOrTab,
-                    2
-                );
+            string[] parts = line.Split(CommonSeparators.SpaceOrTab, 2);
             string commandName = parts[0];
-            string commandArgument = null;
+            string? commandArgument = null;
             if (parts.Length != 1)
             {
                 commandArgument = parts[1];
             }
 
-            MxCommand command = null;
+            MxCommand? command = null;
 
             if (!string.IsNullOrEmpty(commandName))
             {
@@ -443,7 +438,7 @@ namespace ManagedIrbis.Mx
             )
         {
 
-            string text = FileUtility.ReadAllText(fileName, IrbisEncoding.Utf8);
+            string text = File.ReadAllText(fileName, IrbisEncoding.Utf8);
             bool result = ExecuteLine(text);
 
             return result;

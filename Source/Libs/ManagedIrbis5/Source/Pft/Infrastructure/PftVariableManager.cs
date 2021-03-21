@@ -1,6 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftVariableManager.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -15,17 +21,15 @@ using System.Linq;
 using AM;
 using AM.Collections;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     ///
     /// </summary>
-
     public sealed class PftVariableManager
     {
         #region Properties
@@ -33,8 +37,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Parent variable manager.
         /// </summary>
-        [CanBeNull]
-        public PftVariableManager Parent { get; private set; }
+        public PftVariableManager? Parent { get; private set; }
 
         /// <summary>
         /// Registry.
@@ -53,7 +56,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftVariableManager
             (
-                [CanBeNull] PftVariableManager parent
+                PftVariableManager? parent
             )
         {
             Parent = parent;
@@ -73,8 +76,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 TextWriter writer
             )
         {
-            Code.NotNull(writer, "writer");
-
             for (
                     PftVariableManager manager = this;
                     !ReferenceEquals(manager, null);
@@ -118,15 +119,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get existing variable with the specified name.
         /// </summary>
-        [CanBeNull]
-        public PftVariable GetExistingVariable
+        public PftVariable? GetExistingVariable
             (
                 string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
-            PftVariable result = null;
+            PftVariable? result = null;
             for (
                     PftVariableManager manager = this;
                     !ReferenceEquals(manager, null);
@@ -151,8 +149,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 bool isNumeric
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             PftVariable result = GetExistingVariable(name);
             if (ReferenceEquals(result, null))
             {
@@ -176,11 +172,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         public PftVariable SetVariable
             (
                 string name,
-                [CanBeNull] string value
+                string? value
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             PftVariable result = GetOrCreateVariable(name, false);
             result.IsNumeric = false;
             result.StringValue = value;
@@ -196,11 +190,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftContext context,
                 string name,
                 IndexSpecification index,
-                [CanBeNull] string value
+                string? value
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             PftVariable result = GetOrCreateVariable(name, false);
             result.IsNumeric = false;
 
@@ -239,8 +231,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 double value
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             PftVariable result = GetOrCreateVariable(name, true);
             result.IsNumeric = true;
             result.NumericValue = value;

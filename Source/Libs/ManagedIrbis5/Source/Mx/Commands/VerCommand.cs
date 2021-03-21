@@ -83,11 +83,11 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            ConnectedClient connected = executive.Provider as ConnectedClient;
+            var connected = executive.Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
-                IIrbisConnection connection = connected.Connection;
-                IrbisVersion version = connection.GetServerVersion();
+                var connection = connected.Connection;
+                var version = connection.GetServerVersion();
                 executive.WriteLine(version.ToString());
             }
 

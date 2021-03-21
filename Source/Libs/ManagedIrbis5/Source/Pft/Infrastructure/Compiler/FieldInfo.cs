@@ -1,18 +1,19 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* FieldInfo.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* FieldInfo.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Ast;
 
@@ -24,18 +25,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
     {
         #region Properties
 
-        [NotNull]
         public PftField Field { get; private set; }
 
-        [NotNull]
         public FieldSpecification Specification { get; private set; }
 
-        [NotNull]
         public string Text { get; private set; }
 
         public int Id { get; private set; }
 
-        [NotNull]
         public string Reference { get; private set; }
 
         #endregion
@@ -47,12 +44,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public FieldInfo
             (
-                [NotNull] PftField field,
+                PftField field,
                 int id
             )
         {
-            Code.NotNull(field, "field");
-
             Field = field;
             Specification = field.ToSpecification();
             Text = Specification.ToString();
@@ -73,10 +68,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Text;
-        }
+        public override string ToString() => Text;
 
         #endregion
     }

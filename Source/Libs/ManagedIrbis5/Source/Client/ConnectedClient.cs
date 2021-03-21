@@ -62,7 +62,6 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Connection.
         /// </summary>
-        [NotNull]
         public IIrbisConnection Connection { get; private set; }
 
         #endregion
@@ -75,7 +74,7 @@ namespace ManagedIrbis.Client
         public ConnectedClient()
         {
             _ownConnection = true;
-            Connection = new IrbisConnection();
+            Connection = ConnectionFactory.Shared.CreateConnection();
         }
 
         /// <summary>
@@ -83,11 +82,9 @@ namespace ManagedIrbis.Client
         /// </summary>
         public ConnectedClient
             (
-                [NotNull] IIrbisConnection connection
+                IIrbisConnection connection
             )
         {
-            Code.NotNull(connection, "connection");
-
             _ownConnection = false;
             Connection = connection;
         }
@@ -123,11 +120,9 @@ namespace ManagedIrbis.Client
         /// </summary>
         public void ParseConnectionString
             (
-                [NotNull] string connectionString
+                string connectionString
             )
         {
-            Code.NotNullNorEmpty(connectionString, "connectionString");
-
             Connection.ParseConnectionString(connectionString);
         }
 
@@ -147,8 +142,6 @@ namespace ManagedIrbis.Client
                 string configurationString
             )
         {
-            Code.NotNullNorEmpty(configurationString, "configurationString");
-
             Connection.ParseConnectionString(configurationString);
             Connection.Connect();
         }
@@ -159,9 +152,7 @@ namespace ManagedIrbis.Client
                 string term
             )
         {
-            Code.NotNullNorEmpty(term, "term");
-
-            PostingParameters parameters = new PostingParameters
+            var parameters = new PostingParameters
             {
                 Database = Connection.Database,
                 Term = term
@@ -175,13 +166,10 @@ namespace ManagedIrbis.Client
         /// <inheritdoc cref="IrbisProvider.FormatRecord" />
         public override string FormatRecord
             (
-                MarcRecord record,
+                Record record,
                 string format
             )
         {
-            Code.NotNull(record, "record");
-            Code.NotNull(format, "format");
-
             string result = Connection.FormatRecord
                 (
                     format,
@@ -221,8 +209,6 @@ namespace ManagedIrbis.Client
                 string database
             )
         {
-            Code.NotNullNorEmpty(database, "database");
-
             var lines = BatchRecordFormatter.WholeDatabase
                 (
                     Connection,
@@ -313,7 +299,7 @@ namespace ManagedIrbis.Client
         }
 
         /// <inheritdoc cref="IrbisProvider.ReadRecord" />
-        public override MarcRecord ReadRecord
+        public override Record ReadRecord
             (
                 int mfn
             )
@@ -327,8 +313,6 @@ namespace ManagedIrbis.Client
                 FileSpecification fileSpecification
             )
         {
-            Code.NotNull(fileSpecification, "fileSpecification");
-
             return Connection.ReadMenu(fileSpecification);
         }
 
@@ -338,8 +322,6 @@ namespace ManagedIrbis.Client
                 TermParameters parameters
             )
         {
-            Code.NotNull(parameters, "parameters");
-
             TermInfo[] result = Connection
                 .ReadTerms(parameters)
                 .Where(term => term.Count != 0)

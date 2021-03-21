@@ -609,6 +609,11 @@ namespace ManagedIrbis.Infrastructure
             }
         }
 
+        public string[]? GetAnsiStrings(int lineCount)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         ///
         /// </summary>
@@ -657,6 +662,12 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public string ReadUtf() => ReadLine(IrbisEncoding.Utf8);
 
+        public int RequireInt32()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
+
     }
 }

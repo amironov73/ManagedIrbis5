@@ -16,9 +16,8 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
-using System.Threading;
 
+using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -168,6 +167,96 @@ namespace ManagedIrbis
             return response.ReturnCode;
         } // method GetMaxMfn
 
+        public static string[] FormatRecords
+            (
+                this IIrbisConnection connection,
+                string database,
+                string format,
+                int[] mfns
+            )
+        {
+            throw new NotImplementedException();
+        }
+
+        public static string GetDatabaseStat
+            (
+                this IIrbisConnection connection,
+                StatDefinition definition
+            )
+        {
+            throw new NotImplementedException();
+        }
+
+        public static ServerStat GetServerStat
+            (
+                this IIrbisConnection connection
+            )
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public static ServerVersion? GetServerVersion
+            (
+                this IIrbisConnection connection
+            )
+        {
+            if (!connection.CheckConnection())
+            {
+                return null;
+            }
+
+            var query = new ValueQuery(connection, CommandCode.ServerInfo);
+            var response = connection.ExecuteSync(ref query);
+            if (response is null)
+            {
+                return null;
+            }
+
+            response.CheckReturnCode();
+            var result = new ServerVersion();
+            result.Parse(response);
+
+            return result;
+        } // method GetServerVersion
+
+        public static GblResult GlobalCorrection
+            (
+                this IIrbisConnection connection,
+                GblSettings settings
+            )
+        {
+            throw new NotImplementedException();
+        }
+
+        public static DatabaseInfo[] ListDatabases
+            (
+                this IIrbisConnection connection,
+                string specification
+            )
+        {
+            throw new NotImplementedException();
+        }
+
+        public static string[] ListFiles
+            (
+                this IIrbisConnection connection,
+                FileSpecification specification
+            )
+        {
+            throw new NotImplementedException();
+        }
+
+        public static UserInfo[] ListUsers
+            (
+                this IIrbisConnection connection
+            )
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Пустая операция.
         /// </summary>
@@ -314,6 +403,14 @@ namespace ManagedIrbis
 
             return result;
         } // method ReadTextFile
+
+        public static bool RestartServer
+            (
+                this IIrbisConnection connection
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Расширенный поиск.

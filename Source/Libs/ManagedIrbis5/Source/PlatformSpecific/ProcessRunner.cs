@@ -1,56 +1,48 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* ProcessRunner.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Diagnostics.CodeAnalysis;
-
-#if CLASSIC || NETCORE || ANDROID
-
 using System.Diagnostics;
-
-#endif
+using System.Diagnostics.CodeAnalysis;
 
 using AM;
 
-using CodeJam;
-
-using JetBrains.Annotations;
+using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.PlatformSpecific
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [ExcludeFromCodeCoverage]
     static class ProcessRunner
     {
         #region Public methods
 
-        [NotNull]
         public static string GetShell()
         {
-#if WINMOBILE || PocketPC
-
-            throw new NotImplementedException();
-
-#else
+            // TODO support for Linux and OS X
 
             string result = Environment.GetEnvironmentVariable("COMSPEC")
                              ?? "cmd.exe";
 
             return result;
-
-#endif
         }
 
         /// <summary>
@@ -58,13 +50,9 @@ namespace ManagedIrbis.PlatformSpecific
         /// </summary>
         public static void RunAndForget
             (
-                [NotNull] string commandLine
+                string commandLine
             )
         {
-            Code.NotNull(commandLine, "commandLine");
-
-#if CLASSIC || NETCORE
-
             string comspec = GetShell();
 
             commandLine = "/c " + commandLine;
@@ -81,8 +69,6 @@ namespace ManagedIrbis.PlatformSpecific
             Process process = Process.Start(startInfo)
                 .ThrowIfNull("process");
             process.Dispose();
-
-#endif
         }
 
         /// <summary>
@@ -90,13 +76,9 @@ namespace ManagedIrbis.PlatformSpecific
         /// </summary>
         public static string RunAndGetOutput
             (
-                [NotNull] string commandLine
+                string commandLine
             )
         {
-            Code.NotNull(commandLine, "commandLine");
-
-#if CLASSIC || NETCORE
-
             string comspec = GetShell();
 
             commandLine = "/c " + commandLine;
@@ -119,12 +101,6 @@ namespace ManagedIrbis.PlatformSpecific
             string result = process.StandardOutput.ReadToEnd();
 
             return result;
-
-#else
-
-            return string.Empty;
-
-#endif
         }
 
         /// <summary>
@@ -132,13 +108,9 @@ namespace ManagedIrbis.PlatformSpecific
         /// </summary>
         public static void RunAndWait
             (
-                [NotNull] string commandLine
+                string commandLine
             )
         {
-            Code.NotNull(commandLine, "commandLine");
-
-#if CLASSIC || NETCORE
-
             string comspec = GetShell();
 
             commandLine = "/c " + commandLine;
@@ -155,8 +127,6 @@ namespace ManagedIrbis.PlatformSpecific
             Process process = Process.Start(startInfo)
                 .ThrowIfNull("process");
             process.WaitForExit();
-
-#endif
         }
 
         #endregion

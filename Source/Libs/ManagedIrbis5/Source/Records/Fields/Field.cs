@@ -540,6 +540,33 @@ namespace ManagedIrbis
             return this;
         } // method RemoveSubField
 
+        /// <summary>
+        /// Текстовое представление только значимой части поля.
+        /// Метка поля не выводится.
+        /// </summary>
+        public string ToText()
+        {
+            var length = Subfields.Sum
+                (
+                    sf => (sf.Value?.Length ?? 0)
+                          + (sf.Code == ValueCode ? 1 : 2)
+                );
+            var result = new StringBuilder (length);
+
+            if (!string.IsNullOrEmpty(Value))
+            {
+                result.Append(Value);
+            }
+
+            foreach (var subField in Subfields)
+            {
+                var subText = subField.ToString();
+                result.Append(subText);
+            }
+
+            return result.ToString();
+        } // method ToText
+
         #endregion
 
         #region IHandmadeSerializable members

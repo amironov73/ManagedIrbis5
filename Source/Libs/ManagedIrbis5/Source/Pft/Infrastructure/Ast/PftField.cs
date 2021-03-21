@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftField.cs -- base for field reference
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,30 +16,24 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+
 using AM;
 using AM.IO;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     /// Base for field reference.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public class PftField
         : PftNode
     {
@@ -53,13 +51,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Left hand.
         /// </summary>
-        [NotNull]
         public PftNodeCollection LeftHand { get; private set; }
 
         /// <summary>
         /// Right hand.
         /// </summary>
-        [NotNull]
         public PftNodeCollection RightHand { get; private set; }
 
         /// <summary>
@@ -70,8 +66,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Embedded.
         /// </summary>
-        [CanBeNull]
-        public string Embedded { get; set; }
+        public string? Embedded { get; set; }
 
         /// <summary>
         /// Отступ.
@@ -96,14 +91,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Tag.
         /// </summary>
-        [CanBeNull]
-        public string Tag { get; set; }
+        public string? Tag { get; set; }
 
         /// <summary>
         /// Tag specification.
         /// </summary>
-        [CanBeNull]
-        public string TagSpecification { get; set; }
+        public string? TagSpecification { get; set; }
 
         /// <summary>
         /// Repeat count.
@@ -123,8 +116,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Subfield specification.
         /// </summary>
-        [CanBeNull]
-        public string SubFieldSpecification { get; set; }
+        public string? SubFieldSpecification { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -146,7 +138,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // Nothing to do here
 
-                Log.Error
+                Magna.Error
                     (
                         "PftField::Children: "
                         + "set value="
@@ -173,12 +165,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftField
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
-
             LeftHand = new PftNodeCollection(this);
             RightHand = new PftNodeCollection(this);
         }
@@ -202,11 +192,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public void Apply
             (
-                [NotNull] FieldSpecification specification
+                FieldSpecification specification
             )
         {
-            Code.NotNull(specification, "specification");
-
             Command = specification.Command;
             Embedded = specification.Embedded;
             Indent = specification.ParagraphIndent;
@@ -227,11 +215,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public void Apply
             (
-                [NotNull] FieldReference reference
+                FieldReference reference
             )
         {
-            Code.NotNull(reference, "reference");
-
             Command = reference.Command;
             Embedded = reference.Embedded;
             Indent = reference.Indent;
@@ -252,7 +238,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public virtual bool CanOutput
             (
-                [CanBeNull] string value
+                string? value
             )
         {
             return !string.IsNullOrEmpty(value);
@@ -261,14 +247,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Evaluate tag specification (if any).
         /// </summary>
-        [CanBeNull]
-        public string EvaluateTagSpecification
+        public string? EvaluateTagSpecification
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
             string tagSpecification = TagSpecification;
             if (!string.IsNullOrEmpty(tagSpecification))
             {
@@ -317,15 +300,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Get value.
         /// </summary>
-        [CanBeNull]
-        public virtual string GetValue
+        public virtual string? GetValue
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null)
                 || string.IsNullOrEmpty(Tag)
                 && string.IsNullOrEmpty(TagSpecification)
@@ -338,20 +318,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             int index = context.Index;
 
-            RecordField[] fields = PftUtility.GetArrayItem
+            var fields = PftUtility.GetArrayItem
                 (
                     context,
                     record.Fields.GetField(Tag.SafeToInt32()),
                     FieldRepeat
                 );
 
-            RecordField field = fields.GetOccurrence(index);
+            var field = fields.GetOccurrence(index);
             if (ReferenceEquals(field, null))
             {
                 return null;
             }
 
-            string result = PftUtility.GetFieldValue
+            var result = PftUtility.GetFieldValue
                 (
                     context,
                     field,
@@ -369,19 +349,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public virtual bool HaveRepeat
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (record == null
                 || string.IsNullOrEmpty(Tag))
             {
                 return false;
             }
 
-            RecordField field = record.Fields.GetField(Tag.SafeToInt32(), context.Index);
+            var field = record.Fields.GetField(Tag.SafeToInt32(), context.Index);
 
             return !ReferenceEquals(field, null);
         }
@@ -391,11 +369,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public bool IsFirstRepeat
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
             return context.Index == 0;
         }
 
@@ -404,21 +380,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public virtual bool IsLastRepeat
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
             return true;
         }
 
         /// <summary>
         /// Limit text.
         /// </summary>
-        [CanBeNull]
-        public string LimitText
+        public string? LimitText
             (
-                [CanBeNull] string text
+                string? text
             )
         {
             if (string.IsNullOrEmpty(text))
@@ -433,7 +406,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 length = Length;
             }
 
-            string result = PftUtility.SafeSubString
+            var result = PftUtility.SafeSubString
                 (
                     text,
                     offset,
@@ -446,10 +419,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Convert to <see cref="FieldSpecification"/>.
         /// </summary>
-        [NotNull]
         public FieldSpecification ToSpecification()
         {
-            FieldSpecification result = new FieldSpecification
+            var result = new FieldSpecification
             {
                 Command = Command,
                 Embedded = Embedded,

@@ -17,7 +17,8 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using AM;
 using AM.Parameters;
 
@@ -95,22 +96,19 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Get <see cref="IrbisProvider" /> and configure it.
         /// </summary>
-        [NotNull]
         public static IrbisProvider GetAndConfigureProvider
             (
-                [NotNull] string configurationString
+                string configurationString
             )
         {
-            Code.NotNullNorEmpty(configurationString, "configurationString");
-
-            Parameter[] parameters = ParameterUtility.ParseString
+            var parameters = ParameterUtility.ParseString
                 (
                     configurationString
                 );
-            string name = parameters.GetParameter("Provider", null);
+            var name = parameters.GetParameter("Provider", null);
             if (string.IsNullOrEmpty(name))
             {
-                Log.Warn
+                Magna.Warning
                     (
                         "ProviderManager::GetAndConfigureProvider: "
                         + "provider name not specified"
@@ -118,8 +116,6 @@ namespace ManagedIrbis.Client
 
                 name = Default;
             }
-
-#if CLASSIC || NETCORE || ANDROID
 
             string assemblyParameter
                 = parameters.GetParameter("Assembly", null)
@@ -132,8 +128,6 @@ namespace ManagedIrbis.Client
                     Assembly.Load(assembly);
                 }
             }
-
-#endif
 
             string typeName
                 = parameters.GetParameter("Register", null)
@@ -158,19 +152,16 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Get <see cref="IrbisProvider"/> by name.
         /// </summary>
-        [CanBeNull]
-        public static IrbisProvider GetProvider
+        public static IrbisProvider? GetProvider
             (
                 [NotNull] string name,
                 bool throwOnError
             )
         {
-            Code.NotNull(name, "name");
-
-            Type type;
+            Type? type;
             if (!Registry.TryGetValue(name, out type))
             {
-                Log.Error
+                Magna.Error
                     (
                         "ProviderManager::GetProvider: "
                         + "provider not found: "
@@ -190,7 +181,7 @@ namespace ManagedIrbis.Client
 
             if (ReferenceEquals(type, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "ProviderManager::GetProvider: "
                         + "can't find type: "
@@ -208,7 +199,7 @@ namespace ManagedIrbis.Client
                 return null;
             }
 
-            IrbisProvider result = (IrbisProvider)Activator.CreateInstance(type);
+            var result = (IrbisProvider?)Activator.CreateInstance(type);
 
             return result;
         }
@@ -216,11 +207,8 @@ namespace ManagedIrbis.Client
         /// <summary>
         ///
         /// </summary>
-        [NotNull]
         public static IrbisProvider GetPreconfiguredProvider()
         {
-#if CLASSIC || NETCORE
-
             string configurationString
                 = AM.Configuration.ConfigurationUtility.GetString
                 (
@@ -228,7 +216,7 @@ namespace ManagedIrbis.Client
                 );
             if (string.IsNullOrEmpty(configurationString))
             {
-                Log.Error
+                Magna.Error
                     (
                         "ProviderManager::GetPreconfiguredProvider: "
                         + "IrbisProvider configuration key not specified"
@@ -245,11 +233,6 @@ namespace ManagedIrbis.Client
 
             return result;
 
-#else
-
-            throw new NotImplementedException();
-
-#endif
         }
 
         #endregion

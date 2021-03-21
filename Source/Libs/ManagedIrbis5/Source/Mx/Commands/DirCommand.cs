@@ -43,10 +43,6 @@ namespace ManagedIrbis.Mx.Commands
     public sealed class DirCommand
         : MxCommand
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -56,14 +52,6 @@ namespace ManagedIrbis.Mx.Commands
             : base("dir")
         {
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 
@@ -98,13 +86,13 @@ namespace ManagedIrbis.Mx.Commands
             ConnectedClient connected = executive.Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
-                IIrbisConnection connection = connected.Connection;
-                FileSpecification specification = new FileSpecification
-                    (
-                        IrbisPath.MasterFile,
-                        connection.Database,
-                        fileName
-                    );
+                var connection = connected.Connection;
+                var specification = new FileSpecification
+                    {
+                        Path = IrbisPath.MasterFile,
+                        Database = connection.Database,
+                        FileName = fileName
+                    };
                 string[] list = connection.ListFiles(specification);
                 foreach (string file in list)
                 {

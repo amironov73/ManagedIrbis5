@@ -92,7 +92,7 @@ namespace ManagedIrbis.ImportExport
         {
             var result = new IsoRecordHeader
             {
-                RecordStatus = RecordStatus.New,
+                RecordStatus = RecordStatus.None,
                 RecordType = RecordType.Text,
                 BibliographicalIndex = MarcBibliographicalIndex.Monograph,
                 BibliographicalLevel = MarcBibliographicalLevel.Unknown,
