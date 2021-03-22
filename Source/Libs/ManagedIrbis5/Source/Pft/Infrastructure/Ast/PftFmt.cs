@@ -1,17 +1,21 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftF2.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* PftFmt.cs -- форматирование чисел по принципам .NET
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -19,47 +23,41 @@ using System.Text;
 
 using AM;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// Форматирование по принципам .NET Framework
+    /// Форматирование чисел с плавающей точкой по принципам .NET.
     /// </summary>
     /// <example>
     /// <code>
-    /// f2(3+0.14,'E4')
+    /// fmt(3+0.14,'E4')
     /// </code>
     /// </example>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftFmt
         : PftNode
     {
         #region Properties
 
         /// <summary>
-        /// Format.
+        /// Спецификация формата для числа.
+        /// Если спецификация пуста, то применяется форматирование,
+        /// принятое в .NET по умолчанию ("G").
         /// </summary>
-        [NotNull]
         public PftNodeCollection Format { get; private set; }
 
         /// <summary>
-        /// Number.
+        /// Собственно число, подлежащее форматированию.
         /// </summary>
-        [CanBeNull]
-        public PftNumeric Number { get; set; }
+        public PftNumeric? Number { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -70,11 +68,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
 
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
-                    if (!ReferenceEquals(Number, null))
+                    var nodes = new List<PftNode>();
+                    if (Number is { } number)
                     {
-                        nodes.Add(Number);
+                        nodes.Add(number);
                     }
+
                     nodes.AddRange(Format);
                     _virtualChildren.SetChildren(nodes);
                 }
@@ -85,14 +84,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             protected set
             {
                 // Nothing to do here
+
+                Magna.Error
+                    (
+                        "PftFmt::Children: "
+                        + "set value="
+                        + value.ToVisibleString()
+                    );
+
             }
-        }
+        } // property Children
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -104,28 +108,27 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public PftFmt()
         {
             Format = new PftNodeCollection(this);
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftFmt
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Fmt);
 
             Format = new PftNodeCollection(this);
-        }
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -136,14 +139,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public static void FormatNumber
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
+                PftContext context,
+                PftNode? node,
                 double number,
-                [CanBeNull] string format
+                string? format
             )
         {
-            Code.NotNull(context, "context");
-
             string output;
 
             if (string.IsNullOrEmpty(format))
@@ -163,7 +164,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             context.Write(node, output);
-        }
+        } // method FormatNumber
 
         #endregion
 
@@ -172,10 +173,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftFmt result = (PftFmt) base.Clone();
-
+            var result = (PftFmt) base.Clone();
             result._virtualChildren = null;
-
             result.Format = Format.CloneNodes(result).ThrowIfNull();
 
             if (!ReferenceEquals(Number, null))
@@ -184,7 +183,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             return result;
-        }
+        } // method Clone
 
         #endregion
 
@@ -198,18 +197,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftFmt otherF = (PftFmt)otherNode;
+            var otherFmt = (PftFmt)otherNode;
             PftSerializationUtility.CompareLists
                 (
                     Format,
-                    otherF.Format
+                    otherFmt.Format
                 );
             PftSerializationUtility.CompareNodes
                 (
                     Number,
-                    otherF.Number
+                    otherFmt.Number
                 );
-        }
+        } // method CompareNode
 
         /// <inheritdoc cref="PftNode.Compile" />
         public override void Compile
@@ -217,16 +216,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            if (ReferenceEquals(Number, null)
-                || Format.Count == 0)
+            if (Number is null)
             {
-                throw new PftCompilerException();
+                return;
             }
+
+            string? defaultFormat = Format.Count == 0
+                ? "G"
+                : null;
 
             Number.Compile(compiler);
             compiler.CompileNodes(Format);
 
-            string actionName = compiler.CompileAction(Format);
+            var actionName = compiler.CompileAction(Format);
 
             compiler.StartMethod(this);
 
@@ -235,9 +237,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .Write("double value = ")
                 .CallNodeMethod(Number);
 
-            compiler
-                .WriteIndent()
-                .WriteLine("string format = Evaluate({0});", actionName);
+            if (defaultFormat is null)
+            {
+                compiler
+                    .WriteIndent()
+                    .WriteLine("string format = Evaluate({0});", actionName);
+            }
+            else
+            {
+                compiler
+                    .WriteIndent()
+                    .WriteLine("string format = \"{0}\";", defaultFormat);
+            }
 
             compiler
                 .WriteIndent()
@@ -247,7 +258,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Deserialize" />
         protected internal override void Deserialize
@@ -258,8 +269,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             base.Deserialize(reader);
 
             PftSerializer.Deserialize(reader, Format);
-            Number = (PftNumeric) PftSerializer.DeserializeNullable(reader);
-        }
+            Number = (PftNumeric?) PftSerializer.DeserializeNullable(reader);
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -269,53 +280,54 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            if (!ReferenceEquals(Number, null))
+            if (Number is { } number)
             {
-                Number.Execute(context);
-                double number = Number.Value;
-                string format = context.Evaluate(Format);
+                number.Execute(context);
+                var value = number.Value;
+                var format = context.Evaluate(Format);
 
                 FormatNumber
                     (
                         context,
                         this,
-                        number,
+                        value,
                         format
                     );
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "Fmt"
             };
 
-            if (!ReferenceEquals(Number, null))
+            if (Number is { } number)
             {
-                result.Children.Add(Number.GetNodeInfo());
+                result.Children.Add(number.GetNodeInfo());
             }
 
             if (Format.Count != 0)
             {
-                PftNodeInfo format = new PftNodeInfo
+                var format = new PftNodeInfo
                 {
                     Name = "Format"
                 };
+
                 result.Children.Add(format);
-                foreach (PftNode node in Format)
+                foreach (var node in Format)
                 {
                     format.Children.Add(node.GetNodeInfo());
                 }
             }
 
             return result;
-        }
+        } // method GetNodeInfo
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -326,16 +338,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer
                 .SingleSpace()
                 .Write("fmt(");
-            if (!ReferenceEquals(Number, null))
-            {
-                Number.PrettyPrint(printer);
-            }
+            Number?.PrettyPrint(printer);
             printer.EatWhitespace();
             printer
                 .Write(", ")
                 .Write(Format)
                 .Write(')');
-        }
+        } // method PrentyPrint
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -347,14 +356,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             PftSerializer.Serialize(writer, Format);
             PftSerializer.SerializeNullable(writer, Number);
-        }
+        } // method Serialize
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -363,28 +368,33 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("fmt(");
             if (!ReferenceEquals(Number, null))
             {
                 result.Append(Number);
             }
+
             result.Append(',');
-            bool first = true;
-            foreach (PftNode node in Format)
+            var first = true;
+            foreach (var node in Format)
             {
                 if (!first)
                 {
                     result.Append(' ');
                 }
+
                 result.Append(node);
                 first = false;
             }
+
             result.Append(')');
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftFmt
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

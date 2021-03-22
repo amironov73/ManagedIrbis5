@@ -1,41 +1,37 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftFor.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+
+/* PftFor.cs -- цикл "для"
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
 using AM;
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// For loop.
+    /// Цикл "для".
     /// </summary>
     /// <example>
     /// for $x=0; $x &lt; 10; $x = $x+1;
@@ -45,47 +41,35 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     ///     #
     /// end
     /// </example>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftFor
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression
-        {
-            get { return true; }
-        }
+        public override bool ComplexExpression => true;
 
         /// <summary>
         /// Initialization.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Initialization { get; private set; }
 
         /// <summary>
         /// Condition.
         /// </summary>
-        [CanBeNull]
-        public PftCondition Condition { get; set; }
+        public PftCondition? Condition { get; set; }
 
         /// <summary>
         /// Loop statements.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Loop { get; private set; }
 
         /// <summary>
         /// Body.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Body { get; private set; }
 
         /// <inheritdoc cref="PftNode.Children" />
@@ -97,12 +81,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
 
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     nodes.AddRange(Initialization);
-                    if (!ReferenceEquals(Condition, null))
+                    if (Condition is { } condition)
                     {
-                        nodes.Add(Condition);
+                        nodes.Add(condition);
                     }
+
                     nodes.AddRange(Loop);
                     nodes.AddRange(Body);
                     _virtualChildren.SetChildren(nodes);
@@ -115,14 +100,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // Nothing to do here
 
-                Log.Error
+                Magna.Error
                     (
                         "PftFor::Children: "
                         + "set value="
                         + value.ToVisibleString()
                     );
             }
-        }
+        } // property Children
 
         #endregion
 
@@ -143,11 +128,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftFor
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.For);
 
             Initialization = new PftNodeCollection(this);
@@ -159,11 +143,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         private bool _EvaluateCondition
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
             if (ReferenceEquals(Condition, null))
@@ -244,8 +228,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             base.Deserialize(reader);
 
             PftSerializer.Deserialize(reader, Initialization);
-            Condition
-                = (PftCondition)PftSerializer.DeserializeNullable(reader);
+            Condition = (PftCondition?)PftSerializer.DeserializeNullable(reader);
             PftSerializer.Deserialize(reader, Loop);
             PftSerializer.Deserialize(reader, Body);
         }
@@ -270,9 +253,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             catch (PftBreakException exception)
             {
-                // It was brak operator
+                // It was break operator
 
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftFor::Execute",
                         exception
@@ -285,7 +268,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "For"
@@ -358,14 +341,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer.WriteNodes(Initialization);
             printer.Write("; ");
 
-            if (!ReferenceEquals(Condition, null))
-            {
-                Condition.PrettyPrint(printer);
-            }
+            Condition?.PrettyPrint(printer);
+            printer.EatWhitespace();
             printer.Write("; ");
 
             printer.WriteNodes(Loop);
-            printer.WriteLine(';');
+            printer.WriteLine(";");
             printer
                 .WriteIndent()
                 .WriteLine("do");
@@ -379,7 +360,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer
                 .WriteIndent()
                 .WriteLine("end");
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -393,14 +374,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             PftSerializer.SerializeNullable(writer, Condition);
             PftSerializer.Serialize(writer, Loop);
             PftSerializer.Serialize(writer, Body);
-        }
+        } // method Serialize
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -409,7 +386,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append("for ");
             PftUtility.NodesToText(result, Initialization);
             result.Append(';');
@@ -420,9 +397,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             PftUtility.NodesToText(result, Body);
             result.Append(" end");
 
-            return StringBuilderCache.GetStringAndRelease(result);
-        }
+            return result.ToString();
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftFor
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

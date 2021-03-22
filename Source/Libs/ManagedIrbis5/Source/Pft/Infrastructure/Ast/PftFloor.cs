@@ -1,52 +1,47 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftFloor.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
+
+/* PftFloor.cs -- наибольшее целое число, которое не больше, чем заданное
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    /// Функция floor() возвращает наибольшее целое число (представленное как double),
+    /// которое не больше, чем заданное.
     /// </summary>
     /// <example>
     /// <code>
     /// f(floor(1.2),0,0)
     /// </code>
     /// </example>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftFloor
         : PftNumeric
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -57,31 +52,28 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftFloor()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftFloor
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Floor);
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftFloor
             (
-                [NotNull] PftNumeric value
+                PftNumeric value
             )
         {
-            Code.NotNull(value, "value");
-
             Children.Add(value);
         }
 
@@ -95,7 +87,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            PftNumeric child = Children.FirstOrDefault() as PftNumeric;
+            var child = Children.FirstOrDefault() as PftNumeric;
             if (ReferenceEquals(child, null))
             {
                 throw new PftCompilerException();
@@ -120,7 +112,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -130,15 +122,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            PftNumeric child = Children.FirstOrDefault() as PftNumeric;
-            if (!ReferenceEquals(child, null))
+            if (Children.FirstOrDefault() is PftNumeric child)
             {
                 child.Execute(context);
                 Value = Math.Floor(child.Value);
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -152,14 +143,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .Write("floor(");
             base.PrettyPrint(printer);
             printer.Write(')');
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -168,9 +155,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("floor(");
-            PftNode child = Children.FirstOrDefault();
+            var child = Children.FirstOrDefault();
             if (!ReferenceEquals(child, null))
             {
                 result.Append(child);
@@ -178,8 +165,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result.Append(')');
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftFloor
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast
