@@ -15,8 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
@@ -81,8 +79,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// <summary>
     /// ref() function
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftRef
         : PftNode
     {
@@ -91,13 +87,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// MFN.
         /// </summary>
-        [CanBeNull]
-        public PftNumeric Mfn { get; set; }
+        public PftNumeric? Mfn { get; set; }
 
         /// <summary>
         /// Format.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Format { get; private set; }
 
         /// <inheritdoc cref="PftNode.Children" />
@@ -120,18 +114,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Log.Error
-                    (
-                        "PftRef::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            protected set => Magna.Error
+                (
+                    "PftRef::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
         }
 
         #endregion
@@ -151,11 +139,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRef
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Ref);
 
             Format = new PftNodeCollection(this);
@@ -166,13 +153,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRef
             (
-                [NotNull] PftNumeric mfn,
+                PftNumeric mfn,
                 params PftNode[] format
             )
             : this()
         {
-            Code.NotNull(mfn, "mfn");
-
             Mfn = mfn;
             foreach (PftNode node in format)
             {
@@ -311,8 +296,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 parentContext.Evaluate(Mfn);
                 int newMfn = (int)Mfn.Value;
                 int oldMfn = 0;
-                MarcRecord record = parentContext.Record;
-                if (!ReferenceEquals(record, null))
+                var record = parentContext.Record;
+                if (record is not null)
                 {
                     oldMfn = record.Mfn;
                 }
@@ -323,9 +308,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                     record = parentContext.Provider.ReadRecord(newMfn);
                 }
-                if (!ReferenceEquals(record, null))
+
+                if (record is not null)
                 {
-                    PftContext nestedContext = new PftContext(parentContext)
+                    var nestedContext = new PftContext(parentContext)
                     {
                         Record = record,
                         Output = parentContext.Output
@@ -339,7 +325,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             OnAfterExecution(parentContext);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
@@ -375,13 +361,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        public override PftNode? Optimize()
         {
             if (ReferenceEquals(Mfn, null))
             {
                 return null;
             }
-            Mfn = (PftNumeric)Mfn.Optimize();
+
+            Mfn = (PftNumeric?)Mfn.Optimize();
             Format.Optimize();
 
             if (Format.Count == 0)
@@ -390,7 +377,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             return this;
-        }
+        } // method Optimize
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -401,10 +388,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer
                 .SingleSpace()
                 .Write("ref(");
-            if (!ReferenceEquals(Mfn, null))
-            {
-                Mfn.PrettyPrint(printer);
-            }
+            Mfn?.PrettyPrint(printer);
             printer.Write(", ")
                 .WriteNodes(Format)
                 .Write(')');
@@ -423,11 +407,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -436,7 +416,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("ref(");
             if (!ReferenceEquals(Mfn, null))
             {
@@ -447,8 +427,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result.Append(')');
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftRef
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

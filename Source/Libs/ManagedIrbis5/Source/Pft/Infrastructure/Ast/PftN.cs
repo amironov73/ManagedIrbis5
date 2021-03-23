@@ -1,32 +1,29 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftN.cs -- fake field reference
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     /// Fake field reference.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftN
         : PftField
     {
@@ -44,11 +41,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftN
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.V);
 
             FieldSpecification specification
@@ -62,15 +58,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftN
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
-            FieldSpecification specification = new FieldSpecification();
+            var specification = new FieldSpecification();
             if (!specification.Parse(text))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftN::Constructor: "
                         + "syntax error at:"
@@ -92,9 +86,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 char code
             )
         {
-            Code.Positive(tag, "tag");
-
-            FieldSpecification specification = new FieldSpecification(tag, code)
+            var specification = new FieldSpecification(tag, code)
             {
                 Command = 'n'
             };
@@ -109,9 +101,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 int tag
             )
         {
-            Code.Positive(tag, "tag");
-
-            FieldSpecification specification = new FieldSpecification(tag)
+            var specification = new FieldSpecification(tag)
             {
                 Command = 'n'
             };
@@ -166,7 +156,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(context.CurrentField, null))
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftN::Execute: "
                         + "nested field detected"
@@ -177,7 +167,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (LeftHand.Count == 0)
             {
-                Log.Warn
+                Magna.Warning
                     (
                         "PftN::Execute: "
                         + "no left hand nodes"

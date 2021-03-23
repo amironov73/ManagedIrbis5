@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftNested.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,13 +17,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Text;
-
-using MoonSharp.Interpreter;
 
 #endregion
 
@@ -40,8 +38,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// }
     /// </code>
     /// </example>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftNested
         : PftNode
     {
@@ -73,7 +69,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.LeftCurly);
         }
 
@@ -89,8 +84,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            MarcRecord mainRecord = context.Record;
-            MarcRecord alternativeRecord = context.AlternativeRecord;
+            var mainRecord = context.Record;
+            var alternativeRecord = context.AlternativeRecord;
 
             try
             {

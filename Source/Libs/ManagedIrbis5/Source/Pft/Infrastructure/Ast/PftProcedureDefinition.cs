@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftProcedureDefinition.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,23 +18,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using AM;
-using AM.Logging;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftProcedureDefinition
         : PftNode
     {
@@ -39,8 +38,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Procedure itself.
         /// </summary>
-        [CanBeNull]
-        public PftProcedure Procedure { get; set; }
+        public PftProcedure? Procedure { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -60,25 +58,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Log.Error
-                    (
-                        "PftProcedureDefinition::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
-        }
+            protected set => Magna.Error
+                (
+                    "PftProcedureDefinition::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
+        } // property Children
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 

@@ -1,42 +1,37 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+
 /* PftInclude.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using AM;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftInclude
         : PftNode
     {
@@ -45,8 +40,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Parsed program of the included file.
         /// </summary>
-        [CanBeNull]
-        public PftProgram Program { get; set; }
+        public PftProgram? Program { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -56,7 +50,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Program, null))
                     {
                         nodes.Add(Program);
@@ -66,18 +60,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Log.Error
+            protected set => Magna.Error
                 (
-                    "PftInclude::Children: "
-                    + "set value="
+                    nameof(PftInclude) + "::" + nameof(Children)
+                    + ": set value="
                     + value.ToVisibleString()
                 );
-            }
         }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
@@ -102,51 +90,48 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftInclude
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
-
             Text = name;
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftInclude
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
-        }
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         private void ParseProgram
             (
-                [NotNull] PftContext context,
-                [NotNull] string fileName
+                PftContext context,
+                string fileName
             )
         {
-            string ext = Path.GetExtension(fileName);
+            var ext = Path.GetExtension(fileName);
             if (string.IsNullOrEmpty(ext))
             {
                 fileName += ".pft";
             }
-            FileSpecification specification
-                = new FileSpecification
-                (
-                    IrbisPath.MasterFile,
-                    context.Provider.Database,
-                    fileName
-                );
-            string source = context.Provider.ReadFile
+
+            var specification = new FileSpecification
+                {
+                    Path = IrbisPath.MasterFile,
+                    Database = context.Provider.Database,
+                    FileName = fileName
+                };
+            var source = context.Provider.ReadFile
                 (
                     specification
                 );
@@ -154,9 +139,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 return;
             }
-            PftLexer lexer = new PftLexer();
-            PftTokenList tokens = lexer.Tokenize(source);
-            PftParser parser = new PftParser(tokens);
+
+            var lexer = new PftLexer();
+            var tokens = lexer.Tokenize(source);
+            var parser = new PftParser(tokens);
             Program = parser.Parse();
         }
 
@@ -167,7 +153,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            PftInclude result = (PftInclude)base.Clone();
+            var result = (PftInclude)base.Clone();
 
             if (!ReferenceEquals(Program, null))
             {
@@ -192,16 +178,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftCompilerException();
             }
 
-            if (ReferenceEquals(Program, null))
+            if (Program is null)
             {
-                using (PftContext context = new PftContext(null))
-                {
-                    context.SetProvider(compiler.Provider);
-                    ParseProgram(context, Text);
-                }
+                using var context = new PftContext(null);
+                context.SetProvider(compiler.Provider);
+                ParseProgram(context, Text);
             }
 
-            PftProgram program = (PftProgram)Program.ThrowIfNull().Clone();
+            var program = (PftProgram)Program.ThrowIfNull().Clone();
             program.Optimize();
 
             compiler.RenumberNodes(program);
@@ -215,7 +199,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Deserialize" />
         protected internal override void Deserialize
@@ -225,8 +209,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            Program = (PftProgram)PftSerializer.DeserializeNullable(reader);
-        }
+            Program = (PftProgram?) PftSerializer.DeserializeNullable(reader);
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -252,7 +236,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 }
                 catch (Exception exception)
                 {
-                    PftException pftException = new PftException
+                    var pftException = new PftException
                         (
                             "Include: " + Text.ToVisibleString(),
                             exception
@@ -273,7 +257,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "Include",
@@ -282,7 +266,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Program, null))
             {
-                PftNodeInfo program = new PftNodeInfo
+                var program = new PftNodeInfo
                 {
                     Name = "Program"
                 };
@@ -309,10 +293,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return "include(" + Text + ")";
-        }
+        public override string ToString() => "include(" + Text + ")";
 
         #endregion
     }

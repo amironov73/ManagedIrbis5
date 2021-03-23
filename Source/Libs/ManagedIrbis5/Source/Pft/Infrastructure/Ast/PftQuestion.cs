@@ -1,10 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+
 /* PftQuestion.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -15,21 +18,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftQuestion
         : PftNode
     {
@@ -51,21 +48,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftQuestion
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Question);
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 

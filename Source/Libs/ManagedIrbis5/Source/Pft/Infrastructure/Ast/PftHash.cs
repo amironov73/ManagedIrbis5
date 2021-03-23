@@ -1,26 +1,23 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+
 /* PftHash.cs -- переход на новую строку
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
@@ -37,10 +34,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// в тех случаях, когда выбираемое поле оказывается
     /// пустым. Эта ситуация хорошо иллюстрируется
     /// на следующем примере:
-    /// 
+    ///
     /// Пример:
     /// /#V10/#V20/#V30 ...
-    /// 
+    ///
     /// Если все поля присутствуют в документе,
     /// то в результате поля 10, 20, и 30 будут
     /// располагаться с начала строк и каждому будет
@@ -55,24 +52,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// Таким образом, приведенный выше формат
     /// не приведет к желаемому результату.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftHash
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection
-        {
-            get { return false; }
-        }
+        public override bool RequiresConnection => false;
 
         #endregion
 
@@ -83,28 +72,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftHash()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftHash
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Hash);
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
+        } // constructor
 
         #endregion
 
@@ -134,7 +114,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -151,7 +131,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             context.EatNextNewLine = false;
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -165,25 +145,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .Write('#')
                 .SingleSpace()
                 .WriteLineIfNeeded();
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            return "#";
-        }
+        public override string ToString() => "#";
 
         #endregion
-    }
-}
+
+    } // method PftHash
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

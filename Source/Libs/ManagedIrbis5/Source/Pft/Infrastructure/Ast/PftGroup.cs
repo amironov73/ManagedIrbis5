@@ -1,38 +1,33 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftGroup.cs -- группа
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+
+/* PftGroup.cs -- повторяющаяся группа
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
 using System.Text;
 
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
+using AM;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// Группа.
+    /// Повторяющаяся группа.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftGroup
         : PftNode
     {
@@ -44,10 +39,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public static bool ThrowOnEmpty { get; set; }
 
         /// <inheritdoc cref="PftNode.ComplexExpression"/>
-        public override bool ComplexExpression
-        {
-            get { return true; }
-        }
+        public override bool ComplexExpression => true;
 
         #endregion
 
@@ -66,20 +58,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftGroup()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftGroup
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.LeftParenthesis);
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -90,7 +81,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(children)
         {
-        }
+        } // constructor
 
         #endregion
 
@@ -104,7 +95,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             compiler.CompileNodes(Children);
 
-            string actionName = compiler.CompileAction(Children);
+            var actionName = compiler.CompileAction(Children);
 
             compiler.StartMethod(this);
 
@@ -117,7 +108,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -127,10 +118,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             if (!ReferenceEquals(context.CurrentGroup, null))
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftGroup::Execute: "
-                        + "nested group detected: "
+                        nameof(PftGroup) + "::" + nameof(Execute)
+                        + ": nested group detected: "
                         + this
                     );
 
@@ -143,10 +134,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Children.Count == 0)
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftGroup::Execute: "
-                        + "empty group detected: "
+                        nameof(PftGroup) + "::" + nameof(Execute)
+                        + ": empty group detected: "
                         + this
                     );
 
@@ -183,7 +174,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
                     // It was break operator
 
-                    Log.TraceException
+                    Magna.TraceException
                         (
                             "PftGroup::Execute",
                             exception
@@ -196,12 +187,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 context.CurrentGroup = null;
             }
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        public override PftNode? Optimize()
         {
-            PftNodeCollection children = (PftNodeCollection) Children;
+            var children = (PftNodeCollection) Children;
             children.Optimize();
 
             if (children.Count == 0)
@@ -212,7 +203,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             return this;
-        }
+        } // method Optimize
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -256,14 +247,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     .WriteIndentIfNeeded()
                     .Write(')');
             }
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -272,14 +259,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append('(');
             PftUtility.NodesToText(result, Children);
             result.Append(')');
 
-            return StringBuilderCache.GetStringAndRelease(result);
-        }
+            return result.ToString();
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftGroup
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

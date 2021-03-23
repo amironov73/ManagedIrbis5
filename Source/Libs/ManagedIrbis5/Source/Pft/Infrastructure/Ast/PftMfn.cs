@@ -1,47 +1,43 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
 /* PftMfn.cs -- вывод номера записи
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 
 using AM;
 using AM.IO;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     /// Для вывода номера записи в файле документов служит
     /// команда MFN, формат которой:
-    /// 
+    ///
     /// MFN или MFN(d),
-    /// 
+    ///
     /// где d - количество выводимых на экран цифр.
     /// Если параметр(d) опущен, то по умолчанию
     /// предполагается 6 цифр.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftMfn
         : PftNumeric
     {
@@ -71,7 +67,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public PftMfn()
         {
             Width = DefaultWidth;
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -81,28 +77,27 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 int width
             )
         {
-            Code.Nonnegative(width, "width");
+            Sure.Positive(width, nameof(width));
 
             Width = width;
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftMfn
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Mfn);
 
             Width = DefaultWidth;
 
             try
             {
-                string text = token.Text;
+                var text = token.Text;
                 if (!string.IsNullOrEmpty(text))
                 {
                     if (text.Length > 3)
@@ -113,7 +108,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         Width = int.Parse(text);
                         if (Width <= 0)
                         {
-                            Log.Error
+                            Magna.Error
                                 (
                                     "PftMfn::Constructor: "
                                     + "Width="
@@ -127,7 +122,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftMfn::Constructor",
                         exception
@@ -136,7 +131,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftSyntaxException(token, exception);
             }
 
-        }
+        } // constructor
 
         #endregion
 
@@ -151,7 +146,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             base.Deserialize(reader);
 
             Width = reader.ReadPackedInt32();
-        }
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -163,13 +158,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             Value = 0.0;
 
-            if (!ReferenceEquals(context.Record, null))
+            if (context.Record is { } record)
             {
-                Value = context.Record.Mfn;
+                Value = record.Mfn;
 
-                string text = Width == 0
-                    ? context.Record.Mfn.ToInvariantString()
-                    : context.Record.Mfn.ToString
+                var text = Width == 0
+                    ? record.Mfn.ToInvariantString()
+                    : record.Mfn.ToString
                         (
                             new string('0', Width),
                             CultureInfo.InvariantCulture
@@ -183,7 +178,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -194,7 +189,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             base.Serialize(writer);
 
             writer.WritePackedInt32(Width);
-        }
+        } // method Serialize
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -210,15 +205,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     .Write(Width)
                     .Write(')');
             }
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
-    }
-}
+
+    } // class PftMfn
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

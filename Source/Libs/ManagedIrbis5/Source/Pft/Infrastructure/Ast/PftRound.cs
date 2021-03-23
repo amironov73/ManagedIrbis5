@@ -1,47 +1,40 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+
 /* PftRound.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftRound
         : PftNumeric
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -52,33 +45,30 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRound()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftRound
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Round);
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftRound
             (
-                [NotNull] PftNumeric value
+                PftNumeric value
             )
         {
-            Code.NotNull(value, "value");
-
             Children.Add(value);
-        }
+        } // constructor
 
         #endregion
 
@@ -90,11 +80,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            PftNumeric child = Children.FirstOrDefault() as PftNumeric;
-            if (ReferenceEquals(child, null))
-            {
-                throw new PftCompilerException();
-            }
+            var child = Children.FirstOrDefault() as PftNumeric
+                ?? throw new PftCompilerException();
 
             child.Compile(compiler);
 
@@ -115,7 +102,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -125,15 +112,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            PftNumeric child = Children.FirstOrDefault() as PftNumeric;
-            if (!ReferenceEquals(child, null))
-            {
-                child.Execute(context);
-                Value = Math.Round(child.Value);
-            }
+            var child = Children.FirstOrDefault() as PftNumeric
+                ?? throw new PftSyntaxException();
+
+            child.Execute(context);
+            Value = Math.Round(child.Value);
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -150,11 +136,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -163,18 +145,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("round(");
-            PftNode child = Children.FirstOrDefault();
-            if (!ReferenceEquals(child, null))
+            if (Children.FirstOrDefault() is { } child)
             {
                 result.Append(child);
             }
             result.Append(')');
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftRound
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

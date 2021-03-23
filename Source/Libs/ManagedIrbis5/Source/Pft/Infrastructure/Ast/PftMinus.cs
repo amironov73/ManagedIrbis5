@@ -1,36 +1,32 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+
 /* PftMinus.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftMinus
         : PftNumeric
     {
@@ -41,20 +37,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftMinus()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftMinus
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Minus);
-        }
+        } // constructor
 
         #endregion
 
@@ -66,32 +61,29 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            PftNumeric child = Children.FirstOrDefault() as PftNumeric;
-            if (ReferenceEquals(child, null))
-            {
-                throw new PftCompilerException();
-            }
+            var child = Children.FirstOrDefault() as PftNumeric
+                        ?? throw new PftCompilerException();
 
-            child.Compile(compiler);
+             child.Compile(compiler);
 
-            compiler.StartMethod(this);
+             compiler.StartMethod(this);
 
-            compiler
-                .WriteIndent()
-                .WriteLine("double value = ")
-                .CallNodeMethod(child);
+             compiler
+                 .WriteIndent()
+                 .WriteLine("double value = ")
+                 .CallNodeMethod(child);
 
-            compiler
-                .WriteIndent()
-                .WriteLine("double result = -value;");
+             compiler
+                 .WriteIndent()
+                 .WriteLine("double result = -value;");
 
-            compiler
-                .WriteIndent()
-                .WriteLine("return result;");
+             compiler
+                 .WriteIndent()
+                 .WriteLine("return result;");
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        }
+             compiler.EndMethod(this);
+             compiler.MarkReady(this);
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -101,15 +93,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            PftNumeric child = Children.FirstOrDefault() as PftNumeric;
-            if (!ReferenceEquals(child, null))
-            {
-                child.Execute(context);
-                Value = - child.Value;
-            }
+            var child = Children.FirstOrDefault() as PftNumeric
+                        ?? throw new PftSyntaxException();
+
+            child.Execute(context);
+            Value = - child.Value;
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -122,14 +113,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .Write("-(");
             base.PrettyPrint(printer);
             printer.Write(')');
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -144,8 +131,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result.Append(')');
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftMinus
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

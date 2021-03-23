@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftVerbatim.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* PftVerbatim.cs -- буквальный строковый литерал
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,46 +16,31 @@
 using AM;
 using AM.Text;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    /// Буквальный строковый литерал (в тройных угловых скобках).
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftVerbatim
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection
-        {
-            get { return false; }
-        }
+        public override bool RequiresConnection => false;
 
         #endregion
 
@@ -62,38 +51,35 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftVerbatim()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftVerbatim
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNull(text, "text");
-
             Text = text;
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftVerbatim
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.TripleLess);
 
             Text = PrepareText
                 (
                     token.Text.ThrowIfNull("token.Text")
                 );
-        }
+        } // constructor
 
         #endregion
 
@@ -102,16 +88,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Prepare text.
         /// </summary>
-        [CanBeNull]
-        public static string PrepareText
-            (
-                [CanBeNull] string text
-            )
-        {
-            string result = text.DosToUnix();
-
-            return result;
-        }
+        public static string? PrepareText(string text) => text.DosToUnix();
 
         #endregion
 
@@ -135,7 +112,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -148,7 +125,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             context.Write(this, Text);
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -161,17 +138,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .Write("<<<")
                 .Write(Text)
                 .Write(">>>");
-        }
+        } // method PrettyPrint
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="PftNode.ToString" />
-        public override string ToString()
-        {
-            return "<<<" + Text + ">>>";
-        }
+        public override string ToString() => "<<<" + Text + ">>>";
 
         #endregion
     }

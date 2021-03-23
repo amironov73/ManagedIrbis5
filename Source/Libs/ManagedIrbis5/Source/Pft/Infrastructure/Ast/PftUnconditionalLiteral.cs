@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftUnconditionalLiteral.cs -- unconditional literal
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* PftUnconditionalLiteral.cs -- безусловный строковый литерал
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -12,49 +16,37 @@
 using System;
 
 using AM;
-using AM.Logging;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// Unconditional literal.
+    /// Безусловный строковый литерал (в одинарных кавычках).
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftUnconditionalLiteral
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         /// <inheritdoc cref="PftNode.Text" />
-        public override string Text
+        public override string? Text
         {
-            get { return base.Text; }
-            set { base.Text = PftUtility.PrepareText(value); }
+            get => base.Text;
+            set => base.Text = PftUtility.PrepareText(value);
         }
 
         /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection
-        {
-            get { return false; }
-        }
+        public override bool RequiresConnection => false;
 
         /// <summary>
         /// Throw an exception when empty literal detected.
@@ -85,11 +77,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftUnconditionalLiteral
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNull(text, "text");
-
             Text = text;
         }
 
@@ -98,11 +88,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftUnconditionalLiteral
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.UnconditionalLiteral);
 
             try
@@ -111,7 +100,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftUnconditionalLiteral::Constructor",
                         exception
@@ -122,7 +111,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (string.IsNullOrEmpty(Text) && ThrowOnEmpty)
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftUnconditionalLiteral::Constructor: "
                         + "empty unconditional literal"
@@ -162,7 +151,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            string text = Text;
+            var text = Text;
 
             // Never throw on empty literal
 
@@ -205,11 +194,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return '\'' + Text + '\'';
-        }
+        public override string ToString() => '\'' + Text + '\'';
 
         #endregion
-    }
-}
+
+    } // class PftUnconditionalLiteral
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

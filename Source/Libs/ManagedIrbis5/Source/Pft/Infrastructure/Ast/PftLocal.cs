@@ -1,33 +1,30 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+
 /* PftLocal.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-using AM;
 using AM.Collections;
 using AM.IO;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
@@ -47,8 +44,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// $x
     /// </code>
     /// </example>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftLocal
         : PftNode
     {
@@ -57,14 +52,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// List of names.
         /// </summary>
-        [NotNull]
         public NonNullCollection<string> Names { get; private set; }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -83,11 +74,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftLocal
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Local);
 
             Names = new NonNullCollection<string>();
@@ -245,11 +235,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -262,7 +248,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result.Append("local ");
             result.Append
                 (
-                    StringUtility.Join
+                    string.Join
                         (
                             ", ",
                             Names.Select(name => "$" + name)

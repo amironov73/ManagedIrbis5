@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftRepeatableLiteral.cs -- повторяющийся литерал
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -14,19 +18,15 @@ using System.IO;
 using System.Text;
 
 using AM;
-using AM.Logging;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
@@ -39,8 +39,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// Повторяющиеся литералы заключаются
     /// в вертикальные черты (|), например, |Автор: |.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftRepeatableLiteral
         : PftNode
     {
@@ -57,10 +55,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public bool Plus { get; set; }
 
         /// <inheritdoc cref="PftNode.Text" />
-        public override string Text
+        public override string? Text
         {
-            get { return base.Text; }
-            set { base.Text = PftUtility.PrepareText(value); }
+            get => base.Text;
+            set => base.Text = PftUtility.PrepareText(value);
         }
 
         #endregion
@@ -79,11 +77,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRepeatableLiteral
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNull(text, "text");
-
             Text = text;
         }
 
@@ -92,13 +88,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRepeatableLiteral
             (
-                [NotNull] string text,
+                string text,
                 bool isPrefix,
                 bool plus
             )
         {
-            Code.NotNull(text, "text");
-
             Text = text;
             IsPrefix = isPrefix;
             Plus = plus;
@@ -109,12 +103,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRepeatableLiteral
             (
-                [NotNull] string text,
+                string text,
                 bool isPrefix
             )
         {
-            Code.NotNull(text, "text");
-
             Text = text;
             IsPrefix = isPrefix;
         }
@@ -124,12 +116,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftRepeatableLiteral
             (
-                [NotNull] PftToken token,
+                PftToken token,
                 bool isPrefix
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.RepeatableLiteral);
 
             IsPrefix = isPrefix;
@@ -140,7 +131,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftRepeatableLiteral::Constructor",
                         exception
@@ -189,13 +180,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!string.IsNullOrEmpty(Text))
             {
-                PftField field = Parent as PftField;
-                if (ReferenceEquals(field, null))
-                {
-                    throw new PftCompilerException();
-                }
+                var field = Parent as PftField
+                    ?? throw new PftCompilerException();
 
-                FieldInfo info = compiler.Fields.Get(field);
+                var info = compiler.Fields.Get(field);
                 //if (ReferenceEquals(info, null))
                 //{
                 //    throw new PftCompilerException();

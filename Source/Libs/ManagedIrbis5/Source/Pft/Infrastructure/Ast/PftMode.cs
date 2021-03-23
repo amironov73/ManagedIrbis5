@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
 /* PftMode.cs -- переключение режима вывода
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -16,26 +20,19 @@ using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
     /// Переключение режима вывода полей/подполей.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftMode
         : PftNode
     {
@@ -52,16 +49,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public bool UpperMode { get; set; }
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection
-        {
-            get { return false; }
-        }
+        public override bool RequiresConnection => false;
 
         #endregion
 
@@ -79,7 +70,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftMode
             (
-                [NotNull] string text
+                string text
             )
         {
             try
@@ -88,7 +79,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftMode::Constructor",
                         exception
@@ -107,11 +98,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftMode
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Mpl);
 
             try
@@ -123,7 +113,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
                         "PftMode::Constructor",
                         exception
@@ -142,16 +132,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public void ParseText
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
             text = text.ToLower();
             if (text.Length != 3
                 || text[0] != 'm')
             {
-                Log.Error
+                Magna.Error
                     (
                         "PftMode::ParseText: "
                         + "text.Length != 3: "
@@ -176,7 +164,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     break;
 
                 default:
-                    Log.Error
+                    Magna.Error
                         (
                             "PftMode::ParseText: "
                             + "unexpected mode="
@@ -196,7 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     break;
 
                 default:
-                    Log.Error
+                    Magna.Error
                         (
                             "PftMode::ParseText: "
                             + "unexpected mode="
@@ -235,18 +223,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
+
         /// <inheritdoc cref="PftNode.Deserialize" />
         protected internal override void Deserialize
-        (
-            BinaryReader reader
-        )
+            (
+                BinaryReader reader
+            )
         {
             base.Deserialize(reader);
 
             OutputMode = (PftFieldOutputMode) reader.ReadPackedInt32();
             UpperMode = reader.ReadBoolean();
-        }
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -260,16 +249,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             context.UpperMode = UpperMode;
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
-        public override void PrettyPrint
-            (
-                PftPrettyPrinter printer
-            )
-        {
+        public override void PrettyPrint(PftPrettyPrinter printer) =>
             printer.Write(ToString());
-        }
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -325,8 +309,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 );
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftMode
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast
