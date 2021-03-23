@@ -1351,6 +1351,114 @@ namespace AM
         }
 
         /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static short ParseInt16(this string text) =>
+            short.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static short ParseInt16(this ReadOnlySpan<char> text) =>
+            short.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static int ParseInt32(this string text) =>
+            int.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static int ParseInt32(this ReadOnlySpan<char> text) =>
+            int.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static long ParseInt64(this string text) =>
+            long.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static long ParseInt64(this ReadOnlySpan<char> text) =>
+            long.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static ushort ParseUInt16(this string text) =>
+            ushort.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static ushort ParseUInt16(this ReadOnlySpan<char> text) =>
+            ushort.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static uint ParseUInt32(this string text) =>
+            uint.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static uint ParseUInt32(this ReadOnlySpan<char> text) =>
+            uint.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static ulong ParseUInt64(this string text) =>
+            ulong.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static ulong ParseUInt64(this ReadOnlySpan<char> text) =>
+            ulong.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static float ParseSingle(this string text) =>
+            float.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static float ParseSingle(this ReadOnlySpan<char> text) =>
+            float.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static double ParseDouble(this string text) =>
+            double.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static double ParseDouble(this ReadOnlySpan<char> text) =>
+            double.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static decimal ParseDecimal(this string text) =>
+            decimal.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static decimal ParseDecimal(this ReadOnlySpan<char> text) =>
+            decimal.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
         public static bool TryParseInt16(string? text, out short result) =>

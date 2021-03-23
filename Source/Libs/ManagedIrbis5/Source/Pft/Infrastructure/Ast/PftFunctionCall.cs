@@ -1,46 +1,39 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftFunctionCall.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+
+/* PftFunctionCall.cs -- вызов функции по ее имени
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    /// Вызов функции по ее имени.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftFunctionCall
         : PftNode
     {
@@ -49,20 +42,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Function name.
         /// </summary>
-        [CanBeNull]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Array of arguments.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Arguments { get; private set; }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -72,26 +60,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     nodes.AddRange(Arguments);
                     _virtualChildren.SetChildren(nodes);
                 }
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Log.Error
-                    (
-                        "PftFunctionCall::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
-        }
+            protected set => Magna.Error
+                (
+                    nameof(PftFunctionCall) + "::" + nameof(Children)
+                    + ": set value="
+                    + value.ToVisibleString()
+                );
+        } // property Children
 
         #endregion
 
@@ -103,43 +85,42 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public PftFunctionCall()
         {
             Arguments = new PftNodeCollection(this);
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftFunctionCall
             (
-                [NotNull] string name
+                string name
             )
         {
-            Code.NotNullNorEmpty(name, "name");
+            Sure.NotNullNorEmpty(name, nameof(name));
 
             Name = name;
             Arguments = new PftNodeCollection(this);
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftFunctionCall
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Identifier);
 
             Name = token.Text;
             Arguments = new PftNodeCollection(this);
-        }
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -148,15 +129,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            PftFunctionCall result = (PftFunctionCall) base.Clone();
-
+            var result = (PftFunctionCall) base.Clone();
             result._virtualChildren = null;
-
             result.Arguments = Arguments.CloneNodes(result)
                 .ThrowIfNull();
 
             return result;
-        }
+        } // method Clone
 
         #endregion
 
@@ -170,11 +149,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftFunctionCall otherCall = (PftFunctionCall) otherNode;
+            var otherCall = (PftFunctionCall) otherNode;
             if (Name != otherCall.Name)
             {
                 throw new PftSerializationException();
             }
+
             PftSerializationUtility.CompareLists
                 (
                     Arguments,
@@ -195,15 +175,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.CompileNodes(Arguments);
 
-            string actionName = compiler.CompileAction(Arguments);
+            var actionName = compiler.CompileAction(Arguments);
 
             compiler.StartMethod(this);
 
             // TODO implement properly
 
+            compiler
+                .WriteIndent()
+                .WriteLine("string value = Evaluate({0});", actionName)
+                .WriteIndent()
+                .WriteLine("Context.Write(null, value);");
+
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Deserialize" />
         protected internal override void Deserialize
@@ -215,7 +201,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             Name = reader.ReadNullableString();
             PftSerializer.Deserialize(reader, Arguments);
-        }
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -225,25 +211,25 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            string name = Name;
+            var name = Name;
             if (string.IsNullOrEmpty(name))
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftFunctionCall::Execute: "
-                        + "name not specified"
+                        nameof(PftFunctionCall) + "::" + nameof(Execute)
+                        + ": name not specified"
                     );
 
                 throw new PftSyntaxException(this);
             }
 
-            PftNode[] arguments = Arguments.ToArray();
+            var arguments = Arguments.ToArray();
 
-            FunctionDescriptor descriptor = context.Functions
+            var descriptor = context.Functions
                 .FindFunction(name);
-            if (!ReferenceEquals(descriptor, null))
+            if (descriptor is not null)
             {
-                descriptor.Function
+                descriptor.Function?.Invoke
                     (
                         context,
                         this,
@@ -252,12 +238,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else
             {
-                PftProcedure procedure = context.Procedures
+                var procedure = context.Procedures
                     .FindProcedure(name);
 
                 if (!ReferenceEquals(procedure, null))
                 {
-                    string expression 
+                    var expression
                         = context.GetStringArgument(arguments, 0);
                     procedure.Execute
                         (
@@ -278,25 +264,25 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)
             };
 
-            PftNodeInfo name = new PftNodeInfo
+            var name = new PftNodeInfo
             {
                 Name = "Name",
                 Value = Name
             };
             result.Children.Add(name);
 
-            PftNodeInfo arguments = new PftNodeInfo
+            var arguments = new PftNodeInfo
             {
                 Name = "Arguments"
             };
@@ -307,7 +293,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result.Children.Add(arguments);
 
             return result;
-        }
+        } // method GetNodeInfo
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -322,7 +308,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .Write('(')
                 .WriteNodes(", ", Arguments)
                 .Write(')');
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -334,14 +320,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             writer.WriteNullable(Name);
             PftSerializer.Serialize(writer, Arguments);
-        }
+        } // method Serialize
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -350,15 +332,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append(Name);
             result.Append('(');
             PftUtility.NodesToText(",", result, Arguments);
             result.Append(')');
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftFunctionCall
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

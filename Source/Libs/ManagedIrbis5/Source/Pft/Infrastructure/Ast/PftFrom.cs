@@ -1,41 +1,42 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftFrom.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftFrom.cs -- жалкое подобие LINQ
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
 using AM;
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
+using static ManagedIrbis.Pft.Infrastructure.Serialization.PftSerializationUtility;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    /// Жалкое подобие LINQ.
     /// </summary>
     /// <example>
     /// <code>
@@ -46,8 +47,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     /// end
     /// </code>
     /// </example>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftFrom
         : PftNode
     {
@@ -56,44 +55,33 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Variable reference.
         /// </summary>
-        [CanBeNull]
-        public PftVariableReference Variable { get; set; }
+        public PftVariableReference? Variable { get; set; }
 
         /// <summary>
         /// Source.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Source { get; private set; }
 
             /// <summary>
         /// Where clause.
         /// </summary>
-        [CanBeNull]
-        public PftCondition Where { get; set; }
+        public PftCondition? Where { get; set; }
 
         /// <summary>
         /// Select clause.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Select { get; private set; }
 
         /// <summary>
         /// Order clause.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Order { get; private set; }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression
-        {
-            get { return true; }
-        }
+        public override bool ComplexExpression => true;
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -104,7 +92,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
 
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Variable, null))
                     {
                         nodes.Add(Variable);
@@ -126,7 +114,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // Nothing to do here
 
-                Log.Error
+                Magna.Error
                     (
                         "PftFrom::Children: "
                         + "set value="
@@ -154,11 +142,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftFrom
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.From);
 
             Source = new PftNodeCollection(this);
@@ -170,7 +157,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -179,7 +166,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftFrom result = (PftFrom)base.Clone();
+            var result = (PftFrom)base.Clone();
 
             result._virtualChildren = null;
 
@@ -213,33 +200,33 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftFrom otherFrom = (PftFrom) otherNode;
-            PftSerializationUtility.CompareNodes
+            var otherFrom = (PftFrom) otherNode;
+            CompareNodes
                 (
                     Variable,
                     otherFrom.Variable
                 );
-            PftSerializationUtility.CompareLists
+            CompareLists
                 (
                     Source,
                     otherFrom.Source
                 );
-            PftSerializationUtility.CompareNodes
+            CompareNodes
                 (
                     Where,
                     otherFrom.Where
                 );
-            PftSerializationUtility.CompareLists
+            CompareLists
                 (
                     Select,
                     otherFrom.Select
                 );
-            PftSerializationUtility.CompareLists
+            CompareLists
                 (
                     Order,
                     otherFrom.Order
                 );
-        }
+        } // method CompareNode
 
         ///// <inheritdoc cref="PftNode.Compile" />
         //public override void Compile
@@ -278,13 +265,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            Variable = (PftVariableReference) PftSerializer
+            Variable = (PftVariableReference?) PftSerializer
                 .DeserializeNullable(reader);
             PftSerializer.Deserialize(reader, Source);
-            Where = (PftCondition) PftSerializer.DeserializeNullable(reader);
+            Where = (PftCondition?) PftSerializer.DeserializeNullable(reader);
             PftSerializer.Deserialize(reader, Select);
             PftSerializer.Deserialize(reader, Order);
-        }
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -294,23 +281,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            PftVariableManager manager = context.Variables;
-            PftVariableReference variable = Variable;
-            if (!ReferenceEquals(variable, null))
+            var manager = context.Variables;
+            var variable = Variable;
+            if (variable is not null)
             {
-                string name = variable.Name;
+                var name = variable.Name;
                 if (!string.IsNullOrEmpty(name))
                 {
-                    List<string> buffer = new List<string>();
+                    var buffer = new List<string>();
 
                     // In clause
-                    string sourceText = context.Evaluate(Source);
-                    string[] lines = sourceText.SplitLines();
+                    var sourceText = context.Evaluate(Source);
+                    var lines = sourceText.SplitLines();
 
                     // Where clause
                     if (!ReferenceEquals(Where, null))
                     {
-                        foreach (string line in lines)
+                        foreach (var line in lines)
                         {
                             manager.SetVariable(name, line);
                             Where.Execute(context);
@@ -325,10 +312,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                     // Select clause
                     buffer.Clear();
-                    foreach (string line in lines)
+                    foreach (var line in lines)
                     {
                         manager.SetVariable(name, line);
-                        string value = context.Evaluate(Select);
+                        var value = context.Evaluate(Select);
                         buffer.Add(value);
                     }
 
@@ -338,10 +325,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     buffer.Clear();
                     if (Order.Count != 0)
                     {
-                        foreach (string line in lines)
+                        foreach (var line in lines)
                         {
                             manager.SetVariable(name, line);
-                            string value = context.Evaluate(Order);
+                            var value = context.Evaluate(Order);
                             buffer.Add(value);
                         }
 
@@ -352,7 +339,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                             );
                     }
 
-                    string output = string.Join
+                    var output = string.Join
                         (
                             Environment.NewLine,
                             lines
@@ -365,12 +352,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "From"
@@ -378,7 +365,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(Variable, null))
             {
-                PftNodeInfo variable = new PftNodeInfo
+                var variable = new PftNodeInfo
                 {
                     Name = "Variable"
                 };
@@ -386,19 +373,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 variable.Children.Add(Variable.GetNodeInfo());
             }
 
-            PftNodeInfo sourceClause = new PftNodeInfo
+            var sourceClause = new PftNodeInfo
             {
                 Name = "Source"
             };
             result.Children.Add(sourceClause);
-            foreach (PftNode node in Source)
+            foreach (var node in Source)
             {
                 sourceClause.Children.Add(node.GetNodeInfo());
             }
 
             if (!ReferenceEquals(Where, null))
             {
-                PftNodeInfo whereClause = new PftNodeInfo
+                var whereClause = new PftNodeInfo
                 {
                     Name = "Where"
                 };
@@ -406,31 +393,31 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 whereClause.Children.Add(Where.GetNodeInfo());
             }
 
-            PftNodeInfo selectClause = new PftNodeInfo
+            var selectClause = new PftNodeInfo
             {
                 Name = "Select"
             };
             result.Children.Add(selectClause);
-            foreach (PftNode node in Select)
+            foreach (var node in Select)
             {
                 selectClause.Children.Add(node.GetNodeInfo());
             }
 
             if (Order.Count != 0)
             {
-                PftNodeInfo orderClause = new PftNodeInfo
+                var orderClause = new PftNodeInfo
                 {
                     Name = "Order"
                 };
                 result.Children.Add(orderClause);
-                foreach (PftNode node in Order)
+                foreach (var node in Order)
                 {
                     orderClause.Children.Add(node.GetNodeInfo());
                 }
             }
 
             return result;
-        }
+        } // method GetNodeInfo
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -446,15 +433,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .WriteIndent()
                 .Write("from ");
 
-            if (!ReferenceEquals(Variable, null))
-            {
-                Variable.PrettyPrint(printer);
-            }
-
+            Variable?.PrettyPrint(printer);
             printer.Write(" in ");
 
-            bool first = true;
-            foreach (PftNode node in Source)
+            var first = true;
+            foreach (var node in Source)
             {
                 if (!first)
                 {
@@ -465,20 +448,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             printer.WriteLine();
 
-            if (!ReferenceEquals(Where, null))
-            {
-                printer
-                    .WriteIndent()
-                    .Write("where ");
-                Where.PrettyPrint(printer);
-                printer.WriteLine();
-            }
+            printer
+                .WriteIndent()
+                .Write("where ");
+            Where?.PrettyPrint(printer);
+            printer.WriteLine();
 
             printer
                 .WriteIndentIfNeeded()
                 .Write("select ");
             first = true;
-            foreach (PftNode node in Select)
+            foreach (var node in Select)
             {
                 if (!first)
                 {
@@ -495,7 +475,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     .WriteIndent()
                     .Write("order ");
                 first = true;
-                foreach (PftNode node in Order)
+                foreach (var node in Order)
                 {
                     if (!first)
                     {
@@ -511,7 +491,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer
                 .WriteIndent()
                 .WriteLine("end");
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -526,14 +506,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             PftSerializer.SerializeNullable(writer, Where);
             PftSerializer.Serialize(writer, Select);
             PftSerializer.Serialize(writer, Order);
-        }
+        } // method Serialize
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -542,15 +518,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append("from ");
             result.Append(Variable);
             result.Append(" in ");
             PftUtility.NodesToText(result, Source);
-            if (!ReferenceEquals(Where, null))
+            if (Where is { } whereClause)
             {
                 result.Append(" where ");
-                result.Append(Where);
+                result.Append(whereClause);
             }
             result.Append(" select ");
             PftUtility.NodesToText(result, Select);
@@ -561,9 +537,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             result.Append(" end");
 
-            return StringBuilderCache.GetStringAndRelease(result);
-        }
+            return result.ToString();
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftFrom
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

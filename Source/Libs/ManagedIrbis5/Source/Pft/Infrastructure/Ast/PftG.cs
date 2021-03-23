@@ -1,40 +1,38 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftG.cs -- global variable reference
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftG.cs -- обращение к глобальной переменной
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
+using System;
 using System.IO;
-using System.Text;
 
 using AM;
 using AM.IO;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
-using ManagedIrbis.Pft.Infrastructure.Text;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// Global variable reference
+    /// Обращение к глобальной переменной.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftG
         : PftField
     {
@@ -54,31 +52,28 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftG()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftG
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftG
             (
-                [NotNull] string text
+                string text
             )
         {
-            Code.NotNullNorEmpty(text, "text");
-
-            FieldSpecification specification = new FieldSpecification();
+            var specification = new FieldSpecification();
             if (!specification.Parse(text))
             {
                 throw new PftSyntaxException();
@@ -86,11 +81,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             Apply(specification);
 
-            Number = int.Parse
-                (
-                    Tag.ThrowIfNull("Tag")
-                );
-        }
+            Number = Tag.ThrowIfNull("Tag").ParseInt32();
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -100,12 +92,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 int number
             )
         {
-            Code.Positive(number, "number");
-
             Command = 'g';
             Number = number;
             Tag = number.ToInvariantString();
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -116,13 +106,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 char subField
             )
         {
-            Code.Positive(number, "number");
-
             Command = 'g';
             Number = number;
             Tag = number.ToInvariantString();
             SubField = subField;
-        }
+        } // constructor
 
         #endregion
 
@@ -141,7 +129,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 context.Execute(LeftHand);
 
-                string value = GetValue(context);
+                var value = GetValue(context);
                 if (!string.IsNullOrEmpty(value))
                 {
                     if (Indent != 0
@@ -152,6 +140,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                     context.Write(this, value);
                 }
+
                 if (HaveRepeat(context))
                 {
                     context.OutputFlag = true;
@@ -164,7 +153,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 context.CurrentField = null;
             }
-        }
+        }// method _Execute
 
         #endregion
 
@@ -175,34 +164,30 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public int GetCount
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            int result = context.Globals.Get(Number).Length;
+            var result = context.Globals.Get(Number).Length;
 
             return result;
-        }
+        } // method GetCount
 
         /// <summary>
         /// Get value.
         /// </summary>
-        public override string GetValue
+        public override string? GetValue
             (
                 PftContext context
             )
         {
-            Code.NotNull(context, "context");
-
             if (_count == 0)
             {
                 return null;
             }
 
-            int index = context.Index;
+            var index = context.Index;
 
-            RecordField[] fields = context.Globals.Get(Number);
+            var fields = context.Globals.Get(Number);
             if (fields.Length == 0)
             {
                 return null;
@@ -219,13 +204,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 return null;
             }
 
-            RecordField field = fields.GetOccurrence(index);
+            var field = fields.GetOccurrence(index);
             if (ReferenceEquals(field, null))
             {
                 return null;
             }
 
-            string result;
+            string? result;
 
             if (SubField == NoSubField)
             {
@@ -247,33 +232,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result = LimitText(result);
 
             return result;
-        }
+        } // method GetValue
 
         /// <summary>
         /// Have value?
         /// </summary>
-        public override bool HaveRepeat
-            (
-                PftContext context
-            )
-        {
-            Code.NotNull(context, "context");
-
-            return context.Index < GetCount(context);
-        }
+        public override bool HaveRepeat(PftContext context) =>
+            context.Index < GetCount(context);
 
         #endregion
 
         #region PftField members
 
         /// <inheritdoc cref="PftField.IsLastRepeat" />
-        public override bool IsLastRepeat
-            (
-                PftContext context
-            )
-        {
-            return context.Index >= _count - 1;
-        }
+        public override bool IsLastRepeat(PftContext context) =>
+            context.Index >= _count - 1;
 
         #endregion
 
@@ -291,7 +264,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 throw new PftSerializationException();
             }
-        }
+        } // method CompareNode
 
         /// <inheritdoc cref="PftNode.Compile" />
         public override void Compile
@@ -301,19 +274,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             if (Number == 0)
             {
-                Number = NumericUtility.ParseInt32
-                    (
-                        Tag.ThrowIfNull("Tag")
-                    );
+                Number = Tag.ThrowIfNull("Tag").ParseInt32();
             }
 
-            FieldInfo info = compiler.CompileField(this);
+            var info = compiler.CompileField(this);
 
             compiler.CompileNodes(LeftHand);
             compiler.CompileNodes(RightHand);
 
-            string leftHand = compiler.CompileAction(LeftHand) ?? "null";
-            string rightHand = compiler.CompileAction(RightHand) ?? "null";
+            var leftHand = compiler.CompileAction(LeftHand) ?? "null";
+            var rightHand = compiler.CompileAction(RightHand) ?? "null";
 
             compiler.StartMethod(this);
 
@@ -336,7 +306,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Deserialize" />
         protected internal override void Deserialize
@@ -347,7 +317,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             base.Deserialize(reader);
 
             Number = reader.ReadPackedInt32();
-        }
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -359,10 +329,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!ReferenceEquals(context.CurrentField, null))
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftG::Execute: "
-                        + "nested field detected"
+                        nameof(PftG) + "::" + nameof(Execute)
+                        + ": nested field detected"
                     );
 
                 throw new PftSemanticException("nested field");
@@ -370,10 +340,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Number == 0)
             {
-                Number = NumericUtility.ParseInt32
-                    (
-                        Tag.ThrowIfNull("Tag")
-                    );
+                Number = Tag.ThrowIfNull("Tag").ParseInt32();
             }
 
             if (!ReferenceEquals(context.CurrentGroup, null))
@@ -393,25 +360,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftField.GetAffectedFields" />
-        public override int[] GetAffectedFields()
-        {
-            return new int[0];
-        }
+        public override int[] GetAffectedFields() => Array.Empty<int>();
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
             (
-            BinaryWriter writer
+                BinaryWriter writer
             )
         {
             base.Serialize(writer);
 
             writer.WritePackedInt32(Number);
-        }
+        } // method Serialize
 
         #endregion
-    }
-}
+
+    } // class PftG
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast
