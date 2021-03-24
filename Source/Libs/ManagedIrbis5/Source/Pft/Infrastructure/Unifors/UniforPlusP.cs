@@ -54,7 +54,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.Comma,
                     2
@@ -79,17 +79,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 StartTerm = startTerm,
                 NumberOfTerms = 1
             };
-            TermInfo[] terms = provider.ReadTerms(parameters);
+            var terms = provider.ReadTerms(parameters);
             if (terms.Length < 1)
             {
                 return;
             }
 
-            string termText = terms[0].Text.ThrowIfNull();
+            var termText = terms[0].Text.ThrowIfNull();
             if (termText != startTerm)
             {
                 return;
             }
+
             var links = provider.ExactSearchLinks(termText);
             if (links.Length < 1)
             {
@@ -97,7 +98,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             var link = links[0];
-            string output = null;
+            string? output = null;
             switch (command)
             {
                 //mfn
@@ -116,10 +117,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     break;
 
                 default:
-                    Magna.Warning
+                    Magna.Error
                         (
-                            "UniforPlusP::GetPosting: "
-                          + "unknown command=" + command
+                            nameof(UniforPlusP) + "::" + nameof(GetPosting)
+                          + ": unknown command=" + command
                         );
                     break;
             }

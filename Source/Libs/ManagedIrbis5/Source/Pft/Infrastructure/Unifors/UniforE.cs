@@ -13,6 +13,8 @@
 
 #region Using directives
 
+using System.Collections.Generic;
+
 using AM;
 using AM.Text;
 
@@ -56,7 +58,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             // ibatrak через ISISACW.TAB делать смысла нет
             // irbis64 ищет одиночные пробелы
 
-            int[] positions = text.GetPositions(' ');
+            int[] positions = GetPositions(text, ' ');
 
             if (wordCount >= positions.Length)
             {
@@ -67,6 +69,37 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var result = text.Substring(0, end);
 
             return result;
+        }
+
+        /// <summary>
+        /// Get positions of the symbol.
+        /// </summary>
+        internal static int[] GetPositions
+            (
+                string? text,
+                char c
+            )
+        {
+            var result = new List<int>();
+
+            if (!string.IsNullOrEmpty(text))
+            {
+                int start = 0;
+                int length = text.Length;
+
+                while (start < length)
+                {
+                    int position = text.IndexOf(c, start);
+                    if (position < 0)
+                    {
+                        break;
+                    }
+                    result.Add(position);
+                    start = position + 1;
+                }
+            }
+
+            return result.ToArray();
         }
 
         #endregion
@@ -94,7 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                 if (Utility.TryParseInt32(countText, out var wordCount))
                 {
-                    string text = navigator.GetRemainingText();
+                    string text = navigator.GetRemainingText().ToString();
                     var output = GetFirstWords(text, wordCount);
                     context.WriteAndSetFlag(node, output);
                 }

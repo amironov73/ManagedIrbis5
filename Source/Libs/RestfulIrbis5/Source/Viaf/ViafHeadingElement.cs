@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System;
 using AM;
 using AM.Json;
 
@@ -35,7 +36,9 @@ namespace RestfulIrbis.Viaf
         /// </summary>
         public static ViafHeadingElement Parse
             (
-                JObject obj
+                // TODO: implement
+                object obj
+                // JObject obj
             )
         {
             return new ViafHeadingElement
@@ -48,9 +51,13 @@ namespace RestfulIrbis.Viaf
         /// </summary>
         public static ViafHeadingElement[] Parse
             (
-                JArray? array
+                // TODO: implement
+                object[] array
+                // JArray? array
             )
         {
+            /*
+
             if (ReferenceEquals(array, null))
             {
                 return new ViafHeadingElement[0];
@@ -63,6 +70,10 @@ namespace RestfulIrbis.Viaf
             }
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

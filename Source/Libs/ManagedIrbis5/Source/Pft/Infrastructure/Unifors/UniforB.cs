@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.Text;
 
 using AM;
@@ -78,6 +79,35 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         #endregion
 
+        #region Private members
+
+        /// <summary>
+        /// Split the remaining text to array of words.
+        /// </summary>
+        private static string[] SplitToWords
+            (
+                TextNavigator navigator,
+                char[] additionalWordCharacters
+            )
+        {
+            var result = new List<string>();
+
+            while (true)
+            {
+                if (!navigator.SkipNonWord(additionalWordCharacters))
+                {
+                    break;
+                }
+
+                var word = navigator.ReadWord().ToString();
+                result.Add(word);
+            }
+
+            return result.ToArray();
+        } // method SplitToWords
+
+        #endregion
+
         #region Public methods
 
         /// <summary>
@@ -106,7 +136,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             var navigator = new TextNavigator(expression);
-            string[] words = navigator.SplitToWords(_GoodCharacters);
+            string[] words = SplitToWords(navigator, _GoodCharacters);
             if (words.Length == 0)
             {
                 return;

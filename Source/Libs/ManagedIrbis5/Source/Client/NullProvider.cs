@@ -16,9 +16,11 @@
 #region Using directives
 
 using System;
+using AM.IO;
 using AM.PlatformAbstraction;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
 
 #endregion
@@ -47,7 +49,30 @@ namespace ManagedIrbis.Client
 
         public override bool Connected { get; }
 
-        public override IPftFormatter AcquireFormatter()
+        public override IPftFormatter AcquireFormatter() =>
+            throw new NotImplementedException();
+
+        public override MenuFile? ReadMenuFile(FileSpecification specification) =>
+            throw new NotImplementedException();
+
+        public override Record? ReadRecordVersion(int mfn, int version) =>
+            throw new NotImplementedException();
+
+        public override Term[] ReadTerms(TermParameters parameters) =>
+            throw new NotImplementedException();
+
+        public override bool FileExist(FileSpecification specification) =>
+            throw new NotImplementedException();
+
+        public override string GetGeneration() =>
+            throw new NotImplementedException();
+
+        public override IniFile GetUserIniFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void WriteRecord(Record record)
         {
             throw new NotImplementedException();
         }

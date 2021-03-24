@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using ManagedIrbis.Search;
-using static ManagedIrbis.Search.Query;
+using ManagedIrbis;
+using static ManagedIrbis.Q;
 
 namespace UnitTests.ManagedIrbis.Search
 {
@@ -14,13 +14,13 @@ namespace UnitTests.ManagedIrbis.Search
             Assert.AreEqual
                 (
                     "(K=бетон + K=железо)",
-                    Query.Equals("K=", "бетон", "железо")
+                    Q.Equals("K=", "бетон", "железо")
                 );
             Assert.AreEqual
                 (
                     "((T=сказки + T=рассказы) * A=Пушкин)",
-                    Query.Equals("T=", "сказки", "рассказы")
-                        .And(Query.Equals("A=", "Пушкин"))
+                    Q.Equals("T=", "сказки", "рассказы")
+                        .And(Q.Equals("A=", "Пушкин"))
                 );
         }
 
@@ -80,15 +80,15 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void Query_Equals_1()
         {
-            Assert.AreEqual("A=B", Query.Equals("A=", "B"));
-            Assert.AreEqual("\"A=(B)\"", Query.Equals("A=", "(B)"));
+            Assert.AreEqual("A=B", Q.Equals("A=", "B"));
+            Assert.AreEqual("\"A=(B)\"", Q.Equals("A=", "(B)"));
         }
 
         [TestMethod]
         public void Query_Equals_2()
         {
-            Assert.AreEqual("(A=B + A=C$)", Query.Equals("A=", "B", "C$"));
-            Assert.AreEqual("(\"A=(B)\" + A=C$)", Query.Equals("A=", "(B)", "C$"));
+            Assert.AreEqual("(A=B + A=C$)", Q.Equals("A=", "B", "C$"));
+            Assert.AreEqual("(\"A=(B)\" + A=C$)", Q.Equals("A=", "(B)", "C$"));
         }
 
         [TestMethod]
@@ -97,12 +97,12 @@ namespace UnitTests.ManagedIrbis.Search
             Assert.AreEqual
                 (
                     "(A=B + A=C + A=D$)",
-                    Query.Equals("A=", "B", "C", "D$")
+                    Q.Equals("A=", "B", "C", "D$")
                 );
             Assert.AreEqual
                 (
                     "(A=B + \"A=(C)\" + A=D$)",
-                    Query.Equals("A=", "B", "(C)", "D$")
+                    Q.Equals("A=", "B", "(C)", "D$")
                 );
         }
 
@@ -110,7 +110,7 @@ namespace UnitTests.ManagedIrbis.Search
         [ExpectedException(typeof(SearchSyntaxException))]
         public void Query_Equals_4()
         {
-            Query.Equals("A=", null, null, null);
+            Q.Equals("A=", null, null, null);
         }
 
         [TestMethod]
@@ -118,28 +118,28 @@ namespace UnitTests.ManagedIrbis.Search
         public void Query_Equals_5()
         {
             string[] values = { string.Empty };
-            Query.Equals("A=", values);
+            Q.Equals("A=", values);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SearchSyntaxException))]
         public void Query_Equals_6()
         {
-            Query.Equals("A=", string.Empty, string.Empty, string.Empty);
+            Q.Equals("A=", string.Empty, string.Empty, string.Empty);
         }
 
         [TestMethod]
         [ExpectedException(typeof(SearchSyntaxException))]
         public void Query_Equals_7()
         {
-            Query.Equals("A=");
+            Q.Equals("A=");
         }
 
         [TestMethod]
         public void Query_Equals_8()
         {
             string[] values = { "B" };
-            Assert.AreEqual("A=B", Query.Equals("A=", values));
+            Assert.AreEqual("A=B", Q.Equals("A=", values));
         }
 
         [TestMethod]

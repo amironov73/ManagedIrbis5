@@ -5,12 +5,13 @@ using AM.Json;
 using AM.Runtime;
 using AM.Xml;
 
-using ManagedIrbis.Search;
+using ManagedIrbis;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests.ManagedIrbis.Search
 {
+    [Ignore]
     [TestClass]
     public class SearchScenarioTest
         : Common.CommonUnitTest

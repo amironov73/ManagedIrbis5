@@ -22,6 +22,7 @@ using System.Linq;
 
 using AM;
 using AM.IO;
+using AM.PlatformAbstraction;
 using AM.Threading;
 
 using ManagedIrbis.Batch;
@@ -44,7 +45,7 @@ namespace ManagedIrbis.Client
         #region Properties
 
         /// <inheritdoc cref="IrbisProvider.BusyState" />
-        public override BusyState BusyState
+        public BusyState BusyState
         { get { return Connection.Busy; } }
 
         /// <inheritdoc cref="IrbisProvider.Connected" />
@@ -54,7 +55,7 @@ namespace ManagedIrbis.Client
         }
 
         /// <inheritdoc cref="IrbisProvider.Database" />
-        public override string Database
+        public string Database
         {
             get { return Connection.Database; }
             set { Connection.Database = value; }
@@ -134,7 +135,8 @@ namespace ManagedIrbis.Client
         /// <inheritdoc cref="IrbisProvider.AcquireFormatter" />
         public override IPftFormatter AcquireFormatter()
         {
-            return new ConnectedFormatter(Connection);
+            // return new ConnectedFormatter(Connection);
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="IrbisProvider.Configure" />
@@ -147,6 +149,8 @@ namespace ManagedIrbis.Client
             Connection.Connect();
         }
 
+        public override PlatformAbstractionLayer PlatformAbstraction { get; set; }
+
         /// <inheritdoc cref="IrbisProvider.ExactSearchLinks"/>
         public override TermLink[] ExactSearchLinks
             (
@@ -156,12 +160,17 @@ namespace ManagedIrbis.Client
             var parameters = new PostingParameters
             {
                 Database = Connection.Database,
-                Term = term
+                Terms = new[] { term }
             };
             TermPosting[] postings = Connection.ReadPostings(parameters);
             TermLink[] result = TermLink.FromPostings(postings);
 
             return result;
+        }
+
+        public override TermLink[] ExactSearchTrimLinks(string term, int i)
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="IrbisProvider.FormatRecord" />
@@ -178,6 +187,11 @@ namespace ManagedIrbis.Client
                 );
 
             return result;
+        }
+
+        public override ServerVersion GetServerVersion()
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="IrbisProvider.FormatRecords" />
@@ -197,16 +211,25 @@ namespace ManagedIrbis.Client
             return result;
         }
 
+        public override string[] ListFiles(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool NoOp()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <inheritdoc cref="IrbisProvider.GetAlphabetTable" />
-        public override AlphabetTable GetAlphabetTable()
+        public AlphabetTable GetAlphabetTable()
         {
             throw new NotImplementedException();
             // return new AlphabetTable(Connection);
         }
 
         /// <inheritdoc cref="IrbisProvider.GetCatalogState" />
-        public override CatalogState GetCatalogState
+        public CatalogState GetCatalogState
             (
                 string database
             )
@@ -259,20 +282,20 @@ namespace ManagedIrbis.Client
         }
 
         /// <inheritdoc cref="IrbisProvider.GetStopWords" />
-        public override StopWords GetStopWords()
+        public StopWords GetStopWords()
         {
             throw new NotImplementedException();
             // return IrbisStopWords.FromServer(Connection);
         }
 
         /// <inheritdoc cref="IrbisProvider.NoOp" />
-        public override void NoOp()
+        public void Nop()
         {
-            Connection.NoOp();
+            Connection.Nop();
         }
 
         /// <inheritdoc cref="IrbisProvider.ReadFile" />
-        public override string ReadFile
+        public override string? ReadFile
             (
                 FileSpecification fileSpecification
             )
@@ -281,12 +304,12 @@ namespace ManagedIrbis.Client
         }
 
         /// <inheritdoc cref="IrbisProvider.ReadIniFile" />
-        public override IniFile ReadIniFile
+        public IniFile ReadIniFile
             (
                 FileSpecification fileSpecification
             )
         {
-            string content = ReadFile(fileSpecification);
+            var content = ReadFile(fileSpecification);
             if (string.IsNullOrEmpty(content))
             {
                 return null;
@@ -316,16 +339,22 @@ namespace ManagedIrbis.Client
                 FileSpecification fileSpecification
             )
         {
-            return Connection.ReadMenu(fileSpecification);
+            throw new NotImplementedException();
+            // return Connection.ReadMenu(fileSpecification);
+        }
+
+        public override Record? ReadRecordVersion(int mfn, int version)
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="IrbisProvider.ReadTerms" />
-        public override TermInfo[] ReadTerms
+        public override Term[] ReadTerms
             (
                 TermParameters parameters
             )
         {
-            TermInfo[] result = Connection
+            var result = Connection
                 .ReadTerms(parameters)
                 .Where(term => term.Count != 0)
                 .ToArray();
@@ -333,10 +362,26 @@ namespace ManagedIrbis.Client
             return result;
         }
 
-        /// <inheritdoc cref="IrbisProvider.Reconnect" />
-        public override void Reconnect()
+        public override bool FileExist(FileSpecification specification)
         {
-            Connection.Reconnect();
+            throw new NotImplementedException();
+        }
+
+        public override string GetGeneration()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IniFile GetUserIniFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc cref="IrbisProvider.Reconnect" />
+        public void Reconnect()
+        {
+            throw new NotImplementedException();
+            // Connection.Reconnect();
         }
 
         /// <inheritdoc cref="IrbisProvider.ReleaseFormatter" />
@@ -380,7 +425,7 @@ namespace ManagedIrbis.Client
         /// <inheritdoc cref="IrbisProvider.Dispose"/>
         public override void Dispose()
         {
-            base.Dispose();
+            // base.Dispose();
 
             if (_ownConnection)
             {

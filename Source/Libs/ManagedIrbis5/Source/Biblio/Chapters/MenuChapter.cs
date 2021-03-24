@@ -20,13 +20,12 @@ using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
 
 using AM;
-using AM.Text.Output;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
+using ManagedIrbis.Trees;
 
 #endregion
 
@@ -124,7 +123,7 @@ namespace ManagedIrbis.Biblio
         private MenuSubChapter _CreateChapter
             (
                 IPftFormatter formatter,
-                IrbisTreeFile.Item item
+                TreeLine item
             )
         {
             string key = item.Prefix.Trim();
@@ -166,7 +165,7 @@ namespace ManagedIrbis.Biblio
             result.Value = value;
             result.Settings = settings;
 
-            foreach (IrbisTreeFile.Item child in item.Children)
+            foreach (var child in item.Children)
             {
                 var subChapter
                     = _CreateChapter(formatter, child);
@@ -377,7 +376,10 @@ namespace ManagedIrbis.Biblio
                     record.RemoveField(331); // Аннотация
                     record.RemoveField(101); // Язык основного текста
 
-                    record.Fields.Add(new RecordField(200).AddSubField('a', "То же"));
+                    record.Fields.Add
+                        (
+                            new Field { Tag = 200 }.Add('a', "То же")
+                        );
 
                     same.Add(record);
                     toRemove.Add(record);
@@ -594,8 +596,6 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
             var log = context.Log;
             log.WriteLine
                 (
@@ -610,17 +610,17 @@ namespace ManagedIrbis.Biblio
                 var provider = context.Provider;
 
                 var specification = new FileSpecification
-                    (
-                        IrbisPath.MasterFile,
-                        provider.Database,
-                        menuName
-                    );
+                    {
+                        Path = IrbisPath.MasterFile,
+                        Database = provider.Database,
+                        FileName = menuName
+                    };
                 MenuFile menu = provider.ReadMenuFile(specification);
                 if (ReferenceEquals(menu, null))
                 {
                     throw new IrbisException();
                 }
-                IrbisTreeFile tree = menu.ToTree();
+                var tree = menu.ToTree();
 
                 // Create Formatter
 
@@ -633,7 +633,7 @@ namespace ManagedIrbis.Biblio
                         .ThrowIfNull("TitleFormat");
                     formatter.ParseProgram(titleFormat);
 
-                    foreach (IrbisTreeFile.Item root in tree.Roots)
+                    foreach (var root in tree.Roots)
                     {
                         var chapter
                             = _CreateChapter(formatter, root);

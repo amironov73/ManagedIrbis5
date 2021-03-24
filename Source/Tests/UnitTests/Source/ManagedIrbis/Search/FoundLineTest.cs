@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using ManagedIrbis.Search;
+using ManagedIrbis;
 
 // ReSharper disable UseObjectOrCollectionInitializer
 
@@ -13,7 +13,6 @@ namespace UnitTests.ManagedIrbis.Search
         public void FoundLine_Construction_1()
         {
             FoundLine line = new FoundLine();
-            Assert.IsFalse(line.Materialized);
             Assert.AreEqual(0, line.SerialNumber);
             Assert.AreEqual(0, line.Mfn);
             Assert.IsNull(line.Icon);
@@ -27,8 +26,6 @@ namespace UnitTests.ManagedIrbis.Search
         public void FoundLine_Properties_1()
         {
             FoundLine line = new FoundLine();
-            line.Materialized = true;
-            Assert.IsTrue(line.Materialized);
             line.Mfn = 123;
             Assert.AreEqual(123, line.Mfn);
             line.SerialNumber = 321;

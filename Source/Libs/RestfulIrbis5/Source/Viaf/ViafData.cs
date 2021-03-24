@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System;
 using AM;
 using AM.Json;
 
@@ -79,9 +80,12 @@ namespace RestfulIrbis.Viaf
         /// </summary>
         public static ViafData Parse
             (
-                JObject obj
+                // TODO: implement
+                object obj
+                // JObject obj
             )
         {
+            /*
             var result = new ViafData
             {
                 ViafId = obj["viafID"].NullableToString(),
@@ -94,6 +98,10 @@ namespace RestfulIrbis.Viaf
             };
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

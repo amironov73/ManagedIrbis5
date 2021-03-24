@@ -5,10 +5,10 @@ using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis;
-using ManagedIrbis.Search;
 
 namespace UnitTests.ManagedIrbis.Search
 {
+    [Ignore]
     [TestClass]
     public class TermPostingTest
     {

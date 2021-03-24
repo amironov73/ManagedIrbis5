@@ -167,12 +167,31 @@ namespace ManagedIrbis
             return response.ReturnCode;
         } // method GetMaxMfn
 
+        public static string FormatRecord
+            (
+                this IIrbisConnection connection,
+                string format,
+                Record record
+            )
+        {
+            throw new NotImplementedException();
+        }
+
         public static string[] FormatRecords
             (
                 this IIrbisConnection connection,
                 string database,
                 string format,
                 int[] mfns
+            )
+        {
+            throw new NotImplementedException();
+        }
+
+        public static DatabaseInfo GetDatabaseInfo
+            (
+                this IIrbisConnection connection,
+                string database
             )
         {
             throw new NotImplementedException();
@@ -277,6 +296,15 @@ namespace ManagedIrbis
                    && response.CheckReturnCode();
         } // method Nop
 
+        public static TermPosting[] ReadPostings
+            (
+                this IIrbisConnection connection,
+                PostingParameters parameters
+            )
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Чтение библиографической записи с сервера.
         /// </summary>
@@ -371,6 +399,15 @@ namespace ManagedIrbis
 
             return Term.Parse(response);
         } // method ReadTerms
+
+        public static string? ReadTextFile
+            (
+                this IIrbisConnection connection,
+                FileSpecification specification
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         ///

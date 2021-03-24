@@ -224,8 +224,9 @@ namespace ManagedIrbis.Biblio
             IrbisReport report = processor.Report
                 .ThrowIfNull("processor.Report");
 
-            bool showOrder =
-                context.Document.CommonSettings.Value<bool?>("showOrder") ?? false;
+            bool showOrder = false;
+                // TODO: implement
+                /* context.Document.CommonSettings.Value<bool?>("showOrder") ?? false; */
 
             RenderTitle(context);
 

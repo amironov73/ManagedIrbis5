@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System;
 using AM;
 using AM.Json;
 
@@ -55,15 +56,23 @@ namespace RestfulIrbis.Viaf
         /// </summary>
         public static ViafMainHeading Parse
             (
-                JObject obj
+                // TODO: implement
+                object obj
+                // JObject obj
             )
         {
+            /*
+
             return new ViafMainHeading
             {
                 Text = obj["text"].NullableToString(),
                 Sources = obj["sources"]["s"].GetValues<string>(),
                 Sid = obj["sources"]["sid"].GetValues<string>()
             };
+
+            */
+
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -71,9 +80,13 @@ namespace RestfulIrbis.Viaf
         /// </summary>
         public static ViafMainHeading[] Parse
             (
-                JArray? array
+                // TODO: implement
+                object[] array
+                // JArray? array
             )
         {
+            /*
+
             if (ReferenceEquals(array, null))
             {
                 return new ViafMainHeading[0];
@@ -86,6 +99,10 @@ namespace RestfulIrbis.Viaf
             }
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

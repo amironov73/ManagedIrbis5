@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using ManagedIrbis.Search;
+using ManagedIrbis;
 
 namespace UnitTests.ManagedIrbis.Search
 {

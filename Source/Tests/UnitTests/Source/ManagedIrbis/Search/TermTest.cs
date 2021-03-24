@@ -2,33 +2,33 @@
 using AM.Runtime;
 using AM.Xml;
 
-
-using ManagedIrbis.Search;
+using ManagedIrbis;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTests.ManagedIrbis.Search
 {
+    [Ignore]
     [TestClass]
     public class TermInfoTest
     {
         [TestMethod]
         public void TermInfo_Construction_1()
         {
-            TermInfo term = new TermInfo();
+            Term term = new Term();
             Assert.AreEqual(0, term.Count);
             Assert.IsNull(term.Text);
         }
 
         private void _TestSerialization
             (
-                TermInfo first
+                Term first
             )
         {
             byte[] bytes = first.SaveToMemory();
 
-            TermInfo second
-                = bytes.RestoreObjectFromMemory<TermInfo>();
+            Term second
+                = bytes.RestoreObjectFromMemory<Term>();
 
             Assert.AreEqual(first.Count, second.Count);
             Assert.AreEqual(first.Text, second.Text);
@@ -37,7 +37,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfo_Serialization_1()
         {
-            TermInfo termInfo = new TermInfo();
+            Term termInfo = new Term();
             _TestSerialization(termInfo);
 
             termInfo.Count = 10;
@@ -48,7 +48,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfo_Verify_1()
         {
-            TermInfo termInfo = new TermInfo();
+            Term termInfo = new Term();
             Assert.IsFalse(termInfo.Verify(false));
 
             termInfo.Count = 10;
@@ -59,7 +59,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfo_ToString_1()
         {
-            TermInfo termInfo = new TermInfo
+            Term termInfo = new Term
             {
                 Count = 10,
                 Text = "T=HELLO"
@@ -71,13 +71,13 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfo_TrimPrefix_1()
         {
-            TermInfo[] terms =
+            Term[] terms =
             {
-                new TermInfo {Count=1, Text = "T=HELLO"},
-                new TermInfo {Count=2, Text = "T=IRBIS"},
-                new TermInfo {Count=3, Text = "T=WORLD"},
+                new Term {Count=1, Text = "T=HELLO"},
+                new Term {Count=2, Text = "T=IRBIS"},
+                new Term {Count=3, Text = "T=WORLD"},
             };
-            TermInfo[] actual = TermInfo.TrimPrefix(terms, "T=");
+            Term[] actual = Term.TrimPrefix(terms, "T=");
             Assert.AreEqual(3, actual.Length);
             Assert.AreEqual("HELLO", actual[0].Text);
             Assert.AreEqual("IRBIS", actual[1].Text);
@@ -85,11 +85,11 @@ namespace UnitTests.ManagedIrbis.Search
 
             terms = new []
             {
-                new TermInfo {Count=1, Text = "HELLO"},
-                new TermInfo {Count=2, Text = "IRBIS"},
-                new TermInfo {Count=3, Text = "WORLD"},
+                new Term {Count=1, Text = "HELLO"},
+                new Term {Count=2, Text = "IRBIS"},
+                new Term {Count=3, Text = "WORLD"},
             };
-            actual = TermInfo.TrimPrefix(terms, string.Empty);
+            actual = Term.TrimPrefix(terms, string.Empty);
             Assert.AreEqual(3, actual.Length);
             Assert.AreEqual("HELLO", actual[0].Text);
             Assert.AreEqual("IRBIS", actual[1].Text);
@@ -99,12 +99,12 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfo_Clone_1()
         {
-            TermInfo expected = new TermInfo
+            Term expected = new Term
             {
                 Count = 10,
                 Text = "T=HELLLO"
             };
-            TermInfo actual = expected.Clone();
+            Term actual = expected.Clone();
             Assert.AreEqual(expected.Count, actual.Count);
             Assert.AreEqual(expected.Text, actual.Text);
         }
@@ -112,7 +112,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfo_ToXml_1()
         {
-            TermInfo term = new TermInfo();
+            Term term = new Term();
             Assert.AreEqual("<term />", XmlUtility.SerializeShort(term));
 
             term.Count = 10;
@@ -123,7 +123,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfo_ToJson_1()
         {
-            TermInfo term = new TermInfo();
+            Term term = new Term();
             Assert.AreEqual("{}", JsonUtility.SerializeShort(term));
 
             term.Count = 10;

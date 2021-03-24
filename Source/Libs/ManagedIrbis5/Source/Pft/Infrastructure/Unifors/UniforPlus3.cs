@@ -61,7 +61,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = Utility.ChangeEncoding
+                var output = Utility.ChangeEncoding
                     (
                         IrbisEncoding.Utf8,
                         IrbisEncoding.Ansi,
@@ -93,7 +93,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = Utility.ChangeEncoding
+                var output = Utility.ChangeEncoding
                     (
                         IrbisEncoding.Ansi,
                         IrbisEncoding.Utf8,
@@ -153,7 +153,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = StringUtility.UrlDecode
+                var output = IrbisUtility.UrlDecode
                     (
                         expression,
                         IrbisEncoding.Utf8
@@ -189,7 +189,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string output = StringUtility.UrlEncode
+                var output = IrbisUtility.UrlEncode
                     (
                         expression,
                         IrbisEncoding.Utf8
@@ -221,7 +221,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                string output = record.ToPlainText();
+                var output = record.ToPlainText();
                 context.WriteAndSetFlag(node, output);
             }
         }
@@ -295,7 +295,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.Comma,
                     2
@@ -319,13 +319,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 Database = database,
                 NumberOfTerms = 10
             };
-            TermInfo[] terms = provider.ReadTerms(parameters);
+            var terms = provider.ReadTerms(parameters);
             if (terms.Length != 0)
             {
-                TermInfo info = terms[0];
-                if (info.Text.SafeStarts(key))
+                var info = terms[0];
+                if (info.Text?.StartsWith(key) ?? false)
                 {
-                    string output = info.Count.ToInvariantString();
+                    var output = info.Count.ToInvariantString();
                     context.Write(node, output);
                 }
             }
@@ -360,7 +360,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var provider = context.Provider;
             var navigator = new TextNavigator(expression);
-            string database = navigator.ReadUntil(',').ToString();
+            var database = navigator.ReadUntil(',').ToString();
             if (navigator.ReadChar() != ',')
             {
                 return;
@@ -371,7 +371,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 database = provider.Database;
             }
 
-            int count = navigator.ReadUntil(',').ToString().SafeToInt32();
+            var count = navigator.ReadUntil(',').ToString().SafeToInt32();
             if (navigator.ReadChar() != ',')
             {
                 return;
@@ -383,7 +383,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string searchExpression = navigator.ReadUntil(separator).ToString();
+            var searchExpression = navigator.ReadUntil(separator).ToString();
             if (navigator.ReadChar() != separator)
             {
                 return;
@@ -394,7 +394,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string format = navigator.GetRemainingText().ToString();
+            var format = navigator.GetRemainingText().ToString();
             format = format.Trim();
             if (string.IsNullOrEmpty(format) && count != 0)
             {
@@ -469,19 +469,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                 for (var i = 0; i < count; i++)
                 {
-                    using (var guard = new PftContextGuard(context))
-                    {
-                        var nestedContext = guard.ChildContext;
-                        nestedContext.Reset();
-                        nestedContext.Output = context.Output;
+                    using var guard = new PftContextGuard(context);
+                    var nestedContext = guard.ChildContext;
+                    nestedContext.Reset();
+                    nestedContext.Output = context.Output;
 
-                        var mfn = found[i];
-                        var record = provider.ReadRecord(mfn);
-                        if (!ReferenceEquals(record, null))
-                        {
-                            nestedContext.Record = record;
-                            program.Execute(nestedContext);
-                        }
+                    var mfn = found[i];
+                    if (provider.ReadRecord(mfn) is { } record)
+                    {
+                        nestedContext.Record = record;
+                        program.Execute(nestedContext);
                     }
                 }
             }
@@ -654,7 +651,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.Comma,
                     2
@@ -666,7 +663,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            var dividend = parts[0].SafeToDouble(0.0);
+            var dividend = parts[0].SafeToDouble();
             if (!Utility.TryParseDouble(parts[1], out var divisor))
             {
                 return;

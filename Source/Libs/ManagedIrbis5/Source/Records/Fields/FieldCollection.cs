@@ -56,10 +56,6 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region Construction
-
-        #endregion
-
         #region Private members
 
         private List<Field> _GetInnerList()

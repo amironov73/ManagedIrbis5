@@ -14,9 +14,10 @@
 #region Using directives
 
 using System;
-
+using System.Linq;
 using AM;
 using AM.Collections;
+using ManagedIrbis.Pft.Infrastructure.Unifors;
 
 #endregion
 
@@ -339,7 +340,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             index--;
 
-            int[] positions = text.GetPositions(separator[0]);
+            int[] positions = UniforE.GetPositions(text, separator[0]);
 
             if (positions.Length == 0)
             {
@@ -432,19 +433,22 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            field = field.GetEmbeddedFields()
-                .GetField(embed.SafeToInt32())
-                .GetOccurrence(0);
+            field = EmbeddedField.GetEmbeddedField
+                (
+                    field,
+                    embed.SafeToInt32()
+                )
+                .FirstOrDefault();
             if (ReferenceEquals(field, null))
             {
                 return;
             }
 
-            string text = (code == '\0')
+            var text = code == '\0'
                 ? field.ToText()
-                : (code == '*')
-                ? field.Value
-                : field.GetFirstSubFieldValue(code);
+                : code == '*'
+                    ? field.Value
+                    : field.GetValueOrFirstSubField();
 
             context.Write(node, text);
         }

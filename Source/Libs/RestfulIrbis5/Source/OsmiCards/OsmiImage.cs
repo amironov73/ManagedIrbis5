@@ -77,28 +77,29 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public static OsmiImage FromJObject
             (
-                JObject jObject
+                // TODO: implement
+                object obj
+                // JObject jObject
             )
         {
+            /*
+
             var value = jObject.ToObject<OsmiImage>();
 
             return value;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion
 
         #region Object members
 
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "{0} - {1}",
-                    Id.ToVisibleString(),
-                    Description.ToVisibleString()
-                );
-        }
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString() =>
+            $"{Id.ToVisibleString()} - {Description.ToVisibleString()}";
 
         #endregion
     }

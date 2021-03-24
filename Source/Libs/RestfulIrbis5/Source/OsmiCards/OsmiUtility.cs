@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -40,12 +41,16 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Ищем метку в карточке.
         /// </summary>
-        private static JObject? FindLabel
+        private static /* JObject? */ object? FindLabel
             (
-                JObject obj,
+                // TODO: implement
+                object obj,
+                // JObject obj,
                 string label
             )
         {
+            /*
+
             var result = (JObject?) obj["values"].FirstOrDefault
                 (
                     b => b["label"].Value<string>() == label
@@ -57,6 +62,10 @@ namespace RestfulIrbis.OsmiCards
             }
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -66,14 +75,18 @@ namespace RestfulIrbis.OsmiCards
         /// <summary>
         /// Build card for reader.
         /// </summary>
-        public static JObject BuildCardForReader
+        public static /* JObject */ object BuildCardForReader
             (
-                JObject templateObject,
+                // TODO: implement
+                object templateObject,
+                // JObject templateObject,
                 ReaderInfo reader,
                 string ticket,
                 DicardsConfiguration config
             )
         {
+            /*
+
             var name = reader.FamilyName.ThrowIfNull("name");
             var fio = reader.FullName.ThrowIfNull("fio");
 
@@ -149,6 +162,10 @@ namespace RestfulIrbis.OsmiCards
             }
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
-using ManagedIrbis.Search;
-using ManagedIrbis.Search.Infrastructure;
+using ManagedIrbis;
+using ManagedIrbis.Infrastructure;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

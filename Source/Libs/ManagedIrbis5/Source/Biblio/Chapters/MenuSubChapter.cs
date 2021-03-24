@@ -305,8 +305,9 @@ namespace ManagedIrbis.Biblio
                 .ThrowIfNull("processor.Report");
             // ReportDriver driver = context.ReportContext.Driver;
 
-            var showOrder =
-                context.Document.CommonSettings.Value<bool?>("showOrder") ?? false;
+            var showOrder = false;
+                // TODO: implement
+                /* context.Document.CommonSettings.Value<bool?>("showOrder") ?? false; */
 
             if (Records.Count != 0
                 || Duplicates.Count != 0

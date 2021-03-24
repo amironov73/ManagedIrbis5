@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforPlus9.cs --
+/* UniforPlus9.cs -- группа технических форматных выходов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,6 +23,7 @@ using AM;
 using AM.IO;
 using AM.Text;
 
+using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -44,7 +45,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             string address
         )
         {
-            using (System.Net.WebClient client = new System.Net.WebClient())
+            using (var client = new System.Net.WebClient())
             {
                 try
                 {
@@ -71,7 +72,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             )
         {
             var navigator = new TextNavigator(expression);
-            string pathText = navigator.ReadUntil(',').ToString();
+            var pathText = navigator.ReadUntil(',').ToString();
             navigator.ReadChar();
             string dbName = null;
             if (pathText == "0"
@@ -89,23 +90,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 navigator.ReadChar();
             }
 
-            string fileName = navigator.GetRemainingText().ToString();
+            var fileName = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(pathText)
                 || string.IsNullOrEmpty(fileName))
             {
                 return null;
             }
 
-            var path = (IrbisPath)Utility.ParseInt32
-            (
-                pathText
-            );
+            var path = (IrbisPath)pathText.ParseInt32();
             var result = new FileSpecification
-            (
-                path,
-                dbName,
-                fileName
-            );
+                {
+                    Path = path,
+                    Database = dbName,
+                    FileName = fileName
+                };
 
             return result;
         }
@@ -144,15 +142,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetCharacter
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                int code;
-                if (NumericUtility.TryParseInt32(expression, out code))
+                if (Utility.TryParseInt32(expression, out var code))
                 {
                     var output = ((char)code).ToString();
                     context.WriteAndSetFlag(node, output);
@@ -176,9 +173,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetDirectoryName
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -215,9 +212,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetDrive
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -244,9 +241,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetExtension
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -281,9 +278,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetFileContent
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -327,9 +324,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void FileExist
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -376,9 +373,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetFileName
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -403,9 +400,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetFileSize
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -419,11 +416,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 }
                 catch (Exception exception)
                 {
-                    Log.TraceException
-                    (
-                        "UniforPlus9::GetFileSize",
-                        exception
-                    );
+                    Magna.TraceException
+                        (
+                            "UniforPlus9::GetFileSize",
+                            exception
+                        );
                 }
 
                 var output = fileSize.ToInvariantString();
@@ -447,9 +444,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetIndex
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             var index = context.Index;
@@ -484,9 +481,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void GetGeneration
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             context.WriteAndSetFlag(node, context.Provider.GetGeneration());
@@ -508,9 +505,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void StringLength
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             var output = "0";
@@ -547,9 +544,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ReplaceCharacter
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -557,7 +554,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 var navigator = new TextNavigator(expression);
                 var first = navigator.ReadChar();
                 var second = navigator.ReadChar();
-                string text = navigator.GetRemainingText();
+                var text = navigator.GetRemainingText().ToString();
                 if (!string.IsNullOrEmpty(text))
                 {
                     var output = text.Replace(first, second);
@@ -593,9 +590,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ReplaceString
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -607,7 +604,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     return;
                 }
 
-                string first = navigator.ReadUntil(firstDelimiter);
+                var first = navigator.ReadUntil(firstDelimiter).ToString();
                 navigator.ReadChar();
                 if (navigator.IsEOF
                     || string.IsNullOrEmpty(first))
@@ -621,13 +618,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     return;
                 }
 
-                string second = navigator.ReadUntil(secondDelimiter);
+                var second = navigator.ReadUntil(secondDelimiter).ToString();
                 if (navigator.ReadChar() != secondDelimiter)
                 {
                     return;
                 }
 
-                string text = navigator.GetRemainingText();
+                var text = navigator.GetRemainingText().ToString();
                 if (string.IsNullOrEmpty(text))
                 {
                     return;
@@ -655,9 +652,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void SplitWords
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -665,7 +662,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 var words = PftUtility.ExtractWords(expression);
                 for (var i = 0; i < words.Length; i++)
                 {
-                    string word = StringUtility.ToUpperInvariant(words[i]);
+                    var word = words[i].ToUpperInvariant();
                     context.WriteAndSetFlag(node, word);
                     context.WriteLine(node);
                 }
@@ -698,17 +695,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void Substring
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
                 string output;
-                string[] parts = StringUtility.SplitString
+                var parts = expression.Split
                     (
-                        expression,
                         CommonSeparators.NumberSign,
                         2
                     );
@@ -727,15 +723,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     if (navigator.PeekChar() == '*')
                     {
                         navigator.ReadChar();
-                        temp = navigator.ReadInteger();
-                        NumericUtility.TryParseInt32(temp, out offset);
+                        temp = navigator.ReadInteger().ToString();
+                        Utility.TryParseInt32(temp, out offset);
                     }
 
                     if (navigator.PeekChar() == '.')
                     {
                         navigator.ReadChar();
-                        temp = navigator.ReadInteger();
-                        NumericUtility.TryParseInt32(temp, out length);
+                        temp = navigator.ReadInteger().ToString();
+                        Utility.TryParseInt32(temp, out length);
                         haveLength = true;
                     }
 
@@ -779,9 +775,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ToUpper
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             var output = IrbisText.ToUpper(expression);
@@ -815,9 +811,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void FindSubstring
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -827,14 +823,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var navigator = new TextNavigator(expression);
             var delimiter = navigator.ReadChar();
-            string substring = navigator.ReadUntil(delimiter);
+            var substring = navigator.ReadUntil(delimiter).ToString();
             if (string.IsNullOrEmpty(substring)
                 || navigator.ReadChar() != delimiter)
             {
                 goto NOTFOUND;
             }
 
-            string text = navigator.GetRemainingText();
+            var text = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(text))
             {
                 goto NOTFOUND;
@@ -881,9 +877,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void PrintNumbers
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -898,16 +894,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = StringUtility.SplitString
+            var parts = expression.Split
                 (
-                    expression,
                     CommonSeparators.Slash,
                     2
                 );
-            string left = parts[0], right = parts[1];
+            var left = parts[0];
+            var right = parts[1];
             var width = left.Length;
             var digits = Regex.Match(left, "-?\\d+").Value;
-            long start = digits.SafeToInt64(), stop = right.SafeToInt64();
+            var start = digits.SafeToInt64();
+            var stop = right.SafeToInt64();
             var first = true;
             while (start <= stop)
             {
@@ -970,9 +967,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void FormatFileSize
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             var result = "0";
@@ -1044,9 +1041,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void DeleteFiles
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -1089,9 +1086,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void SaveBinaryResource
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -1099,9 +1096,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = StringUtility.SplitString
+            var parts = expression.Split
                 (
-                    expression,
                     CommonSeparators.NumberSign,
                     2
                 );
@@ -1112,19 +1108,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var occurrence = parts[0].SafeToInt32();
             var path = parts[1];
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (!ReferenceEquals(record, null) && occurrence > 0)
             {
                 // TODO implement
                 // var tag = Irbis64Config.IniParam("MAIN", "TAGINTERNALRESOURCE", "953").SafeParseInt32();
                 var tag = 953;
 
-                RecordField field = record.Fields.GetField(tag, occurrence - 1);
+                var field = record.Fields.GetField(tag, occurrence - 1);
                 if (!ReferenceEquals(field, null))
                 {
-                    BinaryResource resource = BinaryResource.Parse(field);
-                    string format = resource.Kind;
-                    string content = resource.Resource;
+                    var resource = BinaryResource.Parse(field);
+                    var format = resource.Kind;
+                    var content = resource.Resource;
                     if (!ReferenceEquals(content, null))
                     {
                         if (!string.IsNullOrEmpty(format)
@@ -1133,8 +1129,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                             path += "." + format;
                         }
 
-                        byte[] bytes = resource.Decode();
-                        FileUtility.WriteAllBytes(path, bytes);
+                        var bytes = resource.Decode();
+                        File.WriteAllBytes(path, bytes);
                     }
                 }
             }
@@ -1164,9 +1160,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ReadFileAsBinaryResource
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -1190,26 +1186,26 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             byte[] content;
             try
             {
-                content = FileUtility.ReadAllBytes(file);
+                content = File.ReadAllBytes(file);
             }
             catch (Exception exception)
             {
-                Log.TraceException
+                Magna.TraceException
                     (
-                        "UniforPlus9::ReadFileAsBinaryResource",
+                        nameof(UniforPlus9) + "::" + nameof(ReadFileAsBinaryResource),
                         exception
                     );
 
                 return;
             }
 
-            BinaryResource resource = new BinaryResource
+            var resource = new BinaryResource
             {
                 Kind = format
             };
             resource.Resource = resource.Encode(content);
-            RecordField field = resource.ToField();
-            string output = field.ToText();
+            var field = resource.ToField();
+            var output = field.ToText();
             context.WriteAndSetFlag(node, output);
         }
 
@@ -1231,9 +1227,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ConcatenateStrings
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression)
@@ -1283,16 +1279,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void AssignGlobals
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
             {
                 var globals = context.Globals;
                 globals.Clear(); // ???
-                string decoded = StringUtility
+                var decoded = IrbisUtility
                     .UrlDecode(expression, IrbisEncoding.Utf8)
                     .ThrowIfNull();
                 var lines = decoded.SplitLines();
@@ -1303,7 +1299,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         continue;
                     }
 
-                    RecordField field = RecordField.Parse(line).ThrowIfNull();
+                    var field = new Field();
+                    field.Decode(line);
                     globals.Append(field.Tag, field.ToText());
                 }
             }
@@ -1314,9 +1311,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         // ibatrak
         private static void _ShowTerm
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression,
+                PftContext context,
+                PftNode? node,
+                string? expression,
                 bool reverseOrder
             )
         {
@@ -1325,9 +1322,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = StringUtility.SplitString
+            var parts = expression.Split
                 (
-                    expression,
                     CommonSeparators.Comma,
                     2
                 );
@@ -1351,10 +1347,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 StartTerm = startTerm,
                 ReverseOrder = reverseOrder
             };
-            TermInfo[] terms = provider.ReadTerms(parameters);
+            var terms = provider.ReadTerms(parameters);
             if (terms.Length != 0)
             {
-                string output;
+                string? output;
 
                 // если найдено точное совпадение термина, вернем следующий термин
                 // при поиске в обратном направлении всегда возвращается предыдущий термин
@@ -1377,9 +1373,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void NextTerm
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             _ShowTerm(context, node, expression, false);
@@ -1390,9 +1386,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void PreviousTerm
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             _ShowTerm(context, node, expression, true);
@@ -1425,7 +1421,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// <returns>the Arabic number (0 if the given string is not convertible to a Roman number)</returns>
         internal static int ToArabicNumber
             (
-                [NotNull] string romanNumber
+                string romanNumber
             )
         {
             return Enumerable.Range(0, _replaceRom.Length)
@@ -1452,9 +1448,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void RomanToArabic
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -1484,9 +1480,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ArabicToRoman
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
 
@@ -1502,5 +1498,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         }
 
         #endregion
-    }
-}
+
+    } // class UniforPlus9
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Unifors

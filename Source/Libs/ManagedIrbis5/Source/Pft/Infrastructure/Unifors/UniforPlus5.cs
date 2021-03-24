@@ -92,7 +92,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             FileSpecification specification;
-            string output = null;
+            string? output = null;
             var index = context.Index;
 
             var extension = Path.GetExtension(fileName).ToUpperInvariant();
@@ -132,14 +132,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         Database = context.Provider.Database,
                         FileName = fileName
                     };
-                MenuFile menu = context.Provider.ReadMenuFile(specification);
-                if (ReferenceEquals(menu, null))
-                {
-                    return;
-                }
-
-                MenuEntry entry = menu.Entries.GetItem(index);
-                if (ReferenceEquals(entry, null))
+                var menu = context.Provider.ReadMenuFile(specification);
+                var entry = menu?.Entries.SafeAt(index);
+                if (entry is null)
                 {
                     return;
                 }

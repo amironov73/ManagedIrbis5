@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using ManagedIrbis.Search;
+using ManagedIrbis.Infrastructure;
 
 namespace UnitTests.ManagedIrbis.Search
 {
@@ -13,7 +13,7 @@ namespace UnitTests.ManagedIrbis.Search
         {
             Assert.AreEqual
                 (
-                    null, 
+                    null,
                     SearchUtility.EscapeQuotation(null)
                 );
             Assert.AreEqual

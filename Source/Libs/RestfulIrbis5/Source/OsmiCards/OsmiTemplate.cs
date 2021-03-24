@@ -56,7 +56,9 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public static OsmiTemplate FromJObject
             (
-                JObject jObject
+                // TODO: implement
+                object obj
+                // JObject jObject
             )
         {
             var result = new OsmiTemplate();

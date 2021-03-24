@@ -280,7 +280,7 @@ namespace ManagedIrbis.Mx
             {
                 while (true)
                 {
-                    int index = StringUtility.LastIndexOfAny(line, prefixes);
+                    int index = Utility.LastIndexOfAny(line, prefixes);
                     if (index < 0)
                     {
                         break;

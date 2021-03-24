@@ -415,6 +415,25 @@ namespace ManagedIrbis
         } // method GetOrAddField
 
         /// <summary>
+        /// Проверка, есть ли в записи поле с указанной меткой.
+        /// </summary>
+        public bool HaveField
+            (
+                int tag
+            )
+        {
+            foreach (var field in Fields)
+            {
+                if (field.Tag == tag)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        } // method HaveField
+
+        /// <summary>
         /// Удаление из записи поля с указанной меткой.
         /// </summary>
         /// <param name="tag">Искомая метка.</param>

@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Linq;
 using System.Text;
 
@@ -126,14 +127,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void FormatJson
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
-#if !PocketPC && !WINMOBILE
+            /*
 
-            MarcRecord record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null))
             {
                 return;
@@ -165,7 +166,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                             fieldObj
                         );
 
-                    RecordField field = fields[i];
+                    var field = fields[i];
                     if (!string.IsNullOrEmpty(field.Value))
                     {
                         fieldObj.Add("*", field.Value);
@@ -188,7 +189,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var output = builder + obj.ToString(Formatting.Indented);
             context.WriteAndSetFlag(node, output);
 
-#endif
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

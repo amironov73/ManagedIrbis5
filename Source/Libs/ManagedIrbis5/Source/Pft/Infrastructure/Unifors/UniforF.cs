@@ -62,7 +62,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             // ibatrak через ISISACW.TAB делать смысла нет
             // irbis64 ищет одиночные пробелы
 
-            int[] positions = text.GetPositions(' ');
+            int[] positions = UniforE.GetPositions(text, ' ');
 
             if (wordCount >= positions.Length)
             {

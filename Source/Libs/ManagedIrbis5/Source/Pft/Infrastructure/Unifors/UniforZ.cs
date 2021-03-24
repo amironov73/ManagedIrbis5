@@ -102,18 +102,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 Field field
             )
         {
-            field.SetSubField('A', "0");
-            string specification = field.GetFirstSubFieldValue('B');
+            field.SetSubFieldValue('a', "0");
+            var specification = field.GetFirstSubFieldValue('B');
             if (string.IsNullOrEmpty(specification))
             {
                 return;
             }
             var navigator = new TextNavigator(specification);
-            string countText = navigator.ReadUntil('/').ToString();
+            var countText = navigator.ReadUntil('/').ToString();
             if (string.IsNullOrEmpty(countText))
             {
                 navigator.ReadChar();
-                field.SetSubField('B', navigator.GetRemainingText());
+                field.SetSubFieldValue('b', navigator.GetRemainingText().ToString());
                 return;
             }
             var count = countText.SafeToInt32();
@@ -129,14 +129,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string inventoryText = navigator.GetRemainingText().ToString();
+            var inventoryText = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(inventoryText))
             {
                 inventoryText = "1";
             }
             NumberText inventory = inventoryText;
 
-            string barcodeText = field.GetFirstSubFieldValue('H');
+            var barcodeText = field.GetFirstSubFieldValue('H');
             var barcode = string.IsNullOrEmpty(barcodeText)
                 ? null
                 : new NumberText(barcodeText);
@@ -151,10 +151,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     record.Fields.Add(current);
                 }
 
-                current.SetSubField('B', inventory.ToString());
+                current.SetSubFieldValue('b', inventory.ToString());
                 if (!ReferenceEquals(barcode, null))
                 {
-                    current.SetSubField('H', barcode.ToString());
+                    current.SetSubFieldValue('h', barcode.ToString());
                     barcode = barcode.Increment();
                 }
 

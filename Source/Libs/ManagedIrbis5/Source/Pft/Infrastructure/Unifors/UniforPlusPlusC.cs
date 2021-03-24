@@ -16,7 +16,6 @@
 using AM;
 using AM.Text;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Fields;
 
 #endregion
@@ -185,7 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             var navigator = new TextNavigator(expression);
-            string index = navigator.ReadUntil('#').ToString();
+            var index = navigator.ReadUntil('#').ToString();
             if (string.IsNullOrEmpty(index))
             {
                 return;
@@ -197,23 +196,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             //string name = provider.GetIniValue("MAIN", "GlobCountNAME", "Count");
             //CounterDatabase database = new CounterDatabase(provider, name);
 
-            CounterDatabase database = new CounterDatabase(provider);
-            GlobalCounter counter = database.GetCounter(index);
+            var database = new CounterDatabase(provider);
+            var counter = database.GetCounter(index);
             if (ReferenceEquals(counter, null))
             {
                 return;
             }
 
             var command = '\0';
-            string value = null;
-            string output = null;
+            string? value = null;
+            string? output = null;
             if (navigator.ReadChar() == '#')
             {
                 if (navigator.PeekChar() == '!')
                 {
                     command = navigator.ReadChar();
                 }
-                value = navigator.GetRemainingText();
+                value = navigator.GetRemainingText().ToString();
             }
 
             if (command == '!')

@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System;
 using AM;
 
 using RestSharp;
@@ -98,6 +99,8 @@ namespace RestfulIrbis.Viaf
                 string name
             )
         {
+            /*
+
             Magna.Trace("ViafClient: get suggestions");
 
             var request = new RestRequest("/viaf/AutoSuggest?query={name}");
@@ -107,6 +110,10 @@ namespace RestfulIrbis.Viaf
                 = JsonConvert.DeserializeObject<ViafSuggestResponse>(response.Content);
 
             return viaf.SuggestResults;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -117,6 +124,8 @@ namespace RestfulIrbis.Viaf
                 string recordId
             )
         {
+            /*
+
             Magna.Trace("ViafClient: get authority cluster data");
 
             var request = new RestRequest("/viaf/{id}/");
@@ -127,6 +136,10 @@ namespace RestfulIrbis.Viaf
             var result = ViafData.Parse(obj);
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

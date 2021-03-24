@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Text.Json.Serialization;
 
 using AM;
@@ -103,9 +104,12 @@ namespace RestfulIrbis.OsmiCards
         /// </summary>
         public static OsmiRegistrationInfo FromJson
             (
-                JObject obj
+                // TODO: implement
+                object obj
+                // JObject obj
             )
         {
+            /*
             var result = new OsmiRegistrationInfo
             {
                 Name = obj.GetString("Имя").NullForEmpty(),
@@ -130,6 +134,10 @@ namespace RestfulIrbis.OsmiCards
             }
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

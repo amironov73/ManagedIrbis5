@@ -88,7 +88,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     StartTerm = term,
                     NumberOfTerms = 10
                 };
-                TermInfo[] terms = provider.ReadTerms(parameters);
+                var terms = provider.ReadTerms(parameters);
                 if (terms.Length == 0)
                 {
                     break;

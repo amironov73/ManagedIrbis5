@@ -68,17 +68,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     if (!string.IsNullOrEmpty(section)
                         && !string.IsNullOrEmpty(parameter))
                     {
-                        string result;
-                        using (var iniFile
-                            = context.Provider.GetUserIniFile())
-                        {
-                            result = iniFile.GetValue
-                                (
-                                    section,
-                                    parameter,
-                                    defaultValue
-                                );
-                        }
+                        var iniFile = context.Provider.GetUserIniFile();
+                        var result = iniFile.GetValue
+                            (
+                                section,
+                                parameter,
+                                defaultValue
+                            );
 
                         context.WriteAndSetFlag(node, result);
                     }

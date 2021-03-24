@@ -28,6 +28,7 @@ using AM;
 using AM.Json;
 
 using System.Runtime.Serialization.Formatters;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -209,6 +210,8 @@ namespace ManagedIrbis.Biblio
                 string fileName
             )
         {
+            /*
+
             string contents = File.ReadAllText
                 (
                     fileName,
@@ -243,6 +246,10 @@ namespace ManagedIrbis.Biblio
             result.CommonSettings = common;
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         /// <summary>

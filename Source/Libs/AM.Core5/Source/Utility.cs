@@ -1306,6 +1306,27 @@ namespace AM
         } // method SafeToInt32
 
         /// <summary>
+        /// Безопасное преобразование строки в целое.
+        /// </summary>
+        public static long SafeToInt64
+            (
+                this string? text
+            )
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return 0;
+            }
+
+            if (!long.TryParse(text, out var result))
+            {
+                result = 0;
+            }
+
+            return result;
+        } // method SafeToInt64
+
+        /// <summary>
         /// Безопасное преобразование строки
         /// в число с плавающей точкой.
         /// </summary>
@@ -2427,6 +2448,7 @@ namespace AM
         /// <summary>
         /// Удаляет в строке начальный и конечный символ кавычек.
         /// </summary>
+        [Pure]
         public static string Unquote
             (
                 this string text,
@@ -2490,6 +2512,55 @@ namespace AM
 
             return result.ToString();
         } // method RandomIdentifier
+
+        /// <summary>
+        /// Универсальное длинное представление даты/времени.
+        /// </summary>
+        [Pure]
+        public static string ToLongUniformString(this DateTime dateTime) =>
+            dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+
+        /// <summary>
+        /// Универсальное короткое представление даты.
+        /// </summary>
+        [Pure]
+        public static string ToShortUniformString(this DateTime dateTime) =>
+            dateTime.ToString("yyyy-MM-dd");
+
+        /// <summary>
+        /// Начало эпохи UNIX.
+        /// </summary>
+        public static readonly DateTime UnixStart
+            = new (1970, 1, 1);
+
+        /// <summary>
+        /// Переводит указанную дату в формат Unix.
+        /// </summary>
+        [Pure]
+        public static long ToUnixTime (this DateTime dateTime) =>
+            (long)(dateTime - UnixStart).TotalSeconds;
+
+        /// <summary>
+        /// Get very last index of substrings.
+        /// </summary>
+        public static int LastIndexOfAny
+            (
+                string text,
+                string[] fragments
+            )
+        {
+            var result = -1;
+            foreach (var fragment in fragments)
+            {
+                var index = text.LastIndexOf(fragment, StringComparison.InvariantCulture);
+                if (index > result)
+                {
+                    result = index;
+                }
+            }
+
+            return result;
+        } // method LastIndexOfAny
 
         /// <summary>
         /// Упрощенное получение информации о методе.

@@ -32,6 +32,7 @@ namespace UnitTests.ManagedIrbis.Reports
             Assert.AreSame(text, cell.Text);
         }
 
+        /*
         [TestMethod]
         public void TextCell_Compute_1()
         {
@@ -58,6 +59,8 @@ namespace UnitTests.ManagedIrbis.Reports
                 Assert.AreEqual("Text\t", output);
             }
         }
+
+        */
 
         [TestMethod]
         public void TextCell_Verify_1()

@@ -5,7 +5,6 @@ using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis;
-using ManagedIrbis.Search;
 
 namespace UnitTests.ManagedIrbis.Search
 {

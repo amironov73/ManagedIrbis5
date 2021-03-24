@@ -15,6 +15,8 @@
 
 using AM;
 
+using ManagedIrbis.Infrastructure;
+
 #endregion
 
 #nullable enable
@@ -37,14 +39,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void ByteSum
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!ReferenceEquals(expression, null))
             {
-                byte[] bytes = IrbisEncoding.Utf8.GetBytes(expression);
+                var bytes = IrbisEncoding.Utf8.GetBytes(expression);
                 long sum = 0;
                 unchecked
                 {

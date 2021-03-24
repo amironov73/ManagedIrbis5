@@ -188,7 +188,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return null;
             }
 
-            return DateTimeUtility.FromJulianDate(date);
+            return IrbisUtility.FromJulianDate(date);
         }
 
         private static string _FromDelphiDate

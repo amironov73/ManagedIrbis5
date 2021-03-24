@@ -26,6 +26,8 @@ namespace UnitTests.ManagedIrbis.Reports
             return Path.Combine(TestDataPath, "Reports");
         }
 
+        /*
+
         [TestMethod]
         public void ReportTest_Construction_1()
         {
@@ -59,5 +61,7 @@ namespace UnitTests.ManagedIrbis.Reports
                 Assert.IsFalse(result.Failed);
             }
         }
+
+        */
     }
 }

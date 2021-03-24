@@ -18,6 +18,8 @@
 
 #endregion
 
+using System;
+using AM.IO;
 using AM.PlatformAbstraction;
 
 using ManagedIrbis.Infrastructure;
@@ -86,6 +88,14 @@ namespace ManagedIrbis.Client
         public abstract Record? ReadRecordVersion(int mfn, int version);
 
         public abstract Term[] ReadTerms(TermParameters parameters);
+
+        public abstract bool FileExist(FileSpecification specification);
+
+        public abstract string GetGeneration();
+
+        public abstract IniFile GetUserIniFile();
+
+        public abstract void WriteRecord(Record record);
     } // class IrbisProvider
 
 } // namespace ManagedIrbis.Client

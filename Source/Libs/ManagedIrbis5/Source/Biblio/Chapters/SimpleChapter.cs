@@ -422,8 +422,9 @@ namespace ManagedIrbis.Biblio
                 .ThrowIfNull("processor.Report");
 
 
-            bool showOrder =
-                context.Document.CommonSettings.Value<bool?>("showOrder") ?? false;
+            bool showOrder = false;
+                // TODO: implement
+                /* context.Document.CommonSettings.Value<bool?>("showOrder") ?? false; */
 
             if (Records.Count != 0
                 || Duplicates.Count != 0

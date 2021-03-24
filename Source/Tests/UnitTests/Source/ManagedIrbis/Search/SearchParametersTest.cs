@@ -1,11 +1,8 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis;
-using ManagedIrbis.Search;
 
 namespace UnitTests.ManagedIrbis.Search
 {
@@ -17,32 +14,32 @@ namespace UnitTests.ManagedIrbis.Search
                 SearchParameters first
             )
         {
-            byte[] bytes = first.SaveToMemory();
+            var bytes = first.SaveToMemory();
 
-            SearchParameters second
+            var second
                 = bytes.RestoreObjectFromMemory<SearchParameters>();
 
             Assert.AreEqual(first.Database, second.Database);
             Assert.AreEqual(first.FirstRecord, second.FirstRecord);
-            Assert.AreEqual(first.FormatSpecification, second.FormatSpecification);
+            Assert.AreEqual(first.Format, second.Format);
             Assert.AreEqual(first.MaxMfn, second.MaxMfn);
             Assert.AreEqual(first.MinMfn, second.MinMfn);
             Assert.AreEqual(first.NumberOfRecords, second.NumberOfRecords);
-            Assert.AreEqual(first.SearchExpression, second.SearchExpression);
-            Assert.AreEqual(first.SequentialSpecification, second.SequentialSpecification);
+            Assert.AreEqual(first.Expression, second.Expression);
+            Assert.AreEqual(first.Sequential, second.Sequential);
         }
 
         [TestMethod]
         public void TestSearchParameters_Serialization()
         {
-            SearchParameters parameters = new SearchParameters();
+            var parameters = new SearchParameters();
             _TestSerialization(parameters);
 
             parameters = new SearchParameters
             {
                 Database = "IBIS",
-                SearchExpression = "T=A$",
-                FormatSpecification = "@brief"
+                Expression = "T=A$",
+                Format = "@brief"
             };
             _TestSerialization(parameters);
         }
@@ -50,32 +47,32 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TestSearchParameters_Clone()
         {
-            SearchParameters expected = new SearchParameters
+            var expected = new SearchParameters
             {
                 Database = "IBIS",
-                SearchExpression = "T=A$",
-                FormatSpecification = "@brief"
+                Expression = "T=A$",
+                Format = "@brief"
             };
-            SearchParameters actual = expected.Clone();
+            var actual = expected.Clone();
 
             Assert.AreEqual(expected.Database, actual.Database);
             Assert.AreEqual(expected.FirstRecord, actual.FirstRecord);
-            Assert.AreEqual(expected.FormatSpecification, actual.FormatSpecification);
+            Assert.AreEqual(expected.Format, actual.Format);
             Assert.AreEqual(expected.MaxMfn, actual.MaxMfn);
             Assert.AreEqual(expected.MinMfn, actual.MinMfn);
             Assert.AreEqual(expected.NumberOfRecords, actual.NumberOfRecords);
-            Assert.AreEqual(expected.SearchExpression, actual.SearchExpression);
-            Assert.AreEqual(expected.SequentialSpecification, actual.SequentialSpecification);
+            Assert.AreEqual(expected.Expression, actual.Expression);
+            Assert.AreEqual(expected.Sequential, actual.Sequential);
         }
 
         [TestMethod]
         public void TestSearchParameters_Verify()
         {
-            SearchParameters parameters = new SearchParameters
+            var parameters = new SearchParameters
             {
                 Database = "IBIS",
-                SearchExpression = "T=A$",
-                FormatSpecification = "@brief"
+                Expression = "T=A$",
+                Format = "@brief"
             };
             Assert.IsTrue(parameters.Verify(false));
         }

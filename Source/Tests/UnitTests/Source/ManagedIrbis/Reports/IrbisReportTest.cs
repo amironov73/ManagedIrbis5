@@ -10,6 +10,7 @@ using ManagedIrbis.Reports;
 
 namespace UnitTests.ManagedIrbis.Reports
 {
+    [Ignore]
     [TestClass]
     public class IrbisReportTest
         : Common.CommonUnitTest
@@ -56,34 +57,10 @@ namespace UnitTests.ManagedIrbis.Reports
             {
                 Record record = new Record();
 
-                record.Fields.Add
-                    (
-                        new RecordField
-                            (
-                                200,
-                                new SubField
-                                    (
-                                        'a',
-                                        "Record" + (i + 1)
-                                    )
-                            )
-                    );
-                record.Fields.Add
-                    (
-                        new RecordField
-                            (
-                                10,
-                                new SubField
-                                    (
-                                        'd',
-                                        (i+1).ToString
-                                        (
-                                            "F2",
-                                            CultureInfo.InvariantCulture
-                                        )
-                                    )
-                            )
-                    );
+                var field = record.Add(200);
+                field.Add('a', "Record" + (i + 1));
+                field = record.Add(10);
+                field.Add('d', (i + 1).ToString("F2", CultureInfo.InvariantCulture));
 
                 result.Add(record);
             }

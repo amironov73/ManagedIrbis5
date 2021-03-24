@@ -65,7 +65,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 NumberOfTerms = 10
             };
 
-            TermInfo[] terms;
+            Term[] terms;
             try
             {
                 terms = provider.ReadTerms(parameters);

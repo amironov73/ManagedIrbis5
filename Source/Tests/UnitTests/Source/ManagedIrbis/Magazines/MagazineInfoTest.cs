@@ -17,6 +17,7 @@ using ManagedIrbis.Magazines;
 
 namespace UnitTests.ManagedIrbis.Magazines
 {
+    [Ignore]
     [TestClass]
     public class MagazineInfoTest
     {

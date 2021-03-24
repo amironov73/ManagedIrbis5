@@ -37,11 +37,12 @@ namespace ManagedIrbis.Biblio
     ///
     /// </summary>
 
-    [JsonConverter(typeof(SpecialSettingsConverter))]
+    // [JsonConverter(typeof(SpecialSettingsConverter))]
     public sealed class SpecialSettings
     {
         #region Nested classes
 
+        /*
         class SpecialSettingsConverter
             : JsonConverter
         {
@@ -100,6 +101,8 @@ namespace ManagedIrbis.Biblio
 
             #endregion
         }
+
+        */
 
         #endregion
 
