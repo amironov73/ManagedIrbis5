@@ -10,7 +10,6 @@
 
 /* Podsob.cs -- подсобные фонды
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
  */
 
 #region Using directives

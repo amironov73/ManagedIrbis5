@@ -22,6 +22,7 @@ using AM.IO;
 using AM.Text;
 
 using ManagedIrbis.Client;
+using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -218,8 +219,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                     result.Expected = expected;
                 }
 
-                IrbisProvider provider = Provider
-                    .ThrowIfNull("Provider");
+                IrbisProvider provider = Provider.ThrowIfNull("Provider");
 
                 string output;
                 using (var formatter = new PftFormatter

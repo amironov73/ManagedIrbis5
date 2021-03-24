@@ -1,45 +1,40 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftNumericExpression.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+
+/* PftNumericExpression.cs -- математическое выражение
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
 using AM;
-using AM.Logging;
 using AM.IO;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    /// Математическое выражение
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftNumericExpression
         : PftNumeric
     {
@@ -48,20 +43,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Left operand.
         /// </summary>
-        [CanBeNull]
-        public PftNumeric LeftOperand { get; set; }
+        public PftNumeric? LeftOperand { get; set; }
 
         /// <summary>
         /// Operation.
         /// </summary>
-        [CanBeNull]
-        public string Operation { get; set; }
+        public string? Operation { get; set; }
 
         /// <summary>
         /// Right operand.
         /// </summary>
-        [CanBeNull]
-        public PftNumeric RightOperand { get; set; }
+        public PftNumeric? RightOperand { get; set; }
 
         /// <inheritdoc cref="PftNode.Children" />
         public override IList<PftNode> Children
@@ -71,7 +63,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(LeftOperand, null))
                     {
                         nodes.Add(LeftOperand);
@@ -85,18 +77,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Log.Error
-                    (
-                        "PftNumericExpression::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            protected set => Magna.Error
+                (
+                    "PftNumericExpression::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
         }
 
         #endregion
@@ -108,7 +94,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftNumericExpression()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -119,8 +105,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -132,10 +117,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 [NotNull] PftNumeric rightOperand
             )
         {
-            Code.NotNull(leftOperand, "leftOperand");
-            Code.NotNullNorEmpty(operation, "operation");
-            Code.NotNull(rightOperand, "rightOperand");
-
             LeftOperand = leftOperand;
             Operation = operation;
             RightOperand = rightOperand;
@@ -145,7 +126,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -162,18 +143,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 double rightValue
             )
         {
-            Code.NotNull(context, "context");
-            Code.NotNullNorEmpty(operation, "operation");
-
-#if PocketPC || WINMOBILE
-
-            operation = operation.ToLower();
-
-#else
-
             operation = operation.ToLowerInvariant();
-
-#endif
 
             double result;
             switch (operation)
@@ -195,20 +165,22 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     break;
 
                 case "%":
-                    // ReSharper disable once PossibleLossOfFraction
+                    // ReSharper disable PossibleLossOfFraction
                     result = (int)leftValue % (int)rightValue;
+                    // ReSharper enable PossibleLossOfFraction
                     break;
 
                 case "div":
-                    // ReSharper disable once PossibleLossOfFraction
+                    // ReSharper disable PossibleLossOfFraction
                     result = (int)leftValue / (int)rightValue;
+                    // ReSharper enable PossibleLossOfFraction
                     break;
 
                 default:
-                    Log.Error
+                    Magna.Error
                         (
-                            "PftNumericExpression: "
-                            + "unexpected operation="
+                            nameof(PftNumericExpression) + "::" + nameof(DoOperation)
+                            + ": unexpected operation="
                             + operation
                         );
 
@@ -216,8 +188,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             return result;
-        }
-
+        } // method DoOperation
 
         #endregion
 
@@ -226,21 +197,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftNumericExpression result
-                = (PftNumericExpression) base.Clone();
+            var result = (PftNumericExpression) base.Clone();
 
-            if (!ReferenceEquals(LeftOperand, null))
+            if (LeftOperand is { } left)
             {
-                result.LeftOperand = (PftNumeric) LeftOperand.Clone();
+                result.LeftOperand = (PftNumeric) left.Clone();
             }
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (RightOperand is { } right)
             {
-                result.RightOperand = (PftNumeric) RightOperand.Clone();
+                result.RightOperand = (PftNumeric) right.Clone();
             }
 
             return result;
-        }
+        } // method Clone
 
         #endregion
 
@@ -254,8 +224,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftNumericExpression otherExpression
-                = (PftNumericExpression) otherNode;
+            var otherExpression = (PftNumericExpression) otherNode;
             PftSerializationUtility.CompareNodes
                 (
                     LeftOperand,
@@ -270,7 +239,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 throw new IrbisException();
             }
-        }
+        } // method CompareNode
 
         /// <inheritdoc cref="PftNode.Compile" />
         public override void Compile
@@ -319,7 +288,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Deserialize" />
         protected internal override void Deserialize
@@ -329,12 +298,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            LeftOperand
-                = (PftNumeric) PftSerializer.DeserializeNullable(reader);
+            LeftOperand = (PftNumeric?) PftSerializer.DeserializeNullable(reader);
             Operation = reader.ReadNullableString();
-            RightOperand
-                = (PftNumeric) PftSerializer.DeserializeNullable(reader);
-        }
+            RightOperand = (PftNumeric?) PftSerializer.DeserializeNullable(reader);
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -344,12 +311,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            if (ReferenceEquals(LeftOperand, null))
+            if (LeftOperand is null)
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftNumericExpression: "
-                        + "LeftOperand not specified"
+                        nameof(PftNumericExpression) + "::" + nameof(Execute)
+                        + ": LeftOperand not specified"
                     );
 
                 throw new PftSyntaxException(this);
@@ -357,33 +324,33 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (string.IsNullOrEmpty(Operation))
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftNumericExpression: "
-                        + "Operation not specified"
+                        nameof(PftNumericExpression) + "::" + nameof(Execute)
+                        + ": Operation not specified"
                     );
 
                 throw new PftSyntaxException(this);
             }
 
-            if (ReferenceEquals(RightOperand, null))
+            if (RightOperand is null)
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftNumericExpression: "
-                        + "RightOperand not specified"
+                        nameof(PftNumericExpression) + "::" + nameof(Execute)
+                        + ": RightOperand not specified"
                     );
 
                 throw new PftSyntaxException(this);
             }
 
-            using (PftContextGuard guard = new PftContextGuard(context))
+            using (var guard = new PftContextGuard(context))
             {
-                PftContext clone = guard.ChildContext;
+                var clone = guard.ChildContext;
                 clone.Evaluate(LeftOperand);
-                double leftValue = LeftOperand.Value;
+                var leftValue = LeftOperand.Value;
                 clone.Evaluate(RightOperand);
-                double rightValue = RightOperand.Value;
+                var rightValue = RightOperand.Value;
                 Value = DoOperation
                     (
                         context,
@@ -394,22 +361,22 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)
             };
 
-            if (!ReferenceEquals(LeftOperand, null))
+            if (LeftOperand is { } left)
             {
-                PftNodeInfo leftNode = new PftNodeInfo
+                var leftNode = new PftNodeInfo
                 {
-                    Node = LeftOperand,
+                    Node = left,
                     Name = "Left"
                 };
                 result.Children.Add(leftNode);
@@ -418,7 +385,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!string.IsNullOrEmpty(Operation))
             {
-                PftNodeInfo operationNode = new PftNodeInfo
+                var operationNode = new PftNodeInfo
                 {
                     Name = "Operation",
                     Value = Operation
@@ -426,11 +393,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 result.Children.Add(operationNode);
             }
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (RightOperand is { } right)
             {
-                PftNodeInfo rightNode = new PftNodeInfo
+                var rightNode = new PftNodeInfo
                 {
-                    Node = RightOperand,
+                    Node = right,
                     Name = "Right"
                 };
                 result.Children.Add(rightNode);
@@ -438,39 +405,34 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             return result;
-        }
+        } // method GetNodeInfo
 
         /// <inheritdoc cref="PftNode.Optimize" />
         public override PftNode Optimize()
         {
-            if (!ReferenceEquals(LeftOperand, null))
+            if (LeftOperand is { } left)
             {
-                LeftOperand = (PftNumeric) LeftOperand.Optimize();
+                LeftOperand = (PftNumeric?) left.Optimize();
             }
-            if (!ReferenceEquals(RightOperand, null))
+
+            if (RightOperand is { } right)
             {
-                RightOperand = (PftNumeric) RightOperand.Optimize();
+                RightOperand = (PftNumeric?) right.Optimize();
             }
 
             return this;
-        }
+        } // method Optimize
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
             (
-            PftPrettyPrinter printer
+                PftPrettyPrinter printer
             )
         {
-            if (!ReferenceEquals(LeftOperand, null))
-            {
-                LeftOperand.PrettyPrint(printer);
-            }
-            printer.Write(" {0} ", Operation);
-            if (!ReferenceEquals(RightOperand, null))
-            {
-                RightOperand.PrettyPrint(printer);
-            }
-        }
+            LeftOperand?.PrettyPrint(printer);
+            printer.Write(" {0} ", Operation ?? String.Empty);
+            RightOperand?.PrettyPrint(printer);
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -483,14 +445,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             PftSerializer.SerializeNullable(writer, LeftOperand);
             writer.WriteNullable(Operation);
             PftSerializer.SerializeNullable(writer, RightOperand);
-        }
+        } // method Serialize
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -499,14 +457,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append(LeftOperand);
             result.Append(Operation);
             result.Append(RightOperand);
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftNumericExpression
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

@@ -51,7 +51,6 @@ namespace ManagedIrbis.Pft.Infrastructure
     /// <summary>
     /// Umarci.
     /// </summary>
-
     public sealed class Umarci
         : IFormatExit
     {
@@ -328,8 +327,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            int index;
-            if (!NumericUtility.TryParseInt32(indexText, out index))
+            if (!Utility.TryParseInt32(indexText, out var index))
             {
                 return;
             }

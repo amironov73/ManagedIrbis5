@@ -1,23 +1,28 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* IndexInfo.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* IndexInfo.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM;
-using JetBrains.Annotations;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     internal sealed class IndexInfo
     {
@@ -26,18 +31,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Specification.
         /// </summary>
-        public IndexSpecification Specification { get; private set; }
+        public IndexSpecification Specification { get; }
 
         /// <summary>
         /// Identifier.
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; }
 
         /// <summary>
         /// Reference.
         /// </summary>
-        [NotNull]
-        public string Reference { get; private set; }
+        public string Reference { get; }
 
         #endregion
 
@@ -64,7 +68,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         private bool Equals
             (
                 IndexInfo other
-        )
+            )
         {
             return Id == other.Id;
         }
@@ -72,19 +76,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <inheritdoc cref="object.Equals(object)" />
         public override bool Equals
             (
-                object obj
+                object? obj
             )
         {
             if (ReferenceEquals(null, obj))
             {
                 return false;
             }
+
             if (ReferenceEquals(this, obj))
             {
                 return true;
             }
 
-            IndexInfo info = obj as IndexInfo;
+            var info = obj as IndexInfo;
 
             return !ReferenceEquals(info, null)
                    && Equals(info);

@@ -84,9 +84,8 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private FieldSpecification? ReadField()
         {
-            FieldSpecification result = new FieldSpecification();
-
-            TextPosition position = _navigator.SavePosition();
+            var result = new FieldSpecification();
+            var position = _navigator.SavePosition();
             _navigator.Move(-1);
 
             if (!result.Parse(_navigator))
@@ -291,7 +290,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 char stop
             )
         {
-            string result = _navigator.ReadUntilNoCrLf(stop);
+            string? result = _navigator.ReadUntilNoCrLf(stop);
             if (ReferenceEquals(result, null))
             {
                 ThrowSyntax();
@@ -462,8 +461,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                                 ReadChar();
                                 ReadChar();
                                 kind = PftTokenKind.TripleCurly;
-                                value = _navigator.ReadTo("}}}");
-                                if (ReferenceEquals(value, null))
+                                value = _navigator.ReadTo("}}}").ToString();
+                                if (string.IsNullOrEmpty(value))
                                 {
                                     ThrowSyntax();
                                 }
@@ -591,7 +590,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         if (c2 == '*')
                         {
                             ReadChar();
-                            value = _navigator.ReadUntil('\r', '\n');
+                            value = _navigator.ReadUntil('\r', '\n').ToString();
                             kind = PftTokenKind.Comment;
                         }
                         else
@@ -617,7 +616,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                                 ReadChar();
                                 ReadChar();
                                 kind = PftTokenKind.TripleLess;
-                                value = _navigator.ReadTo(">>>");
+                                value = _navigator.ReadTo(">>>").ToString();
                                 if (ReferenceEquals(value, null))
                                 {
                                     ThrowSyntax();
@@ -691,9 +690,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                     case '\x1C':
                     case '\u221F':
-                        value = _navigator.ReadUntil('\x1D', '\u2194');
+                        value = _navigator.ReadUntil('\x1D', '\u2194').ToString();
                         if (string.IsNullOrEmpty(value)
-                            || !ReadChar().OneOf('\x1D', '\u2194'))
+                            || !ReadChar().IsOneOf('\x1D', '\u2194'))
                         {
                             ThrowSyntax();
                         }

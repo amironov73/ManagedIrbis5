@@ -318,7 +318,7 @@ namespace ManagedIrbis.Pft
             int current = 0;
             foreach (var field in fields)
             {
-                var subfields = field.GetSubField(code);
+                var subfields = field.GetSubFields(code);
 
                 if (subfieldIndex.Kind == IndexKind.None)
                 {
@@ -341,13 +341,13 @@ namespace ManagedIrbis.Pft
                 {
                     int i = subfieldIndex.ComputeValue(context, subfields);
 
-                    if (i >= subFields.Length)
+                    if (i >= subfields.Length)
                     {
                         field.Subfields.AddRange(newSubFields);
                     }
                     else
                     {
-                        int position = field.Subfields.IndexOf(subFields[i]);
+                        int position = field.Subfields.IndexOf(subfields[i]);
                         field.Subfields[i].Value = newSubFields[0].Value;
 
                         for (int j = 1; j < newSubFields.Count; j++)
@@ -788,9 +788,9 @@ namespace ManagedIrbis.Pft
                 default:
                     Magna.Error
                         (
-                            "PftUtiltity::FormatField: "
-                            + "unexpected data mode="
-                            + mode.ToVisibleString()
+                            nameof(PftUtility) + "::" + nameof(FormatField)
+                            + ": unexpected data mode="
+                            + mode
                         );
 
                     throw new ArgumentOutOfRangeException();
@@ -1120,14 +1120,14 @@ namespace ManagedIrbis.Pft
             }
             else
             {
-                SubField[] subFields = field.GetSubField(subFieldCode);
+                var subFields = field.GetSubFields(subFieldCode);
                 subFields = GetArrayItem
                     (
                         context,
                         subFields,
                         subFieldRepeat
                     );
-                SubField subField = subFields.GetOccurrence(0);
+                var subField = subFields.FirstOrDefault();
                 if (!ReferenceEquals(subField, null))
                 {
                     result = subField.Value;

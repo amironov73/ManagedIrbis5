@@ -1,40 +1,32 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftParallelWith.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* PftParallelWith.cs -- параллельная версия "with"
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
-using AM.Logging;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    /// Параллельная версия "with"
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftParallelWith
         : PftNode
     {
@@ -43,22 +35,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Variable reference.
         /// </summary>
-        [CanBeNull]
-        public PftVariableReference Variable { get; set; }
+        public PftVariableReference? Variable { get; set; }
 
         /// <summary>
         /// Fields.
         /// </summary>
-        [NotNull]
         public NonNullCollection<FieldSpecification> Fields { get; private set; }
 
-        /// <inheritdoc/>
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        /// <inheritdoc cref="PftNode.ExtendedSyntax"/>
+        public override bool ExtendedSyntax => true;
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="PftNode.Children"/>
         public override IList<PftNode> Children
         {
             get
@@ -67,7 +54,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
 
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Variable, null))
                     {
                         nodes.Add(Variable);
@@ -77,19 +64,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Log.Error
-                    (
-                        "PftParallelWith::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
-        }
+            protected set => Magna.Error
+                (
+                    "PftParallelWith::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
+        } // property Children
 
         #endregion
 
@@ -100,26 +81,27 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftParallelWith()
         {
-        }
+            Fields = new();
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftParallelWith
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Parallel);
-        }
+            Fields = new();
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -128,7 +110,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            PftParallelWith result = (PftParallelWith)base.Clone();
+            var result = (PftParallelWith)base.Clone();
 
             result._virtualChildren = null;
 
@@ -138,7 +120,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             result.Fields = new NonNullCollection<FieldSpecification>();
-            foreach (FieldSpecification field in Fields)
+            foreach (var field in Fields)
             {
                 result.Fields.Add
                 (
@@ -147,7 +129,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             return result;
-        }
+        } // method Clone
 
         #endregion
 
@@ -163,9 +145,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             base.Execute(context);
 
+            // TODO: implement
+
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         #endregion
-    }
-}
+
+    } // class PftParallelWith
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

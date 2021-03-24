@@ -1,21 +1,24 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* NodeDictionary.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* NodeDictionary.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System.Collections.Generic;
 
-using CodeJam;
-
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
@@ -26,31 +29,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Forward dictionary.
         /// </summary>
-        [NotNull]
-        public Dictionary<int, NodeInfo> Forward { get; private set; }
+        public Dictionary<int, NodeInfo> Forward { get; } = new();
 
         /// <summary>
         /// Backward dictionary.
         /// </summary>
-        [NotNull]
-        public Dictionary<PftNode, NodeInfo> Backward { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public NodeDictionary()
-        {
-            Forward = new Dictionary<int, NodeInfo>();
-            Backward = new Dictionary<PftNode, NodeInfo>();
-        }
-
-        #endregion
-
-        #region Private members
+        public Dictionary<PftNode, NodeInfo> Backward { get; } = new();
 
         #endregion
 
@@ -58,23 +42,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
         public void Add
             (
-                [NotNull] NodeInfo info
+                NodeInfo info
             )
         {
-            Code.NotNull(info, "info");
-
             Forward.Add(info.Id, info);
             Backward.Add(info.Node, info);
-        }
+        } // method Add
 
-        [CanBeNull]
         public NodeInfo Get
             (
                 int id
             )
         {
-            NodeInfo result;
-            Forward.TryGetValue(id, out result);
+            Forward.TryGetValue(id, out var result);
 
             if (ReferenceEquals(result, null))
             {
@@ -82,16 +62,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             }
 
             return result;
-        }
+        } // method Get
 
-        [NotNull]
         public NodeInfo Get
             (
-                [NotNull] PftNode node
+                PftNode node
             )
         {
-            NodeInfo result;
-            Backward.TryGetValue(node, out result);
+            Backward.TryGetValue(node, out var result);
 
             if (ReferenceEquals(result, null))
             {
@@ -99,12 +77,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             }
 
             return result;
-        }
+        } // method Get
 
         #endregion
 
-        #region Object members
+    } // class NodeDictionary
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Pft.Infrastructure.Compiler

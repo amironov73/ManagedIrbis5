@@ -1,13 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* RemoteFormatter.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
-
-#if CLASSIC
 
 #region Using directives
 
@@ -23,29 +25,16 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Logging;
-using AM.Runtime;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-using Newtonsoft.Json;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
     /// <summary>
     ///
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class RemoteFormatter
         : IDisposable
     {
@@ -59,19 +48,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Domain
         /// </summary>
-        [NotNull]
         public AppDomain Domain { get; private set; }
 
         /// <summary>
         /// Assembly.
         /// </summary>
-        [NotNull]
         public Assembly Assembly { get; private set; }
 
         /// <summary>
         /// Formatter type.
         /// </summary>
-        [NotNull]
         public Type FormatterType { get; private set; }
 
         #endregion
@@ -83,11 +69,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public RemoteFormatter
             (
-                [NotNull] string assemblyFile
+                string assemblyFile
             )
         {
-            Code.NotNullNorEmpty(assemblyFile, "assemblyFile");
-
             string friendlyName = "RemoteFormatter"
                 + (++Counter).ToInvariantString();
 
@@ -128,22 +112,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
         #region Public methods
 
         /// <summary>
         /// Get formatter instance.
         /// </summary>
-        [NotNull]
         public PftPacket GetFormatter
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
-            Code.NotNull(context, "context");
+            /*
 
 // Obsolete method call
 #pragma warning disable 618
@@ -169,6 +148,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             }
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -188,5 +171,3 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         #endregion
     }
 }
-
-#endif

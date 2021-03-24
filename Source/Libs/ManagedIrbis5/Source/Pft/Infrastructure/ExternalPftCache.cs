@@ -1,7 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* ExternalPftCache.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* ExternalPftCache.cs -- дисковый кэш для скомпилированных PFT-скриптов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -13,25 +20,19 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-using AM.IO;
-using AM.Reflection;
-
-
-
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 
-
 #endregion
 
-// ReSharper disable InconsistentNaming
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    ///
+    /// Дисковый кэш для скомпилированных PFT-скриптов
     /// </summary>
-
     public sealed class ExternalPftCache
     {
         #region Constants
@@ -39,12 +40,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Serialized AST file extension.
         /// </summary>
-        public const string AST = ".ast";
+        public const string Ast = ".ast";
 
         /// <summary>
         /// DLL file extension.
         /// </summary>
-        public const string DLL = ".dll";
+        public const string Dll = ".dll";
 
         #endregion
 
@@ -65,9 +66,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         // ReSharper disable once NotNullMemberIsNotInitialized
         public ExternalPftCache()
         {
+            RootDirectory = string.Empty; // to make compiler happy
             _hasp = new object();
             SetRootDirectory(GetDefaultRootDirectory());
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -77,11 +79,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string rootDirectory
             )
         {
-            Code.NotNullNorEmpty(rootDirectory, "rootDirectory");
-
+            RootDirectory = rootDirectory; // to make compiler happy
             _hasp = new object();
             SetRootDirectory(rootDirectory);
-        }
+        } // constructor
 
         #endregion
 
@@ -102,13 +103,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 byte[] image
             )
         {
-            Code.NotNull(scriptText, "scriptText");
-            Code.NotNull(image, "image");
-
             lock (_hasp)
             {
-                string path = ComputePath(scriptText) + DLL;
-                FileUtility.WriteAllBytes(path, image);
+                var path = ComputePath(scriptText) + Dll;
+                File.WriteAllBytes(path, image);
             }
         }
 
@@ -121,13 +119,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 byte[] image
             )
         {
-            Code.NotNull(scriptText, "scriptText");
-            Code.NotNull(image, "image");
-
             lock (_hasp)
             {
-                string path = ComputePath(scriptText) + AST;
-                FileUtility.WriteAllBytes(path, image);
+                var path = ComputePath(scriptText) + Ast;
+                File.WriteAllBytes(path, image);
             }
         }
 
@@ -138,16 +133,14 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             lock (_hasp)
             {
-                string[] files = Directory.GetFiles
+                var files = Directory.EnumerateFiles
                     (
                         RootDirectory,
-                        "*.*"
-#if !WINMOBILE && !PocketPC
-                        , SearchOption.AllDirectories
-#endif
+                        "*.*",
+                        SearchOption.AllDirectories
                     );
 
-                foreach (string file in files)
+                foreach (var file in files)
                 {
                     File.Delete(file);
                 }
@@ -162,89 +155,51 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string scriptText
             )
         {
-            Code.NotNullNorEmpty(scriptText, "scriptText");
-
-            using (MD5 md5 = MD5.Create())
+            using var md5 = MD5.Create();
+            var bytes = IrbisEncoding.Utf8.GetBytes(scriptText);
+            var hash = md5.ComputeHash(bytes);
+            var result = new StringBuilder(hash.Length * 2);
+            foreach (var one in hash)
             {
-                byte[] bytes = IrbisEncoding.Utf8.GetBytes(scriptText);
-                byte[] hash = md5.ComputeHash(bytes);
-                StringBuilder result = new StringBuilder(hash.Length * 2);
-                foreach (byte one in hash)
-                {
-                    result.AppendFormat(one.ToString("X2"));
-                }
-
-                return result.ToString();
+                result.AppendFormat(one.ToString("X2"));
             }
+
+            return result.ToString();
         }
 
         /// <summary>
         /// Compute full file name for given script.
         /// </summary>
-        public string ComputePath
+        public string ComputePath(string scriptText) => Path.Combine
             (
-                string scriptText
-            )
-        {
-            Code.NotNull(scriptText, scriptText);
-
-            string fileName = ComputeFileName(scriptText);
-            string result = Path.Combine
-                (
-                    RootDirectory,
-                    fileName
-                );
-
-            return result;
-        }
+                RootDirectory,
+                ComputeFileName(scriptText)
+            );
 
         /// <summary>
         /// </summary>
         /// Get path of default cache root directory.
-        public string GetDefaultRootDirectory()
-        {
-#if UAP
-
-            // TODO Implement properly
-
-            return ".";
-
-#else
-
-            string result = Path.Combine
+        public string GetDefaultRootDirectory() => Path.Combine
+            (
+                Path.Combine
                 (
-                    Path.Combine
-                    (
-                        Environment.GetFolderPath
-                            (
-                                Environment.SpecialFolder.ApplicationData
-                            ),
-                        "ManagedIrbis"
-                    ),
-                    "PftCache"
-                );
-
-            return result;
-
-#endif
-        }
+                    Environment.GetFolderPath (Environment.SpecialFolder.ApplicationData),
+                    "ManagedIrbis"
+                ),
+                "PftCache"
+            );
 
         /// <summary>
         /// Get DLL for specified script.
         /// </summary>
-        [CanBeNull]
-        public Func<PftContext, PftPacket> GetDll
+        public Func<PftContext, PftPacket>? GetDll
             (
                 string scriptText
             )
         {
-            Code.NotNullNorEmpty(scriptText, "scriptText");
-
-#if CLASSIC || NETCORE || ANDROID
-
             lock (_hasp)
             {
-                string path = GetPath(scriptText, DLL);
+                var path = GetPath(scriptText, Dll);
                 if (ReferenceEquals(path, null))
                 {
                     return null;
@@ -252,39 +207,26 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 // TODO choose the right method
 
-                Assembly assembly = AssemblyUtility.LoadFile(path);
-                //Assembly assembly = Assembly.LoadFrom(path);
-
-                Func<PftContext, PftPacket> result =
-                    CompilerUtility.GetEntryPoint(assembly);
+                var assembly = Assembly.LoadFile(path);
+                var result = CompilerUtility.GetEntryPoint(assembly);
 
                 return result;
 
             }
-
-#else
-
-                return null;
-
-#endif
-        }
+        } // method GetDll
 
         /// <summary>
         /// Get supposed path for specified script.
         /// </summary>
-        [CanBeNull]
-        public string GetPath
+        public string? GetPath
             (
                 string scriptText,
                 string extension
             )
         {
-            Code.NotNullNorEmpty(scriptText, "scriptText");
-            Code.NotNull(extension, "extension");
-
             lock (_hasp)
             {
-                string result = ComputePath(scriptText) + extension;
+                var result = ComputePath(scriptText) + extension;
                 if (File.Exists(result))
                 {
                     return result;
@@ -292,28 +234,25 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
 
             return null;
-        }
+        } // method GetPath
 
         /// <summary>
         /// Get serialized PFT for the script.
         /// </summary>
-        [CanBeNull]
-        public PftNode GetSerializedPft
+        public PftNode? GetSerializedPft
             (
                 string scriptText
             )
         {
-            Code.NotNullNorEmpty(scriptText, "scriptText");
-
             lock (_hasp)
             {
-                string path = GetPath(scriptText, AST);
+                var path = GetPath(scriptText, Ast);
                 if (ReferenceEquals(path, null))
                 {
                     return null;
                 }
 
-                PftNode result = PftSerializer.Read(path);
+                var result = PftSerializer.Read(path);
                 return result;
             }
         }
@@ -326,8 +265,6 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string path
             )
         {
-            Code.NotNullNorEmpty(path, "path");
-
             lock (_hasp)
             {
                 path = Path.GetFullPath(path);
@@ -345,11 +282,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return RootDirectory;
-        }
+        public override string ToString() => RootDirectory;
 
         #endregion
-    }
-}
+
+    } // class ExternalPftCache
+
+} // namespace ManagedIrbis.Pft.Infrastructure

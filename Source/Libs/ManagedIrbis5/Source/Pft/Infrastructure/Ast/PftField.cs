@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -126,7 +128,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     nodes.AddRange(LeftHand);
                     nodes.AddRange(RightHand);
                     _virtualChildren.SetChildren(nodes);
@@ -134,17 +136,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            protected set
-            {
-                // Nothing to do here
-
-                Magna.Error
-                    (
-                        "PftField::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            protected set => Magna.Error
+                (
+                    "PftField::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
         }
 
         #endregion
@@ -158,7 +155,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             LeftHand = new PftNodeCollection(this);
             RightHand = new PftNodeCollection(this);
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -171,17 +168,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             LeftHand = new PftNodeCollection(this);
             RightHand = new PftNodeCollection(this);
-        }
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
-        private PftNumeric _tagProgram;
+        private PftNumeric? _tagProgram;
 
-        private PftNode _subFieldProgram;
+        private PftNode? _subFieldProgram;
 
         #endregion
 
@@ -247,49 +244,47 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <summary>
         /// Evaluate tag specification (if any).
         /// </summary>
-        public string? EvaluateTagSpecification
+        public void EvaluateTagSpecification
             (
                 PftContext context
             )
         {
-            string tagSpecification = TagSpecification;
+            var tagSpecification = TagSpecification;
             if (!string.IsNullOrEmpty(tagSpecification))
             {
                 if (ReferenceEquals(_tagProgram, null))
                 {
-                    PftLexer lexer = new PftLexer();
-                    PftTokenList tokens = lexer.Tokenize(tagSpecification);
-                    PftParser parser = new PftParser(tokens);
+                    var lexer = new PftLexer();
+                    var tokens = lexer.Tokenize(tagSpecification);
+                    var parser = new PftParser(tokens);
                     _tagProgram = parser.ParseArithmetic();
                 }
 
-                string textValue = context.Evaluate(_tagProgram);
-                int integerValue = (int)_tagProgram.Value;
+                var textValue = context.Evaluate(_tagProgram);
+                var integerValue = (int)_tagProgram.Value;
                 Tag = integerValue != 0
                     ? integerValue.ToInvariantString()
                     : textValue;
             }
 
-            string subFieldSpecification = SubFieldSpecification;
+            var subFieldSpecification = SubFieldSpecification;
             if (!string.IsNullOrEmpty(subFieldSpecification))
             {
                 if (ReferenceEquals(_subFieldProgram, null))
                 {
-                    PftLexer lexer = new PftLexer();
-                    PftTokenList tokens = lexer.Tokenize(subFieldSpecification);
-                    PftParser parser = new PftParser(tokens);
+                    var lexer = new PftLexer();
+                    var tokens = lexer.Tokenize(subFieldSpecification);
+                    var parser = new PftParser(tokens);
                     _subFieldProgram = parser.Parse();
                 }
 
-                string value = context.Evaluate(_subFieldProgram);
+                var value = context.Evaluate(_subFieldProgram);
                 if (!string.IsNullOrEmpty(value))
                 {
                     SubField = value[0];
                 }
             }
-
-            return Tag;
-        }
+        } // method EvaluateTagSpecification
 
         /// <inheritdoc cref="PftNode.GetAffectedFields" />
         public override int[] GetAffectedFields()
@@ -316,7 +311,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             EvaluateTagSpecification(context);
 
-            int index = context.Index;
+            var index = context.Index;
 
             var fields = PftUtility.GetArrayItem
                 (
@@ -342,7 +337,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result = LimitText(result);
 
             return result;
-        }
+        } // method GetValue
 
         /// <summary>
         /// Have value?
@@ -353,7 +348,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
         {
             var record = context.Record;
-            if (record == null
+            if (record is null
                 || string.IsNullOrEmpty(Tag))
             {
                 return false;
@@ -362,18 +357,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             var field = record.Fields.GetField(Tag.SafeToInt32(), context.Index);
 
             return !ReferenceEquals(field, null);
-        }
+        } // method HaveRepeat
 
         /// <summary>
         /// Is first repeat?
         /// </summary>
-        public bool IsFirstRepeat
-            (
-                PftContext context
-            )
-        {
-            return context.Index == 0;
-        }
+        public bool IsFirstRepeat(PftContext context) => context.Index == 0;
 
         /// <summary>
         /// Is last repeat?
@@ -399,8 +388,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 return text;
             }
 
-            int offset = Offset;
-            int length = 100000000;
+            var offset = Offset;
+            var length = 100000000;
             if (Length != 0)
             {
                 length = Length;
@@ -414,14 +403,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 );
 
             return result;
-        }
+        } // method LimitText
 
         /// <summary>
         /// Convert to <see cref="FieldSpecification"/>.
         /// </summary>
-        public FieldSpecification ToSpecification()
-        {
-            var result = new FieldSpecification
+        public FieldSpecification ToSpecification() => new()
             {
                 Command = Command,
                 Embedded = Embedded,
@@ -434,9 +421,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 Tag = Tag.SafeToInt32()
             };
 
-            return result;
-        }
-
         #endregion
 
         #region ICloneable members
@@ -444,7 +428,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            PftField result = (PftField)base.Clone();
+            var result = (PftField)base.Clone();
 
             result._virtualChildren = null;
 
@@ -463,7 +447,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             return result;
-        }
+        } // method Clone
 
         #endregion
 
@@ -477,7 +461,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftField otherField = (PftField)otherNode;
+            var otherField = (PftField)otherNode;
             if (Command != otherField.Command
                 || Embedded != otherField.Embedded
                 || Indent != otherField.Indent
@@ -519,13 +503,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            FieldInfo info = compiler.CompileField(this);
+            var info = compiler.CompileField(this);
 
             compiler.CompileNodes(LeftHand);
             compiler.CompileNodes(RightHand);
 
-            string leftHand = compiler.CompileAction(LeftHand) ?? "null";
-            string rightHand = compiler.CompileAction(RightHand) ?? "null";
+            var leftHand = compiler.CompileAction(LeftHand) ?? "null";
+            var rightHand = compiler.CompileAction(RightHand) ?? "null";
 
             compiler.StartMethod(this);
 
@@ -592,7 +576,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name),
@@ -601,7 +585,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!string.IsNullOrEmpty(TagSpecification))
             {
-                PftNodeInfo spec = new PftNodeInfo
+                var spec = new PftNodeInfo
                 {
                     Name = "TagSpec",
                     Value = TagSpecification
@@ -611,7 +595,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (FieldRepeat.Kind != IndexKind.None)
             {
-                PftNodeInfo index = new PftNodeInfo
+                var index = new PftNodeInfo
                 {
                     Name = "FieldIndex",
                     Value = FieldRepeat.Expression
@@ -621,7 +605,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (SubFieldRepeat.Kind != IndexKind.None)
             {
-                PftNodeInfo index = new PftNodeInfo
+                var index = new PftNodeInfo
                 {
                     Name = "SubFieldIndex",
                     Value = SubFieldRepeat.Expression
@@ -631,12 +615,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (LeftHand.Count != 0)
             {
-                PftNodeInfo leftNode = new PftNodeInfo
+                var leftNode = new PftNodeInfo
                 {
                     Name = "Left hand"
                 };
                 result.Children.Add(leftNode);
-                foreach (PftNode node in LeftHand)
+                foreach (var node in LeftHand)
                 {
                     leftNode.Children.Add(node.GetNodeInfo());
                 }
@@ -644,12 +628,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (RightHand.Count != 0)
             {
-                PftNodeInfo rightNode = new PftNodeInfo
+                var rightNode = new PftNodeInfo
                 {
                     Name = "Right hand"
                 };
                 result.Children.Add(rightNode);
-                foreach (PftNode node in RightHand)
+                foreach (var node in RightHand)
                 {
                     rightNode.Children.Add(node.GetNodeInfo());
                 }
@@ -659,13 +643,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        public override PftNode? Optimize()
         {
             LeftHand.Optimize();
             RightHand.Optimize();
 
             return this;
-        }
+        } // method Optimize
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -678,7 +662,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             printer.WriteNodes(LeftHand);
 
-            FieldSpecification specification = ToSpecification();
+            var specification = ToSpecification();
             printer.Write(specification.ToString());
 
             printer.WriteNodes(RightHand);
@@ -719,7 +703,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             PftUtility.NodesToText(result, LeftHand);
             result.Append(ToSpecification());
             PftUtility.NodesToText(result, RightHand);
@@ -728,5 +712,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
+
+    } // class PftField
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

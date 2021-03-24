@@ -17,6 +17,7 @@
 
 using System;
 using ManagedIrbis.Client;
+using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
 
@@ -30,6 +31,11 @@ namespace ManagedIrbis.Pft
     public interface IPftFormatter
         : IDisposable
     {
+        /// <summary>
+        /// Программа.
+        /// </summary>
+        public PftProgram? Program { get; set; }
+
         /// <summary>
         /// Whether the formatter supports the extended syntax.
         /// </summary>

@@ -10,7 +10,6 @@
 
 /* Service.cs -- услуга, оказанная библиотекой
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
  */
 
 #region Using directives

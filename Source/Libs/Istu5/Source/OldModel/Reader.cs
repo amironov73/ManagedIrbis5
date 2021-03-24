@@ -10,7 +10,6 @@
 
 /* Reader.cs -- информация о читателе
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
  */
 
 #region Using directives

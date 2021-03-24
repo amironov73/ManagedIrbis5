@@ -1,6 +1,10 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
 /* MenuSubChapter.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -8,34 +12,23 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+
 using AM;
-using AM.Collections;
 using AM.Text;
 using AM.Text.Output;
 
-
-
-using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
-
-using Newtonsoft.Json.Linq;
-
 #endregion
 
-// ReSharper disable ForCanBeConvertedToForeach
+#nullable enable
 
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
     ///
     /// </summary>
-
     public class MenuSubChapter
         : ChapterWithRecords
     {
@@ -44,19 +37,16 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Key.
         /// </summary>
-        [CanBeNull]
-        public string Key { get; set; }
+        public string? Key { get; set; }
 
         /// <summary>
         /// Main chapter.
         /// </summary>
-        [CanBeNull]
-        public MenuChapter MainChapter { get; set; }
+        public MenuChapter? MainChapter { get; set; }
 
         /// <summary>
         /// Value.
         /// </summary>
-        [CanBeNull]
         public string Value { get; set; }
 
         /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
@@ -69,19 +59,15 @@ namespace ManagedIrbis.Biblio
                     return false;
                 }
 
-                MenuChapter mainChapter = MainChapter;
-                if (ReferenceEquals(mainChapter, null))
+                var mainChapter = MainChapter;
+                if (mainChapter is null)
                 {
                     return Records.Count == 0;
                 }
 
                 return mainChapter.LeafOnly && Records.Count == 0;
             }
-        }
-
-        #endregion
-
-        #region Construction
+        } // property IsServiceChapter
 
         #endregion
 
@@ -95,13 +81,13 @@ namespace ManagedIrbis.Biblio
             BiblioChapter chapter = this;
             while (!ReferenceEquals(chapter, null))
             {
-                MenuSubChapter subChapter = chapter as MenuSubChapter;
+                var subChapter = chapter as MenuSubChapter;
                 if (!ReferenceEquals(subChapter, null))
                 {
-                    SpecialSettings settings = subChapter.Settings;
+                    var settings = subChapter.Settings;
                     if (!ReferenceEquals(settings, null))
                     {
-                        string result = settings.GetSetting("format");
+                        var result = settings.GetSetting("format");
                         if (!string.IsNullOrEmpty(result))
                         {
                             return result;
@@ -126,13 +112,13 @@ namespace ManagedIrbis.Biblio
             BiblioChapter chapter = this;
             while (!ReferenceEquals(chapter, null))
             {
-                MenuSubChapter subChapter = chapter as MenuSubChapter;
+                var subChapter = chapter as MenuSubChapter;
                 if (!ReferenceEquals(subChapter, null))
                 {
-                    SpecialSettings settings = subChapter.Settings;
+                    var settings = subChapter.Settings;
                     if (!ReferenceEquals(settings, null))
                     {
-                        string result = settings.GetSetting("order");
+                        var result = settings.GetSetting("order");
                         if (!string.IsNullOrEmpty(result))
                         {
                             return result;
@@ -154,7 +140,7 @@ namespace ManagedIrbis.Biblio
                 string text
             )
         {
-            string result = text
+            var result = text
                 .Replace(". - ", ". – ")
                 .Replace("№", "\\'B9");
 
@@ -175,10 +161,8 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
-            Record record = null;
+            var log = context.Log;
+            Record? record = null;
 
             log.WriteLine("Begin build items {0}", this);
             Items = new ItemCollection();
@@ -187,14 +171,14 @@ namespace ManagedIrbis.Biblio
             {
                 if (Records.Count != 0)
                 {
-                    BiblioProcessor processor = context.Processor
+                    var processor = context.Processor
                         .ThrowIfNull("context.Processor");
-                    MenuChapter mainChapter = MainChapter
+                    var mainChapter = MainChapter
                         .ThrowIfNull("MainChapter");
 
-                    using (IPftFormatter formatter = processor.AcquireFormatter(context))
+                    using (var formatter = processor.AcquireFormatter(context))
                     {
-                        string descriptionFormat = GetDescriptionFormat();
+                        var descriptionFormat = GetDescriptionFormat();
                         descriptionFormat = processor.GetText
                             (
                                 context,
@@ -205,20 +189,20 @@ namespace ManagedIrbis.Biblio
                         //string[] formatted
                         //    = FormatRecords(context, descriptionFormat);
 
-                        for (int i = 0; i < Records.Count; i++)
+                        for (var i = 0; i < Records.Count; i++)
                         {
                             log.Write(".");
                             record = Records[i];
                             //string description = formatted[i]
                             //    .TrimEnd('\u001F');
-                            string description = formatter.FormatRecord(record)
+                            var description = formatter.FormatRecord(record)
                                 .TrimEnd('\u001F');
 
                             // TODO handle string.IsNullOrEmpty(description)
 
                             description = BiblioUtility.AddTrailingDot(description);
 
-                            BiblioItem item = new BiblioItem
+                            var item = new BiblioItem
                             {
                                 Chapter = this,
                                 Record = record,
@@ -226,12 +210,12 @@ namespace ManagedIrbis.Biblio
                             };
                             Items.Add(item);
 
-                            RecordCollection same = record.UserData as RecordCollection;
+                            var same = record.UserData as RecordCollection;
                             if (!ReferenceEquals(same, null))
                             {
-                                foreach (Record oneRecord in same)
+                                foreach (var oneRecord in same)
                                 {
-                                    string desc = formatter.FormatRecord(oneRecord)
+                                    var desc = formatter.FormatRecord(oneRecord)
                                         .TrimEnd('\u001F');
                                     desc = BiblioUtility.AddTrailingDot(desc);
                                     oneRecord.Description = desc;
@@ -243,7 +227,7 @@ namespace ManagedIrbis.Biblio
 
                         //string orderFormat = mainChapter.OrderBy
                         //    .ThrowIfNull("mainChapter.OrderBy");
-                        string orderFormat = GetOrderFormat();
+                        var orderFormat = GetOrderFormat();
                         orderFormat = processor.GetText
                             (
                                 context,
@@ -252,13 +236,13 @@ namespace ManagedIrbis.Biblio
                             .ThrowIfNull("processor.GetText");
                         formatter.ParseProgram(orderFormat);
                         // formatted = FormatRecords(context, orderFormat);
-                        for (int i = 0; i < Items.Count; i++)
+                        for (var i = 0; i < Items.Count; i++)
                         {
                             log.Write(".");
-                            BiblioItem item = Items[i];
+                            var item = Items[i];
                             record = item.Record;
                             //string order = formatted[i].TrimEnd('\u001F');
-                            string order = formatter.FormatRecord(record)
+                            var order = formatter.FormatRecord(record)
                                 .TrimEnd('\u001F');
 
                             // TODO handle string.IsNullOrEmpty(order)
@@ -277,14 +261,14 @@ namespace ManagedIrbis.Biblio
                     }
                 }
 
-                foreach (BiblioChapter chapter in Children)
+                foreach (var chapter in Children)
                 {
                     chapter.BuildItems(context);
                 }
             }
             catch (Exception exception)
             {
-                string message = string.Format
+                var message = string.Format
                     (
                         "Exception: {0}", exception
                     );
@@ -312,23 +296,17 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            Code.NotNull(context, "context");
-
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
             // ReportDriver driver = context.ReportContext.Driver;
 
-            bool showOrder =
-#if WINMOBILE || PocketPC
-                false;
-#else
+            var showOrder =
                 context.Document.CommonSettings.Value<bool?>("showOrder") ?? false;
-#endif
 
             if (Records.Count != 0
                 || Duplicates.Count != 0
@@ -336,12 +314,12 @@ namespace ManagedIrbis.Biblio
             {
                 RenderTitle(context);
 
-                for (int i = 0; i < Items.Count; i++)
+                for (var i = 0; i < Items.Count; i++)
                 {
                     log.Write(".");
-                    BiblioItem item = Items[i];
-                    int number = item.Number;
-                    string description = item.Description.ThrowIfNull("item.Description");
+                    var item = Items[i];
+                    var number = item.Number;
+                    var description = item.Description.ThrowIfNull("item.Description");
 
                     description = Enhance(description);
 
@@ -359,7 +337,7 @@ namespace ManagedIrbis.Biblio
                             RichText.Encode3(description, UnicodeRange.Russian, "\\f2")
                         ));
 
-                    Record record = item.Record;
+                    var record = item.Record;
 
                     // Для отладки: проверить упорядочение
                     if (showOrder)
@@ -374,12 +352,12 @@ namespace ManagedIrbis.Biblio
 
                     if (!ReferenceEquals(record, null))
                     {
-                        RecordCollection sameBooks = record.UserData as RecordCollection;
+                        var sameBooks = record.UserData as RecordCollection;
                         if (!ReferenceEquals(sameBooks, null))
                         {
-                            foreach (Record book in sameBooks)
+                            foreach (var book in sameBooks)
                             {
-                                string text = book.Description;
+                                var text = book.Description;
                                 text = RichText.Encode3(text, UnicodeRange.Russian, "\\f2")
                                     .ThrowIfNull();
                                 band = new ParagraphBand(text);
@@ -408,9 +386,9 @@ namespace ManagedIrbis.Biblio
         /// <inheritdoc cref="BiblioChapter.ToString" />
         public override string ToString()
         {
-            string result = base.ToString()
-                + " [:] "
-                + Records.Count.ToInvariantString();
+            var result = base.ToString()
+                         + " [:] "
+                         + Records.Count.ToInvariantString();
 
             return result;
         }

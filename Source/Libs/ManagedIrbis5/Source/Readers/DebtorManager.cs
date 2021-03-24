@@ -91,14 +91,8 @@ namespace ManagedIrbis.Readers
 
         private string? _fromDate, _toDate;
 
-        private void HandleBatchRead
-            (
-                object sender,
-                EventArgs eventArgs
-            )
-        {
-            BatchRead.Raise(sender, eventArgs);
-        }
+        private void HandleBatchRead(object sender, EventArgs eventArgs) =>
+            BatchRead?.Invoke(sender, eventArgs);
 
         /// <summary>
         /// Setup <see cref="FromDate"/> and

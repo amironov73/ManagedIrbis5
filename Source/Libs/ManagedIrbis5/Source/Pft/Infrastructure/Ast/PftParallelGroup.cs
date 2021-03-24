@@ -1,39 +1,37 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftParallelGroup.cs --
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+
+/* PftParallelGroup.cs -- параллельная повторяющаяся группа
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
+using AM;
 
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    /// Параллельная повторяющаяся группа.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftParallelGroup
         : PftNode
     {
@@ -45,42 +43,33 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public static bool ThrowOnEmpty { get; set; }
 
         /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression
-        {
-            get { return true; }
-        }
+        public override bool ComplexExpression => true;
+
+        /// <inheritdoc cref="PftNode.ExtendedSyntax"/>
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Static constructor.
-        /// </summary>
-        static PftParallelGroup()
-        {
-            ThrowOnEmpty = false;
-        }
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         public PftParallelGroup()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftParallelGroup
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Parallel);
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -91,7 +80,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(children)
         {
-        }
+        } // constructor
 
         #endregion
 
@@ -103,12 +92,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            if (!ReferenceEquals(context.CurrentGroup, null))
+            if (context.CurrentGroup is not null)
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftParallelGroup::Execute: "
-                        + "nested group detected: "
+                        nameof(PftParallelGroup) + "::" + nameof(Execute)
+                        + ": nested group detected: "
                         + this
                     );
 
@@ -121,10 +110,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Children.Count == 0)
             {
-                Log.Error
+                Magna.Error
                     (
-                        "PftParalllelGroup::Execute: "
-                        + "empty group: "
+                        nameof(PftParallelGroup) + "::" + nameof(Execute)
+                        + ": empty group: "
                         + this
                     );
 
@@ -140,7 +129,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             try
             {
-                PftGroup group = new PftGroup();
+                var group = new PftGroup();
 
                 context.CurrentGroup = group;
 
@@ -148,42 +137,41 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 try
                 {
-                    int[] affectedFields = GetAffectedFields();
-                    int repeatCount = PftUtility.GetFieldCount
-                        (
-                            context,
-                            affectedFields
-                        )
-                        + 1;
+                    var affectedFields = GetAffectedFields();
+                    var repeatCount = PftUtility.GetFieldCount
+                                      (
+                                          context,
+                                          affectedFields
+                                      )
+                                      + 1;
 
-                    PftIteration[] allIterations
-                        = new PftIteration[repeatCount];
-                    for (int index = 0; index < repeatCount; index++)
+                    var allIterations = new PftIteration[repeatCount];
+                    for (var index = 0; index < repeatCount; index++)
                     {
-                        PftIteration iteration = new PftIteration
+                        var iteration = new PftIteration
                             (
                                 context,
                                 (PftNodeCollection)Children,
                                 index,
-                                (iter,data) => iter.Context.Execute(iter.Nodes),
+                                (iter,_) => iter.Context.Execute(iter.Nodes),
                                 this,
                                 true
                             );
                         allIterations[index] = iteration;
                     }
 
-                    Task[] tasks = allIterations
+                    var tasks = allIterations
                         .Select(iter => iter.Task)
                         .ToArray();
                     Task.WaitAll(tasks);
 
-                    foreach (PftIteration iteration in allIterations)
+                    foreach (var iteration in allIterations)
                     {
                         if (!ReferenceEquals(iteration.Exception, null))
                         {
-                            Log.TraceException
+                            Magna.TraceException
                                 (
-                                    "PftParallelGroup::Execute",
+                                    nameof(PftParallelGroup) + "::" + nameof(Execute),
                                     iteration.Exception
                                 );
 
@@ -207,9 +195,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
                     // It was break operator
 
-                    Log.TraceException
+                    Magna.TraceException
                         (
-                            "PftParalleGroup::Execute",
+                            "PftParallelGroup::Execute",
                             exception
                         );
                 }
@@ -220,12 +208,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 context.CurrentGroup = null;
             }
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        public override PftNode? Optimize()
         {
-            PftNodeCollection children = (PftNodeCollection) Children;
+            var children = (PftNodeCollection) Children;
             children.Optimize();
 
             if (children.Count == 0)
@@ -236,7 +224,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             return this;
-        }
+        } // method Optimize
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -244,7 +232,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftPrettyPrinter printer
             )
         {
-            bool isComplex = PftUtility.IsComplexExpression(Children);
+            var isComplex = PftUtility.IsComplexExpression(Children);
             if (isComplex)
             {
                 printer.EatWhitespace();
@@ -280,14 +268,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     .WriteIndentIfNeeded()
                     .Write(')');
             }
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -296,14 +280,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append("parallel(");
             PftUtility.NodesToText(result, Children);
             result.Append(')');
 
-            return StringBuilderCache.GetStringAndRelease(result);
-        }
+            return result.ToString();
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftParallelGroup
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

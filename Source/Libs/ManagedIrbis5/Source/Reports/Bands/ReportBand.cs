@@ -181,7 +181,7 @@ namespace ManagedIrbis.Reports
             if (afterRendering is not null)
             {
                 var eventArgs = new ReportRenderingEventArgs(context);
-                afterRendering.Raise(this, eventArgs);
+                afterRendering(this, eventArgs);
             }
         } // method OnAfterRendering
 
@@ -197,7 +197,7 @@ namespace ManagedIrbis.Reports
             if (beforeRendering is not null)
             {
                 var eventArgs = new ReportRenderingEventArgs(context);
-                beforeRendering.Raise(this, eventArgs);
+                beforeRendering(this, eventArgs);
 
                 context.OnRendering();
             }

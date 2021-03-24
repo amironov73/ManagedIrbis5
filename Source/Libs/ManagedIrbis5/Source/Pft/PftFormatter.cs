@@ -12,6 +12,7 @@
 #region Using directives
 
 using ManagedIrbis.Client;
+using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
 
@@ -38,8 +39,13 @@ namespace ManagedIrbis.Pft
 
         #region IPftFormatter members
 
+        /// <inheritdoc cref="IPftFormatter.Program"/>
+        public PftProgram? Program { get; set; }
+
         public virtual bool SupportsExtendedSyntax { get; }
+
         public object Context { get; }
+
         public virtual string FormatRecord(Record? record) =>
             throw new System.NotImplementedException();
 

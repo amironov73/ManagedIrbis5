@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -14,11 +15,13 @@
 #region Using directives
 
 using System.Linq;
-using AM;
+
 using AM.Collections;
 using AM.Text;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -118,7 +121,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public PftMask()
         {
             Alternatives = new NonNullCollection<string>();
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -129,9 +132,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             )
         {
             Alternatives = new NonNullCollection<string>();
-            string[] parts = Utility.SplitString(specification, "|");
+            var parts = specification.Split('|');
             Alternatives.AddRange(parts);
-        }
+        } // constructor
 
         #endregion
 
@@ -203,5 +206,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         }
 
         #endregion
-    }
-}
+
+    } // class PftMask
+
+} // namespace ManagedIrbis.Pft.Infrastructure

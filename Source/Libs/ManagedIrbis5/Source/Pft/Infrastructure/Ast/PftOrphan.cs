@@ -1,51 +1,41 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftN.cs -- fake field reference
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* PftOrphan.cs -- сирота, ложная ссылка на поле/подполе.
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using AM.Logging;
+using System;
 
-using JetBrains.Annotations;
+using AM;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// Fake field reference.
+    /// Сирота - ложная ссылка на поле/подполе.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftOrphan
         : PftField
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection
-        {
-            get { return false; }
-        }
-
-        #endregion
-
-        #region Construction
+        public override bool RequiresConnection => false;
 
         #endregion
 
@@ -55,14 +45,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #endregion
 
-        #region Public methods
-
-        #endregion
-
         #region PftNode members
 
         /// <inheritdoc cref="PftField.Compile" />
-        public override void Compile(PftCompiler compiler)
+        public override void Compile
+            (
+                PftCompiler compiler
+            )
         {
             compiler.StartMethod(this);
 
@@ -70,13 +59,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftField.GetAffectedFields" />
-        public override int[] GetAffectedFields()
-        {
-            return new int[0];
-        }
+        public override int[] GetAffectedFields() => Array.Empty<int>();
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -90,21 +76,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!_traced)
             {
-                Log.Trace("PftOrphan::Execute");
+                Magna.Trace(nameof(PftOrphan) + "::" + nameof(Execute));
                 _traced = true;
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
-        {
-            // Take the node away from the AST
-
-            return null;
-        }
+        public override PftNode? Optimize() => null;
 
         #endregion
-    }
-}
+
+    } // method PftOrphan
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

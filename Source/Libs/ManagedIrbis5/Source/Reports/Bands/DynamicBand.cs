@@ -55,7 +55,7 @@ namespace ManagedIrbis.Reports
                 try
                 {
                     var eventArgs = new ReportRenderingEventArgs(context);
-                    rendering.Raise(this, eventArgs);
+                    rendering(this, eventArgs);
                 }
                 catch (Exception exception)
                 {
@@ -68,7 +68,7 @@ namespace ManagedIrbis.Reports
             }
 
             OnAfterRendering(context);
-        } // method
+        } // method Render
 
         #endregion
 

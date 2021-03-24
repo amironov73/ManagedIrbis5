@@ -10,7 +10,6 @@
 
 /* Attendance.cs -- посещение библиотеки
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
  */
 
 #region Using directives

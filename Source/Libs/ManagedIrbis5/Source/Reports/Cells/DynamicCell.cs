@@ -61,7 +61,7 @@ namespace ManagedIrbis.Reports
                 try
                 {
                     eventArgs = new ReportComputeEventArgs(context);
-                    computation.Raise(this, eventArgs);
+                    computation(this, eventArgs);
                 }
                 catch (Exception exception)
                 {
@@ -90,7 +90,7 @@ namespace ManagedIrbis.Reports
                 try
                 {
                     var eventArgs = new ReportRenderingEventArgs(context);
-                    Rendering.Raise(this, eventArgs);
+                    rendering(this, eventArgs);
                 }
                 catch (Exception exception)
                 {

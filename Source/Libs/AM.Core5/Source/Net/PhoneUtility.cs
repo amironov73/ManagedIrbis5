@@ -9,8 +9,6 @@
 
 /* PhoneUtility.cs -- утилиты для работы с номером телефона.
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives

@@ -1,20 +1,20 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* CompilerProxy.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
-
-#if CLASSIC || NETCORE
 
 #region Using directives
 
 using System;
 using System.Reflection;
-
-using JetBrains.Annotations;
 
 #endregion
 
@@ -34,10 +34,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Load the assembly.
         /// </summary>
-        [NotNull]
         public Assembly LoadAssembly
             (
-                [NotNull] string assemblyPath
+                string assemblyPath
             )
         {
             Assembly result = Assembly.LoadFile(assemblyPath);
@@ -49,4 +48,3 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
     }
 }
 
-#endif

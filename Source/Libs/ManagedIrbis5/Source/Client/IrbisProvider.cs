@@ -82,6 +82,10 @@ namespace ManagedIrbis.Client
         public abstract IPftFormatter AcquireFormatter();
 
         public abstract MenuFile? ReadMenuFile(FileSpecification specification);
+
+        public abstract Record? ReadRecordVersion(int mfn, int version);
+
+        public abstract Term[] ReadTerms(TermParameters parameters);
     } // class IrbisProvider
 
 } // namespace ManagedIrbis.Client

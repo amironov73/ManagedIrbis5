@@ -119,8 +119,7 @@ namespace ManagedIrbis.Reports
             if (rendering is not null)
             {
                 var eventArgs = new ReportEventArgs(this);
-
-                Rendering.Raise(this, eventArgs);
+                rendering(this, eventArgs);
             }
         } // method OnRendering
 

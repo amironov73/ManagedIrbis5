@@ -1,54 +1,44 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftNumericExpression.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+
+/* PftNumericLiteral.cs -- числовой литерал
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 
 using AM;
 
-using JetBrains.Annotations;
-
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
-// ReSharper disable CompareOfFloatsByEqualityOperator
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Числовой литерал.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftNumericLiteral
         : PftNumeric
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ConstantExpression" />
-        public override bool ConstantExpression
-        {
-            get { return true; }
-        }
+        public override bool ConstantExpression => true;
 
         /// <inheritdoc cref="PftNode.RequiresConnection" />
-        public override bool RequiresConnection
-        {
-            get { return false; }
-        }
+        public override bool RequiresConnection => false;
 
         #endregion
 
@@ -59,7 +49,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftNumericLiteral()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -70,23 +60,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(value)
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftNumericLiteral
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Value = double.Parse
-                (
-                    token.Text.ThrowIfNull("token.Text"),
-                    CultureInfo.InvariantCulture
-                );
-        }
+            Value = token.Text.ThrowIfNull("token.Text").ParseDouble();
+        } // constructor
 
         #endregion
 
@@ -108,7 +94,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.CompareNode"/>
         internal override void CompareNode
@@ -118,8 +104,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftNumericLiteral otherLiteral = (PftNumericLiteral) otherNode;
-            if (Value != otherLiteral.Value) //-V3024
+            var otherLiteral = (PftNumericLiteral) otherNode;
+            if (Value != otherLiteral.Value)
             {
                 throw new IrbisException();
             }
@@ -168,22 +154,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="PftNode.ToString" />
-        public override string ToString()
-        {
-            return Value.ToInvariantString();
-        }
+        public override string ToString() => Value.ToInvariantString();
 
         #endregion
-    }
-}
+
+    } // class PftNumericLiteral
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

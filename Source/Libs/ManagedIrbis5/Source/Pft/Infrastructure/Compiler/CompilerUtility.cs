@@ -9,26 +9,16 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* CompilerUtility.cs --
+/* CompilerUtility.cs -- вспомогательные методы для PFT-компилятора
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
 
 #endregion
 
@@ -37,7 +27,7 @@ using AM.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
     /// <summary>
-    ///
+    /// Вспомогательные методы для PFT-компилятора.
     /// </summary>
     public static class CompilerUtility
     {
@@ -46,19 +36,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Convert boolean to string according C# rules.
         /// </summary>
-        public static string BooleanToText
-            (
-                bool value
-            )
-        {
-            return value ? "true" : "false";
-        }
+        public static string BooleanToText (bool value) => value ? "true" : "false";
 
         /// <summary>
         /// Escape the text according C# rules.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
         public static string? Escape
             (
                 string? text
@@ -67,7 +49,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             // TODO implement properly
 
             return text;
-        }
+        } // method Escape
 
         /// <summary>
         /// Find entry point of the assembly.
@@ -77,12 +59,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 Assembly assembly
             )
         {
-            Type[] types = assembly.GetTypes();
+            var types = assembly.GetTypes();
             if (types.Length != 1)
             {
                 throw new PftCompilerException();
             }
-            Type type = types[0];
+
+            var type = types[0];
             if (!type.IsSubclassOf(typeof(PftPacket)))
             {
                 throw new PftCompilerException();
@@ -98,8 +81,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 )
                 .ThrowIfNull("type.GetMethod");
 
-            var result = (Func<PftContext, PftPacket>)
-                Delegate.CreateDelegate
+            var result = (Func<PftContext, PftPacket>) Delegate.CreateDelegate
                     (
                         typeof(Func<PftContext, PftPacket>),
                         method,
@@ -107,16 +89,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                     )
                     .ThrowIfNull("CreateDelegate");
 
-            if (ReferenceEquals(result, null))
-            {
-                throw new PftCompilerException();
-            }
-
             return result;
-        }
+        } // method GetEntryPoint
 
         /// <summary>
-        /// Shorten the text.
+        /// Укорачиваем текст, чтобы комментарии были не слишком длинными.
         /// </summary>
         public static string ShortenText
             (
@@ -128,14 +105,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 return string.Empty;
             }
 
-            string result = text.Replace('\r', ' ')
+            var result = text.Replace('\r', ' ')
                 .Replace('\n', ' ')
                 .SafeSubstring(0, 25)
-                .IfEmpty(string.Empty);
+                ?? string.Empty;
 
             return result;
-        }
+        } // method ShortenText
 
         #endregion
-    }
-}
+
+    } // class CompilerUtility
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Compiler

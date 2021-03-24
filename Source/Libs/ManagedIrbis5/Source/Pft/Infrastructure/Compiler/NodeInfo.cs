@@ -1,24 +1,22 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* NodeInfo.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* NodeInfo.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using CodeJam;
-
-using JetBrains.Annotations;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     internal sealed class NodeInfo
     {
@@ -27,7 +25,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Node.
         /// </summary>
-        [NotNull]
         public PftNode Node { get; private set; }
 
         /// <summary>
@@ -50,11 +47,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         public NodeInfo
             (
                 int id,
-                [NotNull] PftNode node
+                PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
             Id = id;
             Node = node;
         }
@@ -74,30 +69,30 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <inheritdoc cref="object.Equals(object)" />
         public override bool Equals
             (
-                object obj
+                object? obj
             )
         {
             if (ReferenceEquals(null, obj))
             {
                 return false;
             }
+
             if (ReferenceEquals(this, obj))
             {
                 return true;
             }
 
-            NodeInfo info = obj as NodeInfo;
+            var info = obj as NodeInfo;
 
             return !ReferenceEquals(info, null)
                 && Equals(info);
         }
 
         /// <inheritdoc cref="object.GetHashCode" />
-        public override int GetHashCode()
-        {
-            return Id;
-        }
+        public override int GetHashCode() => Id;
 
         #endregion
-    }
-}
+
+    } // class MethodInfo
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Compiler

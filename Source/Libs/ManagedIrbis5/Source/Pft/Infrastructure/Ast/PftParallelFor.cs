@@ -1,42 +1,39 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftParallelFor.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* PftParallelFor.cs -- параллельная версия цикла "для"
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using AM;
-using AM.Logging;
-using AM.Text;
-
-using CodeJam;
-
-using JetBrains.Annotations;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
-using MoonSharp.Interpreter;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// Parallel for loop.
+    /// Параллельная версия цикла "для".
     /// </summary>
     /// <example>
     /// parallel for $x=0; $x &lt; 10; $x = $x+1;
@@ -46,47 +43,35 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
     ///     #
     /// end
     /// </example>
-    [PublicAPI]
-    [MoonSharpUserData]
     public sealed class PftParallelFor
         : PftNode
     {
         #region Properties
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression
-        {
-            get { return true; }
-        }
+        public override bool ComplexExpression => true;
 
         /// <summary>
         /// Initialization.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Initialization { get; private set; }
 
         /// <summary>
         /// Condition.
         /// </summary>
-        [CanBeNull]
-        public PftCondition Condition { get; set; }
+        public PftCondition? Condition { get; set; }
 
         /// <summary>
         /// Loop statements.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Loop { get; private set; }
 
         /// <summary>
         /// Body.
         /// </summary>
-        [NotNull]
         public PftNodeCollection Body { get; private set; }
 
         /// <inheritdoc cref="PftNode.Children" />
@@ -97,7 +82,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     nodes.AddRange(Initialization);
                     if (!ReferenceEquals(Condition, null))
                     {
@@ -110,19 +95,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
-
-                Log.Error
-                    (
-                        "PftParallelFor::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
-        }
+            protected set => Magna.Error
+                (
+                    nameof(PftParallelFor) + "::" + nameof(Children)
+                    + ": set value="
+                    + value.ToVisibleString()
+                );
+        } // property Children
 
         #endregion
 
@@ -143,11 +122,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftParallelFor
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
-            Code.NotNull(token, "token");
             token.MustBe(PftTokenKind.Parallel);
 
             Initialization = new PftNodeCollection(this);
@@ -159,11 +137,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         private bool _EvaluateCondition
             (
-                [NotNull] PftContext context
+                PftContext context
             )
         {
             if (ReferenceEquals(Condition, null))
@@ -183,11 +161,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftParallelFor result = (PftParallelFor) base.Clone();
+            var result = (PftParallelFor) base.Clone();
 
             result._virtualChildren = null;
 
-            result.Initialization 
+            result.Initialization
                 = Initialization.CloneNodes(result).ThrowIfNull();
             result.Loop = Loop.CloneNodes(result).ThrowIfNull();
             result.Body = Body.CloneNodes(result).ThrowIfNull();
@@ -213,8 +191,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             base.Deserialize(reader);
 
             PftSerializer.Deserialize(reader, Initialization);
-            Condition
-                = (PftCondition)PftSerializer.DeserializeNullable(reader);
+            Condition = (PftCondition?)PftSerializer.DeserializeNullable(reader);
             PftSerializer.Deserialize(reader, Loop);
             PftSerializer.Deserialize(reader, Body);
         }
@@ -231,17 +208,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             try
             {
-                List<PftIteration> allIterations 
-                    = new List<PftIteration>();
+                var allIterations = new List<PftIteration>();
 
                 while (_EvaluateCondition(context))
                 {
-                    PftIteration iteration = new PftIteration
+                    var iteration = new PftIteration
                         (
                             context,
                             Body,
                             0,
-                            (iter, data) => iter.Context.Execute(iter.Nodes),
+                            (iter, _) => iter.Context.Execute(iter.Nodes),
                             this,
                             false
                         );
@@ -251,18 +227,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     context.Execute(Loop);
                 }
 
-                Task[] tasks = allIterations
+                var tasks = allIterations
                     .Select(iter => iter.Task)
                     .ToArray();
                 Task.WaitAll(tasks);
 
-                foreach (PftIteration iteration in allIterations)
+                foreach (var iteration in allIterations)
                 {
                     if (!ReferenceEquals(iteration.Exception, null))
                     {
-                        Log.TraceException
+                        Magna.TraceException
                             (
-                                "PftParallelFor::Execute",
+                                nameof(PftParallelFor) + "::" + nameof(Execute),
                                 iteration.Exception
                             );
 
@@ -285,20 +261,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 // It was break operator
 
-                Log.TraceException
+                Magna.TraceException
                     (
-                        "PftParallelFor::Execute",
+                        nameof(PftParallelFor) + "::" + nameof(Execute),
                         exception
                     );
             }
 
             OnAfterExecution(context);
-        }
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "ParallelFor"
@@ -306,20 +282,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Initialization.Count != 0)
             {
-                PftNodeInfo init = new PftNodeInfo
+                var init = new PftNodeInfo
                 {
                     Name = "Init"
                 };
                 result.Children.Add(init);
-                foreach (PftNode node in Initialization)
+                foreach (var node in Initialization)
                 {
                     init.Children.Add(node.GetNodeInfo());
                 }
             }
 
-            if (!ReferenceEquals(Condition, null))
+            if (Condition is not null)
             {
-                PftNodeInfo condition = new PftNodeInfo
+                var condition = new PftNodeInfo
                 {
                     Node = Condition,
                     Name = "Condition"
@@ -330,29 +306,29 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Loop.Count != 0)
             {
-                PftNodeInfo loop = new PftNodeInfo
+                var loop = new PftNodeInfo
                 {
                     Name = "Loop"
                 };
                 result.Children.Add(loop);
-                foreach (PftNode node in Loop)
+                foreach (var node in Loop)
                 {
                     loop.Children.Add(node.GetNodeInfo());
                 }
             }
 
-            PftNodeInfo body = new PftNodeInfo
+            var body = new PftNodeInfo
             {
                 Name = "Body"
             };
             result.Children.Add(body);
-            foreach (PftNode node in Body)
+            foreach (var node in Body)
             {
                 body.Children.Add(node.GetNodeInfo());
             }
 
             return result;
-        }
+        } // method GetNodeInfo
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -371,10 +347,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer.WriteNodes(Initialization);
             printer.Write("; ");
 
-            if (!ReferenceEquals(Condition, null))
-            {
-                Condition.PrettyPrint(printer);
-            }
+            Condition?.PrettyPrint(printer);
             printer.Write("; ");
 
             printer.WriteNodes(Loop);
@@ -392,7 +365,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer
                 .WriteIndent()
                 .WriteLine("end");
-        }
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -406,7 +379,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             PftSerializer.SerializeNullable(writer, Condition);
             PftSerializer.Serialize(writer, Loop);
             PftSerializer.Serialize(writer, Body);
-        }
+        } // method Serialize
 
         #endregion
 
@@ -415,7 +388,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = StringBuilderCache.Acquire();
+            var result = new StringBuilder();
             result.Append("parallel for ");
             PftUtility.NodesToText(result, Initialization);
             result.Append(';');
@@ -426,9 +399,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             PftUtility.NodesToText(result, Body);
             result.Append(" end");
 
-            return StringBuilderCache.GetStringAndRelease(result);
-        }
+            return result.ToString();
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftParallelFor
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

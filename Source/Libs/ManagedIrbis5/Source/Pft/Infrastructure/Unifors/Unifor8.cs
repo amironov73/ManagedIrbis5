@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 
 using AM;
@@ -165,7 +164,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         StartTerm = query.TrimEnd('$'),
                         NumberOfTerms = 1
                     };
-                    TermInfo[] terms = provider.ReadTerms(parameters);
+                    Term[] terms = provider.ReadTerms(parameters);
                     if (terms.Length == 0)
                     {
                         return;
@@ -209,9 +208,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 for (var i = 0; i < lines.Length; i++)
                 {
                     var line = lines[i];
-                    parts = StringUtility.SplitString
+                    parts = line.TrimStart().Split
                         (
-                            line.TrimStart(),
                             CommonSeparators.SpaceOrTab,
                             3
                         );
@@ -221,9 +219,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     }
 
                     // ищем строки, соответствующие указанным тегу и технике индексирования
-                    int lineTag, lineMethod;
-                    if (!NumericUtility.TryParseInt32(parts[0], out lineTag)
-                        || !NumericUtility.TryParseInt32(parts[1], out lineMethod))
+                    if (!Utility.TryParseInt32(parts[0], out var lineTag)
+                        || !Utility.TryParseInt32(parts[1], out var lineMethod))
                     {
                         continue;
                     }
@@ -262,9 +259,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         program.Execute(nestedContext);
                         var formatted = nestedContext.Text;
                         formatted = formatted.Trim(CommonSeparators.NewLineAndPercent);
-                        string[] subLines = StringUtility.SplitString
+                        string[] subLines = formatted.Split
                             (
-                                formatted,
                                 CommonSeparators.NewLineAndPercent,
                                 StringSplitOptions.RemoveEmptyEntries
                             );

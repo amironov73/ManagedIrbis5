@@ -9,7 +9,6 @@
 
 /* BotService.cs -- сервис, запускающий прослушивание телеграм.
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
  */
 
 #region Using directives

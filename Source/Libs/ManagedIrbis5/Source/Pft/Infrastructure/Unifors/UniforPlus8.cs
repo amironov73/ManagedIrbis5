@@ -1,21 +1,25 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlus8.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using AM.Text;
 
-using JetBrains.Annotations;
-
 using ManagedIrbis.PlatformSpecific;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -28,7 +32,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // +8<имя_DLL>,<имя_функции>,<передаваемые_данные>
     // Внешние функции должны ОБЯЗАТЕЛЬНО иметь следующую структуру:
     // в случае Pascal
-    // test_function1(buf1, buf2: Pchar; bufsize: integer): integer; 
+    // test_function1(buf1, buf2: Pchar; bufsize: integer): integer;
     // в случае C
     // int test_function1(char* buf1, char* buf2, int bufsize)
     // где: buf1 – передаваемые данные(входные), buf2 – возвращаемые
@@ -38,7 +42,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // любое другое значение – ненормальное.
     // В случае нестандартного вызова функций из DLL (по Pascal-правилам)
     // надо указывать символ* перед именем DLL:
-    // &unifor('+8*<имя_DLL>,<имя_функции>,.... 
+    // &unifor('+8*<имя_DLL>,<имя_функции>,....
     // Следует помнить, что имя функции в вызове надо указывать
     // строго в соответствии с тем, как она экспортирована из DLL,
     // большие и маленькие буквы различаются.
@@ -61,9 +65,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         public static void ExecuteNativeMethod
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -78,22 +82,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 winApi = true;
                 navigator.ReadChar();
             }
-            string dllName = navigator.ReadUntil(',');
+            string dllName = navigator.ReadUntil(',').ToString();
             if (string.IsNullOrEmpty(dllName))
             {
                 return;
             }
 
             navigator.ReadChar(); // eat the comma
-            string methodName = navigator.ReadUntil(',');
+            string methodName = navigator.ReadUntil(',').ToString();
             if (string.IsNullOrEmpty(methodName))
             {
                 return;
             }
 
             navigator.ReadChar(); // eat the comma
-            string input = navigator.GetRemainingText()
-                ?? string.Empty;
+            string input = navigator.GetRemainingText().ToString();
 
             var result = MethodRunner.RunMethod
                 (

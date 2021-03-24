@@ -1,34 +1,29 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftNumeric.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* PftNumeric.cs -- некое числовое значение (абстрактный класс)
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
-#region Using directives
-
-using JetBrains.Annotations;
-
-using MoonSharp.Interpreter;
-
-#endregion
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// 
+    /// Некое числовое значение (абстрактный класс).
+    /// От этого класса наследуются все математические выражения.
     /// </summary>
-    [PublicAPI]
-    [MoonSharpUserData]
     public abstract class PftNumeric
         : PftNode
     {
         #region Properties
 
         /// <summary>
-        /// Value.
+        /// Вычисленное значение.
         /// </summary>
         public double Value { get; set; }
 
@@ -41,7 +36,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         protected PftNumeric()
         {
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -52,14 +47,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
         {
             Value = value;
-        }
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         protected PftNumeric
             (
-                [NotNull] PftToken token
+                PftToken token
             )
             : base(token)
         {
@@ -78,21 +73,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #endregion
 
-        #region PftNode members
+    } // class PftNumeric
 
-        ///// <inheritdoc cref="PftNode.Execute" />
-        //public override void Execute
-        //    (
-        //        PftContext context
-        //    )
-        //{
-        //    OnBeforeExecution(context);
-
-        //    base.Execute(context);
-
-        //    OnAfterExecution(context);
-        //}
-
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

@@ -135,8 +135,8 @@ namespace ManagedIrbis.Biblio
             string value = item.Suffix;
 
             var record = new Record();
-            record.Fields.Add(new RecordField(1, key));
-            record.Fields.Add(new RecordField(2, value));
+            record.Fields.Add(new Field { Tag = 1, Value = key });
+            record.Fields.Add(new Field { Tag = 2, Value = value });
             var title = formatter.FormatRecord(record);
 
             string className = null;

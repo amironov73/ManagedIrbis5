@@ -43,6 +43,7 @@ namespace ManagedIrbis
     [DebuggerDisplay("[{" + nameof(Database) +
         "}] MFN={" + nameof(Mfn) + "} ({" + nameof(Version) + "})")]
     public sealed class Record
+        : IVerifiable
     {
         #region Constants
 
@@ -438,6 +439,23 @@ namespace ManagedIrbis
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<Record>(this, throwOnError);
+
+            // TODO: implement
+
+            return verifier.Result;
+        } // method Verify
 
         #endregion
 

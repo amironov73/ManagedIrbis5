@@ -83,14 +83,8 @@ namespace ManagedIrbis.Readers
 
         #region Private members
 
-        private void HandleBatchRead
-            (
-                object? sender,
-                EventArgs eventArgs
-            )
-        {
-            BatchRead.Raise(sender, eventArgs);
-        }
+        private void HandleBatchRead(object? sender, EventArgs eventArgs) =>
+            BatchRead?.Invoke(sender, eventArgs);
 
         #endregion
 

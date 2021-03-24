@@ -132,6 +132,24 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
+        /// Assign the field from another.
+        /// </summary>
+        public Field AssignFrom
+            (
+                Field source
+            )
+        {
+            Value = source.Value;
+            Subfields.Clear();
+            foreach (var subField in source.Subfields)
+            {
+                Subfields.Add(subField.Clone());
+            }
+
+            return this;
+        } // method AssignFrom
+
+        /// <summary>
         /// Если нет подполя, выделенного для хранения
         /// значения поля до первого разделителя,
         /// создаем его (оно должно быть первым в списке подполей).
@@ -394,6 +412,27 @@ namespace ManagedIrbis
                 }
             }
         } // method EnumerateSubFields
+
+        /// <summary>
+        /// Получение всех подполей с указанным кодом.
+        /// </summary>
+        public SubField[] GetSubFields
+            (
+                char code
+            )
+        {
+            var result = new List<SubField>();
+
+            foreach (var subfield in Subfields)
+            {
+                if (subfield.Code.SameChar(code))
+                {
+                    result.Add(subfield);
+                }
+            }
+
+            return result.ToArray();
+        } // method GetSubFields
 
         /// <summary>
         /// Получение первого подполя с указанным кодом

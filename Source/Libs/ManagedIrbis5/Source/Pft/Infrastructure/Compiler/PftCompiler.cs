@@ -13,25 +13,21 @@
 
 #region Using directives
 
-using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
 using AM.Text.Output;
 
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft.Infrastructure.Ast;
+using Microsoft.CSharp;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
@@ -160,17 +156,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
         #region Private members
 
-        private PftNode _currentNode;
+        private PftNode? _currentNode;
 
         private int _actionCount;
 
         internal void RenumberNodes
             (
-                [NotNull] PftNode rootNode
+                PftNode rootNode
             )
         {
-            NumberingVisitor visitor = new NumberingVisitor(Nodes, LastNodeId);
-            bool result = rootNode.AcceptVisitor(visitor);
+            var visitor = new NumberingVisitor(Nodes, LastNodeId);
+            var result = rootNode.AcceptVisitor(visitor);
             if (!result)
             {
                 throw new PftCompilerException();
@@ -185,15 +181,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Call method for the node.
         /// </summary>
-        [NotNull]
         public PftCompiler CallNodeMethod
             (
-                [NotNull] PftNode node
+                PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
-            NodeInfo info = Nodes.Get(node);
+            var info = Nodes.Get(node);
 
             if (!info.Ready)
             {
@@ -213,15 +206,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Call nodes.
         /// </summary>
-        [NotNull]
         public PftCompiler CallNodes
             (
-                [NotNull] IList<PftNode> nodes
+                IList<PftNode> nodes
             )
         {
-            Code.NotNull(nodes, "nodes");
-
-            foreach (PftNode node in nodes)
+            foreach (var node in nodes)
             {
                 WriteIndent();
                 CallNodeMethod(node);
@@ -233,27 +223,25 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Compile action method.
         /// </summary>
-        [CanBeNull]
-        public string CompileAction
+        public string? CompileAction
             (
-                [NotNull] IList<PftNode> nodes
+                IList<PftNode> nodes
             )
         {
-            Code.NotNull(nodes, "nodes");
-
             if (nodes.Count == 0)
             {
                 // Means: do not call action method
                 return null;
             }
+
             if (nodes.Count == 1)
             {
-                NodeInfo info = Nodes.Get(nodes[0]);
+                var info = Nodes.Get(nodes[0]);
 
                 return NodeMethodPrefix + info.Id;
             }
 
-            string methodName = "ActionMethod" + ++_actionCount;
+            var methodName = "ActionMethod" + ++_actionCount;
 
             WriteIndent();
             WriteLine("void {0} ()", methodName);
@@ -272,19 +260,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Compile the field.
         /// </summary>
-        [NotNull]
         internal FieldInfo CompileField
             (
-                [NotNull] PftField field
+                PftField field
             )
         {
-            Code.NotNull(field, "field");
-
-            FieldInfo result = Fields.Get(field);
+            var result = Fields.Get(field);
             if (ReferenceEquals(result, null))
             {
                 result = Fields.Create(field);
-                FieldSpecification spec = result.Specification;
+                var spec = result.Specification;
                 WriteIndent();
                 WriteLine
                     (
@@ -318,17 +303,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             return result;
         }
 
-        [NotNull]
         internal IndexInfo CompileIndex
             (
                 IndexSpecification specification
             )
         {
-            IndexInfo result = Indexes.Get(specification);
+            var result = Indexes.Get(specification);
             if (ReferenceEquals(result, null))
             {
                 result = Indexes.Create(specification);
-                string text = specification.ToText();
+                var text = specification.ToText();
                 WriteIndent();
                 WriteLine
                     (
@@ -386,12 +370,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public void CompileNodes
             (
-                [NotNull] IList<PftNode> nodes
+                IList<PftNode> nodes
             )
         {
-            Code.NotNull(nodes, "nodes");
-
-            foreach (PftNode node in nodes)
+            foreach (var node in nodes)
             {
                 node.Compile(this);
             }
@@ -400,17 +382,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Compile the program.
         /// </summary>
-        [NotNull]
         public string CompileProgram
             (
-                [NotNull] PftProgram program
+                PftProgram program
             )
         {
-            Code.NotNull(program, "program");
-
             RenumberNodes(program);
 
-            string result = StartClass();
+            var result = StartClass();
 
             program.Compile(this);
 
@@ -422,22 +401,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Compile to DLL.
         /// </summary>
-        [CanBeNull]
-        public string CompileToDll
+        public string? CompileToDll
             (
-                [NotNull] AbstractOutput output,
-                [NotNull] string fileName
+                AbstractOutput output,
+                string fileName
             )
         {
-            Code.NotNull(output, "output");
-            Code.NotNullNorEmpty(fileName, "fileName");
-
-#if !CLASSIC && !NETCORE
-
-            return null;
-
-#else
-
             string outputAssemblyPath = Path.Combine
                 (
                     OutputPath,
@@ -495,14 +464,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             }
 
             return outputAssemblyPath;
-
-#endif
         }
 
         /// <summary>
         /// Decrease indent.
         /// </summary>
-        [NotNull]
         public PftCompiler DecreaseIndent()
         {
             Indent--;
@@ -515,7 +481,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public void EndClass
             (
-                [NotNull] string className
+                string className
             )
         {
             if (!ReferenceEquals(_currentNode, null))
@@ -566,11 +532,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public void EndMethod
             (
-                [NotNull] PftNode node
+                PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
             if (!ReferenceEquals(_currentNode, node))
             {
                 throw new PftCompilerException();
@@ -587,10 +551,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Get source code.
         /// </summary>
-        [NotNull]
         public string GetSourceCode()
         {
-            string result = Output.ToString();
+            var result = Output.ToString();
 
             return result;
         }
@@ -598,7 +561,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Increase indent.
         /// </summary>
-        [NotNull]
         public PftCompiler IncreaseIndent()
         {
             Indent++;
@@ -611,12 +573,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public void MarkReady
             (
-                [NotNull] PftNode node
+                PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
-            NodeInfo info = Nodes.Get(node);
+            var info = Nodes.Get(node);
             if (info.Ready)
             {
                 throw new IrbisException();
@@ -627,15 +587,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Referenct method for the node.
         /// </summary>
-        [NotNull]
         public PftCompiler RefNodeMethod
             (
-                [NotNull] PftNode node
+                PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
-            NodeInfo info = Nodes.Get(node);
+            var info = Nodes.Get(node);
 
             if (!info.Ready)
             {
@@ -657,23 +614,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public void SetProvider
             (
-                [NotNull] IrbisProvider provider
+                IrbisProvider provider
             )
         {
-            Code.NotNull(provider, "provider");
-
             Provider = provider;
         }
 
         /// <summary>
         ///
         /// </summary>
-        [NotNull]
         public string StartClass()
         {
-            string result = "CompiledPft_" + StringUtility.Random(10);
+            var result = "CompiledPft_" + Utility.RandomIdentifier(10);
 
-            foreach (string nameSpace in Usings)
+            foreach (var nameSpace in Usings)
             {
                 WriteLine("using {0};", nameSpace);
             }
@@ -695,8 +649,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             DecreaseIndent();
             WriteIndent();
             WriteLine("{");
-            WriteIndent(); //-V3010
-            WriteLine("}"); //-V3010
+            WriteIndent();
+            WriteLine("}");
             WriteLine();
 
             return result;
@@ -707,11 +661,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public void StartMethod
             (
-                [NotNull] PftNode node
+                PftNode node
             )
         {
-            Code.NotNull(node, "node");
-
             if (!ReferenceEquals(_currentNode, null))
             {
                 throw new IrbisException();
@@ -719,7 +671,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
             _currentNode = node;
 
-            NodeInfo info = Nodes.Get(node);
+            var info = Nodes.Get(node);
 
             if (info.Ready)
             {
@@ -733,7 +685,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                     PftNode.SimplifyTypeName(node.GetType().Name),
                     CompilerUtility.ShortenText(node.ToString())
                 );
-            string returnType = "void";
+            var returnType = "void";
             if (node is PftBoolean)
             {
                 returnType = "bool";
@@ -768,7 +720,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         #region Write
 
         /// <inheritdoc cref="TextWriter.Write(char)" />
-        [NotNull]
         public PftCompiler Write
             (
                 char value
@@ -780,7 +731,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.Write(int)" />
-        [NotNull]
         public PftCompiler Write
             (
                 int value
@@ -792,7 +742,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.Write(double)" />
-        [NotNull]
         public PftCompiler Write
             (
                 double value
@@ -804,10 +753,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.Write(string)" />
-        [NotNull]
         public PftCompiler Write
             (
-                [NotNull] string value
+                string value
             )
         {
             Output.Write(value);
@@ -816,10 +764,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.Write(object)" />
-        [NotNull]
         public PftCompiler Write
             (
-                [NotNull] object value
+                object value
             )
         {
             Output.Write(value);
@@ -828,10 +775,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.Write(string,object[])" />
-        [NotNull]
         public PftCompiler Write
             (
-                [NotNull] string format,
+                string format,
                 params object[] arg
             )
         {
@@ -843,10 +789,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Write indentation.
         /// </summary>
-        [NotNull]
         public PftCompiler WriteIndent()
         {
-            for (int i = 0; i < Indent; i++)
+            for (var i = 0; i < Indent; i++)
             {
                 Output.Write("    ");
             }
@@ -855,7 +800,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.WriteLine()" />
-        [NotNull]
         public PftCompiler WriteLine()
         {
             Output.WriteLine();
@@ -864,7 +808,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.WriteLine(char)" />
-        [NotNull]
         public PftCompiler WriteLine
             (
                 char value
@@ -876,7 +819,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.WriteLine(int)" />
-        [NotNull]
         public PftCompiler WriteLine
             (
                 int value
@@ -888,7 +830,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.WriteLine(double)" />
-        [NotNull]
         public PftCompiler WriteLine
             (
                 double value
@@ -900,10 +841,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.WriteLine(string)" />
-        [NotNull]
         public PftCompiler WriteLine
             (
-                [NotNull] string value
+                string value
             )
         {
             Output.WriteLine(value);
@@ -912,10 +852,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.WriteLine(object)" />
-        [NotNull]
         public PftCompiler WriteLine
             (
-                [NotNull] object value
+                object value
             )
         {
             Output.WriteLine(value);
@@ -924,10 +863,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         }
 
         /// <inheritdoc cref="TextWriter.WriteLine(string,object[])" />
-        [NotNull]
         public PftCompiler WriteLine
             (
-                [NotNull] string format,
+                string format,
                 params object[] arg
             )
         {
@@ -940,8 +878,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
 
         #endregion
 
-        #region Object members
+    } // class PftCompiler
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Pft.Infrastructure.Compiler

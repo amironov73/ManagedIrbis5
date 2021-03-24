@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* TextNavigator.cs -- навигатор по тексту
+/* TextNavigator.cs -- навигатор по тексту (оформленный как класс)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +27,7 @@ using System.Text;
 namespace AM.Text
 {
     /// <summary>
-    /// Навигатор по тексту.
+    /// Навигатор по тексту (оформленный как класс).
     /// </summary>
     public sealed class TextNavigator
     {
@@ -846,6 +846,35 @@ namespace AM.Text
         }
 
         /// <summary>
+        /// Чтение вплоть до указанного символа.
+        /// Символы перевода строки игнорируются.
+        /// </summary>
+        public string? ReadUntilNoCrLf
+            (
+                char stopChar
+            )
+        {
+            if (IsEOF)
+            {
+                return null;
+            }
+
+            var result = new StringBuilder();
+            while (true)
+            {
+                char c = PeekCharNoCrLf();
+                if (c == EOF || c == stopChar)
+                {
+                    break;
+                }
+
+                result.Append(ReadChar());
+            }
+
+            return result.ToString();
+        }
+
+        /// <summary>
         /// Считывание вплоть до указанного разделителя
         /// (разделитель не помещается в возвращаемое значение
         /// и не считывается).
@@ -1611,5 +1640,6 @@ namespace AM.Text
 
         #endregion
 
-    }
-}
+    } // class TextNavigator
+
+} // namespace AM.Text

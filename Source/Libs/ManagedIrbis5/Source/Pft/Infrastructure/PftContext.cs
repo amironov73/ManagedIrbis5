@@ -458,8 +458,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             if (ReferenceEquals(condition, null))
             {
                 string text = GetStringArgument(arguments, index);
-                bool boolVal;
-                if (BooleanUtility.TryParse(text, out boolVal))
+                if (bool.TryParse(text, out var boolVal))
                 {
                     result = boolVal;
                 }

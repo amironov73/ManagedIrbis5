@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* UniforX.cs -- 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* UniforX.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -13,9 +17,9 @@ using System.Text;
 
 using AM.Text;
 
-using JetBrains.Annotations;
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -42,9 +46,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static void RemoveAngleBrackets
             (
-                [NotNull] PftContext context,
-                [CanBeNull] PftNode node,
-                [CanBeNull] string expression
+                PftContext context,
+                PftNode? node,
+                string? expression
             )
         {
             if (!string.IsNullOrEmpty(expression))
@@ -57,14 +61,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     var navigator = new TextNavigator(expression);
                     while (!navigator.IsEOF)
                     {
-                        string text = navigator.ReadUntil('<');
+                        string text = navigator.ReadUntil('<').ToString();
                         builder.Append(text);
                         var c = navigator.ReadChar();
                         if (c != '<')
                         {
                             break;
                         }
-                        text = navigator.ReadUntil('>');
+                        text = navigator.ReadUntil('>').ToString();
                         c = navigator.ReadChar();
                         if (c != '>')
                         {

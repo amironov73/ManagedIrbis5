@@ -1,7 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftParser.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* PftOutput.cs -- выходные потоки форматтера
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -9,16 +16,15 @@
 
 using AM.Text;
 
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
     /// Выходные потоки форматтера.
     /// </summary>
-
     public sealed class PftOutput
     {
         #region Properties
@@ -26,53 +32,52 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Родительский буфер. Может быть <c>null</c>.
         /// </summary>
-        [CanBeNull]
-        public PftOutput Parent { get { return _parent; } }
+        public PftOutput? Parent { get; }
 
         /// <summary>
         /// Основной (обычный) поток.
         /// </summary>
-        public TextBuffer Normal { get { return _normal; } }
+        public TextBuffer Normal { get; }
 
         /// <summary>
         /// Поток предупреждений.
         /// </summary>
-        public TextBuffer Warning { get { return _warning; } }
+        public TextBuffer Warning { get; }
 
         /// <summary>
         /// Поток ошибок.
         /// </summary>
-        public TextBuffer Error { get { return _error; } }
+        public TextBuffer Error { get; }
 
         /// <summary>
         /// Накопленный текст основного потока.
         /// </summary>
-        public string Text { get { return Normal.ToString(); } }
+        public string Text => Normal.ToString();
 
         /// <summary>
         /// Накопленный текст потока предупреждений.
         /// </summary>
-        public string WarningText { get { return Warning.ToString(); } }
+        public string WarningText => Warning.ToString();
 
         /// <summary>
         /// Накопленный текст потока ошибок.
         /// </summary>
-        public string ErrorText { get { return Error.ToString(); } }
+        public string ErrorText => Error.ToString();
 
         /// <summary>
         /// Накоплен ли текст в основном потоке?
         /// </summary>
-        public bool HaveText { get { return _HaveText(_normal); } }
+        public bool HaveText => _HaveText(Normal);
 
         /// <summary>
         /// Были ли предупреждения?
         /// </summary>
-        public bool HaveWarning { get { return _HaveText(_warning); } }
+        public bool HaveWarning => _HaveText(Warning);
 
         /// <summary>
         /// Были ли ошибки?
         /// </summary>
-        public bool HaveError { get { return _HaveText(_error); } }
+        public bool HaveError => _HaveText(Error);
 
         #endregion
 
@@ -84,33 +89,25 @@ namespace ManagedIrbis.Pft.Infrastructure
         public PftOutput()
             : this(null)
         {
-        }
-
-        //=================================================
+        } // constructor
 
         /// <summary>
         /// Constructor.
         /// </summary>
         public PftOutput
             (
-               [CanBeNull] PftOutput parent
+               PftOutput? parent
             )
         {
-            _parent = parent;
-            _normal = new TextBuffer();
-            _warning = new TextBuffer();
-            _error = new TextBuffer();
-        }
+            Parent = parent;
+            Normal = new TextBuffer();
+            Warning = new TextBuffer();
+            Error = new TextBuffer();
+        } // constructor
 
         #endregion
 
         #region Private members
-
-        private readonly PftOutput _parent;
-
-        private readonly TextBuffer _normal;
-        private readonly TextBuffer _warning;
-        private readonly TextBuffer _error;
 
         private static bool _HaveText
             (
@@ -129,7 +126,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftOutput ClearText()
         {
-            _normal.Clear();
+            Normal.Clear();
 
             return this;
         }
@@ -141,7 +138,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftOutput ClearWarning()
         {
-            _warning.Clear();
+            Warning.Clear();
 
             return this;
         }
@@ -153,7 +150,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftOutput ClearError()
         {
-            _error.Clear();
+            Error.Clear();
 
             return this;
         }
@@ -165,7 +162,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public int GetCaretPosition()
         {
-            return _normal.Column;
+            return Normal.Column;
         }
 
         //=================================================
@@ -175,7 +172,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public bool HaveEmptyLine()
         {
-            bool result = _normal.Column == 1;
+            bool result = Normal.Column == 1;
 
             return result;
         }
@@ -187,7 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public bool PrecededByEmptyLine()
         {
-            bool result = _normal.PrecededByNewLine();
+            bool result = Normal.PrecededByNewLine();
 
             return result;
         }
@@ -238,7 +235,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftOutput RemoveEmptyLines()
         {
-            _normal.RemoveEmptyLines();
+            Normal.RemoveEmptyLines();
 
             return this;
         }
@@ -246,10 +243,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Write text.
         /// </summary>
-        [StringFormatMethod("format")]
         public PftOutput Write
             (
-                [CanBeNull] string format,
+                string? format,
                 params object[] arg
             )
         {
@@ -268,7 +264,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftOutput Write
             (
-                [CanBeNull] string value
+                string? value
             )
         {
             if (!string.IsNullOrEmpty(value))
@@ -284,10 +280,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Write line.
         /// </summary>
-        [StringFormatMethod("format")]
         public PftOutput WriteLine
             (
-                [CanBeNull] string format,
+                string? format,
                 params object[] arg
             )
         {
@@ -306,7 +301,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftOutput WriteLine
             (
-               [CanBeNull] string value
+               string? value
             )
         {
             if (!string.IsNullOrEmpty(value))
@@ -336,11 +331,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Normal.ToString();
-        }
+        public override string ToString() => Normal.ToString();
 
         #endregion
-    }
-}
+
+    } // class PftOutput
+
+} // namespace ManagedIrbis.Pft.Infrastructure

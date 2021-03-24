@@ -10,7 +10,6 @@
 
 /* Translator.cs -- трансляция штрих-кодов в инвентарные номера
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
  */
 
 #region Using directives

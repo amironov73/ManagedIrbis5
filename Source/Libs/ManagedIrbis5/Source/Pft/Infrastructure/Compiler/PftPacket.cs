@@ -82,10 +82,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             if (!ReferenceEquals(debugger, null))
             {
                 var eventArgs = new PftDebugEventArgs
-                    (
-                        Context,
-                        null
-                    );
+                    {
+                        Context = Context,
+                        Node = null
+                    };
                 debugger.Activate(eventArgs);
             }
         }

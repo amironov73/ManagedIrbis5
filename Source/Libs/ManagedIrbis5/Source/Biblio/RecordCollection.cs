@@ -7,25 +7,16 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* RecordCollection.cs --
+/* RecordCollection.cs -- коллекция записей для главы
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
 
 #endregion
 
@@ -34,24 +25,12 @@ using AM.Text;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    ///
+    /// Коллекция библиографических записей для главы указателя.
     /// </summary>
     public sealed class RecordCollection
         : NonNullCollection<Record>,
         IVerifiable
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
         #region Public methods
 
         /// <summary>
@@ -59,12 +38,12 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public void SortRecords()
         {
-            Record[] records = ToArray();
+            var records = ToArray();
 
             Array.Sort(records, RecordComparer.BySortKey());
             Clear();
             AddRange(records);
-        }
+        } // method SortRecords
 
         #endregion
 
@@ -76,18 +55,18 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            Verifier<RecordCollection> verifier
-                = new Verifier<RecordCollection>(this, throwOnError);
+            var verifier = new Verifier<RecordCollection>(this, throwOnError);
 
-            foreach (Record record in this)
+            foreach (var record in this)
             {
                 verifier.VerifySubObject(record, "record");
             }
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
-    }
-}
+    } // class RecordCollection
+
+} // namespace ManagedIrbis.Biblio

@@ -1,10 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* UniforPlus9.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -17,17 +21,13 @@ using System.Text.RegularExpressions;
 
 using AM;
 using AM.IO;
-using AM.Logging;
 using AM.Text;
 
-using JetBrains.Annotations;
-
-using ManagedIrbis.Client;
-using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Search;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
@@ -41,11 +41,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         private static bool _CheckUrlExist
         (
-            [NotNull] string address
+            string address
         )
         {
-#if CLASSIC || DESKTOP
-
             using (System.Net.WebClient client = new System.Net.WebClient())
             {
                 try
@@ -56,46 +54,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 }
                 catch (Exception exception)
                 {
-                    Log.TraceException
+                    Magna.TraceException
                         (
                             "UniforPlus9::_CheckUrlExist",
                             exception
                         );
                 }
             }
-#elif UAP
-
-            using (System.Net.Http.HttpClient client = new System.Net.Http.HttpClient())
-            {
-                try
-                {
-                    string text = client.GetStringAsync(address).Result;
-
-                    return !ReferenceEquals(text, null);
-                }
-                catch (Exception exception)
-                {
-                    Log.TraceException
-                        (
-                            "UniforPlus9::_CheckUrlExist",
-                            exception
-                        );
-                }
-            }
-
-#endif
 
             return false;
         }
 
-        [CanBeNull]
-        private static FileSpecification _GetFileSpecification
+        private static FileSpecification? _GetFileSpecification
             (
-                [NotNull] string expression
+                string expression
             )
         {
             var navigator = new TextNavigator(expression);
-            string pathText = navigator.ReadUntil(',');
+            string pathText = navigator.ReadUntil(',').ToString();
             navigator.ReadChar();
             string dbName = null;
             if (pathText == "0"
@@ -109,18 +85,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
             else
             {
-                dbName = navigator.ReadUntil(',');
+                dbName = navigator.ReadUntil(',').ToString();
                 navigator.ReadChar();
             }
 
-            string fileName = navigator.GetRemainingText();
+            string fileName = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(pathText)
                 || string.IsNullOrEmpty(fileName))
             {
                 return null;
             }
 
-            var path = (IrbisPath)NumericUtility.ParseInt32
+            var path = (IrbisPath)Utility.ParseInt32
             (
                 pathText
             );

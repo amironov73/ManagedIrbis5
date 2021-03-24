@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -198,9 +199,10 @@ namespace ManagedIrbis.Client
 
 
         /// <inheritdoc cref="IrbisProvider.GetAlphabetTable" />
-        public override IrbisAlphabetTable GetAlphabetTable()
+        public override AlphabetTable GetAlphabetTable()
         {
-            return new IrbisAlphabetTable(Connection);
+            throw new NotImplementedException();
+            // return new AlphabetTable(Connection);
         }
 
         /// <inheritdoc cref="IrbisProvider.GetCatalogState" />
@@ -257,9 +259,10 @@ namespace ManagedIrbis.Client
         }
 
         /// <inheritdoc cref="IrbisProvider.GetStopWords" />
-        public override IrbisStopWords GetStopWords()
+        public override StopWords GetStopWords()
         {
-            return IrbisStopWords.FromServer(Connection);
+            throw new NotImplementedException();
+            // return IrbisStopWords.FromServer(Connection);
         }
 
         /// <inheritdoc cref="IrbisProvider.NoOp" />

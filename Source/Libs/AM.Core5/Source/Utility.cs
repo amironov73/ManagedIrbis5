@@ -11,7 +11,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* Utility.cs -- сборник простых вспомогательных методов.
+/* Utility.cs -- сборник простых вспомогательных методов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -1820,55 +1820,47 @@ namespace AM
                 object value
             )
         {
-            if (value is bool)
+            if (value is bool retval1)
             {
-                return (bool)value;
+                return retval1;
             }
 
-            try
+            if (value is string text)
             {
-                var result = bool.Parse(value as string ?? false.ToString());
+                if (bool.TryParse(text, out var retval2))
+                {
+                    return retval2;
+                }
 
-                return result;
-            }
-            // ReSharper disable once EmptyGeneralCatchClause
-            catch
-            {
-                // Pass through
-            }
+                text = text.ToLowerInvariant();
 
-            var svalue = value as string;
-            if (!ReferenceEquals(svalue, null))
-            {
-                svalue = svalue.ToLowerInvariant();
-
-                if (svalue == "false"
-                    || svalue == "0"
-                    || svalue == "no"
-                    || svalue == "n"
-                    || svalue == "off"
-                    || svalue == "negative"
-                    || svalue == "neg"
-                    || svalue == "disabled"
-                    || svalue == "incorrect"
-                    || svalue == "wrong"
-                    || svalue == "нет"
+                if (text == "false"
+                    || text == "0"
+                    || text == "no"
+                    || text == "n"
+                    || text == "off"
+                    || text == "negative"
+                    || text == "neg"
+                    || text == "disabled"
+                    || text == "incorrect"
+                    || text == "wrong"
+                    || text == "нет"
                 )
                 {
                     return false;
                 }
 
-                if (svalue == "true"
-                    || svalue == "1"
-                    || svalue == "yes"
-                    || svalue == "y"
-                    || svalue == "on"
-                    || svalue == "positiva"
-                    || svalue == "pos"
-                    || svalue == "enabled"
-                    || svalue == "correct"
-                    || svalue == "right"
-                    || svalue == "да"
+                if (text == "true"
+                    || text == "1"
+                    || text == "yes"
+                    || text == "y"
+                    || text == "on"
+                    || text == "positiva"
+                    || text == "pos"
+                    || text == "enabled"
+                    || text == "correct"
+                    || text == "right"
+                    || text == "да"
                 )
                 {
                     return true;
@@ -1902,19 +1894,6 @@ namespace AM
                 (
                     "Bad value " + value
                 );
-        }
-
-        /// <summary>
-        /// Raises the specified handler.
-        /// </summary>
-        public static void Raise
-            (
-                this EventHandler? handler,
-                object? sender,
-                EventArgs args
-            )
-        {
-            handler?.Invoke(sender, args);
         }
 
         /// <summary>
@@ -1954,18 +1933,6 @@ namespace AM
             )
         {
             handler?.Invoke(sender, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// Raises the specified handler.
-        /// </summary>
-        public static void Raise<T>
-            (
-                this EventHandler<T>? handler
-            )
-            where T : EventArgs
-        {
-            handler?.Invoke(null, null!);
         }
 
         /// <summary>
@@ -2491,7 +2458,38 @@ namespace AM
 
                 return module?.FileName ?? throw new ApplicationException();
             }
-        }
+        } // property ExecutableFileName
+
+        private static readonly Random _random = new ();
+        private const string RandomChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                            + "abcdefghijklmnopqrstuvwxyz";
+        private const string RandomSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                            + "abcdefghijklmnopqrstuvwxyz"
+                                            + "0123456789"
+                                            + "_";
+
+        /// <summary>
+        /// Creates random string with given length.
+        /// </summary>
+        public static string RandomIdentifier
+            (
+                int length
+            )
+        {
+            var result = new StringBuilder(length);
+
+            if (length > 0)
+            {
+                result.Append(RandomChars[_random.Next(RandomChars.Length)]);
+            }
+
+            for (; length > 1; length--)
+            {
+                result.Append(RandomSymbols[_random.Next(RandomSymbols.Length)]);
+            }
+
+            return result.ToString();
+        } // method RandomIdentifier
 
         /// <summary>
         /// Упрощенное получение информации о методе.
