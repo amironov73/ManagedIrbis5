@@ -99,7 +99,7 @@ namespace ManagedIrbis.Infrastructure
         {
             Sure.NotNull(context, nameof(context));
 
-            IrbisProvider provider = context.Provider;
+            var provider = context.Provider;
             TermLink[] result;
             string term = Term.ThrowIfNull(nameof(Term));
 

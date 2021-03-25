@@ -43,7 +43,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Provider.
         /// </summary>
-        public IrbisProvider Provider { get; private set; }
+        public ISyncIrbisProvider Provider { get; private set; }
 
         /// <summary>
         /// Text driver.
@@ -603,7 +603,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public void SetProvider
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
         {
             Provider = provider;

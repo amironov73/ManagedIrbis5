@@ -354,7 +354,7 @@ namespace ManagedIrbis.Biblio
                 using (IPftFormatter formatter
                     = processor.AcquireFormatter(context))
                 {
-                    IrbisProvider provider = context.Provider;
+                    var provider = context.Provider;
                     RecordCollection records = Records
                         .ThrowIfNull("Records");
 

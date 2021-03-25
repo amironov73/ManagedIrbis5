@@ -58,7 +58,7 @@ namespace ManagedIrbis.Pft
         public virtual void ParseProgram(string source) =>
             throw new System.NotImplementedException();
 
-        public virtual void SetProvider(IrbisProvider contextProvider) =>
+        public virtual void SetProvider(ISyncIrbisProvider contextProvider) =>
             throw new System.NotImplementedException();
 
         #endregion

@@ -72,7 +72,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Client.
         /// </summary>
-        public IrbisProvider Provider { get; internal set; }
+        public ISyncIrbisProvider Provider { get; internal set; }
 
         /// <summary>
         /// Commands.

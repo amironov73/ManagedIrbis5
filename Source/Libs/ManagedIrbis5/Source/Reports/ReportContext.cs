@@ -50,7 +50,7 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Provider.
         /// </summary>
-        public IrbisProvider Provider { get; set; }
+        public ISyncIrbisProvider Provider { get; set; }
 
         /// <summary>
         /// Current record.
@@ -96,7 +96,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public ReportContext
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
         {
             Variables = new ReportVariableManager();

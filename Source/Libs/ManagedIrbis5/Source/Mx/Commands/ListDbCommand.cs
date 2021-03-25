@@ -75,6 +75,10 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
+            throw new NotImplementedException();
+
+            /*
+
             string? pattern = null;
             if (arguments.Length != 0)
             {
@@ -111,6 +115,8 @@ namespace ManagedIrbis.Mx.Commands
             OnAfterExecute();
 
             return true;
+
+            */
         }
 
         #endregion

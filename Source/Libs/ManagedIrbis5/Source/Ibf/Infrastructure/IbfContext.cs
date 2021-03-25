@@ -45,7 +45,7 @@ namespace ManagedIrbis.Ibf.Infrastructure
         /// <summary>
         /// Provider.
         /// </summary>
-        public IrbisProvider Provider { get; private set; }
+        public ISyncIrbisProvider Provider { get; private set; }
 
         #endregion
 
@@ -56,7 +56,7 @@ namespace ManagedIrbis.Ibf.Infrastructure
         /// </summary>
         public IbfContext
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
         {
             Provider = provider;

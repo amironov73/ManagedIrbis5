@@ -39,7 +39,7 @@ namespace ManagedIrbis.Fst
         /// <summary>
         /// Provider.
         /// </summary>
-        public IrbisProvider Provider { get; private set; }
+        public ISyncIrbisProvider Provider { get; private set; }
 
         #endregion
 

@@ -69,6 +69,10 @@ namespace ManagedIrbis.Mx.Commands
                 lastSearch = executive.History.Peek();
             }
 
+            throw new NotImplementedException();
+
+            /*
+
             var client = executive.Provider as ConnectedClient;
             if (ReferenceEquals(client, null))
             {
@@ -110,6 +114,8 @@ namespace ManagedIrbis.Mx.Commands
             OnAfterExecute();
 
             return true;
+
+            */
         }
 
         #endregion

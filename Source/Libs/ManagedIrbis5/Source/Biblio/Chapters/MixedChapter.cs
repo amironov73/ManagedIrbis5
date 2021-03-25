@@ -73,8 +73,8 @@ namespace ManagedIrbis.Biblio
 
             BiblioProcessor processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisProvider provider = context.Provider;
-            List<Record> nonSpec = new List<Record>();
+            var provider = context.Provider;
+            var nonSpec = new List<Record>();
 
             string generalFormat = settings.GetSetting("general");
             string orderFormat = settings.GetSetting("order");

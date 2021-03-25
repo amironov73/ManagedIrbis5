@@ -83,6 +83,10 @@ namespace ManagedIrbis.Mx.Commands
                 fileName = "*.*";
             }
 
+            throw new NotImplementedException();
+
+            /*
+
             ConnectedClient connected = executive.Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
@@ -103,6 +107,8 @@ namespace ManagedIrbis.Mx.Commands
             OnAfterExecute();
 
             return true;
+
+            */
         }
 
         #endregion

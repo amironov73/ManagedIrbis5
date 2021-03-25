@@ -65,7 +65,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Provider.
         /// </summary>
-        public IrbisProvider? Provider { get; set; }
+        public ISyncIrbisProvider? Provider { get; set; }
 
         /// <summary>
         /// Folder name.
@@ -219,7 +219,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                     result.Expected = expected;
                 }
 
-                IrbisProvider provider = Provider.ThrowIfNull("Provider");
+                ISyncIrbisProvider provider = Provider.ThrowIfNull("Provider");
 
                 string output;
                 using (var formatter = new PftFormatter

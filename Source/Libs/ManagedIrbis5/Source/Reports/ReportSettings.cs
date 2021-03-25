@@ -78,7 +78,7 @@ namespace ManagedIrbis.Reports
         public string? PrinterName { get; set; }
 
         /// <summary>
-        /// Name of <see cref="IrbisProvider"/>.
+        /// Name of <see cref="ISyncIrbisProvider"/>.
         /// </summary>
         [JsonPropertyName("providerName")]
         public string? ProviderName { get; set; }
@@ -97,7 +97,7 @@ namespace ManagedIrbis.Reports
         public string? RegisterDriver { get; set; }
 
         /// <summary>
-        /// <see cref="IrbisProvider"/> to register
+        /// <see cref="ISyncIrbisProvider"/> to register
         /// before report building.
         /// </summary>
         [JsonPropertyName("registerProvider")]

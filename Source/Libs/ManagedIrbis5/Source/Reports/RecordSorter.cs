@@ -47,7 +47,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        public IrbisProvider Provider { get; internal set; }
+        public ISyncIrbisProvider Provider { get; internal set; }
 
         /// <summary>
         ///
@@ -82,7 +82,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordSorter
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
         {
             Provider = provider;
@@ -93,7 +93,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordSorter
             (
-                IrbisProvider provider,
+                ISyncIrbisProvider provider,
                 string expression
             )
         {

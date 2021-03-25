@@ -83,13 +83,8 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            var connected = executive.Provider as ConnectedClient;
-            if (!ReferenceEquals(connected, null))
-            {
-                var connection = connected.Connection;
-                var version = connection.GetServerVersion();
-                executive.WriteLine(version.ToString());
-            }
+            var version = executive.Provider.GetServerVersion();
+            executive.WriteLine(version.ToString());
 
             OnAfterExecute();
 

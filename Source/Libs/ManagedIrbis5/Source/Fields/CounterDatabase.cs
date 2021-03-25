@@ -57,7 +57,7 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Provider.
         /// </summary>
-        public IrbisProvider Provider { get; private set; }
+        public ISyncIrbisProvider Provider { get; private set; }
 
         #endregion
 
@@ -68,7 +68,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public CounterDatabase
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
             : this(provider, DefaultName)
         {
@@ -79,7 +79,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public CounterDatabase
             (
-                IrbisProvider provider,
+                ISyncIrbisProvider provider,
                 string name
             )
         {

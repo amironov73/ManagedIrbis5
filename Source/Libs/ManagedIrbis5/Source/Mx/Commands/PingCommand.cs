@@ -76,7 +76,7 @@ namespace ManagedIrbis.Mx.Commands
 
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
-                executive.Provider.NoOp();
+                executive.Provider.NoOperation();
                 stopwatch.Stop();
 
                 result = stopwatch.ElapsedMilliseconds;

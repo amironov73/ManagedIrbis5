@@ -121,7 +121,7 @@ namespace ManagedIrbis.Workspace
         /// </summary>
         public static WsFile? ReadFromServer
             (
-                IrbisProvider provider,
+                ISyncIrbisProvider provider,
                 FileSpecification specification
             )
         {

@@ -44,9 +44,9 @@ namespace ManagedIrbis
         /// <param name="query">Клиентский запрос.</param>
         /// <returns>Ответ от сервера.</returns>
         Task<Response?> ExecuteAsync
-        (
-            Query query
-        );
+            (
+                Query query
+            );
 
     } // interface IAsyncConnection
 

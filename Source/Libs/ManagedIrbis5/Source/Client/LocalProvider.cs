@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Threading.Tasks;
 using AM.IO;
 using AM.PlatformAbstraction;
 using ManagedIrbis.Infrastructure;
@@ -32,7 +33,7 @@ namespace ManagedIrbis.Client
     /// Провайдер, работающий с локальными файлами.
     /// </summary>
     public class LocalProvider
-        : IrbisProvider
+        : ISyncIrbisProvider
     {
         #region Construction
 
@@ -56,82 +57,105 @@ namespace ManagedIrbis.Client
 
         #region IrbisProvider members
 
-        public override bool Connected { get; }
-
-        public override IPftFormatter AcquireFormatter() =>
-            throw new NotImplementedException();
-
-        public override MenuFile? ReadMenuFile(FileSpecification specification) =>
-            throw new NotImplementedException();
-
-        public override Record? ReadRecordVersion(int mfn, int version) =>
-            throw new NotImplementedException();
-
-        public override Term[] ReadTerms(TermParameters parameters) =>
-            throw new NotImplementedException();
-
-        public override bool FileExist(FileSpecification specification) =>
-            throw new NotImplementedException();
-
-        public override string GetGeneration() =>
-            throw new NotImplementedException();
-
-        public override IniFile GetUserIniFile()
+        public string Host { get; set; }
+        public ushort Port { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Database { get; set; }
+        public string Workstation { get; set; }
+        public int ClientId { get; }
+        public int QueryId { get; }
+        public bool Connected { get; }
+        public bool Busy { get; }
+        public int LastError { get; }
+        public bool CheckConnection()
         {
             throw new NotImplementedException();
         }
 
-        public override void WriteRecord(Record record)
+        public IPftFormatter AcquireFormatter() =>
+            throw new NotImplementedException();
+
+        public MenuFile? ReadMenuFile(FileSpecification specification) =>
+            throw new NotImplementedException();
+
+        public Record? ReadRecordVersion(int mfn, int version) =>
+            throw new NotImplementedException();
+
+        public Term[] ReadTerms(TermParameters parameters) =>
+            throw new NotImplementedException();
+
+        public bool FileExist(FileSpecification specification) =>
+            throw new NotImplementedException();
+
+        public string GetGeneration() =>
+            throw new NotImplementedException();
+
+        public IniFile GetUserIniFile()
         {
             throw new NotImplementedException();
         }
 
-        public override void Configure(string configurationString) =>
+        public void WriteRecord(Record record)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Configure(string configurationString) =>
             throw new NotImplementedException();
 
-        public override PlatformAbstractionLayer PlatformAbstraction { get; set; }
+        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
-        public override string ReadFile(FileSpecification file) =>
+        public string ReadFile(FileSpecification file) =>
             throw new NotImplementedException();
 
-        public override int[] Search(string expression) =>
+        public int[] Search(string expression) =>
             throw new NotImplementedException();
 
-        public override TermLink[] ExactSearchLinks(string term) =>
+        public TermLink[] ExactSearchLinks(string term) =>
             throw new NotImplementedException();
 
-        public override TermLink[] ExactSearchTrimLinks(string term, int i) =>
+        public TermLink[] ExactSearchTrimLinks(string term, int i) =>
             throw new NotImplementedException();
 
-        public override string FormatRecord(Record record, string format) =>
+        public string FormatRecord(Record record, string format) =>
             throw new NotImplementedException();
 
-        public override int GetMaxMfn() =>
+        public int GetMaxMfn() =>
             throw new NotImplementedException();
 
-        public override ServerVersion GetServerVersion() =>
+        public ServerVersion GetServerVersion() =>
             throw new NotImplementedException();
 
-        public override string[] FormatRecords(int[] mfns, string format) =>
+        public string[] FormatRecords(int[] mfns, string format) =>
             throw new NotImplementedException();
 
-        public override string[] ListFiles(FileSpecification specification) =>
+        public string[] ListFiles(FileSpecification specification) =>
             throw new NotImplementedException();
 
-        public override bool NoOp() =>
+        public bool NoOperation() =>
             throw new NotImplementedException();
 
-        public override void ReleaseFormatter(IPftFormatter formatter) =>
+        public void ReleaseFormatter(IPftFormatter formatter) =>
             throw new NotImplementedException();
 
-        public override Record ReadRecord(int mfn) =>
+        public Record ReadRecord(int mfn) =>
             throw new NotImplementedException();
 
-        public override void Dispose() =>
+        public void Dispose() =>
             throw new NotImplementedException();
 
         #endregion
 
+        public ValueTask DisposeAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public object? GetService(Type serviceType)
+        {
+            throw new NotImplementedException();
+        }
     } // class LocalProvider
 
 } // namespace ManagedIrbis.Client

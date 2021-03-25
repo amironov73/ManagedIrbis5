@@ -85,9 +85,9 @@ namespace ManagedIrbis.Client
             {
                 {Null, typeof(NullProvider)},
                 {Local, typeof(LocalProvider)},
-                {Connected, typeof(ConnectedClient)},
-                {SemiConnected, typeof(SemiConnectedClient)},
-                {Default, typeof(ConnectedClient)}
+                //{Connected, typeof(ConnectedClient)},
+                //{SemiConnected, typeof(SemiConnectedClient)},
+                //{Default, typeof(ConnectedClient)}
             };
         }
 
@@ -96,9 +96,9 @@ namespace ManagedIrbis.Client
         #region Public methods
 
         /// <summary>
-        /// Get <see cref="IrbisProvider" /> and configure it.
+        /// Get <see cref="ISyncIrbisProvider" /> and configure it.
         /// </summary>
-        public static IrbisProvider GetAndConfigureProvider
+        public static ISyncIrbisProvider GetAndConfigureProvider
             (
                 string configurationString
             )
@@ -152,9 +152,9 @@ namespace ManagedIrbis.Client
         }
 
         /// <summary>
-        /// Get <see cref="IrbisProvider"/> by name.
+        /// Get <see cref="ISyncIrbisProvider"/> by name.
         /// </summary>
-        public static IrbisProvider? GetProvider
+        public static ISyncIrbisProvider? GetProvider
             (
                 [NotNull] string name,
                 bool throwOnError
@@ -200,7 +200,7 @@ namespace ManagedIrbis.Client
                 return null;
             }
 
-            var result = (IrbisProvider?)Activator.CreateInstance(type);
+            var result = (ISyncIrbisProvider?)Activator.CreateInstance(type);
 
             return result;
         }
@@ -208,7 +208,7 @@ namespace ManagedIrbis.Client
         /// <summary>
         ///
         /// </summary>
-        public static IrbisProvider GetPreconfiguredProvider()
+        public static ISyncIrbisProvider GetPreconfiguredProvider()
         {
             var configurationString
                 = ConfigurationUtility.GetString
@@ -229,8 +229,7 @@ namespace ManagedIrbis.Client
                     );
             }
 
-            IrbisProvider result
-                = GetAndConfigureProvider(configurationString);
+            var result = GetAndConfigureProvider(configurationString);
 
             return result;
 

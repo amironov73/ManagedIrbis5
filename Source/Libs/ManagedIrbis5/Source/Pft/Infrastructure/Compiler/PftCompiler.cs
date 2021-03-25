@@ -50,7 +50,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Provider.
         /// </summary>
-        public IrbisProvider Provider { get; private set; }
+        public ISyncIrbisProvider Provider { get; private set; }
 
         internal FieldDictionary Fields { get; private set; }
 
@@ -614,7 +614,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public void SetProvider
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
         {
             Provider = provider;

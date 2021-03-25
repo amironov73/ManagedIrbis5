@@ -125,7 +125,7 @@ namespace ManagedIrbis.Biblio
             WriteDelimiter(context);
             log.WriteLine("Begin final render");
 
-            IrbisProvider provider = context.Provider
+            var provider = context.Provider
                 .ThrowIfNull("context.Provider");
             IrbisReport report = Report.ThrowIfNull("Report");
             ReportContext reportContext = new ReportContext(provider);
@@ -264,10 +264,10 @@ namespace ManagedIrbis.Biblio
                 string path
             )
         {
-            AbstractOutput log = context.Log;
-            IrbisProvider provider = context.Provider;
+            var log = context.Log;
+            var provider = context.Provider;
 
-            string result = null;
+            string? result = null;
             try
             {
                 string fileName;
@@ -325,7 +325,7 @@ namespace ManagedIrbis.Biblio
                 IPftFormatter formatter
             )
         {
-            IrbisProvider provider = context.Provider;
+            var provider = context.Provider;
             provider.ReleaseFormatter(formatter);
         }
 

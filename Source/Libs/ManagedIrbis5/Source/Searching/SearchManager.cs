@@ -41,7 +41,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Connection.
         /// </summary>
-        public IrbisProvider Provider { get; }
+        public ISyncIrbisProvider Provider { get; }
 
         /// <summary>
         /// Search history.
@@ -57,7 +57,7 @@ namespace ManagedIrbis
         /// </summary>
         public SearchManager
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
         {
             Provider = provider;

@@ -42,7 +42,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Provider.
         /// </summary>
-        public IrbisProvider Provider { get; private set; }
+        public ISyncIrbisProvider Provider { get; private set; }
 
         /// <summary>
         /// Folder name.
@@ -187,7 +187,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public void SetEnvironment
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
         {
             Provider = provider;

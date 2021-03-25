@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using ManagedIrbis.Client;
 
 #endregion
@@ -68,6 +69,10 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
+            throw new NotImplementedException();
+
+            /*
+
             ConnectedClient connected = executive.Provider as ConnectedClient;
             if (!ReferenceEquals(connected, null))
             {
@@ -78,6 +83,8 @@ namespace ManagedIrbis.Mx.Commands
             OnAfterExecute();
 
             return true;
+
+            */
         }
 
         #endregion

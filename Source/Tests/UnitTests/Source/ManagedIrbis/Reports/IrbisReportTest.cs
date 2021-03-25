@@ -145,8 +145,8 @@ namespace UnitTests.ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            IrbisProvider provider = new LocalProvider();
-            ReportContext context = new ReportContext(provider);
+            var provider = new LocalProvider();
+            var context = new ReportContext(provider);
             context.Records.AddRange(_GetRecords());
             report.Render(context);
             string text = context.Output.Text;
@@ -160,8 +160,8 @@ namespace UnitTests.ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            IrbisProvider client = new LocalProvider();
-            ReportContext context = new ReportContext(client);
+            var client = new LocalProvider();
+            var context = new ReportContext(client);
             context.Records.AddRange(_GetRecords());
             context.SetDriver(new HtmlDriver());
             report.Render(context);

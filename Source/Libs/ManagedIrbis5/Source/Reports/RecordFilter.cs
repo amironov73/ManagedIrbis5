@@ -42,7 +42,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        public IrbisProvider Provider { get; internal set; }
+        public ISyncIrbisProvider Provider { get; internal set; }
 
         /// <summary>
         /// Булево выражение для фильтрации записей.
@@ -77,7 +77,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordFilter
             (
-                IrbisProvider provider
+                ISyncIrbisProvider provider
             )
         {
             Provider = provider;
@@ -88,7 +88,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordFilter
             (
-                IrbisProvider provider,
+                ISyncIrbisProvider provider,
                 string expression
             )
         {
