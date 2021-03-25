@@ -10,7 +10,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
-/* IRecord.cs -- маркерный интерфейс для записи
+/* ActualizeRecordParameters.cs -- параметры актуализации записи на ИРБИС-сервере
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,14 +19,25 @@
 namespace ManagedIrbis.Infrastructure
 {
     /// <summary>
-    /// Маркерный интерфейс для записи.
+    /// Параметры актуализации записи на ИРБИС-сервере.
     /// </summary>
-    public interface IRecord
+    public sealed class ActualizeRecordParameters
     {
-        // TODO: implement
+        #region Properties
 
+        /// <summary>
+        /// Имя базы данных (опционально).
+        /// </summary>
         public string? Database { get; set; }
 
-    } // interface IRecord
+        /// <summary>
+        /// MFN актуализируемой записи (обязательно).
+        /// 0 означает "актуализировать всю базу данных".
+        /// </summary>
+        public int Mfn { get; set; }
+
+        #endregion
+
+    } // class ActualizeRecordParameters
 
 } // namespace ManagedIrbis.Infrastructure

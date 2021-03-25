@@ -166,12 +166,12 @@ namespace ManagedIrbis.Readers
                 bool addAllItem = true
             )
         {
-            var specification = FileSpecification.Build
-                (
-                    IrbisPath.MasterFile,
-                    connection.Database,
-                    fileName
-                );
+            var specification = new FileSpecification
+                {
+                    Path = IrbisPath.MasterFile,
+                    Database = connection.Database,
+                    FileName = fileName
+                };
             var content = await connection.ReadTextFileAsync
                 (
                     specification

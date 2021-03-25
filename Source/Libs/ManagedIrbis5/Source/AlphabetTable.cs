@@ -146,7 +146,7 @@ namespace ManagedIrbis
                 };
             var text = client.ReadTextFileAsync
                 (
-                    specification.ToString()
+                    specification
                 )
                 .Result
                 .ThrowIfNull($"Alphabet table: {fileName}");

@@ -30,7 +30,7 @@ namespace ManagedIrbis
     /// Асинхронное подключение к серверу ИРБИС64.
     /// </summary>
     public interface IAsyncConnection
-        : IBasicConnection
+        : IAsyncIrbisProvider
     {
         /// <summary>
         /// Подключение к серверу ИРБИС64.

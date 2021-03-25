@@ -65,7 +65,7 @@ internal class Program
             var maxMfn = await connection.GetMaxMfnAsync();
             WriteLine($"Max MFN={maxMfn}");
 
-            await connection.NopAsync();
+            await connection.NoOperationAsync();
             WriteLine("NOP");
 
             var found = await connection.SearchAsync(Search.Keyword("бетон$"));
@@ -86,10 +86,21 @@ internal class Program
             var formatted = await connection.FormatRecordAsync("@brief", 1);
             WriteLine($"Formatted={formatted}");
 
-            var files = await connection.ListFilesAsync("2.IBIS.*.mnu");
+            var files = await connection.ListFilesAsync(new FileSpecification
+            {
+                Path = IrbisPath.MasterFile,
+                Database = connection.Database,
+                FileName = "*.mnu"
+            });
             WriteLine("Files: " + string.Join(",", files));
 
-            var fileText = await connection.ReadTextFileAsync("2.IBIS.brief.pft");
+            var fileText = await connection.ReadTextFileAsync(new FileSpecification
+            {
+                Path = IrbisPath.MasterFile,
+                Database = connection.Database,
+                FileName = "brief.pft"
+
+            });
             WriteLine($"BRIEF: {fileText}");
             WriteLine();
 
@@ -104,4 +115,5 @@ internal class Program
 
         return 0;
     } // method Main
+
 } // class Program

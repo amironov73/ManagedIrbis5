@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+
 using AM;
 using AM.Collections;
 
@@ -43,7 +44,8 @@ namespace ManagedIrbis
     [DebuggerDisplay("[{" + nameof(Database) +
         "}] MFN={" + nameof(Mfn) + "} ({" + nameof(Version) + "})")]
     public sealed class Record
-        : IVerifiable
+        : IRecord,
+        IVerifiable
     {
         #region Constants
 

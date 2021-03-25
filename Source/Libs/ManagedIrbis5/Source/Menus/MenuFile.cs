@@ -337,7 +337,7 @@ namespace ManagedIrbis.Menus
                 FileSpecification fileSpecification
             )
         {
-            var response = await connection.ReadTextFileAsync(fileSpecification.ToString());
+            var response = await connection.ReadTextFileAsync(fileSpecification);
             if (string.IsNullOrEmpty(response))
             {
                 return null;

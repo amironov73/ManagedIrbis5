@@ -19,6 +19,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -33,52 +34,123 @@ namespace ManagedIrbis
     public interface IAsyncIrbisProvider
         : IBasicConnection
     {
+        /// <summary>
+        /// Актуализация записи.
+        /// </summary>
+        Task<bool> ActualizeRecordAsync(ActualizeRecordParameters parameters);
 
-        Task<bool> ActualizeRecordAsync();
-
+        /// <summary>
+        /// Подключение к серверу.
+        /// </summary>
         Task<bool> ConnectAsync();
 
+        /// <summary>
+        /// Создание базы данных на сервере.
+        /// </summary>
         Task<bool> CreateDatabaseAsync(CreateDatabaseParameters parameters);
 
+        /// <summary>
+        /// Создание поискового словаря в указанной базе данных.
+        /// </summary>
         Task<bool> CreateDictionaryAsync(string? databaseName);
 
+        /// <summary>
+        /// Удаление указанной базы данных на сервере.
+        /// </summary>
+        /// <param name="databaseName">Имя удалаемой базы данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> DeleteDatabaseAsync(string? databaseName);
+
+        /// <summary>
+        /// Отключение от сервера.
+        /// </summary>
         Task<bool> DisconnectAsync();
 
-        Task<bool> FormatRecordAsync();
+        /// <summary>
+        /// Форматирование указанной записи.
+        /// </summary>
+        Task<string?> FormatRecordAsync(string format, int mfn);
 
-        Task<int> GetMaxMfnAsync();
+        /// <summary>
+        /// Форматирование указанной записи.
+        /// </summary>
+        Task<string?> FormatRecordAsync(string format, Record record);
 
-        Task<bool> ListFilesAsync(FileSpecification specification);
+        /// <summary>
+        /// Полнотекстовый поиск ИРБИС64+.
+        /// </summary>
+        Task<FullTextResult?> FullTextSearchAsync(SearchParameters searchParameters,
+            TextParameters textParameters);
 
-        Task<bool> ListProcessesAsync();
+        /// <summary>
+        /// Получение максимального MFN для указанной базы данных.
+        /// По умолчанию используется текущая база данных.
+        /// </summary>
+        Task<int> GetMaxMfnAsync(string? databaseName = default);
 
-        Task<bool> ListUsersAsync();
+        /// <summary>
+        /// Получение версии ИРБИС-сервера.
+        /// </summary>
+        Task<ServerVersion?> GetServerVersionAsync();
 
+        /// <summary>
+        /// Получение списка файлов на сервере,
+        /// удовлетворяющих указанной спецификации.
+        /// </summary>
+        Task<string[]?> ListFilesAsync(FileSpecification specification);
+
+        /// <summary>
+        /// Получение списка файлов на сервере,
+        /// удовлетворяющих указанным спецификациям.
+        /// </summary>
+        Task<string[]?> ListFilesAsync(params FileSpecification[] specifications);
+
+        /// <summary>
+        /// Получение списка процессов, работающих в данный момент
+        /// на ИРБИС-сервере.
+        /// </summary>
+        /// <returns></returns>
+        Task<ProcessInfo[]?> ListProcessesAsync();
+
+        /// <summary>
+        /// Получение списка пользователей, имеющих доступ к
+        /// ИРБИС-серверу. Эти пользователи не обязательно должны
+        /// быть залогинены в данный момент.
+        /// </summary>
+        Task<UserInfo[]?> ListUsersAsync();
+
+        /// <summary>
+        /// Пустая операция, необходимая для поддержания связи
+        /// с ИРБИС-сервером.
+        /// </summary>
         Task<bool> NoOperationAsync();
 
-        Task<bool> ReadFileAsync(FileSpecification specification);
 
-        Task<bool> ReadPostingsAsync(PostingParameters parameters);
+        Task<TermPosting[]?> ReadPostingsAsync(PostingParameters parameters);
 
-        Task<bool> ReadRecordAsync(ReadRecordParameters parameters);
+        Task<Record?> ReadRecordAsync(ReadRecordParameters parameters);
 
-        Task<bool> ReadTermsAsync(TermParameters parameters);
+        Task<Term[]?> ReadTermsAsync(TermParameters parameters);
 
-        Task<bool> ReloadDictionaryAsync();
+        Task<string?> ReadTextFileAsync(FileSpecification specification);
 
-        Task<bool> ReloadMasterFileAsync();
+        Task<bool> ReloadDictionaryAsync(string? databaseName);
+
+        Task<bool> ReloadMasterFileAsync(string? databaseName);
 
         Task<bool> RestartServerAsync();
 
-        Task<bool> SearchAsync(SearchParameters parameters);
+        Task<FoundItem[]?> SearchAsync(SearchParameters parameters);
 
         Task<bool> TruncateDatabaseAsync(string? databaseName);
 
-        Task<bool> UpdateIniFileAsync(IList<string> lines);
-
-        Task<bool> UpdateUserListAsync(UserInfo[] users);
-
         Task<bool> UnlockDatabaseAsync(string? databaseName);
+
+        Task<bool> UpdateIniFileAsync(IEnumerable<string> lines);
+
+        Task<bool> UpdateUserListAsync(IEnumerable<UserInfo> users);
+
+        Task<bool> UnlockRecordsAsync(IEnumerable<int> mfnList, string? databaseName);
 
         Task<bool> WriteFileAsync(FileSpecification specification);
 
