@@ -5,10 +5,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
 /* IRecord.cs -- маркерный интерфейс для записи
  * Ars Magna project, http://arsmagna.ru
@@ -23,9 +19,25 @@ namespace ManagedIrbis.Infrastructure
     /// </summary>
     public interface IRecord
     {
-        // TODO: implement
-
+        /// <summary>
+        /// База данных, в которой хранится запись.
+        /// </summary>
         public string? Database { get; set; }
+
+        /// <summary>
+        /// MFN (порядковый номер в базе данных) записи.
+        /// </summary>
+        public int Mfn { get; set; }
+
+        /// <summary>
+        /// Версия записи.
+        /// </summary>
+        public int Version { get; set; }
+
+        /// <summary>
+        /// Статус записи.
+        /// </summary>
+        public RecordStatus Status { get; set; }
 
     } // interface IRecord
 
