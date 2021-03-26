@@ -55,7 +55,7 @@ namespace ManagedIrbis
                 string prefix
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return Array.Empty<Term>();
             }
@@ -164,7 +164,7 @@ namespace ManagedIrbis
                 string expression
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return Array.Empty<int>();
             }
@@ -198,7 +198,7 @@ namespace ManagedIrbis
                 string expression
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return -1;
             }
@@ -271,7 +271,7 @@ namespace ManagedIrbis
                 params FileSpecification[] specifications
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return false;
             }

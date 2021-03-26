@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Connection.cs -- стандартное подключение к серверу ИРБИС64
+/* AsyncConnection.cs -- асинхронное подключение к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -40,12 +40,10 @@ using Microsoft.Extensions.Logging;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Стандартное одключение к серверу ИРБИС64.
+    /// Асинхронное подключение к серверу ИРБИС64.
     /// </summary>
-    public sealed class Connection
-        : IIrbisConnection
-        /* IAsyncDisposable,
-        IHandmadeSerializable */
+    public sealed class AsyncConnection
+        : IAsyncConnection
     {
         #region Events
 
@@ -137,7 +135,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Socket.
         /// </summary>
-        public ClientSocket Socket { get; private set; }
+        public IAsyncClientSocket Socket { get; private set; }
 
         #endregion
 
@@ -146,9 +144,9 @@ namespace ManagedIrbis
         /// <summary>
         /// Constructor.
         /// </summary>
-        public Connection
+        public AsyncConnection
             (
-                ClientSocket socket,
+                IAsyncClientSocket socket,
                 IServiceProvider provider
             )
         {
@@ -188,7 +186,46 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region Public methods
+        #region IAsyncConnection members
+
+        /// <summary>
+        /// Актуализация всех неактуализированных записей
+        /// в указанной базе данных.
+        /// </summary>
+        /// <param name="database">Имя базы данных.</param>
+        /// <returns>Признак успешности операции.</returns>
+        public async Task<bool> ActualizeDatabaseAsync(string? database = default) =>
+            await ActualizeRecordAsync(new () { Database = database, Mfn = 0 });
+
+        /// <summary>
+        /// Актуализация записи.
+        /// </summary>
+        public async Task<bool> ActualizeRecordAsync
+            (
+                ActualizeRecordParameters parameters
+            )
+        {
+            var database = parameters.Database
+                           ?? Database
+                           ?? throw new IrbisException();
+
+            var response = await ExecuteAsync
+                (
+                    CommandCode.ActualizeRecord,
+                    database,
+                    parameters.Mfn
+                );
+
+            return response is not null;
+        } // method ActualizeRecordAsync
+
+        /// <summary>
+        /// Cancel the current operation.
+        /// </summary>
+        public void CancelOperation()
+        {
+            _cancellation.Cancel();
+        } // method CancelOperation
 
         /// <summary>
         /// Проверка, установлено ли соединение.
@@ -203,53 +240,6 @@ namespace ManagedIrbis
 
             return Connected;
         } // method CheckConnection
-
-        /// <summary>
-        /// Cancel the current operation.
-        /// </summary>
-        public void CancelOperation()
-        {
-            _cancellation.Cancel();
-        } // method CancelOperation
-
-        /// <inheritdoc cref="ISyncConnection.Connect"/>
-        public bool Connect()
-        {
-            if (Connected)
-            {
-                return true;
-            }
-
-            AGAIN: QueryId = 1;
-            ClientId = new Random().Next(100000, 999999);
-
-            var query = new ValueQuery(this, CommandCode.RegisterClient);
-            query.AddAnsi(Username);
-            query.AddAnsi(Password);
-
-            var response = ExecuteSync(ref query);
-            if (ReferenceEquals(response, null))
-            {
-                return false;
-            }
-
-            if (response.GetReturnCode() == -3337)
-            {
-                goto AGAIN;
-            }
-
-            if (response.ReturnCode < 0)
-            {
-                return false;
-            }
-
-            Connected = true;
-            ServerVersion = response.ServerVersion;
-            Interval = response.ReadInteger();
-            // TODO Read INI-file
-
-            return true;
-        } // method Connect
 
         /// <inheritdoc cref="IAsyncConnection.ConnectAsync"/>
         public async Task<bool> ConnectAsync()
@@ -289,398 +279,6 @@ namespace ManagedIrbis
 
             return true;
         } // method ConnectAsync
-
-        /// <summary>
-        /// Отключение от сервера.
-        /// </summary>
-        /// <returns>Признак успешности завершения операции.</returns>
-        public bool Disconnect()
-        {
-            if (Connected)
-            {
-                var query = new ValueQuery(this, CommandCode.UnregisterClient);
-                query.AddAnsi(Username);
-                try
-                {
-                    ExecuteSync(ref query);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                }
-
-                Connected = false;
-            }
-
-            return true;
-        } // method Disconnect
-
-
-
-        /*
-        /// <summary>
-        /// Получение списка баз данных с сервера.
-        /// </summary>
-        /// <param name="fileName">Имя файла со списком баз данных.</param>
-        /// <returns>Массив описаний баз данных.</returns>
-        public async Task<DatabaseInfo[]> ListDatabasesAsync
-            (
-                string fileName
-            )
-        {
-            if (!CheckConnection())
-            {
-                return Array.Empty<DatabaseInfo>();
-            }
-
-            return Array.Empty<DatabaseInfo>();
-        } // method ListDatabasesAsync
-        */
-
-        /// <summary>
-        /// Восстановление ранее прикрытого с помощью <see cref="Suspend"/>
-        /// соединения.
-        /// </summary>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        public static Connection Restore
-            (
-                string state
-            )
-        {
-            throw new NotImplementedException();
-
-            /*
-            ConnectionSettings settings = ConnectionSettings.Decrypt(state);
-
-            if (ReferenceEquals(settings, null))
-            {
-                throw new IrbisException
-                (
-                    "Decrypted state is null"
-                );
-            }
-
-            var result = new IrbisConnection();
-            settings.ApplyToConnection(result);
-
-            return result;
-            */
-        } // method Restore
-
-        /// <summary>
-        /// Восстановление флага подключения, ранее погашенного
-        /// при помощи <see cref="Suspend"/>.
-        /// </summary>
-        public void Rise()
-        {
-            throw new NotImplementedException();
-        } // method Rise
-
-
-        /// <summary>
-        /// Временно "закрывает" соединение с сервером
-        /// (на самом деле соединение не разрывается)
-        /// и сериализует его состояние в строку
-        /// с возможностью последующего восстановления.
-        /// </summary>
-        /// <returns></returns>
-        public string Suspend()
-        {
-            throw new NotImplementedException();
-        } // method Suspend
-
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /*
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Host = reader.ReadNullableString()
-                .ThrowIfNull("Host");
-            Port = (ushort) reader.ReadPackedInt32();
-
-            var username = reader.ReadNullableString();
-            if (!string.IsNullOrEmpty(username))
-            {
-                Username = username;
-            }
-
-            var password = reader.ReadNullableString();
-            if (!ReferenceEquals(password, null))
-            {
-                Password = password;
-            }
-
-            Database = reader.ReadNullableString()
-                .ThrowIfNull("Database");
-
-            var workstation = reader.ReadNullableString();
-            if (!string.IsNullOrEmpty(workstation))
-            {
-                Workstation = workstation;
-            }
-        } // method RestoreFromStream
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(Host)
-                .WritePackedInt32(Port)
-                .WriteNullable(Username)
-                .WriteNullable(Password)
-                .WriteNullable(Database)
-                .WriteNullable(Workstation);
-        } // method SaveTiStream
-
-        */
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable"/>
-
-        public void Dispose()
-        {
-            if (Connected)
-            {
-                Disconnect();
-            }
-        } // method Dispose
-
-        #endregion
-
-        #region IAsyncDisposable members
-
-        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public async ValueTask DisposeAsync()
-        {
-            if (Connected)
-            {
-                await DisconnectAsync();
-            }
-        } // method DisposeAsync
-
-        #endregion
-
-        #region IServiceProvider members
-
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) =>
-            _provider.GetService(serviceType);
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="Object.ToString" />
-        public override string ToString()
-        {
-            var status = Connected ? "[*]" : "[]";
-
-            return $"{Host} {Database} {Username} {status}";
-        } // method ToString
-
-        #endregion
-
-        #region Асинхронные методы
-
-        /// <summary>
-        /// Отправка запроса на сервер по упрощённой схеме.
-        /// </summary>
-        /// <param name="command">Код команды.</param>
-        /// <param name="args">Опциональные параметры команды
-        /// (в кодировке ANSI).</param>
-        /// <returns>Ответ сервера.</returns>
-        public async Task<Response?> ExecuteAsync
-            (
-                string command,
-                params object[] args
-            )
-        {
-            if (!CheckProviderState())
-            {
-                return null;
-            }
-
-            var query = new Query(this, command);
-            foreach (var arg in args)
-            {
-                query.AddAnsi(arg.ToString());
-            }
-
-            var result = await ExecuteAsync(query);
-
-            return result;
-        } // method ExecuteAsync
-
-        #endregion
-
-        #region Temporary
-
-        /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        public async Task<Response?> ExecuteAsync
-            (
-                Query query
-            )
-        {
-            SetBusy(true);
-            try
-            {
-                if (_cancellation.IsCancellationRequested)
-                {
-                    _cancellation = new CancellationTokenSource();
-                }
-
-                Response? result;
-                try
-                {
-                    /*
-                    if (_debug)
-                    {
-                        query.Debug(Console.Out);
-                    }
-                    */
-
-                    result = await Socket.TransactAsync(query);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                    return null;
-                }
-
-                if (result is not null)
-                {
-                    /*
-                    if (_debug)
-                    {
-                        result.Debug(Console.Out);
-                    }
-                    */
-
-                    result.Parse();
-                }
-
-                QueryId++;
-
-                return result;
-            }
-            finally
-            {
-                SetBusy(false);
-            }
-        } // method ExecuteAsync
-
-        /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        public Response? ExecuteSync
-            (
-                ref ValueQuery query
-            )
-        {
-            SetBusy(true);
-            try
-            {
-                if (_cancellation.IsCancellationRequested)
-                {
-                    _cancellation = new CancellationTokenSource();
-                }
-
-                Response? result;
-                try
-                {
-                    /*
-                    if (_debug)
-                    {
-                        query.Debug(Console.Out);
-                    }
-                    */
-
-                    result = Socket.TransactSync(ref query);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                    return null;
-                }
-
-                if (ReferenceEquals(result, null))
-                {
-                    return null;
-                }
-
-                /*
-                if (_debug)
-                {
-                    result.Debug(Console.Out);
-                }
-                */
-
-                result.Parse();
-                QueryId++;
-
-                return result;
-            }
-            finally
-            {
-                SetBusy(false);
-            }
-        } // method ExecuteSync
-
-        //======================================================================
-
-        /// <summary>
-        /// Актуализация всех неактуализированных записей
-        /// в указанной базе данных.
-        /// </summary>
-        /// <param name="database">Имя базы данных.</param>
-        /// <returns>Признак успешности операции.</returns>
-        public async Task<bool> ActualizeDatabaseAsync(string? database = default) =>
-            await ActualizeRecordAsync(new () { Database = database, Mfn = 0 });
-
-        /// <summary>
-        /// Актуализация записи.
-        /// </summary>
-        public async Task<bool> ActualizeRecordAsync
-            (
-                ActualizeRecordParameters parameters
-            )
-        {
-            var database = parameters.Database
-                           ?? Database
-                           ?? throw new IrbisException();
-
-            var response = await ExecuteAsync
-                (
-                    CommandCode.ActualizeRecord,
-                    database,
-                    parameters.Mfn
-                );
-
-            return response is not null;
-        } // method ActualizeRecordAsync
 
         /// <summary>
         /// Создание базы данных на сервере.
@@ -754,6 +352,119 @@ namespace ManagedIrbis
 
             return response?.CheckReturnCode() ?? false;
         } // method DeleteDatabaseAsync
+
+        /// <summary>
+        /// Отключение от сервера.
+        /// </summary>
+        /// <returns>Признак успешности завершения операции.</returns>
+        public async Task<bool> DisconnectAsync()
+        {
+            if (Connected)
+            {
+                var query = new Query(this, CommandCode.UnregisterClient);
+                query.AddAnsi(Username);
+                try
+                {
+                    await ExecuteAsync(query);
+                }
+                catch (Exception exception)
+                {
+                    Debug.WriteLine(exception.Message);
+                }
+
+                Connected = false;
+            }
+
+            return true;
+        } // method DisconnectAsync
+
+        /// <summary>
+        /// Отправка клиентского запроса на сервер
+        /// и получение ответа от него.
+        /// </summary>
+        /// <param name="query">Клиентский запрос.</param>
+        /// <returns>Ответ от сервера.</returns>
+        public async Task<Response?> ExecuteAsync
+            (
+                Query query
+            )
+        {
+            SetBusy(true);
+            try
+            {
+                if (_cancellation.IsCancellationRequested)
+                {
+                    _cancellation = new CancellationTokenSource();
+                }
+
+                Response? result;
+                try
+                {
+                    /*
+                    if (_debug)
+                    {
+                        query.Debug(Console.Out);
+                    }
+                    */
+
+                    result = await Socket.TransactAsync(query);
+                }
+                catch (Exception exception)
+                {
+                    Debug.WriteLine(exception.Message);
+                    return null;
+                }
+
+                if (result is not null)
+                {
+                    /*
+                    if (_debug)
+                    {
+                        result.Debug(Console.Out);
+                    }
+                    */
+
+                    result.Parse();
+                }
+
+                QueryId++;
+
+                return result;
+            }
+            finally
+            {
+                SetBusy(false);
+            }
+        } // method ExecuteAsync
+
+        /// <summary>
+        /// Отправка запроса на сервер по упрощённой схеме.
+        /// </summary>
+        /// <param name="command">Код команды.</param>
+        /// <param name="args">Опциональные параметры команды
+        /// (в кодировке ANSI).</param>
+        /// <returns>Ответ сервера.</returns>
+        public async Task<Response?> ExecuteAsync
+            (
+                string command,
+                params object[] args
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new Query(this, command);
+            foreach (var arg in args)
+            {
+                query.AddAnsi(arg.ToString());
+            }
+
+            var result = await ExecuteAsync(query);
+
+            return result;
+        } // method ExecuteAsync
 
         /// <summary>
         /// Форматирование указанной записи по ее MFN.
@@ -1406,33 +1117,40 @@ namespace ManagedIrbis
             return true;
         } // method WriteRecordAsync
 
-        /// <summary>
-        /// Отключение от сервера.
-        /// </summary>
-        /// <returns>Признак успешности завершения операции.</returns>
-        public async Task<bool> DisconnectAsync()
+        #endregion
+
+        #region IAsyncDisposable members
+
+        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
+        public async ValueTask DisposeAsync()
         {
             if (Connected)
             {
-                var query = new Query(this, CommandCode.UnregisterClient);
-                query.AddAnsi(Username);
-                try
-                {
-                    await ExecuteAsync(query);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                }
-
-                Connected = false;
+                await DisconnectAsync();
             }
-
-            return true;
-        } // method DisconnectAsync
+        } // method DisposeAsync
 
         #endregion
 
-    } // class Connection
+        #region IDisposable members
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose() => DisposeAsync().GetAwaiter().GetResult();
+
+        #endregion
+
+        #region IServiceProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService(Type serviceType) =>
+            _provider.GetService(serviceType);
+
+        #endregion
+
+        #region Object members
+
+        #endregion
+
+    } // class AsyncConnection
 
 } // namespace ManagedIrbis

@@ -66,9 +66,12 @@ namespace ManagedIrbis.Client
         public int ClientId { get; }
         public int QueryId { get; }
         public bool Connected { get; }
+
         public bool Busy { get; }
+
         public int LastError { get; }
-        public bool CheckConnection()
+
+        public bool CheckProviderState()
         {
             throw new NotImplementedException();
         }

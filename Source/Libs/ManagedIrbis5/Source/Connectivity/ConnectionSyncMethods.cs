@@ -45,7 +45,7 @@ namespace ManagedIrbis
                 params object[] args
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return null;
             }
@@ -74,7 +74,7 @@ namespace ManagedIrbis
                 int mfn
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return null;
             }
@@ -111,7 +111,7 @@ namespace ManagedIrbis
                 TextParameters textParameters
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return null;
             }
@@ -145,7 +145,7 @@ namespace ManagedIrbis
                 string? database = default
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return 0;
             }
@@ -222,7 +222,7 @@ namespace ManagedIrbis
                 this IIrbisConnection connection
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return null;
             }
@@ -285,7 +285,7 @@ namespace ManagedIrbis
                 this IIrbisConnection connection
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return false;
             }
@@ -314,7 +314,7 @@ namespace ManagedIrbis
                 int mfn
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return null;
             }
@@ -376,7 +376,7 @@ namespace ManagedIrbis
                 TermParameters parameters
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return Array.Empty<Term>();
             }
@@ -418,7 +418,7 @@ namespace ManagedIrbis
                 string? specification
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return null;
             }
@@ -460,7 +460,7 @@ namespace ManagedIrbis
                 SearchParameters parameters
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return Array.Empty<FoundItem>();
             }
@@ -488,7 +488,7 @@ namespace ManagedIrbis
                 string expression
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return Array.Empty<int>();
             }
@@ -522,7 +522,7 @@ namespace ManagedIrbis
                 string expression
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return -1;
             }
@@ -562,7 +562,7 @@ namespace ManagedIrbis
                 bool dontParse = false
             )
         {
-            if (!connection.CheckConnection())
+            if (!connection.CheckProviderState())
             {
                 return 0;
             }

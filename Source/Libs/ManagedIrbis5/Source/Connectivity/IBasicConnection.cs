@@ -123,10 +123,9 @@ namespace ManagedIrbis
         int LastError { get; }
 
         /// <summary>
-        ///
+        /// Проверка состояния провайдера.
         /// </summary>
-        /// <returns></returns>
-        bool CheckConnection();
+        bool CheckProviderState();
 
     } // interface IBasicConnection
 
