@@ -25,11 +25,13 @@ using System.Threading.Tasks;
 
 using AM;
 using AM.IO;
+using AM.PlatformAbstraction;
 using AM.Runtime;
-
+using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
-
+using ManagedIrbis.Menus;
+using ManagedIrbis.Pft;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -56,19 +58,19 @@ namespace ManagedIrbis
 
         #region Properties
 
-        /// <inheritdoc cref="IBasicConnection.Host"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Host"/>
         public string Host { get; set; } = "127.0.0.1";
 
-        /// <inheritdoc cref="IBasicConnection.Port"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Port"/>
         public ushort Port { get; set; } = 6666;
 
-        /// <inheritdoc cref="IBasicConnection.Username"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Username"/>
         public string Username { get; set; } = string.Empty;
 
-        /// <inheritdoc cref="IBasicConnection.Password"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Password"/>
         public string Password { get; set; } = string.Empty;
 
-        /// <inheritdoc cref="IBasicConnection.Database"/>
+        /// <inheritdoc cref="IBasicIrbisProvider.Database"/>
         public string Database { get; set; } = "IBIS";
 
         /// <summary>
@@ -154,7 +156,7 @@ namespace ManagedIrbis
             socket.Connection = this;
             _cancellation = new CancellationTokenSource();
             Cancellation = _cancellation.Token;
-            _logger = Magna.Factory.CreateLogger<Connection>();
+            _logger = Magna.Factory.CreateLogger<IBasicIrbisProvider>();
             _provider = provider;
         }
 
@@ -221,7 +223,7 @@ namespace ManagedIrbis
             AGAIN: QueryId = 1;
             ClientId = new Random().Next(100000, 999999);
 
-            var query = new ValueQuery(this, CommandCode.RegisterClient);
+            var query = new SyncQuery(this, CommandCode.RegisterClient);
             query.AddAnsi(Username);
             query.AddAnsi(Password);
 
@@ -257,7 +259,7 @@ namespace ManagedIrbis
         /// <returns>Ответ от сервера.</returns>
         public Response? ExecuteSync
             (
-                ref ValueQuery query
+                ref SyncQuery query
             )
         {
             SetBusy(true);
@@ -338,6 +340,141 @@ namespace ManagedIrbis
         #endregion
 
         #region Object members
+
+        #endregion
+
+        #region Temp
+
+        public WaitHandle GetWaitHandle()
+        {
+            throw new NotImplementedException();
+        }
+
+        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
+        public IPftFormatter AcquireFormatter()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Configure(string configurationString)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ReadFile(FileSpecification file)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TermLink[] ExactSearchLinks(string term)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TermLink[] ExactSearchTrimLinks(string term, int i)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string FormatRecord(string format, Record record)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string FormatRecord(string format, int mfn)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string[] FormatRecords(int[] mfns, string format)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetMaxMfn(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ServerVersion GetServerVersion()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string[] ListFiles(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool NoOperation()
+        {
+            throw new NotImplementedException();
+        }
+
+        public MenuFile? ReadMenuFile(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Record ReadRecord(int mfn)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReleaseFormatter(IPftFormatter formatter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int[] Search(string expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Record? ReadRecordVersion(int mfn, int version)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Term[] ReadTerms(TermParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool FileExist(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetGeneration()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IniFile GetUserIniFile()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteRecord(Record record)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ParseConnectionString(string connectionString)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string? ReadTextFile(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public GblResult GlobalCorrection(GblSettings settings)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 

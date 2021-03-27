@@ -47,7 +47,7 @@ namespace ManagedIrbis.Readers
         /// <summary>
         /// Connection.
         /// </summary>
-        public Connection Connection { get; private set; }
+        public ISyncIrbisProvider Connection { get; private set; }
 
         /// <summary>
         /// Database name.
@@ -78,7 +78,7 @@ namespace ManagedIrbis.Readers
         /// </summary>
         public DebtorManager
             (
-                Connection connection
+                ISyncIrbisProvider connection
             )
         {
             Database = "RDR";

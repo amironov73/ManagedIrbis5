@@ -19,6 +19,8 @@ namespace UnitTests.ManagedIrbis.Magazines
     public class BindingManagerTest
         : CommonMagazineTest
     {
+        /*
+
         [TestMethod]
         public void BindingManager_Construction_1()
         {
@@ -28,5 +30,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             var manager = new BindingManager(connection);
             Assert.AreSame(connection, manager.Connection);
         }
+
+        */
     }
 }

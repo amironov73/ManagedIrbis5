@@ -56,13 +56,13 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Fill the combo box with chair list.
         /// </summary>
-        public async Task FillWithChairs
+        public void FillWithChairs
             (
-                Connection connection,
+                ISyncIrbisProvider connection,
                 bool addAllItem = false
             )
         {
-            var chairs = await ChairInfo.ReadAsync
+            var chairs = ChairInfo.Read
                 (
                     connection,
                     ChairInfo.ChairMenu,
@@ -78,13 +78,13 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Fill the combo box with places list.
         /// </summary>
-        public async Task FillWithPlaces
+        public void FillWithPlaces
             (
-                Connection connection,
+                SyncConnection connection,
                 bool addAllItem = false
             )
         {
-            var chairs = await ChairInfo.ReadAsync
+            var chairs = ChairInfo.Read
                 (
                     connection,
                     ChairInfo.PlacesMenu,

@@ -95,34 +95,14 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="connection">Ссылка на подключение к серверу.</param>
         /// <param name="query">Клиентский запрос.</param>
-        public void Encode
+        public void Encode<TQuery>
             (
-                IBasicConnection connection,
-                IQuery query
+                IIrbisConnectionSettings connection,
+                TQuery query
             )
+            where TQuery: IQuery
         {
-            var database = (Database ?? connection.Database)
-                .ThrowIfNull(nameof(Database));
-
-            query.AddAnsi(database);
-            query.AddUtf(StartTerm);
-            query.Add(NumberOfTerms);
-            query.AddFormat(Format);
-        } // method Encode
-
-        /// <summary>
-        /// Кодирование параметров постингов для клиентского запроса.
-        /// </summary>
-        /// <param name="connection">Ссылка на подключение к серверу.</param>
-        /// <param name="query">Клиентский запрос.</param>
-        public void Encode
-            (
-                IBasicConnection connection,
-                ref ValueQuery query
-            )
-        {
-            var database = (Database ?? connection.Database)
-                .ThrowIfNull(nameof(Database));
+            var database = Database.ThrowIfNull(nameof(Database));
 
             query.AddAnsi(database);
             query.AddUtf(StartTerm);
@@ -165,7 +145,7 @@ namespace ManagedIrbis
 
         #region IVerifiable members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="IVerifiable.Verify" />
         public bool Verify
             (
                 bool throwOnError

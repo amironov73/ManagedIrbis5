@@ -42,7 +42,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
         };
 
         private static int _CurrentVersion() =>
-            Connection.ClientVersion.Revision;
+            throw new NotImplementedException();
+            //Connection.ClientVersion.Revision;
 
         #endregion
 

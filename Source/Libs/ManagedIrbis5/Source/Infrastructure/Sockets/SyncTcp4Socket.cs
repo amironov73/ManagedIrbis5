@@ -19,7 +19,6 @@ using System;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 
@@ -29,18 +28,21 @@ using AM;
 
 namespace ManagedIrbis.Infrastructure.Sockets
 {
-    /// <summary>
-    /// Простейший клиентский сокет на основе TCP/IP 4.
-    /// </summary>
-    public sealed class PlainTcp4Socket
-        : ClientSocket
+    public sealed class SyncTcp4Socket
+        : ISyncClientSocket
     {
-        #region ClientSocket methods
+        #region Properties
 
-        /// <inheritdoc cref="ClientSocket.TransactSync"/>
-        public override Response? TransactSync
+        public SyncConnection? Connection { get; set; }
+
+        #endregion
+
+        #region ISyncClientSocket members
+
+        /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
+        public Response? TransactSync
             (
-                ref ValueQuery query
+                ref SyncQuery query
             )
         {
             var connection = Connection.ThrowIfNull();
@@ -105,75 +107,6 @@ namespace ManagedIrbis.Infrastructure.Sockets
 
             return result;
         } // method TransactSync
-
-        /// <inheritdoc cref="ClientSocket.TransactAsync"/>
-        public override async Task<Response?> TransactAsync
-            (
-                Query query
-            )
-        {
-            var connection = Connection.ThrowIfNull();
-            connection.Cancellation.ThrowIfCancellationRequested();
-
-            using var client = new TcpClient();
-            try
-            {
-                await client.ConnectAsync(connection.Host, connection.Port);
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine(exception.Message);
-                connection.LastError = -100_002;
-                return null;
-            }
-
-            var socket = client.Client;
-            var length = query.GetLength();
-            var prefix = Encoding.ASCII.GetBytes
-                (
-                    length.ToInvariantString() + "\n"
-                );
-            var body = query.GetBody();
-
-            try
-            {
-                await socket.SendAsync(prefix, SocketFlags.None);
-                await socket.SendAsync(body, SocketFlags.None);
-                socket.Shutdown(SocketShutdown.Send);
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine(exception.Message);
-                connection.LastError = -100_002;
-                return null;
-            }
-
-            var result = new Response();
-            try
-            {
-                while (true)
-                {
-                    var buffer = new byte[2048];
-                    var chunk = new ArraySegment<byte>(buffer, 0, buffer.Length);
-                    var read = await socket.ReceiveAsync(chunk, SocketFlags.None);
-                    if (read <= 0)
-                    {
-                        break;
-                    }
-
-                    chunk = new ArraySegment<byte>(buffer, 0, read);
-                    result.Add(chunk);
-                }
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine(exception.Message);
-                connection.LastError = -100_002;
-                return null;
-            }
-
-            return result;
-        } // method TransactAsync
 
         #endregion
     }

@@ -38,7 +38,7 @@ internal class Program
         try
         {
             using var connection = ConnectionFactory.Shared
-                .CreateConnection();
+                .CreateAsyncConnection();
 
             connection.Host = args.Length == 0
                 ? "127.0.0.1"

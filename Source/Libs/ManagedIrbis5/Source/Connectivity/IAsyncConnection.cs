@@ -7,18 +7,21 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
-/* IAsyncConnection.cs -- асинхронное подключение к серверу ИРБИС64
+/* IAsyncConnection.cs -- интерфейс асинхронного подключения
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Threading.Tasks;
+using AM.IO;
+using AM.PlatformAbstraction;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
+using ManagedIrbis.Pft;
 
 #endregion
 
@@ -27,27 +30,12 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Асинхронное подключение к серверу ИРБИС64.
+    /// Интерфейс асинхронного подключения.
     /// </summary>
     public interface IAsyncConnection
-        : IAsyncIrbisProvider
+        : IAsyncIrbisProvider,
+        IIrbisConnectionSettings
     {
-        /// <summary>
-        /// Подключение к серверу ИРБИС64.
-        /// </summary>
-        Task<bool> ConnectAsync();
 
-        /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        Task<Response?> ExecuteAsync
-            (
-                Query query
-            );
-
-    } // interface IAsyncConnection
-
-} // namespace ManagedIrbis
+    }
+}

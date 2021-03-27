@@ -10,6 +10,8 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+using System;
+
 #nullable enable
 
 namespace ManagedIrbis
@@ -23,8 +25,12 @@ namespace ManagedIrbis
     {
         #region ConnectionFactory members
 
-        /// <inheritdoc cref="ConnectionFactory.CreateConnection"/>
-        public override IIrbisConnection CreateConnection() => new NullConnection();
+        /// <inheritdoc cref="ConnectionFactory.CreateSyncConnection"/>
+        public override SyncConnection CreateSyncConnection() =>
+            throw new NotImplementedException();
+
+        public override AsyncConnection CreateAsyncConnection() =>
+            throw new NotImplementedException();
 
         #endregion
 

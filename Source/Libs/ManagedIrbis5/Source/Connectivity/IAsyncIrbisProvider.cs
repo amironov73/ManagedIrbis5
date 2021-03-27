@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-
+using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -32,7 +32,7 @@ namespace ManagedIrbis
     /// Интерфейс асинхронного ИРБИС-провайдера.
     /// </summary>
     public interface IAsyncIrbisProvider
-        : IBasicConnection
+        : IBasicIrbisProvider
     {
         /// <summary>
         /// Актуализация записи.
@@ -93,6 +93,8 @@ namespace ManagedIrbis
         /// </summary>
         Task<ServerVersion?> GetServerVersionAsync();
 
+        Task<GblResult?> GlobalCorrection(GblSettings settings);
+
         /// <summary>
         /// Получение списка файлов на сервере,
         /// удовлетворяющих указанной спецификации.
@@ -124,7 +126,6 @@ namespace ManagedIrbis
         /// с ИРБИС-сервером.
         /// </summary>
         Task<bool> NoOperationAsync();
-
 
         Task<TermPosting[]?> ReadPostingsAsync(PostingParameters parameters);
 

@@ -215,13 +215,15 @@ namespace ManagedIrbis
         /// <param name="connection">Неактивное подключение.</param>
         public void Apply
             (
-                IIrbisConnection connection
+                IIrbisConnectionSettings connection
             )
         {
-            if (connection.Connected)
-            {
-                throw new ApplicationException("Already connected");
-            }
+            // TODO: проверять, не подключено ли?
+
+            // if (connection.Connected)
+            // {
+            //     throw new ApplicationException("Already connected");
+            // }
 
             if (!string.IsNullOrEmpty(Host))
             {
@@ -245,10 +247,12 @@ namespace ManagedIrbis
                 connection.Workstation = Workstation;
             }
 
-            if (!string.IsNullOrEmpty(Database))
-            {
-                connection.Database = Database;
-            }
+            // TODO: устанавливать базу данных, если возможно
+
+            // if (!string.IsNullOrEmpty(Database))
+            // {
+            //     connection.Database = Database;
+            // }
 
         } // method Apply
 
@@ -334,18 +338,25 @@ namespace ManagedIrbis
 
         /// <summary>
         /// Construct <see cref="ConnectionSettings"/>
-        /// from <see cref="Connection"/>.
+        /// from <see cref="IIrbisConnectionSettings"/>.
         /// </summary>
-        public static ConnectionSettings FromConnection(IBasicConnection connection) =>
-            new ()
+        public static ConnectionSettings FromConnection
+            (
+                IIrbisConnectionSettings connection
+            )
+        {
+            // TODO: устанавливать базу данных, если возможно
+
+            return new()
             {
                 Host = connection.Host,
                 Port = connection.Port,
                 Username = connection.Username,
                 Password = connection.Password,
-                Database = connection.Database,
+                // Database = connection.Database,
                 Workstation = connection.Workstation
             };
+        } // method FromConnection
 
         /// <summary>
         /// Get missing elements from the settings.

@@ -331,13 +331,13 @@ namespace ManagedIrbis.Menus
         /// <summary>
         /// Read <see cref="MenuFile"/> from server.
         /// </summary>
-        public static async Task<MenuFile?> ReadFromServer
+        public static MenuFile? ReadFromServer
             (
-                Connection connection,
+                ISyncIrbisProvider connection,
                 FileSpecification fileSpecification
             )
         {
-            var response = await connection.ReadTextFileAsync(fileSpecification);
+            var response = connection.ReadTextFile(fileSpecification);
             if (string.IsNullOrEmpty(response))
             {
                 return null;

@@ -29,7 +29,7 @@ using Microsoft.Extensions.Logging;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Паттерн Builder для <see cref="Connection"/>.
+    /// Паттерн Builder для <see cref="SyncConnection"/>.
     /// </summary>
     public sealed class ConnectionBuilder
     {
@@ -37,7 +37,7 @@ namespace ManagedIrbis
 
         private string? _connectionString;
         private ILogger? _logger;
-        private ClientSocket? _socket;
+        private ISyncClientSocket? _socket;
 
         #endregion
 
@@ -46,10 +46,12 @@ namespace ManagedIrbis
         /// <summary>
         /// Создание подключения.
         /// </summary>
-        public Connection Build()
+        public SyncConnection Build()
         {
-            var socket = _socket ?? new PlainTcp4Socket();
-            var result = new Connection(socket, Magna.Host.Services);
+            // TODO: делать ISyncIrbisProvider
+
+            var socket = _socket ?? new SyncTcp4Socket();
+            var result = new SyncConnection(socket, Magna.Host.Services);
 
             if (_logger is not null)
             {
@@ -95,7 +97,7 @@ namespace ManagedIrbis
         /// </summary>
         public ConnectionBuilder WithSocket
             (
-                ClientSocket socket
+                ISyncClientSocket socket
             )
         {
             _socket = socket;

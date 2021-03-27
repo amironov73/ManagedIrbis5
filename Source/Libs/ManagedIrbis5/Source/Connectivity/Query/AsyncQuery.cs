@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Query.cs -- клиентский запрос к серверу ИРБИС64
+/* AsyncQuery.cs -- клиентский запрос к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,10 +26,15 @@ using AM;
 
 namespace ManagedIrbis.Infrastructure
 {
+    //
+    // async-методы не могут принимать ref-параметры,
+    // поэтому пришлось сделать отдельный класс
+    //
+
     /// <summary>
     /// Клиентский запрос к серверу ИРБИС64.
     /// </summary>
-    public sealed class Query
+    public sealed class AsyncQuery
         : IQuery
     {
         #region Construction
@@ -37,9 +42,9 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Constructor.
         /// </summary>
-        public Query
+        public AsyncQuery
             (
-                IBasicConnection connection,
+                IIrbisConnectionSettings connection,
                 string commandCode
             )
         {
@@ -161,5 +166,7 @@ namespace ManagedIrbis.Infrastructure
         public void NewLine() => _stream.WriteByte(10);
 
         #endregion
-    } // class Query
+
+    } // class AsyncQuery
+
 } // namespace ManagedIrbis.Infrastructure

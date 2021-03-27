@@ -86,7 +86,7 @@ namespace ManagedIrbis.Client
         }
 
         /// <summary>
-        /// Query.
+        /// AsyncQuery.
         /// </summary>
         public string? Query
         {

@@ -53,7 +53,7 @@ namespace ManagedIrbis.Quality
         [XmlIgnore]
         [JsonIgnore]
         [Browsable(false)]
-        public IIrbisConnection? Connection =>
+        public ISyncIrbisProvider? Connection =>
             Context?.Connection;
 
         /// <summary>

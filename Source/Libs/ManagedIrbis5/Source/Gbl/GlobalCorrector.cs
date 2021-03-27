@@ -46,7 +46,7 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Connection.
         /// </summary>
-        public IIrbisConnection Connection { get; private set; }
+        public ISyncIrbisProvider Connection { get; private set; }
 
         /// <summary>
         /// Database name.
@@ -94,7 +94,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GlobalCorrector
             (
-                IIrbisConnection connection
+                ISyncIrbisProvider connection
             )
             : this
             (
@@ -110,7 +110,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GlobalCorrector
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database
             )
             : this
@@ -127,7 +127,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GlobalCorrector
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int chunkSize
             )
@@ -165,7 +165,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GlobalCorrector FromSettings
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 GblSettings settings
             )
         {
@@ -254,11 +254,11 @@ namespace ManagedIrbis.Gbl
 
                 try
                 {
-                    GblSettings settings = ToSettings(statements);
+                    var settings = ToSettings(statements);
                     settings.MinMfn = startMfn;
                     settings.MaxMfn = endMfn;
 
-                    GblResult intermediateResult
+                    var intermediateResult
                         = Connection.GlobalCorrection (settings);
                     Result.MergeResult(intermediateResult);
 

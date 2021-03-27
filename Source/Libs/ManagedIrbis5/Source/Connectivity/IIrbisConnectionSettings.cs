@@ -9,31 +9,18 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* IBasicConnection.cs -- наиболее общий интерфейс подключения для мока
+/* IIrbisConnectionSettings.cs -- параметры подключения к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Threading.Tasks;
-
-using ManagedIrbis.Infrastructure;
-
-#endregion
 
 #nullable enable
 
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Наиболее общий интерфейс подключения к серверу ИРБИС64
-    /// для мокирования
+    /// Параметры подключения к серверу ИРБИС64
     /// </summary>
-    public interface IBasicConnection
-        : IDisposable,
-        IAsyncDisposable,
-        IServiceProvider
+    public interface IIrbisConnectionSettings
     {
         /// <summary>
         /// Адрес хоста ИРБИС64. Может задаваться как в числовой форме
@@ -70,20 +57,6 @@ namespace ManagedIrbis
         string Password { get; set; }
 
         /// <summary>
-        /// Имя текущей базы данных. Значение по умолчанию <c>"IBIS"</c>,
-        /// что соответствует базе данных электронного каталога
-        /// в стандартной конфигурации ИРБИС64.
-        /// Имя текущей базы можно менять неограниченное число раз.
-        /// Имя не должно быть пустым и не должно содержать символов,
-        /// не являющихся алфавитно-цифровыми.
-        /// Сервер ИРБИС64, работающий на Windows, <b>не различает</b>
-        /// регистр символов в имени базы данных.
-        /// Сервер ИРБИС64, работающий на Linux, <b>различает</b>
-        /// регистр символов в имени базы данных.
-        /// </summary>
-        string Database { get; set; }
-
-        /// <summary>
         /// Код АРМ АБИС ИРБИС64. Значение по умолчанию <c>"C"</c>
         /// соответствует АРМ "Каталогизатор".
         /// Код должен быть однобуквенным и соответствовать одному
@@ -106,27 +79,6 @@ namespace ManagedIrbis
         /// </summary>
         int QueryId { get; }
 
-        /// <summary>
-        /// Признак успешного подключения к серверу.
-        /// Автоматически устанавливается/сбрасывается клиентом.
-        /// </summary>
-        bool Connected { get; }
-
-        /// <summary>
-        /// Busy?
-        /// </summary>
-        bool Busy { get; }
-
-        /// <summary>
-        /// Last error code.
-        /// </summary>
-        int LastError { get; }
-
-        /// <summary>
-        /// Проверка состояния провайдера.
-        /// </summary>
-        bool CheckProviderState();
-
-    } // interface IBasicConnection
+    } // interface IIrbisConnectionSettings
 
 } // namespace ManagedIrbis

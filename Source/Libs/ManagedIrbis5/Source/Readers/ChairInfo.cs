@@ -18,7 +18,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 using AM;
@@ -159,9 +158,9 @@ namespace ManagedIrbis.Readers
         /// <summary>
         /// Загрузка перечня кафедр обслуживания с сервера.
         /// </summary>
-        public static async Task<ChairInfo[]> ReadAsync
+        public static ChairInfo[] Read
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string fileName = ChairMenu,
                 bool addAllItem = true
             )
@@ -172,7 +171,7 @@ namespace ManagedIrbis.Readers
                     Database = connection.Database,
                     FileName = fileName
                 };
-            var content = await connection.ReadTextFileAsync
+            var content = connection.ReadTextFile
                 (
                     specification
                 );

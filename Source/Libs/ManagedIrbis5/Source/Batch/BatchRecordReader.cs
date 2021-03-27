@@ -64,7 +64,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Connection.
         /// </summary>
-        public IIrbisConnection Connection { get; private set; }
+        public ISyncIrbisProvider Connection { get; private set; }
 
         /// <summary>
         /// Database name.
@@ -95,7 +95,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchRecordReader
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int batchSize,
                 IEnumerable<int> range
@@ -126,7 +126,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchRecordReader
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int batchSize,
                 bool omitDeletedRecords,
@@ -178,7 +178,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            Connection = ConnectionFactory.Shared.CreateConnection();
+            Connection = ConnectionFactory.Shared.CreateSyncConnection();
             Connection.ParseConnectionString(connectionString);
             _ownConnection = true;
             Database = database;
@@ -225,7 +225,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> Interval
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int firstMfn,
                 int lastMfn,
@@ -244,7 +244,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            var maxMfn = connection.GetMaxMfnAsync(database).Result - 1;
+            var maxMfn = connection.GetMaxMfn(database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<Record>();
@@ -272,7 +272,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> Interval
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int firstMfn,
                 int lastMfn,
@@ -350,7 +350,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> Search
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 string searchExpression,
                 int batchSize
@@ -365,10 +365,10 @@ namespace ManagedIrbis.Batch
                         + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException("batchSize");
+                throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            var found = connection.SearchAsync(searchExpression).Result;
+            var found = connection.Search(searchExpression);
             if (found.Length == 0)
             {
                 return Array.Empty<Record>();
@@ -390,7 +390,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> Search
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 string searchExpression,
                 int batchSize,
@@ -419,7 +419,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> WholeDatabase
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int batchSize
             )
@@ -436,7 +436,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            int maxMfn = connection.GetMaxMfnAsync(database).Result - 1;
+            int maxMfn = connection.GetMaxMfn(database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<Record>();
@@ -458,7 +458,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> WholeDatabase
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int batchSize,
                 Action<BatchRecordReader>? action
@@ -485,7 +485,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> WholeDatabase
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int batchSize,
                 bool omitDeletedRecords,

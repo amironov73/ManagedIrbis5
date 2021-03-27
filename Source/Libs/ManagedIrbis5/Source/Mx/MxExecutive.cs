@@ -159,7 +159,7 @@ namespace ManagedIrbis.Mx
 
             MxConsole = new MxConsole();
             Palette = MxPalette.GetDefaultPalette();
-            Provider = new NullProvider();
+            Provider = new Client.NullProvider();
             Context = new PftContext(null);
             Context.SetProvider(Provider);
             Commands = new NonNullCollection<MxCommand>();
@@ -492,7 +492,7 @@ namespace ManagedIrbis.Mx
             )
         {
             var record = new Record();
-            var result = Provider.FormatRecord(record, source)
+            var result = Provider.FormatRecord(source, record)
                           ?? string.Empty;
 
             return result;

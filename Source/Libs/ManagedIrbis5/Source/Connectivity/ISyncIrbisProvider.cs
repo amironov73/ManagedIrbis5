@@ -16,9 +16,10 @@
 
 #region Using directives
 
+using System.Threading.Tasks;
 using AM.IO;
 using AM.PlatformAbstraction;
-
+using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
@@ -33,7 +34,7 @@ namespace ManagedIrbis
     /// Интерфейс синхронного ИРБИС-провайдера.
     /// </summary>
     public interface ISyncIrbisProvider
-        : IBasicConnection
+        : IBasicIrbisProvider
     {
         ///<summary>
         /// Слой платформенной абстракции.
@@ -47,6 +48,8 @@ namespace ManagedIrbis
         /// </summary>
         void Configure(string configurationString);
 
+        bool Connect();
+
         /// <summary>
         /// Чтение файла с сервера.
         /// </summary>
@@ -56,11 +59,13 @@ namespace ManagedIrbis
 
         TermLink[] ExactSearchTrimLinks(string term, int i);
 
-        string FormatRecord(Record record, string format);
+        string FormatRecord(string format, Record record);
+
+        string FormatRecord(string format, int mfn);
 
         string[] FormatRecords(int[] mfns, string format);
 
-        int GetMaxMfn();
+        int GetMaxMfn(string? databaseName = default);
 
         ServerVersion GetServerVersion();
 
@@ -90,6 +95,11 @@ namespace ManagedIrbis
 
         void WriteRecord(Record record);
 
+        void ParseConnectionString(string connectionString);
+
+        string? ReadTextFile(FileSpecification specification);
+
+        GblResult GlobalCorrection(GblSettings settings);
     } // interface ISyncIrbisProvider
 
 } // namespace ManagedIrbis

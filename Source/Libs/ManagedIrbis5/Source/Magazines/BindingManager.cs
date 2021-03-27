@@ -35,7 +35,7 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Connection.
         /// </summary>
-        public IIrbisConnection Connection { get; }
+        public ISyncIrbisProvider Connection { get; }
 
         #endregion
 
@@ -46,7 +46,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         public BindingManager
             (
-                IIrbisConnection connection
+                ISyncIrbisProvider connection
             )
         {
             Connection = connection;

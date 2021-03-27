@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* ValueQuery.cs -- клиентский запрос к серверу ИРБИС64 (для синхронного сценария)
+/* SyncQuery.cs -- клиентский запрос к серверу ИРБИС64 (для синхронного сценария)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,20 +26,26 @@ using AM;
 
 namespace ManagedIrbis.Infrastructure
 {
+    //
+    // В синхронном сценарии у нас есть возможность
+    // использовать структуру, чтобы избежать трафика памяти
+    //
+
     /// <summary>
     /// Клиентский запрос к серверу ИРБИС64
     /// (для синхронного сценария).
     /// </summary>
-    public readonly ref struct ValueQuery
+    public readonly struct SyncQuery
+        : IQuery
     {
         #region Construction
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public ValueQuery
+        public SyncQuery
             (
-                ISyncConnection connection,
+                IIrbisConnectionSettings connection,
                 string commandCode
             )
             : this()

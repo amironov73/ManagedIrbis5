@@ -99,14 +99,14 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="connection">Ссылка на подключение к серверу.</param>
         /// <param name="query">Клиентский запрос.</param>
-        public void Encode
+        public void Encode<TQuery>
             (
-                IBasicConnection connection,
-                IQuery query
+                IIrbisConnectionSettings connection,
+                TQuery query
             )
+            where TQuery: IQuery
         {
-            var database = (Database ?? connection.Database)
-                .ThrowIfNull(nameof(Database));
+            var database = Database.ThrowIfNull(nameof(Database));
 
             query.AddAnsi(database);
             query.Add(NumberOfPostings);
@@ -151,7 +151,6 @@ namespace ManagedIrbis
         }
 
         #endregion
-
 
         #region IVerifiable members
 

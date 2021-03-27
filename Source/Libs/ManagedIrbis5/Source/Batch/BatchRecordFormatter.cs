@@ -69,7 +69,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Connection.
         /// </summary>
-        public IIrbisConnection Connection { get; }
+        public ISyncIrbisProvider Connection { get; }
 
         /// <summary>
         /// Database name.
@@ -100,7 +100,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchRecordFormatter
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 string format,
                 int batchSize,
@@ -152,7 +152,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            Connection = ConnectionFactory.Shared.CreateConnection();
+            Connection = ConnectionFactory.Shared.CreateSyncConnection();
             Connection.ParseConnectionString(connectionString);
             _ownConnection = true;
             Database = database;
@@ -198,7 +198,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<string> Interval
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 string format,
                 int firstMfn,
@@ -218,7 +218,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            int maxMfn = connection.GetMaxMfnAsync(database).Result - 1;
+            int maxMfn = connection.GetMaxMfn(database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<string>();
@@ -262,7 +262,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<string> Search
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 string format,
                 string searchExpression,
@@ -281,7 +281,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            int[] found = connection.SearchAsync(searchExpression).Result;
+            int[] found = connection.Search(searchExpression);
             if (found.Length == 0)
             {
                 return new string[0];
@@ -304,7 +304,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<string> WholeDatabase
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 string format,
                 int batchSize
@@ -322,7 +322,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            int maxMfn = connection.GetMaxMfnAsync(database).Result - 1;
+            int maxMfn = connection.GetMaxMfn(database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<string>();

@@ -235,7 +235,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GblResult Execute
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database
             )
         {
@@ -255,7 +255,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GblResult Execute
             (
-                IIrbisConnection connection
+                ISyncIrbisProvider connection
             )
         {
             return new GlobalCorrector
@@ -274,7 +274,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GblResult Execute
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 string searchExpression
             )
@@ -296,7 +296,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GblResult Execute
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int fromMfn,
                 int toMfn
@@ -320,7 +320,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GblResult Execute
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 int fromMfn,
                 int toMfn
             )
@@ -343,7 +343,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GblResult Execute
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 IEnumerable<int> recordset
             )
@@ -365,7 +365,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GblResult Execute
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 IEnumerable<int> recordset
             )
         {

@@ -41,7 +41,7 @@ namespace ManagedIrbis
         /// <param name="connection"></param>
         /// <param name="mfn"></param>
         /// <returns></returns>
-        public static async Task<Record?> ReadRecordAsync(this IAsyncConnection connection, int mfn) =>
+        public static async Task<Record?> ReadRecordAsync(this AsyncConnection connection, int mfn) =>
             await connection.ReadRecordAsync(new ReadRecordParameters { Mfn = mfn });
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace ManagedIrbis
         /// <returns></returns>
         public static async Task<Term[]> ReadAllTermsAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 string prefix
             )
         {
@@ -114,7 +114,7 @@ namespace ManagedIrbis
         /// <returns>Массив прочитанных постингов.</returns>
         public static async Task<TermPosting[]> ReadPostingsAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 string term,
                 int numberOfPostings
             )
@@ -137,7 +137,7 @@ namespace ManagedIrbis
         /// <returns>Массив прочитанных терминов.</returns>
         public static async Task<Term[]> ReadTermsAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 string startTerm,
                 int numberOfTerms
             )
@@ -160,7 +160,7 @@ namespace ManagedIrbis
         /// <returns>Массив MFN найденных записей.</returns>
         public static async Task<int[]> SearchAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 string expression
             )
         {
@@ -169,7 +169,7 @@ namespace ManagedIrbis
                 return Array.Empty<int>();
             }
 
-            var query = new Query(connection, CommandCode.Search);
+            var query = new AsyncQuery(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
                 Database = connection.Database,
@@ -194,7 +194,7 @@ namespace ManagedIrbis
         /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
         public static async Task<int> SearchCountAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 string expression
             )
         {
@@ -203,7 +203,7 @@ namespace ManagedIrbis
                 return -1;
             }
 
-            var query = new Query(connection, CommandCode.Search);
+            var query = new AsyncQuery(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
                 Database = connection.Database,
@@ -230,7 +230,7 @@ namespace ManagedIrbis
         /// <exception cref="NotImplementedException"></exception>
         public static Task<Record[]> SearchReadAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 string expression,
                 int limit = 0
             )
@@ -246,7 +246,7 @@ namespace ManagedIrbis
         /// <returns></returns>
         public static Task<Record?> SearchSingleRecordAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 string expression
             )
         {
@@ -256,7 +256,7 @@ namespace ManagedIrbis
 
         public static Task<Record[]> WriteRecordsAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 Record[] records,
                 bool lockFlag = false,
                 bool actualize = true
@@ -267,7 +267,7 @@ namespace ManagedIrbis
 
         public static async Task<bool> WriteTextFileAsync
             (
-                this IAsyncConnection connection,
+                this AsyncConnection connection,
                 params FileSpecification[] specifications
             )
         {
@@ -276,7 +276,7 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new Query(connection, CommandCode.ReadDocument);
+            var query = new AsyncQuery(connection, CommandCode.ReadDocument);
             foreach (var specification in specifications)
             {
                 query.AddAnsi(specification.ToString());

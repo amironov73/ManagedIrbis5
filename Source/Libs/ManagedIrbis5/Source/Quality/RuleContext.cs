@@ -27,7 +27,7 @@ namespace ManagedIrbis.Quality
         /// <summary>
         /// Клиент.
         /// </summary>
-        public IIrbisConnection? Connection { get; set; }
+        public ISyncIrbisProvider? Connection { get; set; }
 
         /// <summary>
         /// Обрабатываемая запись.

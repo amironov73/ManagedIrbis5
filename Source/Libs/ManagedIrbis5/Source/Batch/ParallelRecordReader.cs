@@ -142,7 +142,7 @@ namespace ManagedIrbis.Batch
                 string connectionString
             )
         {
-            using (var connection = ConnectionFactory.Shared.CreateConnection())
+            using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
             {
                 connection.ParseConnectionString(connectionString);
                 connection.Connect();
@@ -212,7 +212,7 @@ namespace ManagedIrbis.Batch
                 );
 
             string connectionString = ConnectionString.ThrowIfNull();
-            using (var connection = ConnectionFactory.Shared.CreateConnection())
+            using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
             {
                 connection.ParseConnectionString(connectionString);
                 connection.Connect();

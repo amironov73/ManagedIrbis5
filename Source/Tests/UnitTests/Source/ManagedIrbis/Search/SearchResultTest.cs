@@ -21,8 +21,8 @@ namespace UnitTests.ManagedIrbis.Search
             SearchResult result = new SearchResult();
             result.FoundCount = 123;
             Assert.AreEqual(123, result.FoundCount);
-            result.Query = "Query";
-            Assert.AreEqual("Query", result.Query);
+            result.Query = "AsyncQuery";
+            Assert.AreEqual("AsyncQuery", result.Query);
         }
     }
 }

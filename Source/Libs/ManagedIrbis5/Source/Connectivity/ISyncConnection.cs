@@ -7,18 +7,21 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
-/* ISyncConnection.cs -- синхронное подключение к серверу ИРБИС64
+/* ISyncConnection.cs -- интерфейс синхронного подключения
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Threading.Tasks;
+using AM.IO;
+using AM.PlatformAbstraction;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
+using ManagedIrbis.Pft;
 
 #endregion
 
@@ -27,28 +30,12 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Синхронное подключение к серверу ИРБИС64.
+    /// Интерфейс синхронного подключения.
     /// </summary>
     public interface ISyncConnection
-        : IBasicConnection
+        : ISyncIrbisProvider,
+        IIrbisConnectionSettings
     {
 
-        /// <summary>
-        /// Подключение к серверу ИРБИС64.
-        /// </summary>
-        bool Connect();
-
-        /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        Response? ExecuteSync
-            (
-                ref ValueQuery query
-            );
-
-    } // interface ISyncConnection
-
-} // namespace ManagedIrbis
+    }
+}

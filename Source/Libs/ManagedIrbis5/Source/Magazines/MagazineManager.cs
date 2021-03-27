@@ -56,7 +56,7 @@ namespace ManagedIrbis.Magazines
         /// Клиент для связи с сервером.
         /// </summary>
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local
-        public IIrbisConnection Connection { get; private set; }
+        public ISyncIrbisProvider Connection { get; private set; }
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         public MagazineManager
             (
-                IIrbisConnection connection
+                ISyncIrbisProvider connection
             )
         {
             Connection = connection;
@@ -82,7 +82,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         public MagazineInfo[] GetAllMagazines()
         {
-            List<MagazineInfo> result = new List<MagazineInfo>();
+            var result = new List<MagazineInfo>();
 
             var batch = BatchRecordReader.Search
                 (
@@ -263,6 +263,7 @@ namespace ManagedIrbis.Magazines
                 MagazineIssueInfo issue
             )
         {
+            /*
             string searchExpression = string.Format
                 (
                     "\"II={0}\"",
@@ -271,6 +272,10 @@ namespace ManagedIrbis.Magazines
             int result = Connection.SearchCount(searchExpression);
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         /// <summary>

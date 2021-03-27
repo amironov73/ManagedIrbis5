@@ -28,17 +28,14 @@ namespace ManagedIrbis.Infrastructure.Sockets
     /// </summary>
     public interface ISyncClientSocket
     {
-        /// <summary>
-        /// Используемое подключение (для нотификаций).
-        /// </summary>
-        ISyncConnection? Connection { get; set; }
+        SyncConnection? Connection { get; set; }
 
         /// <summary>
         /// Собственно общение с сервером.
         /// </summary>
-        public abstract Response? TransactSync
+        Response? TransactSync
             (
-                ref ValueQuery query
+                ref SyncQuery query
             );
 
     } // interface ISyncClientSocket

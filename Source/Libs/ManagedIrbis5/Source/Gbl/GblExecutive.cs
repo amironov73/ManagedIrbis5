@@ -41,7 +41,7 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Connection.
         /// </summary>
-        public IIrbisConnection Connection { get; private set; }
+        public ISyncIrbisProvider Connection { get; private set; }
 
         /// <summary>
         /// Record.
@@ -57,7 +57,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GblExecutive
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 Record record
             )
         {

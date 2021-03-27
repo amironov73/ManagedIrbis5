@@ -151,9 +151,9 @@ namespace ManagedIrbis.Menus
         /// <summary>
         /// Read RETURN.MNU from server connection.
         /// </summary>
-        public static async Task<ReturnMnu> FromConnection
+        public static ReturnMnu FromConnection
             (
-                Connection connection,
+                ISyncIrbisProvider connection,
                 string fileName = DefaultFileName
             )
         {
@@ -165,7 +165,7 @@ namespace ManagedIrbis.Menus
                     Database = StandardDatabases.Readers,
                     FileName = DefaultFileName
                 };
-            var menu = await MenuFile.ReadFromServer(connection, specification);
+            var menu = MenuFile.ReadFromServer(connection, specification);
             menu = menu.ThrowIfNull(nameof(menu));
             var result = new ReturnMnu(menu!);
 

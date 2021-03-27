@@ -29,16 +29,16 @@ namespace ManagedIrbis.Infrastructure.Sockets
     public interface IAsyncClientSocket
     {
         /// <summary>
-        /// Используемое подключение (для нотификаций).
+        /// Подключение.
         /// </summary>
-        IAsyncConnection? Connection { get; set; }
+        AsyncConnection? Connection { get; set; }
 
         /// <summary>
         /// Собственно общение с сервером -- в асинхронном режиме.
         /// </summary>
         Task<Response?> TransactAsync
             (
-                Query query
+                AsyncQuery asyncQuery
             );
 
     } // interface IAsyncClientSocket

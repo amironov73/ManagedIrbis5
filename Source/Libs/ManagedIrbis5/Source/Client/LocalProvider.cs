@@ -16,9 +16,13 @@
 #region Using directives
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
+
 using AM.IO;
 using AM.PlatformAbstraction;
+
+using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
@@ -61,6 +65,7 @@ namespace ManagedIrbis.Client
         public ushort Port { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public event EventHandler? BusyChanged;
         public string Database { get; set; }
         public string Workstation { get; set; }
         public int ClientId { get; }
@@ -71,7 +76,17 @@ namespace ManagedIrbis.Client
 
         public int LastError { get; }
 
+        public void CancelOperation()
+        {
+            throw new NotImplementedException();
+        }
+
         public bool CheckProviderState()
+        {
+            throw new NotImplementedException();
+        }
+
+        public WaitHandle GetWaitHandle()
         {
             throw new NotImplementedException();
         }
@@ -104,8 +119,28 @@ namespace ManagedIrbis.Client
             throw new NotImplementedException();
         }
 
+        public void ParseConnectionString(string connectionString)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string? ReadTextFile(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public GblResult GlobalCorrection(GblSettings settings)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Configure(string configurationString) =>
             throw new NotImplementedException();
+
+        public bool Connect()
+        {
+            throw new NotImplementedException();
+        }
 
         public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
@@ -121,11 +156,16 @@ namespace ManagedIrbis.Client
         public TermLink[] ExactSearchTrimLinks(string term, int i) =>
             throw new NotImplementedException();
 
-        public string FormatRecord(Record record, string format) =>
+        public string FormatRecord(string format, Record record) =>
             throw new NotImplementedException();
 
-        public int GetMaxMfn() =>
+        public string FormatRecord(string format, int mfn) =>
             throw new NotImplementedException();
+
+        public int GetMaxMfn(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
 
         public ServerVersion GetServerVersion() =>
             throw new NotImplementedException();

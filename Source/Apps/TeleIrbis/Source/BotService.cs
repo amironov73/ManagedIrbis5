@@ -108,7 +108,7 @@ namespace TeleIrbis
                 string query
             )
         {
-            using var connection = ConnectionFactory.Shared.CreateConnection();
+            using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
             var connectionString = "host=127.0.0.1;port=6666;user=librarian;password=secret;db=ISTU;";
             connection.ParseConnectionString(connectionString);
             await connection.ConnectAsync();

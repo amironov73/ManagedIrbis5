@@ -74,7 +74,7 @@ namespace ManagedIrbis
         /// </remarks>
         public static void DeleteAnyFile
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string fileName
             )
         {
@@ -126,7 +126,7 @@ namespace ManagedIrbis
         /// <exception cref="IrbisException">
         /// Если строка подключения в app.settings не найдена.
         /// </exception>
-        public static IIrbisConnection GetConnectionFromConfig()
+        public static ISyncIrbisProvider GetConnectionFromConfig()
         {
             var connectionString = GetStandardConnectionString();
             if (string.IsNullOrEmpty(connectionString))
@@ -137,7 +137,7 @@ namespace ManagedIrbis
                     );
             }
 
-            var result = ConnectionFactory.Shared.CreateConnection();
+            var result = ConnectionFactory.Shared.CreateSyncConnection();
             result.ParseConnectionString(connectionString);
 
             return result;
@@ -149,7 +149,26 @@ namespace ManagedIrbis
         /// </summary>
         public static void ParseConnectionString
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
+                string? connectionString
+            )
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                return;
+            }
+
+            var settings = new ConnectionSettings();
+            settings.ParseConnectionString(connectionString);
+            settings.Apply(connection);
+        }
+
+        /// <summary>
+        /// Разбор строки подключения.
+        /// </summary>
+        public static void ParseConnectionString
+            (
+                this AsyncConnection connection,
                 string? connectionString
             )
         {

@@ -17,7 +17,7 @@ namespace UnitTests.ManagedIrbis
         {
             Assert.IsNotNull(ConnectionFactory.Shared);
 
-            var actual = ConnectionFactory.Shared.CreateConnection();
+            var actual = ConnectionFactory.Shared.CreateSyncConnection();
             Assert.IsNotNull(actual);
         }
     }

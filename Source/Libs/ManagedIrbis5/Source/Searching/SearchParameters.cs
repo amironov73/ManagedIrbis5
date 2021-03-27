@@ -121,38 +121,14 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="connection">Ссылка на подключение к серверу.</param>
         /// <param name="query">Клиентский запрос.</param>
-        public void Encode
+        public void Encode<TQuery>
             (
-                IBasicConnection connection,
-                IQuery query
+                IIrbisConnectionSettings connection,
+                TQuery query
             )
+            where TQuery: IQuery
         {
-            var database = (Database ?? connection.Database)
-                .ThrowIfNull(nameof(Database));
-
-            query.AddAnsi(database);
-            query.AddUtf(Expression);
-            query.Add(NumberOfRecords);
-            query.Add(FirstRecord);
-            query.AddFormat(Format);
-            query.Add(MinMfn);
-            query.Add(MaxMfn);
-            query.AddAnsi(Sequential);
-        } // method Encode
-
-        /// <summary>
-        /// Кодирование параметров поиска для клиентского запроса.
-        /// </summary>
-        /// <param name="connection">Ссылка на подключение к серверу.</param>
-        /// <param name="query">Клиентский запрос.</param>
-        public void Encode
-            (
-                IBasicConnection connection,
-                ref ValueQuery query
-            )
-        {
-            var database = (Database ?? connection.Database)
-                .ThrowIfNull(nameof(Database));
+            var database = Database.ThrowIfNull(nameof(Database));
 
             query.AddAnsi(database);
             query.AddUtf(Expression);
@@ -183,7 +159,7 @@ namespace ManagedIrbis
             Expression = reader.ReadNullableString();
             Sequential = reader.ReadNullableString();
             Filter = reader.ReadNullableString();
-        }
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -203,7 +179,7 @@ namespace ManagedIrbis
                 .WriteNullable(Expression)
                 .WriteNullable(Sequential)
                 .WriteNullable(Filter);
-        }
+        } // method SaveToStream
 
         #endregion
 
@@ -226,18 +202,18 @@ namespace ManagedIrbis
                 );
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            return (Expression ?? Sequential).ToVisibleString();
-        }
+        public override string ToString() =>
+            (Expression ?? Sequential).ToVisibleString();
 
         #endregion
-    }
-}
+
+    } // class SearchParameters
+
+} // namespace ManagedIrbis

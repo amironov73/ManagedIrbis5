@@ -184,7 +184,7 @@ namespace ManagedIrbis.Morphology
                 var record = Connection.ReadRecord(mfn);
                 if (!ReferenceEquals(record, null))
                 {
-                    string text = Connection.FormatRecord(record, format);
+                    string text = Connection.FormatRecord(format, record);
                     if (!string.IsNullOrEmpty(text))
                     {
                         FoundItem item = new FoundItem

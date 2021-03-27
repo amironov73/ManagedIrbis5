@@ -40,7 +40,7 @@ namespace ManagedIrbis
         /// <returns>Ответ сервера.</returns>
         public static Response? ExecuteSync
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string command,
                 params object[] args
             )
@@ -50,7 +50,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new ValueQuery(connection, command);
+            var query = new SyncQuery(connection, command);
             foreach (var arg in args)
             {
                 query.AddAnsi(arg?.ToString());
@@ -69,7 +69,7 @@ namespace ManagedIrbis
         /// <returns>Результат расформатирования.</returns>
         public static string? FormatRecord
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string format,
                 int mfn
             )
@@ -79,7 +79,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new ValueQuery(connection, CommandCode.FormatRecord);
+            var query = new SyncQuery(connection, CommandCode.FormatRecord);
             query.AddAnsi(connection.Database);
             var prepared = IrbisFormat.PrepareFormat(format);
             query.AddAnsi(prepared);
@@ -106,7 +106,7 @@ namespace ManagedIrbis
         /// </summary>
         public static FullTextResult? FullTextSearch
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 SearchParameters searchParameters,
                 TextParameters textParameters
             )
@@ -116,9 +116,9 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new ValueQuery(connection, CommandCode.NewFulltextSearch);
-            searchParameters.Encode(connection, ref query);
-            textParameters.Encode(connection, ref query);
+            var query = new SyncQuery(connection, CommandCode.NewFulltextSearch);
+            searchParameters.Encode(connection, query);
+            textParameters.Encode(connection, query);
             query.DebugUtf(Console.Out);
             var response = connection.ExecuteSync(ref query);
             if (response is null
@@ -141,7 +141,7 @@ namespace ManagedIrbis
         /// <returns>Макисмальный MFN.</returns>
         public static int GetMaxMfn
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string? database = default
             )
         {
@@ -151,7 +151,7 @@ namespace ManagedIrbis
             }
 
             database ??= connection.Database;
-            var query = new ValueQuery(connection, CommandCode.GetMaxMfn);
+            var query = new SyncQuery(connection, CommandCode.GetMaxMfn);
             query.AddAnsi(database);
             var response = connection.ExecuteSync(ref query);
             if (ReferenceEquals(response, null))
@@ -169,7 +169,7 @@ namespace ManagedIrbis
 
         public static string FormatRecord
             (
-                this IIrbisConnection connection,
+                this ISyncConnection connection,
                 string format,
                 Record record
             )
@@ -179,7 +179,7 @@ namespace ManagedIrbis
 
         public static string[] FormatRecords
             (
-                this IIrbisConnection connection,
+                this ISyncConnection connection,
                 string database,
                 string format,
                 int[] mfns
@@ -190,7 +190,7 @@ namespace ManagedIrbis
 
         public static DatabaseInfo GetDatabaseInfo
             (
-                this IIrbisConnection connection,
+                this ISyncConnection connection,
                 string database
             )
         {
@@ -199,7 +199,7 @@ namespace ManagedIrbis
 
         public static string GetDatabaseStat
             (
-                this IIrbisConnection connection,
+                this ISyncConnection connection,
                 StatDefinition definition
             )
         {
@@ -208,7 +208,7 @@ namespace ManagedIrbis
 
         public static ServerStat GetServerStat
             (
-                this IIrbisConnection connection
+                this ISyncConnection connection
             )
         {
             throw new NotImplementedException();
@@ -219,7 +219,7 @@ namespace ManagedIrbis
         /// </summary>
         public static ServerVersion? GetServerVersion
             (
-                this IIrbisConnection connection
+                this SyncConnection connection
             )
         {
             if (!connection.CheckProviderState())
@@ -227,7 +227,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new ValueQuery(connection, CommandCode.ServerInfo);
+            var query = new SyncQuery(connection, CommandCode.ServerInfo);
             var response = connection.ExecuteSync(ref query);
             if (response is null)
             {
@@ -243,7 +243,7 @@ namespace ManagedIrbis
 
         public static GblResult GlobalCorrection
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 GblSettings settings
             )
         {
@@ -252,7 +252,7 @@ namespace ManagedIrbis
 
         public static DatabaseInfo[] ListDatabases
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string specification
             )
         {
@@ -261,7 +261,7 @@ namespace ManagedIrbis
 
         public static string[] ListFiles
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 FileSpecification specification
             )
         {
@@ -270,7 +270,7 @@ namespace ManagedIrbis
 
         public static UserInfo[] ListUsers
             (
-                this IIrbisConnection connection
+                this SyncConnection connection
             )
         {
             throw new NotImplementedException();
@@ -282,7 +282,7 @@ namespace ManagedIrbis
         /// <returns>Признак успешного завершения операции.</returns>
         public static bool Nop
             (
-                this IIrbisConnection connection
+                this SyncConnection connection
             )
         {
             if (!connection.CheckProviderState())
@@ -298,7 +298,7 @@ namespace ManagedIrbis
 
         public static TermPosting[] ReadPostings
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 PostingParameters parameters
             )
         {
@@ -310,7 +310,7 @@ namespace ManagedIrbis
         /// </summary>
         public static Record? ReadRecord
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 int mfn
             )
         {
@@ -319,7 +319,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new ValueQuery(connection, CommandCode.ReadRecord);
+            var query = new SyncQuery(connection, CommandCode.ReadRecord);
             query.AddAnsi(connection.Database);
             query.Add(mfn);
             var response = connection.ExecuteSync(ref query);
@@ -350,7 +350,7 @@ namespace ManagedIrbis
         /// <returns>Массив прочитанных терминов.</returns>
         public static Term[] ReadTerms
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string startTerm,
                 int numberOfTerms
             )
@@ -372,7 +372,7 @@ namespace ManagedIrbis
         /// <returns>Массив прочитанных терминов.</returns>
         public static Term[] ReadTerms
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 TermParameters parameters
             )
         {
@@ -384,8 +384,8 @@ namespace ManagedIrbis
             var command = parameters.ReverseOrder
                 ? CommandCode.ReadTermsReverse
                 : CommandCode.ReadTerms;
-            var query = new ValueQuery(connection, command);
-            parameters.Encode(connection, ref query);
+            var query = new SyncQuery(connection, command);
+            parameters.Encode(connection, query);
             var response = connection.ExecuteSync(ref query);
             if (response is null)
             {
@@ -402,7 +402,7 @@ namespace ManagedIrbis
 
         public static string? ReadTextFile
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 FileSpecification specification
             )
         {
@@ -414,7 +414,7 @@ namespace ManagedIrbis
         /// </summary>
         public static string? ReadTextFile
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string? specification
             )
         {
@@ -428,7 +428,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new ValueQuery(connection, CommandCode.ReadDocument);
+            var query = new SyncQuery(connection, CommandCode.ReadDocument);
             query.AddAnsi(specification);
             var response = connection.ExecuteSync(ref query);
             if (response is null)
@@ -443,7 +443,7 @@ namespace ManagedIrbis
 
         public static bool RestartServer
             (
-                this IIrbisConnection connection
+                this SyncConnection connection
             )
         {
             throw new NotImplementedException();
@@ -456,7 +456,7 @@ namespace ManagedIrbis
         /// <returns>Массив элементов, описывающих найденные записи.</returns>
         public static FoundItem[] Search
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 SearchParameters parameters
             )
         {
@@ -465,8 +465,8 @@ namespace ManagedIrbis
                 return Array.Empty<FoundItem>();
             }
 
-            var query = new ValueQuery(connection, CommandCode.Search);
-            parameters.Encode(connection, ref query);
+            var query = new SyncQuery(connection, CommandCode.Search);
+            parameters.Encode(connection, query);
             var response = connection.ExecuteSync(ref query);
             if (response is null
                 || !response.CheckReturnCode())
@@ -484,7 +484,7 @@ namespace ManagedIrbis
         /// <returns>Массив MFN найденных записей.</returns>
         public static int[] Search
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string expression
             )
         {
@@ -493,13 +493,13 @@ namespace ManagedIrbis
                 return Array.Empty<int>();
             }
 
-            var query = new ValueQuery(connection, CommandCode.Search);
+            var query = new SyncQuery(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
                 Database = connection.Database,
                 Expression = expression
             };
-            parameters.Encode(connection, ref query);
+            parameters.Encode(connection, query);
             var response = connection.ExecuteSync(ref query);
             if (response is null
                 || !response.CheckReturnCode())
@@ -518,7 +518,7 @@ namespace ManagedIrbis
         /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
         public static int SearchCount
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 string expression
             )
         {
@@ -527,14 +527,14 @@ namespace ManagedIrbis
                 return -1;
             }
 
-            var query = new ValueQuery(connection, CommandCode.Search);
+            var query = new SyncQuery(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
                 Database = connection.Database,
                 Expression = expression,
                 FirstRecord = 0
             };
-            parameters.Encode(connection, ref query);
+            parameters.Encode(connection, query);
             var response = connection.ExecuteSync(ref query);
             if (response is null
                 || !response.CheckReturnCode())
@@ -555,7 +555,7 @@ namespace ManagedIrbis
         /// <returns>Новый максимальный MFN в базе данных.</returns>
         public static int WriteRecord
             (
-                this IIrbisConnection connection,
+                this SyncConnection connection,
                 Record record,
                 bool lockFlag = false,
                 bool actualize = true,
@@ -567,7 +567,7 @@ namespace ManagedIrbis
                 return 0;
             }
 
-            var query = new ValueQuery(connection, CommandCode.UpdateRecord);
+            var query = new SyncQuery(connection, CommandCode.UpdateRecord);
             query.AddAnsi(record.Database ?? connection.Database);
             query.Add(lockFlag ? 1 : 0);
             query.Add(actualize ? 1 : 0);

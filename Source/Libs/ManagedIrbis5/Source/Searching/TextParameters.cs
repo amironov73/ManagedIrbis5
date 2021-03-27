@@ -154,25 +154,14 @@ namespace ManagedIrbis
         /// <summary>
         /// Кодирование в пользовательский запрос.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="query">Пользовательский запрос.</param>
-        public void Encode
+        public void Encode<TQuery>
             (
-                IBasicConnection connection,
-                Query query
+                IIrbisConnectionSettings connection,
+                TQuery query
             )
-        {
-            query.AddUtf(Encode());
-        } // method Encode
-
-        /// <summary>
-        /// Кодирование в пользовательский запрос.
-        /// </summary>
-        /// <param name="query">Пользовательский запрос.</param>
-        public void Encode
-            (
-                IBasicConnection connection,
-                ref ValueQuery query
-            )
+            where TQuery: IQuery
         {
             query.AddUtf(Encode());
         } // method Encode

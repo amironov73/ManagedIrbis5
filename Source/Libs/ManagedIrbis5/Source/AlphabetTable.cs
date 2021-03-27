@@ -133,7 +133,7 @@ namespace ManagedIrbis
         /// </summary>
         public AlphabetTable
             (
-                Connection client,
+                IAsyncIrbisProvider client,
                 string fileName = DefaultFileName
             )
         {
@@ -246,7 +246,7 @@ namespace ManagedIrbis
         /// </summary>
         public static AlphabetTable GetInstance
             (
-                Connection connection
+                IAsyncIrbisProvider connection
             )
         {
             lock (_lock)

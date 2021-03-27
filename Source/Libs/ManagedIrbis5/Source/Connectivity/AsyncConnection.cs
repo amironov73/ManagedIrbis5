@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 using AM;
 using AM.IO;
 using AM.Runtime;
-
+using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
 
@@ -42,8 +42,9 @@ namespace ManagedIrbis
     /// <summary>
     /// Асинхронное подключение к серверу ИРБИС64.
     /// </summary>
-    public sealed class AsyncConnection
-        : IAsyncConnection
+    public class AsyncConnection
+        : IAsyncIrbisProvider,
+        IIrbisConnectionSettings
     {
         #region Events
 
@@ -56,49 +57,37 @@ namespace ManagedIrbis
 
         #region Properties
 
-        /// <inheritdoc cref="IBasicConnection.Host"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Host"/>
         public string Host { get; set; } = "127.0.0.1";
 
-        /// <inheritdoc cref="IBasicConnection.Port"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Port"/>
         public ushort Port { get; set; } = 6666;
 
-        /// <inheritdoc cref="IBasicConnection.Username"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Username"/>
         public string Username { get; set; } = string.Empty;
 
-        /// <inheritdoc cref="IBasicConnection.Password"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Password"/>
         public string Password { get; set; } = string.Empty;
 
-        /// <inheritdoc cref="IBasicConnection.Database"/>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Database"/>
         public string Database { get; set; } = "IBIS";
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Workstation"/>
         public string Workstation { get; set; } = "C";
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IIrbisConnectionSettings.ClientId"/>
         public int ClientId { get; protected internal set; }
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IIrbisConnectionSettings.QueryId"/>
         public int QueryId { get; internal set; }
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IBasicIrbisProvider.Connected"/>
         public bool Connected { get; internal set; } = false;
 
-        /// <summary>
-        /// Busy?
-        /// </summary>
+        /// <inheritdoc cref="IBasicIrbisProvider.Busy"/>
         public bool Busy { get; internal set; } = false;
 
-        /// <summary>
-        /// Last error code.
-        /// </summary>
+        /// <inheritdoc cref="IBasicIrbisProvider.LastError"/>
         public int LastError { get; internal set; } = 0;
 
         /// <summary>
@@ -154,7 +143,7 @@ namespace ManagedIrbis
             socket.Connection = this;
             _cancellation = new CancellationTokenSource();
             Cancellation = _cancellation.Token;
-            _logger = Magna.Factory.CreateLogger<Connection>();
+            _logger = Magna.Factory.CreateLogger<IBasicIrbisProvider>();
             _provider = provider;
         }
 
@@ -183,6 +172,16 @@ namespace ManagedIrbis
                 BusyChanged?.Invoke(this, EventArgs.Empty);
             }
         } // method SetBusy
+
+        #endregion
+
+        #region IBasicIrbisProvider members
+
+        /// <inheritdoc cref="IBasicIrbisProvider.GetWaitHandle"/>
+        public WaitHandle GetWaitHandle()
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 
@@ -241,7 +240,7 @@ namespace ManagedIrbis
             return Connected;
         } // method CheckConnection
 
-        /// <inheritdoc cref="IAsyncConnection.ConnectAsync"/>
+        /// <inheritdoc cref="IAsyncIrbisProvider.ConnectAsync"/>
         public async Task<bool> ConnectAsync()
         {
             if (Connected)
@@ -252,7 +251,7 @@ namespace ManagedIrbis
             AGAIN: QueryId = 1;
             ClientId = new Random().Next(100000, 999999);
 
-            var query = new Query(this, CommandCode.RegisterClient);
+            var query = new AsyncQuery(this, CommandCode.RegisterClient);
             query.AddAnsi(Username);
             query.AddAnsi(Password);
 
@@ -296,7 +295,7 @@ namespace ManagedIrbis
             var database = parameters.Database
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new Query(this, CommandCode.CreateDatabase);
+            var query = new AsyncQuery(this, CommandCode.CreateDatabase);
             query.AddAnsi(database);
             query.AddAnsi(parameters.Database);
             query.Add(parameters.ReaderAccess ? 1 : 0);
@@ -321,7 +320,7 @@ namespace ManagedIrbis
             var database = databaseName
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new Query(this, CommandCode.CreateDictionary);
+            var query = new AsyncQuery(this, CommandCode.CreateDictionary);
             query.AddAnsi(database);
             var response = await ExecuteAsync(query);
 
@@ -346,7 +345,7 @@ namespace ManagedIrbis
             var database = databaseName
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new Query(this, CommandCode.DeleteDatabase);
+            var query = new AsyncQuery(this, CommandCode.DeleteDatabase);
             query.AddAnsi(database);
             var response = await ExecuteAsync(query);
 
@@ -361,7 +360,7 @@ namespace ManagedIrbis
         {
             if (Connected)
             {
-                var query = new Query(this, CommandCode.UnregisterClient);
+                var query = new AsyncQuery(this, CommandCode.UnregisterClient);
                 query.AddAnsi(Username);
                 try
                 {
@@ -382,11 +381,11 @@ namespace ManagedIrbis
         /// Отправка клиентского запроса на сервер
         /// и получение ответа от него.
         /// </summary>
-        /// <param name="query">Клиентский запрос.</param>
+        /// <param name="asyncQuery">Клиентский запрос.</param>
         /// <returns>Ответ от сервера.</returns>
         public async Task<Response?> ExecuteAsync
             (
-                Query query
+                AsyncQuery asyncQuery
             )
         {
             SetBusy(true);
@@ -403,11 +402,11 @@ namespace ManagedIrbis
                     /*
                     if (_debug)
                     {
-                        query.Debug(Console.Out);
+                        asyncQuery.Debug(Console.Out);
                     }
                     */
 
-                    result = await Socket.TransactAsync(query);
+                    result = await Socket.TransactAsync(asyncQuery);
                 }
                 catch (Exception exception)
                 {
@@ -455,7 +454,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, command);
+            var query = new AsyncQuery(this, command);
             foreach (var arg in args)
             {
                 query.AddAnsi(arg.ToString());
@@ -480,7 +479,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.FormatRecord);
+            var query = new AsyncQuery(this, CommandCode.FormatRecord);
             query.AddAnsi(Database);
             var prepared = IrbisFormat.PrepareFormat(format);
             query.AddAnsi(prepared);
@@ -524,7 +523,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.NewFulltextSearch);
+            var query = new AsyncQuery(this, CommandCode.NewFulltextSearch);
             searchParameters.Encode(this, query);
             textParameters.Encode(this, query);
             var response = await ExecuteAsync(query);
@@ -571,7 +570,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ServerInfo);
+            var query = new AsyncQuery(this, CommandCode.ServerInfo);
             var response = await ExecuteAsync(query);
             if (response is null)
             {
@@ -584,6 +583,17 @@ namespace ManagedIrbis
 
             return result;
         } // method GetServerVersionAsync
+
+        /// <summary>
+        /// Глобальная корректировка.
+        /// </summary>
+        public Task<GblResult?> GlobalCorrection
+            (
+                GblSettings settings
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Получение списка файлов на сервере,
@@ -599,7 +609,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ListFiles);
+            var query = new AsyncQuery(this, CommandCode.ListFiles);
             query.AddAnsi(specification.ToString());
 
             var response = await ExecuteAsync(query);
@@ -651,7 +661,7 @@ namespace ManagedIrbis
                 return Array.Empty<string>();
             }
 
-            var query = new Query(this, CommandCode.ListFiles);
+            var query = new AsyncQuery(this, CommandCode.ListFiles);
             foreach (var specification in specifications)
             {
                 query.AddAnsi(specification.ToString());
@@ -697,7 +707,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.GetProcessList);
+            var query = new AsyncQuery(this, CommandCode.GetProcessList);
             var response = await ExecuteAsync(query);
             if (response is null)
             {
@@ -752,7 +762,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ReadPostings);
+            var query = new AsyncQuery(this, CommandCode.ReadPostings);
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
             if (response is null
@@ -780,7 +790,7 @@ namespace ManagedIrbis
             var database = parameters.Database
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new Query(this, CommandCode.ReadRecord);
+            var query = new AsyncQuery(this, CommandCode.ReadRecord);
             query.AddAnsi(database);
             query.Add(parameters.Mfn);
             // TODO: добавить обработку прочих параметров
@@ -818,7 +828,7 @@ namespace ManagedIrbis
             var command = parameters.ReverseOrder
                 ? CommandCode.ReadTermsReverse
                 : CommandCode.ReadTerms;
-            var query = new Query(this, command);
+            var query = new AsyncQuery(this, command);
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
             if (response is null
@@ -845,7 +855,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.ReadDocument);
+            var query = new AsyncQuery(this, CommandCode.ReadDocument);
             query.AddAnsi(specification.ToString());
             var response = await ExecuteAsync(query);
             if (response is null)
@@ -925,7 +935,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new Query(this, CommandCode.Search);
+            var query = new AsyncQuery(this, CommandCode.Search);
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
             if (response is null
@@ -994,7 +1004,7 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new Query(this, CommandCode.UnlockRecords);
+            var query = new AsyncQuery(this, CommandCode.UnlockRecords);
             query.AddAnsi(databaseName ?? Database);
             foreach (var mfn in mfnList)
             {
@@ -1021,7 +1031,7 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new Query(this, CommandCode.UpdateIniFile);
+            var query = new AsyncQuery(this, CommandCode.UpdateIniFile);
             foreach (var line in lines)
             {
                 if (!string.IsNullOrWhiteSpace(line))
@@ -1053,7 +1063,7 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new Query(this, CommandCode.SetUserList);
+            var query = new AsyncQuery(this, CommandCode.SetUserList);
             foreach (var user in userList)
             {
                 query.AddAnsi(user.Encode());
@@ -1095,7 +1105,7 @@ namespace ManagedIrbis
             var database = record.Database
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new Query(this, CommandCode.UpdateRecord);
+            var query = new AsyncQuery(this, CommandCode.UpdateRecord);
             query.AddAnsi(database);
             query.Add(parameters.Lock ? 1 : 0);
             query.Add(parameters.Actualize ? 1 : 0);

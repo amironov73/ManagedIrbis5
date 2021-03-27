@@ -65,7 +65,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Connection.
         /// </summary>
-        public IIrbisConnection Connection { get; private set; }
+        public ISyncIrbisProvider Connection { get; private set; }
 
         /// <summary>
         /// Database name.
@@ -86,7 +86,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchRecordWriter
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 string database,
                 int capacity
             )

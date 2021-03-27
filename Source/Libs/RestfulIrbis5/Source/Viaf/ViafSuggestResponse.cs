@@ -28,7 +28,7 @@ namespace RestfulIrbis.Viaf
     public class ViafSuggestResponse
     {
         /// <summary>
-        /// Query.
+        /// AsyncQuery.
         /// </summary>
         [JsonPropertyName("query")]
         public string? Query { get; set; }

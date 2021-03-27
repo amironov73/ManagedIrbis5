@@ -159,7 +159,7 @@ namespace ManagedIrbis
         /// </summary>
         public Record? ReadRecord
             (
-                IIrbisConnection connection
+                ISyncIrbisProvider connection
             )
         {
             Verify(true);
@@ -192,7 +192,7 @@ namespace ManagedIrbis
         /// </summary>
         public static List<Record> ReadRecords
             (
-                IIrbisConnection connection,
+                ISyncIrbisProvider connection,
                 IEnumerable<RecordReference> references,
                 bool throwOnError
             )
