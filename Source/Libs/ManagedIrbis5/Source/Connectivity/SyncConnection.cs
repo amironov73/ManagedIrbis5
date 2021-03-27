@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,13 +25,13 @@ using System.Threading.Tasks;
 using AM;
 using AM.IO;
 using AM.PlatformAbstraction;
-using AM.Runtime;
+
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
 using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
-using Microsoft.Extensions.DependencyInjection;
+
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -73,71 +72,53 @@ namespace ManagedIrbis
         /// <inheritdoc cref="IBasicIrbisProvider.Database"/>
         public string Database { get; set; } = "IBIS";
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IIrbisConnectionSettings.Workstation"/>
         public string Workstation { get; set; } = "C";
 
-        /// <summary>
-        ///
-        /// </summary>
+        /// <inheritdoc cref="IIrbisConnectionSettings.ClientId"/>
         public int ClientId { get; protected internal set; }
 
-        /// <summary>
-        ///
-        /// </summary>
-        public int QueryId { get; internal set; }
+        /// <inheritdoc cref="IIrbisConnectionSettings.QueryId"/>
+        public int QueryId { get; protected internal set; }
+
+        /// <inheritdoc cref="IBasicIrbisProvider.Connected"/>
+        public bool Connected { get; protected internal set; }
+
+        /// <inheritdoc cref="IBasicIrbisProvider.Busy"/>
+        public bool Busy { get; protected internal set; }
+
+        /// <inheritdoc cref="IBasicIrbisProvider.LastError"/>
+        public int LastError { get; protected internal set; }
 
         /// <summary>
-        ///
-        /// </summary>
-        public bool Connected { get; internal set; } = false;
-
-        /// <summary>
-        /// Busy?
-        /// </summary>
-        public bool Busy { get; internal set; } = false;
-
-        /// <summary>
-        /// Last error code.
-        /// </summary>
-        public int LastError { get; internal set; } = 0;
-
-        /// <summary>
-        ///
+        /// Токен для отмены длительных операций.
         /// </summary>
         public CancellationToken Cancellation { get; }
 
-        // TODO Implement properly
-
         /// <summary>
-        /// Версия клиента.
+        /// Версия сервера. Берется из ответа на регистрацию клиента.
+        /// Сервер может прислать и пустую строку, надо быть
+        /// к этому готовым.
         /// </summary>
-        public static readonly Version ClientVersion = Assembly
-                .GetExecutingAssembly()
-                .GetName()
-                .Version
-            ?? throw new ApplicationException("ClientVersion not defined");
+        public string? ServerVersion { get; protected internal set; }
 
         /// <summary>
-        ///
+        /// INI-файл, присылвемый сервером в ответ на регистрацию клиента.
         /// </summary>
-        public string? ServerVersion { get; private set; }
-
-        // /// <summary>
-        // ///
-        // /// </summary>
-        // public IniFile? IniFile { get; private set; }
+        public IniFile? IniFile { get; private set; }
 
         /// <summary>
-        ///
+        /// Интервал подтверждения на сервере, минуты.
+        /// Берется из ответа сервера при регистрации клиента.
+        /// Сервер может прислать и пустую строку, к этому надо
+        /// быть готовым.
         /// </summary>
         public int Interval { get; private set; }
 
         /// <summary>
-        /// Socket.
+        /// Сокет.
         /// </summary>
-        public ISyncClientSocket Socket { get; private set; }
+        public ISyncClientSocket Socket { get; }
 
         #endregion
 
@@ -164,23 +145,23 @@ namespace ManagedIrbis
 
         #region Private members
 
-        internal ILogger _logger;
+        protected internal ILogger _logger;
 
-        internal IServiceProvider _provider;
+        protected internal IServiceProvider _provider;
 
-        internal CancellationTokenSource _cancellation;
+        protected internal CancellationTokenSource _cancellation;
 
         private static readonly int[] _goodCodesForReadRecord = { -201, -600, -602, -603 };
         private static readonly int[] _goodCodesForReadTerms = { -202, -203, -204 };
 
-        internal void SetBusy
+        protected internal void SetBusy
             (
                 bool busy
             )
         {
             if (Busy != busy)
             {
-                _logger.LogTrace($"SetBusy{busy}");
+                _logger.LogTrace($"SetBusy: {busy}");
                 Busy = busy;
                 BusyChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -188,20 +169,91 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region ISyncConnection members
+        #region Public methods
 
         /// <summary>
-        /// Cancel the current operation.
+        /// Отправка запроса на сервер по упрощённой схеме.
         /// </summary>
-        public void CancelOperation()
+        /// <param name="command">Код команды.</param>
+        /// <param name="args">Опциональные параметры команды
+        /// (в кодировке ANSI).</param>
+        /// <returns>Ответ сервера.</returns>
+        public Response? ExecuteSync
+            (
+                string command,
+                params object[] args
+            )
         {
-            _cancellation.Cancel();
-        } // method CancelOperation
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, command);
+            foreach (var arg in args)
+            {
+                query.AddAnsi(arg.ToString());
+            }
+
+            var result = ExecuteSync(query);
+
+            return result;
+        } // method ExecuteSync
 
         /// <summary>
-        /// Проверка, установлено ли соединение.
+        /// Отправка запроса на сервер по упрощённой схеме.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="command">Код команды.</param>
+        /// <returns>Ответ сервера.</returns>
+        public Response? ExecuteSync
+            (
+                string command
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, command);
+            var result = ExecuteSync(query);
+
+            return result;
+        } // method ExecuteSync
+
+        /// <summary>
+        /// Отправка запроса на сервер по упрощённой схеме.
+        /// </summary>
+        /// <param name="command">Код команды.</param>
+        /// <param name="arg1">Параметр команды.</param>
+        /// <returns>Ответ сервера.</returns>
+        public Response? ExecuteSync
+            (
+                string command,
+                object arg1
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, command);
+            query.AddAnsi(arg1.ToString());
+
+            var result = ExecuteSync(query);
+
+            return result;
+        } // method ExecuteSync
+
+        #endregion
+
+        #region IBasicIrbisProvider members
+
+        /// <inheritdoc cref="IBasicIrbisProvider.CancelOperation"/>
+        public void CancelOperation() => _cancellation.Cancel();
+
+        /// <inheritdoc cref="IBasicIrbisProvider.CheckProviderState"/>
         public bool CheckProviderState()
         {
             if (!Connected)
@@ -212,44 +264,21 @@ namespace ManagedIrbis
             return Connected;
         } // method CheckConnection
 
-        /// <inheritdoc cref="ISyncConnection.Connect"/>
-        public bool Connect()
+        /// <inheritdoc cref="IBasicIrbisProvider.Configure"/>
+        public void Configure(string configurationString)
         {
-            if (Connected)
-            {
-                return true;
-            }
+            // ParseConnectionString
+        }
 
-            AGAIN: QueryId = 1;
-            ClientId = new Random().Next(100000, 999999);
+        /// <inheritdoc cref="IBasicIrbisProvider.GetWaitHandle"/>
+        public WaitHandle GetWaitHandle()
+        {
+            throw new NotImplementedException();
+        } // method GetWaitHandle
 
-            var query = new SyncQuery(this, CommandCode.RegisterClient);
-            query.AddAnsi(Username);
-            query.AddAnsi(Password);
+        #endregion
 
-            var response = ExecuteSync(ref query);
-            if (ReferenceEquals(response, null))
-            {
-                return false;
-            }
-
-            if (response.GetReturnCode() == -3337)
-            {
-                goto AGAIN;
-            }
-
-            if (response.ReturnCode < 0)
-            {
-                return false;
-            }
-
-            Connected = true;
-            ServerVersion = response.ServerVersion;
-            Interval = response.ReadInteger();
-            // TODO Read INI-file
-
-            return true;
-        } // method Connect
+        #region ISyncConnection members
 
         /// <summary>
         /// Отправка клиентского запроса на сервер
@@ -259,7 +288,7 @@ namespace ManagedIrbis
         /// <returns>Ответ от сервера.</returns>
         public Response? ExecuteSync
             (
-                ref SyncQuery query
+                SyncQuery query
             )
         {
             SetBusy(true);
@@ -280,7 +309,7 @@ namespace ManagedIrbis
                     }
                     */
 
-                    result = Socket.TransactSync(ref query);
+                    result = Socket.TransactSync(query);
                 }
                 catch (Exception exception)
                 {
@@ -313,20 +342,716 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IAsyncDisposable members
+        #region ISyncIrbisProvider members
 
-        public ValueTask DisposeAsync()
+        /// <inheritdoc cref="ISyncIrbisProvider.ActualizeRecord"/>
+        public bool ActualizeRecord
+            (
+                ActualizeRecordParameters parameters
+            )
+        {
+            var database = parameters.Database
+                           ?? Database
+                           ?? throw new IrbisException();
+
+            var response = ExecuteSync
+                (
+                    CommandCode.ActualizeRecord,
+                    database,
+                    parameters.Mfn
+                );
+
+            return response is not null;
+        } // method ActualizeRecord
+
+        /// <inheritdoc cref="ISyncConnection.Connect"/>
+        public bool Connect()
+        {
+            if (Connected)
+            {
+                return true;
+            }
+
+            AGAIN: QueryId = 1;
+            ClientId = new Random().Next(100000, 999999);
+
+            var query = new SyncQuery(this, CommandCode.RegisterClient);
+            query.AddAnsi(Username);
+            query.AddAnsi(Password);
+
+            var response = ExecuteSync(query);
+            if (ReferenceEquals(response, null))
+            {
+                return false;
+            }
+
+            if (response.GetReturnCode() == -3337)
+            {
+                goto AGAIN;
+            }
+
+            if (response.ReturnCode < 0)
+            {
+                return false;
+            }
+
+            Connected = true;
+            ServerVersion = response.ServerVersion;
+            Interval = response.ReadInteger();
+            // TODO Read INI-file
+
+            return true;
+        } // method Connect
+
+        /// <inheritdoc cref="ISyncIrbisProvider.CreateDatabase"/>
+        public bool CreateDatabase
+            (
+                CreateDatabaseParameters parameters
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var database = parameters.Database
+                           ?? Database
+                           ?? throw new IrbisException();
+            var query = new SyncQuery(this, CommandCode.CreateDatabase);
+            query.AddAnsi(database);
+            query.AddAnsi(parameters.Database);
+            query.Add(parameters.ReaderAccess ? 1 : 0);
+            var response = ExecuteSync(query);
+
+            return response?.CheckReturnCode() ?? false;
+        } // method CreateDatabase
+
+        /// <inheritdoc cref="ISyncIrbisProvider.CreateDictionary"/>
+        public bool CreateDictionary
+            (
+                string? databaseName = default
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var database = databaseName
+                           ?? Database
+                           ?? throw new IrbisException();
+            var query = new SyncQuery(this, CommandCode.CreateDictionary);
+            query.AddAnsi(database);
+            var response = ExecuteSync(query);
+
+            return response?.CheckReturnCode() ?? false;
+        } // method CreateDictionary
+
+        /// <inheritdoc cref="ISyncIrbisProvider.DeleteDatabase"/>
+        public bool DeleteDatabase
+            (
+                string? databaseName = default
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var database = databaseName
+                           ?? Database
+                           ?? throw new IrbisException();
+            var query = new SyncQuery(this, CommandCode.DeleteDatabase);
+            query.AddAnsi(database);
+            var response = ExecuteSync(query);
+
+            return response?.CheckReturnCode() ?? false;
+        } // method DeleteDatabase
+
+        /// <inheritdoc cref="ISyncIrbisProvider.Disconnect"/>
+        public bool Disconnect()
+        {
+            if (Connected)
+            {
+                var query = new SyncQuery(this, CommandCode.UnregisterClient);
+                query.AddAnsi(Username);
+                try
+                {
+                    ExecuteSync(query);
+                }
+                catch (Exception exception)
+                {
+                    Debug.WriteLine(exception.Message);
+                }
+
+                Connected = false;
+            }
+
+            return true;
+        } // method Disconnect
+
+        /// <inheritdoc cref="ISyncIrbisProvider.FormatRecords"/>
+        public bool FormatRecords
+            (
+                FormatRecordParameters parameters
+            )
         {
             throw new NotImplementedException();
+        } // method FormatRecords
+
+        /// <inheritdoc cref="ISyncIrbisProvider.FullTextSearch"/>
+        public FullTextResult? FullTextSearch
+            (
+                SearchParameters searchParameters,
+                TextParameters textParameters
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, CommandCode.NewFulltextSearch);
+            searchParameters.Encode(this, query);
+            textParameters.Encode(this, query);
+            var response = ExecuteSync(query);
+            if (!(response?.CheckReturnCode() ?? false))
+            {
+                return null;
+            }
+
+            var result = new FullTextResult();
+            result.Decode(response);
+
+            return result;
+        } // method FullTextSearch
+
+        /// <inheritdoc cref="IAsyncIrbisProvider.GetDatabaseInfoAsync"/>
+        public DatabaseInfo? GetDatabaseInfo
+            (
+                string? databaseName = default
+            )
+        {
+            throw new NotImplementedException();
+        } // method GetDatabaseInfo
+
+        /// <inheritdoc cref="ISyncIrbisProvider.GetMaxMfn"/>
+        public int GetMaxMfn
+            (
+                string? databaseName = default
+            )
+        {
+            var database = databaseName
+                           ?? Database
+                           ?? throw new IrbisException();
+            var response = ExecuteSync(CommandCode.GetMaxMfn, database);
+
+            return response?.CheckReturnCode() ?? false
+                ? response.ReturnCode
+                : 0;
+        } // method GetMaxMfn
+
+        /// <inheritdoc cref="ISyncIrbisProvider.GetServerStat"/>
+        public ServerStat? GetServerStat()
+        {
+            throw new NotImplementedException();
+        } // method GetServerStat
+
+        /// <inheritdoc cref="ISyncIrbisProvider.GetServerVersion"/>
+        public ServerVersion? GetServerVersion()
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, CommandCode.ServerInfo);
+            var response = ExecuteSync(query);
+            if (response is null)
+            {
+                return null;
+            }
+
+            response.CheckReturnCode();
+            var result = new ServerVersion();
+            result.Parse(response);
+
+            return result;
+        } // method GetServerVersion
+
+        /// <inheritdoc cref="ISyncIrbisProvider.GlobalCorrection"/>
+        public GblResult? GlobalCorrection
+            (
+                GblSettings settings
+            )
+        {
+            throw new NotImplementedException();
+        } // method GlobalCorrection
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ListFiles"/>
+        public string[]? ListFiles
+            (
+                params FileSpecification[] specifications
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            if (specifications.Length == 0)
+            {
+                return Array.Empty<string>();
+            }
+
+            var query = new SyncQuery(this, CommandCode.ListFiles);
+            foreach (var specification in specifications)
+            {
+                query.AddAnsi(specification.ToString());
+            }
+
+            var response = ExecuteSync(query);
+            if (response is null)
+            {
+                return null;
+            }
+
+            var lines = response.ReadRemainingAnsiLines();
+            var result = new List<string>();
+            foreach (var line in lines)
+            {
+                var files = IrbisText.SplitIrbisToLines(line);
+                foreach (var file1 in files)
+                {
+                    if (!string.IsNullOrEmpty(file1))
+                    {
+                        foreach (var file2 in file1.Split(IrbisText.WindowsDelimiter))
+                        {
+                            if (!string.IsNullOrEmpty(file2))
+                            {
+                                result.Add(file2);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result.ToArray();
+        } // method ListFiles
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ListProcesses"/>
+        public ProcessInfo[]? ListProcesses()
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, CommandCode.GetProcessList);
+            var response = ExecuteSync(query);
+            if (response is null)
+            {
+                return null;
+            }
+
+            response.CheckReturnCode();
+            var result = ProcessInfo.Parse(response);
+
+            return result;
+        } // method ListProcesses
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ListUsers"/>
+        public UserInfo[]? ListUsers()
+        {
+            throw new NotImplementedException();
+        } // method ListUsers
+
+        /// <inheritdoc cref="ISyncIrbisProvider.NoOperation"/>
+        public bool NoOperation()
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var response = ExecuteSync(CommandCode.Nop);
+
+            return response?.CheckReturnCode() ?? false;
+        } // method NoOperation
+
+        /// <inheritdoc cref="ISyncIrbisProvider.PrintTable"/>
+        public string? PrintTable
+            (
+                TableDefinition definition
+            )
+        {
+            throw new NotImplementedException();
+        } // method PrintTableAsync
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ReadBinaryFile"/>
+        public byte[]? ReadBinaryFile
+            (
+                FileSpecification specification
+            )
+        {
+            throw new NotImplementedException();
+        } // method ReadBinaryFile
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ReadPostings"/>
+        public TermPosting[]? ReadPostings
+            (
+                PostingParameters parameters
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, CommandCode.ReadPostings);
+            parameters.Encode(this, query);
+            var response = ExecuteSync(query);
+            if (response is null
+                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadTerms))
+            {
+                return null;
+            }
+
+            return TermPosting.Parse(response);
+        } // method ReadPosting
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ReadRecord"/>
+        public Record? ReadRecord
+            (
+                ReadRecordParameters parameters
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var database = parameters.Database
+                           ?? Database
+                           ?? throw new IrbisException();
+            var query = new SyncQuery(this, CommandCode.ReadRecord);
+            query.AddAnsi(database);
+            query.Add(parameters.Mfn);
+            // TODO: добавить обработку прочих параметров
+            var response = ExecuteSync(query);
+            if (response is null
+                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadRecord) )
+            {
+                return null;
+            }
+
+            var result = new Record
+            {
+                Database = Database
+            };
+            result.Decode(response);
+
+            return result;
+        } // method ReadRecord
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ReadRecordPostings"/>
+        public TermPosting[]? ReadRecordPostings
+            (
+                ReadRecordParameters parameters,
+                string prefix
+            )
+        {
+            throw new NotImplementedException();
+        } // method ReadRecordPostings
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ReadTerms"/>
+        public Term[]? ReadTerms
+            (
+                TermParameters parameters
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var command = parameters.ReverseOrder
+                ? CommandCode.ReadTermsReverse
+                : CommandCode.ReadTerms;
+            var query = new SyncQuery(this, command);
+            parameters.Encode(this, query);
+            var response = ExecuteSync(query);
+            if (response is null
+                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadTerms))
+            {
+                return Array.Empty<Term>();
+            }
+
+            return Term.Parse(response);
+        } // method ReadTerms
+
+        /// <inheritdoc cref="IAsyncIrbisProvider.ReadTextFileAsync"/>
+        public string? ReadTextFile
+            (
+                FileSpecification specification
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, CommandCode.ReadDocument);
+            query.AddAnsi(specification.ToString());
+            var response = ExecuteSync(query);
+            if (response is null)
+            {
+                return null;
+            }
+
+            var result = IrbisText.IrbisToWindows(response.ReadAnsi());
+
+            return result;
+        } // method ReadTextFile
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ReloadDictionary"/>
+        public bool ReloadDictionary
+            (
+                string? databaseName = default
+            )
+        {
+            var response = ExecuteSync
+                (
+                    CommandCode.ReloadDictionary,
+                    databaseName ?? Database
+                );
+
+            return response?.CheckReturnCode() ?? false;
+        } // method ReloadDictionary
+
+        /// <inheritdoc cref="ISyncIrbisProvider.ReloadMasterFile"/>
+        public bool ReloadMasterFile
+            (
+                string? databaseName = default
+            )
+        {
+            var response = ExecuteSync
+                (
+                    CommandCode.ReloadMasterFile,
+                    databaseName ?? Database
+                );
+
+            return response?.CheckReturnCode() ?? false;
+        } // method ReloadMasterFile
+
+        /// <inheritdoc cref="ISyncIrbisProvider.RestartServer"/>
+        public bool RestartServer()
+        {
+            var response = ExecuteSync(CommandCode.RestartServer);
+
+            return response is not null;
+        } // method RestartServer
+
+        /// <inheritdoc cref="ISyncIrbisProvider.Search"/>
+        public FoundItem[]? Search
+            (
+                SearchParameters parameters
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new SyncQuery(this, CommandCode.Search);
+            parameters.Encode(this, query);
+            var response = ExecuteSync(query);
+            if (response is null
+                || !response.CheckReturnCode())
+            {
+                return Array.Empty<FoundItem>();
+            }
+
+            return FoundItem.Parse(response);
+        } // method Search
+
+        /// <inheritdoc cref="ISyncIrbisProvider.TruncateDatabase"/>
+        public bool TruncateDatabase
+            (
+                string? databaseName = default
+            )
+        {
+            var response = ExecuteSync
+                (
+                    CommandCode.EmptyDatabase,
+                    databaseName ?? Database
+                );
+
+            return response is not null && response.CheckReturnCode();
+        } // method TruncateDatabase
+
+        /// <inheritdoc cref="ISyncIrbisProvider.UnlockDatabase"/>
+        public bool UnlockDatabase
+            (
+                string? databaseName = default
+            )
+        {
+            var response = ExecuteSync
+                (
+                    CommandCode.UnlockDatabase,
+                    databaseName ?? Database
+                );
+
+            return response is not null && response.CheckReturnCode();
+        } // method UnlockDatabase
+
+        /// <inheritdoc cref="ISyncIrbisProvider.UnlockRecords"/>
+        public bool UnlockRecords
+            (
+                IEnumerable<int> mfnList,
+                string? databaseName = default
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var query = new SyncQuery(this, CommandCode.UnlockRecords);
+            query.AddAnsi(databaseName ?? Database);
+            foreach (var mfn in mfnList)
+            {
+                query.Add(mfn);
+            }
+
+            var response = ExecuteSync(query);
+
+            return response is not null && response.CheckReturnCode();
+        } // method UnlockRecords
+
+        /// <inheritdoc cref="ISyncIrbisProvider.UpdateIniFile"/>
+        public bool UpdateIniFile
+            (
+                IEnumerable<string> lines
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var query = new SyncQuery(this, CommandCode.UpdateIniFile);
+            foreach (var line in lines)
+            {
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    query.AddAnsi(line);
+                }
+            }
+
+            var response = ExecuteSync(query);
+
+            return response is not null;
+        } // method UpdateIniFile
+
+        /// <inheritdoc cref="ISyncIrbisProvider.UpdateUserList"/>
+        public bool UpdateUserList
+            (
+                IEnumerable<UserInfo> users
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var query = new SyncQuery(this, CommandCode.SetUserList);
+            foreach (var user in users)
+            {
+                query.AddAnsi(user.Encode());
+            }
+
+            var response = ExecuteSync(query);
+
+            return response is not null;
+        } // method UpdateUserList
+
+        /// <inheritdoc cref="ISyncIrbisProvider.WriteRecord"/>
+        public bool WriteRecord
+            (
+                WriteRecordParameters parameters
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var record = parameters.Record as Record
+                         ?? throw new IrbisException();
+            var database = record.Database
+                           ?? Database
+                           ?? throw new IrbisException();
+            var query = new SyncQuery(this, CommandCode.UpdateRecord);
+            query.AddAnsi(database);
+            query.Add(parameters.Lock ? 1 : 0);
+            query.Add(parameters.Actualize ? 1 : 0);
+            query.AddUtf(record.Encode());
+
+            var response = ExecuteSync(query);
+            if (response is null || !response.CheckReturnCode())
+            {
+                return false;
+            }
+
+            var result = response.ReturnCode;
+            if (!parameters.DontParse)
+            {
+                record.Database ??= database;
+                // TODO reparse the record
+            }
+
+            return true;
+        } // method WriteRecord
+
+        /// <inheritdoc cref="ISyncIrbisProvider.WriteTextFile"/>
+        public bool WriteTextFile
+            (
+                FileSpecification specification
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            var query = new SyncQuery(this, CommandCode.ReadDocument);
+            query.AddAnsi(specification.ToString());
+
+            var response = ExecuteSync(query);
+
+            return response is not null;
+        } // method WriteTextFile
+
+        #endregion
+
+        #region IAsyncDisposable members
+
+        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return ValueTask.CompletedTask;
         }
 
         #endregion
 
         #region IDisposable members
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Disconnect();
         }
 
         #endregion
@@ -339,144 +1064,6 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region Object members
+    } // class SyncConnection
 
-        #endregion
-
-        #region Temp
-
-        public WaitHandle GetWaitHandle()
-        {
-            throw new NotImplementedException();
-        }
-
-        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
-        public IPftFormatter AcquireFormatter()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Configure(string configurationString)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string ReadFile(FileSpecification file)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TermLink[] ExactSearchLinks(string term)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TermLink[] ExactSearchTrimLinks(string term, int i)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string FormatRecord(string format, Record record)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string FormatRecord(string format, int mfn)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string[] FormatRecords(int[] mfns, string format)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int GetMaxMfn(string? databaseName = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ServerVersion GetServerVersion()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string[] ListFiles(FileSpecification specification)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool NoOperation()
-        {
-            throw new NotImplementedException();
-        }
-
-        public MenuFile? ReadMenuFile(FileSpecification specification)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Record ReadRecord(int mfn)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ReleaseFormatter(IPftFormatter formatter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int[] Search(string expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Record? ReadRecordVersion(int mfn, int version)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Term[] ReadTerms(TermParameters parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool FileExist(FileSpecification specification)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetGeneration()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IniFile GetUserIniFile()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void WriteRecord(Record record)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ParseConnectionString(string connectionString)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string? ReadTextFile(FileSpecification specification)
-        {
-            throw new NotImplementedException();
-        }
-
-        public GblResult GlobalCorrection(GblSettings settings)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-    }
-}
+} // namespace ManagedIrbis

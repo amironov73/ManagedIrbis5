@@ -4,9 +4,11 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* IBasicIrbisProvider.cs -- наиболее общий интерфейс подключения для мока
@@ -89,6 +91,17 @@ namespace ManagedIrbis
         /// Проверка состояния провайдера.
         /// </summary>
         bool CheckProviderState();
+
+        /// <summary>
+        /// Конфигурация провайдера.
+        /// </summary>
+        /// <param name="configurationString">
+        /// Строка с параметрами конфигурации.
+        /// </param>
+        void Configure
+            (
+                string configurationString
+            );
 
         /// <summary>
         /// Получение хэндла для ожидания.

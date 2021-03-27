@@ -158,12 +158,18 @@ namespace ManagedIrbis.Batch
                 return new int[0];
             }
 
-            List<int> result = new List<int>(totalSize);
+            var result = new List<int>(totalSize);
             foreach (string[] package in packages)
             {
-                string expression = BuildExpression(package);
-                int[] found = Connection.Search(expression);
-                result.AddRange(found);
+                var expression = BuildExpression(package);
+                var parameters = new SearchParameters
+                {
+                    Database = Database,
+                    Expression = expression
+                };
+                var found = Connection.Search(parameters);
+                var mfns = FoundItem.ToMfn(found);
+                result.AddRange(mfns);
             }
 
             return result.ToArray();

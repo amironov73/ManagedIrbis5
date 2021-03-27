@@ -179,7 +179,7 @@ namespace ManagedIrbis.Batch
             }
 
             Connection = ConnectionFactory.Shared.CreateSyncConnection();
-            Connection.ParseConnectionString(connectionString);
+            Connection.Configure(connectionString);
             _ownConnection = true;
             Database = database;
             BatchSize = batchSize;

@@ -61,6 +61,23 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
+        /// Выбирает только MFN из найденных записей.
+        /// </summary>
+        public static int[] ToMfn
+            (
+                FoundItem[] found
+            )
+        {
+            var result = new int[found.Length];
+            for (int i = 0; i < found.Length; i++)
+            {
+                result[i] = found[i].Mfn;
+            }
+
+            return result;
+        } // method ToMfn
+
+        /// <summary>
         /// Разбор ответа сервера.
         /// </summary>
         public static FoundItem[] Parse
@@ -180,5 +197,6 @@ namespace ManagedIrbis
 
         #endregion
 
-    }
-}
+    } // class FoundItem
+
+} // namespace ManagedIrbis

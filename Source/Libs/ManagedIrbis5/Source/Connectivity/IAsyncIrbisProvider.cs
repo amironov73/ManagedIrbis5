@@ -69,7 +69,7 @@ namespace ManagedIrbis
         /// <returns>Признак успешного завершения операции.</returns>
         Task<bool> CreateDictionaryAsync
             (
-                string? databaseName
+                string? databaseName = default
             );
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace ManagedIrbis
         /// <returns>Признак успешного завершения операции.</returns>
         Task<bool> DeleteDatabaseAsync
             (
-                string? databaseName
+                string? databaseName = default
             );
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры команды.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        public Task<bool> FormatRecordsAsync
+        Task<bool> FormatRecordsAsync
             (
                 FormatRecordParameters parameters
             );
@@ -152,7 +152,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="settings">Настройки корректировки.</param>
         /// <returns>Результат корректировки.</returns>
-        Task<GblResult?> GlobalCorrection
+        Task<GblResult?> GlobalCorrectionAsync
             (
                 GblSettings settings
             );
@@ -238,7 +238,7 @@ namespace ManagedIrbis
         /// <param name="parameters">Параметры чтения записи.</param>
         /// <param name="prefix">Префикс в виде <c>"A=$"</c></param>
         /// <returns>Массив прочитанных постингов.</returns>
-        Task<TermPosting[]?> ReadRecordPostings
+        Task<TermPosting[]?> ReadRecordPostingsAsync
             (
                 ReadRecordParameters parameters,
                 string prefix
@@ -358,14 +358,13 @@ namespace ManagedIrbis
                 IEnumerable<UserInfo> users
             );
 
-
         /// <summary>
         /// Сохранение/обновление файла на сервере.
         /// </summary>
         /// <param name="specification">Спецификация файла
         /// (включает в себя содержимое файла).</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> WriteFileAsync
+        Task<bool> WriteTextFileAsync
             (
                 FileSpecification specification
             );

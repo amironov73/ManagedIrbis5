@@ -38,8 +38,16 @@ namespace ManagedIrbis
     /// Не выполняет никаких осмысленных действий.
     /// </summary>
     public sealed class NullProvider
-        : ISyncIrbisProvider
+        : ISyncIrbisProvider,
+        IAsyncIrbisProvider
     {
+        #region ISyncIrbisProvider members
+
+        public void Configure(string configurationString)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
             throw new NotImplementedException();
@@ -75,13 +83,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
-        public IPftFormatter AcquireFormatter()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Configure(string configurationString)
+        public bool ActualizeRecord(ActualizeRecordParameters parameters)
         {
             throw new NotImplementedException();
         }
@@ -91,32 +93,37 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public string ReadFile(FileSpecification file)
+        public bool CreateDatabase(CreateDatabaseParameters parameters)
         {
             throw new NotImplementedException();
         }
 
-        public TermLink[] ExactSearchLinks(string term)
+        public bool CreateDictionary(string? databaseName = default)
         {
             throw new NotImplementedException();
         }
 
-        public TermLink[] ExactSearchTrimLinks(string term, int i)
+        public bool DeleteDatabase(string? databaseName = default)
         {
             throw new NotImplementedException();
         }
 
-        public string FormatRecord(string format, Record record)
+        public bool Disconnect()
         {
             throw new NotImplementedException();
         }
 
-        public string FormatRecord(string format, int mfn)
+        public bool FormatRecords(FormatRecordParameters parameters)
         {
             throw new NotImplementedException();
         }
 
-        public string[] FormatRecords(int[] mfns, string format)
+        public FullTextResult? FullTextSearch(SearchParameters searchParameters, TextParameters textParameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DatabaseInfo? GetDatabaseInfo(string? databaseName = default)
         {
             throw new NotImplementedException();
         }
@@ -126,12 +133,32 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public ServerVersion GetServerVersion()
+        public ServerStat? GetServerStat()
         {
             throw new NotImplementedException();
         }
 
-        public string[] ListFiles(FileSpecification specification)
+        public ServerVersion? GetServerVersion()
+        {
+            throw new NotImplementedException();
+        }
+
+        public GblResult? GlobalCorrection(GblSettings settings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string[]? ListFiles(params FileSpecification[] specifications)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ProcessInfo[]? ListProcesses()
+        {
+            throw new NotImplementedException();
+        }
+
+        public UserInfo[]? ListUsers()
         {
             throw new NotImplementedException();
         }
@@ -141,57 +168,32 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public MenuFile? ReadMenuFile(FileSpecification specification)
+        public string? PrintTable(TableDefinition definition)
         {
             throw new NotImplementedException();
         }
 
-        public Record ReadRecord(int mfn)
+        public byte[]? ReadBinaryFile(FileSpecification specification)
         {
             throw new NotImplementedException();
         }
 
-        public void ReleaseFormatter(IPftFormatter formatter)
+        public TermPosting[]? ReadPostings(PostingParameters parameters)
         {
             throw new NotImplementedException();
         }
 
-        public int[] Search(string expression)
+        public Record? ReadRecord(ReadRecordParameters parameters)
         {
             throw new NotImplementedException();
         }
 
-        public Record? ReadRecordVersion(int mfn, int version)
+        public TermPosting[]? ReadRecordPostings(ReadRecordParameters parameters, string prefix)
         {
             throw new NotImplementedException();
         }
 
-        public Term[] ReadTerms(TermParameters parameters)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool FileExist(FileSpecification specification)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetGeneration()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IniFile GetUserIniFile()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void WriteRecord(Record record)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ParseConnectionString(string connectionString)
+        public Term[]? ReadTerms(TermParameters parameters)
         {
             throw new NotImplementedException();
         }
@@ -201,10 +203,242 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public GblResult GlobalCorrection(GblSettings settings)
+        public bool ReloadDictionary(string? databaseName = default)
         {
             throw new NotImplementedException();
         }
+
+        public bool ReloadMasterFile(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool RestartServer()
+        {
+            throw new NotImplementedException();
+        }
+
+        public FoundItem[]? Search(SearchParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TruncateDatabase(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UnlockDatabase(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UnlockRecords(IEnumerable<int> mfnList, string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UpdateIniFile(IEnumerable<string> lines)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UpdateUserList(IEnumerable<UserInfo> users)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool WriteTextFile(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool WriteRecord(WriteRecordParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region IAsyncIrbisProvider members
+
+        public Task<bool> ActualizeRecordAsync(ActualizeRecordParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> ConnectAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> CreateDatabaseAsync(CreateDatabaseParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> CreateDictionaryAsync(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DeleteDatabaseAsync(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> DisconnectAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> FormatRecordsAsync(FormatRecordParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FullTextResult?> FullTextSearchAsync(SearchParameters searchParameters, TextParameters textParameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DatabaseInfo?> GetDatabaseInfoAsync(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> GetMaxMfnAsync(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServerStat?> GetServerStatAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ServerVersion?> GetServerVersionAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<GblResult?> GlobalCorrectionAsync(GblSettings settings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string[]?> ListFilesAsync(params FileSpecification[] specifications)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ProcessInfo[]?> ListProcessesAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UserInfo[]?> ListUsersAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> NoOperationAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string?> PrintTableAsync(TableDefinition definition)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<byte[]?> ReadBinaryFileAsync(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TermPosting[]?> ReadPostingsAsync(PostingParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Record?> ReadRecordAsync(ReadRecordParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TermPosting[]?> ReadRecordPostingsAsync(ReadRecordParameters parameters, string prefix)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Term[]?> ReadTermsAsync(TermParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string?> ReadTextFileAsync(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> ReloadDictionaryAsync(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> ReloadMasterFileAsync(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> RestartServerAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FoundItem[]?> SearchAsync(SearchParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> TruncateDatabaseAsync(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UnlockDatabaseAsync(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UnlockRecordsAsync(IEnumerable<int> mfnList, string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateIniFileAsync(IEnumerable<string> lines)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> UpdateUserListAsync(IEnumerable<UserInfo> users)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> WriteTextFileAsync(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> WriteRecordAsync(WriteRecordParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
     } // class NullProvider
 
 } // namespace ManagedIrbis

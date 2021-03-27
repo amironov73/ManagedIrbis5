@@ -57,11 +57,11 @@ namespace ManagedIrbis.Client
         /// </summary>
         public const string Null = "Null";
 
-        /// <summary>
-        /// Connected client with some local functionality:
-        /// <see cref="SemiConnectedClient"/>.
-        /// </summary>
-        public const string SemiConnected = "SemiConnected";
+        // /// <summary>
+        // /// Connected client with some local functionality:
+        // /// <see cref="SemiConnectedClient"/>.
+        // /// </summary>
+        // public const string SemiConnected = "SemiConnected";
 
         #endregion
 
@@ -146,6 +146,7 @@ namespace ManagedIrbis.Client
 
             var result = GetProvider(name, true)
                 .ThrowIfNull();
+
             result.Configure(configurationString);
 
             return result;

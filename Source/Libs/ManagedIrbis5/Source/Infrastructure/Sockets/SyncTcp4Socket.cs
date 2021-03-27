@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* PlainTcp4Socket.cs -- клиентский сокет на основе TCP/IP 4
+/* SyncTcp4Socket.cs -- клиентский сокет на основе TCP/IP 4
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -42,7 +42,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
         /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
         public Response? TransactSync
             (
-                ref SyncQuery query
+                SyncQuery query
             )
         {
             var connection = Connection.ThrowIfNull();
@@ -109,5 +109,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
         } // method TransactSync
 
         #endregion
-    }
-}
+
+    } // class SyncTcp4Socket
+
+} // namespace ManagedIrbis.Infrastructure.Sockets

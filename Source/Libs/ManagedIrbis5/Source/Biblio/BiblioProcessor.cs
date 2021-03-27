@@ -220,6 +220,8 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            /*
+
             var provider = context.Provider
                 .ThrowIfNull("context.Provider");
             var result = provider.AcquireFormatter()
@@ -230,6 +232,10 @@ namespace ManagedIrbis.Biblio
             //result.SetProvider(context.Provider);
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -325,8 +331,12 @@ namespace ManagedIrbis.Biblio
                 IPftFormatter formatter
             )
         {
+            /*
             var provider = context.Provider;
             provider.ReleaseFormatter(formatter);
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

@@ -35,7 +35,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
         /// </summary>
         Response? TransactSync
             (
-                ref SyncQuery query
+                SyncQuery query
             );
 
     } // interface ISyncClientSocket

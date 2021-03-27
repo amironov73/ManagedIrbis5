@@ -153,7 +153,7 @@ namespace ManagedIrbis.Batch
             }
 
             Connection = ConnectionFactory.Shared.CreateSyncConnection();
-            Connection.ParseConnectionString(connectionString);
+            Connection.Configure(connectionString);
             _ownConnection = true;
             Database = database;
             BatchSize = batchSize;
@@ -281,19 +281,25 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            int[] found = connection.Search(searchExpression);
-            if (found.Length == 0)
+            var parameters = new SearchParameters
             {
-                return new string[0];
+                Database = database,
+                Expression = searchExpression
+            };
+            var found = connection.Search(parameters);
+            if (found?.Length == 0)
+            {
+                return Array.Empty<string>();
             }
 
+            var mfns = FoundItem.ToMfn(found);
             var result = new BatchRecordFormatter
                 (
                     connection,
                     database,
                     format,
                     batchSize,
-                    found
+                    mfns
                 );
 
             return result;

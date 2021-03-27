@@ -16,9 +16,12 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using AM.IO;
 using AM.PlatformAbstraction;
+
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
@@ -36,70 +39,350 @@ namespace ManagedIrbis
     public interface ISyncIrbisProvider
         : IBasicIrbisProvider
     {
-        ///<summary>
-        /// Слой платформенной абстракции.
+        /// <summary>
+        /// Актуализация записи.
         /// </summary>
-        PlatformAbstractionLayer PlatformAbstraction { get; set; }
-
-        IPftFormatter AcquireFormatter();
+        /// <param name="parameters">Параметры команды.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool ActualizeRecord
+            (
+                ActualizeRecordParameters parameters
+            );
 
         /// <summary>
-        /// Конфигурирование провайдера.
+        /// Подключение к серверу.
         /// </summary>
-        void Configure(string configurationString);
-
+        /// <returns>Признак успешного завершения операции.</returns>
         bool Connect();
 
         /// <summary>
-        /// Чтение файла с сервера.
+        /// Создание базы данных на сервере.
         /// </summary>
-        string ReadFile(FileSpecification file);
-
-        TermLink[] ExactSearchLinks(string term);
-
-        TermLink[] ExactSearchTrimLinks(string term, int i);
-
-        string FormatRecord(string format, Record record);
-
-        string FormatRecord(string format, int mfn);
-
-        string[] FormatRecords(int[] mfns, string format);
-
-        int GetMaxMfn(string? databaseName = default);
-
-        ServerVersion GetServerVersion();
-
-        string[] ListFiles(FileSpecification specification);
-
-        bool NoOperation();
-
-        MenuFile? ReadMenuFile(FileSpecification specification);
-        Record ReadRecord(int mfn);
-        void ReleaseFormatter(IPftFormatter formatter);
-
+        /// <param name="parameters">Параметры команды.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool CreateDatabase
+            (
+                CreateDatabaseParameters parameters
+            );
 
         /// <summary>
-        /// Поиск записей на сервере.
+        /// Создание поискового словаря в указанной базе данных.
         /// </summary>
-        int[] Search(string expression);
+        /// <param name="databaseName">Имя базы данных.
+        /// <c>null</c> означает текущую базу данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool CreateDictionary
+            (
+                string? databaseName = default
+            );
 
-        Record? ReadRecordVersion(int mfn, int version);
+        /// <summary>
+        /// Удаление указанной базы данных на сервере.
+        /// </summary>
+        /// <param name="databaseName">Имя удалаемой базы данных.
+        /// <c>null</c> означает текущую базу данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool DeleteDatabase
+            (
+                string? databaseName = default
+            );
 
-        Term[] ReadTerms(TermParameters parameters);
+        /// <summary>
+        /// Отключение от сервера.
+        /// </summary>
+        /// <returns>Признак успешного завершения операции.
+        /// Как правило, его игнорируют.</returns>
+        bool Disconnect();
 
-        bool FileExist(FileSpecification specification);
+        /// <summary>
+        /// Форматирование записей.
+        /// </summary>
+        /// <param name="parameters">Параметры команды.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool FormatRecords
+            (
+                FormatRecordParameters parameters
+            );
 
-        string GetGeneration();
+        /// <summary>
+        /// Полнотекстовый поиск ИРБИС64+.
+        /// </summary>
+        /// <param name="searchParameters">Параметры поиска.</param>
+        /// <param name="textParameters">Параметры полнотекстовых операций.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        FullTextResult? FullTextSearch
+            (
+                SearchParameters searchParameters,
+                TextParameters textParameters
+            );
 
-        IniFile GetUserIniFile();
+        /// <summary>
+        /// Получение информации об указанной базе данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных (опционально).
+        /// <c>null</c> означает текущую базу данных.</param>
+        /// <returns>Информация о базе данных.</returns>
+        DatabaseInfo? GetDatabaseInfo
+            (
+                string? databaseName = default
+            );
 
-        void WriteRecord(Record record);
+        /// <summary>
+        /// Получение максимального MFN для указанной базы данных.
+        /// По умолчанию используется текущая база данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных (опционально).
+        /// <c>null</c> означает текущую базу данных.</param>
+        /// <returns>Максимальный MFN либо код ошибки.</returns>
+        int GetMaxMfn
+            (
+                string? databaseName = default
+            );
 
-        void ParseConnectionString(string connectionString);
+        /// <summary>
+        /// Получение статистики с сервера.
+        /// </summary>
+        /// <returns>Серверная статистика.</returns>
+        ServerStat? GetServerStat();
 
-        string? ReadTextFile(FileSpecification specification);
+        /// <summary>
+        /// Получение версии ИРБИС-сервера.
+        /// </summary>
+        /// <returns>Версия сервера.</returns>
+        ServerVersion? GetServerVersion();
 
-        GblResult GlobalCorrection(GblSettings settings);
+        /// <summary>
+        /// Глобальная корректировка.
+        /// </summary>
+        /// <param name="settings">Настройки корректировки.</param>
+        /// <returns>Результат корректировки.</returns>
+        GblResult? GlobalCorrection
+            (
+                GblSettings settings
+            );
+
+        /// <summary>
+        /// Получение списка файлов на сервере,
+        /// удовлетворяющих указанным спецификациям.
+        /// </summary>
+        /// <param name="specifications">Массив спецификаций файлов.</param>
+        /// <remarks>Массив найденных на сервере файлов.</remarks>
+        string[]? ListFiles
+            (
+                params FileSpecification[] specifications
+            );
+
+        /// <summary>
+        /// Получение списка процессов, работающих в данный момент
+        /// на ИРБИС-сервере.
+        /// </summary>
+        /// <returns>Массив серверных процессов.</returns>
+        ProcessInfo[]? ListProcesses();
+
+        /// <summary>
+        /// Получение списка пользователей, имеющих доступ к
+        /// ИРБИС-серверу. Эти пользователи не обязательно должны
+        /// быть залогинены в данный момент.
+        /// </summary>
+        /// <remarks>Массив известных системе пользователей.</remarks>
+        UserInfo[]? ListUsers();
+
+        /// <summary>
+        /// Пустая операция, необходимая для поддержания связи
+        /// с ИРБИС-сервером.
+        /// </summary>
+        /// <returns>Признак успешного завершения операции
+        /// (как правило, игнорируется).</returns>
+        bool NoOperation();
+
+        /// <summary>
+        /// Расформатирование таблицы на сервере
+        /// </summary>
+        /// <param name="definition">Определение таблицы.</param>
+        /// <returns>RTF-текст, полученный в результате
+        /// расформатирования.</returns>
+        string? PrintTable
+            (
+                TableDefinition definition
+            );
+
+        /// <summary>
+        /// Чтение двоичного файла (например, картинки) с сервера ИРБИС64.
+        /// </summary>
+        /// <param name="specification">Спецификация пути к файлу.</param>
+        /// <returns>Содержимое файла.</returns>
+        byte[]? ReadBinaryFile
+            (
+                FileSpecification specification
+            );
+
+        /// <summary>
+        /// Считывание постингов для указанных терминов поискового словаря.
+        /// </summary>
+        /// <param name="parameters">Параметры операции.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        TermPosting[]? ReadPostings
+            (
+                PostingParameters parameters
+            );
+
+        /// <summary>
+        /// Чтение записи с сервера.
+        /// </summary>
+        /// <param name="parameters">Параметры операции.</param>
+        /// <returns>Прочитанная запись.</returns>
+        Record? ReadRecord
+            (
+                ReadRecordParameters parameters
+            );
+
+        /// <summary>
+        /// Получение постингов для указанных записи и префикса.
+        /// </summary>
+        /// <param name="parameters">Параметры чтения записи.</param>
+        /// <param name="prefix">Префикс в виде <c>"A=$"</c></param>
+        /// <returns>Массив прочитанных постингов.</returns>
+        TermPosting[]? ReadRecordPostings
+            (
+                ReadRecordParameters parameters,
+                string prefix
+            );
+
+        /// <summary>
+        /// Получение терминов поискового словаря.
+        /// </summary>
+        /// <param name="parameters">Параметры операции.</param>
+        /// <returns>Массив прочитанных терминов.</returns>
+        Term[]? ReadTerms
+            (
+                TermParameters parameters
+            );
+
+        /// <summary>
+        /// Получение содержимого текстового файла с сервера
+        /// согласно спецификации.
+        /// </summary>
+        /// <param name="specification">Спецификация пути к файлу.</param>
+        /// <returns>Содержимое файла.</returns>
+        string? ReadTextFile
+            (
+                FileSpecification specification
+            );
+
+        /// <summary>
+        /// Пересоздание словаря для указанной базы данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool ReloadDictionary
+            (
+                string? databaseName = default
+            );
+
+        /// <summary>
+        /// Пересоздание мастер-файла для указанной базы данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool ReloadMasterFile
+            (
+                string? databaseName = default
+            );
+
+        /// <summary>
+        /// Асинхронный перезапуск сервера без утери подключенных клиентов.
+        /// </summary>
+        /// <returns>Признак успешного завергения операции.</returns>
+        bool RestartServer();
+
+        /// <summary>
+        /// Расширенный поиск.
+        /// </summary>
+        /// <param name="parameters">Параметры поиска.</param>
+        /// <returns>Массив элементов, описывающих найденные записи.</returns>
+        FoundItem[]? Search
+            (
+                SearchParameters parameters
+            );
+
+        /// <summary>
+        /// Опустошение указанной базы данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool TruncateDatabase
+            (
+                string? databaseName = default
+            );
+
+        /// <summary>
+        /// Разблокирование указанной базы данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool UnlockDatabase
+            (
+                string? databaseName = default
+            );
+
+        /// <summary>
+        /// Разблокирование указанных записей в указанной базе данных.
+        /// </summary>
+        /// <param name="mfnList">Перечень MFN, подлежащих разблокировке.</param>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию текущая база данных.</param>
+        /// <returns>Признак успешности завершения операции.</returns>
+        bool UnlockRecords
+            (
+                IEnumerable<int> mfnList,
+                string? databaseName = default
+            );
+
+        /// <summary>
+        /// Обновление указанных строк серверного INI-файла.
+        /// </summary>
+        /// <param name="lines">Измененные строки INI-файла.</param>
+        /// <returns>Признак успешности завершения операции.</returns>
+        bool UpdateIniFile
+            (
+                IEnumerable<string> lines
+            );
+
+        /// <summary>
+        /// Обновление списка пользователей системы на сервере.
+        /// </summary>
+        /// <param name="users">Список известных системе пользователей.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool UpdateUserList
+            (
+                IEnumerable<UserInfo> users
+            );
+
+        /// <summary>
+        /// Сохранение/обновление файла на сервере.
+        /// </summary>
+        /// <param name="specification">Спецификация файла
+        /// (включает в себя содержимое файла).</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool WriteTextFile
+            (
+                FileSpecification specification
+            );
+
+        /// <summary>
+        /// Сохранение/обновление библиографической записи на сервере.
+        /// </summary>
+        /// <param name="parameters">Параметры операции.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        bool WriteRecord
+            (
+                WriteRecordParameters parameters
+            );
+
     } // interface ISyncIrbisProvider
 
 } // namespace ManagedIrbis

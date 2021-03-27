@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,43 +40,31 @@ namespace ManagedIrbis.Client
     public class LocalProvider
         : ISyncIrbisProvider
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public LocalProvider()
+        public void Configure(string configurationString)
         {
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public LocalProvider(string rootPath)
+        public void Dispose()
         {
             throw new NotImplementedException();
         }
 
-        #endregion
+        public ValueTask DisposeAsync()
+        {
+            throw new NotImplementedException();
+        }
 
-        #region IrbisProvider members
+        public object? GetService(Type serviceType)
+        {
+            throw new NotImplementedException();
+        }
 
-        public string Host { get; set; }
-        public ushort Port { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
         public event EventHandler? BusyChanged;
-        public string Database { get; set; }
-        public string Workstation { get; set; }
-        public int ClientId { get; }
-        public int QueryId { get; }
+        public string Database { get; set; } = "IBIS";
         public bool Connected { get; }
-
         public bool Busy { get; }
-
         public int LastError { get; }
-
         public void CancelOperation()
         {
             throw new NotImplementedException();
@@ -91,35 +80,117 @@ namespace ManagedIrbis.Client
             throw new NotImplementedException();
         }
 
-        public IPftFormatter AcquireFormatter() =>
-            throw new NotImplementedException();
-
-        public MenuFile? ReadMenuFile(FileSpecification specification) =>
-            throw new NotImplementedException();
-
-        public Record? ReadRecordVersion(int mfn, int version) =>
-            throw new NotImplementedException();
-
-        public Term[] ReadTerms(TermParameters parameters) =>
-            throw new NotImplementedException();
-
-        public bool FileExist(FileSpecification specification) =>
-            throw new NotImplementedException();
-
-        public string GetGeneration() =>
-            throw new NotImplementedException();
-
-        public IniFile GetUserIniFile()
+        public bool ActualizeRecord(ActualizeRecordParameters parameters)
         {
             throw new NotImplementedException();
         }
 
-        public void WriteRecord(Record record)
+        public bool Connect()
         {
             throw new NotImplementedException();
         }
 
-        public void ParseConnectionString(string connectionString)
+        public bool CreateDatabase(CreateDatabaseParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool CreateDictionary(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool DeleteDatabase(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Disconnect()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool FormatRecords(FormatRecordParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public FullTextResult? FullTextSearch(SearchParameters searchParameters, TextParameters textParameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DatabaseInfo? GetDatabaseInfo(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetMaxMfn(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ServerStat? GetServerStat()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ServerVersion? GetServerVersion()
+        {
+            throw new NotImplementedException();
+        }
+
+        public GblResult? GlobalCorrection(GblSettings settings)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string[]? ListFiles(params FileSpecification[] specifications)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ProcessInfo[]? ListProcesses()
+        {
+            throw new NotImplementedException();
+        }
+
+        public UserInfo[]? ListUsers()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool NoOperation()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string? PrintTable(TableDefinition definition)
+        {
+            throw new NotImplementedException();
+        }
+
+        public byte[]? ReadBinaryFile(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TermPosting[]? ReadPostings(PostingParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Record? ReadRecord(ReadRecordParameters parameters)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TermPosting[]? ReadRecordPostings(ReadRecordParameters parameters, string prefix)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Term[]? ReadTerms(TermParameters parameters)
         {
             throw new NotImplementedException();
         }
@@ -129,73 +200,57 @@ namespace ManagedIrbis.Client
             throw new NotImplementedException();
         }
 
-        public GblResult GlobalCorrection(GblSettings settings)
+        public bool ReloadDictionary(string? databaseName = default)
         {
             throw new NotImplementedException();
         }
 
-        public void Configure(string configurationString) =>
-            throw new NotImplementedException();
-
-        public bool Connect()
+        public bool ReloadMasterFile(string? databaseName = default)
         {
             throw new NotImplementedException();
         }
 
-        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
-
-        public string ReadFile(FileSpecification file) =>
-            throw new NotImplementedException();
-
-        public int[] Search(string expression) =>
-            throw new NotImplementedException();
-
-        public TermLink[] ExactSearchLinks(string term) =>
-            throw new NotImplementedException();
-
-        public TermLink[] ExactSearchTrimLinks(string term, int i) =>
-            throw new NotImplementedException();
-
-        public string FormatRecord(string format, Record record) =>
-            throw new NotImplementedException();
-
-        public string FormatRecord(string format, int mfn) =>
-            throw new NotImplementedException();
-
-        public int GetMaxMfn(string? databaseName = default)
+        public bool RestartServer()
         {
             throw new NotImplementedException();
         }
 
-        public ServerVersion GetServerVersion() =>
-            throw new NotImplementedException();
-
-        public string[] FormatRecords(int[] mfns, string format) =>
-            throw new NotImplementedException();
-
-        public string[] ListFiles(FileSpecification specification) =>
-            throw new NotImplementedException();
-
-        public bool NoOperation() =>
-            throw new NotImplementedException();
-
-        public void ReleaseFormatter(IPftFormatter formatter) =>
-            throw new NotImplementedException();
-
-        public Record ReadRecord(int mfn) =>
-            throw new NotImplementedException();
-
-        public void Dispose() =>
-            throw new NotImplementedException();
-
-        #endregion
-
-        public ValueTask DisposeAsync()
+        public FoundItem[]? Search(SearchParameters parameters)
         {
             throw new NotImplementedException();
         }
 
-        public object? GetService(Type serviceType)
+        public bool TruncateDatabase(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UnlockDatabase(string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UnlockRecords(IEnumerable<int> mfnList, string? databaseName = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UpdateIniFile(IEnumerable<string> lines)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UpdateUserList(IEnumerable<UserInfo> users)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool WriteTextFile(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool WriteRecord(WriteRecordParameters parameters)
         {
             throw new NotImplementedException();
         }

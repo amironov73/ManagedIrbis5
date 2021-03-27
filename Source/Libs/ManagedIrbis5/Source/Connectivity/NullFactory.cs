@@ -10,27 +10,27 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-using System;
-
 #nullable enable
 
 namespace ManagedIrbis
 {
+    // TODO: вернуть наследование от ConnectionFactory
+
     /// <summary>
     /// Фабрика, создающая нулевые подключения
     /// для целей тестирования.
     /// </summary>
     public sealed class NullFactory
-        : ConnectionFactory
+        // : ConnectionFactory
     {
         #region ConnectionFactory members
 
         /// <inheritdoc cref="ConnectionFactory.CreateSyncConnection"/>
-        public override SyncConnection CreateSyncConnection() =>
-            throw new NotImplementedException();
+        public ISyncIrbisProvider CreateSyncConnection() =>
+            new NullProvider();
 
-        public override AsyncConnection CreateAsyncConnection() =>
-            throw new NotImplementedException();
+        public IAsyncIrbisProvider CreateAsyncConnection() =>
+            new NullProvider();
 
         #endregion
 

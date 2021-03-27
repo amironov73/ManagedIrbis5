@@ -36,6 +36,6 @@ namespace ManagedIrbis
         : ISyncIrbisProvider,
         IIrbisConnectionSettings
     {
-
+        Response? ExecuteSync(SyncQuery query);
     }
 }

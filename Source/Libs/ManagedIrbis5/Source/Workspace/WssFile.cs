@@ -108,7 +108,7 @@ namespace ManagedIrbis.Workspace
                 FileSpecification specification
             )
         {
-            string content = provider.ReadFile(specification);
+            string content = provider.ReadTextFile(specification);
             if (string.IsNullOrEmpty(content))
             {
                 return null;

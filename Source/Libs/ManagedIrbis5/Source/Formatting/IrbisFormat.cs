@@ -82,12 +82,12 @@ namespace ManagedIrbis.Infrastructure
             }
 
             int index = 0, length = text.Length;
-            StringBuilder result = new StringBuilder(length);
-            char state = zero;
+            var result = new StringBuilder(length);
+            var state = zero;
 
             while (index < length)
             {
-                char c = text[index];
+                var c = text[index];
 
                 switch (state)
                 {
@@ -165,9 +165,9 @@ namespace ManagedIrbis.Infrastructure
                 return text;
             }
 
-            int length = text.Length;
-            bool flag = false;
-            for (int i = 0; i < length; i++)
+            var length = text.Length;
+            var flag = false;
+            for (var i = 0; i < length; i++)
             {
                 if (text[i] < ' ')
                 {
@@ -181,10 +181,10 @@ namespace ManagedIrbis.Infrastructure
                 return text;
             }
 
-            StringBuilder result = new StringBuilder(length);
-            for (int i = 0; i < length; i++)
+            var result = new StringBuilder(length);
+            for (var i = 0; i < length; i++)
             {
-                char c = text[i];
+                var c = text[i];
                 if (c >= ' ')
                 {
                     result.Append(c);
@@ -219,7 +219,7 @@ namespace ManagedIrbis.Infrastructure
                 return false;
             }
 
-            foreach (char c in text)
+            foreach (var c in text)
             {
                 if (c < ' ')
                 {
@@ -238,11 +238,12 @@ namespace ManagedIrbis.Infrastructure
             } // foreach
 
             const char zero = '\0';
-            char state = zero;
-            int index = 0, length = text.Length;
+            var state = zero;
+            var index = 0;
+            var length = text.Length;
             while (index < length)
             {
-                char c = text[index];
+                var c = text[index];
 
                 switch (state)
                 {
@@ -298,9 +299,11 @@ namespace ManagedIrbis.Infrastructure
             } // if
 
             return true;
+
         } // method VerifyFormat
 
         #endregion
 
     } // class IrbisFormat
-}
+
+} // namespace ManagedIrbis.Infrastructure

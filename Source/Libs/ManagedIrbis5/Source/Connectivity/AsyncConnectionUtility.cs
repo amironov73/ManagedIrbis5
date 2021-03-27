@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* ConnectionAsyncMethods.cs -- асинхронные методы для подключения
+/* AsyncConnectionUtility.cs -- асинхронные методы для подключения
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,27 +31,144 @@ namespace ManagedIrbis
     /// <summary>
     /// Асинхронные методы для подключения к серверу ИРБИС64.
     /// </summary>
-    public static class ConnectionAsyncMethods
+    public static class AsyncConnectionUtility
     {
         #region Public methods
 
         /// <summary>
+        /// Актуализация всех неактуализированных записей
+        /// в указанной базе данных.
+        /// </summary>
+        /// <param name="connection">Подключение.</param>
+        /// <param name="database">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешности завершения операции.</returns>
+        public static async Task<bool> ActualizeDatabaseAsync
+            (
+                this IAsyncIrbisProvider connection,
+                string? database = default
+            )
+        {
+            return await connection.ActualizeRecordAsync
+                (
+                    new() { Database = database, Mfn = 0 }
+                );
+        } // method ActualizeDatabaseAsync
+
+        /// <summary>
+        /// Форматирование указанной записи по ее MFN.
+        /// </summary>
+        public static async Task<string?> FormatRecordAsync
+            (
+                this AsyncConnection connection,
+                string format,
+                int mfn
+            )
+        {
+            if (!connection.CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new AsyncQuery(connection, CommandCode.FormatRecord);
+            query.AddAnsi(connection.Database);
+            var prepared = IrbisFormat.PrepareFormat(format);
+            query.AddAnsi(prepared);
+            query.Add(1);
+            query.Add(mfn);
+            var response = await connection.ExecuteAsync(query);
+            if (response is null)
+            {
+                return null;
+            }
+
+            response.CheckReturnCode();
+            var result = response.ReadRemainingUtfText().TrimEnd();
+
+            return result;
+        } // method FormatRecordAsync
+
+        /// <summary>
+        /// Форматирование указанной записи.
+        /// </summary>
+        public static Task<string?> FormatRecordAsync
+            (
+                this AsyncConnection connection,
+                string format,
+                Record record
+            )
+        {
+            throw new NotImplementedException();
+        } // method FormatRecordAsync
+
+        public static async Task<string[]?> ListFilesAsync
+            (
+                this AsyncConnection connection,
+                FileSpecification specification
+            )
+        {
+            if (!connection.CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new AsyncQuery(connection, CommandCode.ListFiles);
+            query.AddAnsi(specification.ToString());
+
+            var response = await connection.ExecuteAsync(query);
+            if (response is null)
+            {
+                return null;
+            }
+
+            // TODO: вынести повторяющийся код в отдельный метод
+            var lines = response.ReadRemainingAnsiLines();
+            var result = new List<string>();
+            foreach (var line in lines)
+            {
+                var files = IrbisText.SplitIrbisToLines(line);
+                foreach (var file1 in files)
+                {
+                    if (!string.IsNullOrEmpty(file1))
+                    {
+                        foreach (var file2 in file1.Split(IrbisText.WindowsDelimiter))
+                        {
+                            if (!string.IsNullOrEmpty(file2))
+                            {
+                                result.Add(file2);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result.ToArray();
+        } // method ListFileasAsync
+
+        /// <summary>
         /// Чтение библиографической записи с сервера.
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="mfn"></param>
-        /// <returns></returns>
-        public static async Task<Record?> ReadRecordAsync(this AsyncConnection connection, int mfn) =>
-            await connection.ReadRecordAsync(new ReadRecordParameters { Mfn = mfn });
+        public static async Task<Record?> ReadRecordAsync
+            (
+                this IAsyncIrbisProvider connection,
+                int mfn
+            )
+            =>
+            await connection.ReadRecordAsync
+                (
+                    new ()
+                    {
+                        Database = connection.Database,
+                        Mfn = mfn
+                    }
+                );
 
         /// <summary>
         /// Чтение всех терминов с указанным префиксом.
         /// </summary>
-        /// <param name="prefix"></param>
-        /// <returns></returns>
         public static async Task<Term[]> ReadAllTermsAsync
             (
-                this AsyncConnection connection,
+                this IAsyncIrbisProvider connection,
                 string prefix
             )
         {
@@ -114,7 +231,7 @@ namespace ManagedIrbis
         /// <returns>Массив прочитанных постингов.</returns>
         public static async Task<TermPosting[]> ReadPostingsAsync
             (
-                this AsyncConnection connection,
+                this IAsyncIrbisProvider connection,
                 string term,
                 int numberOfPostings
             )
@@ -137,7 +254,7 @@ namespace ManagedIrbis
         /// <returns>Массив прочитанных терминов.</returns>
         public static async Task<Term[]> ReadTermsAsync
             (
-                this AsyncConnection connection,
+                this IAsyncIrbisProvider connection,
                 string startTerm,
                 int numberOfTerms
             )
@@ -265,10 +382,13 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method WriteRecordsAsync
 
-        public static async Task<bool> WriteTextFileAsync
+        /// <summary>
+        /// Запись/обновление файлов на сервере.
+        /// </summary>
+        public static async Task<bool> WriteTextFilesAsync
             (
                 this AsyncConnection connection,
-                params FileSpecification[] specifications
+                FileSpecification[] specifications
             )
         {
             if (!connection.CheckProviderState())
@@ -281,14 +401,11 @@ namespace ManagedIrbis
             {
                 query.AddAnsi(specification.ToString());
             }
-            var response = await connection.ExecuteAsync(query);
-            if (response is null)
-            {
-                return false;
-            }
 
-            throw new NotImplementedException();
-        } // method WriteTextFileAsync
+            var response = await connection.ExecuteAsync(query);
+
+            return response is not null;
+        } // method WriteFileAsync
 
         #endregion
 
