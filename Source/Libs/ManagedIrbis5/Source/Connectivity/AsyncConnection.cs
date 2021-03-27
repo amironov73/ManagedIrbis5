@@ -466,6 +466,58 @@ namespace ManagedIrbis
         } // method ExecuteAsync
 
         /// <summary>
+        /// Отправка запроса на сервер по упрощённой схеме.
+        /// </summary>
+        /// <param name="command">Код команды.</param>
+        /// <param name="arg1">Параметр команды.</param>
+        /// <returns>Ответ сервера.</returns>
+        public async Task<Response?> ExecuteAsync
+            (
+                string command,
+                object arg1
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new AsyncQuery(this, command);
+            query.AddAnsi(arg1.ToString());
+
+            var result = await ExecuteAsync(query);
+
+            return result;
+        } // method ExecuteAsync
+
+        /// <summary>
+        /// Отправка запроса на сервер по упрощённой схеме.
+        /// </summary>
+        /// <param name="command">Код команды.</param>
+        /// <param name="arg1">Параметр команды.</param>
+        /// <param name="arg2">Параметр команды.</param>
+        /// <returns>Ответ сервера.</returns>
+        public async Task<Response?> ExecuteAsync
+            (
+                string command,
+                object arg1,
+                object arg2
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new AsyncQuery(this, command);
+            query.AddAnsi(arg1.ToString());
+
+            var result = await ExecuteAsync(query);
+
+            return result;
+        } // method ExecuteAsync
+
+        /// <summary>
         /// Форматирование указанной записи по ее MFN.
         /// </summary>
         public async Task<string?> FormatRecordAsync
@@ -496,6 +548,15 @@ namespace ManagedIrbis
 
             return result;
         } // method FormatRecordAsync
+
+        /// <inheritdoc cref="IAsyncIrbisProvider.FormatRecordsAsync"/>
+        public Task<bool> FormatRecordsAsync
+            (
+                FormatRecordParameters parameters
+            )
+        {
+            throw new NotImplementedException();
+        } // method FormatRecordsAsync
 
         /// <summary>
         /// Форматирование указанной записи.
@@ -538,6 +599,15 @@ namespace ManagedIrbis
             return result;
         } // method FullTextSearchAsync
 
+        /// <inheritdoc cref="IAsyncIrbisProvider.GetDatabaseInfoAsync"/>
+        public Task<DatabaseInfo?> GetDatabaseInfoAsync
+            (
+                string? databaseName = default
+            )
+        {
+            throw new NotImplementedException();
+        } // method GetDatabaseInfoAsync
+
         /// <summary>
         /// Получение максимального MFN для указанной базы данных.
         /// По умолчанию используется текущая база данных.
@@ -560,9 +630,14 @@ namespace ManagedIrbis
                 : 0;
         } // method GetMaxMfnAsync
 
-        /// <summary>
-        /// Получение версии ИРБИС-сервера.
-        /// </summary>
+        /// <inheritdoc cref="IAsyncIrbisProvider.GetServerStatAsync"/>
+        public Task<ServerStat?> GetServerStatAsync()
+        {
+            throw new NotImplementedException();
+        } // method GetServerStatAsync
+
+
+        /// <inheritdoc cref="IAsyncIrbisProvider.GetServerVersionAsync"/>
         public async Task<ServerVersion?> GetServerVersionAsync()
         {
             if (!CheckProviderState())
@@ -696,10 +771,7 @@ namespace ManagedIrbis
             return result.ToArray();
         } // method ListFilesAsync
 
-        /// <summary>
-        /// Получение списка процессов, работающих в данный момент
-        /// на ИРБИС-сервере.
-        /// </summary>
+        /// <inheritdoc cref="IAsyncIrbisProvider.ListProcessesAsync"/>
         public async Task<ProcessInfo[]?> ListProcessesAsync()
         {
             if (!CheckProviderState())
@@ -720,12 +792,8 @@ namespace ManagedIrbis
             return result;
         } // method ListProcessesAsync
 
-        /// <summary>
-        /// Получение списка пользователей, имеющих доступ к
-        /// ИРБИС-серверу. Эти пользователи не обязательно должны
-        /// быть залогинены в данный момент.
-        /// </summary>
-        public async Task<UserInfo[]?> ListUsersAsync()
+        /// <inheritdoc cref="IAsyncIrbisProvider.ListUsersAsync"/>
+        public Task<UserInfo[]?> ListUsersAsync()
         {
             throw new NotImplementedException();
         } // method ListUsersAsync
@@ -746,6 +814,24 @@ namespace ManagedIrbis
 
             return response?.CheckReturnCode() ?? false;
         } // method NoOperationAsync
+
+        /// <inheritdoc cref="IAsyncIrbisProvider.PrintTableAsync"/>
+        public Task<string?> PrintTableAsync
+            (
+                TableDefinition definition
+            )
+        {
+            throw new NotImplementedException();
+        } // method PrintTableAsync
+
+        /// <inheritdoc cref="IAsyncIrbisProvider.ReadBinaryFileAsync"/>
+        public Task<byte[]?> ReadBinaryFileAsync
+            (
+                FileSpecification specification
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Чтение с сервера постингов для указанных терминов.
@@ -810,11 +896,17 @@ namespace ManagedIrbis
             return result;
         } // method ReadRecordAsync
 
-        /// <summary>
-        /// Чтение с сервера терминов поискового словаря.
-        /// </summary>
-        /// <param name="parameters">Параметры терминов.</param>
-        /// <returns>Массив прочитанных терминов либо <c>null</c>.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.ReadRecordPostings"/>
+        public Task<TermPosting[]?> ReadRecordPostings
+            (
+                ReadRecordParameters parameters,
+                string prefix
+            )
+        {
+            throw new NotImplementedException();
+        } // method ReadRecordPostings
+
+        /// <inheritdoc cref="IAsyncIrbisProvider.ReadTermsAsync"/>
         public async Task<Term[]?> ReadTermsAsync
             (
                 TermParameters parameters
@@ -840,11 +932,7 @@ namespace ManagedIrbis
             return Term.Parse(response);
         } // method ReadTermsAsyncs
 
-        /// <summary>
-        /// Чтение текстового файла с ИРБИС-сервера.
-        /// </summary>
-        /// <param name="specification">Спецификация файла.</param>
-        /// <returns>Содержимое файла либо <c>null</c>.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.ReadTextFileAsync"/>
         public async Task<string?> ReadTextFileAsync
             (
                 FileSpecification specification
@@ -868,12 +956,7 @@ namespace ManagedIrbis
             return result;
         } // method ReadTextFileAsync
 
-        /// <summary>
-        /// Пересоздание словаря для указанной базы данных.
-        /// </summary>
-        /// <param name="databaseName">Имя базы данных.
-        /// По умолчанию - текущая база данных.</param>
-        /// <returns>Признак успешного завершения операции.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.ReloadDictionaryAsync"/>
         public async Task<bool> ReloadDictionaryAsync
             (
                 string? databaseName = default
@@ -888,12 +971,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method ReloadDictionaryAsync
 
-        /// <summary>
-        /// Пересоздание мастер-файла для указанной базы данных.
-        /// </summary>
-        /// <param name="databaseName">Имя базы данных.
-        /// По умолчанию - текущая база данных.</param>
-        /// <returns>Признак успешного завершения операции.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.ReloadMasterFileAsync"/>
         public async Task<bool> ReloadMasterFileAsync
             (
                 string? databaseName = default
@@ -908,11 +986,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method ReloadMasterFileAsync
 
-
-        /// <summary>
-        /// Асинхронный перезапуск сервера без утери подключенных клиентов.
-        /// </summary>
-        /// <returns>Признак успешного завергения операции.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.RestartServerAsync"/>
         public async Task<bool> RestartServerAsync()
         {
             var response = await ExecuteAsync(CommandCode.RestartServer);
@@ -920,11 +994,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method RestartServerAsync
 
-        /// <summary>
-        /// Расширенный поиск.
-        /// </summary>
-        /// <param name="parameters">Параметры поиска.</param>
-        /// <returns>Массив элементов, описывающих найденные записи.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.SearchAsync"/>
         public async Task<FoundItem[]?> SearchAsync
             (
                 SearchParameters parameters
@@ -947,12 +1017,7 @@ namespace ManagedIrbis
             return FoundItem.Parse(response);
         } // method SearchAsync
 
-        /// <summary>
-        /// Опустошение указанной базы данных.
-        /// </summary>
-        /// <param name="databaseName">Имя базы данных.
-        /// По умолчанию - текущая база данных.</param>
-        /// <returns>Признак успешного завершения операции.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.TruncateDatabaseAsync"/>
         public async Task<bool> TruncateDatabaseAsync
             (
                 string? databaseName = default
@@ -967,11 +1032,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method TruncateDatabaseAsync
 
-        /// Разблокирование указанной базы данных.
-        /// </summary>
-        /// <param name="databaseName">Имя базы данных.
-        /// По умолчанию - текущая база данных.</param>
-        /// <returns>Признак успешного завершения операции.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.UnlockDatabaseAsync"/>
         public async Task<bool> UnlockDatabaseAsync
             (
                 string? databaseName = default
@@ -986,13 +1047,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method UnlockDatabaseAsync
 
-        /// <summary>
-        /// Разблокирование указанных записей в указанной базе данных.
-        /// </summary>
-        /// <param name="mfnList">Перечень MFN, подлежащих разблокировке.</param>
-        /// <param name="databaseName">Имя базы данных.
-        /// По умолчанию текущая база данных.</param>
-        /// <returns>Признак успешности </returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.UnlockRecordsAsync"/>
         public async Task<bool> UnlockRecordsAsync
             (
                 IEnumerable<int> mfnList,
@@ -1016,11 +1071,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method UnlockRecordsAsync
 
-        /// <summary>
-        /// Обновление указанных строк серверного INI-файла.
-        /// </summary>
-        /// <param name="lines">Измененные строки INI-файла.</param>
-        /// <returns>Признак успешности завершения операции.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.UpdateIniFileAsync"/>
         public async Task<bool> UpdateIniFileAsync
             (
                 IEnumerable<string> lines
@@ -1045,17 +1096,10 @@ namespace ManagedIrbis
             return response is not null;
         } // method UpdateIniFileAsync
 
-
-        /// <summary>
-
-        /// <summary>
-        /// Обновление списка пользователей системы на сервере.
-        /// </summary>
-        /// <param name="userList">Список пользователей.</param>
-        /// <returns>Признак успешного завершения операции.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.UpdateUserListAsync"/>
         public async Task<bool> UpdateUserListAsync
             (
-                IEnumerable<UserInfo> userList
+                IEnumerable<UserInfo> users
             )
         {
             if (!CheckProviderState())
@@ -1064,7 +1108,7 @@ namespace ManagedIrbis
             }
 
             var query = new AsyncQuery(this, CommandCode.SetUserList);
-            foreach (var user in userList)
+            foreach (var user in users)
             {
                 query.AddAnsi(user.Encode());
             }
@@ -1074,22 +1118,16 @@ namespace ManagedIrbis
             return response is not null;
         } // method UpdateUserListAsync
 
-        /// <summary>
-        /// Сохранение/обновление файла на сервере.
-        /// </summary>
-        /// <param name="specification">Спецификация файла
-        /// (включает в себя содержимое файла).</param>
-        /// <returns>Признак успешного завершения операции.</returns>
-        public async Task<bool> WriteFileAsync(FileSpecification specification)
+        /// <inheritdoc cref="IAsyncIrbisProvider.WriteFileAsync"/>
+        public Task<bool> WriteFileAsync
+            (
+                FileSpecification specification
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method WriteFileAsync
 
-        /// <summary>
-        /// Сохранение/обновление библиографической записи на сервере.
-        /// </summary>
-        /// <param name="parameters">Параметры сохранения/обновления.</param>
-        /// <returns>Признак успешного завершения операции.</returns>
+        /// <inheritdoc cref="IAsyncIrbisProvider.WriteRecordAsync"/>
         public async Task<bool> WriteRecordAsync
             (
                 WriteRecordParameters parameters
@@ -1136,7 +1174,7 @@ namespace ManagedIrbis
         {
             if (Connected)
             {
-                await DisconnectAsync();
+                await DisconnectAsync().ConfigureAwait(false);
             }
         } // method DisposeAsync
 

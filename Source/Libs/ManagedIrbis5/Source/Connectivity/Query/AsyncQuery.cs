@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* AsyncQuery.cs -- клиентский запрос к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
@@ -15,10 +12,7 @@
 
 #region Using directives
 
-using System;
 using System.IO;
-
-using AM;
 
 #endregion
 
@@ -48,26 +42,15 @@ namespace ManagedIrbis.Infrastructure
                 string commandCode
             )
         {
-           // Sure.NotNullNorEmpty(commandCode, nameof(commandCode));
-
-           _stream = new MemoryStream(1024);
-
-           var header = commandCode + "\n"
-                + connection.Workstation + "\n"
-                + commandCode + "\n"
-                + connection.ClientId.ToInvariantString() + "\n"
-                + connection.QueryId.ToInvariantString() + "\n"
-                + connection.Password + "\n"
-                + connection.Username + "\n"
-                + "\n\n";
-            AddAnsi(header);
+           _stream = new QueryStream(1024);
+           _stream.AddHeader(connection, commandCode);
         } // constructor
 
         #endregion
 
         #region Private members
 
-        private readonly MemoryStream _stream;
+        private readonly QueryStream _stream;
 
         #endregion
 
@@ -76,94 +59,48 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Добавление строки с целым числом (плюс перевод строки).
         /// </summary>
-        public void Add (int value) => AddAnsi(value.ToInvariantString());
+        public void Add (int value) => _stream.Add(value);
 
         /// <summary>
         /// Добавление строки в кодировке ANSI (плюс перевод строки).
         /// </summary>
-        public void AddAnsi
-            (
-                string? value
-            )
-        {
-            value ??= string.Empty;
-            var converted = IrbisEncoding.Ansi.GetBytes(value);
-            _stream.Write(converted);
-            NewLine();
-        } // method AddAnsi
+        public void AddAnsi (string? value) => _stream.AddAnsi(value);
 
         /// <summary>
         /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
         /// </summary>
-        public void AddUtf
-            (
-                string? value
-            )
-        {
-            value ??= String.Empty;
-            var converted = IrbisEncoding.Utf8.GetBytes(value);
-            _stream.Write(converted);
-            NewLine();
-        } // method AddUtf
+        public void AddUtf (string? value) => _stream.AddUtf(value);
 
         /// <summary>
         /// Добавление формата.
         /// </summary>
-        public void AddFormat
-            (
-                string? format
-            )
-        {
-            if (string.IsNullOrEmpty(format))
-            {
-                NewLine();
-            }
-            else
-            {
-                AddAnsi(format);
-            }
-        } // method AddFormat
+        public void AddFormat (string? format) => _stream.AddFormat(format);
 
         /// <summary>
         /// Отладочная печать.
         /// </summary>
-        public void Debug
-            (
-                TextWriter writer
-            )
-        {
-            foreach (var b in _stream.ToArray())
-            {
-                writer.Write($" {b:X2}");
-            }
-        } // method Debug
+        public void Debug (TextWriter writer) => _stream.Debug(writer);
 
         /// <summary>
         /// Отладочная печать.
         /// </summary>
-        public void DebugUtf
-            (
-                TextWriter writer
-            )
-        {
-            writer.WriteLine(IrbisEncoding.Utf8.GetString(_stream.ToArray()));
-        } // method Debug
+        public void DebugUtf (TextWriter writer) => _stream.DebugUtf(writer);
 
         /// <summary>
         /// Получение массива фрагментов, из которых состоит
         /// клиентский запрос.
         /// </summary>
-        public byte[] GetBody() => _stream.ToArray();
+        public byte[] GetBody() => _stream.GetBody();
 
         /// <summary>
         /// Подсчет общей длины запроса (в байтах).
         /// </summary>
-        public int GetLength() => (int) _stream.Length;
+        public int GetLength() => _stream.GetLength();
 
         /// <summary>
         /// Добавление одного перевода строки.
         /// </summary>
-        public void NewLine() => _stream.WriteByte(10);
+        public void NewLine() => _stream.NewLine();
 
         #endregion
 

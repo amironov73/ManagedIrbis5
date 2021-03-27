@@ -6,7 +6,8 @@ Currently supports:
 
 * Windows 7/10 x64
 * MacOS 10.14
-* .NET Core 3.0 SDK
+* .NET runtime 5.0.0 and higher
+* .NET SDK 5.0.100 and higher
 
 ```c#
 using System;
@@ -25,7 +26,7 @@ internal class Program
         try
         {
             using var connection = ConnectionFactory.Default
-                .CreateConnection();
+                .CreateAsyncConnection();
 
             connection.Host = "127.0.0.1";
             connection.Username = "librarian";

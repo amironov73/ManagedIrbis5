@@ -8,7 +8,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 
 /* IAsyncIrbisProvider.cs -- интерфейс асинхронного ИРБИС-провайдера
  * Ars Magna project, http://arsmagna.ru
@@ -37,81 +38,141 @@ namespace ManagedIrbis
         /// <summary>
         /// Актуализация записи.
         /// </summary>
-        Task<bool> ActualizeRecordAsync(ActualizeRecordParameters parameters);
+        /// <param name="parameters">Параметры команды.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> ActualizeRecordAsync
+            (
+                ActualizeRecordParameters parameters
+            );
 
         /// <summary>
         /// Подключение к серверу.
         /// </summary>
+        /// <returns>Признак успешного завершения операции.</returns>
         Task<bool> ConnectAsync();
 
         /// <summary>
         /// Создание базы данных на сервере.
         /// </summary>
-        Task<bool> CreateDatabaseAsync(CreateDatabaseParameters parameters);
+        /// <param name="parameters">Параметры команды.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> CreateDatabaseAsync
+            (
+                CreateDatabaseParameters parameters
+            );
 
         /// <summary>
         /// Создание поискового словаря в указанной базе данных.
         /// </summary>
-        Task<bool> CreateDictionaryAsync(string? databaseName);
+        /// <param name="databaseName">Имя базы данных.
+        /// <c>null</c> означает текущую базу данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> CreateDictionaryAsync
+            (
+                string? databaseName
+            );
 
         /// <summary>
         /// Удаление указанной базы данных на сервере.
         /// </summary>
-        /// <param name="databaseName">Имя удалаемой базы данных.</param>
+        /// <param name="databaseName">Имя удалаемой базы данных.
+        /// <c>null</c> означает текущую базу данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> DeleteDatabaseAsync(string? databaseName);
+        Task<bool> DeleteDatabaseAsync
+            (
+                string? databaseName
+            );
 
         /// <summary>
         /// Отключение от сервера.
         /// </summary>
+        /// <returns>Признак успешного завершения операции.
+        /// Как правило, его игнорируют.</returns>
         Task<bool> DisconnectAsync();
 
         /// <summary>
-        /// Форматирование указанной записи.
+        /// Форматирование записей.
         /// </summary>
-        Task<string?> FormatRecordAsync(string format, int mfn);
-
-        /// <summary>
-        /// Форматирование указанной записи.
-        /// </summary>
-        Task<string?> FormatRecordAsync(string format, Record record);
+        /// <param name="parameters">Параметры команды.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        public Task<bool> FormatRecordsAsync
+            (
+                FormatRecordParameters parameters
+            );
 
         /// <summary>
         /// Полнотекстовый поиск ИРБИС64+.
         /// </summary>
-        Task<FullTextResult?> FullTextSearchAsync(SearchParameters searchParameters,
-            TextParameters textParameters);
+        /// <param name="searchParameters">Параметры поиска.</param>
+        /// <param name="textParameters">Параметры полнотекстовых операций.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<FullTextResult?> FullTextSearchAsync
+            (
+                SearchParameters searchParameters,
+                TextParameters textParameters
+            );
+
+        /// <summary>
+        /// Получение информации об указанной базе данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных (опционально).
+        /// <c>null</c> означает текущую базу данных.</param>
+        /// <returns>Информация о базе данных.</returns>
+        Task<DatabaseInfo?> GetDatabaseInfoAsync
+            (
+                string? databaseName = default
+            );
 
         /// <summary>
         /// Получение максимального MFN для указанной базы данных.
         /// По умолчанию используется текущая база данных.
         /// </summary>
-        Task<int> GetMaxMfnAsync(string? databaseName = default);
+        /// <param name="databaseName">Имя базы данных (опционально).
+        /// <c>null</c> означает текущую базу данных.</param>
+        /// <returns>Максимальный MFN либо код ошибки.</returns>
+        Task<int> GetMaxMfnAsync
+            (
+                string? databaseName = default
+            );
+
+        /// <summary>
+        /// Получение статистики с сервера.
+        /// </summary>
+        /// <returns>Серверная статистика.</returns>
+        Task<ServerStat?> GetServerStatAsync();
 
         /// <summary>
         /// Получение версии ИРБИС-сервера.
         /// </summary>
+        /// <returns>Версия сервера.</returns>
         Task<ServerVersion?> GetServerVersionAsync();
 
-        Task<GblResult?> GlobalCorrection(GblSettings settings);
-
         /// <summary>
-        /// Получение списка файлов на сервере,
-        /// удовлетворяющих указанной спецификации.
+        /// Глобальная корректировка.
         /// </summary>
-        Task<string[]?> ListFilesAsync(FileSpecification specification);
+        /// <param name="settings">Настройки корректировки.</param>
+        /// <returns>Результат корректировки.</returns>
+        Task<GblResult?> GlobalCorrection
+            (
+                GblSettings settings
+            );
 
         /// <summary>
         /// Получение списка файлов на сервере,
         /// удовлетворяющих указанным спецификациям.
         /// </summary>
-        Task<string[]?> ListFilesAsync(params FileSpecification[] specifications);
+        /// <param name="specifications">Массив спецификаций файлов.</param>
+        /// <remarks>Массив найденных на сервере файлов.</remarks>
+        Task<string[]?> ListFilesAsync
+            (
+                params FileSpecification[] specifications
+            );
 
         /// <summary>
         /// Получение списка процессов, работающих в данный момент
         /// на ИРБИС-сервере.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Массив серверных процессов.</returns>
         Task<ProcessInfo[]?> ListProcessesAsync();
 
         /// <summary>
@@ -119,43 +180,205 @@ namespace ManagedIrbis
         /// ИРБИС-серверу. Эти пользователи не обязательно должны
         /// быть залогинены в данный момент.
         /// </summary>
+        /// <remarks>Массив известных системе пользователей.</remarks>
         Task<UserInfo[]?> ListUsersAsync();
 
         /// <summary>
         /// Пустая операция, необходимая для поддержания связи
         /// с ИРБИС-сервером.
         /// </summary>
+        /// <returns>Признак успешного завершения операции
+        /// (как правило, игнорируется).</returns>
         Task<bool> NoOperationAsync();
 
-        Task<TermPosting[]?> ReadPostingsAsync(PostingParameters parameters);
+        /// <summary>
+        /// Расформатирование таблицы на сервере
+        /// </summary>
+        /// <param name="definition">Определение таблицы.</param>
+        /// <returns>RTF-текст, полученный в результате
+        /// расформатирования.</returns>
+        Task<string?> PrintTableAsync
+            (
+                TableDefinition definition
+            );
 
-        Task<Record?> ReadRecordAsync(ReadRecordParameters parameters);
+        /// <summary>
+        /// Чтение двоичного файла (например, картинки) с сервера ИРБИС64.
+        /// </summary>
+        /// <param name="specification">Спецификация пути к файлу.</param>
+        /// <returns>Содержимое файла.</returns>
+        Task<byte[]?> ReadBinaryFileAsync
+            (
+                FileSpecification specification
+            );
 
-        Task<Term[]?> ReadTermsAsync(TermParameters parameters);
+        /// <summary>
+        /// Считывание постингов для указанных терминов поискового словаря.
+        /// </summary>
+        /// <param name="parameters">Параметры операции.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<TermPosting[]?> ReadPostingsAsync
+            (
+                PostingParameters parameters
+            );
 
-        Task<string?> ReadTextFileAsync(FileSpecification specification);
+        /// <summary>
+        /// Чтение записи с сервера.
+        /// </summary>
+        /// <param name="parameters">Параметры операции.</param>
+        /// <returns>Прочитанная запись.</returns>
+        Task<Record?> ReadRecordAsync
+            (
+                ReadRecordParameters parameters
+            );
 
-        Task<bool> ReloadDictionaryAsync(string? databaseName);
+        /// <summary>
+        /// Получение постингов для указанных записи и префикса.
+        /// </summary>
+        /// <param name="parameters">Параметры чтения записи.</param>
+        /// <param name="prefix">Префикс в виде <c>"A=$"</c></param>
+        /// <returns>Массив прочитанных постингов.</returns>
+        Task<TermPosting[]?> ReadRecordPostings
+            (
+                ReadRecordParameters parameters,
+                string prefix
+            );
 
-        Task<bool> ReloadMasterFileAsync(string? databaseName);
+        /// <summary>
+        /// Получение терминов поискового словаря.
+        /// </summary>
+        /// <param name="parameters">Параметры операции.</param>
+        /// <returns>Массив прочитанных терминов.</returns>
+        Task<Term[]?> ReadTermsAsync
+            (
+                TermParameters parameters
+            );
 
+        /// <summary>
+        /// Получение содержимого текстового файла с сервера
+        /// согласно спецификации.
+        /// </summary>
+        /// <param name="specification">Спецификация пути к файлу.</param>
+        /// <returns>Содержимое файла.</returns>
+        Task<string?> ReadTextFileAsync
+            (
+                FileSpecification specification
+            );
+
+        /// <summary>
+        /// Пересоздание словаря для указанной базы данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> ReloadDictionaryAsync
+            (
+                string? databaseName = default
+            );
+
+        /// <summary>
+        /// Пересоздание мастер-файла для указанной базы данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> ReloadMasterFileAsync
+            (
+                string? databaseName = default
+            );
+
+        /// <summary>
+        /// Асинхронный перезапуск сервера без утери подключенных клиентов.
+        /// </summary>
+        /// <returns>Признак успешного завергения операции.</returns>
         Task<bool> RestartServerAsync();
 
-        Task<FoundItem[]?> SearchAsync(SearchParameters parameters);
+        /// <summary>
+        /// Расширенный поиск.
+        /// </summary>
+        /// <param name="parameters">Параметры поиска.</param>
+        /// <returns>Массив элементов, описывающих найденные записи.</returns>
+        Task<FoundItem[]?> SearchAsync
+            (
+                SearchParameters parameters
+            );
 
-        Task<bool> TruncateDatabaseAsync(string? databaseName);
+        /// <summary>
+        /// Опустошение указанной базы данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> TruncateDatabaseAsync
+            (
+                string? databaseName = default
+            );
 
-        Task<bool> UnlockDatabaseAsync(string? databaseName);
+        /// <summary>
+        /// Разблокирование указанной базы данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> UnlockDatabaseAsync
+            (
+                string? databaseName = default
+            );
 
-        Task<bool> UpdateIniFileAsync(IEnumerable<string> lines);
+        /// <summary>
+        /// Разблокирование указанных записей в указанной базе данных.
+        /// </summary>
+        /// <param name="mfnList">Перечень MFN, подлежащих разблокировке.</param>
+        /// <param name="databaseName">Имя базы данных.
+        /// По умолчанию текущая база данных.</param>
+        /// <returns>Признак успешности завершения операции.</returns>
+        Task<bool> UnlockRecordsAsync
+            (
+                IEnumerable<int> mfnList,
+                string? databaseName = default
+            );
 
-        Task<bool> UpdateUserListAsync(IEnumerable<UserInfo> users);
+        /// <summary>
+        /// Обновление указанных строк серверного INI-файла.
+        /// </summary>
+        /// <param name="lines">Измененные строки INI-файла.</param>
+        /// <returns>Признак успешности завершения операции.</returns>
+        Task<bool> UpdateIniFileAsync
+            (
+                IEnumerable<string> lines
+            );
 
-        Task<bool> UnlockRecordsAsync(IEnumerable<int> mfnList, string? databaseName);
+        /// <summary>
+        /// Обновление списка пользователей системы на сервере.
+        /// </summary>
+        /// <param name="users">Список известных системе пользователей.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> UpdateUserListAsync
+            (
+                IEnumerable<UserInfo> users
+            );
 
-        Task<bool> WriteFileAsync(FileSpecification specification);
 
-        Task<bool> WriteRecordAsync(WriteRecordParameters parameters);
+        /// <summary>
+        /// Сохранение/обновление файла на сервере.
+        /// </summary>
+        /// <param name="specification">Спецификация файла
+        /// (включает в себя содержимое файла).</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> WriteFileAsync
+            (
+                FileSpecification specification
+            );
+
+        /// <summary>
+        /// Сохранение/обновление библиографической записи на сервере.
+        /// </summary>
+        /// <param name="parameters">Параметры операции.</param>
+        /// <returns>Признак успешного завершения операции.</returns>
+        Task<bool> WriteRecordAsync
+            (
+                WriteRecordParameters parameters
+            );
 
     } // interface IAsyncIrbisProvider
 

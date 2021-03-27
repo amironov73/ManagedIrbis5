@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
@@ -27,6 +28,7 @@ namespace ManagedIrbis.Infrastructure
 
         /// <summary>
         /// Имя базы данных (опционально).
+        /// Если не указано, используется текущая база данных.
         /// </summary>
         public string? Database { get; set; }
 
