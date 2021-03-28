@@ -159,7 +159,7 @@ namespace ManagedIrbis.Mx
 
             MxConsole = new MxConsole();
             Palette = MxPalette.GetDefaultPalette();
-            Provider = new Client.NullProvider();
+            Provider = new NullProvider();
             Context = new PftContext(null);
             Context.SetProvider(Provider);
             Commands = new NonNullCollection<MxCommand>();
@@ -504,7 +504,7 @@ namespace ManagedIrbis.Mx
         public T GetCommand<T>()
             where T : MxCommand
         {
-            T result = Commands.OfType<T>().FirstOrDefault();
+            var result = Commands.OfType<T>().FirstOrDefault();
             if (ReferenceEquals(result, null))
             {
                 throw new IrbisException

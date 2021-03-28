@@ -109,7 +109,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             Nodes = new NodeDictionary();
             Indexes = new IndexDictionary();
             Output = new StringWriter();
-            Provider = new LocalProvider();
+            Provider = new LocalProvider(string.Empty);
             OutputPath = Path.GetTempPath();
             References = new NonNullCollection<string>
             {

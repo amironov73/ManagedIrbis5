@@ -43,6 +43,24 @@ namespace ManagedIrbis
     {
         #region ISyncIrbisProvider members
 
+        public PlatformAbstractionLayer PlatformAbstraction =>
+            throw new NotImplementedException();
+
+        public bool FileExist(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> FileExistAsync(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string? GetGeneration()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Configure(string configurationString)
         {
             throw new NotImplementedException();

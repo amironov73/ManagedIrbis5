@@ -71,7 +71,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 string folder
             )
         {
-            Provider = new LocalProvider();
+            Provider = new LocalProvider(string.Empty);
             Folder = folder;
             Tests = new NonNullCollection<PftTest>();
             Results = new NonNullCollection<PftTestResult>();

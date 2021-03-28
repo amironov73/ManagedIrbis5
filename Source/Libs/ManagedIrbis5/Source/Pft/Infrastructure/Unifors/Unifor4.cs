@@ -15,6 +15,7 @@
 
 using AM;
 using AM.Text;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -113,7 +114,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     // в главном контексте сбрасываются флаги пост обработки
                     context.GetRootContext().PostProcessing = PftCleanup.None;
 
-                    record = context.Provider.ReadRecordVersion(mfn, version);
+                    var parameters = new ReadRecordParameters
+                    {
+                        Database = context.Provider.Database,
+                        Mfn = mfn,
+                        Version = version
+                    };
+                    record = context.Provider.ReadRecord(parameters);
 
                     using (var guard = new PftContextGuard(context))
                     {

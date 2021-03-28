@@ -43,14 +43,15 @@ namespace ManagedIrbis
         #region Properties
 
         /// <summary>
-        /// Text.
+        /// Текстовая часть (может отсутствовать,
+        /// если не запрашивалось форматирование).
         /// </summary>
         [XmlAttribute("text")]
         [JsonPropertyName("text")]
         public string? Text { get; set; }
 
         /// <summary>
-        /// MFN.
+        /// MFN найденной записи.
         /// </summary>
         [XmlAttribute("mfn")]
         [JsonPropertyName("mfn")]
@@ -65,11 +66,16 @@ namespace ManagedIrbis
         /// </summary>
         public static int[] ToMfn
             (
-                FoundItem[] found
+                FoundItem[]? found
             )
         {
+            if (found is null || found.Length == 0)
+            {
+                return Array.Empty<int>();
+            }
+
             var result = new int[found.Length];
-            for (int i = 0; i < found.Length; i++)
+            for (var i = 0; i < found.Length; i++)
             {
                 result[i] = found[i].Mfn;
             }
@@ -98,14 +104,14 @@ namespace ManagedIrbis
                 var parts = line.Split('#', 2);
                 var item = new FoundItem
                 {
-                    Mfn = int.Parse(parts[0]),
+                    Mfn = parts[0].ParseInt32(),
                     Text = parts.Length == 2 ? parts[1] : string.Empty
                 };
                 result.Add(item);
             }
 
             return result.ToArray();
-        }
+        } // method Parse
 
         /// <summary>
         /// Разбор ответа сервера.
@@ -131,7 +137,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        }
+        } // method ParseMfn
 
         #endregion
 
@@ -145,7 +151,7 @@ namespace ManagedIrbis
         {
             Mfn = reader.ReadPackedInt32();
             Text = reader.ReadNullableString();
-        }
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -156,7 +162,7 @@ namespace ManagedIrbis
             writer
                 .WritePackedInt32(Mfn)
                 .WriteNullable(Text);
-        }
+        } // method SaveToStream
 
         #endregion
 
@@ -183,17 +189,14 @@ namespace ManagedIrbis
                 .NotNullNorEmpty(Text, "Text");
 
             return verifier.Result;
-        }
+        } // method Verify
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return $"[{Mfn}] {Text.ToVisibleString()}";
-        }
+        public override string ToString() => $"[{Mfn}] {Text.ToVisibleString()}";
 
         #endregion
 

@@ -91,13 +91,13 @@ namespace ManagedIrbis.Mx.Commands
 
             if (!string.IsNullOrEmpty(fileName))
             {
-                FileSpecification specification = new FileSpecification
+                var specification = new FileSpecification
                 {
                     Database = executive.Provider.Database,
                     Path = IrbisPath.MasterFile,
                     FileName = fileName
                 };
-                string result = executive.Provider.ReadFile(specification)
+                var result = executive.Provider.ReadTextFile(specification)
                     ?? string.Empty;
                 executive.WriteLine(result);
             }

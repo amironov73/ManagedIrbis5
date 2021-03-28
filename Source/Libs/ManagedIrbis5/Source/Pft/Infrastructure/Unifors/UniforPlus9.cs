@@ -289,7 +289,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     = _GetFileSpecification(expression);
                 if (!ReferenceEquals(specification, null))
                 {
-                    var content = context.Provider.ReadFile(specification);
+                    var content = context.Provider.ReadTextFile(specification);
                     context.WriteAndSetFlag(node, content);
                 }
             }

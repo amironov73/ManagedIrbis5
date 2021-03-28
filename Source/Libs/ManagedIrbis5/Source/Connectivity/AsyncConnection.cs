@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 using AM;
 using AM.IO;
-
+using AM.PlatformAbstraction;
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
@@ -135,6 +135,7 @@ namespace ManagedIrbis
             Cancellation = _cancellation.Token;
             _logger = Magna.Factory.CreateLogger<IBasicIrbisProvider>();
             _provider = provider;
+            PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
         #endregion
@@ -166,65 +167,6 @@ namespace ManagedIrbis
         #endregion
 
         #region Public methods
-
-                /// <summary>
-        /// Отправка клиентского запроса на сервер
-        /// и получение ответа от него.
-        /// </summary>
-        /// <param name="asyncQuery">Клиентский запрос.</param>
-        /// <returns>Ответ от сервера.</returns>
-        public async Task<Response?> ExecuteAsync
-            (
-                AsyncQuery asyncQuery
-            )
-        {
-            SetBusy(true);
-            try
-            {
-                if (_cancellation.IsCancellationRequested)
-                {
-                    _cancellation = new CancellationTokenSource();
-                }
-
-                Response? result;
-                try
-                {
-                    /*
-                    if (_debug)
-                    {
-                        asyncQuery.Debug(Console.Out);
-                    }
-                    */
-
-                    result = await Socket.TransactAsync(asyncQuery);
-                }
-                catch (Exception exception)
-                {
-                    Debug.WriteLine(exception.Message);
-                    return null;
-                }
-
-                if (result is not null)
-                {
-                    /*
-                    if (_debug)
-                    {
-                        result.Debug(Console.Out);
-                    }
-                    */
-
-                    result.Parse();
-                }
-
-                QueryId++;
-
-                return result;
-            }
-            finally
-            {
-                SetBusy(false);
-            }
-        } // method ExecuteAsync
 
         /// <summary>
         /// Отправка запроса на сервер по упрощённой схеме.
@@ -325,15 +267,83 @@ namespace ManagedIrbis
             // ParseConnectionString
         }
 
+        /// <inheritdoc cref="IBasicIrbisProvider.GetGeneration"/>
+        public string GetGeneration() => "64";
+
         /// <inheritdoc cref="IBasicIrbisProvider.GetWaitHandle"/>
         public WaitHandle GetWaitHandle()
         {
             throw new NotImplementedException();
         } // method GetWaitHandle
 
+        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
+
         #endregion
 
         #region IAsyncConnection members
+
+        /// <summary>
+        /// Отправка клиентского запроса на сервер
+        /// и получение ответа от него.
+        /// </summary>
+        /// <param name="asyncQuery">Клиентский запрос.</param>
+        /// <returns>Ответ от сервера.</returns>
+        public async Task<Response?> ExecuteAsync
+            (
+                AsyncQuery asyncQuery
+            )
+        {
+            SetBusy(true);
+            try
+            {
+                if (_cancellation.IsCancellationRequested)
+                {
+                    _cancellation = new CancellationTokenSource();
+                }
+
+                Response? result;
+                try
+                {
+                    /*
+                    if (_debug)
+                    {
+                        asyncQuery.Debug(Console.Out);
+                    }
+                    */
+
+                    result = await Socket.TransactAsync(asyncQuery);
+                }
+                catch (Exception exception)
+                {
+                    Debug.WriteLine(exception.Message);
+                    return null;
+                }
+
+                if (result is not null)
+                {
+                    /*
+                    if (_debug)
+                    {
+                        result.Debug(Console.Out);
+                    }
+                    */
+
+                    result.Parse();
+                }
+
+                QueryId++;
+
+                return result;
+            }
+            finally
+            {
+                SetBusy(false);
+            }
+        } // method ExecuteAsync
+
+        #endregion
+
+        #region IAsyncIrbisProvider members
 
         /// <inheritdoc cref="IAsyncIrbisProvider.ActualizeRecordAsync"/>
         public async Task<bool> ActualizeRecordAsync
@@ -480,6 +490,15 @@ namespace ManagedIrbis
 
             return true;
         } // method DisconnectAsync
+
+        /// <inheritdoc cref="IAsyncIrbisProvider.FileExistAsync"/>
+        public Task<bool> FileExistAsync
+            (
+                FileSpecification specification
+            )
+        {
+            throw new NotImplementedException();
+        } // method FileExistAsync
 
         /// <inheritdoc cref="IAsyncIrbisProvider.FormatRecordsAsync"/>
         public Task<bool> FormatRecordsAsync

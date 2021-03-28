@@ -78,7 +78,7 @@ namespace ManagedIrbis
         {
             Sure.NotNull(file, nameof(file));
 
-            var text = Provider.ReadFile(file);
+            var text = Provider.ReadTextFile(file);
             if (string.IsNullOrEmpty(text))
             {
                 return Array.Empty<SearchScenario>();

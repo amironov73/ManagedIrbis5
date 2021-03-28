@@ -49,6 +49,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
+            /*
+
             if (!string.IsNullOrEmpty(expression))
             {
                 string[] parts = expression.Split
@@ -80,6 +82,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     }
                 }
             }
+
+            */
         }
 
         #endregion

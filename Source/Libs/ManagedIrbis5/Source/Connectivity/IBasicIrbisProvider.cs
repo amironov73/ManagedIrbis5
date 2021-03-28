@@ -19,6 +19,7 @@
 
 using System;
 using System.Threading;
+using AM.PlatformAbstraction;
 
 #endregion
 
@@ -78,6 +79,11 @@ namespace ManagedIrbis
         /// </summary>
         int LastError { get; }
 
+        /// <summary>
+        /// Слой абстракции от платформы.
+        /// </summary>
+        PlatformAbstractionLayer PlatformAbstraction { get; }
+
         #endregion
 
         #region Methods
@@ -102,6 +108,12 @@ namespace ManagedIrbis
             (
                 string configurationString
             );
+
+        /// <summary>
+        /// Поколение провайдера.
+        /// </summary>
+        /// <returns>64</returns>
+        string GetGeneration();
 
         /// <summary>
         /// Получение хэндла для ожидания.

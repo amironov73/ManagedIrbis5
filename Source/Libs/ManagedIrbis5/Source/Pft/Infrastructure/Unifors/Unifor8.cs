@@ -58,6 +58,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
+            /*
 
             if (string.IsNullOrEmpty(expression))
             {
@@ -285,6 +286,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 context.Provider.Database = saveDatabase;
             }
+
+            */
         }
 
         #endregion

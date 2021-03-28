@@ -19,12 +19,14 @@
 using System;
 
 using ManagedIrbis;
+using ManagedIrbis.Infrastructure;
 
 using static System.Console;
 
 #endregion
 
 #nullable enable
+
 class Program
 {
     /// <summary>
@@ -62,14 +64,17 @@ class Program
             var maxMfn = connection.GetMaxMfn();
             WriteLine($"Max MFN={maxMfn}");
 
-            connection.Nop();
+            connection.NoOperation();
             WriteLine("NOP");
 
             var found = connection.Search(Search.Keyword("бетон$"));
             WriteLine("Found: " + string.Join(", ", found));
 
             var terms = connection.ReadTerms("K=БЕТОН", 10);
-            WriteLine("Terms: " + string.Join<Term>(", ", terms));
+            if (terms is not null)
+            {
+                WriteLine("Terms: " + string.Join<Term>(", ", terms));
+            }
 
             //if (terms.Length != 0)
             //{
@@ -86,7 +91,13 @@ class Program
             //var files = connection.ListFiles("2.IBIS.*.mnu");
             //WriteLine("Files: " + string.Join(",", files));
 
-            var fileText = connection.ReadTextFile("2.IBIS.brief.pft");
+            var specification = new FileSpecification
+            {
+                Path = IrbisPath.MasterFile,
+                Database = connection.Database,
+                FileName = "brief.pft"
+            };
+            var fileText = connection.ReadTextFile(specification);
             WriteLine($"BRIEF: {fileText}");
             WriteLine();
 
@@ -101,4 +112,5 @@ class Program
 
         return 0;
     } // method Main
+
 } // class Program

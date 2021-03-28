@@ -95,6 +95,13 @@ namespace ManagedIrbis
         bool Disconnect();
 
         /// <summary>
+        /// Существует ли указанный файл?
+        /// </summary>
+        /// <param name="specification">Спецификация пути к файлу.</param>
+        /// <returns>Результат проверки.</returns>
+        bool FileExist(FileSpecification specification);
+
+        /// <summary>
         /// Форматирование записей.
         /// </summary>
         /// <param name="parameters">Параметры команды.</param>

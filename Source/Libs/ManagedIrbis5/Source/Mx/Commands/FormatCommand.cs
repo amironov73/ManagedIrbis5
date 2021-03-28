@@ -61,6 +61,8 @@ namespace ManagedIrbis.Mx.Commands
         {
             OnBeforeExecute();
 
+            /*
+
             string argument = null;
 
             if (arguments.Length != 0)
@@ -99,6 +101,10 @@ namespace ManagedIrbis.Mx.Commands
             OnAfterExecute();
 
             return true;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

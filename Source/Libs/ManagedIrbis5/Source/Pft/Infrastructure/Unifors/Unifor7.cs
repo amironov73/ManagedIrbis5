@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using AM.Text;
 
 using ManagedIrbis.Client;
@@ -64,6 +65,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string term
             )
         {
+            /*
+
             TermLink[] result;
 
             if (term.EndsWith("$"))
@@ -77,6 +80,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         #endregion

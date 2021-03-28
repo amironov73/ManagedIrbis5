@@ -16,6 +16,8 @@
 
 #region Using directives
 
+using System.Threading.Tasks;
+
 using AM.IO;
 using AM.PlatformAbstraction;
 
@@ -36,6 +38,6 @@ namespace ManagedIrbis
         : IAsyncIrbisProvider,
         IIrbisConnectionSettings
     {
-
+        Task<Response?> ExecuteAsync(AsyncQuery query);
     }
 }

@@ -61,6 +61,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
+            /*
+
             if (!string.IsNullOrEmpty(expression))
             {
                 var navigator = new TextNavigator(expression);
@@ -120,6 +122,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     context.WriteAndSetFlag(node, output);
                 }
             }
+
+            */
         }
 
         #endregion

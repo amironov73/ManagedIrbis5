@@ -69,7 +69,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordFilter()
         {
-            Provider = new LocalProvider();
+            Provider = new LocalProvider(string.Empty);
         } // constructor
 
         /// <summary>

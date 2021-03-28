@@ -112,7 +112,7 @@ namespace ManagedIrbis.Biblio
             array_int[2] = ((number % 1000000) - (number % 1000)) / 1000;
             array_int[3] = number % 1000;
             string result = "";
-            for (int i = 0; i < 4; i++)
+            for (var i = 0; i < 4; i++)
             {
                 if (array_int[i] != 0)
                 {
@@ -232,7 +232,7 @@ namespace ManagedIrbis.Biblio
                     Items = new ItemCollection();
                 }
 
-                for (int i = 0; i < Records.Count; i++)
+                for (var i = 0; i < Records.Count; i++)
                 {
                     log.Write(".");
                     Record record = Records[i];
@@ -271,7 +271,7 @@ namespace ManagedIrbis.Biblio
 
                 Regex fioRegex = new Regex(@"^[А-Я]\.(\s+[А-Я]\.)");
 
-                for (int i = 0; i < Items.Count; i++)
+                for (var i = 0; i < Items.Count; i++)
                 {
                     log.Write(".");
                     BiblioItem item = Items[i];
@@ -349,7 +349,7 @@ namespace ManagedIrbis.Biblio
 
             try
             {
-                BiblioProcessor processor = context.Processor
+                var processor = context.Processor
                     .ThrowIfNull("context.Processor");
                 using (IPftFormatter formatter
                     = processor.AcquireFormatter(context))
@@ -358,13 +358,18 @@ namespace ManagedIrbis.Biblio
                     RecordCollection records = Records
                         .ThrowIfNull("Records");
 
-                    string searchExpression = SearchExpression
+                    var searchExpression = SearchExpression
                         .ThrowIfNull("SearchExpression");
                     formatter.ParseProgram(searchExpression);
                     record = new Record();
                     searchExpression = formatter.FormatRecord(record);
 
-                    int[] found = provider.Search(searchExpression);
+                    var parameters = new SearchParameters
+                    {
+                        Database = context.Provider.Database,
+                        Expression = searchExpression
+                    };
+                    var found = provider.Search(parameters);
                     log.WriteLine("Found: {0} record(s)", found.Length);
 
                     log.Write("Reading records");
@@ -372,12 +377,12 @@ namespace ManagedIrbis.Biblio
                     // Пробуем не загружать записи,
                     // а предоставить заглушки
 
-                    for (int i = 0; i < found.Length; i++)
+                    for (var i = 0; i < found.Length; i++)
                     {
                         log.Write(".");
                         record = new Record
                         {
-                            Mfn = found[i]
+                            Mfn = found[i].Mfn
                         };
                         records.Add(record);
                         context.Records.Add(record);
@@ -386,7 +391,7 @@ namespace ManagedIrbis.Biblio
                     log.WriteLine(" done");
                 }
 
-                foreach (BiblioChapter chapter in Children)
+                foreach (var chapter in Children)
                 {
                     chapter.GatherRecords(context);
                 }
@@ -422,7 +427,7 @@ namespace ManagedIrbis.Biblio
                 .ThrowIfNull("processor.Report");
 
 
-            bool showOrder = false;
+            var showOrder = false;
                 // TODO: implement
                 /* context.Document.CommonSettings.Value<bool?>("showOrder") ?? false; */
 
@@ -432,11 +437,11 @@ namespace ManagedIrbis.Biblio
             {
                 RenderTitle(context);
 
-                for (int i = 0; i < Items.Count; i++)
+                for (var i = 0; i < Items.Count; i++)
                 {
                     log.Write(".");
                     BiblioItem item = Items[i];
-                    int number = item.Number;
+                    var number = item.Number;
                     string description = item.Description
                         .ThrowIfNull("item.Description");
 

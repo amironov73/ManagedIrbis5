@@ -97,6 +97,8 @@ namespace ManagedIrbis.Infrastructure
                 SearchContext context
             )
         {
+            /*
+
             Sure.NotNull(context, nameof(context));
 
             var provider = context.Provider;
@@ -137,6 +139,10 @@ namespace ManagedIrbis.Infrastructure
             // TODO implement context filtering
 
             return result;
+
+            */
+
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ISearchTree.ReplaceChild"/>

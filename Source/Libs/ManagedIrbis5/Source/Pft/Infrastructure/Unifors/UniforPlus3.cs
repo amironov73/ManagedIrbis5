@@ -415,7 +415,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         Database = database,
                         FileName = fileName
                     };
-                format = provider.ReadFile(specification);
+                format = provider.ReadTextFile(specification);
                 if (string.IsNullOrEmpty(format))
                 {
                     return;

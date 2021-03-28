@@ -38,9 +38,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Raised on batch reading.
         /// </summary>
-#pragma warning disable 67
         public event EventHandler? BatchRead;
-#pragma warning restore 67
 
         /// <summary>
         /// Raised when exception occurs.
@@ -368,18 +366,24 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            var found = connection.Search(searchExpression);
-            if (found.Length == 0)
+            var parameters = new SearchParameters
+            {
+                Database = database,
+                Expression = searchExpression
+            };
+            var found = connection.Search(parameters);
+            if (found?.Length == 0)
             {
                 return Array.Empty<Record>();
             }
 
+            var range = FoundItem.ToMfn(found);
             var reader = new BatchRecordReader
                 (
                     connection,
                     database,
                     batchSize,
-                    found
+                    range
                 );
 
             return reader;
@@ -407,7 +411,7 @@ namespace ManagedIrbis.Batch
 
             if (!ReferenceEquals(action, null))
             {
-                EventHandler batchHandler = (sender, args) => action(result);
+                EventHandler batchHandler = (_, _) => action(result);
                 result.BatchRead += batchHandler;
             }
 
@@ -436,7 +440,7 @@ namespace ManagedIrbis.Batch
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
-            int maxMfn = connection.GetMaxMfn(database) - 1;
+            var maxMfn = connection.GetMaxMfn(database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<Record>();
@@ -473,7 +477,7 @@ namespace ManagedIrbis.Batch
 
             if (!ReferenceEquals(action, null))
             {
-                EventHandler batchHandler = (sender, args) => action(result);
+                EventHandler batchHandler = (_, _) => action(result);
                 result.BatchRead += batchHandler;
             }
 
@@ -502,8 +506,7 @@ namespace ManagedIrbis.Batch
 
             if (!ReferenceEquals(action, null))
             {
-                EventHandler batchHandler
-                    = (sender, args) => action(result);
+                EventHandler batchHandler = (_, _) => action(result);
                 result.BatchRead += batchHandler;
             }
 

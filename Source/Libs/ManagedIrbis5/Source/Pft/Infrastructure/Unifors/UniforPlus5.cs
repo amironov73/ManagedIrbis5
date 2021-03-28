@@ -64,6 +64,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
+            /*
+
             // ibatrak
             // минимальная длина выражения команда + .mnu (имя файла - только расширение) = 5
             if (string.IsNullOrEmpty(expression) || expression.Length < 5)
@@ -103,7 +105,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         Path = IrbisPath.System,
                         FileName = fileName
                     };
-                var text = context.Provider.ReadFile(specification);
+                var text = context.Provider.ReadTextFile(specification);
                 if (!string.IsNullOrEmpty(text))
                 {
                     var lines = text.SplitLines();
@@ -152,6 +154,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             context.WriteAndSetFlag(node, output);
+
+            */
         }
 
         #endregion

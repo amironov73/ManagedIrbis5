@@ -60,6 +60,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
+            /*
+
             if (string.IsNullOrEmpty(expression))
             {
                 return;
@@ -185,6 +187,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     }
                 }
             }
+
+            */
         }
 
         #endregion

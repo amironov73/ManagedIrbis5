@@ -139,6 +139,7 @@ namespace ManagedIrbis
             Cancellation = _cancellation.Token;
             _logger = Magna.Factory.CreateLogger<IBasicIrbisProvider>();
             _provider = provider;
+            PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
         #endregion
@@ -270,11 +271,16 @@ namespace ManagedIrbis
             // ParseConnectionString
         }
 
+        /// <inheritdoc cref="IBasicIrbisProvider.GetGeneration"/>
+        public string GetGeneration() => "64";
+
         /// <inheritdoc cref="IBasicIrbisProvider.GetWaitHandle"/>
         public WaitHandle GetWaitHandle()
         {
             throw new NotImplementedException();
         } // method GetWaitHandle
+
+        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
         #endregion
 
@@ -489,6 +495,12 @@ namespace ManagedIrbis
 
             return true;
         } // method Disconnect
+
+        /// <inheritdoc cref="ISyncIrbisProvider.FileExist"/>
+        public bool FileExist(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        } // method FileExist
 
         /// <inheritdoc cref="ISyncIrbisProvider.FormatRecords"/>
         public bool FormatRecords

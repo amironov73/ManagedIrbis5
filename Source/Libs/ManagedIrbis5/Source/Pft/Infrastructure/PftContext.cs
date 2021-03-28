@@ -182,7 +182,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             _parent = parent;
 
             Provider = ReferenceEquals(parent, null)
-                ? new LocalProvider()
+                ? new LocalProvider(string.Empty)
                 : parent.Provider;
 
             var parentBuffer = ReferenceEquals(parent, null)

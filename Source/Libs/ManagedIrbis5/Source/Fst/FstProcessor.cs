@@ -126,7 +126,7 @@ namespace ManagedIrbis.Fst
         {
             Provider = provider;
 
-            var content = Provider.ReadFile(specification);
+            var content = Provider.ReadTextFile(specification);
             if (string.IsNullOrEmpty(content))
             {
                 throw new IrbisException();
@@ -442,13 +442,12 @@ namespace ManagedIrbis.Fst
                 Record record
             )
         {
-            List<FstTerm> result = new List<FstTerm>();
+            var result = new List<FstTerm>();
             foreach (FstLine line in File.Lines)
             {
                 /*
                 IPftFormatter formatter = Provider.AcquireFormatter()
                     .ThrowIfNull("formatter");
-                */
 
                 var formatter = new PftFormatter();
 
@@ -629,6 +628,8 @@ namespace ManagedIrbis.Fst
                     default:
                         throw new IrbisException();
                 }
+
+                */
             }
 
             return result.ToArray();

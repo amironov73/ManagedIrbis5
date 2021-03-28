@@ -292,14 +292,14 @@ namespace ManagedIrbis.Batch
                 return Array.Empty<string>();
             }
 
-            var mfns = FoundItem.ToMfn(found);
+            var range = FoundItem.ToMfn(found);
             var result = new BatchRecordFormatter
                 (
                     connection,
                     database,
                     format,
                     batchSize,
-                    mfns
+                    range
                 );
 
             return result;

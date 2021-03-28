@@ -99,7 +99,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         Database = context.Provider.Database,
                         FileName = expression
                     };
-                var source = context.Provider.ReadFile
+                var source = context.Provider.ReadTextFile
                     (
                         specification
                     );

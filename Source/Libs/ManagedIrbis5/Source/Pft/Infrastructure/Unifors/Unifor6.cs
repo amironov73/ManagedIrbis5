@@ -138,7 +138,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     Database = context.Provider.Database,
                     FileName = fileName
                 };
-            var source = context.Provider.ReadFile(specification);
+            var source = context.Provider.ReadTextFile(specification);
             if (string.IsNullOrEmpty(source))
             {
                 return;

@@ -88,6 +88,36 @@ namespace ManagedIrbis
             return result;
         } // method FormatRecord
 
+        public static string? FormatRecord
+            (
+                this ISyncIrbisProvider conneciton,
+                string format,
+                int mfn
+            )
+        {
+            throw new NotImplementedException();
+        } // method FormatRecord
+
+        public static string? FormatRecord
+            (
+                this ISyncIrbisProvider conneciton,
+                string format,
+                Record record
+            )
+        {
+            throw new NotImplementedException();
+        } // method FormatRecord
+
+        public static string[] FormatRecords
+            (
+                this ISyncIrbisProvider conneciton,
+                int[] mfns,
+                string format
+            )
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Форматирование указанной записи.
         /// </summary>
@@ -101,6 +131,23 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method FormatRecord
 
+        /// <summary>
+        /// Чтение записи с сервера.
+        /// </summary>
+        public static Record? ReadRecord
+            (
+                this ISyncIrbisProvider connection,
+                int mfn
+            )
+        {
+            var parameters = new ReadRecordParameters
+            {
+                Database = connection.Database,
+                Mfn = mfn
+            };
+
+            return connection.ReadRecord(parameters);
+        } // method ReadRecord
 
         /// <summary>
         /// Чтение терминов словаря.
@@ -159,6 +206,26 @@ namespace ManagedIrbis
         } // method Search
 
         /// <summary>
+        /// Упрощенный поиск.
+        /// </summary>
+        public static int[] Search
+            (
+                this ISyncIrbisProvider connection,
+                string expression
+            )
+        {
+            var parameters = new SearchParameters
+            {
+                Database = connection.Database,
+                Expression = expression
+            };
+            var lines = connection.Search(parameters);
+            var result = FoundItem.ToMfn(lines);
+
+            return result;
+        } // method Search
+
+        /// <summary>
         /// Определение количества записей, удовлетворяющих
         /// заданному запросу.
         /// </summary>
@@ -192,6 +259,29 @@ namespace ManagedIrbis
 
             return response.ReadInteger();
         } // method SearchCount
+
+        /// <summary>
+        /// Сохранение/обновление записи в базе данных.
+        /// </summary>
+        public static bool WriteRecord
+            (
+                this ISyncIrbisProvider connection,
+                IRecord record,
+                bool actualize = true,
+                bool lockRecord = false,
+                bool dontParse = false
+            )
+        {
+            var parameters = new WriteRecordParameters
+                {
+                    Record = record,
+                    Actualize = actualize,
+                    Lock = lockRecord,
+                    DontParse = dontParse
+                };
+
+            return connection.WriteRecord(parameters);
+        }
 
         #endregion
 

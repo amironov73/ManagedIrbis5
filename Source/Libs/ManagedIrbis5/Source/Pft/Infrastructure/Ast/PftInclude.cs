@@ -131,7 +131,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     Database = context.Provider.Database,
                     FileName = fileName
                 };
-            var source = context.Provider.ReadFile
+            var source = context.Provider.ReadTextFile
                 (
                     specification
                 );

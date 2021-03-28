@@ -413,7 +413,7 @@ namespace ManagedIrbis.Biblio
             log.WriteLine("Begin gather records {0}", this);
             var badRecords = context.BadRecords;
             Records = new RecordCollection();
-            Record record = null;
+            Record? record = null;
 
             try
             {
@@ -432,7 +432,12 @@ namespace ManagedIrbis.Biblio
                     record = new Record();
                     searchExpression = formatter.FormatRecord(record);
 
-                    var found = provider.Search(searchExpression);
+                    var searchParameters = new SearchParameters
+                    {
+                        Database = context.Provider.Database,
+                        Expression = searchExpression
+                    };
+                    var found = provider.Search(searchParameters);
                     log.WriteLine("Found: {0} record(s)", found.Length);
 
                     log.Write("Reading records");
@@ -440,7 +445,12 @@ namespace ManagedIrbis.Biblio
                     for (var i = 0; i < found.Length; i++)
                     {
                         log.Write(".");
-                        record = provider.ReadRecord(found[i]);
+                        var recordParameters = new ReadRecordParameters
+                        {
+                            Database = context.Provider.Database,
+                            Mfn = found[i].Mfn
+                        };
+                        record = provider.ReadRecord(recordParameters);
                         if (!ReferenceEquals(record, null))
                         {
                             _Fix463(record);
@@ -605,6 +615,8 @@ namespace ManagedIrbis.Biblio
                 );
             try
             {
+                /*
+
                 var menuName = MenuName.ThrowIfNull("MenuName");
 
                 var provider = context.Provider;
@@ -647,6 +659,10 @@ namespace ManagedIrbis.Biblio
                 {
                     chapter.Initialize(context);
                 }
+
+                */
+
+                throw new NotImplementedException();
             }
             catch (Exception exception)
             {
@@ -654,12 +670,16 @@ namespace ManagedIrbis.Biblio
                 throw;
             }
 
+            /*
+
             log.WriteLine
                 (
                     "End initialize {0}: {1}",
                     GetType().Name,
                     Title.ToVisibleString()
                 );
+
+            */
         }
 
         /// <inheritdoc cref="BiblioChapter.Render" />

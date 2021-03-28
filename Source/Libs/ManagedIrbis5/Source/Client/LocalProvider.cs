@@ -40,6 +40,27 @@ namespace ManagedIrbis.Client
     public class LocalProvider
         : ISyncIrbisProvider
     {
+        public LocalProvider()
+        {
+        }
+
+        public LocalProvider(string rootPath)
+        {
+        }
+
+        public bool FileExist(FileSpecification specification)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetGeneration()
+        {
+            throw new NotImplementedException();
+        }
+
+        public PlatformAbstractionLayer PlatformAbstraction
+            => throw new NotImplementedException();
+
         public void Configure(string configurationString)
         {
             throw new NotImplementedException();
