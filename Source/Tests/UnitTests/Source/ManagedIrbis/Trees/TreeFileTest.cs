@@ -8,6 +8,7 @@ using System.IO;
 using AM;
 using AM.Runtime;
 using AM.Text;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Trees;
 
@@ -22,7 +23,7 @@ namespace UnitTests.ManagedIrbis
         : Common.CommonUnitTest
     {
         [TestMethod]
-        public void IrbisTreeFile_Construction_1()
+        public void TreeFile_Construction_1()
         {
             var tree = new TreeFile();
 
@@ -46,7 +47,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_ParseStream_1()
+        public void TreeFile_ParseStream_1()
         {
             var reader = TextReader.Null;
             var tree = TreeFile.ParseStream(reader);
@@ -55,7 +56,7 @@ namespace UnitTests.ManagedIrbis
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
-        public void IrbisTreeFile_ParseStream_2()
+        public void TreeFile_ParseStream_2()
         {
             TextReader reader = new StringReader(TreeFile.Indent + "HELLO");
             TreeFile.ParseStream(reader);
@@ -63,7 +64,7 @@ namespace UnitTests.ManagedIrbis
 
         [TestMethod]
         [ExpectedException(typeof(FormatException))]
-        public void IrbisTreeFile_ParseStream_3()
+        public void IrbiTreeFile_ParseStream_3()
         {
             var text = "Hello\n\t\tWorld";
             TextReader reader = new StringReader(text);
@@ -71,7 +72,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_ParseLocalFile_1()
+        public void TreeFile_ParseLocalFile_1()
         {
             var fileName = Path.Combine
                 (
@@ -96,7 +97,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_ParseLocalFile_2()
+        public void TreeFile_ParseLocalFile_2()
         {
             var fileName = Path.Combine
                 (
@@ -124,7 +125,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_Save_1()
+        public void TreeFile_Save_1()
         {
             var tree1 = _CreateTree();
 
@@ -183,7 +184,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_Serialization_1()
+        public void TreeFile_Serialization_1()
         {
             var tree = new TreeFile();
             _TestSerialization(tree);
@@ -193,7 +194,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_Verify_1()
+        public void TreeFile_Verify_1()
         {
             var tree = _CreateTree();
             Assert.IsTrue(tree.Verify(false));
@@ -205,7 +206,7 @@ namespace UnitTests.ManagedIrbis
 
         [TestMethod]
         [ExpectedException(typeof(VerificationException))]
-        public void IrbisTreeFile_Verify_2()
+        public void TreeFile_Verify_2()
         {
             var tree = new TreeFile();
             var item = new TreeLine();
@@ -214,7 +215,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_Verify_3()
+        public void TreeFile_Verify_3()
         {
             var tree = new TreeFile();
             var item = new TreeLine();
@@ -223,7 +224,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_SaveToLocalFile_1()
+        public void TreeFile_SaveToLocalFile_1()
         {
             var tree = _CreateTree();
             var fileName = Path.GetTempFileName();
@@ -233,7 +234,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_ToMenu_1()
+        public void TreeFile_ToMenu_1()
         {
             var tree = _CreateTree();
             var menu = tree.ToMenu();
@@ -241,7 +242,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_Walk_1()
+        public void TreeFile_Walk_1()
         {
             var tree = _CreateTree();
             var count = 0;
@@ -251,7 +252,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void IrbisTreeFile_Delimiter_1()
+        public void TreeFile_Delimiter_1()
         {
             var saveDelimiter = TreeLine.Delimiter;
             TreeLine.Delimiter = "!";

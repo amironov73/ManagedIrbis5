@@ -17,6 +17,7 @@
 
 #region Using directives
 
+using System;
 using AM;
 using ManagedIrbis.Infrastructure.Sockets;
 
@@ -38,6 +39,7 @@ namespace ManagedIrbis
         private string? _connectionString;
         private ILogger? _logger;
         private ISyncClientSocket? _socket;
+        private IServiceProvider? _serviceProvider;
 
         #endregion
 
@@ -51,7 +53,8 @@ namespace ManagedIrbis
             // TODO: делать ISyncIrbisProvider
 
             var socket = _socket ?? new SyncTcp4Socket();
-            var result = new SyncConnection(socket, Magna.Host.Services);
+            var serviceProvider = _serviceProvider ?? Magna.Host.Services;
+            var result = new SyncConnection(socket, serviceProvider);
 
             if (_logger is not null)
             {
@@ -65,6 +68,19 @@ namespace ManagedIrbis
 
             return result;
         } // method Build
+
+        /// <summary>
+        /// Установка провайдера сервисов.
+        /// </summary>
+        public ConnectionBuilder WithServiceProvider
+            (
+                IServiceProvider serviceProvider
+            )
+        {
+            _serviceProvider = serviceProvider;
+
+            return this;
+        } // method WithServiceProvider
 
         /// <summary>
         /// Установка строки подключения.

@@ -218,12 +218,13 @@ namespace ManagedIrbis
                 IIrbisConnectionSettings connection
             )
         {
-            // TODO: проверять, не подключено ли?
-
-            // if (connection.Connected)
-            // {
-            //     throw new ApplicationException("Already connected");
-            // }
+            if (connection is IBasicIrbisProvider basic)
+            {
+                if (basic.Connected)
+                {
+                    throw new IrbisException("Already connected");
+                }
+            }
 
             if (!string.IsNullOrEmpty(Host))
             {
@@ -247,12 +248,11 @@ namespace ManagedIrbis
                 connection.Workstation = Workstation;
             }
 
-            // TODO: устанавливать базу данных, если возможно
-
-            // if (!string.IsNullOrEmpty(Database))
-            // {
-            //     connection.Database = Database;
-            // }
+            if (!string.IsNullOrEmpty(Database)
+                && connection is IBasicIrbisProvider provider)
+            {
+                provider.Database = Database;
+            }
 
         } // method Apply
 

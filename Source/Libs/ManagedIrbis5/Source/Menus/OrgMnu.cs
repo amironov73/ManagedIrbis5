@@ -1,11 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -13,18 +15,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using AM;
-
-#endregion
-
 #nullable enable
 
 namespace ManagedIrbis.Menus
 {
     //
-    // Управляющее файл-справочник ORG.MNU, который используется
+    // Управляющий файл-справочник ORG.MNU, который используется
     // для передачи в выходные коммуникативные форматы данных
     // об Организации-поставщике информации (код страны и наименование
     // Организации-пользователя). Правила создания/корректуры файлов
@@ -167,7 +163,7 @@ namespace ManagedIrbis.Menus
             /* 9 */ AuthorSign = "0";
             /* A */ ExtendedAuthors = "0";
             /* S */ Sigla = "10010033";
-        }
+        } // constructor
 
         /// <summary>
         /// Конструктор.
@@ -178,8 +174,6 @@ namespace ManagedIrbis.Menus
             )
             : this()
         {
-            Sure.NotNull(menu, nameof(menu));
-
             Country = menu.GetString("1", Country);
             Organization = menu.GetString("2", Organization);
             Currency = menu.GetString("3", Currency);
@@ -191,7 +185,7 @@ namespace ManagedIrbis.Menus
             AuthorSign = menu.GetString("9", AuthorSign);
             ExtendedAuthors = menu.GetString("A", ExtendedAuthors);
             Sigla = menu.GetString("S", Sigla);
-        }
+        } // constructor
 
         #endregion
 
@@ -217,8 +211,10 @@ namespace ManagedIrbis.Menus
             menu.Add("9", AuthorSign);
             menu.Add("A", ExtendedAuthors);
             menu.Add("S", Sigla);
-        }
+        } // method ApplyToMenu
 
         #endregion
-    }
-}
+
+    } // class OrgMnu
+
+} // namespace ManagedIrbis.Menus
