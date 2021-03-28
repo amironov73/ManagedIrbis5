@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* MenuEntry.cs -- пара строк в MNU-файле
  * Ars Magna project, http://arsmagna.ru
@@ -43,21 +39,24 @@ namespace ManagedIrbis.Menus
         #region Properties
 
         /// <summary>
-        /// First line -- the code.
+        /// Первая строка - код.
+        /// Коды могут повторяться в рамках одного MNU-файла.
         /// </summary>
         [XmlAttribute("code")]
         [JsonPropertyName("code")]
         public string? Code { get; set; }
 
         /// <summary>
-        /// Second line -- the comment.
+        /// Вторая строка - значение либо комментарий.
+        /// Часто бывает пустой.
         /// </summary>
         [XmlAttribute("comment")]
         [JsonPropertyName("comment")]
         public string? Comment { get; set; }
 
         /// <summary>
-        /// Other menu entry.
+        /// Ссылка на другую пару строк, применяется при построении дерева
+        /// (TRE-файла).
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]

@@ -2,12 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
 /* MenuUtility.cs -- методы для работы с ИРБИС-меню
  * Ars Magna project, http://arsmagna.ru
@@ -19,6 +18,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -41,40 +41,37 @@ namespace ManagedIrbis.Menus
     {
         #region Private members
 
+        /// <summary>
+        /// Построение строчки для TRE-файла.
+        /// </summary>
         private static TreeLine _BuildLine
             (
                 MenuEntry parent,
                 MenuFile menu
             )
         {
-            string value = string.Format
-                (
-                    "{0}{1}{2}",
-                    parent.Code,
-                    TreeLine.Delimiter,
-                    parent.Comment
-                );
+            var value = $"{parent.Code}{TreeLine.Delimiter}{parent.Comment}";
             var result = new TreeLine(value);
-            MenuEntry[] children = menu.Entries
+            var children = menu.Entries
                 .Where(v => ReferenceEquals(v.OtherEntry, parent))
                 .OrderBy(v => v.Code)
                 .ToArray();
 
-            foreach (MenuEntry child in children)
+            foreach (var child in children)
             {
                 var subItem = _BuildLine(child, menu);
                 result.Children.Add(subItem);
             }
 
             return result;
-        }
+        } // method _BuildLine
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Adds the typed value with specified code.
+        /// Добавление в конец меню пары "код - значение".
         /// </summary>
         public static MenuFile Add<T>
             (
@@ -83,9 +80,6 @@ namespace ManagedIrbis.Menus
                 T? value
             )
         {
-            Sure.NotNull(menu, nameof(menu));
-            Sure.NotNull(code, nameof(code));
-
             if (ReferenceEquals(value, null))
             {
                 menu.Add(code, string.Empty);
@@ -97,10 +91,10 @@ namespace ManagedIrbis.Menus
             }
 
             return menu;
-        }
+        } // method Add
 
         /// <summary>
-        /// Collects the comments for code.
+        /// Собирает значения для указанного кода.
         /// </summary>
         public static string?[] CollectStrings
             (
@@ -117,44 +111,47 @@ namespace ManagedIrbis.Menus
                     )
                 .Select(entry => entry.Comment)
                 .ToArray();
-        }
+        } // method CollectStrings
 
         /// <summary>
-        /// Gets the value.
+        /// Получает типизированное значение для указанного кода
+        /// (без учета регистра символов).
+        /// Если строк с таким кодом несколько, используется
+        /// первая найденная.
         /// </summary>
         public static T? GetValue<T>
             (
                 this MenuFile menu,
                 string code,
-                T? defaultValue
+                T? defaultValue = default
             )
         {
-            Sure.NotNull(menu, nameof(menu));
-            Sure.NotNull(code, nameof(code));
-
             var found = menu.FindEntry(code);
 
-            return ReferenceEquals(found, null)
+            return found is null
                 ? defaultValue
                 : Utility.ConvertTo<T>(found.Comment);
-        }
+        } // method GetValue
 
         /// <summary>
-        /// Gets the value (case sensitive).
+        /// Получает типизированное значение для указанного кода
+        /// (с учетом регистра символов).
+        /// Если строк с таким кодом несколько, используется
+        /// первая найденная.
         /// </summary>
         public static T? GetValueSensitive<T>
             (
                 this MenuFile menu,
                 string code,
-                T? defaultValue
+                T? defaultValue = default
             )
         {
             var found = menu.FindEntrySensitive(code);
 
-            return ReferenceEquals(found, null)
+            return found is null
                 ? defaultValue
                 : Utility.ConvertTo<T>(found.Comment);
-        }
+        } // method GetValueSensitive
 
         /// <summary>
         /// Converts the menu to JSON.
@@ -164,30 +161,30 @@ namespace ManagedIrbis.Menus
                 this MenuFile menu
             )
         {
-            Sure.NotNull(menu, nameof(menu));
-
-            var result = JsonSerializer.Serialize(menu.Entries);
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+            var result = JsonSerializer.Serialize(menu.Entries, options);
 
             return result;
-        }
+        } // method ToJson
 
         /// <summary>
-        /// Restores the menu from JSON.
+        /// Восстанавливает меню из JSON-текста.
         /// </summary>
         public static MenuFile FromJson
             (
                 string text
             )
         {
-            Sure.NotNullNorEmpty(text, nameof(text));
-
             var entries = JsonSerializer
                 .Deserialize<NonNullCollection<MenuEntry>>(text)
                 .ThrowIfNull();
-            MenuFile result = new MenuFile(entries);
+            var result = new MenuFile(entries);
 
             return result;
-        }
+        } // method FromJson
 
         /// <summary>
         /// Saves the menu to local JSON file.
@@ -198,9 +195,6 @@ namespace ManagedIrbis.Menus
                 string fileName
             )
         {
-            Sure.NotNull(menu, nameof(menu));
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
-
             var contents = JsonSerializer.Serialize(menu.Entries);
 
             File.WriteAllText
@@ -209,7 +203,7 @@ namespace ManagedIrbis.Menus
                     contents,
                     IrbisEncoding.Utf8
                 );
-        }
+        } // method SaveLocalJsonFile
 
         /// <summary>
         /// Parses the local json file.
@@ -219,26 +213,30 @@ namespace ManagedIrbis.Menus
                 string fileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
-
-            string text = File.ReadAllText
+            var text = File.ReadAllText
                 (
                     fileName,
                     IrbisEncoding.Utf8
                 );
-            MenuFile result = FromJson(text);
+            var result = FromJson(text);
 
             return result;
-        }
+        } // method ParseLocalJsonFile
 
         /// <summary>
-        /// Convert MNU to TRE.
+        /// Преобразует меню в дерево (TRE-файл).
         /// </summary>
         public static TreeFile ToTree
             (
                 this MenuFile menu
             )
         {
+            //
+            // Здесь мы используем свойство OtherEntry
+            // как указатель на вышестоящий элемент.
+            // У рутовых элементов он равен null.
+            //
+
             foreach (var entry in menu.Entries)
             {
                 entry.Code = entry.Code.ThrowIfNull("entryCode").Trim();
@@ -246,46 +244,51 @@ namespace ManagedIrbis.Menus
 
             foreach (var first in menu.Entries)
             {
-                if (ReferenceEquals(first, null))
+                if (first is not null)
                 {
-                    continue;
-                }
-                var firstCode = first.Code;
-                if (ReferenceEquals(firstCode, null))
-                {
-                    continue;
-                }
-                foreach (var second in menu.Entries)
-                {
-                    var secondCode = second?.Code;
-                    if (ReferenceEquals(secondCode, null))
-                    {
-                        continue;
-                    }
-                    if (ReferenceEquals(first, second))
-                    {
-                        continue;
-                    }
-                    if (firstCode.SameString(secondCode))
+                    var firstCode = first.Code;
+                    if (string.IsNullOrEmpty(firstCode))
                     {
                         continue;
                     }
 
-                    if (firstCode.StartsWith(secondCode))
+                    foreach (var second in menu.Entries)
                     {
-                        var otherEntry = first.OtherEntry;
-                        if (ReferenceEquals(otherEntry, null))
+                        if (second is not null)
                         {
-                            first.OtherEntry = second;
-                        }
-                        else
-                        {
-                            var otherCode = otherEntry.Code;
-                            if (!ReferenceEquals(otherCode, null))
+                            var secondCode = second.Code;
+                            if (string.IsNullOrEmpty(secondCode))
                             {
-                                if (secondCode.Length > otherCode.Length)
+                                continue;
+                            }
+
+                            if (ReferenceEquals(first, second))
+                            {
+                                continue;
+                            }
+
+                            if (firstCode.SameString(secondCode))
+                            {
+                                continue;
+                            }
+
+                            if (firstCode.StartsWith(secondCode))
+                            {
+                                var otherEntry = first.OtherEntry;
+                                if (otherEntry is null)
                                 {
                                     first.OtherEntry = second;
+                                }
+                                else
+                                {
+                                    var otherCode = otherEntry.Code;
+                                    if (!string.IsNullOrEmpty(otherCode))
+                                    {
+                                        if (secondCode.Length > otherCode.Length)
+                                        {
+                                            first.OtherEntry = second;
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -293,49 +296,125 @@ namespace ManagedIrbis.Menus
                 }
             }
 
-            MenuEntry[] roots = menu.Entries
+            var roots = menu.Entries
                 .Where(entry => ReferenceEquals(entry.OtherEntry, null))
                 .OrderBy(entry => entry.Code)
                 .ToArray();
 
             var result = new TreeFile();
-            foreach (MenuEntry root in roots)
+            foreach (var root in roots)
             {
                 var item = _BuildLine(root, menu);
                 result.Roots.Add(item);
             }
 
             return result;
-        }
+        } // method ToTree
 
         /// <summary>
-        /// Converts the menu to XML.
+        /// Сериализация меню в XML.
         /// </summary>
         public static string ToXml
             (
                 this MenuFile menu
             )
         {
-            Sure.NotNull(menu, nameof(menu));
-
-            XmlWriterSettings settings = new XmlWriterSettings
+            var settings = new XmlWriterSettings
             {
                 OmitXmlDeclaration = true,
                 Indent = false,
                 NewLineHandling = NewLineHandling.None
             };
-            StringBuilder output = new StringBuilder();
-            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            var output = new StringBuilder();
+            var namespaces = new XmlSerializerNamespaces();
             namespaces.Add(string.Empty, string.Empty);
-            using (XmlWriter writer = XmlWriter.Create(output, settings))
-            {
-                XmlSerializer serializer = new XmlSerializer(typeof(MenuFile));
-                serializer.Serialize(writer, menu, namespaces);
-            }
+
+            using var writer = XmlWriter.Create(output, settings);
+            var serializer = new XmlSerializer(typeof(MenuFile));
+            serializer.Serialize(writer, menu, namespaces);
 
             return output.ToString();
-        }
+        } // method ToXml
+
+        /// <summary>
+        /// Чтение MNU-файла с ИРБИС-сервера в синхронном режиме.
+        /// </summary>
+        /// <param name="connection">Подключение к ИРБИС-серверу.</param>
+        /// <param name="specification">Спецификация файла.</param>
+        /// <returns>Прочитанное меню либо <c>null</c></returns>
+        public static MenuFile? ReadMenu
+            (
+                this ISyncIrbisProvider connection,
+                FileSpecification specification
+            )
+        {
+            var content = connection.ReadTextFile(specification);
+            if (string.IsNullOrEmpty(content))
+            {
+                return null;
+            }
+
+            using var reader = new StringReader(content);
+            var result = MenuFile.ParseStream(reader);
+
+            return result;
+        } // method ReadMenu
+
+        /// <summary>
+        /// Чтение MNU-файла с ИРБИС-сервера в асинхронном режиме.
+        /// </summary>
+        /// <param name="connection">Подключение к ИРБИС-серверу.</param>
+        /// <param name="specification">Спецификация файла.</param>
+        /// <returns>Прочитанное меню либо <c>null</c></returns>
+        public static async Task<MenuFile?> ReadMenuAsync
+            (
+                this IAsyncIrbisProvider connection,
+                FileSpecification specification
+            )
+        {
+            var content = await connection.ReadTextFileAsync(specification);
+            if (string.IsNullOrEmpty(content))
+            {
+                return null;
+            }
+
+            using var reader = new StringReader(content);
+            var result = MenuFile.ParseStream(reader);
+
+            return result;
+        } // method ReadMenuAsync
+
+        /// <summary>
+        /// Чтение меню с ИРБИС-сервера в синхронном режиме.
+        /// </summary>
+        /// <param name="connection">Подключение к ИРБИС-серверу.</param>
+        /// <param name="specification">Спецификация файла.</param>
+        /// <returns>Прочитанное меню (либо выбрасывает исключение).</returns>
+        public static MenuFile RequireMenu
+            (
+                this ISyncIrbisProvider connection,
+                FileSpecification specification
+            )
+            => connection.ReadMenu(specification).ThrowIfNull("RequireMenu");
+
+        /// <summary>
+        /// Чтение меню с ИРБИС-сервера в асинхронном режиме.
+        /// </summary>
+        /// <param name="connection">Подключение к ИРБИС-серверу.</param>
+        /// <param name="specification">Спецификация файла.</param>
+        /// <returns>Прочитанное меню (либо выбрасывает исключение).</returns>
+        public static async Task<MenuFile> RequireMenuAsync
+            (
+                this IAsyncIrbisProvider connection,
+                FileSpecification specification
+            )
+        {
+            var result = await connection.ReadMenuAsync(specification);
+            return result.ThrowIfNull("RequireMenuAsync");
+        } // method RequireMenuAsync
 
         #endregion
-    }
-}
+
+    } // class MenuUtility
+
+} // namespace ManagedIrbis.Menus

@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* MenuSort.cs -- виды сортировки ИРБИС-меню
  * Ars Magna project, http://arsmagna.ru
@@ -31,8 +27,10 @@ namespace ManagedIrbis.Menus
         ByCode,
 
         /// <summary>
-        /// Сортировка по комментариям.
+        /// Сортировка по комментариям (значениям).
         /// </summary>
         ByComment
-    }
-}
+
+    } // enum MenuSort
+
+} // namespace ManagedIrbis.Menus

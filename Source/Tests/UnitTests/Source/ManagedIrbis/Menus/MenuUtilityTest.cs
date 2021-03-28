@@ -1,16 +1,14 @@
-﻿using System.IO;
+﻿// ReSharper disable IdentifierTypo
+// ReSharper disable CheckNamespace
+// ReSharper disable StringLiteralTypo
 
-using AM.Text;
+using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis.Menus;
 
 #nullable enable
-
-// ReSharper disable IdentifierTypo
-// ReSharper disable CheckNamespace
-// ReSharper disable StringLiteralTypo
 
 namespace UnitTests.ManagedIrbis.Menus
 {
@@ -84,6 +82,7 @@ namespace UnitTests.ManagedIrbis.Menus
             Assert.AreEqual("[]", actual);
         }
 
+        [Ignore]
         [TestMethod]
         public void MenuUtility_ToJson_2()
         {

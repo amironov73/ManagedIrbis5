@@ -33,7 +33,7 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis.Menus
 {
     //
-    // Official documentation says:
+    // Выдержка из официальной документации:
     //
     // 1 - ввод через простое меню (неиерархический справочник).
     //
@@ -62,28 +62,28 @@ namespace ManagedIrbis.Menus
         #region Properties
 
         /// <summary>
-        /// File name (with extension).
+        /// Имя файла (с расширением). Обязательно.
         /// </summary>
         [XmlAttribute("file")]
         [JsonPropertyName("file")]
         public string? FileName { get; set; }
 
         /// <summary>
-        /// Database name.
+        /// Имя базы данных. Обязательно.
         /// </summary>
         [XmlAttribute("db")]
         [JsonPropertyName("db")]
         public string? Database { get; set; }
 
         /// <summary>
-        /// Path.
+        /// Код пути.
         /// </summary>
         [XmlAttribute("path")]
         [JsonPropertyName("path")]
         public IrbisPath Path { get; set; }
 
         /// <summary>
-        /// Sort mode.
+        /// Метод сортировки.
         /// </summary>
         [XmlAttribute("sort")]
         [JsonPropertyName("sort")]
@@ -100,16 +100,12 @@ namespace ManagedIrbis.Menus
             (
                 FileSpecification specification
             )
-        {
-            var result = new MenuSpecification
+            => new ()
             {
                 Database = specification.Database,
                 Path = specification.Path,
                 FileName = specification.FileName
             };
-
-            return result;
-        }
 
         /// <summary>
         /// Parse the text.
@@ -246,11 +242,10 @@ namespace ManagedIrbis.Menus
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return FileName.ToVisibleString();
-        }
+        public override string ToString() => FileName.ToVisibleString();
 
         #endregion
-    }
-}
+
+    } // class MenuSpecification
+
+} // namespace ManagedIrbis.Menus
