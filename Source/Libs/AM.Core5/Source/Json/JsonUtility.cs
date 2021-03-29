@@ -303,7 +303,8 @@ namespace AM.Json
             var options = new JsonSerializerOptions
             {
                 IgnoreNullValues = true,
-                WriteIndented = true
+                WriteIndented = false,
+
             };
             var result = JsonSerializer.Serialize(obj, options);
 

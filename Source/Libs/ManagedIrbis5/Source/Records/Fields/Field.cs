@@ -326,7 +326,7 @@ namespace ManagedIrbis
             )
         {
             var index = line.IndexOf('#');
-            Tag = int.Parse(line.Slice(0, index));
+            Tag = line.Slice(0, index).ParseInt32();
             line = line.Slice(index + 1);
             DecodeBody(line);
         } // method Decode

@@ -80,13 +80,13 @@ namespace ManagedIrbis.Fields
         /// Compare <see cref="AuthorInfo"/>
         /// by <see cref="AuthorInfo.FamilyName"/> field.
         /// </summary>
-        public static IComparer<AuthorInfo> ByFamilyName() => new FamilyNameComparer();
+        public static IComparer<AuthorInfo> FamilyName() => new FamilyNameComparer();
 
         /// <summary>
         /// Compare <see cref="AuthorInfo"/>
         /// by <see cref="AuthorInfo.FullName"/> field.
         /// </summary>
-        public static IComparer<AuthorInfo> ByFullName() => new FullNameComparer();
+        public static IComparer<AuthorInfo> FullName() => new FullNameComparer();
 
         #endregion
 

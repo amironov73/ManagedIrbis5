@@ -15,6 +15,8 @@
 
 using System;
 using System.IO;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
@@ -69,11 +71,18 @@ namespace ManagedIrbis
         /// </summary>
         public bool RepresentsValue => Code == NoCode;
 
+        /// <summary>
+        /// Подполе модифицировано?
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
         public bool Modified { get; internal set; }
 
         /// <summary>
         /// Ссылка на поле.
         /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
         public Field? Field { get; internal set; }
 
         #endregion
@@ -209,6 +218,8 @@ namespace ManagedIrbis
         } // method AsReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.ReadOnly"/>
+        [XmlIgnore]
+        [JsonIgnore]
         public bool ReadOnly { get; private set; }
 
         /// <inheritdoc cref="IReadOnly{T}.SetReadOnly"/>

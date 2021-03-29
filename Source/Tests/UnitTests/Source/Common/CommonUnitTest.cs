@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 using AM.IO;
 
-//using ManagedIrbis;
+using ManagedIrbis;
 //using ManagedIrbis.Client;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -102,37 +103,41 @@ namespace UnitTests.Common
         //    return result;
         //}
 
-        //protected static string GatherCodes
-        //    (
-        //        RecordField field
-        //    )
-        //{
-        //    char[] codes = field.SubFields.Select(sf => sf.Code)
-        //        .OrderBy(c => c)
-        //        .ToArray();
+        protected static string GatherCodes
+            (
+                Field field
+            )
+        {
+            var codes = field.Subfields.Select(sf => sf.Code)
+                .OrderBy(c => c)
+                .ToArray();
 
-        //    return new string(codes);
-        //}
+            return new string(codes);
+        }
 
-        //protected static void CompareFields
-        //    (
-        //        RecordField expected,
-        //        RecordField actual
-        //    )
-        //{
-        //    string expectedCodes = GatherCodes(expected);
-        //    string actualCodes = GatherCodes(actual);
-        //    Assert.AreEqual(expectedCodes, actualCodes, true);
-        //    foreach (char code in expectedCodes)
-        //    {
-        //        SubField[] expectedSubFields = expected.GetSubField(code);
-        //        SubField[] actualSubFields = actual.GetSubField(code);
-        //        Assert.AreEqual(expectedSubFields.Length, actualSubFields.Length);
-        //        for (int i = 0; i < expectedSubFields.Length; i++)
-        //        {
-        //            Assert.AreEqual(expectedSubFields[i].Value, actualSubFields[i].Value);
-        //        }
-        //    }
-        //}
+        protected static void CompareFields
+            (
+                Field expected,
+                Field actual
+            )
+        {
+            var expectedCodes = GatherCodes(expected);
+            var actualCodes = GatherCodes(actual);
+            Assert.AreEqual(expectedCodes, actualCodes, true);
+            foreach (char code in expectedCodes)
+            {
+                var expectedSubFields = expected.EnumerateSubFields(code).ToArray();
+                var actualSubFields = actual.EnumerateSubFields(code).ToArray();
+                Assert.AreEqual(expectedSubFields.Length, actualSubFields.Length);
+                for (var i = 0; i < expectedSubFields.Length; i++)
+                {
+                    Assert.AreEqual
+                        (
+                            expectedSubFields[i].Value,
+                            actualSubFields[i].Value
+                        );
+                }
+            }
+        }
     }
 }
