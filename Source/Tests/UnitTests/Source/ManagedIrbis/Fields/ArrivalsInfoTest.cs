@@ -143,11 +143,12 @@ namespace UnitTests.ManagedIrbis.Fields
             }
             else
             {
+                Assert.IsNotNull(second);
                 Assert.IsNotNull(second.UnknownSubFields);
                 Assert.AreEqual
                     (
                         first.UnknownSubFields.Length,
-                        second.UnknownSubFields.Length
+                        second.UnknownSubFields!.Length
                     );
                 for (var i = 0; i < first.UnknownSubFields.Length; i++)
                 {
@@ -164,7 +165,8 @@ namespace UnitTests.ManagedIrbis.Fields
         {
             var bytes = first.SaveToMemory();
             var second = bytes.RestoreObjectFromMemory<ArrivalsInfo>();
-            _Compare(first, second);
+            Assert.IsNotNull(second);
+            _Compare(first, second!);
             Assert.IsNull(second.Field);
             Assert.IsNull(second.UserData);
         }

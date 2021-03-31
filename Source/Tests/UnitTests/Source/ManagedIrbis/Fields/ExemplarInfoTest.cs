@@ -22,9 +22,9 @@ namespace UnitTests.ManagedIrbis.Fields
         {
             var bytes = first.SaveToMemory();
 
-            var second = bytes
-                .RestoreObjectFromMemory<ExemplarInfo>();
-            Assert.AreEqual(first.Number, second.Number);
+            var second = bytes.RestoreObjectFromMemory<ExemplarInfo>();
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Number, second!.Number);
             Assert.AreEqual(first.Barcode, second.Barcode);
         }
 

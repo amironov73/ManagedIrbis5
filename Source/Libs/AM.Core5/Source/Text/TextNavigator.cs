@@ -1613,22 +1613,48 @@ namespace AM.Text
         /// <summary>
         /// Временная заглушка.
         /// </summary>
-        public char PeekCharNoCrLf() => throw new NotImplementedException();
+        public char PeekCharNoCrLf()
+        {
+            var position = _position;
+            char result = '\0';
+
+            while (position < _text.Length)
+            {
+                result = _text.Span[position];
+                if (result != '\r' && result != '\n')
+                {
+                    break;
+                }
+
+                ++position;
+            }
+
+            return result;
+        } // method PeekCharNoCrLf
 
         /// <summary>
         /// Временная заглушка.
         /// </summary>
-        public char ReadCharNoCrLf() => throw new NotImplementedException();
+        public char ReadCharNoCrLf()
+        {
+            var result = ReadChar();
+            while (result == '\r' || result == '\n')
+            {
+                result = ReadChar();
+            }
+
+            return result;
+        } // method ReadCharNoCrLf
 
         /// <summary>
         /// Временная заглушка.
         /// </summary>
-        public int SavePosition() => throw new NotImplementedException();
+        public int SavePosition() => _position;
 
         /// <summary>
         /// Временная заглушка.
         /// </summary>
-        public void RestorePosition(int saved) => throw new NotImplementedException();
+        public void RestorePosition(int saved) => _position = saved;
 
         #endregion
 

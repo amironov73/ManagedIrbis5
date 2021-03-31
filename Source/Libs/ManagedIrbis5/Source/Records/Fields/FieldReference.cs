@@ -298,7 +298,7 @@ namespace ManagedIrbis
 
             try
             {
-                FieldSpecification fs = new FieldSpecification();
+                var fs = new FieldSpecification();
                 fs.Parse(specification);
                 result = new FieldReference();
                 result.Apply(fs);
