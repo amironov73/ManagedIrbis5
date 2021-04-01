@@ -241,6 +241,7 @@ namespace ManagedIrbis.Readers
         /// <summary>
         /// Книга просрочена?
         /// </summary>
+        [JsonIgnore]
         public bool Expired
         {
             get

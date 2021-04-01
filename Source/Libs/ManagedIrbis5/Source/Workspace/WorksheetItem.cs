@@ -18,7 +18,10 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
@@ -114,6 +117,7 @@ namespace ManagedIrbis.Workspace
     /// <summary>
     /// Строчка в рабочем листе.
     /// </summary>
+    [XmlRoot("line")]
     [DebuggerDisplay("{Tag} {Title} [{Repeatable}][{EditMode}]")]
     public sealed class WorksheetItem
         : IHandmadeSerializable,
@@ -124,60 +128,86 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Числовая метка поля.
         /// </summary>
+        [XmlElement("tag")]
+        [JsonPropertyName("tag")]
         public string? Tag { get; set; }
 
         /// <summary>
         /// Наименование поля.
         /// </summary>
+        [XmlElement("title")]
+        [JsonPropertyName("title")]
         public string? Title { get; set; }
 
         /// <summary>
         /// Повторяемость поля.
         /// </summary>
+        [XmlElement("repeatable")]
+        [JsonPropertyName("repeatable")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public bool Repeatable { get; set; }
 
         /// <summary>
         /// Индекс контекстной помощи.
         /// </summary>
+        [XmlElement("help")]
+        [JsonPropertyName("help")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Help { get; set; }
 
         /// <summary>
         /// Режим ввода.
         /// </summary>
+        [XmlElement("input-mode")]
+        [JsonPropertyName("input-mode")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? EditMode { get; set; }
 
         /// <summary>
         /// Дополнительная информация для расширенных
         /// средств ввода.
         /// </summary>
+        [XmlElement("input-info")]
+        [JsonPropertyName("input-info")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? InputInfo { get; set; }
 
         /// <summary>
         /// ФЛК.
         /// </summary>
+        [XmlElement("formal-verification")]
+        [JsonPropertyName("formal-verification")]
         public string? FormalVerification { get; set; }
 
         /// <summary>
         /// Подсказка - текст помощи (инструкции),
         /// сопровождающий ввод в поле.
         /// </summary>
+        [XmlElement("hint")]
+        [JsonPropertyName("hint")]
         public string? Hint { get; set; }
 
         /// <summary>
         /// Знчение по умолчанию при создании
         /// новой записи.
         /// </summary>
+        [XmlElement("default-value")]
+        [JsonPropertyName("default-value")]
         public string? DefaultValue { get; set; }
 
         /// <summary>
         /// Используется при определенных режимах ввода.
         /// </summary>
+        [XmlElement("reserved")]
+        [JsonPropertyName("reserved")]
         public string? Reserved { get; set; }
 
         /// <summary>
         /// Произвольные пользовательские данные.
         /// </summary>
         [Browsable(false)]
+        [XmlIgnore]
+        [JsonIgnore]
         public object? UserData { get; set; }
 
         #endregion
@@ -250,6 +280,13 @@ namespace ManagedIrbis.Workspace
             return result;
         } // method ParseStream
 
+        /// <summary>
+        /// Should serialize the <see cref="Repeatable"/> field?
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ShouldSerializeRepeatable() => Repeatable;
+
         #endregion
 
         #region IHandmadeSerializable members
@@ -313,6 +350,14 @@ namespace ManagedIrbis.Workspace
 
             return verifier.Result;
         }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString() =>
+            $"{Tag.ToVisibleString()}: {Title.ToVisibleString()} [{Repeatable}][{EditMode.ToVisibleString()}]";
 
         #endregion
 

@@ -152,7 +152,7 @@ namespace AM.Network
                     default:
                         if (c < 256)
                         {
-                            result.Append(char.ToUpper(c));
+                            result.Append(c);
                         }
                         break;
                 }
