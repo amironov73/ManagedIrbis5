@@ -57,6 +57,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// Number of the repeat.
         /// </summary>
         [JsonPropertyName("index")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Index { get; set; }
 
         #endregion

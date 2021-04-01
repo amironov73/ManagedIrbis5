@@ -54,7 +54,7 @@ namespace ManagedIrbis.Gbl
     [DebuggerDisplay("{Name}: {Value}")]
     public sealed class GblParameter
         : IHandmadeSerializable,
-            IVerifiable
+        IVerifiable
     {
         #region Properties
 

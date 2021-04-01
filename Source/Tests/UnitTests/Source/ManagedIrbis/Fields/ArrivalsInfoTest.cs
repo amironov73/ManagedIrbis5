@@ -167,7 +167,7 @@ namespace UnitTests.ManagedIrbis.Fields
             var second = bytes.RestoreObjectFromMemory<ArrivalsInfo>();
             Assert.IsNotNull(second);
             _Compare(first, second!);
-            Assert.IsNull(second.Field);
+            Assert.IsNull(second!.Field);
             Assert.IsNull(second.UserData);
         }
 

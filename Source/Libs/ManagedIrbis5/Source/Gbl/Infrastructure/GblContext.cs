@@ -39,6 +39,26 @@ namespace ManagedIrbis.Gbl.Infrastructure
     {
         #region Properties
 
+        /// <summary>
+        /// Current record.
+        /// </summary>
+        public Record? CurrentRecord { get; set; }
+
+        /// <summary>
+        /// Provider.
+        /// </summary>
+        public ISyncIrbisProvider Provider { get; set; }
+
+        /// <summary>
+        /// Record source.
+        /// </summary>
+        public IRecordSource RecordSource { get; set; }
+
+        /// <summary>
+        /// Logger.
+        /// </summary>
+        public GblLogger Logger { get; set; }
+
         #endregion
 
         #region Construction

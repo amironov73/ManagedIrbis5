@@ -47,7 +47,6 @@ namespace ManagedIrbis.Quality
         /// </summary>
         [XmlAttribute("field")]
         [JsonPropertyName("field")]
-
         public int Field { get; set; }
 
         /// <summary>
@@ -55,6 +54,7 @@ namespace ManagedIrbis.Quality
         /// </summary>
         [XmlAttribute("repeat")]
         [JsonPropertyName("repeat")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Repeat { get; set; }
 
         /// <summary>
@@ -82,6 +82,7 @@ namespace ManagedIrbis.Quality
         /// </summary>
         [XmlAttribute("damage")]
         [JsonPropertyName("damage")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Damage { get; set; }
 
         /// <summary>
@@ -163,8 +164,7 @@ namespace ManagedIrbis.Quality
                 bool throwOnError
             )
         {
-            Verifier<FieldDefect> verifier
-                = new Verifier<FieldDefect>(this, throwOnError);
+            var verifier = new Verifier<FieldDefect>(this, throwOnError);
 
             verifier
                 .Positive(Field, "Field")
