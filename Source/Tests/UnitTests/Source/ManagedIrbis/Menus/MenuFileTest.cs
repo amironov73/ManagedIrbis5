@@ -151,7 +151,7 @@ namespace UnitTests.ManagedIrbis.Menus
         //     string fileName = Path.Combine
         //         (
         //             TestDataPath,
-        //             "ORG.MNU"
+        //             "org.mnu"
         //         );
         //
         //     MenuFile menu = MenuFile

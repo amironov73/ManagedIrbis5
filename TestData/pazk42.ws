@@ -1,11 +1,11 @@
 7
 Дублетность
-@BOuni
-@Index
-@Content
-@KO
-@RD
-@KRV
+@bouni
+@index
+@content
+@ko
+@rd
+@krv
 11
 0
 0

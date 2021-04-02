@@ -32,6 +32,15 @@ namespace ManagedIrbis.Menus
     /// </summary>
     public sealed class OrgMnu
     {
+        #region Constants
+
+        /// <summary>
+        /// Имя файла в дистрибутиве.
+        /// </summary>
+        public const string FileName = "org.mnu";
+
+        #endregion
+
         #region Properties
 
         /// <summary>

@@ -36,7 +36,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void OrgMnu_Construction_2()
         {
-            var path = Path.Combine(Irbis64RootPath, "Datai/Deposit/ORG.MNU");
+            var path = Path.Combine(Irbis64RootPath, "Datai/Deposit/org.mnu");
             var menu = MenuFile.ParseLocalFile(path);
             var org = new OrgMnu(menu);
             Assert.IsNotNull(org.Country);

@@ -77,7 +77,7 @@ namespace UnitTests.ManagedIrbis
             var fileName = Path.Combine
                 (
                     TestDataPath,
-                    "II.TRE"
+                    "ii.tre"
                 );
 
             var tree = TreeUtility.ReadLocalFile

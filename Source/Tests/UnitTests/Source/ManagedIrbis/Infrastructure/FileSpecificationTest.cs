@@ -195,7 +195,7 @@ namespace UnitTests.ManagedIrbis.Infrastructure
         //     specification = new FileSpecification
         //         (
         //             IrbisPath.System,
-        //             "RC.MNU"
+        //             "rc.mnu"
         //         );
         //     Assert.IsTrue(specification.Verify(false));
         //
