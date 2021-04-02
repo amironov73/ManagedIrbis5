@@ -18,7 +18,7 @@ namespace UnitTests.ManagedIrbis
     public class IrbisStopWordsTest
         : Common.CommonUnitTest
     {
-        private const string Ibis = "IBIS.STW";
+        private const string Ibis = "ibis.stw";
 
         [TestMethod]
         public void IrbisStopWords_Construction_1()

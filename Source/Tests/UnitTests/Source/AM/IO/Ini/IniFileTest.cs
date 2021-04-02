@@ -125,7 +125,7 @@ namespace UnitTests.AM.IO.Ini
             var fileName = Path.Combine
                 (
                     TestDataPath,
-                    "IniFile1.ini"
+                    "inifile1.ini"
                 );
             var file = new IniFile(fileName);
 
@@ -324,10 +324,10 @@ namespace UnitTests.AM.IO.Ini
         public void IniFile_WriteModifiedValues_1()
         {
             var fileName = Path.Combine
-            (
-                TestDataPath,
-                "IniFile1.ini"
-            );
+                (
+                    TestDataPath,
+                    "inifile1.ini"
+                );
             var file = new IniFile(fileName);
 
             file["Main", "Greeting"] = "Hello";
@@ -539,7 +539,5 @@ namespace UnitTests.AM.IO.Ini
             Assert.AreEqual("Value222", section2["Parameter2"]);
             Assert.AreEqual("Value3", section2["Parameter3"]);
         }
-
-
     }
 }

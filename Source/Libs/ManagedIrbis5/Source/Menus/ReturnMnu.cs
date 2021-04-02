@@ -40,7 +40,7 @@ namespace ManagedIrbis.Menus
         /// <summary>
         /// Default file name.
         /// </summary>
-        public const string DefaultFileName = "RETURN.MNU";
+        public const string DefaultFileName = "return.mnu";
 
         #endregion
 

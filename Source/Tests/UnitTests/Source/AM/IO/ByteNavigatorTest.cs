@@ -114,7 +114,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ByteNavigator_FromFile_1()
         {
-            string fileName = Path.Combine(TestDataPath, "EMPTY.MST");
+            string fileName = Path.Combine(TestDataPath, "empty.mst");
             ByteNavigator navigator = ByteNavigator.FromFile(fileName);
             Assert.IsFalse(navigator.IsEOF);
             Assert.AreEqual(0, navigator.Position);

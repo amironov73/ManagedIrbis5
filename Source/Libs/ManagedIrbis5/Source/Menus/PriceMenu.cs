@@ -55,7 +55,7 @@ namespace ManagedIrbis.Menus
         /// <summary>
         /// Default file name.
         /// </summary>
-        public const string DefaultFileName = "IZC.MNU";
+        public const string DefaultFileName = "izc.mnu";
 
         #endregion
 

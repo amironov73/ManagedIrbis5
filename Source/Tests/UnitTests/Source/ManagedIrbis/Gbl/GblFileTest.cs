@@ -104,7 +104,7 @@ namespace UnitTests.ManagedIrbis.Gbl
             var fileName = Path.Combine
                 (
                     TestDataPath,
-                    "Del910s.gbl"
+                    "del910s.gbl"
                 );
 
             var gbl = GblFile.ParseLocalFile

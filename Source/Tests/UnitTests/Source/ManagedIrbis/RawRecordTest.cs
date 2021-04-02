@@ -68,7 +68,7 @@ namespace UnitTests.ManagedIrbis
             var fileName = Path.Combine
                 (
                     TestDataPath,
-                    "rawRecord.txt"
+                    "rawrecord.txt"
                 );
             var text = File.ReadAllText
                 (

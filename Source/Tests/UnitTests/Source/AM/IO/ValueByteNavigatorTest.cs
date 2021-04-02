@@ -40,7 +40,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ValueByteNavigator_FromFile_1()
         {
-            var fileName = Path.Combine(TestDataPath, "EMPTY.MST");
+            var fileName = Path.Combine(TestDataPath, "empty.mst");
             var navigator = ValueByteNavigator.FromFile(fileName);
             Assert.IsFalse(navigator.IsEOF);
             Assert.AreEqual(0, navigator.Position);

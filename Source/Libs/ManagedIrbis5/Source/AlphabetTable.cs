@@ -66,7 +66,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Имя файла таблицы по умолчанию.
         /// </summary>
-        public const string DefaultFileName = "ISISACW.TAB";
+        public const string DefaultFileName = "isisacw.tab";
 
         #endregion
 

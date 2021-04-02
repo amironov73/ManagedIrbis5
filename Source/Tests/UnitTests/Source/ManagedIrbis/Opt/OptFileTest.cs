@@ -49,7 +49,7 @@ namespace UnitTests.ManagedIrbis
                 (
                     Irbis64RootPath,
                     "Datai/IBIS",
-                    "WS31.OPT"
+                    "ws31.opt"
                 );
 
             var opt = OptFile.LoadFile(filePath);
