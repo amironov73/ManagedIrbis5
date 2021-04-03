@@ -68,12 +68,11 @@ namespace ManagedIrbis
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
         public ValueTask DisposeAsync()
         {
-            throw new NotImplementedException();
+            return ValueTask.CompletedTask;
         }
 
         public object? GetService(Type serviceType)

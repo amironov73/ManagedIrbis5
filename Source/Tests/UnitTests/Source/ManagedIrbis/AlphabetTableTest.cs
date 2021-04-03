@@ -12,8 +12,8 @@ using Moq;
 
 #nullable enable
 
-// ReSharper disable IdentifierTypo
 // ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
 namespace UnitTests.ManagedIrbis

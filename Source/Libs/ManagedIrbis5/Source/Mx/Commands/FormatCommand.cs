@@ -61,14 +61,13 @@ namespace ManagedIrbis.Mx.Commands
         {
             OnBeforeExecute();
 
-            /*
-
-            string argument = null;
+            string? argument = null;
 
             if (arguments.Length != 0)
             {
                 argument = arguments[0].Text;
             }
+
             if (!string.IsNullOrEmpty(argument))
             {
                 executive.DescriptionFormat = argument;
@@ -76,14 +75,14 @@ namespace ManagedIrbis.Mx.Commands
                 if (executive.Provider.Connected
                     && executive.Records.Count != 0)
                 {
-                    int[] mfns = executive.Records.Select(r => r.Mfn)
+                    var mfns = executive.Records.Select(r => r.Mfn)
                         .ToArray();
-                    string[] formatted = executive.Provider.FormatRecords
+                    var formatted = executive.Provider.FormatRecords
                         (
                             mfns,
                             executive.DescriptionFormat
                         );
-                    for (int i = 0; i < mfns.Length; i++)
+                    for (var i = 0; i < mfns.Length; i++)
                     {
                         executive.Records[i].Description = formatted[i];
                     }
@@ -101,15 +100,7 @@ namespace ManagedIrbis.Mx.Commands
             OnAfterExecute();
 
             return true;
-
-            */
-
-            throw new NotImplementedException();
         }
-
-        #endregion
-
-        #region Object members
 
         #endregion
     }

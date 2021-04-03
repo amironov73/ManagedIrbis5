@@ -28,7 +28,7 @@ namespace UnitTests.AM.IO.Ini
             var second = bytes.RestoreObjectFromMemory<IniFile>();
 
             Assert.IsNotNull(second);
-            Assert.AreEqual(first.FileName, second.FileName);
+            Assert.AreEqual(first.FileName, second!.FileName);
             Assert.AreEqual(first.Count(), second.Count());
         }
 
@@ -236,12 +236,12 @@ namespace UnitTests.AM.IO.Ini
             Assert.AreEqual("Value1", file["Main", "Parameter1"]);
 
             Assert.AreEqual(2, file.Count());
-            Assert.AreEqual(1, file["Main"].Count);
-            Assert.AreEqual(1, file["Aux"].Count);
+            Assert.AreEqual(1, file["Main"]!.Count);
+            Assert.AreEqual(1, file["Aux"]!.Count);
 
             var writer = new StringWriter();
             file.Save(writer);
-            var text = writer.ToString().DosToUnix()
+            var text = writer.ToString().DosToUnix()!
                 .Replace("\n", "|");
 
             Assert.AreEqual
@@ -341,7 +341,7 @@ namespace UnitTests.AM.IO.Ini
             file.WriteModifiedValues(writer);
             const string expected = @"[Main]|Greeting=Hello|Count=123||[Aux]|K1=V1|K2=V2||[Empty]|";
 
-            var actual = writer.ToString().DosToUnix().Replace("\n", "|");
+            var actual = writer.ToString().DosToUnix()!.Replace("\n", "|");
 
             Assert.AreEqual(expected, actual);
 
@@ -484,7 +484,7 @@ namespace UnitTests.AM.IO.Ini
             var file = new IniFile();
             var section = file.CreateSection("Main");
             section.Add("Parameter1", "Value1");
-            section.SetValue("Parameter1", (object)null);
+            section.SetValue("Parameter1", (object?)null);
             section.SetValue("Parameter2", 123);
             Assert.AreEqual
                 (
@@ -514,8 +514,7 @@ namespace UnitTests.AM.IO.Ini
             var section = file.CreateSection("Main");
             section.Add("Parameter1", "Value1");
 
-            string value;
-            Assert.IsTrue(section.TryGetValue("Parameter1", out value));
+            Assert.IsTrue(section.TryGetValue("Parameter1", out var value));
             Assert.AreEqual("Value1", value);
             Assert.IsFalse(section.TryGetValue("Parameter2", out value));
         }

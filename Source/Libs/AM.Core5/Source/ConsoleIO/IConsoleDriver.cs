@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* IConsoleDriver.cs --
+/* IConsoleDriver.cs -- интерфейс абстрактной консоли
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System;
 namespace AM.ConsoleIO
 {
     /// <summary>
-    ///
+    /// Интерфейс абстрактной консоли.
     /// </summary>
     public interface IConsoleDriver
     {
@@ -51,7 +51,6 @@ namespace AM.ConsoleIO
         /// in the console title bar.
         /// </summary>
         string Title { get; set; }
-
 
         #endregion
 

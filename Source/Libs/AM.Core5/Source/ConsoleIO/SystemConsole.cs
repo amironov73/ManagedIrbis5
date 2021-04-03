@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* SystemConsole.cs --
+/* SystemConsole.cs -- драйвер для системной консоли
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +25,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace AM.ConsoleIO
 {
     /// <summary>
-    ///
+    /// Драйвер для системной консоли.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public sealed class SystemConsole
@@ -36,49 +36,25 @@ namespace AM.ConsoleIO
         /// <inheritdoc cref="IConsoleDriver.BackgroundColor" />
         public ConsoleColor BackgroundColor
         {
-            get
-            {
-                return Console.BackgroundColor;
-            }
-            set
-            {
-                Console.BackgroundColor = value;
-            }
+            get => Console.BackgroundColor;
+            set => Console.BackgroundColor = value;
         }
 
         /// <inheritdoc cref="IConsoleDriver.ForegroundColor" />
         public ConsoleColor ForegroundColor
         {
-            get
-            {
-                return Console.ForegroundColor;
-            }
-            set
-            {
-                Console.ForegroundColor = value;
-            }
+            get => Console.ForegroundColor;
+            set => Console.ForegroundColor = value;
         }
 
         /// <inheritdoc cref="IConsoleDriver.KeyAvailable" />
-        public bool KeyAvailable
-        {
-            get
-            {
-                return Console.KeyAvailable;
-            }
-        }
+        public bool KeyAvailable => Console.KeyAvailable;
 
         /// <inheritdoc cref="IConsoleDriver.Title" />
         public string Title
         {
-            get
-            {
-                return Console.Title;
-            }
-            set
-            {
-                Console.Title = value;
-            }
+            get => Console.Title;
+            set => Console.Title = value;
         }
 
         /// <inheritdoc cref="IConsoleDriver.Clear" />
@@ -103,7 +79,7 @@ namespace AM.ConsoleIO
         }
 
         /// <inheritdoc cref="IConsoleDriver.ReadLine" />
-        public string ReadLine()
+        public string? ReadLine()
         {
             return Console.ReadLine();
         }
@@ -111,7 +87,7 @@ namespace AM.ConsoleIO
         /// <inheritdoc cref="IConsoleDriver.Write" />
         public void Write
             (
-                string text
+                string? text
             )
         {
             Console.Write(text);
@@ -124,5 +100,7 @@ namespace AM.ConsoleIO
         }
 
         #endregion
-    }
-}
+
+    } // class SystemConsole
+
+} // namespace AM.ConsoleIO
