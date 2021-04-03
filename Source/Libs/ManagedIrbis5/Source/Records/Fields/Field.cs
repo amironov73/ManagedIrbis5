@@ -599,10 +599,10 @@ namespace ManagedIrbis
                 );
             var result = new StringBuilder (length);
 
-            if (!string.IsNullOrEmpty(Value))
-            {
-                result.Append(Value);
-            }
+            // if (!string.IsNullOrEmpty(Value))
+            // {
+            //     result.Append(Value);
+            // }
 
             foreach (var subField in Subfields)
             {

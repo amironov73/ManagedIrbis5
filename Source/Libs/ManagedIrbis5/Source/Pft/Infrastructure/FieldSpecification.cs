@@ -190,7 +190,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 throw new PftSyntaxException(navigator);
             }
 
-            IndexSpecification result = new IndexSpecification
+            var result = new IndexSpecification
             {
                 Expression = text
             };
@@ -241,37 +241,37 @@ namespace ManagedIrbis.Pft.Infrastructure
                 FieldSpecification right
             )
         {
-            bool result = left.Command == right.Command
-                && PftSerializationUtility.CompareStrings
-                    (
-                        left.Embedded, right.Embedded
-                    )
-                && left.FirstLine == right.FirstLine
-                && left.ParagraphIndent == right.ParagraphIndent
-                && left.Offset == right.Offset
-                && left.Length == right.Length
-                && IndexSpecification.Compare
-                    (
-                        left.FieldRepeat,
-                        right.FieldRepeat
-                    )
-                && left.SubField == right.SubField
-                && IndexSpecification.Compare
-                    (
-                        left.SubFieldRepeat,
-                        right.SubFieldRepeat
-                    )
-                && left.Tag == right.Tag
-                && PftSerializationUtility.CompareStrings
-                    (
-                        left.TagSpecification,
-                        right.TagSpecification
-                    )
-                && PftSerializationUtility.CompareStrings
-                    (
-                        left.SubFieldSpecification,
-                        right.SubFieldSpecification
-                    );
+            var result = left.Command == right.Command
+                         && PftSerializationUtility.CompareStrings
+                         (
+                             left.Embedded, right.Embedded
+                         )
+                         && left.FirstLine == right.FirstLine
+                         && left.ParagraphIndent == right.ParagraphIndent
+                         && left.Offset == right.Offset
+                         && left.Length == right.Length
+                         && IndexSpecification.Compare
+                         (
+                             left.FieldRepeat,
+                             right.FieldRepeat
+                         )
+                         && left.SubField == right.SubField
+                         && IndexSpecification.Compare
+                         (
+                             left.SubFieldRepeat,
+                             right.SubFieldRepeat
+                         )
+                         && left.Tag == right.Tag
+                         && PftSerializationUtility.CompareStrings
+                         (
+                             left.TagSpecification,
+                             right.TagSpecification
+                         )
+                         && PftSerializationUtility.CompareStrings
+                         (
+                             left.SubFieldSpecification,
+                             right.SubFieldSpecification
+                         );
 
             return result;
         }
@@ -321,10 +321,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 TextNavigator navigator
             )
         {
-            int start = navigator.Position;
+            var start = navigator.Position;
             var saved = navigator.SavePosition();
-            char c = navigator.ReadChar();
-            StringBuilder builder = new StringBuilder();
+            var c = navigator.ReadChar();
+            var builder = new StringBuilder();
 
             switch (c)
             {
@@ -357,7 +357,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (c == '[')
             {
-                string text = navigator.ReadUntil
+                var text = navigator.ReadUntil
                     (
                         _openChars,
                         _closeChars,
@@ -451,7 +451,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 navigator.ReadCharNoCrLf();
                 navigator.SkipWhitespace();
 
-                string text = navigator.ReadUntil
+                var text = navigator.ReadUntil
                     (
                         _openChars,
                         _closeChars,
@@ -492,29 +492,27 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 if (c == '[' & ParseSubFieldSpecification)
                 {
-                    string text = navigator.ReadUntil
+                    var text = navigator.ReadUntil
                         (
                             _openChars,
                             _closeChars,
                             _stopChars
                         ).ToString();
-                    if (ReferenceEquals(text, null))
+                    if (string.IsNullOrEmpty(text))
                     {
-                        SubField = c;
+                        var c2 = navigator.PeekCharNoCrLf();
+                        if (c2 == ']')
+                        {
+                            SubFieldSpecification = null;
+                            navigator.ReadCharNoCrLf();
+                        }
+                        else
+                        {
+                            SubField = c;
+                        }
                     }
                     else
                     {
-                        if (string.IsNullOrEmpty(text))
-                        {
-                            Magna.Error
-                                (
-                                    "FieldSpecification::Parse: "
-                                    + "empty subfield specification"
-                                );
-
-                            throw new PftSyntaxException(navigator);
-                        }
-
                         SubFieldSpecification = text;
 
                         navigator.ReadCharNoCrLf();
@@ -546,7 +544,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     navigator.ReadCharNoCrLf();
                     navigator.SkipWhitespace();
 
-                    string text = navigator.ReadUntil
+                    var text = navigator.ReadUntil
                         (
                             _openChars,
                             _closeChars,
@@ -719,7 +717,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             } // c == '('
 
             DONE:
-            int length = navigator.Position - start;
+            var length = navigator.Position - start;
             RawText = navigator.Substring(start, length).ToString();
 
             return true;
@@ -746,10 +744,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 TextNavigator navigator
             )
         {
-            int start = navigator.Position;
+            var start = navigator.Position;
             var saved = navigator.SavePosition();
-            char c = navigator.ReadChar();
-            StringBuilder builder = new StringBuilder();
+            var c = navigator.ReadChar();
+            var builder = new StringBuilder();
 
             switch (c)
             {
@@ -822,7 +820,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 /* c = navigator.PeekChar(); */
             } // c == '^'
 
-            int length = navigator.Position - start;
+            var length = navigator.Position - start;
             RawText = navigator.Substring(start, length).ToString();
 
             return true;
@@ -849,10 +847,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 TextNavigator navigator
             )
         {
-            int start = navigator.Position;
+            var start = navigator.Position;
             var saved = navigator.SavePosition();
-            char c = navigator.ReadChar();
-            StringBuilder builder = new StringBuilder();
+            var c = navigator.ReadChar();
+            var builder = new StringBuilder();
 
             switch (c)
             {
@@ -1017,12 +1015,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                 }
                 else
                 {
-                    bool minus = navigator.PeekChar() == '-';
+                    var minus = navigator.PeekChar() == '-';
                     if (minus)
                     {
                         navigator.ReadChar();
                     }
-                    string indexText = navigator.ReadInteger().ToString();
+                    var indexText = navigator.ReadInteger().ToString();
                     if (string.IsNullOrEmpty(indexText))
                     {
                         Magna.Error
@@ -1034,7 +1032,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         throw new PftSyntaxException(navigator);
                     }
 
-                    int indexValue = int.Parse(indexText);
+                    var indexValue = int.Parse(indexText);
                     if (minus)
                     {
                         indexValue = -indexValue;
@@ -1048,7 +1046,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 }
             }
 
-            int length = navigator.Position - start;
+            var length = navigator.Position - start;
             RawText = navigator.Substring(start, length).ToString();
 
             return true;
@@ -1085,7 +1083,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="ICloneable.Clone" />
         public object Clone()
         {
-            FieldSpecification result
+            var result
                 = (FieldSpecification) MemberwiseClone();
 
             result.FieldRepeat = (IndexSpecification) FieldRepeat.Clone();
@@ -1102,7 +1100,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             result.Append(Command);
             result.Append(Tag);
