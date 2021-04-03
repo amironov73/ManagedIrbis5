@@ -89,6 +89,8 @@ internal class Program
 [![Build status](https://api.travis-ci.org/amironov73/ManagedIrbis5.svg)](https://travis-ci.org/amironov73/ManagedIrbis5/)
 [![GitHub Action](https://github.com/amironov73/ManagedIrbis5/workflows/CI/badge.svg)](https://github.com/amironov73/ManagedIrbis5/actions)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Famironov73%2FManagedIrbis5.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Famironov73%2FManagedIrbis5?ref=badge_shield)
+[![Maintainability](https://api.codeclimate.com/v1/badges/50cc8f9ee8ebc972e037/maintainability)](https://codeclimate.com/github/amironov73/ManagedIrbis5/maintainability)
+[![CodeFactor](https://www.codefactor.io/repository/github/amironov73/managedirbis5/badge)](https://www.codefactor.io/repository/github/amironov73/managedirbis5)
 
 ### License
 
