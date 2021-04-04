@@ -1,14 +1,14 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
+
+using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM;
 using AM.Collections;
-
-// ReSharper disable CheckNamespace
-// ReSharper disable ForCanBeConvertedToForeach
-// ReSharper disable InvokeAsExtensionMethod
-// ReSharper disable PropertyCanBeMadeInitOnly.Local
 
 #nullable enable
 
