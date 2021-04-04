@@ -36,14 +36,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
     {
         #region Private members
 
+        // !AST
         private static readonly byte[] _signature =
         {
             0x21, 0x41, 0x53, 0x54
         };
 
         private static int _CurrentVersion() =>
-            throw new NotImplementedException();
-            //Connection.ClientVersion.Revision;
+            ClientVersion.Version.Build;
 
         #endregion
 
