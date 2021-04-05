@@ -1,0 +1,22 @@
+﻿[
+  {
+    "class": "FormsTests.ClocksTest",
+    "title": "Clocks"
+  },
+  {
+    "class": "FormsTests.BusyStripeTest",
+    "title": "BusyStripe"
+  },
+  {
+    "class": "FormsTests.ColorComboBoxTest",
+    "title": "ColorComboBox"
+  },
+  {
+    "class": "FormsTests.DriveComboBoxTest",
+    "title": "DriveComboBox"
+  },
+  {
+    "class": "FormsTests.FontComboBoxTest",
+    "title": "FontComboBox"
+  }
+]

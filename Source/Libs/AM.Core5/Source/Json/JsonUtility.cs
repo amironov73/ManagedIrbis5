@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System.IO;
 using System.Text.Json;
 
 #endregion
@@ -318,10 +319,12 @@ namespace AM.Json
             (
                 string fileName
             )
+            where T: class
         {
-            // TODO implement
-            throw new System.NotImplementedException();
-        }
+            var content = File.ReadAllText(fileName);
+
+            return JsonSerializer.Deserialize<T>(content).ThrowIfNull();
+        } // method ReadObjectFromFile
 
         /// <summary>
         /// Временная заглушка.

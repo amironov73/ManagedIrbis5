@@ -122,6 +122,21 @@ namespace AM
             => Logger.LogDebug(message, args);
 
         /// <summary>
+        /// Отладочное логирование.
+        /// </summary>
+        [Conditional("DEBUG")]
+        public static void Debug
+            (
+                Func<string> lazy
+            )
+        {
+            if (Logger.IsEnabled(LogLevel.Debug))
+            {
+                Logger.LogDebug(lazy());
+            }
+        } // method Debug
+
+        /// <summary>
         /// Логирует сообщение об ошибке.
         /// </summary>
         public static void Error (string message)
@@ -134,6 +149,20 @@ namespace AM
             => Logger.LogError(message, args);
 
         /// <summary>
+        /// Логирует сообщение об ошибке.
+        /// </summary>
+        public static void Error
+            (
+                Func<string> lazy
+            )
+        {
+            if (Logger.IsEnabled(LogLevel.Error))
+            {
+                Logger.LogError(lazy());
+            }
+        } // method Error
+
+        /// <summary>
         /// Логирует информационное сообщение.
         /// </summary>
         public static void Info (string message)
@@ -144,6 +173,20 @@ namespace AM
         /// </summary>
         public static void Info (string message, params object[] args)
             => Logger.LogInformation(message, args);
+
+        /// <summary>
+        /// Логирует информационное сообщение.
+        /// </summary>
+        public static void Info
+            (
+                Func<string> lazy
+            )
+        {
+            if (Logger.IsEnabled(LogLevel.Information))
+            {
+                Logger.LogInformation(lazy());
+            }
+        } // method Error
 
         /// <summary>
         /// Инициализация.
@@ -177,6 +220,21 @@ namespace AM
             => Logger.LogTrace(message, args);
 
         /// <summary>
+        /// Логирует сообщение об ошибке.
+        /// </summary>
+        [Conditional("TRACE")]
+        public static void Trace
+            (
+                Func<string> lazy
+            )
+        {
+            if (Logger.IsEnabled(LogLevel.Trace))
+            {
+                Logger.LogTrace(lazy());
+            }
+        } // method Trace
+
+        /// <summary>
         /// Регистрация исключения в логах.
         /// </summary>
         public static void TraceException (string text, Exception exception)
@@ -193,6 +251,20 @@ namespace AM
         /// </summary>
         public static void Warning(string message, params object[] args)
             => Logger.LogWarning(message, args);
+
+        /// <summary>
+        /// Логирование предупреждения.
+        /// </summary>
+        public static void Warning
+            (
+                Func<string> lazy
+            )
+        {
+            if (Logger.IsEnabled(LogLevel.Warning))
+            {
+                Logger.LogWarning(lazy());
+            }
+        } // method Warning
 
         #endregion
 
