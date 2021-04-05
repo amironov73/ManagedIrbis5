@@ -1,22 +1,286 @@
 ﻿[
   {
+    "class": "FormsTests.IrbisLoginFormTest",
+    "title": "Login form"
+  },
+  {
+    "class": "FormsTests.IrbisLoginForm2Test",
+    "title": "Login form 2"
+  },
+  {
+    "class": "FormsTests.IrbisBusyFormTest",
+    "title": "Busy form"
+  },
+  {
     "class": "FormsTests.ClocksTest",
     "title": "Clocks"
   },
   {
-    "class": "FormsTests.BusyStripeTest",
-    "title": "BusyStripe"
+    "class": "FormsTests.CollapsibleGroupBoxTest",
+    "title": "Collapsible GroupBox"
   },
   {
     "class": "FormsTests.ColorComboBoxTest",
     "title": "ColorComboBox"
   },
   {
-    "class": "FormsTests.DriveComboBoxTest",
-    "title": "DriveComboBox"
+    "class": "FormsTests.EnumComboBoxTest",
+    "title": "EnumComboBox"
+  },
+  {
+    "class": "FormsTests.EnumListBoxTest",
+    "title": "EnumListBox"
   },
   {
     "class": "FormsTests.FontComboBoxTest",
     "title": "FontComboBox"
+  },
+  {
+    "class": "FormsTests.HatchComboBoxTest",
+    "title": "HatchComboBox"
+  },
+  {
+    "class": "FormsTests.InputBoxTest",
+    "title": "InputBox"
+  },
+  {
+    "class": "FormsTests.JogControlTest",
+    "title": "JogControl"
+  },
+  {
+    "class": "FormsTests.LabelExTest",
+    "title": "LabelEx"
+  },
+  {
+    "class": "FormsTests.SuggestingTextBoxTest",
+    "title": "SuggestingTextBox"
+  },
+  {
+    "class": "FormsTests.DaDataClientTest",
+    "title": "DaData client"
+  },
+  {
+    "class": "FormsTests.ListBoxExTest",
+    "title": "ListBoxEx"
+  },
+  {
+    "class": "FormsTests.ToolStripTest",
+    "title": "ToolStrip items"
+  },
+  {
+    "class": "FormsTests.DataGridViewTest",
+    "title": "DataGridView items"
+  },
+  {
+    "class": "FormsTests.ButtonedTextBoxTest",
+    "title": "ButtonedTextBox"
+  },
+  {
+    "class": "FormsTests.FileNameBoxTest",
+    "title": "FileNameBox"
+  },
+  {
+    "class": "FormsTests.FolderNameBoxTest",
+    "title": "FolderNameBox"
+  },
+  {
+    "class": "FormsTests.BusyStripeTest",
+    "title": "BusyStripe"
+  },
+  {
+    "class": "FormsTests.BottomlessTextBoxTest",
+    "title": "BottomlessTextBox"
+  },
+  {
+    "class": "FormsTests.BindingListSourceTest",
+    "title": "BindingListSource"
+  },
+  {
+    "class": "FormsTests.CheckBoxGroupTest",
+    "title": "CheckBoxGroup"
+  },
+  {
+    "class": "FormsTests.CheckedGroupBoxTest",
+    "title": "CheckedGroupBox"
+  },
+  {
+    "class": "FormsTests.BrowserFormTest",
+    "title": "BrowserForm"
+  },
+  {
+    "class": "FormsTests.LabeledComboBoxTest",
+    "title": "LabeledComboBox"
+  },
+  {
+    "class": "FormsTests.LabeledTextBoxTest",
+    "title": "LabeledTextBox"
+  },
+  {
+    "class": "FormsTests.MeterTest",
+    "title": "Meter"
+  },
+  {
+    "class": "FormsTests.PlainTextEditorTest",
+    "title": "PlainTextEditor"
+  },
+  {
+    "class": "FormsTests.RichTextEditorTest",
+    "title": "RichTextEditor"
+  },
+  {
+    "class": "FormsTests.ProgressCircleTest",
+    "title": "ProgressCircle"
+  },
+  {
+    "class": "FormsTests.DriveComboBoxTest",
+    "title": "DriveComboBox"
+  },
+  {
+    "class": "FormsTests.ExceptionBoxTest",
+    "title": "ExceptionBox"
+  },
+  {
+    "class": "FormsTests.PopupFormTest",
+    "title": "PopupForm"
+  },
+  {
+    "class": "FormsTests.PictureViewFormTest",
+    "title": "PictureViewForm"
+  },
+  {
+    "class": "FormsTests.RadioGroupTest",
+    "title": "RadioGroup"
+  },
+  {
+    "class": "FormsTests.StringGridTest",
+    "title": "StringGrid"
+  },
+  {
+    "class": "FormsTests.PropertyBoxTest",
+    "title": "PropertyBox"
+  },
+  {
+    "class": "FormsTests.PickListTest",
+    "title": "PickList"
+  },
+  {
+    "class": "FormsTests.RainbowControlTest",
+    "title": "RainbowControl"
+  },
+  {
+    "class": "FormsTests.ThermometerTest",
+    "title": "Thermometer"
+  },
+  {
+    "class": "FormsTests.TextBoxPlusTest",
+    "title": "TextBoxPlus"
+  },
+  {
+    "class": "FormsTests.ConsoleControlTest",
+    "title": "ConsoleControl - test 1"
+  },
+  {
+    "class": "FormsTests.ConsoleControlTest2",
+    "title": "ConsoleControl - test 2"
+  },
+  {
+    "class": "FormsTests.ConsoleControlTest3",
+    "title": "ConsoleControl - test 3"
+  },
+  {
+    "class": "FormsTests.ConsoleFormTest",
+    "title": "ConsoleForm - test 1"
+  },
+  {
+    "class": "FormsTests.ConsoleFormTest2",
+    "title": "ConsoleForm - test 2"
+  },
+  {
+    "class": "FormsTests.ConsoleFormTest3",
+    "title": "ConsoleForm - test 3"
+  },
+  {
+    "class": "FormsTests.DictionaryPanelTest",
+    "title": "DictionaryPanel"
+  },
+  {
+    "class": "FormsTests.DictionaryFormTest",
+    "title": "DictionaryForm - test 1"
+  },
+  {
+    "class": "FormsTests.DictionaryFormTest2",
+    "title": "DictionaryForm - test 2"
+  },
+  {
+    "class": "FormsTests.MenuFormTest",
+    "title": "MenuForm"
+  },
+  {
+    "class": "FormsTests.WssFormTest",
+    "title": "WssForm"
+  },
+  {
+    "class": "FormsTests.FoundPanelTest",
+    "title": "FoundPanel"
+  },
+  {
+    "class": "FormsTests.PreviewPanelTest",
+    "title": "PreviewPanel"
+  },
+  {
+    "class": "FormsTests.ConsoleControlOutputTest",
+    "title": "ConsoleControlOutput"
+  },
+  {
+    "class": "FormsTests.ScrollControlTest",
+    "title": "ScrollControl"
+  },
+  {
+    "class": "FormsTests.HabitualDataGridViewTest",
+    "title": "HabitualDataGridView"
+  },
+  {
+    "class": "FormsTests.PagingDataGridViewTest",
+    "title": "PagingDataGridView"
+  },
+  {
+    "class": "FormsTests.DragMoveTest",
+    "title": "DragMove"
+  },
+  {
+    "class": "FormsTests.PftEditorControlTest",
+    "title": "PftEditorControl"
+  },
+  {
+    "class": "FormsTests.TextBoxWithButtonTest",
+    "title": "TextBoxWithButton"
+  },
+  {
+    "class": "FormsTests.FieldPainterTest",
+    "title": "FieldPainter"
+  },
+  {
+    "class": "FormsTests.EventedTextBoxTest",
+    "title": "EventedTextBox"
+  },
+  {
+    "class": "FormsTests.BusyControllerTest",
+    "title": "BusyControllerTest"
+  },
+  {
+    "class": "FormsTests.InputLanguageIndicatorTest",
+    "title": "InputLanguageIndicatorTest"
+  },
+  {
+    "class": "FormsTests.InputLanguageUtilityTest",
+    "title": "InputLanguageUtilityTest"
+  },
+  {
+    "class": "FormsTests.SimplestMarcEditorTest",
+    "title": "SimplestMarcEditorTest"
+  },
+  {
+    "class": "FormsTests.PingPlotterTest",
+    "title": "PingPlotterTest"
   }
 ]

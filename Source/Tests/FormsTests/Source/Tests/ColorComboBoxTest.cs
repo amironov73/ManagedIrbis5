@@ -35,8 +35,10 @@ namespace FormsTests
                 IWin32Window? ownerWindow
             )
         {
-            using var form = new Form();
-            form.Size = new Size(800, 600);
+            using var form = new Form
+            {
+                Size = new Size(800, 600)
+            };
 
             var colorBox = new ColorComboBox
             {
