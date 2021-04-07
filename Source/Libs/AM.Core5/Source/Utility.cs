@@ -2514,6 +2514,39 @@ namespace AM
         } // method RandomIdentifier
 
         /// <summary>
+        /// Unwrap the <see cref="AggregateException"/>
+        /// (or do nothing if not aggregate).
+        /// </summary>
+        public static Exception Unwrap
+            (
+                Exception exception
+            )
+        {
+            if (exception is AggregateException aggregate)
+            {
+                aggregate = aggregate.Flatten();
+
+                aggregate.Handle
+                    (
+                        ex =>
+                            {
+                                Magna.TraceException
+                                    (
+                                        "Utility::Unwrap",
+                                        ex
+                                    );
+
+                                return true;
+                            }
+                    );
+
+                return aggregate.InnerExceptions[0];
+            }
+
+            return exception;
+        } // method Unwrap
+
+        /// <summary>
         /// Универсальное длинное представление даты/времени.
         /// </summary>
         [Pure]
