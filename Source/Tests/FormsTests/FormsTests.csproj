@@ -28,6 +28,10 @@
       <Content Include="tests.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Images\sherlock.jpg" />
+      <Content Include="Images\sherlock.jpg">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

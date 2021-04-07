@@ -28,7 +28,7 @@ namespace FormsTests
     public sealed class ClocksTest
         : IFormsTest
     {
-        #region IUITest members
+        #region IFormsTest members
 
         public void RunTest
             (

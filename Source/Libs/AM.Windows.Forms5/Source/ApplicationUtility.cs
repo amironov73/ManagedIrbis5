@@ -464,6 +464,78 @@ namespace AM.Windows.Forms
                 );
         } // method WaitFor
 
+        /// <summary>
+        /// Determines whether secondary screen present.
+        /// </summary>
+        /// <value><c>true</c> if secondary screen present;
+        /// otherwise, <c>false</c>.</value>
+        public static bool HaveSecondaryScreen => SecondaryScreen is not null;
+
+        /// <summary>
+        /// Gets the secondary screen.
+        /// </summary>
+        /// <value>The secondary screen or <c>null</c> if none.
+        /// </value>
+        public static Screen? SecondaryScreen
+        {
+            get
+            {
+                foreach (Screen screen in Screen.AllScreens)
+                {
+                    if (!screen.Primary)
+                    {
+                        return screen;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Moves given form window to the primary screen.
+        /// </summary>
+        public static void MoveToPrimaryScreen
+            (
+                Form form
+            )
+        {
+            MoveToScreen(Screen.PrimaryScreen, form);
+        }
+
+        /// <summary>
+        /// Moves form window to given screen.
+        /// </summary>
+        public static void MoveToScreen
+            (
+                Screen screen,
+                Form form
+            )
+        {
+            form.Location = screen.WorkingArea.Location;
+        }
+
+        /// <summary>
+        /// Moves given form window to secondary screen (if present).
+        /// </summary>
+        /// <param name="form">The form.</param>
+        /// <returns><c>true</c> on success, <c>false</c>
+        /// on failure (e.g. no secondary screen present).</returns>
+        public static bool MoveToSecondaryScreen
+            (
+                Form form
+            )
+        {
+            Screen secondaryScreen = SecondaryScreen;
+            if (secondaryScreen != null)
+            {
+                MoveToScreen(secondaryScreen, form);
+                return true;
+            }
+
+            return false;
+        }
+
         #endregion
 
     } // class ApplicationUtility

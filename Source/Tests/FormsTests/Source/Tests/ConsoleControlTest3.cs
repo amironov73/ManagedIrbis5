@@ -24,7 +24,7 @@ namespace FormsTests
     public sealed class ConsoleControlTest3
         : IFormsTest
     {
-        #region IUITest members
+        #region IFormsTest members
 
         public void RunTest
             (

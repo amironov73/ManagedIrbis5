@@ -23,7 +23,7 @@ namespace FormsTests
     public sealed class ThermometerTest
         : IFormsTest
     {
-        #region IUITest members
+        #region IFormsTest members
 
         public void RunTest
             (
