@@ -87,6 +87,32 @@ namespace ManagedIrbis
 
         #endregion
 
+        #region Construction
+
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
+        public SubField()
+        {
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="code">Код подполя.</param>
+        /// <param name="value">Значение подполя (опционально)</param>
+        public SubField
+            (
+                char code,
+                string? value = default
+            )
+        {
+            Code = code;
+            Value = value;
+        } // constructor
+
+        #endregion
+
         #region Public methods
 
         /// <summary>

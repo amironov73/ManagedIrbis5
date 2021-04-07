@@ -19,6 +19,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -42,7 +43,8 @@ namespace ManagedIrbis
     /// </summary>
     public class Field
         : IHandmadeSerializable,
-        IReadOnly<Field>
+        IReadOnly<Field>,
+        IEnumerable<SubField>
     {
         #region Constants
 
@@ -129,7 +131,221 @@ namespace ManagedIrbis
 
         #endregion
 
+        #region Construction
+
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
+        public Field()
+        {
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="value">Значение поля до первого разделителя
+        /// (опционально).</param>
+        public Field
+            (
+                int tag,
+                string? value = default
+            )
+        {
+            Tag = tag;
+            Value = value;
+        } // constructor
+
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="subfield1"></param>
+        public Field
+            (
+                int tag,
+                SubField subfield1
+            )
+        {
+            Tag = tag;
+            Subfields.Add(subfield1);
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="subfield1"></param>
+        /// <param name="subfield2"></param>
+        public Field
+            (
+                int tag,
+                SubField subfield1,
+                SubField subfield2
+            )
+        {
+            Tag = tag;
+            Subfields.Add(subfield1);
+            Subfields.Add(subfield2);
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="subfield1"></param>
+        /// <param name="subfield2"></param>
+        /// <param name="subfield3"></param>
+        public Field
+            (
+                int tag,
+                SubField subfield1,
+                SubField subfield2,
+                SubField subfield3
+            )
+        {
+            Tag = tag;
+            Subfields.Add(subfield1);
+            Subfields.Add(subfield2);
+            Subfields.Add(subfield3);
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="subfields">Подполя.</param>
+        public Field
+            (
+                int tag,
+                params SubField[] subfields
+            )
+        {
+            Tag = tag;
+            Subfields.AddRange(subfields);
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code1">Код подполя.</param>
+        /// <param name="value1">Значение подполя (опционально).</param>
+        public Field
+            (
+                int tag,
+                char code1,
+                string? value1 = default
+            )
+        {
+            Tag = tag;
+            Subfields.Add(new SubField(code1, value1));
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code1">Код подполя.</param>
+        /// <param name="value1">Значение подполя.</param>
+        /// <param name="code2">Код подполя.</param>
+        /// <param name="value2">Значение подполя (опционально).</param>
+        public Field
+            (
+                int tag,
+                char code1,
+                string? value1,
+                char code2,
+                string? value2 = default
+            )
+        {
+            Tag = tag;
+            Subfields.Add(new SubField(code1, value1));
+            Subfields.Add(new SubField(code2, value2));
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code1">Код подполя.</param>
+        /// <param name="value1">Значение подполя.</param>
+        /// <param name="code2">Код подполя.</param>
+        /// <param name="value2">Значение подполя.</param>
+        /// <param name="code3">Код подполя.</param>
+        /// <param name="value3">Значение подполя (опционально).</param>
+        public Field
+            (
+                int tag,
+                char code1,
+                string? value1,
+                char code2,
+                string? value2,
+                char code3,
+                string? value3 = default
+            )
+        {
+            Tag = tag;
+            Subfields.Add(new SubField(code1, value1));
+            Subfields.Add(new SubField(code2, value2));
+            Subfields.Add(new SubField(code3, value3));
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="subfields">Коды и значения подполей.</param>
+        public Field
+            (
+                int tag,
+                params string?[] subfields
+            )
+        {
+            Tag = tag;
+            for (var i = 0; i < subfields.Length; i += 2)
+            {
+                var code = subfields[i]![0];
+                var value = subfields[i + 1];
+                Subfields.Add(new SubField(code, value));
+            }
+        } // constructor
+
+        #endregion
+
         #region Public methods
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
+        /// <param name="subfield">Добавляемое подполе.</param>
+        /// <returns>this</returns>
+        public Field Add
+            (
+                SubField subfield
+            )
+        {
+            Subfields.Add(subfield);
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
+        /// <param name="code">Код подполя.</param>
+        /// <param name="value">Значение подполя (опционально).</param>
+        /// <returns>this</returns>
+        public Field Add
+            (
+                char code,
+                string? value = default
+            )
+        {
+            Subfields.Add(new SubField(code, value));
+            return this;
+        } // method Add
+
 
         /// <summary>
         /// Assign the field from another.
@@ -678,6 +894,16 @@ namespace ManagedIrbis
                 throw new ReadOnlyException();
             }
         } // method ThrowIfReadOnly
+
+        #endregion
+
+        #region IEnumerable<SubField> members
+
+        /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        public IEnumerator<SubField> GetEnumerator() => Subfields.GetEnumerator();
 
         #endregion
 

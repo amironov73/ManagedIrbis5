@@ -128,12 +128,26 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
-        /// Добавление поля в запись.
+        /// Установка статуса записи.
+        /// </summary>
+        /// <param name="status">Новый статус записи.</param>
+        /// <returns>this</returns>
+        public Record Add
+            (
+                RecordStatus status
+            )
+        {
+            Status = status;
+            return this;
+        }
+
+        /// <summary>
+        /// Добавление поля в конец записи.
         /// </summary>
         /// <returns>
         /// Свежедобавленное поле (для цепочечных вызовов).
         /// </returns>
-        public Field Add
+        public Record Add
             (
                 int tag,
                 string? value = default
@@ -141,11 +155,199 @@ namespace ManagedIrbis
         {
             Sure.Positive(tag, nameof(tag));
 
-            var result = new Field { Tag = tag };
-            result.DecodeBody(value);
-            Fields.Add(result);
+            var field = new Field(tag);
+            field.DecodeBody(value);
+            Fields.Add(field);
 
-            return result;
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление поля в конец записи.
+        /// </summary>
+        /// <returns>
+        /// this (для цепочечных вызовов).
+        /// </returns>
+        public Record Add
+            (
+                int tag,
+                SubField subfield1
+            )
+        {
+            Sure.Positive(tag, nameof(tag));
+
+            var field = new Field(tag) { subfield1 };
+            Fields.Add(field);
+
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление полей в конец записи.
+        /// </summary>
+        /// <returns>
+        /// this (для цепочечных вызовов).
+        /// </returns>
+        public Record Add
+            (
+                int tag,
+                SubField subfield1,
+                SubField subfield2
+            )
+        {
+            Sure.Positive(tag, nameof(tag));
+
+            var field = new Field(tag) { subfield1, subfield2 };
+            Fields.Add(field);
+
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление полей в конец записи.
+        /// </summary>
+        /// <returns>
+        /// this (для цепочечных вызовов).
+        /// </returns>
+        public Record Add
+            (
+                int tag,
+                SubField subfield1,
+                SubField subfield2,
+                SubField subfield3
+            )
+        {
+            Sure.Positive(tag, nameof(tag));
+
+            var field = new Field(tag) { subfield1, subfield2, subfield3 };
+            Fields.Add(field);
+
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление полей в конец записи.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="subfields">Подполя.</param>
+        /// <returns>this (для цепочечных вызовов).</returns>
+        public Record Add
+            (
+                int tag,
+                params SubField[] subfields
+            )
+        {
+            Sure.Positive(tag, nameof(tag));
+
+            var field = new Field(tag);
+            field.Subfields.AddRange(subfields);
+            Fields.Add(field);
+
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление поля в конец записи.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code">Код подполя.</param>
+        /// <param name="value">Значение подполя (опционально).</param>
+        /// <returns>this</returns>
+        public Record Add
+            (
+                int tag,
+                char code,
+                string? value = default
+            )
+        {
+            Sure.Positive(tag, nameof(tag));
+
+            var field = new Field(tag);
+            field.Subfields.Add(new SubField(code, value));
+            Fields.Add(field);
+
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление поля в конец записи.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code1">Код подполя.</param>
+        /// <param name="value1">Значение подполя.</param>
+        /// <param name="code2">Код подполя.</param>
+        /// <param name="value2">Значение подполя (опционально).</param>
+        /// <returns>this</returns>
+        public Record Add
+            (
+                int tag,
+                char code1,
+                string? value1,
+                char code2,
+                string? value2 = default
+            )
+        {
+            Sure.Positive(tag, nameof(tag));
+
+            var field = new Field(tag);
+            field.Subfields.Add(new SubField(code1, value1));
+            field.Subfields.Add(new SubField(code2, value2));
+            Fields.Add(field);
+
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление поля в конец записи.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code1">Код подполя.</param>
+        /// <param name="value1">Значение подполя.</param>
+        /// <param name="code2">Код подполя.</param>
+        /// <param name="value2">Значение подполя.</param>
+        /// <param name="code3">Код подполя.</param>
+        /// <param name="value3">Значение подполя (опционально).</param>
+        /// <returns>this</returns>
+        public Record Add
+            (
+                int tag,
+                char code1,
+                string? value1,
+                char code2,
+                string? value2,
+                char code3,
+                string? value3 = default
+            )
+        {
+            Sure.Positive(tag, nameof(tag));
+
+            var field = new Field(tag);
+            field.Subfields.Add(new SubField(code1, value1));
+            field.Subfields.Add(new SubField(code2, value2));
+            field.Subfields.Add(new SubField(code3, value3));
+            Fields.Add(field);
+
+            return this;
+        } // method Add
+
+        /// <summary>
+        /// Добавление поля в конец записи.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="subfields">Коды и значения подполей.</param>
+        /// <returns>this (для цепочечных вызовов)</returns>
+        public Record Add
+            (
+                int tag,
+                string?[] subfields
+            )
+        {
+            Sure.Positive(tag, nameof(tag));
+
+            var field = new Field(tag, subfields);
+            Fields.Add(field);
+
+            return this;
         } // method Add
 
         /// <summary>
