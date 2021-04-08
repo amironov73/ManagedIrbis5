@@ -40,6 +40,8 @@ namespace ManagedIrbis.Client
     public class LocalProvider
         : ISyncIrbisProvider
     {
+        public event EventHandler? Disposing;
+
         public LocalProvider()
         {
         }

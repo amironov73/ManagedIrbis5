@@ -42,6 +42,7 @@ namespace ManagedIrbis
     [XmlRoot("connection")]
     public sealed class ConnectionSettings
         : IHandmadeSerializable,
+        IIrbisConnectionSettings,
         IVerifiable
     {
         #region Constants
@@ -167,7 +168,18 @@ namespace ManagedIrbis
 
         #endregion
 
+        #region IIrbisConnectionSettings members
+
+        int IIrbisConnectionSettings.ClientId => _clientId;
+
+        int IIrbisConnectionSettings.QueryId => _queryId;
+
+        #endregion
+
         #region Private members
+
+        private int _clientId;
+        private int _queryId;
 
         private static void _Add
             (

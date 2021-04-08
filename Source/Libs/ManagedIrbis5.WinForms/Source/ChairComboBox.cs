@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* ChairComboBox.cs -- выпадающий список кафедр обслуживания
  * Ars Magna project, http://arsmagna.ru

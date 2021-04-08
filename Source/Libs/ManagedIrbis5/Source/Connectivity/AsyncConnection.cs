@@ -50,6 +50,9 @@ namespace ManagedIrbis
         /// </summary>
         public event EventHandler? BusyChanged;
 
+        /// <inheritdoc cref="IBasicIrbisProvider.Disposing"/>
+        public event EventHandler? Disposing;
+
         #endregion
 
         #region Properties
@@ -487,6 +490,8 @@ namespace ManagedIrbis
                 }
 
                 Connected = false;
+
+                Disposing?.Invoke(this, EventArgs.Empty);
             }
 
             return true;

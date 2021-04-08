@@ -44,6 +44,11 @@ namespace ManagedIrbis
         /// </summary>
         event EventHandler? BusyChanged;
 
+        /// <summary>
+        /// Событие, возникающее при освобождении провайдера.s
+        /// </summary>
+        event EventHandler? Disposing;
+
         #endregion
 
         #region Properties

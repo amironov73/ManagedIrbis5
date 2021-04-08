@@ -43,6 +43,8 @@ namespace ManagedIrbis
     {
         #region ISyncIrbisProvider members
 
+        public event EventHandler? Disposing;
+
         public PlatformAbstractionLayer PlatformAbstraction =>
             throw new NotImplementedException();
 
