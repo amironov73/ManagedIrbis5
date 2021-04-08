@@ -1,17 +1,5 @@
 ﻿[
   {
-    "class": "FormsTests.IrbisLoginFormTest",
-    "title": "Login form"
-  },
-  {
-    "class": "FormsTests.IrbisLoginForm2Test",
-    "title": "Login form 2"
-  },
-  {
-    "class": "FormsTests.IrbisBusyFormTest",
-    "title": "Busy form"
-  },
-  {
     "class": "FormsTests.ClocksTest",
     "title": "Clocks"
   },
@@ -200,32 +188,8 @@
     "title": "ConsoleForm - test 3"
   },
   {
-    "class": "FormsTests.DictionaryPanelTest",
-    "title": "DictionaryPanel"
-  },
-  {
-    "class": "FormsTests.DictionaryFormTest",
-    "title": "DictionaryForm - test 1"
-  },
-  {
-    "class": "FormsTests.DictionaryFormTest2",
-    "title": "DictionaryForm - test 2"
-  },
-  {
     "class": "FormsTests.MenuFormTest",
     "title": "MenuForm"
-  },
-  {
-    "class": "FormsTests.WssFormTest",
-    "title": "WssForm"
-  },
-  {
-    "class": "FormsTests.FoundPanelTest",
-    "title": "FoundPanel"
-  },
-  {
-    "class": "FormsTests.PreviewPanelTest",
-    "title": "PreviewPanel"
   },
   {
     "class": "FormsTests.ConsoleControlOutputTest",
@@ -246,10 +210,6 @@
   {
     "class": "FormsTests.DragMoveTest",
     "title": "DragMove"
-  },
-  {
-    "class": "FormsTests.PftEditorControlTest",
-    "title": "PftEditorControl"
   },
   {
     "class": "FormsTests.TextBoxWithButtonTest",
@@ -274,13 +234,5 @@
   {
     "class": "FormsTests.InputLanguageUtilityTest",
     "title": "InputLanguageUtilityTest"
-  },
-  {
-    "class": "FormsTests.SimplestMarcEditorTest",
-    "title": "SimplestMarcEditorTest"
-  },
-  {
-    "class": "FormsTests.PingPlotterTest",
-    "title": "PingPlotterTest"
   }
 ]

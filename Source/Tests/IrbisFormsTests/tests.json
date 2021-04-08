@@ -1,0 +1,50 @@
+﻿[
+  {
+    "class": "IrbisFormsTests.IrbisLoginFormTest",
+    "title": "Login form"
+  },
+  {
+    "class": "IrbisFormsTests.IrbisLoginForm2Test",
+    "title": "Login form 2"
+  },
+  {
+    "class": "IrbisFormsTests.IrbisBusyFormTest",
+    "title": "Busy form"
+  },
+  {
+    "class": "IrbisFormsTests.DictionaryPanelTest",
+    "title": "DictionaryPanel"
+  },
+  {
+    "class": "IrbisFormsTests.DictionaryFormTest",
+    "title": "DictionaryForm - test 1"
+  },
+  {
+    "class": "IrbisFormsTests.DictionaryFormTest2",
+    "title": "DictionaryForm - test 2"
+  },
+  {
+    "class": "IrbisFormsTests.WssFormTest",
+    "title": "WssForm"
+  },
+  {
+    "class": "IrbisFormsTests.FoundPanelTest",
+    "title": "FoundPanel"
+  },
+  {
+    "class": "IrbisFormsTests.PreviewPanelTest",
+    "title": "PreviewPanel"
+  },
+  {
+    "class": "IrbisFormsTests.FieldPainterTest",
+    "title": "FieldPainter"
+  },
+  {
+    "class": "IrbisFormsTests.SimplestMarcEditorTest",
+    "title": "SimplestMarcEditor"
+  },
+  {
+    "class": "IrbisFormsTests.PingPlotterTest",
+    "title": "PingPlotterTest"
+  }
+]

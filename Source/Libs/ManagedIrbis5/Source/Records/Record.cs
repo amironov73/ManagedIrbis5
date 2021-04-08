@@ -27,7 +27,7 @@ using System.Xml.Serialization;
 
 using AM;
 using AM.Collections;
-
+using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 
 using static ManagedIrbis.RecordStatus;
@@ -660,7 +660,7 @@ namespace ManagedIrbis
 
         public string ToPlainText()
         {
-            throw new NotImplementedException();
+            return PlainText.ToPlainText(this);
         }
 
         #endregion
