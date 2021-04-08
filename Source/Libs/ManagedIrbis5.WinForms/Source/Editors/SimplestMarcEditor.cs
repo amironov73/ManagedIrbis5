@@ -1,0 +1,123 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
+/* SimplestMarcEditor.cs --
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.Collections.Generic;
+using System.Windows.Forms;
+
+#endregion
+
+#nullable enable
+
+namespace ManagedIrbis.WinForms.Editors
+{
+    /// <summary>
+    ///
+    /// </summary>
+    public partial class SimplestMarcEditor
+        : UserControl
+    {
+        #region Properties
+
+        /// <summary>
+        /// Whether the editor is read-only.
+        /// </summary>
+        public bool ReadOnly
+        {
+            get { return _gridView.ReadOnly; }
+            set
+            {
+                _bindingNavigator.Enabled = !value;
+                _gridView.ReadOnly = value;
+            }
+        }
+
+        #endregion
+
+        #region Constructions
+
+        /// <summary>
+        ///
+        /// </summary>
+        public SimplestMarcEditor()
+        {
+            InitializeComponent();
+        }
+
+        #endregion
+
+        #region Private members
+
+        private List<Field> _originalFields;
+
+        private List<FieldItem> _items;
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Get the fields.
+        /// </summary>
+        public void GetFields
+            (
+                List<Field> collection
+            )
+        {
+            //collection.BeginUpdate();
+            collection.Clear();
+            //collection.EnsureCapacity(_items.Count);
+
+            foreach (FieldItem item in _items)
+            {
+                int tag = item.Tag;
+                string text = item.Text;
+
+                var field = new Field(tag);
+                field.DecodeBody(text);
+                //if (field.Verify(false))
+                {
+                    collection.Add(field);
+                }
+            }
+
+            //collection.EndUpdate();
+        }
+
+        /// <summary>
+        /// Set the fields.
+        /// </summary>
+        public void SetFields
+            (
+                List<Field> collection
+            )
+        {
+            _originalFields = collection;
+            List<FieldItem> list = new List<FieldItem>(collection.Count);
+            foreach (var field in collection)
+            {
+                FieldItem item = new FieldItem
+                {
+                    Tag = field.Tag,
+                    Text = field.ToText()
+                };
+                list.Add(item);
+            }
+            _items = list;
+            _bindingSource.DataSource = _items;
+        }
+
+        #endregion
+    }
+}
