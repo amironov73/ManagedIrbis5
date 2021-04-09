@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* EditMode.cs -- режим редактирования поля/подполя
+/* EditMode.cs -- код режима редактирования поля/подполя
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,7 @@ namespace ManagedIrbis.Workspace
     //
 
     /// <summary>
-    /// Режим редактирования поля/подполя.
+    /// Код режима редактирования поля/подполя.
     /// </summary>
     public enum EditMode
     {

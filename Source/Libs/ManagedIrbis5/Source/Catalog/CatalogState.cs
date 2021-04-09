@@ -28,7 +28,7 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Catalog
 {
     /// <summary>
     /// State of the catalog.
