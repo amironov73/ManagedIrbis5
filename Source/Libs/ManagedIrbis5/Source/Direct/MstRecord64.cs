@@ -18,7 +18,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
+
+using AM.IO;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -96,153 +101,148 @@ namespace ManagedIrbis.Direct
 
         #region Public methods
 
-        ///// <summary>
-        ///// Decode the field.
-        ///// </summary>
-        //public RecordField DecodeField
-        //    (
-        //        MstDictionaryEntry64 entry
-        //    )
-        //{
-        //    RecordField result = RecordField.Parse
-        //        (
-        //            entry.Tag,
-        //            entry.Text
-        //        );
+        /// <summary>
+        /// Decode the field.
+        /// </summary>
+        public Field DecodeField
+            (
+                MstDictionaryEntry64 entry
+            )
+        {
+            var result = new Field(entry.Tag);
+            result.DecodeBody(entry.Text);
 
-        //    return result;
-        //}
+            return result;
+        }
 
-        ///// <summary>
-        ///// Decode the record.
-        ///// </summary>
-        //public Record DecodeRecord()
-        //{
-        //    Record result = new Record
-        //    {
-        //        Mfn = Leader.Mfn,
-        //        Status = (RecordStatus)Leader.Status,
-        //        PreviousOffset = Leader.Previous,
-        //        Version = Leader.Version
-        //    };
+        /// <summary>
+        /// Decode the record.
+        /// </summary>
+        public Record DecodeRecord()
+        {
+            Record result = new Record
+            {
+                Mfn = Leader.Mfn,
+                Status = (RecordStatus)Leader.Status,
+                Version = Leader.Version
+            };
 
-        //    result.Fields.BeginUpdate();
-        //    result.Fields.EnsureCapacity(Dictionary.Count);
+            // result.Fields.BeginUpdate();
+            // result.Fields.EnsureCapacity(Dictionary.Count);
 
-        //    foreach (MstDictionaryEntry64 entry in Dictionary)
-        //    {
-        //        RecordField field = DecodeField(entry);
-        //        result.Fields.Add(field);
-        //    }
+            foreach (var entry in Dictionary)
+            {
+                var field = DecodeField(entry);
+                result.Fields.Add(field);
+            }
 
-        //    result.Fields.EndUpdate();
+            // result.Fields.EndUpdate();
 
-        //    return result;
-        //}
+            return result;
+        }
 
-        ///// <summary>
-        ///// Encode the field.
-        ///// </summary>
-        //public static MstDictionaryEntry64 EncodeField
-        //    (
-        //        RecordField field
-        //    )
-        //{
-        //    MstDictionaryEntry64 result = new MstDictionaryEntry64
-        //    {
-        //        Tag = field.Tag,
-        //        Text = field.ToText()
-        //    };
+        /// <summary>
+        /// Encode the field.
+        /// </summary>
+        public static MstDictionaryEntry64 EncodeField
+            (
+                Field field
+            )
+        {
+            var result = new MstDictionaryEntry64
+            {
+                Tag = field.Tag,
+                Text = field.ToText()
+            };
 
-        //    return result;
-        //}
+            return result;
+        }
 
-        ///// <summary>
-        /////
-        ///// </summary>
-        //public static MstRecord64 EncodeRecord
-        //    (
-        //        Record record
-        //    )
-        //{
-        //    MstRecordLeader64 leader = new MstRecordLeader64
-        //    {
-        //        Mfn = record.Mfn,
-        //        Status = (int)record.Status,
-        //        Previous = record.PreviousOffset,
-        //        Version = record.Version
-        //    };
-        //    MstRecord64 result = new MstRecord64
-        //    {
-        //        Leader = leader
-        //    };
+        /// <summary>
+        ///
+        /// </summary>
+        public static MstRecord64 EncodeRecord
+            (
+                Record record
+            )
+        {
+            var leader = new MstRecordLeader64
+            {
+                Mfn = record.Mfn,
+                Status = (int)record.Status,
+                Version = record.Version
+            };
+            var result = new MstRecord64
+            {
+                Leader = leader
+            };
 
-        //    if (result.Dictionary.Capacity < record.Fields.Count)
-        //    {
-        //        result.Dictionary.Capacity = record.Fields.Count;
-        //    }
-        //    foreach (RecordField field in record.Fields)
-        //    {
-        //        MstDictionaryEntry64 entry = EncodeField(field);
-        //        result.Dictionary.Add(entry);
-        //    }
+            if (result.Dictionary.Capacity < record.Fields.Count)
+            {
+                result.Dictionary.Capacity = record.Fields.Count;
+            }
+            foreach (var field in record.Fields)
+            {
+                var entry = EncodeField(field);
+                result.Dictionary.Add(entry);
+            }
 
-        //    return result;
-        //}
+            return result;
+        }
 
-        ///// <summary>
-        ///// Prepare the record for serialization.
-        ///// </summary>
-        //public void Prepare()
-        //{
-        //    MstRecordLeader64 leader = Leader;
-        //    Encoding encoding = IrbisEncoding.Utf8;
-        //    leader.Nvf = Dictionary.Count;
-        //    int recordSize = MstRecordLeader64.LeaderSize
-        //        + Dictionary.Count * MstDictionaryEntry64.EntrySize;
-        //    leader.Base = recordSize;
-        //    int position = 0;
-        //    for (int i = 0; i < Dictionary.Count; i++)
-        //    {
-        //        MstDictionaryEntry64 entry = Dictionary[i];
-        //        entry.Position = position;
-        //        entry.Bytes = encoding.GetBytes(entry.Text);
-        //        int length = entry.Bytes.Length;
-        //        entry.Length = length;
-        //        Dictionary[i] = entry;
-        //        recordSize += length;
-        //        position += length;
-        //    }
+        /// <summary>
+        /// Prepare the record for serialization.
+        /// </summary>
+        public void Prepare()
+        {
+            MstRecordLeader64 leader = Leader;
+            Encoding encoding = IrbisEncoding.Utf8;
+            leader.Nvf = Dictionary.Count;
+            int recordSize = MstRecordLeader64.LeaderSize
+                + Dictionary.Count * MstDictionaryEntry64.EntrySize;
+            leader.Base = recordSize;
+            int position = 0;
+            for (int i = 0; i < Dictionary.Count; i++)
+            {
+                MstDictionaryEntry64 entry = Dictionary[i];
+                entry.Position = position;
+                entry.Bytes = encoding.GetBytes(entry.Text);
+                int length = entry.Bytes.Length;
+                entry.Length = length;
+                Dictionary[i] = entry;
+                recordSize += length;
+                position += length;
+            }
 
-        //    if (recordSize % 2 != 0)
-        //    {
-        //        recordSize++;
-        //    }
-        //    leader.Length = recordSize;
+            if (recordSize % 2 != 0)
+            {
+                recordSize++;
+            }
+            leader.Length = recordSize;
 
-        //    Leader = leader;
-        //}
+            Leader = leader;
+        }
 
-        ///// <summary>
-        ///// Write the record to specified stream.
-        ///// </summary>
-        //public void Write
-        //    (
-        //        Stream stream
-        //    )
-        //{
-        //    Leader.Write(stream);
-        //    foreach (MstDictionaryEntry64 entry in Dictionary)
-        //    {
-        //        stream.WriteInt32Network(entry.Tag);
-        //        stream.WriteInt32Network(entry.Position);
-        //        stream.WriteInt32Network(entry.Length);
-        //    }
-        //    foreach (MstDictionaryEntry64 entry in Dictionary)
-        //    {
-        //        stream.Write(entry.Bytes, 0, entry.Bytes.Length);
-        //    }
-        //}
+        /// <summary>
+        /// Write the record to specified stream.
+        /// </summary>
+        public void Write
+            (
+                Stream stream
+            )
+        {
+            Leader.Write(stream);
+            foreach (MstDictionaryEntry64 entry in Dictionary)
+            {
+                stream.WriteInt32Network(entry.Tag);
+                stream.WriteInt32Network(entry.Position);
+                stream.WriteInt32Network(entry.Length);
+            }
+            foreach (MstDictionaryEntry64 entry in Dictionary)
+            {
+                stream.Write(entry.Bytes, 0, entry.Bytes.Length);
+            }
+        }
 
         #endregion
 

@@ -15,7 +15,9 @@
 
 #region Using directives
 
-using System.Diagnostics;
+using System.IO;
+
+using AM.IO;
 
 #endregion
 
@@ -67,11 +69,12 @@ namespace ManagedIrbis.Direct
 
         /// <summary>
         /// Версия (плюс или нет?).
+        /// MFT_TYPE в документации.
         /// </summary>
         public int Version { get; set; }
 
         /// <summary>
-        /// Резерв.
+        /// Резерв. REC_CNT в документации.
         /// </summary>
         public int Reserv3 { get; set; }
 
@@ -89,44 +92,60 @@ namespace ManagedIrbis.Direct
 
         #region Public methods
 
-        ///// <summary>
-        ///// Read the control record from specified stream.
-        ///// </summary>
-        //public static MstControlRecord64 Read
-        //    (
-        //        Stream stream
-        //    )
-        //{
-        //    MstControlRecord64 result = new MstControlRecord64
-        //    {
-        //        Reserv1 = stream.ReadInt32Network(),
-        //        NextMfn = stream.ReadInt32Network(),
-        //        NextPosition = stream.ReadInt64Network(),
-        //        Reserv2 = stream.ReadInt32Network(),
-        //        Reserv3 = stream.ReadInt32Network(),
-        //        Reserv4 = stream.ReadInt32Network(),
-        //        Blocked = stream.ReadInt32Network()
-        //    };
+        /// <summary>
+        /// Dump the control record.
+        /// </summary>
+        public void Dump
+            (
+                TextWriter writer
+            )
+        {
+            writer.WriteLine("CTLMFN: {0}", Reserv1);
+            writer.WriteLine("NXTMFN: {0}", NextMfn);
+            writer.WriteLine("NXTPOS: {0}", NextPosition);
+            writer.WriteLine("MFTYPE: {0}", Version);
+            writer.WriteLine("RECCNT: {0}", Reserv3);
+            writer.WriteLine("LOCKED: {0}", Blocked);
+        }
 
-        //    return result;
-        //}
+        /// <summary>
+        /// Read the control record from specified stream.
+        /// </summary>
+        public static MstControlRecord64 Read
+            (
+                Stream stream
+            )
+        {
+            var result = new MstControlRecord64
+            {
+                Reserv1 = stream.ReadInt32Network(),
+                NextMfn = stream.ReadInt32Network(),
+                NextPosition = stream.ReadInt64Network(),
+                Version = stream.ReadInt32Network(),
+                Reserv3 = stream.ReadInt32Network(),
+                Reserv4 = stream.ReadInt32Network(),
+                Blocked = stream.ReadInt32Network()
+            };
 
-        ///// <summary>
-        ///// Write the control record to specified stream.
-        ///// </summary>
-        //public void Write
-        //    (
-        //        Stream stream
-        //    )
-        //{
-        //    stream.WriteInt32Network(Reserv1);
-        //    stream.WriteInt32Network(NextMfn);
-        //    stream.WriteInt64Network(NextPosition);
-        //    stream.WriteInt32Network(Reserv2);
-        //    stream.WriteInt32Network(Reserv3);
-        //    stream.WriteInt32Network(Reserv4);
-        //    stream.WriteInt32Network(Blocked);
-        //}
+            return result;
+        }
+
+        /// <summary>
+        /// Write the control record to specified stream.
+        /// </summary>
+        public void Write
+            (
+                Stream stream
+            )
+        {
+            stream.WriteInt32Network(Reserv1);
+            stream.WriteInt32Network(NextMfn);
+            stream.WriteInt64Network(NextPosition);
+            stream.WriteInt32Network(Version);
+            stream.WriteInt32Network(Reserv3);
+            stream.WriteInt32Network(Reserv4);
+            stream.WriteInt32Network(Blocked);
+        }
 
         #endregion
     }

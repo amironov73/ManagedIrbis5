@@ -255,6 +255,36 @@ namespace ManagedIrbis.Direct
             return result;
         } // method ReadNetworkInt64
 
+        /// <summary>
+        /// Open the <see cref="MemoryMappedFile"/> for read only.
+        /// </summary>
+        public static MemoryMappedFile OpenMemoryMappedFile
+            (
+                string fileName
+            )
+        {
+            var stream = new FileStream
+                (
+                    fileName,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read
+                );
+
+            var result = MemoryMappedFile.CreateFromFile
+                (
+                    stream,
+                    null, // map name = anonymous
+                    stream.Length, // capacity = all the file
+                    MemoryMappedFileAccess.Read,
+                    HandleInheritability.None,
+                    false // close the stream when the MMF is closed
+                );
+
+            return result;
+        }
+
+
         #endregion
 
     } // class DirectUtility

@@ -16,6 +16,9 @@
 #region Using directives
 
 using System.Diagnostics;
+using System.IO;
+
+using AM.IO;
 
 #endregion
 
@@ -82,47 +85,47 @@ namespace ManagedIrbis.Direct
 
         #region Public methods
 
-        ///// <summary>
-        ///// Read the record leader.
-        ///// </summary>
-        //public static MstRecordLeader64 Read
-        //    (
-        //        Stream stream
-        //    )
-        //{
-        //    MstRecordLeader64 result = new MstRecordLeader64
-        //    {
-        //        Mfn = stream.ReadInt32Network(),
-        //        Length = stream.ReadInt32Network(),
-        //        Previous = stream.ReadInt64Network(),
-        //        Base = stream.ReadInt32Network(),
-        //        Nvf = stream.ReadInt32Network(),
-        //        Version = stream.ReadInt32Network(),
-        //        Status = stream.ReadInt32Network()
-        //    };
+        /// <summary>
+        /// Read the record leader.
+        /// </summary>
+        public static MstRecordLeader64 Read
+            (
+                Stream stream
+            )
+        {
+            MstRecordLeader64 result = new MstRecordLeader64
+            {
+                Mfn = stream.ReadInt32Network(),
+                Length = stream.ReadInt32Network(),
+                Previous = stream.ReadInt64Network(),
+                Base = stream.ReadInt32Network(),
+                Nvf = stream.ReadInt32Network(),
+                Version = stream.ReadInt32Network(),
+                Status = stream.ReadInt32Network()
+            };
 
-        //    //Debug.Assert(result.Base ==
-        //    //    (LeaderSize + result.Nvf * MstDictionaryEntry64.EntrySize));
+            //Debug.Assert(result.Base ==
+            //    (LeaderSize + result.Nvf * MstDictionaryEntry64.EntrySize));
 
-        //    return result;
-        //}
+            return result;
+        }
 
-        ///// <summary>
-        ///// Write the record leader.
-        ///// </summary>
-        //public void Write
-        //    (
-        //        Stream stream
-        //    )
-        //{
-        //    stream.WriteInt32Network(Mfn);
-        //    stream.WriteInt32Network(Length);
-        //    stream.WriteInt64Network(Previous);
-        //    stream.WriteInt32Network(Base);
-        //    stream.WriteInt32Network(Nvf);
-        //    stream.WriteInt32Network(Version);
-        //    stream.WriteInt32Network(Status);
-        //}
+        /// <summary>
+        /// Write the record leader.
+        /// </summary>
+        public void Write
+            (
+                Stream stream
+            )
+        {
+            stream.WriteInt32Network(Mfn);
+            stream.WriteInt32Network(Length);
+            stream.WriteInt64Network(Previous);
+            stream.WriteInt32Network(Base);
+            stream.WriteInt32Network(Nvf);
+            stream.WriteInt32Network(Version);
+            stream.WriteInt32Network(Status);
+        }
 
         #endregion
 
