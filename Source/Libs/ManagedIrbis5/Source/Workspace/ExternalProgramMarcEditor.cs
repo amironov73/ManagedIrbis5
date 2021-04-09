@@ -29,7 +29,29 @@ namespace ManagedIrbis.Workspace
     public sealed class ExternalProgramMarcEditor
         : IMarcEditor
     {
-        #region IMarcEditor members
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="provider">Провайдер сервисов.</param>
+        public ExternalProgramMarcEditor
+            (
+                IServiceProvider provider
+            )
+        {
+            _provider = provider;
+        } // constructor
+
+        #endregion
+
+        #region Private members
+
+        private readonly IServiceProvider _provider;
+
+        #endregion
+
+        #region IMarcEditor
 
         /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
         public void PerformEdit
@@ -39,6 +61,13 @@ namespace ManagedIrbis.Workspace
         {
             throw new NotImplementedException();
         } // method PerformEdit
+
+        #endregion
+
+        #region IServiveProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService(Type serviceType) => _provider.GetService(serviceType);
 
         #endregion
 

@@ -18,6 +18,8 @@
 
 #region Using directives
 
+using System;
+
 using ManagedIrbis.Workspace;
 
 #endregion
@@ -32,6 +34,28 @@ namespace ManagedIrbis.WinForms.Workspace
     public sealed class AuthorityMarcEditor
         : IMarcEditor
     {
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="provider">Провайдер сервисов.</param>
+        public AuthorityMarcEditor
+            (
+                IServiceProvider provider
+            )
+        {
+            _provider = provider;
+        } // constructor
+
+        #endregion
+
+        #region Private members
+
+        private readonly IServiceProvider _provider;
+
+        #endregion
+
         #region IMarcEditor
 
         /// <inheritdoc cref="IMarcEditor.PerformEdit"/>
@@ -40,8 +64,15 @@ namespace ManagedIrbis.WinForms.Workspace
                 EditContext context
             )
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         } // method PerformEdit
+
+        #endregion
+
+        #region IServiveProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService(Type serviceType) => _provider.GetService(serviceType);
 
         #endregion
 

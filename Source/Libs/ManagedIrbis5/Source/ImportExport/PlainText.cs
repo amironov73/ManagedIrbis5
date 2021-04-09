@@ -308,14 +308,13 @@ namespace ManagedIrbis.ImportExport
             foreach (var field in record.Fields)
             {
                 result.AppendFormat("{0}#", field.Tag);
-                if (!string.IsNullOrEmpty(field.Value))
-                {
-                    result.Append(field.Value);
-                }
                 foreach (var subField in field.Subfields)
                 {
-                    result.Append('^');
-                    result.Append(subField.Code);
+                    if (subField.Code != SubField.NoCode)
+                    {
+                        result.Append('^');
+                        result.Append(subField.Code);
+                    }
                     result.Append(subField.Value);
                 }
                 result.AppendLine();

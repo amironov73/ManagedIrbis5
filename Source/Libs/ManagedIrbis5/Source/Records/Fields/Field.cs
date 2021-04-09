@@ -44,7 +44,8 @@ namespace ManagedIrbis
     public class Field
         : IHandmadeSerializable,
         IReadOnly<Field>,
-        IEnumerable<SubField>
+        IEnumerable<SubField>,
+        IVerifiable
     {
         #region Constants
 
@@ -907,6 +908,30 @@ namespace ManagedIrbis
 
         #endregion
 
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            // TODO: удостовериться, что подполе-значение единственное
+
+            var verifier = new Verifier<Field>(this, throwOnError);
+
+            verifier.Positive(Tag, nameof(Tag));
+            verifier.Positive(Subfields.Count, "Subfields.Count");
+            foreach (var subfield in Subfields)
+            {
+                verifier.VerifySubObject(subfield);
+            }
+
+            return verifier.Result;
+        } // method Verify
+
+        #endregion
+
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
@@ -919,8 +944,7 @@ namespace ManagedIrbis
                 );
             var result = new StringBuilder (length);
             result.Append(Tag.ToInvariantString())
-                .Append('#')
-                .Append(Value);
+                .Append('#');
             foreach (var subfield in Subfields)
             {
                 result.Append(subfield);

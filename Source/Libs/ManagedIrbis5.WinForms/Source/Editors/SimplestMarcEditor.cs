@@ -79,14 +79,14 @@ namespace ManagedIrbis.WinForms.Editors
             collection.Clear();
             //collection.EnsureCapacity(_items.Count);
 
-            foreach (FieldItem item in _items)
+            foreach (var item in _items)
             {
-                int tag = item.Tag;
-                string text = item.Text;
+                var tag = item.Tag;
+                var text = item.Text;
 
                 var field = new Field(tag);
                 field.DecodeBody(text);
-                //if (field.Verify(false))
+                if (field.Verify(false))
                 {
                     collection.Add(field);
                 }
@@ -104,10 +104,10 @@ namespace ManagedIrbis.WinForms.Editors
             )
         {
             _originalFields = collection;
-            List<FieldItem> list = new List<FieldItem>(collection.Count);
+            var list = new List<FieldItem>(collection.Count);
             foreach (var field in collection)
             {
-                FieldItem item = new FieldItem
+                var item = new FieldItem
                 {
                     Tag = field.Tag,
                     Text = field.ToText()

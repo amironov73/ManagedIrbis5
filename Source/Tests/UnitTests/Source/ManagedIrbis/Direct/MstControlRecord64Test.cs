@@ -51,7 +51,7 @@ namespace UnitTests.ManagedIrbis.Direct
         [TestMethod]
         public void MstControlRecord64_Read_2()
         {
-            var fileName = Path.Combine(TestDataPath, "KZD.MST");
+            var fileName = Path.Combine(TestDataPath, "kzd.mst");
             using (var stream = File.OpenRead(fileName))
             {
                 var control = MstControlRecord64.Read(stream);
@@ -119,7 +119,7 @@ namespace UnitTests.ManagedIrbis.Direct
         [TestMethod]
         public void MstControlRecord64_Dump_2()
         {
-            var fileName = Path.Combine(TestDataPath, "KZD.MST");
+            var fileName = Path.Combine(TestDataPath, "kzd.mst");
             var writer = new StringWriter();
             using (var stream = File.OpenRead(fileName))
             {

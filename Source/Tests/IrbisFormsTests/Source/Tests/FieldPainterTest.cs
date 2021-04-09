@@ -59,15 +59,16 @@ namespace IrbisFormsTests
             {
                 var font = form.Font;
                 var point = new PointF(10, 10);
+                var extent = new SizeF(200, 100);
                 var text = "Text1^atext2^btext3";
 
                 painter.DrawLine
-                (
-                    e.Graphics,
-                    font,
-                    point,
-                    text
-                );
+                    (
+                        e.Graphics,
+                        font,
+                        new RectangleF(point, extent),
+                        text
+                    );
             }
         }
     }

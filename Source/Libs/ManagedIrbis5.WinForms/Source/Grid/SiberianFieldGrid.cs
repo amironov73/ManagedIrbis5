@@ -57,13 +57,13 @@ namespace ManagedIrbis.WinForms.Grid
         {
             HeaderHeight = 26;
 
-            TagColumn = (SiberianTagColumn) CreateColumn<SiberianTagColumn>();
+            TagColumn = CreateColumn<SiberianTagColumn>();
             TagColumn.Title = "Field";
             TagColumn.FillWidth = 100;
 
-            RepeatColumn = (SiberianRepeatColumn)CreateColumn<SiberianRepeatColumn>();
+            RepeatColumn = CreateColumn<SiberianRepeatColumn>();
 
-            FieldColumn = (SiberianFieldColumn) CreateColumn<SiberianFieldColumn>();
+            FieldColumn = CreateColumn<SiberianFieldColumn>();
             FieldColumn.Title = "Value";
             FieldColumn.FillWidth = 100;
         }

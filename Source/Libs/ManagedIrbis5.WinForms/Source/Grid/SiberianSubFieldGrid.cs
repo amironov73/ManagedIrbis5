@@ -56,11 +56,11 @@ namespace ManagedIrbis.WinForms.Grid
         {
             HeaderHeight = 26;
 
-            CodeColumn = (SiberianCodeColumn)CreateColumn<SiberianCodeColumn>();
+            CodeColumn = CreateColumn<SiberianCodeColumn>();
             CodeColumn.Title = "Subfield";
             CodeColumn.FillWidth = 100;
 
-            SubFieldColumn = (SiberianSubFieldColumn)CreateColumn<SiberianSubFieldColumn>();
+            SubFieldColumn = CreateColumn<SiberianSubFieldColumn>();
             SubFieldColumn.Title = "Value";
             SubFieldColumn.FillWidth = 100;
         }

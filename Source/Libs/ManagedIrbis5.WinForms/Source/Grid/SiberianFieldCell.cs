@@ -61,9 +61,11 @@ namespace ManagedIrbis.WinForms.Grid
             var rectangle = args.ClipRectangle;
 
             var foreColor = Color.Black;
+            var codeColor = Color.FromArgb(220, 0, 0);
             if (ReferenceEquals(Row, Grid.CurrentRow))
             {
                 foreColor = Color.White;
+                codeColor = Color.FromArgb(0, 255, 255);
             }
 
             if (ReferenceEquals(this, Grid.CurrentCell))
@@ -84,13 +86,27 @@ namespace ManagedIrbis.WinForms.Grid
                 if (!string.IsNullOrEmpty(text))
                 {
 
-                    var flags
-                        = TextFormatFlags.TextBoxControl
+                    var flags = TextFormatFlags.TextBoxControl
                           | TextFormatFlags.EndEllipsis
                           | TextFormatFlags.NoPrefix
                           | TextFormatFlags.VerticalCenter;
 
-                    TextRenderer.DrawText
+
+                    using var painter = new FieldPainter
+                    {
+                        CodeColor = codeColor,
+                        TextColor = foreColor
+                    };
+
+                    painter.DrawLine
+                        (
+                            graphics,
+                            Grid.Font,
+                            rectangle,
+                            text
+                        );
+
+                    /* TextRenderer.DrawText
                         (
                             graphics,
                             text,
@@ -99,6 +115,7 @@ namespace ManagedIrbis.WinForms.Grid
                             foreColor,
                             flags
                         );
+                        */
                 }
             }
         }

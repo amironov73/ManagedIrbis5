@@ -30,6 +30,7 @@ namespace ManagedIrbis.Workspace
     /// Интерфейс редактора поля/подполя.
     /// </summary>
     public interface IMarcEditor
+        : IServiceProvider
     {
         /// <summary>
         /// Осуществляет редактирование в указанном контексте.

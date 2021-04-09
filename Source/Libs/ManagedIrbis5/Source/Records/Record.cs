@@ -658,10 +658,10 @@ namespace ManagedIrbis
             return this;
         } // method RemoveField
 
-        public string ToPlainText()
-        {
-            return PlainText.ToPlainText(this);
-        }
+        /// <summary>
+        /// Формирует плоское текстовое представление записи.
+        /// </summary>
+        public string ToPlainText() => PlainText.ToPlainText(this);
 
         #endregion
 

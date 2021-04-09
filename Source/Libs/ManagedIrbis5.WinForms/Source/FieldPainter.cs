@@ -204,7 +204,7 @@ namespace ManagedIrbis.WinForms
             (
                 Graphics graphics,
                 Font font,
-                PointF position,
+                RectangleF rectangle,
                 string? text
             )
         {
@@ -213,16 +213,18 @@ namespace ManagedIrbis.WinForms
                 return;
             }
 
-            using var format = new StringFormat();
-            format.Alignment = StringAlignment.Near;
-            format.FormatFlags = StringFormatFlags.NoWrap
-                                 | StringFormatFlags.MeasureTrailingSpaces;
+            using var format = new StringFormat
+            {
+                Alignment = StringAlignment.Near,
+                FormatFlags = StringFormatFlags.NoWrap
+                              | StringFormatFlags.MeasureTrailingSpaces
+            };
 
             var em = graphics.MeasureString
                 (
                     "m",
                     font,
-                    position,
+                    rectangle.Size,
                     format
                 );
             var em6 = em.Width / 5f;
@@ -231,12 +233,12 @@ namespace ManagedIrbis.WinForms
             foreach (var segment in segments)
             {
                 var size = graphics.MeasureString
-                (
-                    segment.Text,
-                    font,
-                    position,
-                    format
-                );
+                    (
+                        segment.Text,
+                        font,
+                        rectangle.Size,
+                        format
+                    );
 
                 var brush = (segment.Code
                     ? _codeBrush
@@ -248,11 +250,36 @@ namespace ManagedIrbis.WinForms
                         segment.Text,
                         font,
                         brush,
-                        position,
+                        rectangle,
                         format
                     );
 
-                position.X += size.Width - em6;
+                /*
+
+                var flags = TextFormatFlags.TextBoxControl
+                            | TextFormatFlags.EndEllipsis
+                            | TextFormatFlags.NoPrefix
+                            | TextFormatFlags.VerticalCenter;
+                TextRenderer.DrawText
+                    (
+                        graphics,
+                        text,
+                        Grid.Font,
+                        rectangle,
+                        foreColor,
+                        flags
+                    );
+
+                */
+
+                var delta = size.Width - em6;
+                rectangle.X += delta;
+                rectangle.Width -= delta;
+
+                if (rectangle.Width <= 0)
+                {
+                    break;
+                }
             }
         }
 

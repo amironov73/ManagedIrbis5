@@ -2,13 +2,14 @@
 
 #nullable enable
 
-namespace FormsTests
+namespace SiberianTests
 {
-    public interface IFormsTest
+    public interface ISiberianTest
     {
         /// <summary>
         /// Запуск теста.
         /// </summary>
         void RunTest(IWin32Window? ownerWindow);
+
     }
 }

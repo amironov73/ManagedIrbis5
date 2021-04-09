@@ -101,7 +101,7 @@ namespace ManagedIrbis.WinForms.Grid
         }
 
         /// <inheritdoc />
-        public override Control CreateEditor
+        public override Control? CreateEditor
             (
                 SiberianCell cell,
                 bool edit,

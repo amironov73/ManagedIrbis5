@@ -42,14 +42,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region SiberianColumn members
 
         /// <inheritdoc/>

@@ -1,0 +1,22 @@
+﻿[
+  {
+    "class": "SiberianTests.ConstructionTest",
+    "title": "!Construction"
+  },
+  {
+    "class": "SiberianTests.FieldGridTest",
+    "title": "Field grid"
+  },
+  {
+    "class": "SiberianTests.SubFieldGridTest",
+    "title": "SubField grid"
+  },
+  {
+    "class": "SiberianTests.TermGridTest",
+    "title": "Term grid (requires connection)"
+  },
+  {
+    "class": "SiberianTests.FoundGridTest",
+    "title": "Found grid (requires connection)"
+  }
+]
