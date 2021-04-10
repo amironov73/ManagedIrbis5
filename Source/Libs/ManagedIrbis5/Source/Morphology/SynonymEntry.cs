@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -88,10 +89,10 @@ namespace ManagedIrbis.Morphology
             (
                 Record record,
                 int tag,
-                string? text
+                ReadOnlyMemory<char> text
             )
         {
-            if (!string.IsNullOrEmpty(text))
+            if (text.IsEmpty)
             {
                 record.Fields.Add(new Field { Tag = tag, Value = text });
             }
@@ -111,16 +112,16 @@ namespace ManagedIrbis.Morphology
                 Mfn = Mfn
             };
 
-            _AddField(result, 10, MainWord.ThrowIfNull(nameof(MainWord)));
+            _AddField(result, 10, MainWord.ThrowIfNull(nameof(MainWord)).AsMemory());
             if (!ReferenceEquals(Synonyms, null))
             {
                 foreach (string synonym in Synonyms)
                 {
-                    _AddField(result, 11, synonym);
+                    _AddField(result, 11, synonym.AsMemory());
                 }
             }
-            _AddField(result, 12, Language);
-            _AddField(result, 920, Worksheet);
+            _AddField(result, 12, Language.AsMemory());
+            _AddField(result, 920, Worksheet.AsMemory());
 
             return result;
         }
@@ -133,14 +134,15 @@ namespace ManagedIrbis.Morphology
                 Record record
             )
         {
+            // TODO: реализовать оптимально
 
             var result = new SynonymEntry
             {
                 Mfn = record.Mfn,
-                MainWord = record.FM(10),
-                Synonyms = record.FMA(11),
-                Language = record.FM(12),
-                Worksheet = record.FM(920)
+                MainWord = record.FM(10).ToString(),
+                Synonyms = record.FMA(11).ToStringArray(),
+                Language = record.FM(12).ToString(),
+                Worksheet = record.FM(920).ToString()
             };
 
             return result;

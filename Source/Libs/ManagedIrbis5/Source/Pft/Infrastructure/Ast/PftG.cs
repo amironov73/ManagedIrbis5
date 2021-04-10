@@ -222,11 +222,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else if (SubField == '*')
             {
-                result = field.GetValueOrFirstSubField();
+                result = field.GetValueOrFirstSubField().ToString();
             }
             else
             {
-                result = field.GetFirstSubFieldValue(SubField);
+                result = field.GetFirstSubFieldValue(SubField).ToString();
             }
 
             result = LimitText(result);

@@ -182,14 +182,14 @@ namespace ManagedIrbis.Readers
 
             return new ReaderAddress
             {
-                Postcode = field.GetFirstSubFieldValue('A'),
-                Country = field.GetFirstSubFieldValue('B'),
-                City = field.GetFirstSubFieldValue('C'),
-                Street = field.GetFirstSubFieldValue('D'),
-                Building = field.GetFirstSubFieldValue('E'),
-                Entrance = field.GetFirstSubFieldValue('G'),
-                Apartment = field.GetFirstSubFieldValue('H'),
-                AdditionalData = field.GetFirstSubFieldValue('F'),
+                Postcode = field.GetFirstSubFieldValue('A').ToString().EmptyToNull(),
+                Country = field.GetFirstSubFieldValue('B').ToString().EmptyToNull(),
+                City = field.GetFirstSubFieldValue('C').ToString().EmptyToNull(),
+                Street = field.GetFirstSubFieldValue('D').ToString().EmptyToNull(),
+                Building = field.GetFirstSubFieldValue('E').ToString().EmptyToNull(),
+                Entrance = field.GetFirstSubFieldValue('G').ToString().EmptyToNull(),
+                Apartment = field.GetFirstSubFieldValue('H').ToString().EmptyToNull(),
+                AdditionalData = field.GetFirstSubFieldValue('F').ToString().EmptyToNull(),
                 UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
                 Field = field
             };

@@ -203,9 +203,9 @@ namespace RestfulIrbis.OsmiCards
             )
         {
             var idTag = config.ReaderId.SafeToInt32(30);
-            var result = record.FM(idTag).ThrowIfNull("reader.Ticket");
+            var result = record.FM(idTag).ThrowIfEmpty("reader.Ticket");
 
-            return result;
+            return result.ToString();
         }
 
         /// <summary>

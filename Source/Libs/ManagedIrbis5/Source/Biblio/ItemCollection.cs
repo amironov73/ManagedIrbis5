@@ -94,7 +94,7 @@ namespace ManagedIrbis.Biblio
         {
             // Официальные документы имеют характер n или 67
 
-            string?[] character =
+            var character = new[]
             {
                 record.FM(900, 'c'),
                 record.FM(900, '2'),
@@ -104,9 +104,9 @@ namespace ManagedIrbis.Biblio
                 record.FM(900, '6')
             };
 
-            return character.Contains("n")
-                   || character.Contains("N")
-                   || character.Contains("67");
+            return character.Contains("n".AsMemory())
+                   || character.Contains("N".AsMemory())
+                   || character.Contains("67".AsMemory());
         }
 
         private static bool _IsForeign
@@ -117,7 +117,11 @@ namespace ManagedIrbis.Biblio
             // У иностранных книг язык не rus
             // Если язык не указан, считаем, что rus
 
-            var language = record.FM(101) ?? "rus";
+            var language = record.FM(101);
+            if (language.IsEmpty)
+            {
+                language = "rus".AsMemory();
+            }
 
             return !language.SameString("rus");
         }

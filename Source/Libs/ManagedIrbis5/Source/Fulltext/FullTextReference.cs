@@ -197,14 +197,16 @@ namespace ManagedIrbis.Fulltext
                 return null;
             }
 
-            FullTextReference result = new FullTextReference
+            // TODO: реализовать эффективно
+
+            var result = new FullTextReference
             {
-                FileName = field.GetFirstSubFieldValue('a'),
-                Info = field.GetFirstSubFieldValue('b'),
-                SeparatePage = field.GetFirstSubFieldValue('c'),
-                Url = field.GetFirstSubFieldValue('i'),
-                Substrate = field.GetFirstSubFieldValue('t'),
-                Additional = field.GetFirstSubFieldValue('u'),
+                FileName = field.GetFirstSubFieldValue('a').ToString(),
+                Info = field.GetFirstSubFieldValue('b').ToString(),
+                SeparatePage = field.GetFirstSubFieldValue('c').ToString(),
+                Url = field.GetFirstSubFieldValue('i').ToString(),
+                Substrate = field.GetFirstSubFieldValue('t').ToString(),
+                Additional = field.GetFirstSubFieldValue('u').ToString(),
                 Field = field
             };
 

@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -412,7 +413,7 @@ namespace ManagedIrbis.Fields
             }
 
             var withInitials = field.GetFirstSubFieldValue(subFields[0]);
-            if (string.IsNullOrEmpty(withInitials))
+            if (withInitials.IsEmpty)
             {
                 return false;
             }
@@ -424,10 +425,10 @@ namespace ManagedIrbis.Fields
                 return false;
             }
 
-            withInitials = FamilyName;
+            withInitials = FamilyName.AsMemory();
             if (!string.IsNullOrEmpty(Initials))
             {
-                withInitials = withInitials + " " + Initials;
+                withInitials = (withInitials + " " + Initials).AsMemory();
             }
 
             field
@@ -539,26 +540,25 @@ namespace ManagedIrbis.Fields
             )
         {
             var familyName = field.GetFirstSubFieldValue('a');
-            if (string.IsNullOrEmpty(familyName))
+            if (familyName.IsEmpty)
             {
                 return null;
             }
 
+            // TODO: реализовать эффективно
+
             var result = new AuthorInfo
             {
-                FamilyName = familyName,
-                Initials = field.GetFirstSubFieldValue('b'),
-                FullName = field.GetFirstSubFieldValue('g'),
-                CantBeInverted = !string.IsNullOrEmpty
-                    (
-                        field.GetFirstSubFieldValue('9')
-                    ),
-                Postfix = field.GetFirstSubFieldValue('1'),
-                Appendix = field.GetFirstSubFieldValue('c'),
-                Number = field.GetFirstSubFieldValue('d'),
-                Dates = field.GetFirstSubFieldValue('f'),
-                Variant = field.GetFirstSubFieldValue('r'),
-                WorkPlace = field.GetFirstSubFieldValue('p'),
+                FamilyName = familyName.ToString(),
+                Initials = field.GetFirstSubFieldValue('b').ToString(),
+                FullName = field.GetFirstSubFieldValue('g').ToString(),
+                CantBeInverted = !field.GetFirstSubFieldValue('9').IsEmpty,
+                Postfix = field.GetFirstSubFieldValue('1').ToString(),
+                Appendix = field.GetFirstSubFieldValue('c').ToString(),
+                Number = field.GetFirstSubFieldValue('d').ToString(),
+                Dates = field.GetFirstSubFieldValue('f').ToString(),
+                Variant = field.GetFirstSubFieldValue('r').ToString(),
+                WorkPlace = field.GetFirstSubFieldValue('p').ToString(),
                 Field = field
             };
 
@@ -574,7 +574,7 @@ namespace ManagedIrbis.Fields
             )
         {
             var withInitials = field.GetFirstSubFieldValue('a');
-            if (string.IsNullOrEmpty(withInitials))
+            if (withInitials.IsEmpty)
             {
                 return null;
             }
@@ -588,17 +588,14 @@ namespace ManagedIrbis.Fields
             {
                 FamilyName = familyName.ToString(),
                 Initials = initials.ToString(),
-                FullName = field.GetFirstSubFieldValue('g'),
-                CantBeInverted = !string.IsNullOrEmpty
-                    (
-                        field.GetFirstSubFieldValue('9')
-                    ),
-                Postfix = field.GetFirstSubFieldValue('1'),
-                Appendix = field.GetFirstSubFieldValue('c'),
-                Number = field.GetFirstSubFieldValue('d'),
-                Dates = field.GetFirstSubFieldValue('f'),
-                Variant = field.GetFirstSubFieldValue('r'),
-                WorkPlace = field.GetFirstSubFieldValue('p'),
+                FullName = field.GetFirstSubFieldValue('g').ToString(),
+                CantBeInverted = !field.GetFirstSubFieldValue('9').IsEmpty,
+                Postfix = field.GetFirstSubFieldValue('1').ToString(),
+                Appendix = field.GetFirstSubFieldValue('c').ToString(),
+                Number = field.GetFirstSubFieldValue('d').ToString(),
+                Dates = field.GetFirstSubFieldValue('f').ToString(),
+                Variant = field.GetFirstSubFieldValue('r').ToString(),
+                WorkPlace = field.GetFirstSubFieldValue('p').ToString(),
                 Field = field
             };
 
@@ -724,22 +721,19 @@ namespace ManagedIrbis.Fields
             }
 
             var withInitials = field.GetFirstSubFieldValue(subFields[0]);
-            if (string.IsNullOrEmpty(withInitials))
+            if (withInitials.IsEmpty)
             {
                 return null;
             }
 
             var result = new AuthorInfo();
             var navigator = new TextNavigator(withInitials);
-            result.CantBeInverted = !string.IsNullOrEmpty
-                (
-                    field.GetFirstSubFieldValue(subFields[2])
-                );
+            result.CantBeInverted = !field.GetFirstSubFieldValue(subFields[2]).IsEmpty;
             result.FamilyName = navigator.ReadUntil(_delimiters).ToString();
             navigator.SkipChar(_delimiters);
             result.Initials = navigator.GetRemainingText().ToString();
-            result.FullName = field.GetFirstSubFieldValue(subFields[1]);
-            result.WorkPlace = field.GetFirstSubFieldValue(subFields[3]);
+            result.FullName = field.GetFirstSubFieldValue(subFields[1]).ToString();
+            result.WorkPlace = field.GetFirstSubFieldValue(subFields[3]).ToString();
             result.Field = field;
 
             return result;

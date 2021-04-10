@@ -132,7 +132,8 @@ namespace ManagedIrbis.Opt
         /// <summary>
         /// Получаем рабочий лист для указанной записи.
         /// </summary>
-        public string? GetWorksheet (Record record) => record.FM(WorksheetTag);
+        public ReadOnlyMemory<char> GetWorksheet (Record record) =>
+            record.FM(WorksheetTag);
 
         /// <summary>
         /// Загружаем из OPT-файла.

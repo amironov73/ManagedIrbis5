@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Linq;
 
 using AM;
@@ -102,9 +103,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 Field field
             )
         {
-            field.SetSubFieldValue('a', "0");
+            field.SetSubFieldValue('a', "0".AsMemory());
             var specification = field.GetFirstSubFieldValue('B');
-            if (string.IsNullOrEmpty(specification))
+            if (specification.IsEmpty)
             {
                 return;
             }
@@ -113,7 +114,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             if (string.IsNullOrEmpty(countText))
             {
                 navigator.ReadChar();
-                field.SetSubFieldValue('b', navigator.GetRemainingText().ToString());
+                field.SetSubFieldValue('b', navigator.GetRemainingText());
                 return;
             }
             var count = countText.SafeToInt32();
@@ -137,9 +138,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             NumberText inventory = inventoryText;
 
             var barcodeText = field.GetFirstSubFieldValue('H');
-            var barcode = string.IsNullOrEmpty(barcodeText)
+            var barcode = barcodeText.IsEmpty
                 ? null
-                : new NumberText(barcodeText);
+                : new NumberText(barcodeText.ToString());
 
             var first = true;
             while (count > 0)
@@ -151,10 +152,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     record.Fields.Add(current);
                 }
 
-                current.SetSubFieldValue('b', inventory.ToString());
+                current.SetSubFieldValue('b', inventory.ToString().AsMemory());
                 if (!ReferenceEquals(barcode, null))
                 {
-                    current.SetSubFieldValue('h', barcode.ToString());
+                    current.SetSubFieldValue('h', barcode.ToString().AsMemory());
                     barcode = barcode.Increment();
                 }
 

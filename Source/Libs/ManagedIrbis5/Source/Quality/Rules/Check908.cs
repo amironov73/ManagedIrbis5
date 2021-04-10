@@ -37,8 +37,9 @@ namespace ManagedIrbis.Quality.Rules
             )
         {
             MustNotContainSubfields(field);
-            string text = field.Value;
-            if (string.IsNullOrEmpty(text))
+
+            var text = field.Value;
+            if (text.IsEmpty)
             {
                 AddDefect
                     (
@@ -49,7 +50,7 @@ namespace ManagedIrbis.Quality.Rules
             }
             else
             {
-                char firstLetter = text[0];
+                char firstLetter = text.Span[0];
                 bool isGood = ((firstLetter >= 'A') && (firstLetter <= 'Z'))
                               || ((firstLetter >= 'А') && (firstLetter <= 'Я'));
                 if (!isGood)
@@ -75,7 +76,7 @@ namespace ManagedIrbis.Quality.Rules
                         regex = @"[ЗОЧ]-\d{2}";
                     }
 
-                    if (!Regex.IsMatch(text, regex))
+                    if (!Regex.IsMatch(text.ToString(), regex))
                     {
                         AddDefect
                             (
@@ -93,10 +94,7 @@ namespace ManagedIrbis.Quality.Rules
         #region QualityRule members
 
         /// <inheritdoc />
-        public override string FieldSpec
-        {
-            get { return "908"; }
-        }
+        public override string FieldSpec => "908";
 
         /// <inheritdoc />
         public override RuleReport CheckRecord

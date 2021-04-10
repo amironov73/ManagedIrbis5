@@ -99,7 +99,7 @@ namespace UnitTests.ManagedIrbis.Quality
         {
             var rule = new TestRule();
             var record = new Record();
-            record.Fields.Add(new Field { Tag = 999, Value = "1000" });
+            record.Fields.Add(new Field (999, "1000"));
             var context = new RuleContext
             {
                 Record = record
@@ -115,8 +115,8 @@ namespace UnitTests.ManagedIrbis.Quality
         {
             var rule = new TestRule();
             var record = new Record();
-            record.Fields.Add(new Field { Tag = 999, Value = "1000" });
-            record.Fields.Add(new Field { Tag = 999, Value = "1001" });
+            record.Fields.Add(new Field (999, "1000"));
+            record.Fields.Add(new Field (999, "1001"));
             var context = new RuleContext
             {
                 Record = record

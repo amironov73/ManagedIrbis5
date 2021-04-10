@@ -134,7 +134,7 @@ namespace UnitTests.ManagedIrbis.Readers
             var record = reader.ToRecord();
             Assert.IsNotNull(reader);
             Assert.AreEqual(reader.Mfn, record.Mfn);
-            Assert.AreEqual(reader.Ticket, record.FM(30));
+            Assert.AreEqual(reader.Ticket, record.FM(30).ToString());
             Assert.IsNotNull(reader.Visits);
             Assert.AreEqual(reader.Visits!.Length, record.Fields.GetFieldCount(40));
         }

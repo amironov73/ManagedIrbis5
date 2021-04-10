@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Text.RegularExpressions;
 
 using AM;
@@ -39,6 +40,10 @@ namespace ManagedIrbis.Quality.Rules
             )
         {
             MustNotContainText(field);
+
+            throw new NotImplementedException();
+
+            /*
 
             SubField isbn = field.GetFirstSubField('a');
             if (isbn != null)
@@ -73,6 +78,8 @@ namespace ManagedIrbis.Quality.Rules
                         );
                 }
             }
+
+            */
         }
 
         #endregion

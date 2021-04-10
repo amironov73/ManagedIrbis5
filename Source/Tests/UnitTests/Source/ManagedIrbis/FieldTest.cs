@@ -32,7 +32,7 @@ namespace UnitTests.ManagedIrbis
         {
             Field field = new Field();
             Assert.AreEqual(0, field.Tag);
-            Assert.IsNull(field.Value);
+            Assert.IsTrue(field.Value.IsEmpty);
             Assert.AreEqual(0,field.Subfields.Count);
         }
 
@@ -52,7 +52,7 @@ namespace UnitTests.ManagedIrbis
                 .AddNonEmpty('b', new MyClass{Text = "SubfieldB"});
             Assert.AreEqual(1, field.Subfields.Count);
             Assert.AreEqual('b', field.Subfields[0].Code);
-            Assert.AreEqual("SubfieldB", field.Subfields[0].Value);
+            Assert.AreEqual("SubfieldB", field.Subfields[0].Value.ToString());
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace UnitTests.ManagedIrbis
                 .AddNonEmpty('b', 1);
             Assert.AreEqual(1, field.Subfields.Count);
             Assert.AreEqual('b', field.Subfields[0].Code);
-            Assert.AreEqual("1", field.Subfields[0].Value);
+            Assert.AreEqual("1", field.Subfields[0].Value.ToString());
         }
 
         [TestMethod]
@@ -74,7 +74,7 @@ namespace UnitTests.ManagedIrbis
                 .AddNonEmpty('b', 1L);
             Assert.AreEqual(1, field.Subfields.Count);
             Assert.AreEqual('b', field.Subfields[0].Code);
-            Assert.AreEqual("1", field.Subfields[0].Value);
+            Assert.AreEqual("1", field.Subfields[0].Value.ToString());
         }
 
         [TestMethod]
@@ -87,7 +87,7 @@ namespace UnitTests.ManagedIrbis
                 .AddNonEmpty('b', second);
             Assert.AreEqual(1, field.Subfields.Count);
             Assert.AreEqual('b', field.Subfields[0].Code);
-            Assert.AreEqual("20170930", field.Subfields[0].Value);
+            Assert.AreEqual("20170930", field.Subfields[0].Value.ToString());
         }
 
         [TestMethod]
@@ -100,7 +100,7 @@ namespace UnitTests.ManagedIrbis
                 .AddNonEmpty('b', second);
             Assert.AreEqual(1, field.Subfields.Count);
             Assert.AreEqual('b', field.Subfields[0].Code);
-            Assert.AreEqual("20170930", field.Subfields[0].Value);
+            Assert.AreEqual("20170930", field.Subfields[0].Value.ToString());
         }
     }
 }

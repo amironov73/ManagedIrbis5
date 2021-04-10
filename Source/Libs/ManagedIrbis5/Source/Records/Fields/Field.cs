@@ -86,12 +86,12 @@ namespace ManagedIrbis
         /// Значение имитируется с помощью первого подполя,
         /// код которого должен быть равен '\0'.
         /// </remarks>
-        public string? Value
+        public ReadOnlyMemory<char> Value
         {
-            get => GetValueSubField()?.Value;
+            get => GetValueSubField()?.Value ?? default;
             set
             {
-                if (value is null)
+                if (value.IsEmpty)
                 {
                     var valueSubfield = GetValueSubField();
                     if (valueSubfield is not null)
@@ -128,7 +128,7 @@ namespace ManagedIrbis
         /// Пустое ли поле?
         /// </summary>
         [JsonIgnore]
-        public bool IsEmpty => string.IsNullOrEmpty(Value) && Subfields.Count == 0;
+        public bool IsEmpty => Subfields.Count == 0;
 
         #endregion
 
@@ -150,13 +150,28 @@ namespace ManagedIrbis
         public Field
             (
                 int tag,
-                string? value = default
+                ReadOnlyMemory<char> value = default
             )
         {
             Tag = tag;
             Value = value;
         } // constructor
 
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="value">Значение поля до первого разделителя
+        /// (опционально).</param>
+        public Field
+            (
+                int tag,
+                string? value
+            )
+        {
+            Tag = tag;
+            Value = value.AsMemory();
+        } // constructor
 
         /// <summary>
         /// Конструктор.
@@ -237,7 +252,7 @@ namespace ManagedIrbis
             (
                 int tag,
                 char code1,
-                string? value1 = default
+                ReadOnlyMemory<char> value1 = default
             )
         {
             Tag = tag;
@@ -424,12 +439,12 @@ namespace ManagedIrbis
         {
             if (code == ValueCode)
             {
-                Value = value?.ToString();
+                Value = (value?.ToString()).AsMemory();
                 return this;
             }
 
             var text = value?.ToString();
-            var subfield = new SubField { Code = code, Value = text };
+            var subfield = new SubField { Code = code, Value = text.AsMemory() };
             Subfields.Add(subfield);
 
             return this;
@@ -494,14 +509,14 @@ namespace ManagedIrbis
             {
                 if (code == ValueCode)
                 {
-                    Value = value.ToString();
+                    Value = value.ToString().AsMemory();
                     return this;
                 }
 
                 var text = value.ToString();
                 if (!string.IsNullOrEmpty(text))
                 {
-                    var subfield = new SubField { Code = code, Value = text };
+                    var subfield = new SubField { Code = code, Value = text.AsMemory() };
                     Subfields.Add(subfield);
                 }
             }
@@ -559,14 +574,17 @@ namespace ManagedIrbis
             var index = line.IndexOf('^');
             if (index < 0)
             {
-                Value = line.ToString();
+                // TODO: реализовать оптимально
+                Value = line.ToString().AsMemory();
                 return;
             }
 
             if (index != 0)
             {
-                Value = line.Slice(0, index).ToString();
+                // TODO: реализовать оптимально
+                Value = line.Slice(0, index).ToString().AsMemory();
             }
+
             line = line.Slice(index + 1);
 
             while (true)
@@ -739,18 +757,18 @@ namespace ManagedIrbis
         /// Нумерация начинается с нуля.
         /// Отрицательные индексы отсчитываются с конца массива.</param>
         /// <returns>Текст найденного подполя или <c>null</c>.</returns>
-        public string? GetSubFieldValue
+        public ReadOnlyMemory<char> GetSubFieldValue
             (
                 char code,
                 int occurrence = 0
             )
-            => GetSubField(code, occurrence)?.Value;
+            => GetSubField(code, occurrence)?.Value ?? default;
 
         /// <summary>
         /// For * specification.
         /// </summary>
-        public string? GetValueOrFirstSubField()
-            => Subfields.FirstOrDefault()?.Value;
+        public ReadOnlyMemory<char> GetValueOrFirstSubField()
+            => Subfields.FirstOrDefault()?.Value ?? default;
 
         /// <summary>
         /// Установка значения подполя.
@@ -761,7 +779,7 @@ namespace ManagedIrbis
         public Field SetSubFieldValue
             (
                 char code,
-                string? value
+                ReadOnlyMemory<char> value
             )
         {
             if (code == ValueCode)
@@ -770,7 +788,7 @@ namespace ManagedIrbis
             }
             else
             {
-                if (string.IsNullOrEmpty(value))
+                if (value.IsEmpty)
                 {
                     RemoveSubField(code);
                 }
@@ -811,7 +829,7 @@ namespace ManagedIrbis
         {
             var length = Subfields.Sum
                 (
-                    sf => (sf.Value?.Length ?? 0)
+                    sf => (sf.Value.Length)
                           + (sf.Code == ValueCode ? 1 : 2)
                 );
             var result = new StringBuilder (length);
@@ -841,7 +859,9 @@ namespace ManagedIrbis
             )
         {
             Tag = reader.ReadPackedInt32();
-            Value = reader.ReadNullableString();
+            // отдельно Value сохранять не надо, оно входит в Subfields!
+            // Value = reader.ReadNullableString().AsMemory();
+            // TODO: реализовать
             //Subfields.RestoreFromStream(reader);
         }
 
@@ -854,7 +874,9 @@ namespace ManagedIrbis
             Sure.NotNull(writer, nameof(writer));
 
             writer.WritePackedInt32(Tag);
-            writer.WriteNullable(Value);
+            // отдельно Value восстанавливать не надо, оно входит в Subfields!
+            // Value.SaveToStream(writer);
+            // TODO: реализовать
             //Subfields.SaveToStream(writer);
         }
 
@@ -939,7 +961,7 @@ namespace ManagedIrbis
         {
             var length = 4 + Subfields.Sum
                 (
-                    sf => (sf.Value?.Length ?? 0)
+                    sf => (sf.Value.Length)
                     + (sf.Code == ValueCode ? 1 : 2)
                 );
             var result = new StringBuilder (length);

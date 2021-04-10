@@ -135,8 +135,8 @@ namespace ManagedIrbis.Biblio
             var value = item.Suffix;
 
             var record = new Record();
-            record.Fields.Add(new Field { Tag = 1, Value = key });
-            record.Fields.Add(new Field { Tag = 2, Value = value });
+            record.Fields.Add(new Field { Tag = 1, Value = key.AsMemory() });
+            record.Fields.Add(new Field { Tag = 2, Value = value.AsMemory() });
             var title = formatter.FormatRecord(record);
 
             string? className = null;
@@ -200,16 +200,17 @@ namespace ManagedIrbis.Biblio
 
             foreach (var field in record.Fields)
             {
-                if (!string.IsNullOrEmpty(field.Value))
-                {
-                    field.Value = MenuSubChapter.Enhance(field.Value);
-                }
+                // отдельно Value улучшать не надо, оно уже входит в Subfields!
+                // if (!string.IsNullOrEmpty(field.Value))
+                // {
+                //     field.Value = MenuSubChapter.Enhance(field.Value);
+                // }
 
                 foreach (var subField in field.Subfields)
                 {
-                    if (!string.IsNullOrEmpty(subField.Value))
+                    if (!subField.Value.IsEmpty)
                     {
-                        subField.Value = MenuSubChapter.Enhance(subField.Value);
+                        subField.Value = MenuSubChapter.Enhance(subField.Value.ToString()).AsMemory();
                     }
                 }
             }
@@ -254,10 +255,10 @@ namespace ManagedIrbis.Biblio
             if (!ReferenceEquals(subField, null))
             {
                 var value = subField.Value;
-                if (!string.IsNullOrEmpty(value))
+                if (!value.IsEmpty)
                 {
 
-                    var match = _regex463.Match(value);
+                    var match = _regex463.Match(value.ToString());
                     if (match.Success)
                     {
 
@@ -265,7 +266,7 @@ namespace ManagedIrbis.Biblio
                         if (!string.IsNullOrEmpty(date)
                             && date.Contains(" "))
                         {
-                            subField.Value = date.Replace(" ", "\\~");
+                            subField.Value = date.Replace(" ", "\\~").AsMemory();
                         }
                     }
                 }
@@ -302,31 +303,32 @@ namespace ManagedIrbis.Biblio
             )
         {
             var result = record.FM(210, 'd');
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty)
             {
                 result = record.FM(461, 'h');
             }
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty)
             {
                 result = record.FM(461, 'z');
             }
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty)
             {
                 result = record.FM(463, 'j');
             }
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty)
             {
                 result = record.FM(934);
             }
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty)
             {
                 return 0;
             }
 
-            var match = Regex.Match(result, @"\d{4}");
+            // TODO: реализовать оптимально
+            var match = Regex.Match(result.ToString(), @"\d{4}");
             if (match.Success)
             {
-                result = match.Value;
+                result = match.Value.AsMemory();
             }
             return result.SafeToInt32();
         }

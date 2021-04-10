@@ -218,21 +218,23 @@ namespace ManagedIrbis.Fields
                 return null;
             }
 
+            // TODO: реализовать эффективно
+
             var result = new AthraTitle
             {
-                Surname = field.GetFirstSubFieldValue('a'),
-                Initials = field.GetFirstSubFieldValue('b'),
-                Extension = field.GetFirstSubFieldValue('g'),
-                Role = field.GetFirstSubFieldValue('<'),
-                IntegralPart = field.GetFirstSubFieldValue('1'),
-                IdentifyingSigns = field.GetFirstSubFieldValue('c'),
-                RomanNumerals = field.GetFirstSubFieldValue('d'),
-                Dates = field.GetFirstSubFieldValue('f'),
-                CorrectionNeeded = field.GetFirstSubFieldValue('!'),
-                Graphics = field.GetFirstSubFieldValue('7'),
-                Language = field.GetFirstSubFieldValue('8'),
-                Mark = field.GetFirstSubFieldValue('9'),
-                RelationCode = field.GetFirstSubFieldValue('4'),
+                Surname = field.GetFirstSubFieldValue('a').ToString(),
+                Initials = field.GetFirstSubFieldValue('b').ToString(),
+                Extension = field.GetFirstSubFieldValue('g').ToString(),
+                Role = field.GetFirstSubFieldValue('<').ToString(),
+                IntegralPart = field.GetFirstSubFieldValue('1').ToString(),
+                IdentifyingSigns = field.GetFirstSubFieldValue('c').ToString(),
+                RomanNumerals = field.GetFirstSubFieldValue('d').ToString(),
+                Dates = field.GetFirstSubFieldValue('f').ToString(),
+                CorrectionNeeded = field.GetFirstSubFieldValue('!').ToString(),
+                Graphics = field.GetFirstSubFieldValue('7').ToString(),
+                Language = field.GetFirstSubFieldValue('8').ToString(),
+                Mark = field.GetFirstSubFieldValue('9').ToString(),
+                RelationCode = field.GetFirstSubFieldValue('4').ToString(),
                 Field = field
             };
 

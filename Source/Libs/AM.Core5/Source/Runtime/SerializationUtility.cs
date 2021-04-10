@@ -260,6 +260,58 @@ namespace AM.Runtime
         }
 
         /// <summary>
+        /// Сохранение в поток массива элементов.
+        /// </summary>
+        public static void SaveToStream
+            (
+                this ReadOnlyMemory<char> memory,
+                BinaryWriter writer
+            )
+        {
+            writer.WritePackedInt32(memory.Length);
+            writer.Write(memory.Span);
+        }
+
+        /// <summary>
+        /// Сохранение в поток массива элементов.
+        /// </summary>
+        public static void SaveToStream
+            (
+                this ReadOnlySpan<char> span,
+                BinaryWriter writer
+            )
+        {
+            writer.WritePackedInt32(span.Length);
+            writer.Write(span);
+        }
+
+        /// <summary>
+        /// Сохранение в поток массива элементов.
+        /// </summary>
+        public static void SaveToStream
+            (
+                this ReadOnlyMemory<byte> memory,
+                BinaryWriter writer
+            )
+        {
+            writer.WritePackedInt32(memory.Length);
+            writer.Write(memory.Span);
+        }
+
+        /// <summary>
+        /// Сохранение в поток массива элементов.
+        /// </summary>
+        public static void SaveToStream
+            (
+                this ReadOnlySpan<byte> span,
+                BinaryWriter writer
+            )
+        {
+            writer.WritePackedInt32(span.Length);
+            writer.Write(span);
+        }
+
+        /// <summary>
         /// Сохранение в файл объекта,
         /// умеющего сериализоваться вручную.
         /// </summary>

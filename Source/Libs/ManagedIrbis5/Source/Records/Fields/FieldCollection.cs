@@ -183,6 +183,44 @@ namespace ManagedIrbis
                     Add(field);
                 }
 
+                field.Value = value.AsMemory();
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Apply the field value.
+        /// </summary>
+        /// <remarks>
+        /// For non-repeating fields only.
+        /// </remarks>
+        public FieldCollection ApplyFieldValue
+            (
+                int tag,
+                ReadOnlyMemory<char> value
+            )
+        {
+            var field = this.FirstOrDefault
+                (
+                    item => item.Tag == tag
+                );
+
+            if (value.IsEmpty)
+            {
+                if (!ReferenceEquals(field, null))
+                {
+                    Remove(field);
+                }
+            }
+            else
+            {
+                if (field is null)
+                {
+                    field = new Field {Tag = tag};
+                    Add(field);
+                }
+
                 field.Value = value;
             }
 

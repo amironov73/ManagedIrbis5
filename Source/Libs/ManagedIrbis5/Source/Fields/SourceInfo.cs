@@ -414,8 +414,10 @@ namespace ManagedIrbis.Fields
                 Record record
             )
         {
-            List<SourceInfo> result = new List<SourceInfo>();
-            for (int i = 0; ; i++)
+            // TODO: реализовать эффективно
+
+            var result = new List<SourceInfo>();
+            for (var i = 0; ; i++)
             {
                 var field463 = record.Fields.GetField(Tag463, i);
                 var field963 = record.Fields.GetField(Tag963, i);
@@ -425,48 +427,48 @@ namespace ManagedIrbis.Fields
                     break;
                 }
 
-                SourceInfo info = new SourceInfo();
+                var info = new SourceInfo();
                 result.Add(info);
 
                 if (!ReferenceEquals(field463, null))
                 {
-                    info.Title = field463.GetFirstSubFieldValue('c');
-                    info.Year = field463.GetFirstSubFieldValue('j');
-                    info.Publisher = field463.GetFirstSubFieldValue('g');
-                    info.City = field463.GetFirstSubFieldValue('d');
-                    info.Unit = field463.GetFirstSubFieldValue('1');
-                    info.Position = field463.GetFirstSubFieldValue('s');
-                    info.ArticleNumber = field463.GetFirstSubFieldValue('n');
-                    info.Illustrations = field463.GetFirstSubFieldValue('0');
-                    info.Comments = field463.GetFirstSubFieldValue('p');
-                    info.VolumeNumber = field463.GetFirstSubFieldValue('v');
-                    info.VolumeTitle = field463.GetFirstSubFieldValue('a');
-                    info.ParallelVolumeTitle = field463.GetFirstSubFieldValue('r');
-                    info.SecondLevelNumber = field463.GetFirstSubFieldValue('h');
-                    info.SecondLevelTitle = field463.GetFirstSubFieldValue('i');
-                    info.ThirdLevelNumber = field463.GetFirstSubFieldValue('k');
-                    info.ThirdLevelTitle = field463.GetFirstSubFieldValue('l');
-                    info.Abbreviation = field463.GetFirstSubFieldValue('7');
-                    info.ParallelTitle1 = field463.GetFirstSubFieldValue('x');
-                    info.ParallelTitle2 = field463.GetFirstSubFieldValue('y');
-                    info.ParallelTitle3 = field463.GetFirstSubFieldValue('z');
-                    info.Index = field463.GetFirstSubFieldValue('w');
+                    info.Title = field463.GetFirstSubFieldValue('c').ToString();
+                    info.Year = field463.GetFirstSubFieldValue('j').ToString();
+                    info.Publisher = field463.GetFirstSubFieldValue('g').ToString();
+                    info.City = field463.GetFirstSubFieldValue('d').ToString();
+                    info.Unit = field463.GetFirstSubFieldValue('1').ToString();
+                    info.Position = field463.GetFirstSubFieldValue('s').ToString();
+                    info.ArticleNumber = field463.GetFirstSubFieldValue('n').ToString();
+                    info.Illustrations = field463.GetFirstSubFieldValue('0').ToString();
+                    info.Comments = field463.GetFirstSubFieldValue('p').ToString();
+                    info.VolumeNumber = field463.GetFirstSubFieldValue('v').ToString();
+                    info.VolumeTitle = field463.GetFirstSubFieldValue('a').ToString();
+                    info.ParallelVolumeTitle = field463.GetFirstSubFieldValue('r').ToString();
+                    info.SecondLevelNumber = field463.GetFirstSubFieldValue('h').ToString();
+                    info.SecondLevelTitle = field463.GetFirstSubFieldValue('i').ToString();
+                    info.ThirdLevelNumber = field463.GetFirstSubFieldValue('k').ToString();
+                    info.ThirdLevelTitle = field463.GetFirstSubFieldValue('l').ToString();
+                    info.Abbreviation = field463.GetFirstSubFieldValue('7').ToString();
+                    info.ParallelTitle1 = field463.GetFirstSubFieldValue('x').ToString();
+                    info.ParallelTitle2 = field463.GetFirstSubFieldValue('y').ToString();
+                    info.ParallelTitle3 = field463.GetFirstSubFieldValue('z').ToString();
+                    info.Index = field463.GetFirstSubFieldValue('w').ToString();
                     info.Field463 = field463;
                 }
 
                 if (!ReferenceEquals(field963, null))
                 {
-                    info.FirstAuthor = field963.GetFirstSubFieldValue('x');
-                    info.CantBeInverted = field963.GetFirstSubFieldValue('9');
-                    info.Collective = field963.GetFirstSubFieldValue('b');
-                    info.CollectiveAbbreviation = field963.GetFirstSubFieldValue('7');
-                    info.Subtitle = field963.GetFirstSubFieldValue('e');
-                    info.Responsibility = field963.GetFirstSubFieldValue('f');
-                    info.Isbn = field963.GetFirstSubFieldValue('i');
-                    info.Reprint = field963.GetFirstSubFieldValue('p');
-                    info.SeriesNumber = field963.GetFirstSubFieldValue('v');
-                    info.SeriesTitle = field963.GetFirstSubFieldValue('a');
-                    info.SeriesResponsibility = field963.GetFirstSubFieldValue('o');
+                    info.FirstAuthor = field963.GetFirstSubFieldValue('x').ToString();
+                    info.CantBeInverted = field963.GetFirstSubFieldValue('9').ToString();
+                    info.Collective = field963.GetFirstSubFieldValue('b').ToString();
+                    info.CollectiveAbbreviation = field963.GetFirstSubFieldValue('7').ToString();
+                    info.Subtitle = field963.GetFirstSubFieldValue('e').ToString();
+                    info.Responsibility = field963.GetFirstSubFieldValue('f').ToString();
+                    info.Isbn = field963.GetFirstSubFieldValue('i').ToString();
+                    info.Reprint = field963.GetFirstSubFieldValue('p').ToString();
+                    info.SeriesNumber = field963.GetFirstSubFieldValue('v').ToString();
+                    info.SeriesTitle = field963.GetFirstSubFieldValue('a').ToString();
+                    info.SeriesResponsibility = field963.GetFirstSubFieldValue('o').ToString();
                     info.Field963 = field963;
                 }
             }

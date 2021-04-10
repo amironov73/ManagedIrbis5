@@ -194,17 +194,19 @@ namespace ManagedIrbis.Magazines
                 Record record
             )
         {
+            // TODO: реализовать оптимально
+
             var result = new MagazineIssueInfo
             {
                 Mfn = record.Mfn,
-                Index = record.FM(903),
-                DocumentCode = record.FM(903),
-                MagazineCode = record.FM(933),
-                Year = record.FM(934),
-                Volume = record.FM(935),
-                Number = record.FM(936),
-                Supplement = record.FM(931, 'c'),
-                Worksheet = record.FM(920),
+                Index = record.FM(903).ToString(),
+                DocumentCode = record.FM(903).ToString(),
+                MagazineCode = record.FM(933).ToString(),
+                Year = record.FM(934).ToString(),
+                Volume = record.FM(935).ToString(),
+                Number = record.FM(936).ToString(),
+                Supplement = record.FM(931, 'c').ToString(),
+                Worksheet = record.FM(920).ToString(),
 
                 Articles = record.Fields
                     .GetField(922)

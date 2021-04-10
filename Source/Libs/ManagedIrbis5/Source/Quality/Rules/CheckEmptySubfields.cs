@@ -41,7 +41,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             foreach (SubField subField in field.Subfields)
             {
-                if (string.IsNullOrEmpty(subField.Value))
+                if (subField.Value.IsEmpty)
                 {
                     AddDefect
                         (

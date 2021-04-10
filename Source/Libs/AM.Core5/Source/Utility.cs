@@ -619,6 +619,56 @@ namespace AM
             Environment.GetEnvironmentVariable("GITHUB_ACTIONS").SameString("True");
 
         /// <summary>
+        /// Бросает исключение, если переданное значение пустое,
+        /// иначе просто возвращает его.
+        /// </summary>
+        public static ReadOnlyMemory<T> ThrowIfEmpty<T>
+            (
+                this ReadOnlyMemory<T> memory,
+                string message = "Empty value detected"
+            )
+        {
+            if (memory.IsEmpty)
+            {
+                Magna.Error
+                    (
+                        nameof(Utility) + "::" + nameof(ThrowIfEmpty)
+                        + ": "
+                        + message
+                    );
+
+                throw new ArgumentException (message);
+            }
+
+            return memory;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если переданное значение пустое,
+        /// иначе просто возвращает его.
+        /// </summary>
+        public static ReadOnlySpan<T> ThrowIfEmpty<T>
+            (
+                this ReadOnlySpan<T> memory,
+                string message = "Empty value detected"
+            )
+        {
+            if (memory.IsEmpty)
+            {
+                Magna.Error
+                    (
+                        nameof(Utility) + "::" + nameof(ThrowIfEmpty)
+                        + ": "
+                        + message
+                    );
+
+                throw new ArgumentException (message);
+            }
+
+            return memory;
+        }
+
+        /// <summary>
         /// Бросает исключение, если переданное значение равно <c>null</c>,
         /// иначе просто возвращает его.
         /// </summary>
@@ -677,6 +727,13 @@ namespace AM
         [Pure]
         public static char FirstChar (this string? text) =>
             string.IsNullOrEmpty(text) ? '\0' : text[0];
+
+        /// <summary>
+        /// Безопасное получение первого символа в строке.
+        /// </summary>
+        [Pure]
+        public static char FirstChar(this ReadOnlyMemory<char> text) =>
+            text.Length == 0 ? '\0' : text.Span[0];
 
         /// <summary>
         /// Безопасное получение первого символа в строке.
@@ -828,6 +885,17 @@ namespace AM
         /// <param name="two">Вторая строка.</param>
         /// <returns>Строки совпадают с точностью до регистра?</returns>
         [Pure]
+        public static bool SameString(this ReadOnlyMemory<char> one, string? two) =>
+            one.Span.CompareTo(two.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0;
+
+        /// <summary>
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
+        [Pure]
         public static bool SameString(this ReadOnlySpan<char> one, ReadOnlySpan<char> two) =>
             one.CompareTo(two, StringComparison.OrdinalIgnoreCase) == 0;
 
@@ -843,6 +911,19 @@ namespace AM
         public static bool SameString (this string? one, string? two, string? three) =>
             string.Compare (one, two, StringComparison.OrdinalIgnoreCase) == 0
             || string.Compare (one, three, StringComparison.OrdinalIgnoreCase) == 0;
+
+        /// <summary>
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
+        /// <param name="three">Третья строка.</param>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
+        [Pure]
+        public static bool SameString(this ReadOnlyMemory<char> one, string? two, string? three) =>
+            one.Span.CompareTo(two.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0
+            || one.Span.CompareTo(three.AsSpan(), StringComparison.OrdinalIgnoreCase) == 0;
 
         /// <summary>
         /// Сравнивает строки с точностью до регистра
@@ -921,6 +1002,36 @@ namespace AM
         } // method SameString
 
         /// <summary>
+        /// Сравнивает строки с точностью до регистра
+        /// без учета текущей культуры.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="strings">Строки для сопоставления.</param>
+        /// <returns>Строки совпадают с точностью до регистра?</returns>
+        [Pure]
+        public static bool SameString
+            (
+                this ReadOnlyMemory<char> one,
+                IEnumerable<string?> strings
+            )
+        {
+            foreach (var two in strings)
+            {
+                if (one.Span.CompareTo
+                    (
+                        two.AsSpan(),
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                    == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        } // method SameString
+
+        /// <summary>
         /// Сравнивает строки с учетом регистра символов,
         /// но без учета текущей культуры.
         /// </summary>
@@ -940,6 +1051,23 @@ namespace AM
                     two,
                     StringComparison.Ordinal
                 ) == 0;
+        } // method SameStringSensitive
+
+        /// <summary>
+        /// Сравнивает строки с учетом регистра символов,
+        /// но без учета текущей культуры.
+        /// </summary>
+        /// <param name="one">Первая строка.</param>
+        /// <param name="two">Вторая строка.</param>
+        /// <returns>Строки совпадают?</returns>
+        [Pure]
+        public static bool SameStringSensitive
+            (
+                this ReadOnlyMemory<char> one,
+                ReadOnlyMemory<char> two
+            )
+        {
+            return one.Span.CompareTo(two.Span, StringComparison.Ordinal) == 0;
         } // method SameStringSensitive
 
         /// <summary>
@@ -1308,12 +1436,96 @@ namespace AM
         /// <summary>
         /// Безопасное преобразование строки в целое.
         /// </summary>
+        public static int SafeToInt32
+            (
+                this ReadOnlyMemory<char> text
+            )
+        {
+            if (text.IsEmpty)
+            {
+                return 0;
+            }
+
+            if (!int.TryParse(text.Span, out var result))
+            {
+                result = 0;
+            }
+
+            return result;
+        } // method SafeToInt32
+
+        /// <summary>
+        /// Безопасное преобразование строки в целое.
+        /// </summary>
+        public static int SafeToInt32
+            (
+                this ReadOnlySpan<char> text
+            )
+        {
+            if (text.IsEmpty)
+            {
+                return 0;
+            }
+
+            if (!int.TryParse(text, out var result))
+            {
+                result = 0;
+            }
+
+            return result;
+        } // method SafeToInt32
+
+        /// <summary>
+        /// Безопасное преобразование строки в целое.
+        /// </summary>
         public static long SafeToInt64
             (
                 this string? text
             )
         {
             if (string.IsNullOrEmpty(text))
+            {
+                return 0;
+            }
+
+            if (!long.TryParse(text, out var result))
+            {
+                result = 0;
+            }
+
+            return result;
+        } // method SafeToInt64
+
+        /// <summary>
+        /// Безопасное преобразование строки в целое.
+        /// </summary>
+        public static long SafeToInt64
+            (
+                this ReadOnlyMemory<char> text
+            )
+        {
+            if (text.IsEmpty)
+            {
+                return 0;
+            }
+
+            if (!long.TryParse(text.Span, out var result))
+            {
+                result = 0;
+            }
+
+            return result;
+        } // method SafeToInt64
+
+        /// <summary>
+        /// Безопасное преобразование строки в целое.
+        /// </summary>
+        public static long SafeToInt64
+            (
+                this ReadOnlySpan<char> text
+            )
+        {
+            if (text.IsEmpty)
             {
                 return 0;
             }
@@ -1350,6 +1562,52 @@ namespace AM
         }
 
         /// <summary>
+        /// Безопасное преобразование строки
+        /// в число с плавающей точкой.
+        /// </summary>
+        public static double SafeToDouble
+            (
+                this ReadOnlyMemory<char> text,
+                double defaultValue = default
+            )
+        {
+            if (text.IsEmpty)
+            {
+                return defaultValue;
+            }
+
+            if (!TryParseDouble(text.Span, out var result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Безопасное преобразование строки
+        /// в число с плавающей точкой.
+        /// </summary>
+        public static double SafeToDouble
+            (
+                this ReadOnlySpan<char> text,
+                double defaultValue = default
+            )
+        {
+            if (text.IsEmpty)
+            {
+                return defaultValue;
+            }
+
+            if (!TryParseDouble(text, out var result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Безопасное преобразование строки в денежный тип.
         /// </summary>
         public static decimal SafeToDecimal
@@ -1372,10 +1630,60 @@ namespace AM
         }
 
         /// <summary>
+        /// Безопасное преобразование строки в денежный тип.
+        /// </summary>
+        public static decimal SafeToDecimal
+            (
+                this ReadOnlyMemory<char> text,
+                decimal defaultValue = default
+            )
+        {
+            if (text.IsEmpty)
+            {
+                return defaultValue;
+            }
+
+            if (!decimal.TryParse(text.Span, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Безопасное преобразование строки в денежный тип.
+        /// </summary>
+        public static decimal SafeToDecimal
+            (
+                this ReadOnlySpan<char> text,
+                decimal defaultValue = default
+            )
+        {
+            if (text.IsEmpty)
+            {
+                return defaultValue;
+            }
+
+            if (!decimal.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Сокращение для Parse.
         /// </summary>
         public static short ParseInt16(this string text) =>
             short.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static short ParseInt16(this ReadOnlyMemory<char> text) =>
+            short.Parse(text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
@@ -1392,6 +1700,12 @@ namespace AM
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        public static int ParseInt32(this ReadOnlyMemory<char> text) =>
+            int.Parse(text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
         public static int ParseInt32(this ReadOnlySpan<char> text) =>
             int.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
@@ -1400,6 +1714,12 @@ namespace AM
         /// </summary>
         public static long ParseInt64(this string text) =>
             long.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// Сокращение для Parse.
+        /// </summary>
+        public static long ParseInt64(this ReadOnlyMemory<char> text) =>
+            long.Parse(text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
@@ -1661,6 +1981,70 @@ namespace AM
             foreach (var one in array)
             {
                 if (value.CompareTo(one) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        } // method IsOneOf
+
+        /// <summary>
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf
+            (
+                this ReadOnlyMemory<char> value,
+                string? first
+            )
+            => value.Span.CompareTo(first.AsSpan(), StringComparison.Ordinal) == 0;
+
+        /// <summary>
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf
+            (
+                this ReadOnlyMemory<char> value,
+                string? first,
+                string? second
+            )
+            => value.Span.CompareTo(first.AsSpan(), StringComparison.Ordinal) == 0
+            || value.Span.CompareTo(second.AsSpan(), StringComparison.Ordinal) == 0;
+
+        /// <summary>
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf
+            (
+                this ReadOnlyMemory<char> value,
+                string? first,
+                string? second,
+                string? third
+            )
+            => value.Span.CompareTo(first.AsSpan(), StringComparison.Ordinal) == 0
+            || value.Span.CompareTo(second.AsSpan(), StringComparison.Ordinal) == 0
+            || value.Span.CompareTo(third.AsSpan(), StringComparison.Ordinal) == 0;
+
+        /// <summary>
+        /// Определяет, равен ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf
+            (
+                this ReadOnlyMemory<char> value,
+                params string?[] array
+            )
+        {
+            foreach (var one in array)
+            {
+                if (value.Span.CompareTo(one.AsSpan(), StringComparison.Ordinal) == 0)
                 {
                     return true;
                 }
@@ -2411,6 +2795,49 @@ namespace AM
                 : throw new ArgumentOutOfRangeException();
 
         /// <summary>
+        /// Выбирает первый не пустой спан среди перечисленных.
+        /// </summary>
+        public static ReadOnlyMemory<T> NonEmpty<T>
+            (
+                ReadOnlyMemory<T> first,
+                ReadOnlyMemory<T> second
+            )
+            => !first.IsEmpty ? first
+                : !second.IsEmpty ? second
+                : throw new ArgumentOutOfRangeException();
+
+        /// <summary>
+        /// Выбирает первый не пустой спан среди перечисленных.
+        /// </summary>
+        public static ReadOnlyMemory<T> NonEmpty<T>
+            (
+                ReadOnlyMemory<T> first,
+                ReadOnlyMemory<T> second,
+                ReadOnlyMemory<T> third
+            )
+            => !first.IsEmpty ? first
+                : !second.IsEmpty ? second
+                : !third.IsEmpty ? third
+                : throw new ArgumentOutOfRangeException();
+
+        /// <summary>
+        /// Выбирает первый не пустой спан среди перечисленных.
+        /// </summary>
+        public static ReadOnlyMemory<T> NonEmpty<T>
+            (
+                ReadOnlyMemory<T> first,
+                ReadOnlyMemory<T> second,
+                ReadOnlyMemory<T> third,
+                ReadOnlyMemory<T> fourth
+            )
+            =>
+                !first.IsEmpty ? first
+                : !second.IsEmpty ? second
+                : !third.IsEmpty ? third
+                : !fourth.IsEmpty ? fourth
+                : throw new ArgumentOutOfRangeException();
+
+        /// <summary>
         /// Trim lines.
         /// </summary>
         public static IEnumerable<string> TrimLines
@@ -2545,6 +2972,26 @@ namespace AM
 
             return exception;
         } // method Unwrap
+
+        /// <summary>
+        /// Преобразование последовательности объектов в массив строк.
+        /// </summary>
+        public static string[] ToStringArray<T>
+            (
+                this IEnumerable<T> items
+            )
+        {
+            var result = new List<string>();
+            foreach (var item in items)
+            {
+                var line = item is null
+                    ? (string?)null
+                    : item.ToString();
+                result.Add(line);
+            }
+
+            return result.ToArray();
+        }
 
         /// <summary>
         /// Универсальное длинное представление даты/времени.

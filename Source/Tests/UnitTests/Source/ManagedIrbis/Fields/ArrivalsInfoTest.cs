@@ -2,6 +2,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable StringLiteralTypo
 
+using AM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Json;
@@ -131,10 +132,10 @@ namespace UnitTests.ManagedIrbis.Fields
                 ArrivalsInfo second
             )
         {
-            Assert.AreEqual(first.OnBalanceWithoutPeriodicals, second.OnBalanceWithoutPeriodicals);
-            Assert.AreEqual(first.OffBalanceWithoutPeriodicals, second.OffBalanceWithoutPeriodicals);
-            Assert.AreEqual(first.TotalWithoutPeriodicals, second.TotalWithoutPeriodicals);
-            Assert.AreEqual(first.OnBalanceWithoutPeriodicals, second.OnBalanceWithoutPeriodicals);
+            Assert.AreEqual(first.OnBalanceWithoutPeriodicals, second.OnBalanceWithoutPeriodicals.EmptyToNull());
+            Assert.AreEqual(first.OffBalanceWithoutPeriodicals, second.OffBalanceWithoutPeriodicals.EmptyToNull());
+            Assert.AreEqual(first.TotalWithoutPeriodicals, second.TotalWithoutPeriodicals.EmptyToNull());
+            Assert.AreEqual(first.OnBalanceWithoutPeriodicals, second.OnBalanceWithoutPeriodicals.EmptyToNull());
             Assert.AreEqual(first.Educational, second.Educational);
 
             if (ReferenceEquals(first.UnknownSubFields, null))

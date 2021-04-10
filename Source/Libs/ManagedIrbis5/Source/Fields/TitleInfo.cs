@@ -140,7 +140,7 @@ namespace ManagedIrbis.Fields
         {
             get
             {
-                StringBuilder result = new StringBuilder();
+                var result = new StringBuilder();
                 if (!string.IsNullOrEmpty(VolumeNumber))
                 {
                     result.Append(VolumeNumber);
@@ -251,16 +251,17 @@ namespace ManagedIrbis.Fields
             )
         {
             // TODO: support for unknown subfields
+            // TODO: реализовать эффективно
 
             var result = new TitleInfo
             {
-                VolumeNumber = field.GetFirstSubFieldValue('v'),
-                Title = field.GetFirstSubFieldValue('a'),
-                Specific = field.GetFirstSubFieldValue('u'),
-                General = field.GetFirstSubFieldValue('b'),
-                Subtitle = field.GetFirstSubFieldValue('e'),
-                FirstResponsibility = field.GetFirstSubFieldValue('f'),
-                OtherResponsibility = field.GetFirstSubFieldValue('g'),
+                VolumeNumber = field.GetFirstSubFieldValue('v').ToString(),
+                Title = field.GetFirstSubFieldValue('a').ToString(),
+                Specific = field.GetFirstSubFieldValue('u').ToString(),
+                General = field.GetFirstSubFieldValue('b').ToString(),
+                Subtitle = field.GetFirstSubFieldValue('e').ToString(),
+                FirstResponsibility = field.GetFirstSubFieldValue('f').ToString(),
+                OtherResponsibility = field.GetFirstSubFieldValue('g').ToString(),
                 Field = field
             };
 
@@ -276,12 +277,13 @@ namespace ManagedIrbis.Fields
             )
         {
             // TODO: support for unknown subfields
+            // TODO: реализовать эффективно
 
-            TitleInfo result = new TitleInfo
+            var result = new TitleInfo
             {
-                Title = field.GetFirstSubFieldValue('c'),
-                Subtitle = field.GetFirstSubFieldValue('e'),
-                FirstResponsibility = field.GetFirstSubFieldValue('g'),
+                Title = field.GetFirstSubFieldValue('c').ToString(),
+                Subtitle = field.GetFirstSubFieldValue('e').ToString(),
+                FirstResponsibility = field.GetFirstSubFieldValue('g').ToString(),
                 Field = field
             };
 

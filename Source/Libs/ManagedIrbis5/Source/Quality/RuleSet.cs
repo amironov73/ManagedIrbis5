@@ -89,7 +89,7 @@ namespace ManagedIrbis.Quality
                         context.BriefFormat,
                         context.Record.Mfn
                     ),
-                Index = context.Record.FM(903),
+                Index = context.Record.FM(903).ToString(),
                 Mfn = context.Record.Mfn
             };
             RuleUtility.RenumberFields
@@ -128,8 +128,8 @@ namespace ManagedIrbis.Quality
             if (!_registeredRules.TryGetValue
                 (
                     name,
-                    out ruleType)
-                )
+                    out ruleType
+                ))
             {
                 return null;
             }

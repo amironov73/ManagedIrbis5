@@ -13,6 +13,8 @@
 
 #region Using directives
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -61,7 +63,7 @@ namespace ManagedIrbis.Fields
             get
             {
                 AuthorInfo? result = null;
-                Field? field700 = Record.Fields.GetFirstField(700);
+                var field700 = Record.Fields.GetFirstField(700);
                 if (!ReferenceEquals(field700, null))
                 {
                     result = AuthorInfo.ParseField700(field700);
@@ -97,18 +99,14 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Характер документа (первый из).
         /// </summary>
-        public string? DocumentCharacter
-        {
-            get { return Record.FM(900, 'c'); }
-        }
+        public ReadOnlyMemory<char> DocumentCharacter =>
+            Record.FM(900, 'c');
 
         /// <summary>
         /// Тип документа.
         /// </summary>
-        public string? DocumentType
-        {
-            get { return Record.FM(900, 't'); }
-        }
+        public ReadOnlyMemory<char> DocumentType =>
+            Record.FM(900, 't');
 
         /// <summary>
         /// Электронный ресурс?
@@ -128,7 +126,7 @@ namespace ManagedIrbis.Fields
                     return true;
                 }
 
-                char measureUnit = Record.FM(215, '1').FirstChar();
+                var measureUnit = Record.FM(215, '1').FirstChar();
                 if (measureUnit.IsOneOf('r', 'j', 'o'))
                 {
                     return true;
@@ -163,7 +161,7 @@ namespace ManagedIrbis.Fields
         {
             get
             {
-                int result = 0;
+                var result = 0;
                 foreach (ExemplarInfo exemplar in Exemplars)
                 {
                     string status = exemplar.Status;
@@ -173,7 +171,7 @@ namespace ManagedIrbis.Fields
                         && status != "9")
                         continue;
 
-                    int amount = exemplar.Amount.SafeToInt32();
+                    var amount = exemplar.Amount.SafeToInt32();
                     if (amount == 0)
                     {
                         amount = 1;
@@ -193,7 +191,7 @@ namespace ManagedIrbis.Fields
         {
             get
             {
-                string[] languages = Languages;
+                var languages = Languages;
                 if (languages.Length == 0)
                 {
                     return false;
@@ -206,26 +204,19 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Языки документа
         /// </summary>
-        public string[] Languages
-        {
-            get { return Record.FMA(101); }
-        }
+        public ReadOnlyMemory<char>[] Languages =>
+            Record.FMA(101);
 
         /// <summary>
         /// Первая ссылка на внешний ресурс.
         /// </summary>
-        public string? Link
-        {
-            get { return _ExecuteScript(_linkScript).EmptyToNull(); }
-        }
+        public ReadOnlyMemory<char> Link =>
+            _ExecuteScript(_linkScript).AsMemory();
 
         /// <summary>
         /// Количество страниц.
         /// </summary>
-        public int Pages
-        {
-            get { return CountPages(Volume); }
-        }
+        public int Pages => CountPages(Volume);
 
         /// <summary>
         /// Цена, общая для всех экземпляров.
@@ -238,13 +229,14 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Издательства.
         /// </summary>
-        public string[] Publishers
+        public ReadOnlyMemory<char>[] Publishers
         {
             get
             {
-                return Record.FMA(210, 'c')
-                    .Union(Record.FMA(461, 'g'))
-                    .ToArray();
+                var result = new List<ReadOnlyMemory<char>>();
+                result.AddRange(Record.FMA(210, 'c'));
+                result.AddRange(Record.FMA(461, 'g'));
+                return result.ToArray();
             }
         }
 
@@ -280,18 +272,12 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Объем издания (цифры).
         /// </summary>
-        public string? Volume
-        {
-            get { return Record.FM(215, 'a'); }
-        }
+        public ReadOnlyMemory<char> Volume => Record.FM(215, 'a');
 
         /// <summary>
         /// Рабочий лист.
         /// </summary>
-        public string? Worksheet
-        {
-            get { return Record.FM(920); }
-        }
+        public ReadOnlyMemory<char> Worksheet => Record.FM(920);
 
         /// <summary>
         /// Год издания.
@@ -302,34 +288,36 @@ namespace ManagedIrbis.Fields
             {
                 var record = Record;
                 var result = record.FM(210, 'd');
-                if (string.IsNullOrEmpty(result))
+                if (result.IsEmpty)
                 {
                     result = record.FM(461, 'h');
                 }
-                if (string.IsNullOrEmpty(result))
+                if (result.IsEmpty)
                 {
                     result = record.FM(461, 'z');
                 }
-                if (string.IsNullOrEmpty(result))
+                if (result.IsEmpty)
                 {
                     result = record.FM(463, 'j');
                 }
-                if (string.IsNullOrEmpty(result))
+                if (result.IsEmpty)
                 {
                     result = record.FM(934);
                 }
-                if (string.IsNullOrEmpty(result))
+                if (result.IsEmpty)
                 {
                     return 0;
                 }
 
-                var match = Regex.Match(result, @"\d{4}");
+                // TODO: реализовать оптимально
+
+                var match = Regex.Match(result.ToString(), @"\d{4}");
                 if (match.Success)
                 {
-                    result = match.Value;
+                    result = match.Value.AsMemory();
                 }
-                return result.SafeToInt32();
 
+                return result.SafeToInt32();
             }
         }
 
@@ -384,38 +372,40 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public static int CountPages
             (
-                string? text
+                ReadOnlyMemory<char> text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (text.IsEmpty)
             {
                 return 0;
             }
 
             text = text.Trim();
-            if (string.IsNullOrEmpty(text))
+            if (text.IsEmpty)
             {
                 return 0;
             }
 
-            int result = 0;
+            var result = 0;
 
-            MatchCollection matches = Regex.Matches
+            // TODO: реализовать оптимально
+
+            var matches = Regex.Matches
                 (
-                    text,
+                    text.ToString(),
                     @"[ivxlcm]+",
                     RegexOptions.IgnoreCase
                 );
             foreach (Match match in matches)
             {
-                int value = UniforPlus9.ToArabicNumber(match.Value);
+                var value = UniforPlus9.ToArabicNumber(match.Value);
                 result += value;
             }
 
-            matches = Regex.Matches(text, @"[0-9]+");
+            matches = Regex.Matches(text.ToString(), @"[0-9]+");
             foreach (Match match in matches)
             {
-                int value = FastNumber.ParseInt32(match.Value);
+                var value = FastNumber.ParseInt32(match.Value);
                 result += value;
             }
 

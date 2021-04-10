@@ -52,7 +52,7 @@ namespace ManagedIrbis.Systematization
         {
             var result = new AthrbGuidelines
             {
-                Guidelines = field.GetFirstSubFieldValue('a')
+                Guidelines = field.GetFirstSubFieldValue('a').ToString()
             };
 
             return result;

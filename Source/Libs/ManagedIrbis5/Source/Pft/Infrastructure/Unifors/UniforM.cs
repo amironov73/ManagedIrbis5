@@ -71,8 +71,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     Field = found[i],
                     Text = code == '\0'
                         ? found[i].ToText()
-                        : found[i].GetFirstSubFieldValue(code)
-                          ?? string.Empty
+                        : found[i].GetFirstSubFieldValue(code).ToString()
                 };
                 record.Fields.Remove(found[i]);
             }

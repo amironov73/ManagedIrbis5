@@ -118,14 +118,14 @@ namespace UnitTests.ManagedIrbis
             field.Add('a', "123");
             result.Fields.Add(field);
 
-            field = new Field { Tag = 300, Value = "Первое примечание" };
+            field = new Field (300, "Первое примечание");
             result.Fields.Add(field);
-            field = new Field { Tag = 300, Value = "Второе примечание" };
+            field = new Field (300, "Второе примечание");
             result.Fields.Add(field);
-            field = new Field { Tag = 300, Value = "Третье примечание" };
+            field = new Field (300, "Третье примечание");
             result.Fields.Add(field);
 
-            field = new Field { Tag = 920, Value = "PAZK" };
+            field = new Field (920, "PAZK");
             result.Fields.Add(field);
 
             return result;
@@ -138,7 +138,7 @@ namespace UnitTests.ManagedIrbis
             opt.SetWorksheetTag(920);
             var record = _GetRecord();
             const string expected = "PAZK";
-            var actual = opt.GetWorksheet(record);
+            var actual = opt.GetWorksheet(record).ToString();
             Assert.AreEqual(expected, actual);
         }
 

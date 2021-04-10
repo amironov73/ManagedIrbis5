@@ -64,7 +64,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Значение подполя.
         /// </summary>
-        public string? Value { get; set; }
+        public ReadOnlyMemory<char> Value { get; set; }
 
         /// <summary>
         /// Подполе хранит значение поля до первого разделителя.
@@ -100,15 +100,30 @@ namespace ManagedIrbis
         /// Конструктор.
         /// </summary>
         /// <param name="code">Код подполя.</param>
-        /// <param name="value">Значение подполя (опционально)</param>
+        /// <param name="value">Значение подполя (опционально).</param>
         public SubField
             (
                 char code,
-                string? value = default
+                ReadOnlyMemory<char> value = default
             )
         {
             Code = code;
             Value = value;
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="code">Код подполя.</param>
+        /// <param name="value">Значение подполя (опционально).</param>
+        public SubField
+            (
+                char code,
+                string? value
+            )
+        {
+            Code = code;
+            Value = value.AsMemory();
         } // constructor
 
         #endregion
@@ -132,17 +147,15 @@ namespace ManagedIrbis
                 SubField subField2
             )
         {
-            var result = subField1.Code.CompareTo(subField2.Code);
+            // сравниваем коды подполей с точностью до регистра символов
+            var result = char.ToUpperInvariant(subField1.Code)
+                .CompareTo(char.ToUpperInvariant(subField2.Code));
             if (result != 0)
             {
                 return result;
             }
 
-            result = string.CompareOrdinal
-                (
-                    subField1.Value,
-                    subField2.Value
-                );
+            result = subField1.Value.Span.CompareTo(subField2.Value.Span, StringComparison.Ordinal);
 
             return result;
         } // method Compare
@@ -152,13 +165,13 @@ namespace ManagedIrbis
         /// </summary>
         public void Decode
             (
-                ReadOnlySpan<char> text
+                ReadOnlyMemory<char> text
             )
         {
             if (!text.IsEmpty)
             {
-                Code = char.ToLowerInvariant(text[0]);
-                Value = text.Slice(1).ToString();
+                Code = char.ToLowerInvariant(text.Span[0]);
+                Value = text.Slice(1);
             }
         } // method Decode
 
@@ -184,8 +197,8 @@ namespace ManagedIrbis
             )
         {
             Code = reader.ReadChar();
-            Value = reader.ReadNullableString();
-        }
+            Value = reader.ReadNullableString().AsMemory();
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -194,8 +207,8 @@ namespace ManagedIrbis
             )
         {
             writer.Write(Code);
-            writer.WriteNullable(Value);
-        }
+            Value.SaveToStream(writer);
+        } // method SaveToStream
 
         #endregion
 
@@ -210,25 +223,13 @@ namespace ManagedIrbis
             var verifier = new Verifier<SubField>(this, throwOnError);
 
             verifier.Assert(Code == NoCode || Code > ' ', "Wrong Code");
-            if (!string.IsNullOrEmpty(Value))
+            if (!Value.IsEmpty)
             {
-                verifier.Assert(!Value.Contains(Delimiter));
+                verifier.Assert(!Value.Span.Contains(Delimiter));
             }
 
             return verifier.Result;
         } // method Verify
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Code == NoCode
-                ? Value ?? string.Empty
-                : "^" + char.ToLowerInvariant(Code) + Value;
-        } // method ToString
 
         #endregion
 
@@ -281,6 +282,18 @@ namespace ManagedIrbis
             Value = null;
             Field = null;
         } // method Dispose
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString()
+        {
+            return Code == NoCode
+                ? Value.ToString()
+                : "^" + char.ToLowerInvariant(Code) + Value;
+        } // method ToString
 
         #endregion
 

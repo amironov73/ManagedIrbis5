@@ -49,7 +49,7 @@ namespace ManagedIrbis.ImportExport
             builder.Append(IrbisText.IrbisDelimiter);
         }
 
-        private static string _ReadTo
+        private static ReadOnlyMemory<char> _ReadTo
             (
                 StringReader reader,
                 char delimiter
@@ -72,7 +72,7 @@ namespace ManagedIrbis.ImportExport
                 result.Append(c);
             }
 
-            return result.ToString();
+            return result.ToString().AsMemory();
         }
 
         #endregion
@@ -185,7 +185,7 @@ namespace ManagedIrbis.ImportExport
             var result = new Field
             {
                 Tag = FastNumber.ParseInt32(_ReadTo(reader, '#')),
-                Value = _ReadTo(reader, '^').EmptyToNull()
+                Value = _ReadTo(reader, '^')
             };
 
             while (true)

@@ -78,7 +78,7 @@ namespace ManagedIrbis.Fst
                 string fileName
             )
         {
-            string content = File.ReadAllText
+            var content = File.ReadAllText
                 (
                     fileName,
                     IrbisEncoding.Ansi
@@ -87,8 +87,8 @@ namespace ManagedIrbis.Fst
             {
                 return null;
             }
-            StringReader reader = new StringReader(content);
-            FstFile result = FstFile.ParseStream(reader);
+            var reader = new StringReader(content);
+            var result = FstFile.ParseStream(reader);
             if (result.Lines.Count == 0)
             {
                 return null;
@@ -115,17 +115,17 @@ namespace ManagedIrbis.Fst
 
             context.SetProvider(Provider);
             program.Execute(context);
-            string transformed = context.Text;
+            var transformed = context.Text;
 
             var result = new Record
             {
                 Database = Provider.Database
             };
-            string[] lines = transformed.Split((char) 0x07);
+            var lines = transformed.Split((char) 0x07);
             string[] separators = {"\r\n", "\r", "\n"};
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
-                string[] parts = line.Split
+                var parts = line.Split
                     (
                         separators,
                         StringSplitOptions.RemoveEmptyEntries
@@ -136,26 +136,29 @@ namespace ManagedIrbis.Fst
                     continue;
                 }
 
-                string tag = parts[0];
-                for (int i = 1; i < parts.Length; i++)
+                // TODO: реализовать эффективно
+
+                var tag = parts[0];
+                for (var i = 1; i < parts.Length; i++)
                 {
-                    string body = parts[i];
+                    var body = parts[i];
                     if (string.IsNullOrEmpty(body))
                     {
                         continue;
                     }
-                    var field = RecordFieldUtility.Parse(tag, body);
 
-                    SubField[] badSubFields
+                    var field = FieldUtility.Parse(tag.AsMemory(), body.AsMemory());
+
+                    var badSubFields
                         = field.Subfields
-                        .Where(sf => string.IsNullOrEmpty(sf.Value))
+                        .Where(sf => sf.Value.IsEmpty)
                         .ToArray();
-                    foreach (SubField subField in badSubFields)
+                    foreach (var subField in badSubFields)
                     {
                         field.Subfields.Remove(subField);
                     }
 
-                    if (!string.IsNullOrEmpty(field.Value)
+                    if (!field.Value.IsEmpty
                         || field.Subfields.Count != 0)
                     {
                         result.Fields.Add(field);
@@ -175,7 +178,7 @@ namespace ManagedIrbis.Fst
                 FstFile fstFile
             )
         {
-            string format = fstFile.ConcatenateFormat();
+            var format = fstFile.ConcatenateFormat();
             var result = TransformRecord
                 (
                     record,

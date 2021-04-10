@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -15,6 +16,7 @@
 
 #region Using directives
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -74,11 +76,18 @@ namespace ManagedIrbis.ImportExport
             }
         }
 
-        private static int _Encode(byte[] bytes, int pos, string? str, Encoding encoding)
+        private static int _Encode
+            (
+                byte[] bytes,
+                int pos,
+                ReadOnlySpan<char> str,
+                Encoding encoding
+            )
         {
-            if (!ReferenceEquals(str, null))
+            if (!str.IsEmpty)
             {
-                var encoded = encoding.GetBytes(str);
+                // TODO: реализовать менее затратно
+                var encoded = encoding.GetBytes(str.ToArray());
                 for (var i = 0; i < encoded.Length; pos++, i++)
                 {
                     bytes[pos] = encoded[i];
@@ -162,6 +171,7 @@ namespace ManagedIrbis.ImportExport
                 result.Fields.Add(field);
                 if (tag < 10)
                 {
+                    // TODO: реализовать оптимально
                     // Фиксированное поле
                     // не может содержать подполей и индикаторов
                     field.Value = encoding.GetString
@@ -169,7 +179,8 @@ namespace ManagedIrbis.ImportExport
                             record,
                             fieldOffset,
                             fieldLength - 1
-                        );
+                        )
+                        .AsMemory();
                 }
                 else
                 {
@@ -195,12 +206,14 @@ namespace ManagedIrbis.ImportExport
                     // Если есть текст до первого разделителя, запоминаем его
                     if (position != start)
                     {
+                        // TODO: реализовать оптимально
                         field.Value = encoding.GetString
                             (
                                 record,
                                 start,
                                 position - start
-                            );
+                            )
+                            .AsMemory();
                     }
 
                     // Просматриваем подполя
@@ -225,6 +238,7 @@ namespace ManagedIrbis.ImportExport
                                         start + 2,
                                         position - start - 2
                                     )
+                                    .AsMemory()
                             };
                         field.Subfields.Add(subField);
                         start = position;
@@ -266,12 +280,12 @@ namespace ManagedIrbis.ImportExport
                 if (field.Tag < 10)
                 {
                     // В фиксированном поле не бывает подполей.
-                    fldlen += encoding.GetByteCount(field.Value ?? string.Empty);
+                    fldlen += encoding.GetByteCount(field.Value.Span);
                 }
                 else
                 {
                     fldlen += 2; // RecordField.IndicatorCount; // Индикаторы
-                    fldlen += encoding.GetByteCount(field.Value ?? string.Empty);
+                    fldlen += encoding.GetByteCount(field.Value.Span);
                     for (var j = 0; j < field.Subfields.Count; j++)
                     {
                         SubField subField = field.Subfields[j];
@@ -287,7 +301,7 @@ namespace ManagedIrbis.ImportExport
 //                        }
 
                             fldlen += 2; // Признак подполя и его код
-                            fldlen += encoding.GetByteCount(subField.Value ?? string.Empty);
+                            fldlen += encoding.GetByteCount(subField.Value.Span);
                         }
                     }
                 }
@@ -357,7 +371,7 @@ namespace ManagedIrbis.ImportExport
                         (
                             bytes,
                             currentAddress,
-                            field.Value,
+                            field.Value.Span,
                             encoding
                         );
                 }
@@ -371,7 +385,7 @@ namespace ManagedIrbis.ImportExport
                         (
                             bytes,
                             currentAddress,
-                            field.Value,
+                            field.Value.Span,
                             encoding
                         );
 
@@ -383,12 +397,12 @@ namespace ManagedIrbis.ImportExport
                             bytes[currentAddress++] = SubfieldDelimiter;
                             bytes[currentAddress++] = (byte) subfield.Code;
                             currentAddress = _Encode
-                            (
-                                bytes,
-                                currentAddress,
-                                subfield.Value,
-                                encoding
-                            );
+                                (
+                                    bytes,
+                                    currentAddress,
+                                    subfield.Value.Span,
+                                    encoding
+                                );
                         }
                     }
                 }

@@ -2,6 +2,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+using System;
 using System.IO;
 
 using AM.Text;
@@ -34,7 +35,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             };
             node.Execute(context);
             var actual = record.FM(int.Parse(node.Field!.Tag!));
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual(expected, actual.ToString());
         }
 
         private static Field Parse

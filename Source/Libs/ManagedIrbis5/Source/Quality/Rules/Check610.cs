@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using AM;
 
 #endregion
@@ -38,8 +39,8 @@ namespace ManagedIrbis.Quality.Rules
         {
             MustNotContainSubfields(field);
 
-            string text = field.Value;
-            if (text.SafeContains("."))
+            var text = field.Value;
+            if (text.Span.Contains('.'))
             {
                 AddDefect
                     (

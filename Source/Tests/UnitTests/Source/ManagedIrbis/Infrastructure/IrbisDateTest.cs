@@ -78,7 +78,7 @@ namespace UnitTests.ManagedIrbis
         [TestMethod]
         public void IrbisDate_ConvertStringToDate_1()
         {
-            DateTime date = IrbisDate.ConvertStringToDate(null);
+            DateTime date = IrbisDate.ConvertStringToDate((string?)null);
             Assert.AreEqual(DateTime.MinValue, date);
         }
 

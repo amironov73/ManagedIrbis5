@@ -279,7 +279,7 @@ namespace ManagedIrbis
                     result = record
                         .FMA(tag, SubField)
                         .NonEmptyLines()
-                        .ToArray();
+                        .ToStringArray();
                 }
             }
 

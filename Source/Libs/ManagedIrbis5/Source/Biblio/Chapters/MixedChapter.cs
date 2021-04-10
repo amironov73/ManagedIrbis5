@@ -88,8 +88,7 @@ namespace ManagedIrbis.Biblio
                 return;
             }
 
-            using (var formatter
-                = processor.AcquireFormatter(context))
+            using (var formatter = processor.AcquireFormatter(context))
             {
                 generalFormat = processor.GetText(context, generalFormat)
                     .ThrowIfNull("generalFormat");
@@ -99,7 +98,7 @@ namespace ManagedIrbis.Biblio
                 {
                     record = Records[i];
                     var bookInfo = new BookInfo(provider, record);
-                    if (bookInfo.Worksheet != "SPEC")
+                    if (!bookInfo.Worksheet.SameString( "SPEC"))
                     {
                         nonSpec.Add(record);
                         continue;

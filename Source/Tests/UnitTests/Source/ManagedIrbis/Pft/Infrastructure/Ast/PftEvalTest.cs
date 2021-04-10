@@ -26,7 +26,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         {
             var context = new PftContext(null);
             var record = new Record();
-            record.Fields.Add(new Field { Tag = 100, Value = "field100" });
+            record.Fields.Add(new Field (100, "field100"));
             context.Record = record;
             node.Execute(context);
             var actual = context.Text.DosToUnix();

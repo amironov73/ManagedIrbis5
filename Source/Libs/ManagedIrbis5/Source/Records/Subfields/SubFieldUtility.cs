@@ -91,7 +91,7 @@ namespace ManagedIrbis
             foreach (var subField in subFields)
             {
                 if (subField.Code.SameChar(code)
-                    && subField.Value == value)
+                    && subField.Value.SameString(value))
                 {
                     return subField;
                 }
@@ -241,10 +241,10 @@ namespace ManagedIrbis
             foreach (var subField in subFields.NonNullItems())
             {
                 var value = subField.Value;
-                if (!string.IsNullOrEmpty(value))
+                if (!value.IsEmpty)
                 {
                     result ??= new List<string>();
-                    result.Add(value);
+                    result.Add(value.ToString());
                 }
             }
 

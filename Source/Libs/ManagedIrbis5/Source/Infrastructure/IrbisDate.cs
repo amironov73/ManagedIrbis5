@@ -155,6 +155,42 @@ namespace ManagedIrbis.Infrastructure
         }
 
         /// <summary>
+        /// Преобразование строки в дату.
+        /// </summary>
+        public static DateTime ConvertStringToDate
+            (
+                ReadOnlyMemory<char> date
+            )
+        {
+            // TODO: реализовать оптимально
+
+            if (date.Length < 4)
+            {
+                return DateTime.MinValue;
+            }
+
+            if (date.Length > 8)
+            {
+                var match = Regex.Match(date.ToString(), @"\d{8}");
+                if (match.Success)
+                {
+                    date = match.Value.AsMemory();
+                }
+            }
+
+            DateTime.TryParseExact
+                (
+                    date.ToString(),
+                    ConversionFormat,
+                    CultureInfo.CurrentCulture,
+                    DateTimeStyles.None,
+                    out var result
+                );
+
+            return result;
+        }
+
+        /// <summary>
         /// Convert string to time.
         /// </summary>
         public static TimeSpan ConvertStringToTime

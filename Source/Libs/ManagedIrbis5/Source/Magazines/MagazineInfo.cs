@@ -112,7 +112,7 @@ namespace ManagedIrbis.Magazines
         {
             get
             {
-                StringBuilder result = new StringBuilder();
+                var result = new StringBuilder();
                 result.Append(Title);
                 if (!string.IsNullOrEmpty(SeriesNumber))
                 {
@@ -218,18 +218,20 @@ namespace ManagedIrbis.Magazines
                 Record record
             )
         {
-            MagazineInfo result = new MagazineInfo
+            // TODO: реализовать оптимально
+
+            var result = new MagazineInfo
             {
-                Index = record.FM(903),
-                Title = record.FM(200, 'a'),
-                SubTitle = record.FM(200, 'e'),
+                Index = record.FM(903).ToString(),
+                Title = record.FM(200, 'a').ToString(),
+                SubTitle = record.FM(200, 'e').ToString(),
                 Cumulation = MagazineCumulation.Parse(record),
                 QuarterlyOrders = QuarterlyOrderInfo.Parse(record),
-                SeriesNumber = record.FM(923,'h'),
-                SeriesTitle = record.FM(923, 'i'),
-                MagazineType = record.FM(110, 't'),
-                MagazineKind = record.FM(110, 'b'),
-                Periodicity = record.FM(110, 'x'),
+                SeriesNumber = record.FM(923,'h').ToString(),
+                SeriesTitle = record.FM(923, 'i').ToString(),
+                MagazineType = record.FM(110, 't').ToString(),
+                MagazineKind = record.FM(110, 'b').ToString(),
+                Periodicity = record.FM(110, 'x').ToString(),
                 Record = record,
                 Mfn = record.Mfn
             };
@@ -312,7 +314,7 @@ namespace ManagedIrbis.Magazines
                 bool throwOnError
             )
         {
-            Verifier<MagazineInfo> verifier
+            var verifier
                 = new Verifier<MagazineInfo>(this, throwOnError);
 
             verifier

@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -657,6 +658,8 @@ namespace ManagedIrbis.Fst
 
             var transformed = string.Empty;
 
+            // TODO: реализовать эффективно
+
             var result = new Record
             {
                 Database = record.Database ?? Provider.Database
@@ -677,19 +680,18 @@ namespace ManagedIrbis.Fst
                     {
                         continue;
                     }
-                    var field = RecordFieldUtility.Parse(tag, body);
+                    var field = FieldUtility.Parse(tag.AsMemory(), body.AsMemory());
 
                     var badSubFields
                         = field.Subfields
-                        .Where(sf => string.IsNullOrEmpty(sf.Value))
+                        .Where(sf => sf.Value.IsEmpty)
                         .ToArray();
                     foreach (var subField in badSubFields)
                     {
                         field.Subfields.Remove(subField);
                     }
 
-                    if (!string.IsNullOrEmpty(field.Value)
-                        || field.Subfields.Count != 0)
+                    if (field.Subfields.Count != 0)
                     {
                         result.Fields.Add(field);
                     }

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 /* PlainText.cs --
@@ -12,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -78,7 +80,7 @@ namespace ManagedIrbis.ImportExport
     {
         #region Private members
 
-        private static string _ReadTo
+        private static ReadOnlyMemory<char> _ReadTo
             (
                 TextReader reader,
                 char delimiter
@@ -101,7 +103,7 @@ namespace ManagedIrbis.ImportExport
                 result.Append(c);
             }
 
-            return result.ToString();
+            return result.ToString().AsMemory();
         }
 
         private static Field _ParseLine
@@ -338,7 +340,7 @@ namespace ManagedIrbis.ImportExport
                 writer.Write('#');
                 writer.Write(field.Tag.ToString(culture));
                 writer.Write(": ");
-                if (!string.IsNullOrEmpty(field.Value))
+                if (!field.Value.IsEmpty)
                 {
                     writer.Write(field.Value);
                 }

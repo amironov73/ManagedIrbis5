@@ -89,7 +89,7 @@ namespace ManagedIrbis.Quality.Rules
                         field
                     );
 
-                worksheet = field.Value;
+                worksheet = field.Value.ToString();
                 if (!worksheet.IsOneOf(_goodWorksheets))
                 {
                     AddDefect

@@ -161,13 +161,15 @@ namespace ManagedIrbis.Fields
                 Field field
             )
         {
+            // TODO: реализовать эффективно
+
             var result = new ArrivalsInfo
             {
-                OnBalanceWithoutPeriodicals = field.GetFirstSubFieldValue('1'),
-                OffBalanceWithoutPeriodicals = field.GetFirstSubFieldValue('b'),
-                TotalWithoutPeriodicals = field.GetFirstSubFieldValue('a'),
-                OffBalanceWithPeriodicals = field.GetFirstSubFieldValue('2'),
-                Educational = field.GetFirstSubFieldValue('3'),
+                OnBalanceWithoutPeriodicals = field.GetFirstSubFieldValue('1').ToString(),
+                OffBalanceWithoutPeriodicals = field.GetFirstSubFieldValue('b').ToString(),
+                TotalWithoutPeriodicals = field.GetFirstSubFieldValue('a').ToString(),
+                OffBalanceWithPeriodicals = field.GetFirstSubFieldValue('2').ToString(),
+                Educational = field.GetFirstSubFieldValue('3').ToString(),
                 UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
                 Field = field
             };

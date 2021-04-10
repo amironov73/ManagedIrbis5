@@ -4,7 +4,7 @@
 
 using System;
 using System.IO;
-
+using AM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Json;
@@ -202,18 +202,18 @@ namespace UnitTests.ManagedIrbis.Readers
         {
             var visit = _GetVisit();
             var field = visit.ToField();
-            Assert.AreEqual(visit.Index, field.GetFirstSubFieldValue('a'));
-            Assert.AreEqual(visit.Inventory, field.GetFirstSubFieldValue('b'));
-            Assert.AreEqual(visit.Sigla, field.GetFirstSubFieldValue('k'));
-            Assert.AreEqual(visit.Description, field.GetFirstSubFieldValue('c'));
-            Assert.AreEqual(visit.Department, field.GetFirstSubFieldValue('v'));
-            Assert.AreEqual(visit.TimeIn, field.GetFirstSubFieldValue('1'));
-            Assert.AreEqual(visit.DateGivenString, field.GetFirstSubFieldValue('d'));
-            Assert.AreEqual(visit.DateExpectedString, field.GetFirstSubFieldValue('e'));
-            Assert.AreEqual(visit.DateReturnedString, field.GetFirstSubFieldValue('f'));
-            Assert.AreEqual(visit.Database, field.GetFirstSubFieldValue('g'));
-            Assert.AreEqual(visit.Barcode, field.GetFirstSubFieldValue('h'));
-            Assert.AreEqual(visit.Responsible, field.GetFirstSubFieldValue('i'));
+            Assert.AreEqual(visit.Index, field.GetFirstSubFieldValue('a').ToString().EmptyToNull());
+            Assert.AreEqual(visit.Inventory, field.GetFirstSubFieldValue('b').ToString().EmptyToNull());
+            Assert.AreEqual(visit.Sigla, field.GetFirstSubFieldValue('k').ToString().EmptyToNull());
+            Assert.AreEqual(visit.Description, field.GetFirstSubFieldValue('c').ToString().EmptyToNull());
+            Assert.AreEqual(visit.Department, field.GetFirstSubFieldValue('v').ToString().EmptyToNull());
+            Assert.AreEqual(visit.TimeIn, field.GetFirstSubFieldValue('1').ToString().EmptyToNull());
+            Assert.AreEqual(visit.DateGivenString, field.GetFirstSubFieldValue('d').ToString().EmptyToNull());
+            Assert.AreEqual(visit.DateExpectedString, field.GetFirstSubFieldValue('e').ToString().EmptyToNull());
+            Assert.AreEqual(visit.DateReturnedString, field.GetFirstSubFieldValue('f').ToString().EmptyToNull());
+            Assert.AreEqual(visit.Database, field.GetFirstSubFieldValue('g').ToString().EmptyToNull());
+            Assert.AreEqual(visit.Barcode, field.GetFirstSubFieldValue('h').ToString().EmptyToNull());
+            Assert.AreEqual(visit.Responsible, field.GetFirstSubFieldValue('i').ToString().EmptyToNull());
         }
 
         private void _Compare

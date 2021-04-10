@@ -128,7 +128,7 @@ namespace ManagedIrbis.Readers
 
             var result = new ArchiveReaderInfo
             {
-                Ticket = record.FM(30),
+                Ticket = record.FM(30).ToString(),
                 Visits = record.Fields
                     .GetField(40)
                     .Select(VisitInfo.Parse)

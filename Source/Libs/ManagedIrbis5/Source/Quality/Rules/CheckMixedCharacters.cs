@@ -84,7 +84,7 @@ namespace ManagedIrbis.Quality.Rules
                 Field field
             )
         {
-            List<string> result = CheckText(field.Value);
+            List<string> result = CheckText(field.Value.ToString());
             if (result.Count != 0)
             {
                 AddDefect
@@ -102,7 +102,7 @@ namespace ManagedIrbis.Quality.Rules
                 SubField subField
             )
         {
-            List<string> result = CheckText(subField.Value);
+            List<string> result = CheckText(subField.Value.ToString());
             if (result.Count != 0)
             {
                 AddDefect

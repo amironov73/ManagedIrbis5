@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -86,7 +87,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         #region Private members
 
-        private static string _ReadTo
+        private static ReadOnlyMemory<char> _ReadTo
             (
                 StringReader reader,
                 char delimiter
@@ -96,12 +97,12 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             while (true)
             {
-                int next = reader.Read();
+                var next = reader.Read();
                 if (next < 0)
                 {
                     break;
                 }
-                char c = (char)next;
+                var c = (char)next;
                 if (c == delimiter)
                 {
                     break;
@@ -109,7 +110,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 result.Append(c);
             }
 
-            return result.ToString();
+            return result.ToString().AsMemory();
         }
 
         #endregion
@@ -155,14 +156,14 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             while (true)
             {
-                int next = reader.Read();
+                var next = reader.Read();
                 if (next < 0)
                 {
                     break;
                 }
 
-                char code = char.ToLower((char)next);
-                string text = _ReadTo(reader, '^');
+                var code = char.ToLower((char)next);
+                var text = _ReadTo(reader, '^');
                 SubField subField = new SubField
                 {
                     Code = code,
@@ -211,7 +212,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             var result = new StringBuilder();
 
-            bool first = true;
+            var first = true;
 
             foreach (var field in Fields)
             {

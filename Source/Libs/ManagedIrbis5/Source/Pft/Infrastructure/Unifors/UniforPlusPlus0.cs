@@ -91,7 +91,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     }
 
                     var fieldValue = field.Value;
-                    if (!string.IsNullOrEmpty(fieldValue))
+                    if (!fieldValue.IsEmpty)
                     {
                         output.Append(fieldValue);
                     }

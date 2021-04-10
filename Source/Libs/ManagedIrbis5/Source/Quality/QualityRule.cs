@@ -86,7 +86,7 @@ namespace ManagedIrbis.Quality
         [XmlIgnore]
         [JsonIgnore]
         [Browsable(false)]
-        public string? Worksheet => Record?.FM(920);
+        public string? Worksheet => Record?.FM(920).ToString();
 
         /// <summary>
         /// Arbitrary user data.
@@ -159,7 +159,7 @@ namespace ManagedIrbis.Quality
                 Field = field.Tag,
                 Repeat = field.Repeat,
                 Subfield = subfield.Code.ToString(),
-                Value = subfield.Value,
+                Value = subfield.Value.ToString(),
                 Damage = damage,
                 Message = string.Format(format, args)
             };
@@ -229,35 +229,41 @@ namespace ManagedIrbis.Quality
         /// <summary>
         /// Get text at specified position in the string.
         /// </summary>
-        protected static string GetTextAtPosition
+        protected static ReadOnlyMemory<char> GetTextAtPosition
             (
-                string text,
+                ReadOnlyMemory<char> text,
                 int position
             )
         {
-            int length = text.Length;
-            int start = Math.Max(0, position - 1);
-            int stop = Math.Min(length - 1, position + 2);
-            while (start >= 0 && text[start] == ' ')
+            var length = text.Length;
+            var start = Math.Max(0, position - 1);
+            var stop = Math.Min(length - 1, position + 2);
+
+            while (start >= 0 && text.Span[start] == ' ')
             {
                 start--;
             }
-            while (start >= 0 && text[start] != ' ')
+
+            while (start >= 0 && text.Span[start] != ' ')
             {
                 start--;
             }
+
             start = Math.Max(0, start);
-            while (stop < length && text[stop] == ' ')
+
+            while (stop < length && text.Span[stop] == ' ')
             {
                 stop++;
             }
-            while (stop < length && text[stop] != ' ')
+
+            while (stop < length && text.Span[stop] != ' ')
             {
                 stop++;
             }
+
             stop = Math.Min(length - 1, stop);
 
-            return text.Substring
+            return text.Slice
                 (
                     start,
                     stop - start + 1
@@ -268,12 +274,12 @@ namespace ManagedIrbis.Quality
         /// <summary>
         /// Show double whitespace in the text.
         /// </summary>
-        protected static string ShowDoubleWhiteSpace
+        protected static ReadOnlyMemory<char> ShowDoubleWhiteSpace
             (
-                string text
+                ReadOnlyMemory<char> text
             )
         {
-            int position = text.IndexOf
+            var position = text.Span.IndexOf
                 (
                     "  ",
                     StringComparison.Ordinal
@@ -295,9 +301,9 @@ namespace ManagedIrbis.Quality
                 SubField subfield
             )
         {
-            string text = subfield.Value;
+            var text = subfield.Value;
 
-            if (string.IsNullOrEmpty(text))
+            if (text.IsEmpty)
             {
                 AddDefect
                     (
@@ -311,7 +317,7 @@ namespace ManagedIrbis.Quality
                 return;
             }
 
-            if (text.StartsWith(" "))
+            if (text.Span.StartsWith(" "))
             {
                 AddDefect
                     (
@@ -324,7 +330,7 @@ namespace ManagedIrbis.Quality
                     );
             }
 
-            if (text.EndsWith(" "))
+            if (text.Span.EndsWith(" "))
             {
                 AddDefect
                     (
@@ -337,7 +343,9 @@ namespace ManagedIrbis.Quality
                     );
             }
 
-            if (text.Contains("  "))
+            // TODO: реализовать эффективно
+
+            if (text.ToString().Contains("  "))
             {
                 AddDefect
                     (
@@ -360,10 +368,10 @@ namespace ManagedIrbis.Quality
                 Field field
             )
         {
-            string text = field.Value;
-            if (!string.IsNullOrEmpty(text))
+            var text = field.Value;
+            if (!text.IsEmpty)
             {
-                if (text.StartsWith(" "))
+                if (text.Span.StartsWith(" "))
                 {
                     AddDefect
                         (
@@ -373,7 +381,7 @@ namespace ManagedIrbis.Quality
                             field.Tag
                         );
                 }
-                if (text.EndsWith(" "))
+                if (text.Span.EndsWith(" "))
                 {
                     AddDefect
                         (
@@ -383,7 +391,14 @@ namespace ManagedIrbis.Quality
                             field.Tag
                         );
                 }
-                if (text.Contains("  "))
+
+                // TODO: implement
+
+                throw new NotImplementedException();
+
+                /*
+
+                if (text.Span.Contains("  "))
                 {
                     AddDefect
                         (
@@ -394,6 +409,8 @@ namespace ManagedIrbis.Quality
                             ShowDoubleWhiteSpace(text)
                         );
                 }
+
+                */
             }
 
             foreach (SubField subfield in field.Subfields)
@@ -491,7 +508,7 @@ namespace ManagedIrbis.Quality
                 Field field
             )
         {
-            if (!string.IsNullOrEmpty(field.Value))
+            if (!field.Value.IsEmpty)
             {
                 AddDefect
                     (
@@ -546,7 +563,8 @@ namespace ManagedIrbis.Quality
                 .GroupBy
                 (
                     f => f.Value
-                        .ThrowIfNull("field.Value")
+                        .ThrowIfEmpty("field.Value")
+                        .ToString()
                         .ToLowerInvariant()
                 )
                 ;
@@ -577,7 +595,7 @@ namespace ManagedIrbis.Quality
         {
             var selected = field.Subfields
                 .GetSubField(new[] {code})
-                .Where(sf => string.IsNullOrEmpty(sf.Value));
+                .Where(sf => sf.Value.IsEmpty);
             foreach (SubField subField in selected)
             {
                 AddDefect
@@ -607,7 +625,8 @@ namespace ManagedIrbis.Quality
                 .GroupBy
                 (
                     sf => sf.Value
-                        .ThrowIfNull("field.Value")
+                        .ThrowIfEmpty("field.Value")
+                        .ToString()
                         .ToLowerInvariant()
                 );
             foreach (var grp in grouped)
@@ -637,7 +656,7 @@ namespace ManagedIrbis.Quality
                 params char[] codes
             )
         {
-            foreach (char code in codes)
+            foreach (var code in codes)
             {
                 MustBeUniqueSubfield
                     (
@@ -737,10 +756,10 @@ namespace ManagedIrbis.Quality
                 Field field
             )
         {
-            string text = field.Value;
-            if (!string.IsNullOrEmpty(text))
+            var text = field.Value;
+            if (!text.IsEmpty)
             {
-                int position = RuleUtility.BadCharacterPosition(text);
+                var position = RuleUtility.BadCharacterPosition(text.ToString());
                 if (position >= 0)
                 {
                     AddDefect
@@ -763,10 +782,10 @@ namespace ManagedIrbis.Quality
                 SubField subField
             )
         {
-            string text = subField.Value;
-            if (!string.IsNullOrEmpty(text))
+            var text = subField.Value;
+            if (!text.IsEmpty)
             {
-                int position = RuleUtility.BadCharacterPosition(text);
+                var position = RuleUtility.BadCharacterPosition(text.ToString());
                 if (position >= 0)
                 {
                     AddDefect

@@ -467,18 +467,18 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="tag">Метка поля.</param>
         /// <returns>Значение поля или <c>null</c>.</returns>
-        public string? FM
+        public ReadOnlyMemory<char> FM
             (
                 int tag
             )
         {
-            return GetField(tag)?.Value;
+            return GetField(tag)?.Value ?? default;
         } // method FM
 
         /// <summary>
         /// Текст первого подполя с указанным тегом и кодом.
         /// </summary>
-        public string? FM
+        public ReadOnlyMemory<char> FM
             (
                 int tag,
                 char code
@@ -493,23 +493,23 @@ namespace ManagedIrbis
                     : field.GetSubFieldValue(code);
             }
 
-            return null;
+            return default;
         } // method FM
 
         /// <summary>
         /// Текст всех полей с указанным тегом.
         /// </summary>
-        public string[] FMA
+        public ReadOnlyMemory<char>[] FMA
             (
                 int tag
             )
         {
-            var result = new LocalList<string>();
+            var result = new LocalList<ReadOnlyMemory<char>>();
 
             foreach (var field in Fields)
             {
                 if (field.Tag == tag
-                    && !string.IsNullOrEmpty(field.Value))
+                    && !field.Value.IsEmpty)
                 {
                     result.Add(field.Value);
                 }
@@ -521,22 +521,23 @@ namespace ManagedIrbis
         /// <summary>
         /// Текст всех подполей с указанным тегом и кодом.
         /// </summary>
-        public string[] FMA
+        public ReadOnlyMemory<char>[] FMA
             (
                 int tag,
                 char code
             )
         {
-            var result = new LocalList<string>();
+            var result = new LocalList<ReadOnlyMemory<char>>();
 
             foreach (var field in Fields)
             {
                 if (field.Tag == tag)
                 {
+                    // TODO: Value, если есть, всегда первое в списке подполей
                     var value = code == '*'
                         ? field.GetValueOrFirstSubField()
                         : field.GetSubFieldValue(code);
-                    if (!string.IsNullOrEmpty(value))
+                    if (!value.IsEmpty)
                     {
                         result.Add(value);
                     }

@@ -99,7 +99,7 @@ namespace ManagedIrbis.WinForms.Grid
 
                 if (!ReferenceEquals(subField, null))
                 {
-                    line.Value = subField.Value;
+                    line.Value = subField.Value.ToString();
                 }
 
                 CreateRow(line);

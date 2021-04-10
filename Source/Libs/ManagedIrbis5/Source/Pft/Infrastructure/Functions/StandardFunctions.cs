@@ -59,7 +59,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                     foreach (var body in lines)
                     {
-                        var field = RecordFieldUtility.Parse(tag, body);
+                        var field = FieldUtility.Parse(tag.AsMemory(), body.AsMemory());
                         context.Record.Fields.Add(field);
                     }
                 }

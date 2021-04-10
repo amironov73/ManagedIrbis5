@@ -130,7 +130,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private static string _ReadTo
+        private static ReadOnlyMemory<char> _ReadTo
             (
                 StringReader reader,
                 char delimiter
@@ -140,12 +140,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             while (true)
             {
-                int next = reader.Read();
+                var next = reader.Read();
                 if (next < 0)
                 {
                     break;
                 }
-                char c = (char)next;
+                var c = (char)next;
                 if (c == delimiter)
                 {
                     break;
@@ -153,7 +153,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 result.Append(c);
             }
 
-            return result.ToString();
+            return result.ToString().AsMemory();
         }
 
         private static Field _ParseLine
@@ -169,15 +169,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             while (true)
             {
-                int next = reader.Read();
+                var next = reader.Read();
                 if (next < 0)
                 {
                     break;
                 }
 
-                char code = char.ToLower((char)next);
-                string text = _ReadTo(reader, '^');
-                SubField subField = new SubField
+                var code = char.ToLower((char)next);
+                var text = _ReadTo(reader, '^');
+                var subField = new SubField
                 {
                     Code = code,
                     Value = text
@@ -204,7 +204,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 char subField
             )
         {
-            double result = 0.0;
+            var result = 0.0;
 
             var variable = context.Variables.GetExistingVariable(name);
             if (ReferenceEquals(variable, null))
@@ -257,9 +257,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                                 (
                                     subField
                                 );
-                            if (text is not null)
+                            if (!text.IsEmpty)
                             {
-                                list.Add(text);
+                                list.Add(text.ToString());
                             }
                         }
 
@@ -287,9 +287,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                                 (
                                     subField
                                 );
-                            if (text is not null)
+                            if (!text.IsEmpty)
                             {
-                                list.Add(text);
+                                list.Add(text.ToString());
                             }
                         }
 

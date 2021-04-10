@@ -71,7 +71,7 @@ namespace ManagedIrbis.Infrastructure
             }
 
             var text = record.FM(Tag);
-            if (string.IsNullOrEmpty(text))
+            if (text.IsEmpty)
             {
                 return null;
             }
@@ -93,7 +93,7 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Parse the text.
         /// </summary>
-        public static Guid Parse (string text) => Guid.Parse(text);
+        public static Guid Parse (ReadOnlyMemory<char> text) => Guid.Parse(text.Span);
 
         /// <summary>
         /// Parse the record.
@@ -104,7 +104,7 @@ namespace ManagedIrbis.Infrastructure
             )
         {
             var text = record.FM(Tag);
-            if (string.IsNullOrEmpty(text))
+            if (text.IsEmpty)
             {
                 return null;
             }

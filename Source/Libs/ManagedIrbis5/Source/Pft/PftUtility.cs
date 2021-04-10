@@ -91,22 +91,22 @@ namespace ManagedIrbis.Pft
 
         #region Private members
 
-        private static string _ReadTo
+        private static ReadOnlyMemory<char> _ReadTo
             (
                 StringReader reader,
                 char delimiter
             )
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             while (true)
             {
-                int next = reader.Read();
+                var next = reader.Read();
                 if (next < 0)
                 {
                     break;
                 }
-                char c = (char)next;
+                var c = (char)next;
                 if (c == delimiter)
                 {
                     break;
@@ -114,7 +114,7 @@ namespace ManagedIrbis.Pft
                 result.Append(c);
             }
 
-            return result.ToString();
+            return result.ToString().AsMemory();
         }
 
         private static Field _ParseLine
@@ -123,7 +123,7 @@ namespace ManagedIrbis.Pft
             )
         {
 
-            StringReader reader = new StringReader(line);
+            var reader = new StringReader(line);
             var result = new Field
             {
                 Value = _ReadTo(reader, '^')
@@ -131,15 +131,15 @@ namespace ManagedIrbis.Pft
 
             while (true)
             {
-                int next = reader.Read();
+                var next = reader.Read();
                 if (next < 0)
                 {
                     break;
                 }
 
-                char code = char.ToLower((char)next);
-                string text = _ReadTo(reader, '^');
-                SubField subField = new SubField
+                var code = char.ToLower((char)next);
+                var text = _ReadTo(reader, '^');
+                var subField = new SubField
                 {
                     Code = code,
                     Value = text
@@ -190,7 +190,7 @@ namespace ManagedIrbis.Pft
                 }
                 else
                 {
-                    int i = index.ComputeValue(context, fields);
+                    var i = index.ComputeValue(context, fields);
 
                     if (i >= 0 && i < fields.Length)
                     {
@@ -201,9 +201,9 @@ namespace ManagedIrbis.Pft
                 return;
             }
 
-            string[] lines = value.SplitLines().NonEmptyLines().ToArray();
+            var lines = value.SplitLines().NonEmptyLines().ToArray();
             var newFields = new List<Field>();
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
                 var field = ParseField(line);
                 field.Tag = tag;
@@ -221,7 +221,7 @@ namespace ManagedIrbis.Pft
             }
             else
             {
-                int i = index.ComputeValue(context, fields);
+                var i = index.ComputeValue(context, fields);
 
                 if (newFields.Count == 0)
                 {
@@ -238,10 +238,10 @@ namespace ManagedIrbis.Pft
                     }
                     else
                     {
-                        int position = record.Fields.IndexOf(fields[i]);
+                        var position = record.Fields.IndexOf(fields[i]);
                         fields[i].AssignFrom(newFields[0]);
 
-                        for (int j = 1; j < newFields.Count; j++)
+                        for (var j = 1; j < newFields.Count; j++)
                         {
                             record.Fields.Insert
                                 (
@@ -294,7 +294,7 @@ namespace ManagedIrbis.Pft
 
             if (fieldIndex.Kind != IndexKind.None)
             {
-                int i = fieldIndex.ComputeValue(context, fields);
+                var i = fieldIndex.ComputeValue(context, fields);
 
                 var field = fields.GetOccurrence(i);
                 if (ReferenceEquals(field, null))
@@ -309,13 +309,17 @@ namespace ManagedIrbis.Pft
                 .NonEmptyLines()
                 .ToArray();
             var newSubFields = new List<SubField>();
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
-                var subField = new SubField { Code = code, Value = line };
+                var subField = new SubField
+                {
+                    Code = code,
+                    Value = line.AsMemory()
+                };
                 newSubFields.Add(subField);
             }
 
-            int current = 0;
+            var current = 0;
             foreach (var field in fields)
             {
                 var subfields = field.GetSubFields(code);
@@ -329,7 +333,7 @@ namespace ManagedIrbis.Pft
 
                     if (current < newSubFields.Count)
                     {
-                        SubField newSubField = newSubFields[current];
+                        var newSubField = newSubFields[current];
                         if (!ReferenceEquals(newSubField, null))
                         {
                             field.Subfields.Add(newSubField);
@@ -339,7 +343,7 @@ namespace ManagedIrbis.Pft
                 }
                 else
                 {
-                    int i = subfieldIndex.ComputeValue(context, subfields);
+                    var i = subfieldIndex.ComputeValue(context, subfields);
 
                     if (i >= subfields.Length)
                     {
@@ -347,10 +351,10 @@ namespace ManagedIrbis.Pft
                     }
                     else
                     {
-                        int position = field.Subfields.IndexOf(subfields[i]);
+                        var position = field.Subfields.IndexOf(subfields[i]);
                         field.Subfields[i].Value = newSubFields[0].Value;
 
-                        for (int j = 1; j < newSubFields.Count; j++)
+                        for (var j = 1; j < newSubFields.Count; j++)
                         {
                             field.Subfields.Insert
                                 (
@@ -388,9 +392,9 @@ namespace ManagedIrbis.Pft
             {
                 result = new PftNodeCollection(parent);
 
-                foreach (PftNode child1 in nodes)
+                foreach (var child1 in nodes)
                 {
-                    PftNode child2 = (PftNode)child1.Clone();
+                    var child2 = (PftNode)child1.Clone();
                     result.Add(child2);
                 }
             }
@@ -409,7 +413,7 @@ namespace ManagedIrbis.Pft
                 string? second
             )
         {
-            int result = string.Compare
+            var result = string.Compare
                 (
                     first,
                     second,
@@ -477,7 +481,7 @@ namespace ManagedIrbis.Pft
             outer = outer.ToLower();
             inner = inner.ToLower();
 
-            bool result = outer.Contains(inner);
+            var result = outer.Contains(inner);
 
             return result;
         }
@@ -514,7 +518,7 @@ namespace ManagedIrbis.Pft
                 return false;
             }
 
-            bool result = outer.Contains(inner);
+            var result = outer.Contains(inner);
 
             return result;
         }
@@ -544,7 +548,7 @@ namespace ManagedIrbis.Pft
                 return 0.0;
             }
 
-            string value = match.Value;
+            var value = match.Value;
             double.TryParse
                 (
                     value,
@@ -574,8 +578,8 @@ namespace ManagedIrbis.Pft
                 return new double[0];
             }
 
-            List<double> result = new List<double>();
-            MatchCollection matches = Regex.Matches
+            var result = new List<double>();
+            var matches = Regex.Matches
                 (
                     input,
                     "[-]?[0-9]*[\\.]?[0-9]*"
@@ -656,8 +660,8 @@ namespace ManagedIrbis.Pft
                 IEnumerable<FieldSpecification> fields
             )
         {
-            bool first = true;
-            foreach (FieldSpecification field in fields.NonNullItems())
+            var first = true;
+            foreach (var field in fields.NonNullItems())
             {
                 if (!first)
                 {
@@ -678,7 +682,7 @@ namespace ManagedIrbis.Pft
                 this Field field
             )
         {
-            string result = FormatHeaderMode(field);
+            var result = FormatHeaderMode(field);
 
             if (!result.EndsWith(".")
                 & !result.EndsWith(". ")
@@ -713,13 +717,13 @@ namespace ManagedIrbis.Pft
                 this Field field
             )
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             result.Append(field.Value);
-            foreach (SubField subField in field.Subfields)
+            foreach (var subField in field.Subfields)
             {
-                string delimiter = ". ";
-                char code = char.ToLower(subField.Code);
+                var delimiter = ". ";
+                var code = char.ToLower(subField.Code);
                 switch (code)
                 {
                     case 'a':
@@ -742,13 +746,15 @@ namespace ManagedIrbis.Pft
                     result.Append(delimiter);
                 }
 
-                string value = subField.Value;
-                if (!string.IsNullOrEmpty(value))
+                var value = subField.Value;
+                if (!value.IsEmpty)
                 {
                     value = value
+                        .ToString()
                         .Replace("><", "; ")
                         .Replace("<", string.Empty)
-                        .Replace(">", string.Empty);
+                        .Replace(">", string.Empty)
+                        .AsMemory();
                 }
 
                 result.Append(value);
@@ -817,7 +823,7 @@ namespace ManagedIrbis.Pft
                 int arg3
             )
         {
-            int minLength = 1;
+            var minLength = 1;
             if (arg2 < 0)
             {
                 if (arg3 < 0)
@@ -830,8 +836,8 @@ namespace ManagedIrbis.Pft
                 minLength = arg2;
             }
 
-            bool useE = true;
-            int decimalPoints = 0;
+            var useE = true;
+            var decimalPoints = 0;
             if (arg3 >= 0)
             {
                 useE = false;
@@ -935,7 +941,7 @@ namespace ManagedIrbis.Pft
                 ? string.Format("E{0}", minLength)
                 : string.Format("F{0}", decimalPoints);
 
-            string result = value.ToString
+            var result = value.ToString
                 (
                     format,
                     CultureInfo.InvariantCulture
@@ -971,7 +977,7 @@ namespace ManagedIrbis.Pft
                     provider.Database = database;
                 }
 
-                Record record = provider.ReadRecord(link.Mfn);
+                var record = provider.ReadRecord(link.Mfn);
                 if (!ReferenceEquals(record, null))
                 {
                     var field = record.Fields.GetField
@@ -981,7 +987,7 @@ namespace ManagedIrbis.Pft
                         );
                     if (!ReferenceEquals(field, null))
                     {
-                        string output = FormatField
+                        var output = FormatField
                             (
                                 field,
                                 context.FieldOutputMode,
@@ -1021,7 +1027,7 @@ namespace ManagedIrbis.Pft
                 return array;
             }
 
-            int i = index.ComputeValue(context, array);
+            var i = index.ComputeValue(context, array);
 
             if (i >= 0 && i < array.Length)
             {
@@ -1042,13 +1048,13 @@ namespace ManagedIrbis.Pft
                 params int[] tags
             )
         {
-            int result = 0;
+            var result = 0;
             var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                foreach (int tag in tags)
+                foreach (var tag in tags)
                 {
-                    int count = record.Fields.GetFieldCount(tag);
+                    var count = record.Fields.GetFieldCount(tag);
                     result = Math.Max(count, result);
                 }
             }
@@ -1075,7 +1081,7 @@ namespace ManagedIrbis.Pft
             }
 
             var fields = record.Fields.GetField(tag);
-            string[] result = fields.Select
+            var result = fields.Select
                 (
                     field => field.ToText()
                 )
@@ -1116,7 +1122,7 @@ namespace ManagedIrbis.Pft
             }
             else if (subFieldCode == '*')
             {
-                result = field.GetValueOrFirstSubField();
+                result = field.GetValueOrFirstSubField().ToString();
             }
             else
             {
@@ -1130,7 +1136,7 @@ namespace ManagedIrbis.Pft
                 var subField = subFields.FirstOrDefault();
                 if (!ReferenceEquals(subField, null))
                 {
-                    result = subField.Value;
+                    result = subField.Value.ToString();
                 }
             }
 
@@ -1250,10 +1256,9 @@ namespace ManagedIrbis.Pft
                     fieldIndex
                 );
 
-            string[] result = fields.Select
+            var result = fields.Select
                 (
-                    subField => subField.GetFirstSubFieldValue(code)
-                                ?? string.Empty
+                    subField => subField.GetFirstSubFieldValue(code).ToString()
                 )
                 .ToArray();
 
@@ -1282,9 +1287,9 @@ namespace ManagedIrbis.Pft
                 return true;
             }
 
-            NonNullCollection<PftNode> children
+            var children
                 = node.GetDescendants<PftNode>();
-            bool result = children.Any(item => item.ComplexExpression);
+            var result = children.Any(item => item.ComplexExpression);
 
             return result;
         }
@@ -1299,7 +1304,7 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            bool result = nodes.Any(item => IsComplexExpression(item));
+            var result = nodes.Any(item => IsComplexExpression(item));
 
             return result;
         }
@@ -1345,7 +1350,7 @@ namespace ManagedIrbis.Pft
             if (!ReferenceEquals(reference, null)
                 && !ReferenceEquals(reference.Name, null))
             {
-                PftVariable variable
+                var variable
                     = context.Variables.GetExistingVariable(reference.Name);
                 if (!ReferenceEquals(variable, null))
                 {
@@ -1370,8 +1375,8 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            bool first = true;
-            foreach (PftNode node in nodes.NonNullItems())
+            var first = true;
+            foreach (var node in nodes.NonNullItems())
             {
                 if (!first)
                 {
@@ -1394,8 +1399,8 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            bool first = true;
-            foreach (PftNode node in nodes.NonNullItems())
+            var first = true;
+            foreach (var node in nodes.NonNullItems())
             {
                 if (!first)
                 {
@@ -1458,9 +1463,9 @@ namespace ManagedIrbis.Pft
                 return true;
             }
 
-            NonNullCollection<PftNode> children
+            var children
                 = node.GetDescendants<PftNode>();
-            bool result = children.Any(item => item.RequiresConnection);
+            var result = children.Any(item => item.RequiresConnection);
 
             return result;
         }
@@ -1475,7 +1480,7 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            bool result = nodes.Any(item => RequiresConnection(item));
+            var result = nodes.Any(item => RequiresConnection(item));
 
             return result;
         }
@@ -1584,14 +1589,14 @@ namespace ManagedIrbis.Pft
             }
             else if (index.Kind == IndexKind.AllRepeats)
             {
-                for (int i = 0; i < array.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
                     array[i] = value;
                 }
             }
             else
             {
-                int i = index.ComputeValue(context, array);
+                var i = index.ComputeValue(context, array);
 
                 if (i >= 0)
                 {

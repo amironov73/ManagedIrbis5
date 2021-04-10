@@ -248,6 +248,23 @@ namespace AM
         }
 
         /// <summary>
+        /// Отбирает из последовательности только непустые строки.
+        /// </summary>
+        public static IEnumerable<ReadOnlyMemory<char>> NonEmptyLines
+            (
+                this IEnumerable<ReadOnlyMemory<char>> sequence
+            )
+        {
+            foreach (var line in sequence)
+            {
+                if (!line.IsEmpty)
+                {
+                    yield return line;
+                }
+            }
+        }
+
+        /// <summary>
         /// Повторяет указанное значение.
         /// </summary>
         [Pure]

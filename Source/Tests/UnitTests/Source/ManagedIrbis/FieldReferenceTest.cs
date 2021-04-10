@@ -116,11 +116,11 @@ namespace UnitTests.ManagedIrbis
             field.Add('f', "И. И. Иванов, П. П. Петров");
             result.Fields.Add(field);
 
-            field = new Field { Tag = 300, Value = "Первое примечание" };
+            field = new Field ( 300, "Первое примечание" );
             result.Fields.Add(field);
-            field = new Field { Tag = 300, Value = "Второе примечание" };
+            field = new Field (300,  "Второе примечание" );
             result.Fields.Add(field);
-            field = new Field { Tag = 300, Value = "Третье примечание" };
+            field = new Field ( 300, "Третье примечание" );
             result.Fields.Add(field);
 
             return result;
@@ -139,7 +139,7 @@ namespace UnitTests.ManagedIrbis
                         (
                             reference.Tag,
                             reference.SubField
-                        ),
+                        ).ToString(),
                     actual
                 );
         }

@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using AM;
 
 #endregion
@@ -38,9 +39,13 @@ namespace ManagedIrbis.Quality.Rules
         {
             MustNotContainText(field);
 
-            SubField city = field.GetFirstSubField('a');
-            SubField publisher = field.GetFirstSubField('c');
-            SubField year = field.GetFirstSubField('d');
+            var city = field.GetFirstSubField('a');
+            var publisher = field.GetFirstSubField('c');
+            var year = field.GetFirstSubField('d');
+
+            throw new NotImplementedException();
+
+            /*
 
             if (city != null)
             {
@@ -135,6 +140,8 @@ namespace ManagedIrbis.Quality.Rules
                         "Город введен в подполе 200^4: Город на издании"
                     );
             }
+
+            */
         }
 
         #endregion
@@ -155,7 +162,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (fields.Length == 0)
             {
                 AddDefect
@@ -165,7 +172,7 @@ namespace ManagedIrbis.Quality.Rules
                         "Отсутствует поле 210: Выходные данные"
                     );
             }
-            foreach (Field field in fields)
+            foreach (var field in fields)
             {
                 CheckField(field);
             }

@@ -93,7 +93,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         public void PftC_Execute_2()
         {
             var record = new Record();
-            record.Fields.Add(new Field { Tag = 1, Value = "Hello" });
+            record.Fields.Add(new Field (1, "Hello"));
             var context = new PftContext(null)
             {
                 Record = record
