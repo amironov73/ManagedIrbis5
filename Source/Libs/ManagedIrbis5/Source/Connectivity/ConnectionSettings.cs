@@ -77,7 +77,7 @@ namespace ManagedIrbis
         /// <remarks>Default value is "127.0.0.1".</remarks>
         [XmlAttribute("host")]
         [JsonPropertyName("host")]
-        public string? Host { get; set; } = DefaultHost;
+        public string Host { get; set; } = DefaultHost;
 
         /// <summary>
         /// Номер порта, на котором сервер ИРБИС64 принимает клиентские подключения.
@@ -94,7 +94,7 @@ namespace ManagedIrbis
         /// so connection can't be made.</remarks>
         [XmlAttribute("username")]
         [JsonPropertyName("username")]
-        public string? Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         /// <summary>
         /// Пароль пользователя системы ИРБИС64.
@@ -103,7 +103,7 @@ namespace ManagedIrbis
         /// so connection can't be made.</remarks>
         [XmlAttribute("password")]
         [JsonPropertyName("password")]
-        public string? Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         /// <summary>
         /// Имя базы данных.
@@ -123,7 +123,7 @@ namespace ManagedIrbis
         /// </remarks>
         [XmlAttribute("workstation")]
         [JsonPropertyName("workstation")]
-        public string? Workstation { get; set; } = DefaultWorkstation;
+        public string Workstation { get; set; } = DefaultWorkstation;
 
         /// <summary>
         /// Turn on network logging.
@@ -527,12 +527,12 @@ namespace ManagedIrbis
         /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
         public void RestoreFromStream(BinaryReader reader)
         {
-            Host = reader.ReadNullableString();
+            Host = reader.ReadNullableString() ?? DefaultHost;
             Port = (ushort)reader.ReadPackedInt32();
-            Username = reader.ReadNullableString();
-            Password = reader.ReadNullableString();
+            Username = reader.ReadNullableString() ?? string.Empty;
+            Password = reader.ReadNullableString() ?? string.Empty;
             Database = reader.ReadNullableString();
-            Workstation = reader.ReadNullableString();
+            Workstation = reader.ReadNullableString() ?? DefaultWorkstation;
             NetworkLogging = reader.ReadNullableString();
             SocketTypeName = reader.ReadNullableString();
             RetryLimit = reader.ReadPackedInt32();

@@ -49,10 +49,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public bool IsSuffix { get; set; }
 
         /// <inheritdoc cref="PftNode.Text" />
-        public override string Text
+        public override string? Text
         {
-            get { return base.Text; }
-            set { base.Text = PftUtility.PrepareText(value); }
+            get => base.Text;
+            set => base.Text = PftUtility.PrepareText(value);
         }
 
         #endregion
@@ -119,7 +119,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftField field
             )
         {
-            string value = field.GetValue(context);
+            var value = field.GetValue(context);
 
             if (field.CanOutput(value))
             {
@@ -162,13 +162,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!string.IsNullOrEmpty(Text))
             {
-                PftField field = Parent as PftField;
+                var field = Parent as PftField;
                 if (ReferenceEquals(field, null))
                 {
                     throw new PftCompilerException();
                 }
 
-                FieldInfo info = compiler.Fields.Get(field);
+                var info = compiler.Fields.Get(field);
                 //if (ReferenceEquals(info, null))
                 //{
                 //    throw new PftCompilerException();

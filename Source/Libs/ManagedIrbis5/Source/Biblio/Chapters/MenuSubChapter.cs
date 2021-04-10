@@ -78,11 +78,10 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected virtual string GetDescriptionFormat()
         {
-            BiblioChapter chapter = this;
+            BiblioChapter? chapter = this;
             while (!ReferenceEquals(chapter, null))
             {
-                var subChapter = chapter as MenuSubChapter;
-                if (!ReferenceEquals(subChapter, null))
+                if (chapter is MenuSubChapter subChapter)
                 {
                     var settings = subChapter.Settings;
                     if (!ReferenceEquals(settings, null))
@@ -109,7 +108,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected virtual string GetOrderFormat()
         {
-            BiblioChapter chapter = this;
+            BiblioChapter? chapter = this;
             while (!ReferenceEquals(chapter, null))
             {
                 var subChapter = chapter as MenuSubChapter;

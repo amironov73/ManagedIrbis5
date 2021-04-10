@@ -31,18 +31,6 @@ namespace ManagedIrbis.WinForms.Grid
     public class SiberianDateColumn
         : SiberianColumn
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SiberianDateColumn()
-        {
-            //BackColor = Color.White;
-        }
-
-        #endregion
-
         #region SiberianColumn members
 
         /// <inheritdoc/>
@@ -68,7 +56,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <inheritdoc />
         public override void GetData
             (
-                object theObject,
+                object? theObject,
                 SiberianCell cell
             )
         {
@@ -86,16 +74,14 @@ namespace ManagedIrbis.WinForms.Grid
                     );
 
                 var value = property.GetValue(theObject);
-                dateCell.Date = ReferenceEquals(value, null)
-                    ? DateTime.MinValue
-                    : (DateTime)value;
+                dateCell.Date = (DateTime?) value ?? DateTime.MinValue;
             }
         }
 
         /// <inheritdoc />
         public override void PutData
             (
-                object theObject,
+                object? theObject,
                 SiberianCell cell
             )
         {

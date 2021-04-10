@@ -29,6 +29,8 @@ using AM.Runtime;
 
 #endregion
 
+#nullable enable
+
 namespace ManagedIrbis.Gbl
 {
     /// <summary>

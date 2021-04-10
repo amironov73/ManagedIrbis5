@@ -115,12 +115,12 @@ namespace ManagedIrbis.Batch
             _lock = new object();
 
             _tasks = new Task[Parallelism];
-            int[][] chunks = ArrayUtility.SplitArray
+            var chunks = ArrayUtility.SplitArray
                 (
                     mfnList,
                     Parallelism
                 );
-            for (int i = 0; i < Parallelism; i++)
+            for (var i = 0; i < Parallelism; i++)
             {
                 var task = new Task
                     (
@@ -129,7 +129,7 @@ namespace ManagedIrbis.Batch
                     );
                 _tasks[i] = task;
             }
-            foreach (Task task in _tasks)
+            foreach (var task in _tasks)
             {
                 Thread.Sleep(50);
                 task.Start();
@@ -141,9 +141,9 @@ namespace ManagedIrbis.Batch
                 object state
             )
         {
-            int[] chunk = (int[])state;
-            int first = chunk.SafeAt(0, -1);
-            int threadId = Thread.CurrentThread.ManagedThreadId;
+            var chunk = (int[])state;
+            var first = chunk.SafeAt(0, -1);
+            var threadId = Thread.CurrentThread.ManagedThreadId;
 
             Magna.Trace
                 (
@@ -156,13 +156,13 @@ namespace ManagedIrbis.Batch
                     + threadId
                 );
 
-            string connectionString = ConnectionString.ThrowIfNull();
+            var connectionString = ConnectionString.ThrowIfNull();
             using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
             {
                 connection.ParseConnectionString(connectionString);
                 connection.Connect();
 
-                BatchRecordFormatter batch = new BatchRecordFormatter
+                var batch = new BatchRecordFormatter
                     (
                         connection,
                         connection.Database,
@@ -170,7 +170,7 @@ namespace ManagedIrbis.Batch
                         1000,
                         chunk
                     );
-                foreach (string line in batch)
+                foreach (var line in batch)
                 {
                     _PutLine(line);
                 }
@@ -215,9 +215,9 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public string[] FormatAll()
         {
-            List<string> result = new List<string>();
+            var result = new List<string>();
 
-            foreach (string line in this)
+            foreach (var line in this)
             {
                 result.Add(line);
             }
@@ -269,7 +269,7 @@ namespace ManagedIrbis.Batch
             _event?.Dispose();
             if (_tasks is not null)
             {
-                foreach (Task task in _tasks)
+                foreach (var task in _tasks)
                 {
                     task.Dispose();
                 }

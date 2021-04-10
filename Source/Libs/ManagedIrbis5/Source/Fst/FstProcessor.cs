@@ -160,9 +160,9 @@ namespace ManagedIrbis.Fst
 
         private static readonly char[] _delimiters = { '\r', '\n', '%' };
 
-        private AlphabetTable _alphabetTable;
+        private AlphabetTable? _alphabetTable;
 
-        private StopWords _stopWords;
+        private StopWords? _stopWords;
 
         // private UpperCaseTable _upperCaseTable;
 
@@ -172,17 +172,17 @@ namespace ManagedIrbis.Fst
             )
         {
             var result = new List<string>(items.Length);
-            foreach (string item in items)
+            foreach (var item in items)
             {
                 if (item.Contains("<"))
                 {
-                    TextNavigator navigator = new TextNavigator(item);
+                    var navigator = new TextNavigator(item);
                     while (!navigator.IsEOF)
                     {
                         navigator.ReadUntil('<');
                         if (navigator.ReadChar() == '<')
                         {
-                            string text = navigator.ReadUntil('>').ToString();
+                            var text = navigator.ReadUntil('>').ToString();
                             if (navigator.ReadChar() == '>'
                                 && !string.IsNullOrEmpty(text))
                             {
@@ -202,17 +202,17 @@ namespace ManagedIrbis.Fst
             )
         {
             var result = new List<string>(items.Length);
-            foreach (string item in items)
+            foreach (var item in items)
             {
                 if (item.Contains("/"))
                 {
-                    TextNavigator navigator = new TextNavigator(item);
+                    var navigator = new TextNavigator(item);
                     while (!navigator.IsEOF)
                     {
                         navigator.ReadUntil('/');
                         if (navigator.ReadChar() == '/')
                         {
-                            string text = navigator.ReadUntil('/').ToString();
+                            var text = navigator.ReadUntil('/').ToString();
                             if (navigator.ReadChar() == '/'
                                 && !string.IsNullOrEmpty(text))
                             {
@@ -297,15 +297,15 @@ namespace ManagedIrbis.Fst
 
             */
 
-            FstTerm[] result = new FstTerm[items.Length];
-            for (int i = 0; i < items.Length; i++)
+            var result = new FstTerm[items.Length];
+            for (var i = 0; i < items.Length; i++)
             {
-                string text = SearchUtility.TrimTerm
+                var text = SearchUtility.TrimTerm
                     (
                         items[i].ToUpperInvariant()
                         // _upperCaseTable.ToUpper(items[i])
                     );
-                FstTerm link = new FstTerm
+                var link = new FstTerm
                 {
                     Mfn = record.Mfn,
                     Tag = line.Tag,
@@ -373,8 +373,8 @@ namespace ManagedIrbis.Fst
                 string[] items
             )
         {
-            List<string> result = new List<string>(items.Length);
-            foreach (string item in items)
+            var result = new List<string>(items.Length);
+            foreach (var item in items)
             {
                 if (!item.Contains("^"))
                 {
@@ -382,7 +382,7 @@ namespace ManagedIrbis.Fst
                 }
                 else
                 {
-                    TextNavigator navigator = new TextNavigator(item);
+                    var navigator = new TextNavigator(item);
                     while (!navigator.IsEOF)
                     {
                         var text = navigator.ReadUntil('^').ToString();
@@ -415,10 +415,10 @@ namespace ManagedIrbis.Fst
             */
 
             var result = new List<string>(items.Length);
-            foreach (string item in items)
+            foreach (var item in items)
             {
-                string[] words = _alphabetTable.SplitWords(item);
-                foreach (string word in words)
+                var words = _alphabetTable.SplitWords(item);
+                foreach (var word in words)
                 {
                     if (!_stopWords.IsStopWord(word))
                     {
@@ -443,7 +443,7 @@ namespace ManagedIrbis.Fst
             )
         {
             var result = new List<FstTerm>();
-            foreach (FstLine line in File.Lines)
+            foreach (var line in File.Lines)
             {
                 /*
                 IPftFormatter formatter = Provider.AcquireFormatter()
@@ -655,35 +655,35 @@ namespace ManagedIrbis.Fst
 
              */
 
-            string transformed = string.Empty;
+            var transformed = string.Empty;
 
             var result = new Record
             {
                 Database = record.Database ?? Provider.Database
             };
-            string[] lines = transformed.Split((char)0x07);
-            foreach (string line in lines)
+            var lines = transformed.Split((char)0x07);
+            foreach (var line in lines)
             {
-                string[] parts = line.SplitLines();
+                var parts = line.SplitLines();
                 if (parts.Length == 0)
                 {
                     continue;
                 }
-                string tag = parts[0];
-                for (int i = 1; i < parts.Length; i++)
+                var tag = parts[0];
+                for (var i = 1; i < parts.Length; i++)
                 {
-                    string body = parts[i];
+                    var body = parts[i];
                     if (string.IsNullOrEmpty(body))
                     {
                         continue;
                     }
                     var field = RecordFieldUtility.Parse(tag, body);
 
-                    SubField[] badSubFields
+                    var badSubFields
                         = field.Subfields
                         .Where(sf => string.IsNullOrEmpty(sf.Value))
                         .ToArray();
-                    foreach (SubField subField in badSubFields)
+                    foreach (var subField in badSubFields)
                     {
                         field.Subfields.Remove(subField);
                     }

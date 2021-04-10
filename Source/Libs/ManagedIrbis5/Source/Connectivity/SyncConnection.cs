@@ -43,7 +43,7 @@ namespace ManagedIrbis
     /// <summary>
     /// Синхронное подключение к серверу ИРБИС64.
     /// </summary>
-    public sealed class SyncConnection
+    public class SyncConnection
         : ISyncConnection
     {
         #region Events

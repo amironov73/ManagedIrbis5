@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UseNameofExpression
 
@@ -17,14 +18,14 @@ using System;
 using System.IO;
 using System.Linq;
 
-using AM.IO;
-
 using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Fst
 {

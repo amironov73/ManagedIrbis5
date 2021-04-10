@@ -67,7 +67,7 @@ namespace ManagedIrbis.Fields
                     }
                 }
 
-                return Title.Compare(x.Title, y.Title);
+                return Title.Compare(x?.Title, y?.Title);
             } // method Compare
 
             #endregion

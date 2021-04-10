@@ -109,7 +109,7 @@ namespace ManagedIrbis.Reports
         public override void Write
             (
                 ReportContext context,
-                string text
+                string? text
             )
         {
             var encoded = RichText.Encode(text, null);
@@ -121,7 +121,7 @@ namespace ManagedIrbis.Reports
         public override void WriteServiceText
             (
                 ReportContext context,
-                string text
+                string? text
             )
         {
             var output = context.Output;

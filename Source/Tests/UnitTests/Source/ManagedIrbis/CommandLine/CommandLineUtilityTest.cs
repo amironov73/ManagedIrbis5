@@ -63,8 +63,8 @@ namespace UnitTests.ManagedIrbis.CommandLine
                     {
                         Assert.AreEqual("127.0.0.1", settings.Host);
                         Assert.AreEqual((ushort)6666, settings.Port);
-                        Assert.IsNull(settings.Username);
-                        Assert.IsNull(settings.Password);
+                        Assert.AreEqual(string.Empty, settings.Username);
+                        Assert.AreEqual(string.Empty, settings.Password);
                         Assert.AreEqual("IBIS", settings.Database);
                         Assert.AreEqual("C", settings.Workstation);
                     }

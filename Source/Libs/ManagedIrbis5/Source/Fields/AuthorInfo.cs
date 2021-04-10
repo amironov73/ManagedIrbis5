@@ -15,7 +15,6 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -268,7 +267,7 @@ namespace ManagedIrbis.Fields
             )
         {
 
-            int tag = field.Tag;
+            var tag = field.Tag;
             if (tag.IsOneOf(KnownTags1))
             {
                 ApplyToField700(field);
@@ -326,7 +325,7 @@ namespace ManagedIrbis.Fields
                 Field field
             )
         {
-            string withInitials = FamilyName;
+            var withInitials = FamilyName;
             if (!string.IsNullOrEmpty(Initials))
             {
                 withInitials = withInitials + " " + Initials;
@@ -418,7 +417,7 @@ namespace ManagedIrbis.Fields
                 return false;
             }
 
-            TextNavigator navigator = new TextNavigator(withInitials);
+            var navigator = new TextNavigator(withInitials);
             var familyName = navigator.ReadUntil(_delimiters).ToString();
             if (!familyName.SameString(FamilyName))
             {
@@ -473,7 +472,7 @@ namespace ManagedIrbis.Fields
             {
                 if (field.Tag.IsOneOf(tags))
                 {
-                    AuthorInfo[] authors = ParseField(field);
+                    var authors = ParseField(field);
                     result.AddRange(authors);
                 }
             }
@@ -490,7 +489,7 @@ namespace ManagedIrbis.Fields
             )
         {
             AuthorInfo? one;
-            int tag = field.Tag;
+            var tag = field.Tag;
             if (tag.IsOneOf(KnownTags1))
             {
                 one = ParseField700(field);
@@ -539,13 +538,13 @@ namespace ManagedIrbis.Fields
                 Field field
             )
         {
-            string familyName = field.GetFirstSubFieldValue('a');
+            var familyName = field.GetFirstSubFieldValue('a');
             if (string.IsNullOrEmpty(familyName))
             {
                 return null;
             }
 
-            AuthorInfo result = new AuthorInfo
+            var result = new AuthorInfo
             {
                 FamilyName = familyName,
                 Initials = field.GetFirstSubFieldValue('b'),
@@ -574,7 +573,7 @@ namespace ManagedIrbis.Fields
                 Field field
             )
         {
-            string withInitials = field.GetFirstSubFieldValue('a');
+            var withInitials = field.GetFirstSubFieldValue('a');
             if (string.IsNullOrEmpty(withInitials))
             {
                 return null;
@@ -649,7 +648,7 @@ namespace ManagedIrbis.Fields
         {
             // TODO parse other authors
 
-            List<AuthorInfo> result = new List<AuthorInfo>();
+            var result = new List<AuthorInfo>();
 
             var first = ParseOneAuthor(field, _first454);
             if (!ReferenceEquals(first, null))
@@ -724,14 +723,14 @@ namespace ManagedIrbis.Fields
                 throw new IrbisException();
             }
 
-            string withInitials = field.GetFirstSubFieldValue(subFields[0]);
+            var withInitials = field.GetFirstSubFieldValue(subFields[0]);
             if (string.IsNullOrEmpty(withInitials))
             {
                 return null;
             }
 
             var result = new AuthorInfo();
-            TextNavigator navigator = new TextNavigator(withInitials);
+            var navigator = new TextNavigator(withInitials);
             result.CantBeInverted = !string.IsNullOrEmpty
                 (
                     field.GetFirstSubFieldValue(subFields[2])
@@ -773,9 +772,9 @@ namespace ManagedIrbis.Fields
         /// Полное ФИО автора (насколько возможно).
         /// </summary>
         /// <returns></returns>
-        public string ToFullName()
+        public string? ToFullName()
         {
-            string result = FamilyName;
+            var result = FamilyName;
 
             if (!string.IsNullOrEmpty(FullName))
             {

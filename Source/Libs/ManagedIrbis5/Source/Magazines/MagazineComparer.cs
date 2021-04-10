@@ -2,13 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UnusedType.Global
 
 /* MagazineComparer.cs -- сравнение описаний журналов
  * Ars Magna project, http://arsmagna.ru
@@ -31,15 +26,13 @@ namespace ManagedIrbis.Magazines
     public static class MagazineComparer
     {
         /// <summary>
-        ///
+        /// Сравнение журналов по их заглавиям.
         /// </summary>
         public class ByTitle : IComparer<MagazineInfo>
         {
             /// <inheritdoc cref="IComparer{T}.Compare"/>
-            public int Compare(MagazineInfo x, MagazineInfo y)
-            {
-                return string.Compare(x.Title, y.Title, StringComparison.CurrentCulture);
-            }
+            public int Compare(MagazineInfo? x, MagazineInfo? y)
+                => string.Compare(x?.Title, y?.Title, StringComparison.CurrentCulture);
         }
 
     } // class MagazineComparer

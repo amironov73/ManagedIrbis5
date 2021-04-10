@@ -102,7 +102,7 @@ namespace ManagedIrbis.Biblio
                 Multivolume bookGroup
             )
         {
-            BiblioItem[] items = bookGroup
+            var items = bookGroup
                 .OrderBy(item => item.Order)
                 .ToArray();
             bookGroup.Clear();
@@ -121,14 +121,14 @@ namespace ManagedIrbis.Biblio
         {
             base.BuildItems(context);
 
-            SpecialSettings settings = Settings;
+            var settings = Settings;
             if (ReferenceEquals(settings, null))
             {
                 return;
             }
 
-            string generalFormat = settings.GetSetting("general");
-            string orderFormat = settings.GetSetting("order");
+            var generalFormat = settings.GetSetting("general");
+            var orderFormat = settings.GetSetting("order");
             if (string.IsNullOrEmpty(generalFormat)
                 || string.IsNullOrEmpty(orderFormat))
             {
@@ -138,20 +138,20 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin grouping {0}", this);
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            using (IPftFormatter formatter
+            using (var formatter
                 = processor.AcquireFormatter(context))
             {
                 generalFormat = processor.GetText(context, generalFormat)
                     .ThrowIfNull("generalFormat");
                 formatter.ParseProgram(generalFormat);
 
-                foreach (BiblioItem item in Items)
+                foreach (var item in Items)
                 {
-                    Record record = item.Record
+                    var record = item.Record
                         .ThrowIfNull("item.Record");
-                    string header = formatter.FormatRecord(record.Mfn);
+                    var header = formatter.FormatRecord(record.Mfn);
                     if (!string.IsNullOrEmpty(header))
                     {
                         header = header.Trim();
@@ -175,11 +175,11 @@ namespace ManagedIrbis.Biblio
                     .ThrowIfNull("orderFormat");
                 formatter.ParseProgram(orderFormat);
 
-                foreach (Multivolume bookGroup in Groups)
+                foreach (var bookGroup in Groups)
                 {
-                    Record record = bookGroup.First().Record
+                    var record = bookGroup.First().Record
                         .ThrowIfNull("bookGroup.Record");
-                    string order = formatter.FormatRecord(record.Mfn);
+                    var order = formatter.FormatRecord(record.Mfn);
                     if (!string.IsNullOrEmpty(order))
                     {
                         order = order.Trim();
@@ -193,10 +193,10 @@ namespace ManagedIrbis.Biblio
 
             Groups = Groups.OrderBy(x => x.Order).ToList();
             Items.Clear();
-            foreach (Multivolume bookGroup in Groups)
+            foreach (var bookGroup in Groups)
             {
                 OrderGroup(bookGroup);
-                BiblioItem item = new BiblioItem
+                var item = new BiblioItem
                 {
                     Description = bookGroup.Header,
                     Record = new Record(), // TODO ???
@@ -219,28 +219,28 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
 
-            bool showOrder = false;
+            var showOrder = false;
                 // TODO: implement
                 /* context.Document.CommonSettings.Value<bool?>("showOrder") ?? false; */
 
             RenderTitle(context);
 
-            foreach (Multivolume bookGroup in Groups)
+            foreach (var bookGroup in Groups)
             {
-                string header = bookGroup.Header;
+                var header = bookGroup.Header;
                 log.WriteLine(header);
 
                 header = RichText.Encode3(header, UnicodeRange.Russian, "\\f2");
 
                 report.Body.Add(new ParagraphBand());
-                BiblioItem item = bookGroup.Item
+                var item = bookGroup.Item
                     .ThrowIfNull("bookGroup.Item");
-                int number = item.Number;
+                var number = item.Number;
                 ReportBand band = new ParagraphBand
                     (
                         number.ToInvariantString() + ".\\~\\~"
@@ -259,11 +259,11 @@ namespace ManagedIrbis.Biblio
 
                 if (!bookGroup.Single)
                 {
-                    for (int i = 0; i < bookGroup.Count; i++)
+                    for (var i = 0; i < bookGroup.Count; i++)
                     {
                         log.Write(".");
                         item = bookGroup[i];
-                        string description = item.Description
+                        var description = item.Description
                             .ThrowIfNull("item.Description");
                         description = RichText.Encode3(description,
                             UnicodeRange.Russian, "\\f2")

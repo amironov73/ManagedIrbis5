@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -22,7 +24,6 @@ using System.Text.Json.Serialization;
 using AM;
 
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Menus;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 using ManagedIrbis.Trees;
@@ -126,19 +127,19 @@ namespace ManagedIrbis.Biblio
                 TreeLine item
             )
         {
-            string key = item.Prefix.Trim();
+            var key = item.Prefix?.Trim();
             var settings = MenuSettings.FirstOrDefault
                 (
                     s => s.Name == key
                 );
-            string value = item.Suffix;
+            var value = item.Suffix;
 
             var record = new Record();
             record.Fields.Add(new Field { Tag = 1, Value = key });
             record.Fields.Add(new Field { Tag = 2, Value = value });
             var title = formatter.FormatRecord(record);
 
-            string className = null;
+            string? className = null;
             if (!ReferenceEquals(settings, null))
             {
                 className = settings.GetSetting("type");
@@ -157,7 +158,8 @@ namespace ManagedIrbis.Biblio
                 }
                 var type = Type.GetType(className, true)
                     .ThrowIfNull("Type.GetType");
-                result = (MenuSubChapter)Activator.CreateInstance(type);
+                result = (MenuSubChapter)Activator.CreateInstance(type)
+                    .ThrowIfNull("Activator.CreateInstance");
             }
             result.Key = key;
             result.MainChapter = this;
@@ -455,9 +457,9 @@ namespace ManagedIrbis.Biblio
                         {
                             _Fix463(record);
                             _BeautifyRecord(record);
+                            records.Add(record);
+                            context.Records.Add(record);
                         }
-                        records.Add(record);
-                        context.Records.Add(record);
                     }
 
                     _GatherSame(context);
@@ -533,9 +535,8 @@ namespace ManagedIrbis.Biblio
                             }
                             else
                             {
-                                MenuSubChapter subChapter;
                                 if (dictionary
-                                    .TryGetValue(key, out subChapter))
+                                    .TryGetValue(key, out MenuSubChapter? subChapter))
                                 {
                                     subChapter.Records.Add(record);
                                 }
@@ -547,9 +548,8 @@ namespace ManagedIrbis.Biblio
 
                             foreach (var nextKey in keys.Skip(1))
                             {
-                                MenuSubChapter subChapter;
                                 if (dictionary
-                                    .TryGetValue(nextKey, out subChapter))
+                                    .TryGetValue(nextKey, out MenuSubChapter? subChapter))
                                 {
                                     subChapter.Duplicates.Add(record);
                                 }

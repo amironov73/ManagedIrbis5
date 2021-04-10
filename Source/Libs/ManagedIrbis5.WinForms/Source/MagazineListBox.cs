@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -17,8 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-
-using AM;
 
 using ManagedIrbis.Magazines;
 
@@ -39,7 +38,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Fired when selected magazine changed.
         /// </summary>
-        public event EventHandler SelectedMagazineChanged;
+        public event EventHandler? SelectedMagazineChanged;
 
         #endregion
 
@@ -70,41 +69,43 @@ namespace ManagedIrbis.WinForms
 
         #region Private members
 
-        private MagazineInfo[] _magazines;
+        private MagazineInfo[]? _magazines;
 
         private void _listBox_SelectedIndexChanged
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
-            SelectedMagazineChanged.Raise(this);
+            SelectedMagazineChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void _textBox_DelayedTextChanged
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
-            string text = _textBox.Text.Trim();
-
-            for (int i = 0; i < _magazines.Length; i++)
+            if (_magazines is not null)
             {
-                string candidate = _magazines[i].Title;
-                if (string.Compare(candidate, text,
-                    StringComparison.CurrentCultureIgnoreCase)
-                    >= 0)
+                var text = _textBox.Text.Trim();
+                for (var i = 0; i < _magazines.Length; i++)
                 {
-                    _listBox.SelectedIndex = i;
-                    break;
+                    var candidate = _magazines[i].Title;
+                    if (string.Compare(candidate, text,
+                            StringComparison.CurrentCultureIgnoreCase)
+                        >= 0)
+                    {
+                        _listBox.SelectedIndex = i;
+                        break;
+                    }
                 }
             }
         }
 
         private void _textBox_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs e
             )
         {
@@ -154,7 +155,7 @@ namespace ManagedIrbis.WinForms
                 MagazineManager manager
             )
         {
-            MagazineInfo[] magazines = manager.GetAllMagazines();
+            var magazines = manager.GetAllMagazines();
             SetMagazines(magazines);
         }
 

@@ -62,18 +62,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
 
-                Magna.Error
-                    (
-                        "PftConditionNot::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            [ExcludeFromCodeCoverage]
+            protected set => Magna.Error
+                (
+                    "PftConditionNot::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
         }
 
         #endregion
@@ -102,7 +98,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -179,7 +175,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             base.Deserialize(reader);
 
             InnerCondition
-                = (PftCondition) PftSerializer.DeserializeNullable(reader);
+                = (PftCondition?) PftSerializer.DeserializeNullable(reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -212,7 +208,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             if (!ReferenceEquals(InnerCondition, null))
             {
-                InnerCondition = (PftCondition) InnerCondition.Optimize();
+                InnerCondition = (PftCondition?) InnerCondition.Optimize();
             }
 
             return this;

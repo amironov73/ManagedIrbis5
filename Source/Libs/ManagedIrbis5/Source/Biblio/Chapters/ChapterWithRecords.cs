@@ -80,7 +80,7 @@ namespace ManagedIrbis.Biblio
         {
             if (!ReferenceEquals(chapter.Items, null))
             {
-                foreach (BiblioItem item in chapter.Items)
+                foreach (var item in chapter.Items)
                 {
                     if (ReferenceEquals(item.Record, record))
                     {
@@ -89,12 +89,12 @@ namespace ManagedIrbis.Biblio
                 }
             }
 
-            foreach (BiblioChapter child in chapter.Children)
+            foreach (var child in chapter.Children)
             {
-                MenuSubChapter subChapter = child as MenuSubChapter;
+                var subChapter = child as MenuSubChapter;
                 if (!ReferenceEquals(subChapter, null))
                 {
-                    BiblioItem found = _FindItem(subChapter, record);
+                    var found = _FindItem(subChapter, record);
                     if (!ReferenceEquals(found, null))
                     {
                         return found;
@@ -116,12 +116,12 @@ namespace ManagedIrbis.Biblio
                 rootChapter = rootChapter.Parent;
             }
 
-            foreach (BiblioChapter child in rootChapter.Children)
+            foreach (var child in rootChapter.Children)
             {
-                MenuSubChapter chapter = child as MenuSubChapter;
+                var chapter = child as MenuSubChapter;
                 if (!ReferenceEquals(chapter, null))
                 {
-                    BiblioItem found = _FindItem(chapter, record);
+                    var found = _FindItem(chapter, record);
                     if (!ReferenceEquals(found, null))
                     {
                         return found;
@@ -152,7 +152,7 @@ namespace ManagedIrbis.Biblio
 
             using var formatter = processor.AcquireFormatter(context);
             formatter.ParseProgram(format);
-            string[] formatted = formatter.FormatRecords(mfns);
+            var formatted = formatter.FormatRecords(mfns);
             if (formatted.Length != mfns.Length)
             {
                 throw new IrbisException();
@@ -171,8 +171,8 @@ namespace ManagedIrbis.Biblio
             )
         {
             var records = Records .ThrowIfNull(nameof(Records));
-            int[] mfns = records.Select(r => r.Mfn).ToArray();
-            string[] result = FormatRecords(context, mfns, format);
+            var mfns = records.Select(r => r.Mfn).ToArray();
+            var result = FormatRecords(context, mfns, format);
 
             return result;
         }
@@ -186,18 +186,18 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
 
             if (Duplicates.Count != 0)
             {
-                List<BiblioItem> items
+                var items
                     = new List<BiblioItem>(Duplicates.Count);
-                foreach (Record dublicate in Duplicates)
+                foreach (var dublicate in Duplicates)
                 {
-                    BiblioItem item = _FindItem(dublicate);
+                    var item = _FindItem(dublicate);
                     if (!ReferenceEquals(item, null))
                     {
                         items.Add(item);
@@ -216,10 +216,10 @@ namespace ManagedIrbis.Biblio
                     .Distinct()
                     .ToList();
 
-                StringBuilder builder = new StringBuilder();
+                var builder = new StringBuilder();
                 builder.Append("См. также: {\\i ");
-                bool first = true;
-                foreach (BiblioItem item in items)
+                var first = true;
+                foreach (var item in items)
                 {
                     if (!first)
                     {

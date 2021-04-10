@@ -239,7 +239,7 @@ namespace ManagedIrbis.Direct
             var result = _ReadNode
                 (
                     record.IsLeaf,
-                    record._stream,
+                    record._stream.ThrowIfNull("record._stream"),
                     _NodeOffset(number)
                 );
 
@@ -265,7 +265,7 @@ namespace ManagedIrbis.Direct
             var result = _ReadNode
                 (
                     record.IsLeaf,
-                    record._stream,
+                    record._stream.ThrowIfNull("record._stream"),
                     _NodeOffset(number)
                 );
 
@@ -312,7 +312,7 @@ namespace ManagedIrbis.Direct
                     var rootNode = ReadNode(firstNode.Leader.Number);
                     var currentNode = rootNode;
 
-                    NodeItem64 goodItem = null, candidate = null;
+                    NodeItem64? goodItem = null, candidate = null;
                     var goodIndex = 0;
                     while (true)
                     {
@@ -464,7 +464,7 @@ namespace ManagedIrbis.Direct
                     var rootNode = ReadNode(firstNode.Leader.Number);
                     var currentNode = rootNode;
 
-                    NodeItem64 goodItem = null;
+                    NodeItem64? goodItem = null;
                     while (true)
                     {
                         var found = false;
@@ -589,7 +589,7 @@ namespace ManagedIrbis.Direct
                 var rootNode = ReadNode(firstNode.Leader.Number);
                 var currentNode = rootNode;
 
-                NodeItem64 goodItem = null;
+                NodeItem64? goodItem = null;
                 while (true)
                 {
                     var found = false;

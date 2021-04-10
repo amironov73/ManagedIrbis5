@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -15,21 +16,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 using AM.Text;
-using AM.Text.Output;
 
-using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
 #endregion
@@ -111,17 +105,17 @@ namespace ManagedIrbis.Biblio
                 BiblioChapter chapter
             )
         {
-            AbstractOutput log = context.Log;
-            BiblioProcessor processor = context.Processor
+            var log = context.Log;
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
 
-            SpecialSettings settings = Settings;
+            var settings = Settings;
             if (!ReferenceEquals(settings, null))
             {
-                string pattern = settings.GetSetting("chapterFilter");
+                var pattern = settings.GetSetting("chapterFilter");
                 if (!string.IsNullOrEmpty(pattern))
                 {
-                    string title = chapter.Title;
+                    var title = chapter.Title;
                     if (!ReferenceEquals(title, null))
                     {
                         if (!Regex.IsMatch(title, pattern))
@@ -134,38 +128,39 @@ namespace ManagedIrbis.Biblio
                 }
             }
 
-            ItemCollection items = chapter.Items;
+            var items = chapter.Items;
             if (!ReferenceEquals(items, null)
                 && items.Count != 0)
             {
                 log.WriteLine("Gather terms from chapter {0}", chapter);
 
-                int[] mfns = items.Select(i => i.Record.Mfn)
+                var mfns = items.Select(i => i.Record.Mfn)
                     .Where(mfn => mfn > 0)
                     .ToArray();
                 if (mfns.Length == 0)
                 {
                     goto DONE;
                 }
+
                 if (mfns.Length != items.Count)
                 {
                     throw new IrbisException();
                 }
 
-                int termCount = 0;
-                using (IPftFormatter formatter
+                var termCount = 0;
+                using (var formatter
                     = processor.AcquireFormatter(context))
                 {
-                    string select = SelectClause
+                    var select = SelectClause
                         .ThrowIfNull("SelectClause");
-                    string format = processor.GetText(context, select)
+                    var format = processor.GetText(context, select)
                         .ThrowIfNull("SelectClause");
                     formatter.ParseProgram(format);
 
-                    string[] formatted = formatter.FormatRecords(mfns);
-                    string[] formatted2 = new string[mfns.Length];
+                    var formatted = formatter.FormatRecords(mfns);
+                    var formatted2 = new string[mfns.Length];
 
-                    string extendedFormat = ExtendedFormat;
+                    var extendedFormat = ExtendedFormat;
                     if (!string.IsNullOrEmpty(extendedFormat))
                     {
                         extendedFormat = processor.GetText
@@ -178,18 +173,18 @@ namespace ManagedIrbis.Biblio
                         formatted2 = formatter.FormatRecords(mfns);
                     }
 
-                    for (int i = 0; i < items.Count; i++)
+                    for (var i = 0; i < items.Count; i++)
                     {
                         if (!string.IsNullOrEmpty(formatted[i]))
                         {
-                            string[] lines = formatted[i]
+                            var lines = formatted[i]
                                 .Split(_lineDelimiters)
                                 .TrimLines()
                                 .TrimLines(_charactersToTrim)
                                 .NonEmptyLines()
                                 .Distinct()
                                 .ToArray();
-                            string[] lines2 = new string[lines.Length];
+                            var lines2 = new string[lines.Length];
                             if (!string.IsNullOrEmpty(formatted2[i]))
                             {
                                 lines2 = formatted2[i]
@@ -200,13 +195,13 @@ namespace ManagedIrbis.Biblio
                                     .Distinct()
                                     .ToArray();
                             }
-                            for (int j = 0; j < lines.Length && j < lines2.Length; j++)
+                            for (var j = 0; j < lines.Length && j < lines2.Length; j++)
                             {
-                                string line1 = lines[j];
-                                string line2 = lines2[j];
+                                var line1 = lines[j];
+                                var line2 = lines2[j];
                                 if (!ExcludeList.Contains(line1))
                                 {
-                                    BiblioTerm term = new BiblioTerm
+                                    var term = new BiblioTerm
                                     {
                                         Title = line1,
                                         Extended = line2,
@@ -227,7 +222,7 @@ namespace ManagedIrbis.Biblio
 
             DONE:
 
-            foreach (BiblioChapter child in chapter.Children)
+            foreach (var child in chapter.Children)
             {
                 _ChapterToTerms(context, child);
             }
@@ -250,10 +245,10 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin build dictionary {0}", this);
 
-            foreach (BiblioTerm term in Terms)
+            foreach (var term in Terms)
             {
-                string title = term.Title.ThrowIfNull("term.Title");
-                BiblioItem item = term.Item;
+                var title = term.Title.ThrowIfNull("term.Title");
+                var item = term.Item;
                 if (ReferenceEquals(item, null))
                 {
                     continue;
@@ -277,9 +272,9 @@ namespace ManagedIrbis.Biblio
             {
                 try
                 {
-                    BiblioDocument document = context.Document;
+                    var document = context.Document;
 
-                    foreach (BiblioChapter chapter in document.Chapters)
+                    foreach (var chapter in document.Chapters)
                     {
                         _ChapterToTerms(context, chapter);
                     }
@@ -305,43 +300,43 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
 
             report.Body.Add(new NewPageBand());
             RenderTitle(context);
 
-            string[] keys = Dictionary.Keys.ToArray();
-            string[] items = keys.Select(k => CleanOrder(k)).ToArray();
+            var keys = Dictionary.Keys.ToArray();
+            var items = keys.Select(k => CleanOrder(k)).ToArray();
             Array.Sort(items, keys); //-V3066
-            StringBuilder builder = new StringBuilder();
-            foreach (string key in keys)
+            var builder = new StringBuilder();
+            foreach (var key in keys)
             {
                 log.Write(".");
                 builder.Clear();
-                DictionaryEntry entry = Dictionary[key];
-                ParagraphBand band = new ParagraphBand();
+                var entry = Dictionary[key];
+                var band = new ParagraphBand();
                 report.Body.Add(band);
 
-                string title = entry.Title;
+                var title = entry.Title;
                 if (string.IsNullOrEmpty(title))
                 {
                     continue;
                 }
                 if (!string.IsNullOrEmpty(ExtendedFormat))
                 {
-                    int maxLength = 0;
-                    string longest = null;
-                    foreach (BiblioTerm term in Terms)
+                    var maxLength = 0;
+                    string? longest = null;
+                    foreach (var term in Terms)
                     {
                         if (term.Title == title)
                         {
-                            string candidate = term.Extended;
+                            var candidate = term.Extended;
                             if (!string.IsNullOrEmpty(candidate))
                             {
-                                int length = candidate.Length;
+                                var length = candidate.Length;
                                 if (length > maxLength)
                                 {
                                     maxLength = length;
@@ -359,12 +354,12 @@ namespace ManagedIrbis.Biblio
 
                 builder.Append(title);
                 builder.Append(" {\\i ");
-                int[] refs = entry.References
+                var refs = entry.References
                     .Where(item => item > 0)
                     .ToArray();
                 Array.Sort(refs);
-                bool first = true;
-                foreach (int reference in refs)
+                var first = true;
+                foreach (var reference in refs)
                 {
                     if (!first)
                     {
@@ -400,7 +395,7 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            Verifier<ChapterWithDictionary> verifier
+            var verifier
                 = new Verifier<ChapterWithDictionary>(this, throwOnError);
 
             verifier

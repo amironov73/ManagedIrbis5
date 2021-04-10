@@ -140,7 +140,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftField.CanOutput" />
         public override bool CanOutput
             (
-                string value
+                string? value
             )
         {
             return string.IsNullOrEmpty(value);

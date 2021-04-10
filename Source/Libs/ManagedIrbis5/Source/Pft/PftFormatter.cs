@@ -16,6 +16,8 @@ using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
 
+#nullable enable
+
 namespace ManagedIrbis.Pft
 {
     /// <summary>

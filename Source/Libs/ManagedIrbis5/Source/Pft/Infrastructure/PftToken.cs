@@ -1,7 +1,15 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* PftToken.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/* PftToken.cs -- токен PFT-скрипта
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,17 +23,15 @@ using AM;
 using AM.IO;
 using AM.Runtime;
 
-
-
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// Token.
+    /// Токен PFT-скрипта.
     /// </summary>
-
     [DebuggerDisplay("{Kind} {Text} {Line} {Column}")]
     public sealed class PftToken
         : IHandmadeSerializable,

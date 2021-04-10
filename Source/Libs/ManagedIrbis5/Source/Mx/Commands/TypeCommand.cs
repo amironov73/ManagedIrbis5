@@ -15,19 +15,6 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -58,14 +45,6 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region MxCommand members
 
         /// <inheritdoc cref="MxCommand.Execute" />
@@ -83,7 +62,7 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            string fileName = null;
+            string? fileName = null;
             if (arguments.Length != 0)
             {
                 fileName = arguments[0].Text;
@@ -109,8 +88,5 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

@@ -96,7 +96,7 @@ namespace ManagedIrbis.Biblio
             )
         {
             WriteDelimiter(context);
-            BiblioDocument document = context.Document;
+            var document = context.Document;
             document.BuildDictionaries(context);
         }
 
@@ -109,7 +109,7 @@ namespace ManagedIrbis.Biblio
             )
         {
             WriteDelimiter(context);
-            BiblioDocument document = context.Document;
+            var document = context.Document;
             document.BuildItems(context);
         }
 
@@ -121,18 +121,18 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             WriteDelimiter(context);
             log.WriteLine("Begin final render");
 
             var provider = context.Provider
                 .ThrowIfNull("context.Provider");
-            IrbisReport report = Report.ThrowIfNull("Report");
-            ReportContext reportContext = new ReportContext(provider);
+            var report = Report.ThrowIfNull("Report");
+            var reportContext = new ReportContext(provider);
             Output = reportContext.Output;
             reportContext.SetDriver(new RtfDriver());
 
-            string prologue = GetText(context, "*prologue.txt");
+            var prologue = GetText(context, "*prologue.txt");
             if (!string.IsNullOrEmpty(prologue))
             {
                 reportContext.Driver.SetPrologue(prologue);
@@ -155,7 +155,7 @@ namespace ManagedIrbis.Biblio
             )
         {
             WriteDelimiter(context);
-            BiblioDocument document = context.Document;
+            var document = context.Document;
             document.GatherRecords(context);
         }
 
@@ -168,7 +168,7 @@ namespace ManagedIrbis.Biblio
             )
         {
             WriteDelimiter(context);
-            BiblioDocument document = context.Document;
+            var document = context.Document;
             document.GatherTerms(context);
         }
 
@@ -181,7 +181,7 @@ namespace ManagedIrbis.Biblio
             )
         {
             WriteDelimiter(context);
-            BiblioDocument document = context.Document;
+            var document = context.Document;
             document.NumberItems(context);
         }
 
@@ -195,7 +195,7 @@ namespace ManagedIrbis.Biblio
         {
             WriteDelimiter(context);
             Report = new IrbisReport();
-            BiblioDocument document = context.Document;
+            var document = context.Document;
             document.RenderItems(context);
         }
 
@@ -246,7 +246,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            BiblioDocument document = context.Document;
+            var document = context.Document;
             document.Initialize(context);
 
             GatherRecords(context);
@@ -316,7 +316,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            AbstractOutput log = context.Log;
+            var log = context.Log;
             log.WriteLine("Begin initialize the processor");
             context.Processor = this;
             log.WriteLine("End initialize the processor");

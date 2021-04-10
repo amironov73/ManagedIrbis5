@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 /* DictionaryForm.cs --
@@ -32,7 +33,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Adapter.
         /// </summary>
-        public TermAdapter Adapter { get; set; }
+        public TermAdapter? Adapter { get; set; }
 
         /// <summary>
         /// Chosen term.
@@ -93,11 +94,11 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_KeyPress
             (
-                object sender,
+                object? sender,
                 KeyPressEventArgs e
             )
         {
-            char keyChar = e.KeyChar;
+            var keyChar = e.KeyChar;
             if (keyChar != '\0')
             {
                 _keyBox.Focus();
@@ -108,7 +109,7 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_MouseWheel
             (
-                object sender,
+                object? sender,
                 MouseEventArgs e
             )
         {
@@ -117,7 +118,7 @@ namespace ManagedIrbis.WinForms
                 return;
             }
 
-            int delta = e.Delta;
+            var delta = e.Delta;
 
             if (delta > 0)
             {
@@ -136,7 +137,7 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs e
             )
         {
@@ -175,7 +176,7 @@ namespace ManagedIrbis.WinForms
 
         private void _keyBox_TextChanged
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -190,7 +191,7 @@ namespace ManagedIrbis.WinForms
 
         private void _keyBox_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs e
             )
         {
@@ -229,13 +230,13 @@ namespace ManagedIrbis.WinForms
 
         private void _RaiseChoosed()
         {
-            ChosenTerm = Adapter.CurrentValue;
+            ChosenTerm = Adapter?.CurrentValue;
             DialogResult = DialogResult.OK;
         }
 
         private void _grid_DoubleClick
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -244,7 +245,7 @@ namespace ManagedIrbis.WinForms
 
         private void _scroll_Scroll
             (
-                object sender,
+                object? sender,
                 ScrollEventArgs e
             )
         {
@@ -275,11 +276,11 @@ namespace ManagedIrbis.WinForms
 
         private void _okButton_Click
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
-            ChosenTerm = Adapter.CurrentValue;
+            ChosenTerm = Adapter?.CurrentValue;
             DialogResult = DialogResult.OK;
         }
 
@@ -308,18 +309,18 @@ namespace ManagedIrbis.WinForms
                 string? startTerm
             )
         {
-            using (DictionaryForm form = new DictionaryForm(adapter))
+            using var form = new DictionaryForm(adapter);
+            form.Goto(startTerm);
+            if (form.ShowDialog(owner) == DialogResult.OK)
             {
-                form.Goto(startTerm);
-                if (form.ShowDialog(owner) == DialogResult.OK)
-                {
-                    return form.ChosenTerm;
-                }
+                return form.ChosenTerm;
             }
 
             return null;
         }
 
         #endregion
-    }
-}
+
+    } // class DictionaryForm
+
+} // namespace ManagedIrbis.WinForms

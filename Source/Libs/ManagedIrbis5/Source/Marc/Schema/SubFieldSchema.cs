@@ -57,18 +57,8 @@ namespace ManagedIrbis.Marc.Schema
         [JsonPropertyName("code")]
         public string CodeString
         {
-            get
-            {
-                return Code < ' '
-                    ? " "
-                    : Code.ToString();
-            }
-            set
-            {
-                Code = string.IsNullOrEmpty(value)
-                    ? '\0'
-                    : value[0];
-            }
+            get => Code < ' ' ? " " : Code.ToString();
+            set => Code = string.IsNullOrEmpty(value) ? '\0' : value[0];
         }
 
         /// <summary>
@@ -97,7 +87,7 @@ namespace ManagedIrbis.Marc.Schema
         /// </summary>
         [XmlElement("mandatory-text")]
         [JsonPropertyName("mandatory-text")]
-        public string MandatoryText { get; set; }
+        public string? MandatoryText { get; set; }
 
         /// <summary>
         /// Name.

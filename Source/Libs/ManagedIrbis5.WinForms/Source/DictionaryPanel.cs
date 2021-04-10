@@ -35,7 +35,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Raised when the term is choosed.
         /// </summary>
-        public event EventHandler Choosed;
+        public event EventHandler? Choosed;
 
         #endregion
 
@@ -44,7 +44,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Adapter.
         /// </summary>
-        public TermAdapter Adapter { get; set; }
+        public TermAdapter? Adapter { get; set; }
 
         #endregion
 
@@ -97,7 +97,7 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_KeyPress
             (
-                object sender,
+                object? sender,
                 KeyPressEventArgs e
             )
         {
@@ -112,7 +112,7 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_MouseWheel
             (
-                object sender,
+                object? sender,
                 MouseEventArgs e
             )
         {
@@ -140,7 +140,7 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs e
             )
         {
@@ -179,7 +179,7 @@ namespace ManagedIrbis.WinForms
 
         private void _keyBox_TextChanged
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -194,7 +194,7 @@ namespace ManagedIrbis.WinForms
 
         private void _keyBox_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs e
             )
         {
@@ -238,7 +238,7 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_DoubleClick
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -247,7 +247,7 @@ namespace ManagedIrbis.WinForms
 
         private void _scrollControl_Scroll
             (
-                object sender,
+                object? sender,
                 ScrollEventArgs e
             )
         {

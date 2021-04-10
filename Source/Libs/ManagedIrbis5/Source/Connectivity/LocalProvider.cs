@@ -44,10 +44,12 @@ namespace ManagedIrbis.Client
 
         public LocalProvider()
         {
+            PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
         public LocalProvider(string rootPath)
         {
+            PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
         public bool FileExist(FileSpecification specification)
@@ -61,7 +63,10 @@ namespace ManagedIrbis.Client
         }
 
         public PlatformAbstractionLayer PlatformAbstraction
-            => throw new NotImplementedException();
+        {
+            get;
+            set;
+        }
 
         public void Configure(string configurationString)
         {

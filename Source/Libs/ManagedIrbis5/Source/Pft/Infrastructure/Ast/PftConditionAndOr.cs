@@ -79,18 +79,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
 
-                Magna.Error
-                    (
-                        "PftConditionAndOr::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            [ExcludeFromCodeCoverage]
+            protected set => Magna.Error
+                (
+                    "PftConditionAndOr::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
         }
 
         #endregion
@@ -119,7 +115,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -229,11 +225,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            LeftOperand
-                = (PftCondition) PftSerializer.DeserializeNullable(reader);
+            LeftOperand = (PftCondition?) PftSerializer.DeserializeNullable(reader);
             Operation = reader.ReadNullableString();
-            RightOperand
-                = (PftCondition) PftSerializer.DeserializeNullable(reader);
+            RightOperand = (PftCondition?) PftSerializer.DeserializeNullable(reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -346,11 +340,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             if (!ReferenceEquals(LeftOperand, null))
             {
-                LeftOperand = (PftCondition) LeftOperand.Optimize();
+                LeftOperand = (PftCondition?) LeftOperand.Optimize();
             }
             if (!ReferenceEquals(RightOperand, null))
             {
-                RightOperand = (PftCondition) RightOperand.Optimize();
+                RightOperand = (PftCondition?) RightOperand.Optimize();
             }
 
             return this;

@@ -226,10 +226,11 @@ namespace ManagedIrbis
         /// <summary>
         /// Чтение постингов указанного термина.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="term">Термин.</param>
         /// <param name="numberOfPostings">Максимальное количество постингов</param>
         /// <returns>Массив прочитанных постингов.</returns>
-        public static async Task<TermPosting[]> ReadPostingsAsync
+        public static async Task<TermPosting[]?> ReadPostingsAsync
             (
                 this IAsyncIrbisProvider connection,
                 string term,
@@ -249,10 +250,11 @@ namespace ManagedIrbis
         /// <summary>
         /// Чтение терминов словаря.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="startTerm">Начальный термин.</param>
         /// <param name="numberOfTerms">Максимальное число терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
-        public static async Task<Term[]> ReadTermsAsync
+        public static async Task<Term[]?> ReadTermsAsync
             (
                 this IAsyncIrbisProvider connection,
                 string startTerm,

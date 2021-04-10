@@ -106,7 +106,7 @@ namespace ManagedIrbis.WinForms
 
         private void _ClientDisposing
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -120,7 +120,7 @@ namespace ManagedIrbis.WinForms
 
         private void _BreakPressed
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -138,7 +138,7 @@ namespace ManagedIrbis.WinForms
 
         private void _BusyChanged
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {

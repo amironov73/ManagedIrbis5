@@ -6,10 +6,14 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedType.Global
 
-/* IrbisSystemEvent.cs --
+/* IrbisSystemEvent.cs -- системные события, используемые сервером ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +28,7 @@ using AM;
 
 #nullable enable
 
-namespace ManagedIrbis.Direct
+namespace ManagedIrbis.Server
 {
     //
     // При старте сервера
@@ -42,7 +46,8 @@ namespace ManagedIrbis.Direct
     //
 
     /// <summary>
-    ///
+    /// Системные события, используемые сервером ИРБИС64
+    /// для координации экземпляров сервера.
     /// </summary>
     public sealed class IrbisSystemEvent
         : IDisposable
@@ -66,24 +71,25 @@ namespace ManagedIrbis.Direct
         /// <summary>
         /// IRBIS64 server started.
         /// </summary>
-        public EventWaitHandle? StartedEvent { get; private set; }
+        public EventWaitHandle? StartedEvent { get; }
 
         /// <summary>
         /// Stop the IRBIS64 server.
         /// </summary>
-        public EventWaitHandle? StopEvent { get; private set; }
+        public EventWaitHandle? StopEvent { get; }
 
         /// <summary>
-        /// New event created.
+        /// Флаг, означающий, что создано новое событие
+        /// (а не использовано ранее созданное).
         /// </summary>
-        public bool Created { get; private set; }
+        public bool Created { get; }
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public IrbisSystemEvent()
         {
@@ -110,11 +116,10 @@ namespace ManagedIrbis.Direct
                     EventResetMode.ManualReset,
                     StopName
                 );
-
-        }
+        } // constructor
 
         /// <summary>
-        /// Finalizer.
+        /// Финализатор.
         /// </summary>
         ~IrbisSystemEvent()
         {
@@ -124,63 +129,39 @@ namespace ManagedIrbis.Direct
                 );
 
             Dispose();
-        }
-
-        #endregion
-
-        #region Private members
+        } // finalizer
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Check if other IRBIS64 server is running.
+        /// Проверяет, не запущен ли другой экземпляр сервера ИРБИС64.
         /// </summary>
-        public bool CheckOtherServerRunning()
-        {
-#if WINMOBILE || PocketPC
-
-            throw new NotImplementedException();
-
-#else
-
-            return !StartedEvent.WaitOne(1);
-
-#endif
-        }
+        /// <returns><c>true</c>, если другого экземпляра нет.</returns>
+        public bool CheckOtherServerRunning() =>
+            !StartedEvent.ThrowIfNull("StartedEvent").WaitOne(1);
 
         /// <summary>
-        /// Whether the IRBIS64 needs to stop.
+        /// Проверяет, не запрошен ли останов сервера ИРБИС64.
         /// </summary>
-        public bool CheckStopRequested()
-        {
-#if WINMOBILE || PocketPC
-
-            throw new NotImplementedException();
-
-#else
-
-            return StopEvent.WaitOne(1);
-
-#endif
-        }
+        /// <returns><c>true</c>, если запрошен останов сервера.</returns>
+        public bool CheckStopRequested() =>
+            StopEvent.ThrowIfNull("StopEvent").WaitOne(1);
 
         /// <summary>
-        /// Request stop.
+        /// Запрашивает остановку ранее запущенного экземпляра
+        /// сервера ИРБИС64.
         /// </summary>
-        public void RequestStop()
-        {
-            StopEvent.Set();
-        }
+        public void RequestStop() =>
+            StopEvent.ThrowIfNull("StopEvent").Set();
 
         /// <summary>
-        /// Say "I am running" to other servers (if any).
+        /// Заявляет "Я, сервер ИРБИС64, не потерплю других серверов
+        /// пред ликом моим".
         /// </summary>
-        public void SayIamRunning()
-        {
-            StartedEvent.Set();
-        }
+        public void SayIamRunning() =>
+            StartedEvent.ThrowIfNull("StartedEvent").Set();
 
         #endregion
 
@@ -189,26 +170,19 @@ namespace ManagedIrbis.Direct
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
-            Magna.Trace
-                (
-                    "IrbisSystemEvent::Dispose"
-                );
-
             GC.SuppressFinalize(this);
 
-            if (!ReferenceEquals(StartedEvent, null))
-            {
-                StartedEvent.Dispose();
-            }
+            Magna.Trace
+                (
+                    nameof(IrbisSystemEvent) + "::" + nameof(Dispose)
+                );
 
-            if (!ReferenceEquals(StopEvent, null))
-            {
-                StopEvent.Dispose();
-            }
-
-        }
+            StartedEvent?.Dispose();
+            StopEvent?.Dispose();
+        } // method Dispose
 
         #endregion
 
-    }
-}
+    } // class IrbisSystemEvent
+
+} // namespace ManagedIrbis.Server

@@ -30,23 +30,11 @@ namespace ManagedIrbis.WinForms.Grid
     public class SiberianTextColumn
         : SiberianColumn
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SiberianTextColumn()
-        {
-            //BackColor = Color.White;
-        }
-
-        #endregion
-
         #region Private members
 
         private void Editor_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs args
             )
         {
@@ -146,7 +134,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <inheritdoc />
         public override void GetData
             (
-                object theObject,
+                object? theObject,
                 SiberianCell cell
             )
         {
@@ -173,7 +161,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <inheritdoc />
         public override void PutData
             (
-                object theObject,
+                object? theObject,
                 SiberianCell cell
             )
         {

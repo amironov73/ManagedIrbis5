@@ -158,8 +158,8 @@ namespace ManagedIrbis.Client
             {
                 Host = ServerIP,
                 Port = ServerPort,
-                Username = UserName.EmptyToNull(),
-                Password = UserPassword.EmptyToNull()
+                Username = UserName.EmptyToNull() ?? string.Empty,
+                Password = UserPassword.EmptyToNull() ?? string.Empty
             };
 
             return settings.ToString();

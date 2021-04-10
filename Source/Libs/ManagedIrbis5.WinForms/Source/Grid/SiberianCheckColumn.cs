@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
@@ -30,18 +31,6 @@ namespace ManagedIrbis.WinForms.Grid
     public class SiberianCheckColumn
         : SiberianColumn
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SiberianCheckColumn()
-        {
-            //BackColor = Color.White;
-        }
-
-        #endregion
-
         #region SiberianColumn members
 
         /// <inheritdoc/>
@@ -67,7 +56,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <inheritdoc />
         public override void GetData
             (
-                object theObject,
+                object? theObject,
                 SiberianCell cell
             )
         {
@@ -85,16 +74,14 @@ namespace ManagedIrbis.WinForms.Grid
                     );
 
                 var value = property.GetValue(theObject);
-                checkCell.State = ReferenceEquals(value, null)
-                    ? false
-                    : (bool) value;
+                checkCell.State = (bool?) value ?? false;
             }
         }
 
         /// <inheritdoc />
         public override void PutData
             (
-                object theObject,
+                object? theObject,
                 SiberianCell cell
             )
         {

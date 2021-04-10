@@ -97,7 +97,7 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_MouseWheel
             (
-                object sender,
+                object? sender,
                 MouseEventArgs e
             )
         {
@@ -125,7 +125,7 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs e
             )
         {
@@ -164,7 +164,7 @@ namespace ManagedIrbis.WinForms
 
         private void _keyBox_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs e
             )
         {
@@ -208,16 +208,12 @@ namespace ManagedIrbis.WinForms
 
         private void _grid_DoubleClick
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
             _RaiseChoosed();
         }
-
-        #endregion
-
-        #region Public methods
 
         #endregion
     }

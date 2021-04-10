@@ -15,9 +15,12 @@
 
 using AM;
 using AM.Text;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {

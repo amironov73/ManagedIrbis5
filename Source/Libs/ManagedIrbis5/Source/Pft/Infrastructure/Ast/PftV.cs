@@ -129,7 +129,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 context.Execute(LeftHand);
 
-                string value = GetValue(context);
+                var value = GetValue(context);
                 if (!string.IsNullOrEmpty(value))
                 {
                     if (Indent != 0
@@ -178,7 +178,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 return 0;
             }
 
-            int result = record.Fields.GetField(Tag.SafeToInt32()).Length;
+            var result = record.Fields.GetField(Tag.SafeToInt32()).Length;
 
             return result;
         }
@@ -234,7 +234,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 }
                 else
                 {
-                    PftContext childContext = new PftContext(context)
+                    var childContext = new PftContext(context)
                     {
                         FieldOutputMode = context.FieldOutputMode,
                         UpperMode = context.UpperMode,

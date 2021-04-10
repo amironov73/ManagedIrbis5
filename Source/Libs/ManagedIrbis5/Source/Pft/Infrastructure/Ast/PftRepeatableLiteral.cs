@@ -161,7 +161,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftRepeatableLiteral otherLiteral
+            var otherLiteral
                 = (PftRepeatableLiteral) otherNode;
             if (IsPrefix != otherLiteral.IsPrefix
                 || Plus != otherLiteral.Plus)
@@ -225,15 +225,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            PftField field = context.CurrentField;
-
+            var field = context.CurrentField;
             if (!ReferenceEquals(field, null))
             {
-                bool flag = field.HaveRepeat(context);
+                var flag = field.HaveRepeat(context);
 
                 if (flag)
                 {
-                    string value = field.GetValue(context);
+                    var value = field.GetValue(context);
 
                     flag = field.CanOutput(value);
                 }
@@ -247,7 +246,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 if (flag)
                 {
-                    string text = Text;
+                    var text = Text;
                     if (context.UpperMode
                         && !ReferenceEquals(text, null))
                     {
@@ -261,7 +260,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.Optimize" />
-        public override PftNode Optimize()
+        public override PftNode? Optimize()
         {
             if (string.IsNullOrEmpty(Text))
             {
@@ -311,7 +310,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             if (!IsPrefix && Plus)
             {
                 result.Append('+');

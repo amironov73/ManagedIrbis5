@@ -86,13 +86,13 @@ namespace ManagedIrbis.Workspace
                 TextReader reader
             )
         {
-            WssFile result = new WssFile();
+            var result = new WssFile();
 
-            int count = int.Parse(reader.RequireLine());
+            var count = int.Parse(reader.RequireLine());
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                WorksheetItem item = WorksheetItem.ParseStream(reader);
+                var item = WorksheetItem.ParseStream(reader);
                 result.Items.Add(item);
             }
 
@@ -108,16 +108,14 @@ namespace ManagedIrbis.Workspace
                 FileSpecification specification
             )
         {
-            string content = provider.ReadTextFile(specification);
+            var content = provider.ReadTextFile(specification);
             if (string.IsNullOrEmpty(content))
             {
                 return null;
             }
 
-            using (StringReader reader = new StringReader(content))
-            {
-                return ParseStream(reader);
-            }
+            using var reader = new StringReader(content);
+            return ParseStream(reader);
         }
 
         /// <summary>
@@ -129,12 +127,12 @@ namespace ManagedIrbis.Workspace
                 Encoding encoding
             )
         {
-            using StreamReader reader = TextReaderUtility.OpenRead
+            using var reader = TextReaderUtility.OpenRead
             (
                 fileName,
                 encoding
             );
-            WssFile result = ParseStream(reader);
+            var result = ParseStream(reader);
 
             result.Name = Path.GetFileName(fileName);
 

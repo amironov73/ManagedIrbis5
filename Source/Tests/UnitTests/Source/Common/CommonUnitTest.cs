@@ -1,20 +1,22 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable StringLiteralTypo
+
+using System;
 using System.IO;
 using System.Linq;
 
-using AM.IO;
+using AM.PlatformAbstraction;
 
 using ManagedIrbis;
-//using ManagedIrbis.Client;
+using ManagedIrbis.Client;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
-
-// ReSharper disable CheckNamespace
-// ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable StringLiteralTypo
 
 namespace UnitTests.Common
 {
@@ -90,18 +92,17 @@ namespace UnitTests.Common
             }
         }
 
-        //[NotNull]
-        //protected virtual IrbisProvider GetProvider()
-        //{
-        //    string rootPath = Irbis64RootPath;
-        //    LocalProvider result = new LocalProvider(rootPath)
-        //    {
-        //        Database = "IBIS",
-        //        PlatformAbstraction = new TestingPlatformAbstraction()
-        //    };
+        protected virtual ISyncIrbisProvider GetProvider()
+        {
+            string rootPath = Irbis64RootPath;
+            LocalProvider result = new LocalProvider(rootPath)
+            {
+                Database = "IBIS",
+                PlatformAbstraction = new TestingPlatformAbstraction()
+            };
 
-        //    return result;
-        //}
+            return result;
+        }
 
         protected static string GatherCodes
             (

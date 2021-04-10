@@ -67,7 +67,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected virtual string GetDescriptionFormat()
         {
-            string result = GetProperty<SimpleChapter, string>
+            var result = GetProperty<SimpleChapter, string?>
                 (
                     chapter => chapter.Format
                 );
@@ -84,7 +84,7 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         protected virtual string GetOrderFormat()
         {
-            string result = GetProperty<SimpleChapter, string>
+            var result = GetProperty<SimpleChapter, string?>
                 (
                     chapter => chapter.Order
                 );
@@ -98,8 +98,8 @@ namespace ManagedIrbis.Biblio
 
         static string Propis(int number)
         {
-            int[] array_int = new int[4];
-            string[,] array_string = new string[4, 3]
+            var array_int = new int[4];
+            var array_string = new string[4, 3]
             {
                 {" миллиард", " миллиарда", " миллиардов"},
                 {" миллион", " миллиона", " миллионов"},
@@ -111,7 +111,7 @@ namespace ManagedIrbis.Biblio
             array_int[1] = ((number % 1000000000) - (number % 1000000)) / 1000000;
             array_int[2] = ((number % 1000000) - (number % 1000)) / 1000;
             array_int[3] = number % 1000;
-            string result = "";
+            var result = "";
             for (var i = 0; i < 4; i++)
             {
                 if (array_int[i] != 0)
@@ -209,13 +209,13 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin build items {0}", this);
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
 
-            using (IPftFormatter formatter
+            using (var formatter
                 = processor.AcquireFormatter(context))
             {
-                string descriptionFormat = GetDescriptionFormat();
+                var descriptionFormat = GetDescriptionFormat();
                 descriptionFormat = processor.GetText
                     (
                         context,
@@ -224,8 +224,8 @@ namespace ManagedIrbis.Biblio
                     .ThrowIfNull("processor.GetText");
                 formatter.ParseProgram(descriptionFormat);
 
-                int[] mfns = Records.Select(r => r.Mfn).ToArray();
-                string[] formatted = formatter.FormatRecords(mfns);
+                var mfns = Records.Select(r => r.Mfn).ToArray();
+                var formatted = formatter.FormatRecords(mfns);
 
                 if (ReferenceEquals(Items, null))
                 {
@@ -235,15 +235,15 @@ namespace ManagedIrbis.Biblio
                 for (var i = 0; i < Records.Count; i++)
                 {
                     log.Write(".");
-                    Record record = Records[i];
-                    string description = formatted[i]
+                    var record = Records[i];
+                    var description = formatted[i]
                         .TrimEnd('\u001F');
 
                     // TODO handle string.IsNullOrEmpty(description)
 
                     description = BiblioUtility.AddTrailingDot(description);
 
-                    BiblioItem item = new BiblioItem
+                    var item = new BiblioItem
                     {
                         Chapter = this,
                         Record = record,
@@ -254,10 +254,10 @@ namespace ManagedIrbis.Biblio
                 log.WriteLine(" done");
             }
 
-            using (IPftFormatter formatter
+            using (var formatter
                 = processor.AcquireFormatter(context))
             {
-                string orderFormat = GetOrderFormat();
+                var orderFormat = GetOrderFormat();
                 orderFormat = processor.GetText
                     (
                         context,
@@ -266,16 +266,16 @@ namespace ManagedIrbis.Biblio
                     .ThrowIfNull("processor.GetText");
                 formatter.ParseProgram(orderFormat);
 
-                int[] mfns = Records.Select(r => r.Mfn).ToArray();
-                string[] formatted = formatter.FormatRecords(mfns);
+                var mfns = Records.Select(r => r.Mfn).ToArray();
+                var formatted = formatter.FormatRecords(mfns);
 
-                Regex fioRegex = new Regex(@"^[А-Я]\.(\s+[А-Я]\.)");
+                var fioRegex = new Regex(@"^[А-Я]\.(\s+[А-Я]\.)");
 
                 for (var i = 0; i < Items.Count; i++)
                 {
                     log.Write(".");
-                    BiblioItem item = Items[i];
-                    string order = formatted[i].TrimEnd('\u001F');
+                    var item = Items[i];
+                    var order = formatted[i].TrimEnd('\u001F');
 
                     // TODO handle string.IsNullOrEmpty(order)
 
@@ -312,7 +312,7 @@ namespace ManagedIrbis.Biblio
                         order = numberText + " " + order;
                     }
 
-                    Match match = fioRegex.Match(order);
+                    var match = fioRegex.Match(order);
                     if (match.Success)
                     {
                         var length = match.Value.Length;
@@ -329,7 +329,7 @@ namespace ManagedIrbis.Biblio
 
             log.WriteLine("Items: {0}", Items.Count);
 
-            foreach (BiblioChapter chapter in Children)
+            foreach (var chapter in Children)
             {
                 chapter.BuildItems(context);
             }
@@ -351,11 +351,11 @@ namespace ManagedIrbis.Biblio
             {
                 var processor = context.Processor
                     .ThrowIfNull("context.Processor");
-                using (IPftFormatter formatter
+                using (var formatter
                     = processor.AcquireFormatter(context))
                 {
                     var provider = context.Provider;
-                    RecordCollection records = Records
+                    var records = Records
                         .ThrowIfNull("Records");
 
                     var searchExpression = SearchExpression
@@ -370,22 +370,25 @@ namespace ManagedIrbis.Biblio
                         Expression = searchExpression
                     };
                     var found = provider.Search(parameters);
-                    log.WriteLine("Found: {0} record(s)", found.Length);
-
-                    log.Write("Reading records");
-
-                    // Пробуем не загружать записи,
-                    // а предоставить заглушки
-
-                    for (var i = 0; i < found.Length; i++)
+                    if (found is not null)
                     {
-                        log.Write(".");
-                        record = new Record
+                        log.WriteLine("Found: {0} record(s)", found.Length);
+
+                        log.Write("Reading records");
+
+                        // Пробуем не загружать записи,
+                        // а предоставить заглушки
+
+                        for (var i = 0; i < found.Length; i++)
                         {
-                            Mfn = found[i].Mfn
-                        };
-                        records.Add(record);
-                        context.Records.Add(record);
+                            log.Write(".");
+                            record = new Record
+                            {
+                                Mfn = found[i].Mfn
+                            };
+                            records.Add(record);
+                            context.Records.Add(record);
+                        }
                     }
 
                     log.WriteLine(" done");
@@ -399,7 +402,7 @@ namespace ManagedIrbis.Biblio
             }
             catch (Exception exception)
             {
-                string message = string.Format
+                var message = string.Format
                     (
                         "Exception: {0}",
                         exception
@@ -421,9 +424,9 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
-            BiblioProcessor processor = context.Processor
+            var processor = context.Processor
                 .ThrowIfNull("context.Processor");
-            IrbisReport report = processor.Report
+            var report = processor.Report
                 .ThrowIfNull("processor.Report");
 
 
@@ -440,9 +443,9 @@ namespace ManagedIrbis.Biblio
                 for (var i = 0; i < Items.Count; i++)
                 {
                     log.Write(".");
-                    BiblioItem item = Items[i];
+                    var item = Items[i];
                     var number = item.Number;
-                    string description = item.Description
+                    var description = item.Description
                         .ThrowIfNull("item.Description");
 
                     ReportBand band = new ParagraphBand
@@ -455,7 +458,7 @@ namespace ManagedIrbis.Biblio
                             //RichText.Encode3(description, UnicodeRange.Russian, "\\f2")
                         ));
 
-                    Record record = item.Record;
+                    var record = item.Record;
 
                     // Для отладки: проверить упорядочение
                     if (showOrder)

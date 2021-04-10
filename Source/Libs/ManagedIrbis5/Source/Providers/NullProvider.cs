@@ -58,7 +58,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public string? GetGeneration()
+        public string GetGeneration()
         {
             throw new NotImplementedException();
         }

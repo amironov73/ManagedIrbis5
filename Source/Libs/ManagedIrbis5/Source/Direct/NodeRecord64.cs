@@ -90,7 +90,7 @@ namespace ManagedIrbis.Direct
     /// <summary>
     /// Запись в файлах L01 и N01.
     /// </summary>
-    [DebuggerDisplay("Leader={Leader}")]
+    [DebuggerDisplay("Leader={" + nameof(Leader) + "}")]
     public sealed class NodeRecord64
     {
         #region Constants
@@ -150,7 +150,7 @@ namespace ManagedIrbis.Direct
 
         private readonly List<NodeItem64> _items;
 
-        internal Stream _stream;
+        internal Stream? _stream;
 
         #endregion
 
@@ -174,19 +174,13 @@ namespace ManagedIrbis.Direct
         /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
-            StringBuilder items = new StringBuilder();
-            foreach (NodeItem64 item in Items)
+            var items = new StringBuilder();
+            foreach (var item in Items)
             {
                 items.AppendLine(item.ToString());
             }
 
-            return string.Format
-                (
-                    "{0}{1}{2}",
-                    Leader,
-                    Environment.NewLine,
-                    items
-                );
+            return $"{Leader}{Environment.NewLine}{items}";
         }
 
         #endregion

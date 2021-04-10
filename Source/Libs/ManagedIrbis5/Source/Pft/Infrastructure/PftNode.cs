@@ -191,7 +191,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode otherNode
             )
         {
-            bool result = ReferenceEquals
+            var result = ReferenceEquals
                 (
                     GetType(),
                     otherNode.GetType()
@@ -213,7 +213,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 result = Children.Count == otherNode.Children.Count;
                 if (result)
                 {
-                    for (int i = 0; i < Children.Count; i++)
+                    for (var i = 0; i < Children.Count; i++)
                     {
                         PftNode our = Children[i];
                         PftNode their = otherNode.Children[i];
@@ -414,7 +414,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftCompiler compiler
             )
         {
-            bool flag = ShouldSerializeChildren();
+            var flag = ShouldSerializeChildren();
             if (flag)
             {
                 compiler.CompileNodes(Children);
@@ -572,7 +572,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int level
             )
         {
-            PftNode? node = this;
+            var node = this;
 
             while (!ReferenceEquals(node, null))
             {
@@ -671,7 +671,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 bool throwOnError
             )
         {
-            bool result = Children.All
+            var result = Children.All
                 (
                     child => child.Verify(throwOnError)
                 );
@@ -698,20 +698,15 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Object members
 
         /// <inheritdoc cref="object.Equals(object)" />
-        public override bool Equals
-            (
-                object other
-            )
-        {
-            return ReferenceEquals(this, other);
-        }
+        public override bool Equals ( object? other ) =>
+            ReferenceEquals(this, other);
 
         /// <inheritdoc cref="object.GetHashCode" />
         public override int GetHashCode()
         {
             unchecked
             {
-                int hashCode = Column;
+                var hashCode = Column;
                 hashCode = (hashCode * 397) ^ LineNumber;
                 hashCode = (hashCode * 397) ^
                     (

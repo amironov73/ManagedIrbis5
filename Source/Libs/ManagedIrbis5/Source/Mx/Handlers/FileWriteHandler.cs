@@ -92,7 +92,7 @@ namespace ManagedIrbis.Mx.Handlers
         public override void Parse
             (
                 MxExecutive executive,
-                string commandLine
+                string? commandLine
             )
         {
             // TODO Implement properly
@@ -126,7 +126,7 @@ namespace ManagedIrbis.Mx.Handlers
         public override void HandleOutput
             (
                 MxExecutive executive,
-                string output
+                string? output
             )
         {
             if (!ReferenceEquals(_writer, null)

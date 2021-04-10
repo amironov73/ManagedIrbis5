@@ -96,7 +96,7 @@ namespace ManagedIrbis.Reports
         public override void Write
             (
                 ReportContext context,
-                string text
+                string? text
             )
         {
             context.Output.Write(text);

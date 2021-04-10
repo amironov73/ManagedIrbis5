@@ -81,7 +81,7 @@ namespace ManagedIrbis.Direct
         /// <summary>
         /// Additional IFP files.
         /// </summary>
-        public Stream[] AdditionalIfp { get; private set; }
+        public Stream[]? AdditionalIfp { get; private set; }
 
         /// <summary>
         /// Control record of the IFP file.
@@ -91,27 +91,27 @@ namespace ManagedIrbis.Direct
         /// <summary>
         /// Additional control records.
         /// </summary>
-        public IfpControlRecord64[] AdditionalControlRecord { get; set; }
+        public IfpControlRecord64[]? AdditionalControlRecord { get; set; }
 
         /// <summary>
         /// L01 node file.
         /// </summary>
-        public Stream L01 { get; private set; }
+        public Stream? L01 { get; private set; }
 
         /// <summary>
         /// Additional L01 node files.
         /// </summary>
-        public Stream[] AdditionalL01 { get; private set; }
+        public Stream[]? AdditionalL01 { get; private set; }
 
         /// <summary>
         /// N01 node file.
         /// </summary>
-        public Stream N01 { get; private set; }
+        public Stream? N01 { get; private set; }
 
         /// <summary>
         /// Additional N01
         /// </summary>
-        public Stream[] AdditionalN01 { get; private set; }
+        public Stream[]? AdditionalN01 { get; private set; }
 
         #endregion
 
@@ -142,7 +142,7 @@ namespace ManagedIrbis.Direct
 
         #region Private members
 
-        private object _lockObject;
+        private readonly object _lockObject;
 
         private readonly Encoding _encoding;
 
@@ -222,7 +222,7 @@ namespace ManagedIrbis.Direct
             var result = _ReadNode
                 (
                     false,
-                    N01,
+                    N01.ThrowIfNull("N01"),
                     _NodeOffset(number)
                 );
 
@@ -241,7 +241,7 @@ namespace ManagedIrbis.Direct
             var result = _ReadNode
                 (
                     true,
-                    L01,
+                    L01.ThrowIfNull("L01"),
                     _NodeOffset(number)
                 );
 
@@ -268,7 +268,7 @@ namespace ManagedIrbis.Direct
             var result = _ReadNode
                 (
                     record.IsLeaf,
-                    record._stream,
+                    record._stream.ThrowIfNull("record._stream"),
                     _NodeOffset(number)
                 );
 
@@ -294,7 +294,7 @@ namespace ManagedIrbis.Direct
             var result = _ReadNode
                 (
                     record.IsLeaf,
-                    record._stream,
+                    record._stream.ThrowIfNull("record._stream"),
                     _NodeOffset(number)
                 );
 
@@ -309,7 +309,11 @@ namespace ManagedIrbis.Direct
                 long offset
             )
         {
-            IfpRecord64 result = IfpRecord64.Read(Ifp, offset);
+            IfpRecord64 result = IfpRecord64.Read
+                (
+                    Ifp.ThrowIfNull("Ifp"),
+                    offset
+                );
 
             return result;
         }
@@ -341,7 +345,7 @@ namespace ManagedIrbis.Direct
                     var rootNode = ReadNode(firstNode.Leader.Number);
                     var currentNode = rootNode;
 
-                    NodeItem64 goodItem = null, candidate = null;
+                    NodeItem64? goodItem = null, candidate = null;
                     var goodIndex = 0;
                     while (true)
                     {
@@ -484,15 +488,15 @@ namespace ManagedIrbis.Direct
                 {
                     Mode = mode;
 
-                    Ifp.Dispose();
+                    Ifp?.Dispose();
                     Ifp = DirectUtility.OpenFile(FileName, mode);
                     IfpControlRecord = IfpControlRecord64.Read(Ifp);
 
-                    L01.Dispose();
+                    L01?.Dispose();
                     L01 = DirectUtility
                         .OpenFile(Path.ChangeExtension(FileName, ".l01"), mode);
 
-                    N01.Dispose();
+                    N01?.Dispose();
                     N01 = DirectUtility
                         .OpenFile(Path.ChangeExtension(FileName, ".n01"), mode);
                 }
@@ -522,7 +526,7 @@ namespace ManagedIrbis.Direct
                     var rootNode = ReadNode(firstNode.Leader.Number);
                     var currentNode = rootNode;
 
-                    NodeItem64 goodItem = null;
+                    NodeItem64? goodItem = null;
                     while (true)
                     {
                         var found = false;
@@ -649,7 +653,7 @@ namespace ManagedIrbis.Direct
                 var rootNode = ReadNode(firstNode.Leader.Number);
                 var currentNode = rootNode;
 
-                NodeItem64 goodItem = null;
+                NodeItem64? goodItem = null;
                 while (true)
                 {
                     var found = false;

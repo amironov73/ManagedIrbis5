@@ -13,18 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
@@ -38,10 +27,6 @@ namespace ManagedIrbis.Mx.Commands
     public sealed class SortCommand
         : MxCommand
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -73,16 +58,12 @@ namespace ManagedIrbis.Mx.Commands
 
             if (string.IsNullOrEmpty(argument))
             {
-                string sort = executive.OrderFormat;
+                var sort = executive.OrderFormat;
                 if (string.IsNullOrEmpty(sort))
                 {
                     sort = "OFF";
                 }
-                executive.WriteMessage(string.Format
-                    (
-                        "SORT is: {0}",
-                        sort
-                    ));
+                executive.WriteMessage($"SORT is: {sort}");
             }
             else if (argument.SameString("off"))
             {
@@ -101,8 +82,5 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

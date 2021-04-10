@@ -15,21 +15,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
 using ManagedIrbis.Pft;
-using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
 
@@ -43,10 +29,6 @@ namespace ManagedIrbis.Mx.Commands
     public sealed class BangCommand
         : MxCommand
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -56,14 +38,6 @@ namespace ManagedIrbis.Mx.Commands
             : base("!")
         {
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 
@@ -78,7 +52,7 @@ namespace ManagedIrbis.Mx.Commands
         {
             OnBeforeExecute();
 
-            string source = null;
+            string? source = null;
             if (arguments.Length != 0)
             {
                 source = arguments[0].Text;
@@ -101,8 +75,5 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

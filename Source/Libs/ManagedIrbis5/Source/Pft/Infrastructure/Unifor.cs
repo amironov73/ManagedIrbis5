@@ -222,7 +222,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Find action for specified expression.
         /// </summary>
-        public static Action<PftContext, PftNode, string> FindAction
+        public static Action<PftContext, PftNode, string>? FindAction
             (
                 ref string expression
             )
@@ -263,8 +263,8 @@ namespace ManagedIrbis.Pft.Infrastructure
         public void Execute
             (
                 PftContext context,
-                PftNode node,
-                string expression
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))
@@ -289,8 +289,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            Action<PftContext, PftNode, string> action
-                = FindAction(ref expression);
+            var action = FindAction(ref expression);
 
             if (ReferenceEquals(action, null))
             {

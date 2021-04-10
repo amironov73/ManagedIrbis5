@@ -13,11 +13,18 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System;
+
+#endregion
+
 namespace ManagedIrbis
 {
     /// <summary>
     /// Элемент строки подключения.
     /// </summary>
+    [Flags]
     public enum ConnectionElement
     {
         /// <summary>

@@ -155,7 +155,7 @@ namespace ManagedIrbis.Reports
         public override void Write
             (
                 ReportContext context,
-                string text
+                string? text
             )
         {
             Magna.Trace(string.Format

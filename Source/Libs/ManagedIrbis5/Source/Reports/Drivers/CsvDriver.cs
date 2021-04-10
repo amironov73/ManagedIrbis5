@@ -16,17 +16,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
@@ -35,7 +24,7 @@ using AM.Runtime;
 namespace ManagedIrbis.Reports
 {
     /// <summary>
-    ///
+    /// Драйвер для CSV-формата.
     /// </summary>
     public sealed class CsvDriver
         : ReportDriver
@@ -43,32 +32,20 @@ namespace ManagedIrbis.Reports
         #region Properties
 
         /// <summary>
-        /// Field separator.
+        /// Разделитель полей. По умолчанию ';'.
         /// </summary>
         public string? Separator = ";";
 
         /// <summary>
-        /// Quotes.
+        /// Символ кавычек. По умолчанию '"'.
         /// </summary>
         public string? Quotes = "\"";
 
         #endregion
 
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region ReportDriver members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="ReportDriver.BeginCell" />
         public override void BeginCell
             (
                 ReportContext context,
@@ -81,7 +58,7 @@ namespace ManagedIrbis.Reports
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="ReportDriver.EndCell" />
         public override void EndCell
             (
                 ReportContext context,
@@ -101,7 +78,7 @@ namespace ManagedIrbis.Reports
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="ReportDriver.EndRow" />
         public override void EndRow
             (
                 ReportContext context,
@@ -111,11 +88,11 @@ namespace ManagedIrbis.Reports
             context.Output.Write(Environment.NewLine);
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="ReportDriver.Write" />
         public override void Write
             (
                 ReportContext context,
-                string text
+                string? text
             )
         {
             context.Output.Write(text);
@@ -123,5 +100,6 @@ namespace ManagedIrbis.Reports
 
         #endregion
 
-    }
-}
+    } // class ReportDriver
+
+} // namespace ManagedIrbis.Reports

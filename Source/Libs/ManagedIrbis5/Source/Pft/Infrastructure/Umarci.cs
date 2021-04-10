@@ -547,8 +547,8 @@ namespace ManagedIrbis.Pft.Infrastructure
         public void Execute
             (
                 PftContext context,
-                PftNode node,
-                string expression
+                PftNode? node,
+                string? expression
             )
         {
             if (string.IsNullOrEmpty(expression))

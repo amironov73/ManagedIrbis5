@@ -52,7 +52,7 @@ namespace ManagedIrbis.Biblio
                 StringBuilder text
             )
         {
-            char c = navigator.PeekChar();
+            var c = navigator.PeekChar();
             if (char.IsDigit(c))
             {
                 navigator.ReadChar();
@@ -117,7 +117,7 @@ namespace ManagedIrbis.Biblio
             // У иностранных книг язык не rus
             // Если язык не указан, считаем, что rus
 
-            string language = record.FM(101) ?? "rus";
+            var language = record.FM(101) ?? "rus";
 
             return !language.SameString("rus");
         }
@@ -128,14 +128,14 @@ namespace ManagedIrbis.Biblio
                 BiblioItem y
             )
         {
-            Record xrec = x.Record;
-            Record yrec = y.Record;
+            var xrec = x.Record;
+            var yrec = y.Record;
             if (!ReferenceEquals(xrec, null) && !ReferenceEquals(yrec, null))
             {
                 // Поднимаем официальные документы
 
-                bool xup = _IsOfficial(xrec);
-                bool yup = _IsOfficial(yrec);
+                var xup = _IsOfficial(xrec);
+                var yup = _IsOfficial(yrec);
                 if (xup != yup)
                 {
                     return xup ? -1 : 1;
@@ -143,8 +143,8 @@ namespace ManagedIrbis.Biblio
 
                 // Опускаем иностранные документы
 
-                bool xdown = _IsForeign(xrec);
-                bool ydown = _IsForeign(yrec);
+                var xdown = _IsForeign(xrec);
+                var ydown = _IsForeign(yrec);
                 if (xdown != ydown)
                 {
                     return xdown ? 1 : -1;
@@ -167,8 +167,8 @@ namespace ManagedIrbis.Biblio
         /// </summary>
         public void SortByOrder()
         {
-            List<BiblioItem> list = this.ToList();
-            foreach (BiblioItem item in list)
+            var list = this.ToList();
+            foreach (var item in list)
             {
                 item.Order = _TrimOrder(item.Order);
             }
@@ -187,10 +187,10 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            Verifier<ItemCollection> verifier
+            var verifier
                 = new Verifier<ItemCollection>(this, throwOnError);
 
-            foreach (BiblioItem item in this)
+            foreach (var item in this)
             {
                 verifier.VerifySubObject(item, "item");
             }
