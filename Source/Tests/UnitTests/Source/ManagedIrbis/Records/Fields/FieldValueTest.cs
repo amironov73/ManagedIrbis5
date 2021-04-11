@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
 
-namespace UnitTests.ManagedIrbis
+namespace UnitTests.ManagedIrbis.Records.Fields
 {
     [TestClass]
     public class FieldValueTest

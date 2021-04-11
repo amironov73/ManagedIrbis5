@@ -48,7 +48,7 @@ namespace ManagedIrbis
         public const char NoCode = '\0';
 
         /// <summary>
-        /// Subfield delimiter.
+        /// Разделитель подполей.
         /// </summary>
         public const char Delimiter = '^';
 
@@ -108,6 +108,11 @@ namespace ManagedIrbis
             )
         {
             Code = code;
+            if (value.Span.Contains(Delimiter))
+            {
+                throw new ArgumentException(nameof(value));
+            }
+
             Value = value;
         } // constructor
 
@@ -123,6 +128,14 @@ namespace ManagedIrbis
             )
         {
             Code = code;
+            if (value is not null)
+            {
+                if (value.Contains(Delimiter))
+                {
+                    throw new ArgumentException(nameof(value));
+                }
+            }
+
             Value = value.AsMemory();
         } // constructor
 
@@ -133,10 +146,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Клонирование подполя.
         /// </summary>
-        public SubField Clone()
-        {
-            return (SubField) MemberwiseClone();
-        } // method Clone
+        public SubField Clone() =>
+            (SubField) MemberwiseClone();
 
         /// <summary>
         /// Сравнение двух подполей.
@@ -155,7 +166,11 @@ namespace ManagedIrbis
                 return result;
             }
 
-            result = subField1.Value.Span.CompareTo(subField2.Value.Span, StringComparison.Ordinal);
+            result = subField1.Value.Span.CompareTo
+                (
+                    subField2.Value.Span,
+                    StringComparison.Ordinal
+                );
 
             return result;
         } // method Compare
@@ -171,7 +186,12 @@ namespace ManagedIrbis
             if (!text.IsEmpty)
             {
                 Code = char.ToLowerInvariant(text.Span[0]);
-                Value = text.Slice(1);
+                var value = text[1..];
+                if (value.Span.Contains(Delimiter))
+                {
+                    throw new ArgumentException("Illegal subfield value");
+                }
+                Value = value;
             }
         } // method Decode
 
@@ -222,7 +242,11 @@ namespace ManagedIrbis
         {
             var verifier = new Verifier<SubField>(this, throwOnError);
 
-            verifier.Assert(Code == NoCode || Code > ' ', "Wrong Code");
+            verifier.Assert
+                (
+                    Code is NoCode or > ' ',
+                    $"Wrong subfield code {Code}"
+                );
             if (!Value.IsEmpty)
             {
                 verifier.Assert(!Value.Span.Contains(Delimiter));
@@ -288,12 +312,10 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Code == NoCode
+        public override string ToString() =>
+            Code == NoCode
                 ? Value.ToString()
                 : "^" + char.ToLowerInvariant(Code) + Value;
-        } // method ToString
 
         #endregion
 

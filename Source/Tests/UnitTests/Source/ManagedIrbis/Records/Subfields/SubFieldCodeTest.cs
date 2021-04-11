@@ -9,16 +9,23 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
 
-namespace UnitTests.ManagedIrbis
+namespace UnitTests.ManagedIrbis.Records.Subfields
 {
     [TestClass]
     public class SubFieldCodeTest
     {
         [TestMethod]
-        public void TestSubFieldCode_IsValidCode()
+        [Description("Валидные коды подполя")]
+        public void SubFieldCode_IsValidCode_1()
         {
             Assert.IsTrue(SubFieldCode.IsValidCode('C'));
             Assert.IsTrue(SubFieldCode.IsValidCode('c'));
+        }
+
+        [TestMethod]
+        [Description("Невалидные коды подполя")]
+        public void SubFieldCode_IsValidCode_2()
+        {
             Assert.IsFalse(SubFieldCode.IsValidCode('\0'));
             Assert.IsFalse(SubFieldCode.IsValidCode('\u042F'));
         }
@@ -35,7 +42,8 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void TestSubFieldCode_Normalize()
+        [Description("Нормализация кодов подполя")]
+        public void SubFieldCode_Normalize_1()
         {
             _TestNormalize('\0', '\0');
             _TestNormalize('0', '0');
@@ -43,15 +51,25 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
-        public void TestSubFieldCode_Verify()
+        [Description("Верификация: валидные коды подполей")]
+        public void SubFieldCode_Verify_1()
         {
             Assert.IsTrue(SubFieldCode.Verify('c'));
+            Assert.IsTrue(SubFieldCode.Verify('1'));
+        }
+
+        [TestMethod]
+        [Description("Верификация: невалидные коды подполей")]
+        public void SubFieldCode_Verify_2()
+        {
             Assert.IsFalse(SubFieldCode.Verify('\0'));
+            Assert.IsFalse(SubFieldCode.Verify('\t'));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void TestSubFieldCode_Verify_Exception()
+        [Description("Исключения при верификации кодов подполей")]
+        public void SubFieldCode_Verify_3()
         {
             Assert.IsFalse(SubFieldCode.Verify('^', true));
         }

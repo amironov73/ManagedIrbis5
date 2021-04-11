@@ -12,7 +12,7 @@ using ManagedIrbis;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis
+namespace UnitTests.ManagedIrbis.Records.Fields
 {
     [TestClass]
     public sealed class FieldTest

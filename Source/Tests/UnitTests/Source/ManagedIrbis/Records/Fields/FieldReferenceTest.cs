@@ -1,8 +1,6 @@
-﻿// ReSharper disable IdentifierTypo
-// ReSharper disable CheckNamespace
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
-
-using System;
 
 using AM.Runtime;
 
@@ -13,7 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis
+namespace UnitTests.ManagedIrbis.Records.Fields
 {
     [TestClass]
     public class FieldReferenceTest

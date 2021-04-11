@@ -120,7 +120,7 @@ namespace ManagedIrbis
                 Magna.Debug
                     (
                         nameof(FieldTag) + "::" + nameof(Verify)
-                        + Resources.FieldTag_Verify_BadTag1
+                        + ": "
                         + tag.ToVisibleString()
                     );
 
@@ -128,7 +128,8 @@ namespace ManagedIrbis
                 {
                     throw new VerificationException
                         (
-                            Resources.FieldTag_Verify_BadTag2
+                            nameof(FieldTag) + "::" + nameof(Verify)
+                            + ": "
                             + tag.ToVisibleString()
                         );
                 }
@@ -153,7 +154,7 @@ namespace ManagedIrbis
                 Magna.Debug
                     (
                         nameof(FieldTag) + "::" + nameof(Verify)
-                        + Resources.FieldTag_Verify_BadTag1
+                        + ": "
                         + tag.ToInvariantString()
                     );
 
@@ -161,7 +162,8 @@ namespace ManagedIrbis
                 {
                     throw new VerificationException
                     (
-                        Resources.FieldTag_Verify_BadTag2
+                        nameof(FieldTag) + "::" + nameof(Verify)
+                        + ": "
                         + tag.ToInvariantString()
                     );
                 }

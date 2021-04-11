@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -11,31 +12,126 @@ using ManagedIrbis;
 
 #nullable enable
 
-namespace UnitTests.ManagedIrbis
+namespace UnitTests.ManagedIrbis.Records.Subfields
 {
     [TestClass]
     public class SubFieldTest
     {
         [TestMethod]
+        [Description("Конструктор по умолчанию")]
         public void SubField_Constructor_1()
         {
             var subField = new SubField();
             Assert.AreEqual(SubField.NoCode, subField.Code);
-            Assert.AreEqual(null, subField.Value);
+            Assert.IsTrue(subField.Value.IsEmpty);
             Assert.AreEqual(string.Empty, subField.ToString());
+            Assert.IsTrue(subField.RepresentsValue);
+            Assert.IsFalse(subField.Modified);
+            Assert.IsNull(subField.Field);
+            Assert.IsFalse(subField.ReadOnly);
+            Assert.IsTrue(subField.Verify(false));
+        }
 
-            subField = new SubField ('A', "The value");
+        [TestMethod]
+        [Description("Конструктор с ReadOnlyMemory")]
+        public void SubField_Constructor_2()
+        {
+            const string value = "The value";
+            var subField = new SubField ('A', value.AsMemory());
             Assert.AreEqual('A', subField.Code);
-            Assert.AreEqual("The value", subField.Value.ToString());
+            Assert.AreEqual(value, subField.Value.ToString());
             Assert.AreEqual("^aThe value", subField.ToString());
+            Assert.IsFalse(subField.RepresentsValue);
+            Assert.IsFalse(subField.Modified);
+            Assert.IsNull(subField.Field);
+            Assert.IsFalse(subField.ReadOnly);
+            Assert.IsTrue(subField.Verify(false));
+        }
 
+        [TestMethod]
+        [Description("Конструктор со строкой")]
+        public void SubField_Constructor_3()
+        {
+            const string value = "The value";
+            var subField = new SubField ('A', value);
+            Assert.AreEqual('A', subField.Code);
+            Assert.AreEqual(value, subField.Value.ToString());
+            Assert.AreEqual("^aThe value", subField.ToString());
+            Assert.IsFalse(subField.RepresentsValue);
+            Assert.IsFalse(subField.Modified);
+            Assert.IsNull(subField.Field);
+            Assert.IsFalse(subField.ReadOnly);
+            Assert.IsTrue(subField.Verify(false));
+        }
+
+        [TestMethod]
+        [Description("Клонирование пустого подполя")]
+        public void SubField_Clone_1()
+        {
+            var subField = new SubField ();
+            var clone = subField.Clone();
+            Assert.AreEqual(subField.Code, clone.Code);
+            Assert.AreEqual(subField.Value, clone.Value);
+            Assert.AreEqual(string.Empty, clone.ToString());
+            Assert.IsTrue(clone.RepresentsValue);
+            Assert.IsFalse(clone.Modified);
+            Assert.IsNull(clone.Field);
+            Assert.AreEqual(subField.ReadOnly, clone.ReadOnly);
+        }
+
+        [TestMethod]
+        [Description("Клонирование непустого подполя")]
+        public void SubField_Clone_2()
+        {
+            const string value = "The value";
+            var subField = new SubField ('A', value.AsMemory());
             var clone = subField.Clone();
             Assert.AreEqual(subField.Code, clone.Code);
             Assert.AreEqual(subField.Value, clone.Value);
             Assert.AreEqual("^aThe value", clone.ToString());
+            Assert.IsFalse(clone.RepresentsValue);
+            Assert.IsFalse(clone.Modified);
+            Assert.IsNull(clone.Field);
+            Assert.AreEqual(subField.ReadOnly, clone.ReadOnly);
         }
 
         [TestMethod]
+        [Description("Сравнение пустых полей (в расчет идут только коды)")]
+        public void SubField_Compare_1()
+        {
+            var left = new SubField('a');
+            var right = new SubField('b');
+            Assert.IsTrue(SubField.Compare(left, right) < 0);
+
+            left.Code = 'c';
+            Assert.IsTrue(SubField.Compare(left, right) > 0);
+
+            left.Code = right.Code;
+            Assert.IsTrue(SubField.Compare(left, right) == 0);
+
+            left.Code = SubField.NoCode;
+            Assert.IsTrue(SubField.Compare(left, right) < 0);
+        }
+
+        [TestMethod]
+        [Description("Сравнение непустых полей")]
+        public void SubField_Compare_2()
+        {
+            var left = new SubField('a', "The value");
+            var right = new SubField('b', "The value");
+            Assert.IsTrue(SubField.Compare(left, right) < 0);
+
+            left = new SubField('a', "Title1");
+            right = new SubField('a', "Title2");
+            Assert.IsTrue(SubField.Compare(left, right) < 0);
+
+            left = new SubField('a', "Title");
+            right = new SubField('a', "Title");
+            Assert.IsTrue(SubField.Compare(left, right) == 0);
+        }
+
+        [TestMethod]
+        [Description("Декодирование пустой строки")]
         public void SubField_Decode_1()
         {
             var subField = new SubField();
@@ -45,6 +141,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
+        [Description("Декодирование строки из одного символа")]
         public void SubField_Decode_2()
         {
             var subField = new SubField();
@@ -54,12 +151,33 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
+        [Description("Декодирование строки из нескольких символов")]
         public void SubField_Decode_3()
         {
             var subField = new SubField();
             subField.Decode("AValue".AsMemory());
             Assert.AreEqual('a', subField.Code);
             Assert.AreEqual("Value", subField.Value.ToString());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SubField_Decode_4()
+        {
+            var subField = new SubField();
+            subField.Decode("Wrong^value".AsMemory());
+        }
+
+        [Ignore]
+        [TestMethod]
+        public void SubField_Field_1()
+        {
+            SubField subField = new SubField('a', "Title");
+            Assert.IsNull(subField.Field);
+
+            var field = new Field(200);
+            field.Subfields.Add(subField);
+            Assert.AreEqual(field, subField.Field);
         }
 
         private void _TestSerialization
@@ -220,16 +338,6 @@ namespace UnitTests.ManagedIrbis
             Assert.AreEqual(expected, actual);
         }
 
-        [TestMethod]
-        public void SubField_Field_1()
-        {
-            SubField subField = new SubField('a', "Title");
-            Assert.IsNull(subField.Field);
-
-            RecordField field = new RecordField("200");
-            field.SubFields.Add(subField);
-            Assert.AreEqual(field, subField.Field);
-        }
 
         */
 
@@ -246,38 +354,8 @@ namespace UnitTests.ManagedIrbis
             Assert.IsTrue(subField.Verify(false));
         }
 
-        [TestMethod]
-        public void SubField_Verify_2()
-        {
-            var subField = new SubField ('a', "Hello^World");
-            Assert.IsFalse(subField.Verify(false));
-        }
 
         /*
-        [TestMethod]
-        public void SubField_Compare_1()
-        {
-            SubField subField1 = new SubField('a');
-            SubField subField2 = new SubField('b');
-            Assert.IsTrue
-                (
-                    SubField.Compare(subField1, subField2) < 0
-                );
-
-            subField1 = new SubField('a', "Title1");
-            subField2 = new SubField('a', "Title2");
-            Assert.IsTrue
-                (
-                    SubField.Compare(subField1, subField2) < 0
-                );
-
-            subField1 = new SubField('a', "Title");
-            subField2 = new SubField('a', "Title");
-            Assert.IsTrue
-                (
-                    SubField.Compare(subField1, subField2) == 0
-                );
-        }
 
         [TestMethod]
         public void SubField_SetModified_1()
