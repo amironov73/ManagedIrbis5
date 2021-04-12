@@ -276,7 +276,11 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            Sure.NotNull(item, nameof(item));
+
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
 
             item.Field = Field;
 
@@ -315,7 +319,11 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            Sure.NotNull(item, nameof(item));
+
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
 
             item.Field = Field;
 

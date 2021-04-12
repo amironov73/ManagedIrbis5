@@ -165,7 +165,10 @@ namespace AM.Collections
                 T item
             )
         {
-            Sure.NotNull(item, nameof(item));
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
 
             base.InsertItem(index, item);
         }
@@ -177,7 +180,10 @@ namespace AM.Collections
                 T item
             )
         {
-            Sure.NotNull(item, nameof(item));
+            if (item is null)
+            {
+                throw new ArgumentNullException(nameof(item));
+            }
 
             base.SetItem(index, item);
         }

@@ -86,11 +86,10 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void SubFieldCollection_NotNull_1()
         {
-            var collection =
-                new SubFieldCollection
+            var collection = new SubFieldCollection
                 {
                     new SubField(),
                     null,
@@ -317,7 +316,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void SubFieldCollection_InsertItem_2()
         {
             var collection = _GetCollection();
@@ -345,7 +344,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void SubFieldCollection_SetItem_2()
         {
             var collection = _GetCollection();
