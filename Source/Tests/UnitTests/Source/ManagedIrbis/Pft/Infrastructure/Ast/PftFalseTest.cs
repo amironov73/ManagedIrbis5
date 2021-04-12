@@ -1,4 +1,8 @@
-﻿using AM.Text;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
@@ -6,6 +10,8 @@ using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
 {
