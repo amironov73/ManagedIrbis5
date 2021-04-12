@@ -217,7 +217,7 @@ namespace ManagedIrbis
             )
         {
             Code = reader.ReadChar();
-            Value = reader.ReadNullableString().AsMemory();
+            Value = reader.ReadOnlyMemory();
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -227,7 +227,7 @@ namespace ManagedIrbis
             )
         {
             writer.Write(Code);
-            Value.SaveToStream(writer);
+            writer.Write(Value);
         } // method SaveToStream
 
         #endregion

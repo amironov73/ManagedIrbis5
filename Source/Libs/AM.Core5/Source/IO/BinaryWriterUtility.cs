@@ -221,6 +221,22 @@ namespace AM.IO
         }
 
         /// <summary>
+        /// Запись строки в виде ReadOnlyMemory.
+        /// </summary>
+        public static BinaryWriter Write
+            (
+                this BinaryWriter writer,
+                ReadOnlyMemory<char> memory
+            )
+        {
+            var length = memory.Length;
+            writer.WritePackedInt32(length);
+            writer.Write(memory.Span);
+
+            return writer;
+        }
+
+        /// <summary>
         /// Write array of bytes.
         /// </summary>
         public static BinaryWriter WriteArray

@@ -33,6 +33,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         [TestMethod]
+        [Description("Конструктор по умолчанию")]
         public void PftAbs_Construction_1()
         {
             var node = new PftAbs();
@@ -42,6 +43,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         [TestMethod]
+        [Description("Конструктор с токеном")]
         public void PftAbs_Construction_2()
         {
             var token = new PftToken(PftTokenKind.Abs, 1, 1, "abs");
@@ -55,6 +57,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         [TestMethod]
+        [Description("Успешная компиляция ноды")]
         public void PftAbs_Compile_1()
         {
             var node = new PftAbs();
@@ -69,6 +72,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
 
         [TestMethod]
         [ExpectedException(typeof(PftCompilerException))]
+        [Description("Компиляция ноды с ошибкой синтаксиса")]
         public void PftAbs_Compile_2()
         {
             var node = new PftAbs();

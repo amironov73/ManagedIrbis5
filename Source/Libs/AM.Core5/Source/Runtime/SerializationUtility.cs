@@ -264,19 +264,6 @@ namespace AM.Runtime
         /// </summary>
         public static void SaveToStream
             (
-                this ReadOnlyMemory<char> memory,
-                BinaryWriter writer
-            )
-        {
-            writer.WritePackedInt32(memory.Length);
-            writer.Write(memory.Span);
-        }
-
-        /// <summary>
-        /// Сохранение в поток массива элементов.
-        /// </summary>
-        public static void SaveToStream
-            (
                 this ReadOnlySpan<char> span,
                 BinaryWriter writer
             )

@@ -83,7 +83,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftTokenKind kind,
                 int line,
                 int column,
-                string text
+                string? text
             )
         {
             Kind = kind;

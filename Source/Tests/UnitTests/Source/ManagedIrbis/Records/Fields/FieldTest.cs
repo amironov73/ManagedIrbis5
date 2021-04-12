@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
 using System;
 
@@ -28,6 +29,7 @@ namespace UnitTests.ManagedIrbis.Records.Fields
         }
 
         [TestMethod]
+        [Description("Создание пустого поля")]
         public void RecordField_Constructor_1()
         {
             Field field = new Field();

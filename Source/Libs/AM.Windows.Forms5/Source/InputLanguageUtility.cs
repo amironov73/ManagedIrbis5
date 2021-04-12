@@ -6,10 +6,12 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* InputLanguageUtility.cs --
+/* InputLanguageUtility.cs -- манипуляции с языком ввода
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,22 +35,37 @@ namespace AM.Windows.Forms
     /// </remarks>
     public static class InputLanguageUtility
     {
+        #region Nested classes
+
+        internal class InputLanguageMessageFilter
+            : IMessageFilter
+        {
+            #region Properties
+
+            public static IMessageFilter? Instance { get; set; }
+
+            #endregion
+
+            #region IMessageFilter members
+
+            public bool PreFilterMessage(ref Message message)
+            {
+                return HandleWmInputLanguageRequest(ref message);
+            }
+
+            #endregion
+        }
+
+        #endregion
+
         #region Properties
 
         /// <summary>
         /// American English language.
         /// </summary>
-        public static InputLanguage AmericanEnglishLanguage
-        {
-            get
-            {
-                return InputLanguage.FromCulture
-                    (
-                        new CultureInfo(0x0409)
-                    )
-                    .ThrowIfNull("InputLanguage.FromCulture");
-            }
-        }
+        public static InputLanguage AmericanEnglishLanguage =>
+            InputLanguage.FromCulture(new CultureInfo(0x0409))
+                .ThrowIfNull("InputLanguage.FromCulture");
 
         /// <summary>
         /// Next installed input language.
@@ -57,8 +74,7 @@ namespace AM.Windows.Forms
         {
             get
             {
-                var languages
-                    = InputLanguage.InstalledInputLanguages;
+                var languages= InputLanguage.InstalledInputLanguages;
                 var currentIndex = languages.IndexOf
                     (
                         InputLanguage.CurrentInputLanguage
@@ -77,17 +93,9 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Russian language.
         /// </summary>
-        public static InputLanguage RussianLanguage
-        {
-            get
-            {
-                return InputLanguage.FromCulture
-                    (
-                        new CultureInfo(0x0419)
-                    )
-                    .ThrowIfNull("InputLanguage.FromCulture");
-            }
-        }
+        public static InputLanguage RussianLanguage =>
+            InputLanguage.FromCulture(new CultureInfo(0x0419))
+                .ThrowIfNull("InputLanguage.FromCulture");
 
         #endregion
 
@@ -98,8 +106,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public static void ChangeInputLanguage()
         {
-            var languages
-                = InputLanguage.InstalledInputLanguages;
+            var languages = InputLanguage.InstalledInputLanguages;
 
             // Nothing to do if there is only one input language supported:
             if (languages.Count == 1)
@@ -145,10 +152,7 @@ namespace AM.Windows.Forms
             // Convert Integer Culture code to InputLanguage object.
             // Be aware: if Culture code is not supported
             // Exception will be invoked here
-            var language = InputLanguage.FromCulture
-                (
-                    new CultureInfo(languageId)
-                )
+            var language = InputLanguage.FromCulture(new CultureInfo(languageId))
                 .ThrowIfNull("language");
 
             ChangeInputLanguage(language);
@@ -203,6 +207,51 @@ namespace AM.Windows.Forms
         public static void SwitchToRussian()
         {
             ChangeInputLanguage(RussianLanguage);
+        }
+
+        /// <summary>
+        /// Обрабатываем запрос на смену языка ввода.
+        /// </summary>
+        public static bool HandleWmInputLanguageRequest
+            (
+                ref Message message
+            )
+        {
+            // WM_INPUTLANGCHANGEREQUEST
+            if (message.Msg == 0x0050)
+            {
+                ChangeInputLanguage();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Устанавливает глобальный обработчик сообщения
+        /// WM_INPUTLANGCHANGEREQUEST.
+        /// </summary>
+        public static void InstallWmInputLanguageRequestFix()
+        {
+            if (InputLanguageMessageFilter.Instance is null)
+            {
+                var instance = new InputLanguageMessageFilter();
+                Application.AddMessageFilter(instance);
+                InputLanguageMessageFilter.Instance = instance;
+            }
+        }
+
+        /// <summary>
+        /// Удаляет глобальный обработчик сообщения
+        /// WM_INPUTLANGCHANGEREQUEST.
+        /// </summary>
+        public static void RemoveWmInputLanguageRequestFix()
+        {
+            if (InputLanguageMessageFilter.Instance is not null)
+            {
+                Application.RemoveMessageFilter(InputLanguageMessageFilter.Instance);
+                InputLanguageMessageFilter.Instance = null;
+            }
         }
 
         #endregion

@@ -21,7 +21,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         [TestMethod]
         public void PftFalse_Construction_1()
         {
-            PftFalse node = new PftFalse();
+            var node = new PftFalse();
             Assert.IsTrue(node.ConstantExpression);
             Assert.IsTrue(node.ExtendedSyntax);
             Assert.IsFalse(node.RequiresConnection);
@@ -30,8 +30,8 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         [TestMethod]
         public void PftFalse_Construction_2()
         {
-            PftToken token = new PftToken(PftTokenKind.False, 1, 1, "False");
-            PftFalse node = new PftFalse(token);
+            var token = new PftToken(PftTokenKind.False, 1, 1, "False");
+            var node = new PftFalse(token);
             Assert.IsTrue(node.ConstantExpression);
             Assert.IsTrue(node.ExtendedSyntax);
             Assert.IsFalse(node.RequiresConnection);
@@ -43,8 +43,8 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         [TestMethod]
         public void PftFalse_Compile_1()
         {
-            PftCompiler compiler = new PftCompiler();
-            PftProgram program = new PftProgram();
+            var compiler = new PftCompiler();
+            var program = new PftProgram();
             program.Children.Add(new PftFalse());
             compiler.CompileProgram(program);
         }
@@ -52,10 +52,10 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         [TestMethod]
         public void PftFalse_Execute_1()
         {
-            PftContext context = new PftContext(null);
-            PftFalse node = new PftFalse();
+            var context = new PftContext(null);
+            var node = new PftFalse();
             node.Execute(context);
-            string actual = context.Text.DosToUnix();
+            var actual = context.Text.DosToUnix();
             Assert.IsFalse(node.Value);
             Assert.AreEqual("", actual);
         }
@@ -63,8 +63,8 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         [TestMethod]
         public void PftFalse_PrettyPrint_1()
         {
-            PftPrettyPrinter printer = new PftPrettyPrinter();
-            PftProgram program = new PftProgram();
+            var printer = new PftPrettyPrinter();
+            var program = new PftProgram();
             program.Children.Add(new PftFalse());
             program.PrettyPrint(printer);
             Assert.AreEqual("false ", printer.ToString().DosToUnix());
@@ -73,22 +73,24 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         [TestMethod]
         public void PftFalse_ToString_1()
         {
-            PftFalse node = new PftFalse();
+            var node = new PftFalse();
             Assert.AreEqual("false", node.ToString());
         }
 
         [TestMethod]
         public void PftFalse_Value_1()
         {
-            PftFalse node = new PftFalse();
+            var node = new PftFalse();
             Assert.IsFalse(node.Value);
         }
 
         [TestMethod]
         public void PftFalse_Value_2()
         {
-            PftFalse node = new PftFalse();
-            node.Value = true;
+            var node = new PftFalse
+            {
+                Value = true
+            };
             Assert.IsFalse(node.Value);
         }
     }

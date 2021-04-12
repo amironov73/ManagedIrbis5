@@ -49,8 +49,26 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         }
 
         [TestMethod]
-        [Description("Конструктор со строкой")]
+        [Description("Неверное значение подполя (ReadOnlyMemory)")]
+        [ExpectedException(typeof(ArgumentException))]
         public void SubField_Constructor_3()
+        {
+            var subField = new SubField('a', "Wrong^Value".AsMemory());
+            Assert.IsNotNull(subField);
+        }
+
+        [TestMethod]
+        [Description("Неверное значение подполя (String)")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SubField_Constructor_4()
+        {
+            var subField = new SubField('a', "Wrong^Value");
+            Assert.IsNotNull(subField);
+        }
+
+        [TestMethod]
+        [Description("Конструктор с String")]
+        public void SubField_Constructor_5()
         {
             const string value = "The value";
             var subField = new SubField ('A', value);
@@ -162,6 +180,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
+        [Description("Декодирование строки, содержащей недопустимый символ")]
         public void SubField_Decode_4()
         {
             var subField = new SubField();
@@ -170,9 +189,10 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
 
         [Ignore]
         [TestMethod]
+        [Description("Поле, которому принадлежит данное подполе")]
         public void SubField_Field_1()
         {
-            SubField subField = new SubField('a', "Title");
+            var subField = new SubField('a', "Title");
             Assert.IsNull(subField.Field);
 
             var field = new Field(200);
@@ -180,19 +200,45 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.AreEqual(field, subField.Field);
         }
 
+        [TestMethod]
+        [Description("Работа с пулом подполей")]
+        public void SubField_FromPool_1()
+        {
+            var subField = SubField.FromPool();
+            Assert.IsTrue(subField.Value.IsEmpty);
+            Assert.AreEqual(string.Empty, subField.ToString());
+            Assert.IsTrue(subField.RepresentsValue);
+            Assert.IsFalse(subField.Modified);
+            Assert.IsNull(subField.Field);
+            Assert.IsFalse(subField.ReadOnly);
+            Assert.IsTrue(subField.Verify(false));
+
+            subField.Code = 'a';
+            subField.Value = "The Value".AsMemory();
+
+            subField.ToPool();
+            Assert.IsTrue(subField.Value.IsEmpty);
+            Assert.AreEqual(string.Empty, subField.ToString());
+            Assert.IsTrue(subField.RepresentsValue);
+            Assert.IsFalse(subField.Modified);
+            Assert.IsNull(subField.Field);
+            Assert.IsFalse(subField.ReadOnly);
+            Assert.IsTrue(subField.Verify(false));
+        }
+
         private void _TestSerialization
             (
                 params SubField[] subFields
             )
         {
-            SubField[] array1 = subFields;
-            byte[] bytes = array1.SaveToMemory();
+            var array1 = subFields;
+            var bytes = array1.SaveToMemory();
 
-            SubField[] array2 = bytes
+            var array2 = bytes
                     .RestoreArrayFromMemory<SubField>();
 
             Assert.AreEqual(array1.Length, array2.Length);
-            for (int i = 0; i < array1.Length; i++)
+            for (var i = 0; i < array1.Length; i++)
             {
                 Assert.AreEqual
                     (
@@ -202,7 +248,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             }
         }
 
-        [Ignore]
         [TestMethod]
         public void SubField_Serialization_1()
         {

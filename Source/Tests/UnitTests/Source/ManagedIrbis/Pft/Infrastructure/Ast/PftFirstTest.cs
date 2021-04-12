@@ -138,9 +138,9 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         {
             var record = _GetRecord();
             var node = _GetNode();
-            var comparison = (PftComparison) node.InnerCondition;
+            var comparison = (PftComparison?) node.InnerCondition;
             Assert.IsNotNull(comparison);
-            comparison.RightOperand = new PftUnconditionalLiteral("noSuchWord");
+            comparison!.RightOperand = new PftUnconditionalLiteral("noSuchWord");
             _Execute(record, node, 0);
         }
 
@@ -149,9 +149,9 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         {
             var record = _GetRecord();
             var node = _GetNode();
-            var comparison = (PftComparison) node.InnerCondition;
+            var comparison = (PftComparison?) node.InnerCondition;
             Assert.IsNotNull(comparison);
-            comparison.LeftOperand = new PftV("v444");
+            comparison!.LeftOperand = new PftV("v444");
             _Execute(record, node, 0);
         }
 

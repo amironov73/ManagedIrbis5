@@ -157,6 +157,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             var node = _GetNode();
             var context = new PftContext(null)
             {
+                Record = record,
                 CurrentGroup = new PftGroup()
             };
             node.Execute(context);

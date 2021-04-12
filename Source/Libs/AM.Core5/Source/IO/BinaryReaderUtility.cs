@@ -60,11 +60,11 @@ namespace AM.IO
             )
             where T : IHandmadeSerializable, new()
         {
-            int count = reader.ReadPackedInt32();
+            var count = reader.ReadPackedInt32();
             T[] result = new T[count];
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                T item = new T();
+                var item = new T();
                 item.RestoreFromStream(reader);
                 result[i] = item;
             }
@@ -80,7 +80,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            int length = reader.ReadPackedInt32();
+            var length = reader.ReadPackedInt32();
             byte[] result = new byte[length];
             reader.Read(result, 0, length);
 
@@ -99,8 +99,8 @@ namespace AM.IO
         {
             collection.Clear();
 
-            int count = reader.ReadPackedInt32();
-            for (int i = 0; i < count; i++)
+            var count = reader.ReadPackedInt32();
+            for (var i = 0; i < count; i++)
             {
                 T item = new T();
                 item.RestoreFromStream(reader);
@@ -118,7 +118,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            DateTime result = DateTime.FromBinary(reader.ReadInt64());
+            var result = DateTime.FromBinary(reader.ReadInt64());
 
             return result;
         }
@@ -133,7 +133,7 @@ namespace AM.IO
         {
             DateTime? result = null;
 
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             if (flag)
             {
                 result = reader.ReadDateTime();
@@ -150,9 +150,9 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            int length = reader.ReadPackedInt32();
+            var length = reader.ReadPackedInt32();
             short[] result = new short[length];
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 result[i] = reader.ReadInt16();
             }
@@ -168,9 +168,9 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            int length = reader.ReadPackedInt32();
+            var length = reader.ReadPackedInt32();
             int[] result = new int[length];
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 result[i] = reader.ReadInt32();
             }
@@ -186,9 +186,9 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            int length = reader.ReadPackedInt32();
+            var length = reader.ReadPackedInt32();
             long[] result = new long[length];
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 result[i] = reader.ReadInt64();
             }
@@ -205,17 +205,36 @@ namespace AM.IO
             )
             where T : IHandmadeSerializable, new()
         {
-            int count = reader.ReadPackedInt32();
-            List<T> result = new List<T>(count);
+            var count = reader.ReadPackedInt32();
+            var result = new List<T>(count);
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                T item = new T();
+                var item = new T();
                 item.RestoreFromStream(reader);
                 result.Add(item);
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Считывание строки в виде ReadOnlyMemory.
+        /// </summary>
+        public static ReadOnlyMemory<char> ReadOnlyMemory
+            (
+                this BinaryReader reader
+            )
+        {
+            var length = reader.ReadPackedInt32();
+            var result = new char[length];
+            var read = reader.Read(result, 0, length);
+            if (read != length)
+            {
+                throw new IOException();
+            }
+
+            return result.AsMemory();
         }
 
         /// <summary>
@@ -226,7 +245,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             return flag
                 ? (byte?)reader.ReadByte()
                 : null;
@@ -240,7 +259,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             return flag
                 ? (double?)reader.ReadDouble()
                 : null;
@@ -254,7 +273,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
 
             return flag
                 ? (decimal?)reader.ReadDecimal()
@@ -269,7 +288,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             return flag
                 ? (short?)reader.ReadInt16()
                 : null;
@@ -283,7 +302,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             return flag
                 ? (int?)reader.ReadInt32()
                 : null;
@@ -297,15 +316,15 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            bool isNull = !reader.ReadBoolean();
+            var isNull = !reader.ReadBoolean();
             if (isNull)
             {
                 return null;
             }
 
-            int length = reader.ReadPackedInt32();
+            var length = reader.ReadPackedInt32();
             int[] result = new int[length];
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 result[i] = reader.ReadInt32();
             }
@@ -322,7 +341,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             return flag
                 ? (long?)reader.ReadInt64()
                 : null;
@@ -336,7 +355,7 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             return flag
                 ? reader.ReadString()
                 : null;
@@ -353,9 +372,9 @@ namespace AM.IO
             string[]? result = null;
             if (reader.ReadBoolean())
             {
-                int count = reader.ReadPackedInt32();
+                var count = reader.ReadPackedInt32();
                 result = new string[count];
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     result[i] = reader.ReadString();
                 }
@@ -377,9 +396,9 @@ namespace AM.IO
 
             if (reader.ReadBoolean())
             {
-                int count = reader.ReadPackedInt32();
+                var count = reader.ReadPackedInt32();
                 result = new T[count];
-                for (int i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
                 {
                     result[i] = new T();
                     result[i].RestoreFromStream(reader);
@@ -402,8 +421,8 @@ namespace AM.IO
         {
             unchecked
             {
-                int count = 0;
-                int shift = 0;
+                var count = 0;
+                var shift = 0;
                 byte b;
                 do
                 {
@@ -441,7 +460,7 @@ namespace AM.IO
             unchecked
             {
                 long count = 0;
-                int shift = 0;
+                var shift = 0;
                 long b;
                 do
                 {
@@ -479,9 +498,9 @@ namespace AM.IO
                 this BinaryReader reader
             )
         {
-            int length = reader.ReadPackedInt32();
+            var length = reader.ReadPackedInt32();
             string[] result = new string[length];
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 result[i] = reader.ReadString();
             }
