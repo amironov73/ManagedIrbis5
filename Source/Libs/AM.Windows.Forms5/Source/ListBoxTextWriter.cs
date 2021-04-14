@@ -85,13 +85,13 @@ namespace AM.Windows.Forms
 
         #region Private members
 
-        private object _sync;
+        private readonly object _sync;
 
-        private ListBox _listBox;
+        private readonly ListBox _listBox;
 
-        private StringBuilder _builder;
+        private readonly StringBuilder _builder;
 
-        private List<string> _lines;
+        private readonly List<string> _lines;
 
         private void _NewLine()
         {
@@ -129,10 +129,6 @@ namespace AM.Windows.Forms
         /// </summary>
         public override void Flush()
         {
-            if (_listBox == null)
-            {
-                return;
-            }
             lock (_sync)
             {
                 try
@@ -189,7 +185,10 @@ namespace AM.Windows.Forms
         /// <param name="value">The string to write. If value is null, only the line termination characters are written.</param>
         /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
         /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter"></see> is closed. </exception>
-        public override void WriteLine(string value)
+        public override void WriteLine
+            (
+                string? value
+            )
         {
             lock (_sync)
             {
@@ -207,7 +206,11 @@ namespace AM.Windows.Forms
         /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
         /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter"></see> is closed. </exception>
         /// <exception cref="T:System.ArgumentNullException">A string or object is passed in as null. </exception>
-        public override void WriteLine(string format, params object[] arg)
+        public override void WriteLine
+            (
+                string format,
+                params object?[] arg
+            )
         {
             lock (_sync)
             {
@@ -222,7 +225,10 @@ namespace AM.Windows.Forms
         /// <param name="value">The string to write.</param>
         /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
         /// <exception cref="T:System.ObjectDisposedException">The <see cref="T:System.IO.TextWriter"></see> is closed. </exception>
-        public override void Write(string value)
+        public override void Write
+            (
+                string? value
+            )
         {
             lock (_sync)
             {

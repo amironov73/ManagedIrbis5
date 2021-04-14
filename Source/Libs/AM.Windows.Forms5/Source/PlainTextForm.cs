@@ -26,7 +26,7 @@ using System.Windows.Forms;
 
 #endregion
 
-// ReSharper disable VirtualMemberCallInConstructor
+#nullable enable
 
 namespace AM.Windows.Forms
 {

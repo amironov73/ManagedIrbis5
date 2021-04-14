@@ -29,8 +29,8 @@ namespace AM.Windows.Forms
     {
         #region Private members
 
-        internal TreeGrid _grid;
-        internal TreeGridNode _parent;
+        internal TreeGrid? _grid;
+        internal TreeGridNode? _parent;
 
         #endregion
 
@@ -42,8 +42,8 @@ namespace AM.Windows.Forms
         /// <param name="parent">The parent.</param>
         public TreeGridNodeCollection
             (
-            TreeGrid grid,
-            TreeGridNode parent
+                TreeGrid? grid,
+                TreeGridNode? parent
             )
         {
             _grid = grid;

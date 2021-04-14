@@ -90,12 +90,12 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Occurs when [before edit].
         /// </summary>
-        public event EventHandler BeforeEdit;
+        public event EventHandler? BeforeEdit;
 
         /// <summary>
         /// Occurs when [after edit].
         /// </summary>
-        public event EventHandler AfterEdit;
+        public event EventHandler? AfterEdit;
 
         #endregion
 
@@ -124,26 +124,14 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Called when [before edit].
         /// </summary>
-        protected virtual void OnBeforeEdit ()
-        {
-            EventHandler handler = BeforeEdit;
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
-        }
+        protected virtual void OnBeforeEdit () =>
+            BeforeEdit?.Invoke(this, EventArgs.Empty);
 
         /// <summary>
         /// Called when [after edit].
         /// </summary>
-        protected virtual void OnAfterEdit ()
-        {
-            EventHandler handler = AfterEdit;
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
-        }
+        protected virtual void OnAfterEdit () =>
+            AfterEdit?.Invoke(this, EventArgs.Empty);
 
         protected internal virtual void OnDrawRow
             (
@@ -220,13 +208,13 @@ namespace AM.Windows.Forms
 
         protected internal virtual void OnMouseDoubleClick
             (
-            TreeGridMouseEventArgs args
+                TreeGridMouseEventArgs args
             )
         {
             args.Column.OnMouseDoubleClick(args);
         }
 
-        protected internal virtual TreeGridEditor CreateEditor
+        protected internal virtual TreeGridEditor? CreateEditor
             (
                 TreeGridColumn column,
                 Rectangle bounds,
@@ -238,8 +226,7 @@ namespace AM.Windows.Forms
                 return null;
             }
 
-            TreeGridEditor result
-                = (TreeGridEditor) Activator
+            TreeGridEditor result = (TreeGridEditor) Activator
                     .CreateInstance(EditorType);
 
             //if (result != null)
@@ -284,15 +271,18 @@ namespace AM.Windows.Forms
                     TreeGrid.GotoLine(TreeGrid.CurrentLine + 1);
                     e.IsInputKey = false;
                     break;
+
                 case Keys.Escape:
                     TreeGrid.EndEdit(false);
                     e.IsInputKey = false;
                     break;
+
                 case Keys.Down:
                     TreeGrid.EndEdit(true);
                     TreeGrid.GotoLine(TreeGrid.CurrentLine + 1);
                     e.IsInputKey = false;
                     break;
+
                 case Keys.Up:
                     TreeGrid.EndEdit(true);
                     TreeGrid.GotoLine(TreeGrid.CurrentLine - 1);

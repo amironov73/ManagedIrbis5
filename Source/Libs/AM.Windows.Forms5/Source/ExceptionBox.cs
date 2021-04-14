@@ -21,6 +21,8 @@ using AM.Drawing.Printing;
 
 #endregion
 
+#nullable enable
+
 namespace AM.Windows.Forms
 {
     /// <summary>

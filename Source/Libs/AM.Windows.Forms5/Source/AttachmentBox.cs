@@ -55,20 +55,20 @@ namespace AM.Windows.Forms
                 EventArgs e
             )
         {
-            BinaryAttachment attachment
-                = _listBox.SelectedItem as BinaryAttachment;
-
-            if (!ReferenceEquals(attachment, null))
+            if (_listBox.SelectedItem is BinaryAttachment attachment)
             {
-                DialogResult rc = _saveFileDialog.ShowDialog(this);
+                var rc = _saveFileDialog.ShowDialog(this);
                 if (rc == DialogResult.OK)
                 {
-                    string fileName = _saveFileDialog.FileName;
-                    File.WriteAllBytes
+                    if (attachment.Content is { } content)
+                    {
+                        var fileName = _saveFileDialog.FileName;
+                        File.WriteAllBytes
                         (
                             fileName,
-                            attachment.Content
+                            content
                         );
+                    }
                 }
             }
         }

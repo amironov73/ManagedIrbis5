@@ -46,7 +46,7 @@ namespace AM.Windows.Forms
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Panel color2D;
 
-        public BorderInfo Result = null;
+        public BorderInfo? Result = null;
 
         public BorderInfoControl
             (
@@ -61,30 +61,35 @@ namespace AM.Windows.Forms
             _provider = provider;
             InitializeComponent();
 
-            drawBox.Checked = binfo.DrawBorder;
-            draw3D.Checked = binfo.Draw3D;
+            drawBox!.Checked = binfo.DrawBorder;
+            draw3D!.Checked = binfo.Draw3D;
 
-            foreach (object o in Enum.GetValues(typeof(ButtonBorderStyle)))
+            foreach (var o in Enum.GetValues(typeof(ButtonBorderStyle)))
             {
-                style2D.Items.Add(o);
+                style2D!.Items.Add(o);
             }
-            style2D.SelectedItem = binfo.Style2D;
-            foreach (object o in Enum.GetValues(typeof(Border3DStyle)))
+
+            style2D!.SelectedItem = binfo.Style2D;
+
+            foreach (var o in Enum.GetValues(typeof(Border3DStyle)))
             {
-                style3D.Items.Add(o);
+                style3D!.Items.Add(o);
             }
-            style3D.SelectedItem = binfo.Style3D;
-            color2D.BackColor = binfo.BorderColor;
+
+            style3D!.SelectedItem = binfo.Style3D;
+            color2D!.BackColor = binfo.BorderColor;
         }
 
         private BorderInfo _Border()
         {
-            BorderInfo result = new BorderInfo();
-            result.DrawBorder = drawBox.Checked;
-            result.Draw3D = draw3D.Checked;
-            result.Style2D = (ButtonBorderStyle)style2D.SelectedItem;
-            result.Style3D = (Border3DStyle)style3D.SelectedItem;
-            result.BorderColor = color2D.BackColor;
+            var result = new BorderInfo
+            {
+                DrawBorder = drawBox.Checked,
+                Draw3D = draw3D.Checked,
+                Style2D = (ButtonBorderStyle) style2D.SelectedItem,
+                Style3D = (Border3DStyle) style3D.SelectedItem,
+                BorderColor = color2D.BackColor
+            };
             return result;
         }
 
@@ -107,13 +112,13 @@ namespace AM.Windows.Forms
 
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
-            BorderInfo b = _Border();
+            var b = _Border();
             b.Draw(e.Graphics, panel1.ClientRectangle);
         }
 
         private void color2D_Click(object sender, EventArgs e)
         {
-            using (ColorDialog dialog = new ColorDialog())
+            using (var dialog = new ColorDialog())
             {
                 dialog.Color = color2D.BackColor;
                 if (dialog.ShowDialog() == DialogResult.OK)

@@ -75,7 +75,11 @@ namespace AM.Windows.Forms
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="T:System.EventArgs"/>
         /// instance containing the event data.</param>
-        private void _textBox_Disposed(object sender, EventArgs e)
+        private void _textBox_Disposed
+            (
+                object? sender,
+                EventArgs e
+            )
         {
             _disposed = true;
             Trace.Listeners.Remove(this);
@@ -96,8 +100,7 @@ namespace AM.Windows.Forms
                 string? message
             )
         {
-            if (!_disposed
-                 && (TextBox != null))
+            if (!_disposed)
             {
                 if (TextBox.InvokeRequired)
                 {
@@ -105,8 +108,11 @@ namespace AM.Windows.Forms
                 }
                 else
                 {
-                    TextBox.AppendText(message);
-                    TextBox.SelectionStart = TextBox.TextLength;
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        TextBox.AppendText(message);
+                        TextBox.SelectionStart = TextBox.TextLength;
+                    }
                 }
             }
         }
@@ -118,10 +124,12 @@ namespace AM.Windows.Forms
         /// </summary>
         /// <param name="message">A message to write.
         /// </param>
-        public override void WriteLine(string message)
+        public override void WriteLine
+            (
+                string? message
+            )
         {
-            if (!_disposed
-                 && (TextBox != null))
+            if (!_disposed)
             {
                 if (TextBox.InvokeRequired)
                 {

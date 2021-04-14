@@ -106,11 +106,11 @@ namespace AM.Data
                 string fileName
             )
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(DataSetInfo));
-            using (Stream stream = File.OpenRead(fileName))
-            {
-                return (DataSetInfo)serializer.Deserialize(stream);
-            }
+            var serializer = new XmlSerializer(typeof(DataSetInfo));
+            using var stream = File.OpenRead(fileName);
+
+            return (DataSetInfo)serializer.Deserialize(stream)
+                .ThrowIfNull("serializer.Deserialize(stream)");
         }
 
         /// <summary>
@@ -122,11 +122,9 @@ namespace AM.Data
                 string fileName
             )
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(DataSetInfo));
-            using (Stream stream = File.Create(fileName))
-            {
-                serializer.Serialize(stream, this);
-            }
+            var serializer = new XmlSerializer(typeof(DataSetInfo));
+            using var stream = File.Create(fileName);
+            serializer.Serialize(stream, this);
         }
 
         /// <summary>
@@ -193,7 +191,7 @@ namespace AM.Data
         {
             var verifier = new Verifier<DataSetInfo>(this, throwOnError);
 
-            foreach (DataTableInfo table in Tables)
+            foreach (var table in Tables)
             {
                 verifier.VerifySubObject(table, "Table");
             }
