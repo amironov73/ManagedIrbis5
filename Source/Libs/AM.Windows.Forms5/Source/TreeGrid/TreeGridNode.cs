@@ -537,8 +537,7 @@ namespace AM.Windows.Forms
         /// Gets the data.
         /// </summary>
         /// <value>The data.</value>
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Content)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
         public TreeGridDataCollection Data
         {
             get
@@ -552,8 +551,7 @@ namespace AM.Windows.Forms
         /// </summary>
         /// <value>The tree grid.</value>
         [Browsable(false)]
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public TreeGrid TreeGrid
         {
             get
@@ -567,8 +565,7 @@ namespace AM.Windows.Forms
         /// </summary>
         /// <value>The parent.</value>
         [Browsable(false)]
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public TreeGridNode Parent
         {
             get
@@ -584,23 +581,15 @@ namespace AM.Windows.Forms
         /// 	<c>true</c> if this instance has children; otherwise, <c>false</c>.
         /// </value>
         [Browsable(false)]
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Hidden)]
-        public bool HasChildren
-        {
-            get
-            {
-                return Nodes.FirstOrDefault() != null;
-            }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public bool HasChildren => Nodes.FirstOrDefault() != null;
 
         /// <summary>
         /// Gets the level.
         /// </summary>
         /// <value>The level.</value>
         [Browsable(false)]
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public int Level
         {
             get
@@ -670,7 +659,7 @@ namespace AM.Windows.Forms
         /// <returns></returns>
         public List<TreeGridNode> Flatten()
         {
-            List<TreeGridNode> result = new List<TreeGridNode> { this };
+            var result = new List<TreeGridNode> { this };
             if (Expanded)
             {
                 foreach (TreeGridNode child in Nodes)
@@ -766,8 +755,7 @@ namespace AM.Windows.Forms
         /// <returns></returns>
         public List<TreeGridNode> GetAllSubnodes ()
         {
-            List<TreeGridNode> result
-                = new List<TreeGridNode>(Nodes);
+            var result = new List<TreeGridNode>(Nodes);
 
             result.AddRange(Nodes.SelectMany(_=>_.GetAllSubnodes()));
 
