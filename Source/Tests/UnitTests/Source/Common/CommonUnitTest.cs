@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
@@ -139,6 +140,33 @@ namespace UnitTests.Common
                         );
                 }
             }
+        }
+
+        protected static void ShowDifference
+            (
+                string expected,
+                string actual
+            )
+        {
+            int index = 0;
+            while (index < expected.Length && index < actual.Length)
+            {
+                if (expected[index] != actual[index])
+                {
+                    break;
+                }
+
+                ++index;
+            }
+
+            if (index == expected.Length && index == actual.Length)
+            {
+                return;
+            }
+
+            Console.WriteLine($"Difference at index {index}");
+            Console.WriteLine($"Expected: {expected.Substring(index)}");
+            Console.WriteLine($"Actual  : {actual.Substring(index)}");
         }
     }
 }

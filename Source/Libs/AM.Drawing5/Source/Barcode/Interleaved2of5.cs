@@ -46,7 +46,7 @@ namespace AM.Drawing.Barcodes
             public Graphics? Graphics;
             public Brush? Fore;
             public Brush? Back;
-            public float Scale;
+            public float Weight;
             public float Position;
             public RectangleF Bounds;
 
@@ -86,7 +86,7 @@ namespace AM.Drawing.Barcodes
                         return false;
                 }
 
-                width *= Scale;
+                width *= Weight;
                 var rectangle = new RectangleF
                     (
                         Position,
@@ -114,7 +114,7 @@ namespace AM.Drawing.Barcodes
         /// <summary>
         /// Множитель для ширины полос.
         /// </summary>
-        public float Scale { get; set; } = 3.0f;
+        public float Weight { get; set; } = 3.0f;
 
         #endregion
 
@@ -142,6 +142,9 @@ namespace AM.Drawing.Barcodes
 
         #region Public methods
 
+        /// <summary>
+        /// Проверка, пригодны ли данные для штрих-кода.
+        /// </summary>
         public bool Verify
             (
                 BarcodeData data
@@ -185,7 +188,7 @@ namespace AM.Drawing.Barcodes
                 Fore = new SolidBrush(Color.Black),
                 Back = new SolidBrush(Color.White),
                 Bounds = context.Bounds,
-                Scale = Scale,
+                Weight = Weight,
                 Position = context.Bounds.Left
             };
 

@@ -15,19 +15,20 @@ using AM.Drawing.Barcodes;
 namespace UnitTests.AM.Drawing.Barcodes
 {
     [TestClass]
-    public class Interleaved2of5Test
+    public class Code39Test
+        : DrawingTests.CommonUnitTest
     {
         [TestMethod]
-        public void Interleaved2of5_DrawBarcode_1()
+        public void Code39_DrawBarcode_1()
         {
-            using var image = new Bitmap(300, 100);
+            using var image = new Bitmap(500, 100);
             using var graphics = Graphics.FromImage(image);
             graphics.Clear(Color.Lime);
 
-            var barcode = new Interleaved2of5();
+            var barcode = new Code39();
             var data = new BarcodeData
             {
-                Message = "02128506"
+                Message = "2128506"
             };
             var bounds = new RectangleF(0, 0, image.Width, image.Height);
             bounds.Inflate(-5, - 5);
@@ -40,7 +41,16 @@ namespace UnitTests.AM.Drawing.Barcodes
             barcode.DrawBarcode(context);
 
             graphics.Dispose();
-            image.Save("Interleaved2of5.bmp");
+            image.Save("Code39.bmp");
+        }
+
+        [TestMethod]
+        public void Code39_Encode_1()
+        {
+            var expected = "10010110110101011001010110110100101011010110010101101101001011010110100110101010100110110101011001101010100101101101";
+            var actual = Code39.Encode("2128506");
+            ShowDifference(expected, actual);
+            Assert.AreEqual(expected, actual);
         }
     }
 }
