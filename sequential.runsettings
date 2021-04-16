@@ -4,4 +4,10 @@
   <RunConfiguration>
     <MaxCpuCount>1</MaxCpuCount>
   </RunConfiguration>
+  <MSTest>
+    <Parallelize>
+      <Workers>1</Workers>
+      <Scope>MethodLevel</Scope>
+    </Parallelize>
+  </MSTest>
 </RunSettings>
