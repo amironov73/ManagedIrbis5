@@ -25,6 +25,17 @@
     </Compile>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Images\BLD.BMP" />
+    <Resource Include="Images\BLD.BMP" />
+    <None Remove="Images\CLOSED.BMP" />
+    <Resource Include="Images\CLOSED.BMP" />
+    <None Remove="Images\COPY.BMP" />
+    <Resource Include="Images\COPY.BMP" />
+    <None Remove="Images\NEW.BMP" />
+    <Resource Include="Images\NEW.BMP" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>

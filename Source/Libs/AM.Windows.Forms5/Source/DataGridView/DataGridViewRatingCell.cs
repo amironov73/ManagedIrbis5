@@ -17,7 +17,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
-using RC=AM.Windows.Forms.Resources;
+using RC=AM.Windows.Forms.Properties.Resources;
 
 #endregion
 

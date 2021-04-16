@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* GraphicsStateSaver.cs -- simple holder of graphics context state.
+/* GraphicsStateSaver.cs -- simple holder of graphics context state
  * Ars Magna project, http://arsmagna.ru
  */
 

@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* Code1.cs -- штрихкод, поддерживающий цифры и дефис
+/* Code11.cs -- штрихкод, поддерживающий цифры и дефис
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -198,8 +198,8 @@ namespace AM.Drawing.Barcodes
             encoded = "00" + encoded + "00";
             var graphics = context.Graphics.ThrowIfNull("context.Graphics");
             var bounds = context.Bounds;
-            using var fore = new SolidBrush(Color.Black);
-            using var back = new SolidBrush(Color.White);
+            using var fore = new SolidBrush(data.ForeColor);
+            using var back = new SolidBrush(data.BackColor);
             var position = bounds.Left;
 
             foreach (var c in encoded)

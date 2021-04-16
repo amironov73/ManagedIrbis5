@@ -31,7 +31,7 @@ build_script:
 - cmd: dotnet build --no-restore --configuration Release Source/ManagedIrbis5-windows.sln
 
 test_script:
-- cmd: dotnet test --no-restore --no-build --configuration Release Source/ManagedIrbis5-windows.sln
+- cmd: dotnet test --no-restore --no-build --configuration Release --settings sequential.runsettings Source/ManagedIrbis5-windows.sln
 - cmd: dotnet run  --no-restore --no-build --configuration Release --project Source/Benchmarks/CoreBenchmarks/CoreBenchmarks.csproj
 
 after_build:
