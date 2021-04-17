@@ -89,7 +89,7 @@ namespace UnitTests.ManagedIrbis.Fst
             var fst = processor.ReadFile(fileName);
             Assert.IsNotNull(fst);
             var source = new Record();
-            var target = processor.TransformRecord(source, fst);
+            var target = processor.TransformRecord(source, fst!);
             Assert.AreEqual(0, target.Fields.Count);
         }
 
@@ -108,7 +108,7 @@ namespace UnitTests.ManagedIrbis.Fst
             Assert.IsNotNull(fst);
             var source = processor.Provider.ReadRecord(1);
             Assert.IsNotNull(source);
-            var target = processor.TransformRecord(source, fst);
+            var target = processor.TransformRecord(source!, fst!);
             Assert.AreEqual(1, target.Fields.Count);
         }
     }

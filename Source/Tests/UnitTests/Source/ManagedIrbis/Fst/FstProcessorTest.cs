@@ -18,7 +18,7 @@ namespace UnitTests.ManagedIrbis.Fst
     public class FstProcessorTest
         : Common.CommonUnitTest
     {
-        private ISyncIrbisProvider GetProvider()
+        private new ISyncIrbisProvider GetProvider()
         {
             var mock = new Mock<ISyncIrbisProvider>();
             var provider = mock.Object;
