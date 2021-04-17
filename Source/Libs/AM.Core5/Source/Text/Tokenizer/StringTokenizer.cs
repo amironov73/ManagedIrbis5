@@ -45,14 +45,7 @@ namespace AM.Text.Tokenizer
         /// <summary>
         /// Tokenizer settings.
         /// </summary>
-        public TokenizerSettings Settings
-        {
-            get { return _settings; }
-            set
-            {
-                _settings = value;
-            }
-        }
+        public TokenizerSettings Settings { get; set; }
 
         #endregion
 
@@ -83,8 +76,6 @@ namespace AM.Text.Tokenizer
         private int _line, _column;
 
         private string _text;
-
-        private TokenizerSettings _settings;
 
         private Token _CreateToken
             (

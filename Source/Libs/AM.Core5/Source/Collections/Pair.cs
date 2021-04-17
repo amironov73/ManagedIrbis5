@@ -265,7 +265,7 @@ namespace AM.Collections
         }
 
         /// <inheritdoc cref="IList.this"/>
-        public object this[int index]
+        public object? this[int index]
         {
             get
             {
@@ -305,11 +305,11 @@ namespace AM.Collections
                 switch (index)
                 {
                     case 0:
-                        First = (T1)value;
+                        First = (T1?)value;
                         break;
 
                     case 1:
-                        Second = (T2)value;
+                        Second = (T2?)value;
                         break;
 
                     default:
@@ -454,15 +454,22 @@ namespace AM.Collections
             // ReSharper disable NonReadonlyFieldInGetHashCode
             unchecked
             {
-                return (EqualityComparer<T1>.Default.GetHashCode(_first) * 397)
-                    ^ EqualityComparer<T2>.Default.GetHashCode(_second);
+                var first = _first is null ? 0 : EqualityComparer<T1>.Default.GetHashCode(_first);
+                var second = _second is null ? 0 : EqualityComparer<T2>.Default.GetHashCode(_second);
+
+                return (first * 397) ^ second;
             }
             // ReSharper restore NonReadonlyFieldInGetHashCode
         }
 
         ///<inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            $"{First.ToString()};{Second.ToString()}";
+        public override string ToString()
+        {
+            var first = _first is null ? "(null)" : _first.ToString();
+            var second = _second is null ? "(null)" : _second.ToString();
+
+            return first + ";" + second;
+        }
 
         #endregion
     }

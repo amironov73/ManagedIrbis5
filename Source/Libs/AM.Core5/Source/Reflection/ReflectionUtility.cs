@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -17,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 #endregion
 
@@ -91,7 +91,7 @@ namespace AM.Reflection
                     inherit
                 );
 
-            return (T) all.FirstOrDefault();
+            return (T?) all.FirstOrDefault();
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace AM.Reflection
         /// <summary>
         /// Get field value either public or private.
         /// </summary>
-        public static object GetFieldValue<T>
+        public static object? GetFieldValue<T>
             (
                 T target,
                 string fieldName
@@ -279,7 +279,7 @@ namespace AM.Reflection
         /// <summary>
         /// Get property value either public or private.
         /// </summary>
-        public static object GetPropertyValue<T>
+        public static object? GetPropertyValue<T>
             (
                 T target,
                 string propertyName

@@ -96,37 +96,25 @@ namespace AM.Reflection
                 _sortBy = sortBy;
             }
 
-            /// <summary>
-            /// Compares two objects and returns a value indicating
-            /// whether one is less than, equal to, or greater than the other.
-            /// </summary>
-            /// <param name="x">The first object to compare.
-            /// </param>
-            /// <param name="y">The second object to compare.
-            /// </param>
-            /// <returns>
-            /// Value Condition Less than zero x is less than y.
-            /// Zero x equals y. Greater than zero x is greater than y.
-            /// </returns>
-            /// <exception cref="T:System.ArgumentException">
-            /// Neither x nor y implements the
-            /// <see cref="T:System.IComparable"/> interface.
-            /// -or- x and y are of different types and neither one can
-            /// handle comparisons with the other. </exception>
-            public int Compare(object x, object y)
+            /// <inheritdoc cref="IComparer.Compare"/>
+            public int Compare
+                (
+                    object? x,
+                    object? y
+                )
             {
-                EnumMemberInfo first = (EnumMemberInfo)x;
-                EnumMemberInfo second = (EnumMemberInfo)y;
+                var first = (EnumMemberInfo?)x;
+                var second = (EnumMemberInfo?)y;
                 switch (_sortBy)
                 {
                     case SortBy.Name:
-                        return string.CompareOrdinal(first.Name, second.Name);
+                        return string.CompareOrdinal(first?.Name, second?.Name);
 
                     case SortBy.FriendlyName:
-                        return string.CompareOrdinal(first.DisplayName, second.DisplayName);
+                        return string.CompareOrdinal(first?.DisplayName, second?.DisplayName);
 
                     case SortBy.Value:
-                        return first.Value - second.Value;
+                        return (first?.Value ?? default) - (second?.Value ?? default);
                 }
 
                 return 0;

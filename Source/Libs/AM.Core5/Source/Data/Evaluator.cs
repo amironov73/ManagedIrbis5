@@ -30,7 +30,7 @@ namespace AM.Data
         /// Gets the value of a Linq expression.
         /// </summary>
         /// <param name="expr">The expresssion.</param>
-        public static object EvalExpression (Expression expr)
+        public static object? EvalExpression (Expression expr)
         {
             //
             // Easy case

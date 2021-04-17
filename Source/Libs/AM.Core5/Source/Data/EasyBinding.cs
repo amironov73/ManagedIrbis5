@@ -54,7 +54,7 @@ namespace AM.Data
         /// <summary>
         /// Uses the lambda expression to create data bindings.
         /// Equality expression (==) become data bindings.
-        /// And expressions (&&) can be used to group the data bindings.
+        /// And expressions (&amp;&amp;) can be used to group the data bindings.
         /// </summary>
         /// <param name="specifications">The binding specifications.</param>
         public static EasyBinding Create<T> (Expression<Func<T>> specifications)
@@ -103,7 +103,19 @@ namespace AM.Data
             throw new NotSupportedException ("Only equality bindings are supported.");
         }
 
-        protected static bool SetValue (Expression expr, object value, int changeId)
+        /// <summary>
+        /// Установка значения.
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <param name="value"></param>
+        /// <param name="changeId"></param>
+        /// <returns></returns>
+        protected static bool SetValue
+            (
+                Expression expr,
+                object value,
+                int changeId
+            )
         {
             if (expr.NodeType == ExpressionType.MemberAccess) {
                 var m = (MemberExpression)expr;
@@ -131,6 +143,9 @@ namespace AM.Data
             return false;
         }
 
+        /// <summary>
+        /// Возникает при ошибке.
+        /// </summary>
         public static event Action<string> Error = delegate {};
 
         static void ReportError (string message)
@@ -139,6 +154,10 @@ namespace AM.Data
             Error (message);
         }
 
+        /// <summary>
+        /// Сообщает об ошибке
+        /// </summary>
+        /// <param name="errorObject"></param>
         static void ReportError (object errorObject)
         {
             ReportError (errorObject.ToString ());

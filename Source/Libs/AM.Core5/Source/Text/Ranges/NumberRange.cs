@@ -374,7 +374,7 @@ namespace AM.Text.Ranges
         /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
         public bool Equals
             (
-                NumberRange other
+                NumberRange? other
             )
         {
             if (ReferenceEquals(Start, null)
@@ -415,13 +415,13 @@ namespace AM.Text.Ranges
             if (verifier.Result)
             {
                 verifier
-                    .VerifySubObject(Start, "Start")
-                    .VerifySubObject(Stop, "Stop")
+                    .VerifySubObject(Start!, "Start")
+                    .VerifySubObject(Stop!, "Stop")
                     .Assert
-                    (
-                        Start.CompareTo(Stop) <= 0,
-                        "Start <= Stop"
-                    );
+                        (
+                            Start!.CompareTo(Stop) <= 0,
+                            "Start <= Stop"
+                        );
             }
 
             return verifier.Result;
@@ -436,6 +436,7 @@ namespace AM.Text.Ranges
         {
             int result = 0;
 
+            // ReSharper disable NonReadonlyMemberInGetHashCode
             if (!ReferenceEquals(Start, null))
             {
                 result = Start.GetHashCode();
@@ -445,6 +446,7 @@ namespace AM.Text.Ranges
             {
                 result = result * 137 + Stop.GetHashCode();
             }
+            // ReSharper restore NonReadonlyMemberInGetHashCode
 
             return result;
         }
@@ -460,12 +462,12 @@ namespace AM.Text.Ranges
 
             if (ReferenceEquals(Start, null))
             {
-                return Stop.ToString(); //-V3125 //-V3095
+                return Stop!.ToString();
             }
 
             if (ReferenceEquals(Stop, null))
             {
-                return Start.ToString();
+                return Start!.ToString();
             }
 
             if (Start.CompareTo(Stop) == 0)
@@ -473,12 +475,7 @@ namespace AM.Text.Ranges
                 return Start.ToString();
             }
 
-            return string.Format
-                (
-                    "{0}-{1}",
-                    Start,
-                    Stop
-                );
+            return $"{Start}-{Stop}";
         }
 
         #endregion

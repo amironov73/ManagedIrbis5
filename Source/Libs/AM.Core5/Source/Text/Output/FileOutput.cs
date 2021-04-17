@@ -7,6 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
 /* FileOutput.cs -- файловый вывод
@@ -36,7 +37,7 @@ namespace AM.Text.Output
         /// <summary>
         /// Имя файла.
         /// </summary>
-        public string FileName { get { return _fileName; } }
+        public string? FileName { get; private set; }
 
         #endregion
 
@@ -57,19 +58,14 @@ namespace AM.Text.Output
                 string fileName
             )
         {
-            Open
-                (
-                    fileName
-                );
+            Open(fileName);
         }
 
         #endregion
 
         #region Private members
 
-        private string _fileName;
-
-        private TextWriter _writer;
+        private TextWriter? _writer;
 
         #endregion
 
@@ -89,33 +85,18 @@ namespace AM.Text.Output
         public void Open
             (
                 string fileName,
-                bool append
+                bool append = false
             )
         {
             Close();
-            _fileName = fileName;
+            FileName = fileName;
 
-            FileMode fileMode = append
+            var fileMode = append
                 ? FileMode.Append
                 : FileMode.Create;
             _writer = new StreamWriter
                 (
                     File.Open(fileName, fileMode)
-                );
-        }
-
-        /// <summary>
-        /// Открытие файла.
-        /// </summary>
-        public void Open
-            (
-                string fileName
-            )
-        {
-            Open
-                (
-                    fileName,
-                    false
                 );
         }
 
@@ -130,9 +111,9 @@ namespace AM.Text.Output
             )
         {
             Close();
-            _fileName = fileName;
+            FileName = fileName;
 
-            FileMode fileMode = append
+            var fileMode = append
                 ? FileMode.Append
                 : FileMode.Create;
             _writer = new StreamWriter
@@ -239,11 +220,7 @@ namespace AM.Text.Output
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public override void Dispose()
         {
-            if (_writer != null)
-            {
-                _writer.Dispose();
-                _writer = null;
-            }
+            _writer?.Dispose();
             base.Dispose();
         }
 

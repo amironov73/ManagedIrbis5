@@ -15,7 +15,6 @@
 
 #region Using directives
 
-using System;
 using System.IO;
 using System.Text;
 
@@ -36,10 +35,7 @@ namespace AM.Text.Output
         /// <summary>
         /// Inner <see cref="AbstractOutput"/>.
         /// </summary>
-        public AbstractOutput Output
-        {
-            get { return _output; }
-        }
+        public AbstractOutput Output { get; }
 
         #endregion
 
@@ -53,82 +49,65 @@ namespace AM.Text.Output
                 AbstractOutput output
             )
         {
-            _output = output;
+            Output = output;
         }
-
-        #endregion
-
-        #region Private members
-
-        private readonly AbstractOutput _output;
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 
         #region TextWriter members
 
-        /// <summary>
-        /// When overridden in a derived class,
-        /// returns the character encoding in which the output is written.
-        /// </summary>
-        public override Encoding Encoding
-        {
-            get { return Encoding.Default; }
-        }
+        /// <inheritdoc cref="TextWriter.Encoding"/>
+        public override Encoding Encoding => Encoding.Default;
 
-        /// <summary>
-        /// Writes a line terminator to the text string or stream.
-        /// </summary>
+        /// <inheritdoc cref="TextWriter.WriteLine()"/>
         public override void WriteLine()
         {
             Output.WriteLine(string.Empty);
         }
 
-        /// <summary>
-        /// Writes a string to the text string or stream.
-        /// </summary>
-        /// <param name="value">The string to write.</param>
-        public override void Write(string value)
+        /// <inheritdoc cref="TextWriter.Write(string?)"/>
+        public override void Write
+            (
+                string? value
+            )
         {
-            Output.Write(value);
+            if (value is not null)
+            {
+                Output.Write(value);
+            }
         }
 
-        /// <summary>
-        /// Writes a string followed by a line terminator to the text string or stream.
-        /// </summary>
-        /// <param name="value">The string to write. If <paramref name="value" /> is null, only the line terminator is written.</param>
-        public override void WriteLine(string value)
+        /// <inheritdoc cref="TextWriter.WriteLine(string?)"/>
+        public override void WriteLine
+            (
+                string? value
+            )
         {
-            Output.WriteLine(value);
+            if (value is not null)
+            {
+                Output.WriteLine(value);
+            }
         }
 
-        /// <summary>
-        /// Writes a character to the text string or stream.
-        /// </summary>
-        /// <param name="value">The character to write to the text stream.</param>
+        /// <inheritdoc cref="TextWriter.Write(char)"/>
         public override void Write(char value)
         {
             Write(new string(value, 1));
         }
 
-        /// <summary>
-        /// Writes a character array to the text string or stream.
-        /// </summary>
-        /// <param name="buffer">The character array to write to the text stream.</param>
-        public override void Write(char[] buffer)
+        /// <inheritdoc cref="TextWriter.Write(char[])"/>
+        public override void Write
+            (
+                char[]? buffer
+            )
         {
-            Write(new string(buffer));
+            if (buffer is not null)
+            {
+                Write(new string(buffer));
+            }
         }
 
-        /// <summary>
-        /// Writes a subarray of characters to the text string or stream.
-        /// </summary>
-        /// <param name="buffer">The character array to write data from.</param>
-        /// <param name="index">The character position in the buffer at which to start retrieving data.</param>
-        /// <param name="count">The number of characters to write.</param>
+        /// <inheritdoc cref="TextWriter.Write(char[],int,int)"/>
         public override void Write(char[] buffer, int index, int count)
         {
             Write(new string(buffer, index, count));

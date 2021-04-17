@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -14,20 +15,10 @@
 #region Using directives
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
 
 #endregion
 
@@ -50,7 +41,7 @@ namespace AM.Reflection
             /// <summary>
             /// Title.
             /// </summary>
-            public string Title { get; set; }
+            public string? Title { get; set; }
 
             /// <summary>
             /// Index.
@@ -70,7 +61,7 @@ namespace AM.Reflection
             /// <summary>
             /// Property info.
             /// </summary>
-            public PropertyInfo Property { get; set; }
+            public PropertyInfo? Property { get; set; }
         }
 
         #endregion
@@ -85,7 +76,7 @@ namespace AM.Reflection
             )
         {
             writer.Write(text);
-            for (int i = text.Length; i < width; i++)
+            for (var i = text.Length; i < width; i++)
             {
                 writer.Write(' ');
             }
@@ -98,7 +89,7 @@ namespace AM.Reflection
                 int width
             )
         {
-            for (int i = text.Length; i < width; i++)
+            for (var i = text.Length; i < width; i++)
             {
                 writer.Write(' ');
             }
@@ -118,11 +109,11 @@ namespace AM.Reflection
                 string[][] cells
             )
         {
-            int height = cells.Length;
-            for (int i = 0; i < columns.Length; i++)
+            var height = cells.Length;
+            for (var i = 0; i < columns.Length; i++)
             {
-                int width = columns[i].Title.Length;
-                for (int j = 0; j < height; j++)
+                var width = columns[i].Title?.Length ?? 8;
+                for (var j = 0; j < height; j++)
                 {
                     width = Math.Max(width, cells[j][i].Length);
                 }
@@ -141,14 +132,14 @@ namespace AM.Reflection
             )
         {
             var result = new List<string[]>();
-            int length = columns.Length;
-            foreach (object? item in items)
+            var length = columns.Length;
+            foreach (var item in items)
             {
                 string[] line = new string[length];
-                for (int i = 0; i < length; i++)
+                for (var i = 0; i < length; i++)
                 {
-                    object? value = columns[i].Property.GetValue(item, null);
-                    string? text = value.ToVisibleString();
+                    var value = columns[i].Property?.GetValue(item, null);
+                    var text = value.ToVisibleString();
                     line[i] = text;
                 }
                 result.Add(line);
@@ -171,7 +162,7 @@ namespace AM.Reflection
             foreach (PropertyInfo property in properties)
             {
                 var code = Type.GetTypeCode(property.PropertyType);
-                int index = 0;
+                var index = 0;
                 var moa = ReflectionUtility
                     .GetCustomAttribute<MemberOrderAttribute>(property);
                 if (!ReferenceEquals(moa, null))
@@ -224,17 +215,17 @@ namespace AM.Reflection
                 string[][] cells
             )
         {
-            for (int i = 0; i < columns.Length; i++)
+            for (var i = 0; i < columns.Length; i++)
             {
                 if (i != 0)
                 {
                     writer.Write(' ');
                 }
-                _LeftAlign(writer, columns[i].Title, columns[i].Width);
+                _LeftAlign(writer, columns[i].Title ?? string.Empty, columns[i].Width);
             }
             writer.WriteLine();
 
-            for (int i = 0; i < columns.Length; i++)
+            for (var i = 0; i < columns.Length; i++)
             {
                 if (i != 0)
                 {
@@ -244,9 +235,9 @@ namespace AM.Reflection
             }
             writer.WriteLine();
 
-            for (int i = 0; i < cells.Length; i++)
+            for (var i = 0; i < cells.Length; i++)
             {
-                for (int j = 0; j < columns.Length; j++)
+                for (var j = 0; j < columns.Length; j++)
                 {
                     if (j != 0)
                     {

@@ -9,16 +9,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Ref.cs --
+/* Ref.cs -- ссылка на структуру
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Runtime.CompilerServices;
-
-#endregion
 
 #nullable enable
 
@@ -32,6 +25,10 @@ namespace AM.Events
     // copyright Vadim Sedov
     //
 
+    /// <summary>
+    /// Ссылка на структуру.
+    /// </summary>
+    /// <typeparam name="T">Структура.</typeparam>
     internal sealed class Ref<T> where T
         : struct
     {
@@ -42,6 +39,6 @@ namespace AM.Events
             Value = value;
         }
 
-        public override string ToString() => Value.ToString();
+        public override string ToString() => Value.ToString() ?? "(null)";
     }
 }

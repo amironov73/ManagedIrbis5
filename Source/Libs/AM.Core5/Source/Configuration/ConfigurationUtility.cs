@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -18,6 +19,7 @@
 using System;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -499,15 +501,17 @@ namespace AM.Configuration
                 return string.Empty;
             }
 
-            return Convert.ToBase64String
-                (
-                    ProtectedData.Protect
-                        (
-                            Encoding.Unicode.GetBytes(text),
-                            _additionalEntropy,
-                            DataProtectionScope.LocalMachine
-                        )
-                );
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? Convert.ToBase64String
+                    (
+                        ProtectedData.Protect
+                            (
+                                Encoding.Unicode.GetBytes(text),
+                                _additionalEntropy,
+                                DataProtectionScope.LocalMachine
+                            )
+                    )
+                : Convert.ToBase64String(Encoding.Unicode.GetBytes(text));
         }
 
         /// <summary>
@@ -523,15 +527,17 @@ namespace AM.Configuration
                 return string.Empty;
             }
 
-            return Encoding.Unicode.GetString
-                (
-                    ProtectedData.Unprotect
-                        (
-                            Convert.FromBase64String(text),
-                            _additionalEntropy,
-                            DataProtectionScope.LocalMachine
-                        )
-                );
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? Encoding.Unicode.GetString
+                    (
+                        ProtectedData.Unprotect
+                                (
+                                    Convert.FromBase64String(text),
+                                    _additionalEntropy,
+                                    DataProtectionScope.LocalMachine
+                                )
+                    )
+                : Encoding.Unicode.GetString(Convert.FromBase64String(text));
         }
 
         #endregion

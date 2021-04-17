@@ -2985,8 +2985,8 @@ namespace AM
             foreach (var item in items)
             {
                 var line = item is null
-                    ? (string?)null
-                    : item.ToString();
+                    ? string.Empty
+                    : item.ToString() ?? string.Empty;
                 result.Add(line);
             }
 
