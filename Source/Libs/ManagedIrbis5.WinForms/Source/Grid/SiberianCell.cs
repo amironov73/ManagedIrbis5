@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -124,12 +125,14 @@ namespace ManagedIrbis.WinForms.Grid
                 bool accept
             )
         {
-            if (!ReferenceEquals(Grid.Editor, null))
-            {
-                Grid.Editor.Dispose();
-                Grid.Editor = null;
+            var grid = Grid;
 
-                Grid.Invalidate();
+            if (grid is {Editor: { }})
+            {
+                grid.Editor.Dispose();
+                grid.Editor = null;
+
+                grid.Invalidate();
             }
         }
 

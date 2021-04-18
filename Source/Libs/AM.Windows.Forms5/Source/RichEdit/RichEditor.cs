@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable LocalizableElement
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -15,12 +17,10 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Data;
-using System.Text;
+using System.Globalization;
 using System.Windows.Forms;
 
 #endregion
@@ -34,72 +34,53 @@ namespace AM.Windows.Forms
     {
         #region Events
 
-        public event EventHandler FileNameChanged;
+        public event EventHandler? FileNameChanged;
 
         #endregion
 
         #region Properties
 
-        private string _fileName;
+        private string? _fileName;
 
-        [DefaultValue ( null )]
-        public string FileName
+        [DefaultValue(null)]
+        public string? FileName
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _fileName;
-            }
+            get => _fileName;
             [DebuggerStepThrough]
             set
             {
                 if ( _fileName != value )
                 {
                     _fileName = value;
-                    if ( FileNameChanged != null )
-                    {
-                        FileNameChanged ( this, EventArgs.Empty );
-                    }
+
+                    FileNameChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
 
-        public ToolStrip ToolStrip
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return toolStrip;
-            }
-        }
+        /// <summary>
+        /// Панель инструментов.
+        /// </summary>
+        public ToolStrip ToolStrip => toolStrip;
 
-        public RichTextBox RichTextBox
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return rtfBox;
-            }
-        }
+        /// <summary>
+        /// Редактор.
+        /// </summary>
+        public RichTextBox RichTextBox => rtfBox;
 
         public bool Modified
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return rtfBox.Modified;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                rtfBox.Modified = value;
-            }
+            get => rtfBox.Modified;
+            set => rtfBox.Modified = value;
         }
 
         #endregion
 
         #region Construction
 
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
         public RichEditor ()
         {
             InitializeComponent ();
@@ -111,21 +92,22 @@ namespace AM.Windows.Forms
 
         private void _Refresh ()
         {
-            bool canCopy = ( rtfBox.SelectionLength > 0 );
+            var canCopy = rtfBox.SelectionLength > 0;
             cutButton.Enabled = canCopy;
             copyButton.Enabled = canCopy;
             colorButton.Text = rtfBox.SelectionColor.Name;
-            Font selFont = rtfBox.SelectionFont;
-            if ( selFont != null )
+            var selFont = rtfBox.SelectionFont;
+            if (selFont != null)
             {
                 fontButton.Text = selFont.Name;
                 boldButton.Checked = selFont.Bold;
                 italicButton.Checked = selFont.Italic;
                 underlineButton.Checked = selFont.Underline;
                 strikeoutButton.Checked = selFont.Strikeout;
-                sizeBox.SelectedItem = selFont.Size.ToString ();
+                sizeBox.SelectedItem = selFont.Size.ToString(CultureInfo.InvariantCulture);
             }
-            HorizontalAlignment ha = rtfBox.SelectionAlignment;
+
+            var ha = rtfBox.SelectionAlignment;
             leftButton.Checked = ha == HorizontalAlignment.Left;
             centerButton.Checked = ha == HorizontalAlignment.Center;
             rightButton.Checked = ha == HorizontalAlignment.Right;
@@ -133,7 +115,7 @@ namespace AM.Windows.Forms
 
         private void RichEditor_Load ( object sender, EventArgs e )
         {
-            foreach ( FontFamily ff in FontFamily.Families )
+            foreach ( var ff in FontFamily.Families )
             {
                 fontMenu.Items.Add ( ff.Name );
             }
@@ -160,7 +142,7 @@ namespace AM.Windows.Forms
         private void saveButton_Click ( object sender, EventArgs e )
         {
             if ( string.IsNullOrEmpty ( FileName )
-                && ( saveFileDialog.ShowDialog () == DialogResult.OK ) )
+                && saveFileDialog.ShowDialog () == DialogResult.OK )
             {
                 FileName = saveFileDialog.FileName;
             }
@@ -189,7 +171,7 @@ namespace AM.Windows.Forms
         {
             if ( rtfBox.SelectionFont != null )
             {
-                FontStyle newStyle = rtfBox.SelectionFont.Style ^ change;
+                var newStyle = rtfBox.SelectionFont.Style ^ change;
                 rtfBox.SelectionFont = new Font ( rtfBox.SelectionFont, newStyle );
                 _Refresh ();
             }
@@ -247,8 +229,16 @@ namespace AM.Windows.Forms
 
         private void sizeBox_SelectedIndexChanged ( object sender, EventArgs e )
         {
-            float newSize = float.Parse ( sizeBox.SelectedItem.ToString () );
-            rtfBox.SelectionFont = new Font ( rtfBox.SelectionFont.Name, newSize );
+            var selectedItem = sizeBox.SelectedItem;
+            if (selectedItem is not null)
+            {
+                var text = selectedItem.ToString();
+                if (!string.IsNullOrEmpty(text))
+                {
+                    var newSize = float.Parse(text);
+                    rtfBox.SelectionFont = new Font(rtfBox.SelectionFont.Name, newSize);
+                }
+            }
         }
 
         private void rtfBox_TextChanged ( object sender, EventArgs e )
@@ -262,17 +252,17 @@ namespace AM.Windows.Forms
                 ToolStripItemClickedEventArgs e
             )
         {
-            Font selFont = rtfBox.SelectionFont;
-            Font newFont = null;
-            if ( selFont != null )
+            var selectionFont = rtfBox.SelectionFont;
+            Font? newFont = null;
+            if (selectionFont != null)
             {
                 try
                 {
                     newFont = new Font
                        (
                            e.ClickedItem.Text,
-                           selFont.Size,
-                           selFont.Style
+                           selectionFont.Size,
+                           selectionFont.Style
                        );
                 }
                 catch
@@ -282,31 +272,36 @@ namespace AM.Windows.Forms
                         newFont = new Font
                            (
                                e.ClickedItem.Text,
-                               selFont.Size
+                               selectionFont.Size
                            );
                     }
-                    catch
+                    catch (Exception exception)
                     {
+                        Magna.TraceException("Change font", exception);
                     }
                 }
             }
             else
             {
-                float fontSize = 12f;
-                float.TryParse ( sizeBox.Text, out fontSize );
-                try
+                var fontSize = sizeBox.Text.ParseSingle();
+                if (fontSize != 0f)
                 {
-                    newFont = new Font
-                        (
-                            e.ClickedItem.Text,
-                            fontSize
-                        );
-                }
-                catch
-                {
+                    try
+                    {
+                        newFont = new Font
+                            (
+                                e.ClickedItem.Text,
+                                fontSize
+                            );
+                    }
+                    catch (Exception exception)
+                    {
+                        Magna.TraceException("Change font", exception);
+                    }
                 }
             }
-            if ( newFont != null )
+
+            if (newFont != null)
             {
                 rtfBox.SelectionFont = newFont;
             }
@@ -319,7 +314,7 @@ namespace AM.Windows.Forms
                 ToolStripItemClickedEventArgs e
             )
         {
-            Color newColor = Color.FromName ( e.ClickedItem.Text );
+            var newColor = Color.FromName ( e.ClickedItem.Text );
             rtfBox.SelectionColor = newColor;
             _Refresh ();
         }
@@ -375,8 +370,6 @@ namespace AM.Windows.Forms
             }
         }
 
-        #region Public methods
+    } // class RichEditor
 
-        #endregion
-    }
-}
+} // namespace AM.Windows.Forms

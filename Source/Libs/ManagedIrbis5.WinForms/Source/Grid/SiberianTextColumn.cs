@@ -89,16 +89,21 @@ namespace ManagedIrbis.WinForms.Grid
         }
 
         /// <inheritdoc />
-        public override Control CreateEditor
+        public override Control? CreateEditor
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
-            var textCell = (SiberianTextCell)cell;
+            var grid = Grid;
+            if (grid is null)
+            {
+                return default;
+            }
 
-            var rectangle = Grid.GetCellRectangle(cell);
+            var textCell = (SiberianTextCell)cell;
+            var rectangle = grid.GetCellRectangle(cell);
             rectangle.Inflate(-1,-1);
 
             var result = new TextBox
@@ -106,7 +111,7 @@ namespace ManagedIrbis.WinForms.Grid
                 AutoSize = false,
                 Location = rectangle.Location,
                 Size = rectangle.Size,
-                Font = Grid.Font,
+                Font = grid.Font,
                 BorderStyle = BorderStyle.FixedSingle
             };
             result.KeyDown += Editor_KeyDown;
@@ -152,9 +157,7 @@ namespace ManagedIrbis.WinForms.Grid
                     );
 
                 var value = property.GetValue(theObject);
-                textCell.Text = ReferenceEquals(value, null)
-                    ? null
-                    : value.ToString();
+                textCell.Text = value?.ToString();
             }
         }
 

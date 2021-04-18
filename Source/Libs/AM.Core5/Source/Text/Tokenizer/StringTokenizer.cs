@@ -71,51 +71,19 @@ namespace AM.Text.Tokenizer
 
         #region Private members
 
-        private int _length, _position;
+        private readonly string _text;
+        private readonly int _length;
+        private int _position;
+        private int _line;
+        private int _column;
 
-        private int _line, _column;
+        private Token _CreateToken(TokenKind kind) => new(kind, string.Empty, _line, _column);
 
-        private string _text;
+        private bool _IsWhitespace(char c) => char.IsWhiteSpace(c) && !(c == '\r' || c == '\n');
 
-        private Token _CreateToken
-            (
-                TokenKind kind
-            )
-        {
-            return new Token
-                (
-                    kind,
-                    string.Empty,
-                    _line,
-                    _column
-                );
-        }
+        private bool _IsWord ( char c ) => char.IsLetterOrDigit(c) || c == '_';
 
-        private bool _IsWhitespace
-            (
-                char c
-            )
-        {
-            return char.IsWhiteSpace(c)
-                && !(c == '\r' || c == '\n');
-        }
-
-        private bool _IsWord
-            (
-                char c
-            )
-        {
-            return char.IsLetterOrDigit(c)
-                   || c == '_';
-        }
-
-        private bool _IsSymbol
-            (
-                char c
-            )
-        {
-            return Array.IndexOf(Settings.SymbolChars, c) >= 0;
-        }
+        private bool _IsSymbol ( char c ) => Array.IndexOf(Settings.SymbolChars, c) >= 0;
 
         private Token _SetTokenValue
             (
@@ -129,12 +97,12 @@ namespace AM.Text.Tokenizer
 
         private Token _ReadWhitespace()
         {
-            Token result = _CreateToken(TokenKind.Whitespace);
-            int begin = _position;
+            var result = _CreateToken(TokenKind.Whitespace);
+            var begin = _position;
             ReadChar();
             while (true)
             {
-                char c = PeekChar();
+                var c = PeekChar();
                 if (!_IsWhitespace(c))
                 {
                     break;
@@ -147,10 +115,10 @@ namespace AM.Text.Tokenizer
 
         private Token _ReadNumber()
         {
-            Token result = _CreateToken(TokenKind.Number);
-            int begin = _position;
+            var result = _CreateToken(TokenKind.Number);
+            var begin = _position;
             ReadChar();
-            bool dotFound = _text[begin] == '.';
+            var dotFound = _text[begin] == '.';
             char c;
             while (true)
             {
@@ -200,12 +168,12 @@ namespace AM.Text.Tokenizer
 
         private Token _ReadString()
         {
-            Token result = _CreateToken(TokenKind.QuotedString);
-            int begin = _position;
-            char stop = ReadChar();
+            var result = _CreateToken(TokenKind.QuotedString);
+            var begin = _position;
+            var stop = ReadChar();
             while (true)
             {
-                char c = PeekChar();
+                var c = PeekChar();
                 if (c == EOF)
                 {
                     break;
@@ -260,12 +228,12 @@ namespace AM.Text.Tokenizer
 
         private Token _ReadWord()
         {
-            Token result = _CreateToken(TokenKind.Word);
-            int begin = _position;
+            var result = _CreateToken(TokenKind.Word);
+            var begin = _position;
             ReadChar();
             while (true)
             {
-                char c = PeekChar();
+                var c = PeekChar();
                 if (!_IsWord(c))
                 {
                     break;
@@ -278,8 +246,8 @@ namespace AM.Text.Tokenizer
 
         private Token _ReadSymbol()
         {
-            Token result = _CreateToken(TokenKind.Symbol);
-            int begin = _position;
+            var result = _CreateToken(TokenKind.Symbol);
+            var begin = _position;
             ReadChar();
 
             return _SetTokenValue(result, begin);
@@ -287,8 +255,8 @@ namespace AM.Text.Tokenizer
 
         private Token _ReadUnknown()
         {
-            Token result = _CreateToken(TokenKind.Unknown);
-            int begin = _position;
+            var result = _CreateToken(TokenKind.Unknown);
+            var begin = _position;
             ReadChar();
 
             return _SetTokenValue(result, begin);
@@ -303,11 +271,11 @@ namespace AM.Text.Tokenizer
         /// </summary>
         public Token[] GetAllTokens()
         {
-            List<Token> result = new List<Token>();
+            var result = new List<Token>();
 
             while (true)
             {
-                Token token = NextToken();
+                var token = NextToken();
                 if (token.IsEOF)
                 {
                     if (!Settings.IgnoreEOF)
@@ -345,7 +313,7 @@ namespace AM.Text.Tokenizer
             {
                 return EOF;
             }
-            char result = _text[_position];
+            var result = _text[_position];
             _position++;
             _column++;
             return result;
@@ -356,7 +324,7 @@ namespace AM.Text.Tokenizer
         /// </summary>
         public Token NextToken()
         {
-        BEGIN: char c = PeekChar();
+        BEGIN: var c = PeekChar();
             Token result;
 
             if (c == EOF)
@@ -433,7 +401,7 @@ namespace AM.Text.Tokenizer
         {
             while (true)
             {
-                Token result = NextToken();
+                var result = NextToken();
                 yield return result;
                 if (result.IsEOF)
                 {

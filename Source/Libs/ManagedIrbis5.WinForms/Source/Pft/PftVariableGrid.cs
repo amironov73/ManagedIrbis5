@@ -4,6 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Local
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -16,6 +19,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+
+using AM;
 
 using ManagedIrbis.Pft.Infrastructure;
 
@@ -37,9 +42,9 @@ namespace ManagedIrbis.WinForms.Pft
         {
             #region Properties
 
-            public string Name { get; set; }
+            public string? Name { get; set; }
 
-            public object Value { get; set; }
+            public object? Value { get; set; }
 
             #endregion
 
@@ -58,7 +63,7 @@ namespace ManagedIrbis.WinForms.Pft
 
                 var result = new VariableInfo
                 {
-                    Name = variable.Name,
+                    Name = variable.Name.ThrowIfNull("variable.Name"),
                     Value = value
                 };
 

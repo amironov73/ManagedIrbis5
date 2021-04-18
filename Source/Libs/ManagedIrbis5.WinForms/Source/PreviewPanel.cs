@@ -53,10 +53,10 @@ namespace ManagedIrbis.WinForms
 
         #region Private members
 
-        private Control _previewControl;
-        private TextBox _previewTextBox;
-        private RichTextBox _previewRichTextBox;
-        private WebBrowser _previewHtmlTextBox;
+        private Control? _previewControl;
+        private TextBox? _previewTextBox;
+        private RichTextBox? _previewRichTextBox;
+        private WebBrowser? _previewHtmlTextBox;
 
         private void _DisposePreviousControl()
         {

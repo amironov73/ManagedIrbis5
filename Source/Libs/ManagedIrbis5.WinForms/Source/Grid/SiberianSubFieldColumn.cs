@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianSubFieldColumn.cs --
+/* SiberianSubFieldColumn.cs -- колонка, отображающая подполя MARC-записи
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +25,7 @@ using AM.Windows.Forms;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Колонка, отображающая подполя MARC-записи.
     /// </summary>
     public class SiberianSubFieldColumn
         : SiberianColumn
@@ -45,7 +45,7 @@ namespace ManagedIrbis.WinForms.Grid
         #region Private members
         private void Editor_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs args
             )
         {
@@ -84,10 +84,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-        #region Public methods
-
-        #endregion
-
         #region SiberianColumn members
 
         /// <inheritdoc/>
@@ -100,23 +96,27 @@ namespace ManagedIrbis.WinForms.Grid
         }
 
         /// <inheritdoc />
-        public override Control CreateEditor
+        public override Control? CreateEditor
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
+            if (Grid is null)
+            {
+                return default;
+            }
+
             var subFieldCell = (SiberianSubFieldCell)cell;
 
-            var subField = (SiberianSubField)subFieldCell.Row.Data;
+            var subField = (SiberianSubField?)subFieldCell.Row?.Data;
             if (ReferenceEquals(subField, null))
             {
-                return null;
+                return default;
             }
 
             var text = subField.Value;
-
             var rectangle = Grid.GetCellRectangle(cell);
             rectangle.Inflate(-1, -1);
 
@@ -132,13 +132,13 @@ namespace ManagedIrbis.WinForms.Grid
 
             if (edit)
             {
-                result.Text = text;
+                result.Text = text ?? string.Empty;
             }
             else
             {
                 if (!ReferenceEquals(state, null))
                 {
-                    result.Text = state.ToString();
+                    result.Text = state.ToString() ?? string.Empty;
                     result.SelectionStart = result.TextLength;
                 }
             }
@@ -152,5 +152,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-    }
-}
+    } // class SiberianSubFieldColumn
+
+} // namespace ManagedIrbis.WinForms.Grid

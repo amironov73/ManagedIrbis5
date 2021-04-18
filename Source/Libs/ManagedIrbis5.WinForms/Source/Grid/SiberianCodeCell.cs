@@ -45,36 +45,35 @@ namespace ManagedIrbis.WinForms.Grid
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint?
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
             var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var subField = (SiberianSubField?)Row.Data;
+            var subField = (SiberianSubField?)Row?.Data;
             if (!ReferenceEquals(subField, null))
             {
-                var text = string.Format
-                    (
-                        "{0}: {1}",
-                        subField.Code,
-                        subField.Title
-                    );
+                var text = $"{subField.Code}: {subField.Title}";
 
-                var flags
-                    = TextFormatFlags.TextBoxControl
+                var flags = TextFormatFlags.TextBoxControl
                       | TextFormatFlags.EndEllipsis
                       | TextFormatFlags.NoPrefix
                       | TextFormatFlags.VerticalCenter;
@@ -83,7 +82,7 @@ namespace ManagedIrbis.WinForms.Grid
                     (
                         graphics,
                         text,
-                        Grid.Font,
+                        grid.Font,
                         rectangle,
                         foreColor,
                         flags
@@ -95,36 +94,24 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            int row = Row?.Index ?? -1,
+                column = Column?.Index ?? -1;
 
-            var subField = (SiberianSubField?)Row.Data;
+            var subField = (SiberianSubField?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(subField, null))
             {
-                text = string.Format
-                    (
-                        "{0}: {1} ({2})",
-                        subField.Code,
-                        subField.Value,
-                        subField.OriginalValue
-                    );
+                text = $"{subField.Code}: {subField.Value} ({subField.OriginalValue})";
             }
 
-            return string.Format
-                (
-                    "CodeCell [{0}, {1}]: {2}",
-                    column,
-                    row,
-                    text
-                );
+            return $"CodeCell [{column}, {row}]: {text}";
         }
 
         #endregion
-    }
-}
+
+    } // class SiberianCodeCell
+
+} // namespace ManagedIrbis.WinForms.Grid

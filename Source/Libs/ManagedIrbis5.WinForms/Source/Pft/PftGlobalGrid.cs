@@ -4,6 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Local
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -40,7 +43,7 @@ namespace ManagedIrbis.WinForms.Pft
 
             public int Number { get; set; }
 
-            public string Value { get; set; }
+            public string? Value { get; set; }
 
             #endregion
 

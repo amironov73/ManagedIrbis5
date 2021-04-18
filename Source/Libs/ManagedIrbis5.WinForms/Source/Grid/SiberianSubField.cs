@@ -13,18 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 using ManagedIrbis.Workspace;
 
@@ -86,7 +75,7 @@ namespace ManagedIrbis.WinForms.Grid
         {
             var result = new SiberianSubField
             {
-                Code = item.Tag[0],
+                Code = item.Tag.FirstChar(),
                 Title = item.Title
             };
 

@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -17,8 +19,6 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-
-using AM;
 
 #endregion
 
@@ -93,14 +93,11 @@ namespace ManagedIrbis.WinForms.Grid
         [DefaultValue(DefaultFillWidth)]
         public int FillWidth
         {
-            get { return _fillWidth; }
+            get => _fillWidth;
             set
             {
                 _fillWidth = value;
-                if (!ReferenceEquals(Grid, null))
-                {
-                    Grid.AutoSizeColumns();
-                }
+                Grid?.AutoSizeColumns();
             }
         }
 
@@ -110,14 +107,11 @@ namespace ManagedIrbis.WinForms.Grid
         [DefaultValue(DefaultWidth)]
         public int Width
         {
-            get { return _width; }
+            get => _width;
             set
             {
                 _width = Math.Max(value, MinWidth);
-                if (!ReferenceEquals(Grid, null))
-                {
-                    Grid.AutoSizeColumns();
-                }
+                Grid?.AutoSizeColumns();
             }
         }
 
@@ -189,7 +183,7 @@ namespace ManagedIrbis.WinForms.Grid
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
             return null;
@@ -221,14 +215,12 @@ namespace ManagedIrbis.WinForms.Grid
             if (Palette.BackColor != Color.Transparent
                 && Palette.BackColor != Color.Empty)
             {
-                using (Brush brush = new SolidBrush(Palette.BackColor))
-                {
-                    graphics.FillRectangle
+                using Brush brush = new SolidBrush(Palette.BackColor);
+                graphics.FillRectangle
                     (
                         brush,
                         rectangle
                     );
-                }
             }
         }
 
@@ -251,32 +243,27 @@ namespace ManagedIrbis.WinForms.Grid
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint?
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
-            using (Brush brush = new SolidBrush(Palette.HeaderBackColor))
+            using (var brush = new SolidBrush(Palette.HeaderBackColor))
             {
                 graphics.FillRectangle(brush, rectangle);
             }
 
-            using (var headerFont = new Font(Grid.Font, FontStyle.Bold))
+            using (var headerFont = new Font(grid.Font, FontStyle.Bold))
             {
-                var flags
-                    = TextFormatFlags.Left
+                var flags = TextFormatFlags.Left
                     | TextFormatFlags.NoPrefix
                     | TextFormatFlags.VerticalCenter
                     | TextFormatFlags.EndEllipsis;
-
-                //ButtonRenderer.DrawButton
-                //    (
-                //        graphics,
-                //        rectangle,
-                //        Title,
-                //        headerFont,
-                //        flags,
-                //        false,
-                //        PushButtonState.Normal
-                //    );
 
                 rectangle.Inflate(-2, 0);
 
@@ -308,9 +295,11 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString() => $"{GetType().Name}: {Title}";
 
         #endregion
-    }
-}
+
+    } // class SiberianColumn
+
+} // namespace ManagedIrbis.WinForms.Grid

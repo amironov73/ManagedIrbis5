@@ -17,6 +17,7 @@
 
 using System.ComponentModel;
 using System.Drawing;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 #endregion
@@ -36,56 +37,53 @@ namespace AM.Drawing.CardPrinting
 
         [XmlElement("width")]
         [DisplayName("Ширина")]
+        [JsonPropertyName("width")]
         public int Width { get; set; }
 
         [XmlElement("height")]
         [DisplayName("Высота")]
+        [JsonPropertyName("height")]
         public int Height { get; set; }
 
         [XmlElement("fill")]
         [DisplayName("Цвет заливки")]
-        public string FillColor { get; set; }
+        [JsonPropertyName("fill")]
+        public string? FillColor { get; set; }
 
         [XmlElement("border")]
         [DisplayName("Цвет границы")]
-        public string BorderColor { get; set; }
+        [JsonPropertyName("border")]
+        public string? BorderColor { get; set; }
 
         [XmlElement("thickness")]
         [DisplayName("Толщина границы")]
+        [JsonPropertyName("thickness")]
         public int Thickness { get; set; }
 
         #endregion
 
         #region CardItem members
 
-        public override void Draw(DrawingContext context)
+        public override void Draw
+            (
+                DrawingContext context
+            )
         {
-            ColorConverter converter = new ColorConverter();
+            var converter = new ColorConverter();
 
-            Graphics g = context.Graphics;
+            var graphics = context.Graphics;
             if (!string.IsNullOrEmpty(FillColor))
             {
-                // ReSharper disable PossibleNullReferenceException
-                Color fillColor = (Color) converter
-                    .ConvertFromString(FillColor);
-                // ReSharper restore PossibleNullReferenceException
-                using (Brush brush = new SolidBrush(fillColor))
-                {
-                    g.FillRectangle(brush, Left, Top, Width, Height);
-                }
+                var fillColor = (Color) converter.ConvertFromString(FillColor).ThrowIfNull("Color");
+                using Brush brush = new SolidBrush(fillColor);
+                graphics.FillRectangle(brush, Left, Top, Width, Height);
             }
 
-            if (!string.IsNullOrEmpty(BorderColor)
-                && (Thickness > 0))
+            if (!string.IsNullOrEmpty(BorderColor) && Thickness > 0)
             {
-                // ReSharper disable PossibleNullReferenceException
-                Color borderColor = (Color) converter
-                    .ConvertFromString(BorderColor);
-                // ReSharper restore PossibleNullReferenceException
-                using (Pen pen = new Pen(borderColor, Thickness))
-                {
-                    g.DrawRectangle(pen, Left, Top, Width, Height);
-                }
+                var borderColor = (Color) converter.ConvertFromString(BorderColor).ThrowIfNull("Border");
+                using var pen = new Pen(borderColor, Thickness);
+                graphics.DrawRectangle(pen, Left, Top, Width, Height);
             }
         }
 
@@ -93,10 +91,8 @@ namespace AM.Drawing.CardPrinting
 
         #region Object members
 
-        public override string ToString()
-        {
-            return "Прямоугольник";
-        }
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => "Прямоугольник";
 
         #endregion
     }

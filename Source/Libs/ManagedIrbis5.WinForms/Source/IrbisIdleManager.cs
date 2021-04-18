@@ -3,7 +3,10 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -15,8 +18,6 @@
 
 using System;
 using System.Windows.Forms;
-
-using AM;
 
 #endregion
 
@@ -35,7 +36,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Raised when connection is idle.
         /// </summary>
-        public event EventHandler Idle;
+        public event EventHandler? Idle;
 
         #endregion
 
@@ -91,7 +92,7 @@ namespace ManagedIrbis.WinForms
 
         private void Connection_Disposing
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -100,7 +101,7 @@ namespace ManagedIrbis.WinForms
 
         private void _timer_Tick
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -111,7 +112,7 @@ namespace ManagedIrbis.WinForms
                 {
                     Connection.NoOperation();
 
-                    Idle.Raise(this);
+                    Idle?.Invoke(this, EventArgs.Empty);
                 }
             }
         }

@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -52,9 +53,10 @@ namespace AM.Drawing
         /// Color of the tube.
         /// </summary>
         [XmlAttribute("color")]
+        [JsonPropertyName("color")]
         public Color Color
         {
-            get { return _color; }
+            get => _color;
             set
             {
                 Dispose();
@@ -68,6 +70,7 @@ namespace AM.Drawing
         /// Get the brush.
         /// </summary>
         [XmlIgnore]
+        [JsonIgnore]
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Brush Brush => _brush ??= new SolidBrush(Color);
@@ -78,6 +81,7 @@ namespace AM.Drawing
         /// Get the pen.
         /// </summary>
         [XmlIgnore]
+        [JsonIgnore]
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Pen Pen => _pen ??= new Pen(Color);
@@ -87,8 +91,7 @@ namespace AM.Drawing
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="Tube"/> class.
+        /// Конструктор.
         /// </summary>
         public Tube()
         {
@@ -96,11 +99,12 @@ namespace AM.Drawing
         }
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="Tube"/> class.
+        /// Конструктор.
         /// </summary>
-        /// <param name="color">The color.</param>
-        public Tube(Color color)
+        public Tube
+            (
+                Color color
+            )
         {
             Name = "No name";
             Color = color;
@@ -181,14 +185,20 @@ namespace AM.Drawing
             return null;
         }
 
-        void IXmlSerializable.ReadXml(XmlReader reader)
+        void IXmlSerializable.ReadXml
+            (
+                XmlReader reader
+            )
         {
-            Name = reader.GetAttribute("name");
-            _color = ColorTranslator.FromHtml(reader.GetAttribute("color"));
+            Name = reader.GetAttribute("name") ?? "No name";
+            _color = ColorTranslator.FromHtml(reader.GetAttribute("color") ?? "#000");
             reader.Read();
         }
 
-        void IXmlSerializable.WriteXml(XmlWriter writer)
+        void IXmlSerializable.WriteXml
+            (
+                XmlWriter writer
+            )
         {
             writer.WriteAttributeString("name", Name);
             writer.WriteAttributeString
@@ -222,15 +232,22 @@ namespace AM.Drawing
         #region Object members
 
         /// <inheritdoc cref="IEquatable{T}.Equals(T)" />
-        public bool Equals(Tube other)
+        public bool Equals
+            (
+                Tube? other
+            )
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
+
             return Equals(other.Name, Name);
         }
 
-        /// <inheritdoc cref="object.Equals(object)" />
-        public override bool Equals(object obj)
+        /// <inheritdoc cref="object.Equals(object?)" />
+        public override bool Equals
+            (
+                object? obj
+            )
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
@@ -242,16 +259,11 @@ namespace AM.Drawing
         /// <inheritdoc cref="object.GetHashCode" />
         public override int GetHashCode()
         {
-            // ReSharper disable once NonReadonlyMemberInGetHashCode
-
-            return Name?.GetHashCode() ?? 0;
+            return Name.GetHashCode();
         }
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return $"{Color} [{Name}]";
-        }
+        public override string ToString() => $"{Color} [{Name}]";
 
         #endregion
     }

@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianIntegerColumn.cs --
+/* SiberianIntegerColumn.cs -- колонка, отображающая целые числа
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,23 +25,11 @@ using AM.Reflection;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Колонка, отображающая целые числа.
     /// </summary>
     public class SiberianIntegerColumn
         : SiberianColumn
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SiberianIntegerColumn()
-        {
-            //BackColor = Color.White;
-        }
-
-        #endregion
-
         #region SiberianColumn members
 
         /// <inheritdoc/>
@@ -58,7 +46,7 @@ namespace ManagedIrbis.WinForms.Grid
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
             return null;
@@ -85,9 +73,7 @@ namespace ManagedIrbis.WinForms.Grid
                     );
 
                 var value = property.GetValue(theObject);
-                integerCell.Value = ReferenceEquals(value, null)
-                    ? 0
-                    : (int)value;
+                integerCell.Value = (int?) value ?? 0;
             }
         }
 
@@ -117,5 +103,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-    }
-}
+    } // class SiberianIntegerColumn
+
+} // namespace ManagedIrbis.WinForms.Grid

@@ -17,6 +17,7 @@
 
 using System.ComponentModel;
 using System.Drawing;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 #endregion
@@ -35,15 +36,18 @@ namespace AM.Drawing.CardPrinting
 
         [XmlElement("font")]
         [DisplayName("Шрифт")]
-        public string Font { get; set; }
+        [JsonPropertyName("font")]
+        public string? Font { get; set; }
 
         [XmlElement("color")]
         [DisplayName("Цвет")]
-        public string Color { get; set; }
+        [JsonPropertyName("color")]
+        public string? Color { get; set; }
 
         [XmlElement("text")]
         [DisplayName("Текст")]
-        public string Text { get; set; }
+        [JsonPropertyName("text")]
+        public string? Text { get; set; }
 
         #endregion
 
@@ -51,27 +55,23 @@ namespace AM.Drawing.CardPrinting
 
         public override void Draw(DrawingContext context)
         {
-            Graphics g = context.Graphics;
+            var g = context.Graphics;
 
-            if (!string.IsNullOrEmpty(Font)
-                && !string.IsNullOrEmpty(Color)
-                && !string.IsNullOrEmpty(Text))
+            if (
+                    !string.IsNullOrEmpty(Font)
+                    && !string.IsNullOrEmpty(Color)
+                    && !string.IsNullOrEmpty(Text)
+               )
             {
-                FontConverter fontConverter = new FontConverter();
-                using (Font font = (Font) fontConverter.ConvertFromString(Font))
-                {
-                    ColorConverter colorConverter = new ColorConverter();
-                    // ReSharper disable PossibleNullReferenceException
-                    Color color = (Color) colorConverter.ConvertFromString(Color);
-                    // ReSharper restore PossibleNullReferenceException
+                var fontConverter = new FontConverter();
+                using var font = (Font) fontConverter.ConvertFromString(Font).ThrowIfNull("Font");
+                var colorConverter = new ColorConverter();
+                var color = (Color) colorConverter.ConvertFromString(Color).ThrowIfNull("Color");
 
-                    string text = context.ExpandText(Text);
+                var text = context.ExpandText(Text);
 
-                    using (Brush brush = new SolidBrush(color))
-                    {
-                        g.DrawString(text, font, brush, Left, Top);
-                    }
-                }
+                using Brush brush = new SolidBrush(color);
+                g.DrawString(text, font, brush, Left, Top);
             }
         }
 
@@ -79,10 +79,8 @@ namespace AM.Drawing.CardPrinting
 
         #region Object members
 
-        public override string ToString()
-        {
-            return string.Format("Однострочный текст: {0}", Text);
-        }
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"Однострочный текст: {Text}";
 
         #endregion
     }

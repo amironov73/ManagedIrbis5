@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianTagCell.cs --
+/* SiberianTagCell.cs -- ячейка, отображающая метку поля.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,6 +15,7 @@
 
 using System.Drawing;
 using System.Windows.Forms;
+using AM;
 
 #endregion
 
@@ -23,14 +24,14 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Ячейка, отображающая метку поля.
     /// </summary>
     public class SiberianTagCell
         : SiberianCell
     {
         #region SiberianCell members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="SiberianCell.Paint"/>
         public override void Paint
             (
                 PaintEventArgs args
@@ -38,44 +39,37 @@ namespace ManagedIrbis.WinForms.Grid
         {
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
+            var grid = Grid.ThrowIfNull("Grid");
 
             var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using Brush brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var field = (SiberianField)Row.Data;
-
+            var row = Row.ThrowIfNull("Row");
+            var field = (SiberianField?)row.Data;
             if (!ReferenceEquals(field, null))
             {
-                var text = string.Format
-                    (
-                        "{0}: {1}",
-                        field.Tag,
-                        field.Title
-                    );
+                var text = $"{field.Tag}: {field.Title}";
 
-                var flags
-                    = TextFormatFlags.TextBoxControl
-                      | TextFormatFlags.EndEllipsis
-                      | TextFormatFlags.NoPrefix
-                      | TextFormatFlags.VerticalCenter;
+                var flags = TextFormatFlags.TextBoxControl
+                            | TextFormatFlags.EndEllipsis
+                            | TextFormatFlags.NoPrefix
+                            | TextFormatFlags.VerticalCenter;
 
                 TextRenderer.DrawText
                     (
                         graphics,
                         text,
-                        Grid.Font,
+                        grid.Font,
                         rectangle,
                         foreColor,
                         flags
@@ -87,35 +81,20 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            int rowIndex = Row?.Index ?? -1,
+                columnIndex = Column?.Index ?? -1;
 
-            var field = (SiberianField)Row.Data;
+            var field = (SiberianField?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(field, null))
             {
-                text = string.Format
-                    (
-                        "{0}/{1}: {2} ({3})",
-                        field.Tag,
-                        field.Repeat,
-                        field.Value,
-                        field.OriginalValue
-                    );
+                text = $"{field.Tag}/{field.Repeat}: {field.Value} ({field.OriginalValue})";
             }
 
-            return string.Format
-                (
-                    "TagCell [{0}, {1}]: {2}",
-                    column,
-                    row,
-                    text
-                );
+            return $"TagCell [{columnIndex}, {rowIndex}]: {text}";
         }
 
         #endregion

@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianDateColumn.cs --
+/* SiberianDateColumn.cs -- колонка, отображающая даты
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,7 +26,7 @@ using AM.Reflection;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Колонка, отображающая даты.
     /// </summary>
     public class SiberianDateColumn
         : SiberianColumn
@@ -47,7 +47,7 @@ namespace ManagedIrbis.WinForms.Grid
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
             return null;

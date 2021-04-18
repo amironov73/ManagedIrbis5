@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -55,7 +56,7 @@ namespace ManagedIrbis.WinForms.Grid
 
         private bool _state;
 
-        private string _text;
+        private string? _text;
 
         private void _SetState
             (
@@ -63,17 +64,17 @@ namespace ManagedIrbis.WinForms.Grid
             )
         {
             _state = state;
-            Column.PutData(Row.Data, this);
-            Grid.Invalidate();
+            Column?.PutData(Row?.Data, this);
+            Grid?.Invalidate();
         }
 
         private void _SetText
             (
-                string text
+                string? text
             )
         {
             _text = text;
-            Grid.Invalidate();
+            Grid?.Invalidate();
         }
 
         #endregion
@@ -86,7 +87,7 @@ namespace ManagedIrbis.WinForms.Grid
                 bool accept
             )
         {
-            if (!ReferenceEquals(Grid.Editor, null))
+            if (!ReferenceEquals(Grid?.Editor, null))
             {
                 if (accept)
                 {
@@ -103,6 +104,13 @@ namespace ManagedIrbis.WinForms.Grid
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
             var textRectangle = new Rectangle
@@ -113,10 +121,10 @@ namespace ManagedIrbis.WinForms.Grid
                     rectangle.Height
                 );
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using Brush brush = new SolidBrush(backColor);
+                using var brush = new SolidBrush(backColor);
                 graphics.FillRectangle(brush, rectangle);
             }
 
@@ -141,7 +149,7 @@ namespace ManagedIrbis.WinForms.Grid
                     point,
                     textRectangle,
                     Text,
-                    Grid.Font,
+                    grid.Font,
                     flags,
                     false,
                     state

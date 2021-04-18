@@ -58,19 +58,19 @@ namespace ManagedIrbis
         #region Properties
 
         /// <inheritdoc cref="IIrbisConnectionSettings.Host"/>
-        public string Host { get; set; } = "127.0.0.1";
+        public string? Host { get; set; } = "127.0.0.1";
 
         /// <inheritdoc cref="IIrbisConnectionSettings.Port"/>
         public ushort Port { get; set; } = 6666;
 
         /// <inheritdoc cref="IIrbisConnectionSettings.Username"/>
-        public string Username { get; set; } = string.Empty;
+        public string? Username { get; set; } = string.Empty;
 
         /// <inheritdoc cref="IIrbisConnectionSettings.Password"/>
-        public string Password { get; set; } = string.Empty;
+        public string? Password { get; set; } = string.Empty;
 
         /// <inheritdoc cref="IBasicIrbisProvider.Database"/>
-        public string Database { get; set; } = "IBIS";
+        public string? Database { get; set; } = "IBIS";
 
         /// <inheritdoc cref="IIrbisConnectionSettings.Workstation"/>
         public string Workstation { get; set; } = "C";

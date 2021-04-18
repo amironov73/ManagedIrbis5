@@ -6,9 +6,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
-/* RadioGroup.cs -- Group of radio-buttons.
+/* RadioGroup.cs -- группа радио-кнопок
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,15 +31,15 @@ using AM.Collections;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    /// Group of radio-buttons.
+    /// Группа радио-кнопок.
     /// </summary>
     // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
     // ReSharper restore RedundantNameQualifier
-    public class RadioGroup
+    public sealed class RadioGroup
         : GroupBox
     {
-        private RadioButton[] _buttons = null;
+        private RadioButton[]? _buttons;
 
         /// <summary>
         /// Called when current RadioButton changed.
@@ -54,7 +56,7 @@ namespace AM.Windows.Forms
         [Browsable(true)]
         [Category("Property Changed")]
         [Description("Current RadioButton changed")]
-        public event CurrentChangedHandler CurrentChanged;
+        public event CurrentChangedHandler? CurrentChanged;
 
         private const int DefaultLeftIndent = 5;
         private int _leftIndent = DefaultLeftIndent;
@@ -64,14 +66,9 @@ namespace AM.Windows.Forms
         /// </summary>
         [Browsable(true)]
         [DefaultValue(DefaultLeftIndent)]
-        public virtual int LeftIndent
+        public int LeftIndent
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _leftIndent;
-            }
-            [DebuggerStepThrough]
+            get => _leftIndent;
             set
             {
                 if (_leftIndent != value)
@@ -90,14 +87,9 @@ namespace AM.Windows.Forms
         /// </summary>
         [Browsable(true)]
         [DefaultValue(DefaultLineIndent)]
-        public virtual int LineIndent
+        public int LineIndent
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _lineIndent;
-            }
-            [DebuggerStepThrough]
+            get => _lineIndent;
             set
             {
                 if (_lineIndent != value)
@@ -111,16 +103,7 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Button count.
         /// </summary>
-        public virtual int Count
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _buttons == null
-                           ? 0
-                           : _buttons.Length;
-            }
-        }
+        public int Count => _buttons?.Length ?? 0;
 
         private const bool DefaultEvenly = true;
         private bool _evenly = DefaultEvenly;
@@ -130,14 +113,9 @@ namespace AM.Windows.Forms
         /// </summary>
         [Browsable(true)]
         [DefaultValue(DefaultEvenly)]
-        public virtual bool Evenly
+        public bool Evenly
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _evenly;
-            }
-            [DebuggerStepThrough]
+            get => _evenly;
             set
             {
                 if (_evenly != value)
@@ -150,41 +128,34 @@ namespace AM.Windows.Forms
 
         private const int DefaultCurrent = -1;
         private int _current = DefaultCurrent;
-        private bool _inCurrent = false;
+        private bool _inCurrent;
 
         /// <summary>
         /// Current button index.
         /// </summary>
         [Browsable(true)]
         [DefaultValue(DefaultCurrent)]
-        public virtual int Current
+        public int Current
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _current;
-            }
+            get => _current;
             [DebuggerStepThrough]
             set
             {
                 if (_buttons != null)
                 {
                     _inCurrent = true;
-                    for (int i = 0; i < _buttons.Length; i++)
+                    for (var i = 0; i < _buttons.Length; i++)
                     {
                         _buttons[i].Checked = (i == value);
                     }
                     _inCurrent = false;
                 }
+
                 if (_current != value)
                 {
                     _current = value;
 
-                    CurrentChangedHandler handler = CurrentChanged;
-                    if (!ReferenceEquals(handler, null))
-                    {
-                        handler(this, _current);
-                    }
+                    CurrentChanged?.Invoke(this, _current);
                 }
             }
         }
@@ -192,7 +163,7 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Lines of text.
         /// </summary>
-        public virtual string[] Lines
+        public string[]? Lines
         {
             get
             {
@@ -200,17 +171,15 @@ namespace AM.Windows.Forms
                 {
                     return null;
                 }
+
                 string[] result = new string[_buttons.Length];
-                for (int i = 0; i < _buttons.Length; i++)
+                for (var i = 0; i < _buttons.Length; i++)
                 {
                     result[i] = _buttons[i].Text;
                 }
                 return result;
             }
-            set
-            {
-                CreateButtons(value, _current);
-            }
+            set => CreateButtons(value, _current);
         }
 
         private void DeleteButtons()
@@ -219,17 +188,19 @@ namespace AM.Windows.Forms
             {
                 return;
             }
+
             foreach (RadioButton button in _buttons)
             {
                 Controls.Remove(button);
                 button.Dispose();
             }
+
             _buttons = null;
         }
 
         private void CreateButtons
             (
-                string[] lines,
+                string[]? lines,
                 int currentPosition
             )
         {
@@ -240,10 +211,10 @@ namespace AM.Windows.Forms
                 return;
             }
 
-            _buttons = new RadioButton[lines.Length];
-            int topIndent = Font.Height * 3 / 2;
-            int delta = (ClientSize.Height - topIndent) / lines.Length;
-            for (int i = 0; i < lines.Length; i++)
+            _buttons = new RadioButton[lines!.Length];
+            var topIndent = Font.Height * 3 / 2;
+            var delta = (ClientSize.Height - topIndent) / lines.Length;
+            for (var i = 0; i < lines.Length; i++)
             {
                 RadioButton button = new RadioButton
                 {
@@ -272,47 +243,41 @@ namespace AM.Windows.Forms
             {
                 _current = currentPosition;
 
-                CurrentChangedHandler handler = CurrentChanged;
-                if (!ReferenceEquals(handler, null))
-                {
-                    handler(this, _current);
-                }
+                CurrentChanged?.Invoke(this, _current);
             }
         }
 
-        private void button_CheckedChanged(object sender, EventArgs e)
+        private void button_CheckedChanged
+            (
+                object? sender,
+                EventArgs e
+            )
         {
             if (_buttons == null)
             {
                 return;
             }
+
             if (_inCurrent)
             {
                 return;
             }
 
-            int newCurrent = _current;
-            for (int i = 0; i < _buttons.Length; i++)
+            var newCurrent = _current;
+            for (var i = 0; i < _buttons.Length; i++)
             {
-                if (_buttons[i] == null)
-                {
-                    break;
-                }
                 if (_buttons[i].Checked)
                 {
                     newCurrent = i;
                     break;
                 }
             }
+
             if (newCurrent != _current)
             {
                 _current = newCurrent;
 
-                CurrentChangedHandler handler = CurrentChanged;
-                if (!ReferenceEquals(handler, null))
-                {
-                    handler(this, _current);
-                }
+                CurrentChanged?.Invoke(this, _current);
             }
         }
     }

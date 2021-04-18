@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftTokenGrid.cs --
+/* PftTokenGrid.cs -- таблица, отображающая токены PFT-скрипта
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,8 +15,6 @@
 
 using System;
 using System.Windows.Forms;
-
-using AM;
 
 using ManagedIrbis.Pft.Infrastructure;
 
@@ -27,7 +25,7 @@ using ManagedIrbis.Pft.Infrastructure;
 namespace ManagedIrbis.WinForms.Pft
 {
     /// <summary>
-    ///
+    /// Таблица, отображающая токены PFT-скрипта.
     /// </summary>
     public partial class PftTokenGrid
         : UserControl
@@ -37,7 +35,7 @@ namespace ManagedIrbis.WinForms.Pft
         /// <summary>
         /// Cell double click.
         /// </summary>
-        public event EventHandler CellDoubleClick;
+        public event EventHandler? CellDoubleClick;
 
         #endregion
 
@@ -46,19 +44,7 @@ namespace ManagedIrbis.WinForms.Pft
         /// <summary>
         /// Selected token.
         /// </summary>
-        public PftToken? SelectedToken
-        {
-            get
-            {
-                DataGridViewRow row = _grid.CurrentRow;
-                if (ReferenceEquals(row, null))
-                {
-                    return null;
-                }
-
-                return row.DataBoundItem as PftToken;
-            }
-        }
+        public PftToken? SelectedToken => _grid.CurrentRow?.DataBoundItem as PftToken;
 
         #endregion
 
@@ -80,11 +66,11 @@ namespace ManagedIrbis.WinForms.Pft
 
         void _grid_CellDoubleClick
             (
-                object sender,
+                object? sender,
                 DataGridViewCellEventArgs e
             )
         {
-            CellDoubleClick.Raise(this);
+            CellDoubleClick?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion
@@ -112,5 +98,7 @@ namespace ManagedIrbis.WinForms.Pft
         }
 
         #endregion
-    }
-}
+
+    } // class PftTokenGrid
+
+} // namespace ManagedIrbis.WinForms.Pft

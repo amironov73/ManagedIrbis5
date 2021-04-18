@@ -52,21 +52,7 @@ namespace ManagedIrbis.WinForms.Pft
         /// <summary>
         /// Current node.
         /// </summary>
-        public PftNodeInfo? CurrentNode
-        {
-            get
-            {
-                TreeNode currentNode = _tree.SelectedNode;
-                if (ReferenceEquals(currentNode, null))
-                {
-                    return null;
-                }
-
-                PftNodeInfo result = currentNode.Tag as PftNodeInfo;
-
-                return result;
-            }
-        }
+        public PftNodeInfo? CurrentNode => _tree.SelectedNode?.Tag as PftNodeInfo;
 
         #endregion
 
@@ -92,20 +78,20 @@ namespace ManagedIrbis.WinForms.Pft
                 PftNodeInfo info
             )
         {
-            string text = info.ToString();
+            var text = info.ToString();
 
-            TreeNode result = new TreeNode
+            var result = new TreeNode
             {
                 Tag = info,
                 Text = text,
                 ToolTipText = text
             };
 
-            foreach (PftNodeInfo child in info.Children)
+            foreach (var child in info.Children)
             {
                 if (!ReferenceEquals(child, null))
                 {
-                    TreeNode node = _ConvertNode(child);
+                    var node = _ConvertNode(child);
                     if (!ReferenceEquals(node, null))
                     {
                         result.Nodes.Add(node);
@@ -116,23 +102,11 @@ namespace ManagedIrbis.WinForms.Pft
             return result;
         }
 
-        private void _tree_AfterCheck
-            (
-                object sender,
-                TreeViewEventArgs e
-            )
-        {
-            NodeChecked.Raise(sender, e);
-        }
+        private void _tree_AfterCheck ( object sender, TreeViewEventArgs e ) =>
+            NodeChecked?.Invoke(sender, e);
 
-        void _tree_AfterSelect
-            (
-                object sender,
-                TreeViewEventArgs e
-            )
-        {
-            CurrentNodeChanged.Raise(sender, e);
-        }
+        void _tree_AfterSelect ( object sender, TreeViewEventArgs e ) =>
+            CurrentNodeChanged?.Invoke(sender, e);
 
         #endregion
 
@@ -158,8 +132,8 @@ namespace ManagedIrbis.WinForms.Pft
             {
                 _tree.BeginUpdate();
                 _tree.Nodes.Clear();
-                PftNodeInfo rootInfo = rootNode.GetNodeInfo();
-                TreeNode treeNode = _ConvertNode(rootInfo);
+                var rootInfo = rootNode.GetNodeInfo();
+                var treeNode = _ConvertNode(rootInfo);
                 _tree.Nodes.Add(treeNode);
                 _tree.ExpandAll();
                 _tree.SelectedNode = treeNode;

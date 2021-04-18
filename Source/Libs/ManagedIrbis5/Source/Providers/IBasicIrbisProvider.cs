@@ -65,7 +65,7 @@ namespace ManagedIrbis
         /// Сервер ИРБИС64, работающий на Linux, <b>различает</b>
         /// регистр символов в имени базы данных.
         /// </summary>
-        string Database { get; set; }
+        string? Database { get; set; }
 
         /// <summary>
         /// Признак успешного подключения к серверу.

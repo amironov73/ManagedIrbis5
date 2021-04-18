@@ -6,7 +6,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ImageInfo.cs -- general information about image
@@ -49,7 +51,7 @@ namespace AM.Drawing
         /// <summary>
         /// Gets the name of the file.
         /// </summary>
-        public string FileName { get; internal set; }
+        public string? FileName { get; internal set; }
 
         /// <summary>
         /// Gets the height.
@@ -69,7 +71,7 @@ namespace AM.Drawing
         /// <summary>
         /// Gets the version.
         /// </summary>
-        public string Version { get; internal set; }
+        public string? Version { get; internal set; }
 
         /// <summary>
         /// Gets the vertical resolution.
@@ -158,7 +160,7 @@ namespace AM.Drawing
                 params byte[] pattern
             )
         {
-            if ((offset + pattern.Length) > stream.Length)
+            if (offset + pattern.Length > stream.Length)
             {
                 return false;
             }
@@ -178,27 +180,28 @@ namespace AM.Drawing
                 string fileName
             )
         {
-            using (var file = File.OpenRead(fileName))
-            {
-                var buffer = new byte[256];
-                var result = new ImageInfo(fileName);
-                while (true)
-                {
-                    if ((file.Read(buffer, 0, 32) != 32)
-                       || !_Compare(buffer, 0, 0x42, 0x4D)
-                       )
-                    {
-                        break;
-                    }
-                    result.Width = BitConverter.ToInt32(buffer, 18);
-                    result.Height = BitConverter.ToInt32(buffer, 22);
-                    result.Colors = 1 << buffer[28];
+            using var file = File.OpenRead(fileName);
+            var buffer = new byte[256];
+            var result = new ImageInfo(fileName);
 
-                    return result;
+            while (true)
+            {
+                if (
+                        file.Read(buffer, 0, 32) != 32
+                        || !_Compare(buffer, 0, 0x42, 0x4D)
+                    )
+                {
+                    break;
                 }
 
-                throw new ApplicationException();
+                result.Width = BitConverter.ToInt32(buffer, 18);
+                result.Height = BitConverter.ToInt32(buffer, 22);
+                result.Colors = 1 << buffer[28];
+
+                return result;
             }
+
+            throw new ApplicationException();
         }
 
         private static ImageInfo _GetGifImageInfo
@@ -206,34 +209,36 @@ namespace AM.Drawing
                 string fileName
             )
         {
-            using (var file = File.OpenRead(fileName))
-            {
-                var buffer = new byte[256];
-                var result = new ImageInfo(fileName);
-                while (true)
-                {
-                    if ((file.Read(buffer, 0, 13) != 13)
-                       || !_Compare(buffer, 0, 0x47, 0x49, 0x46)
-                       )
-                    {
-                        break;
-                    }
-                    var version = Encoding.ASCII.GetString(buffer, 3, 3);
-                    if ((version != "87a") && (version != "89a"))
-                    {
-                        break;
-                    }
-                    result.Version = version;
-                    result.Width = buffer[6] + buffer[7] * 256;
-                    result.Height = buffer[8] + buffer[9] * 256;
-                    var packed = buffer[10];
-                    result.Colors = 1 << ((packed & 7) + 1);
+            using var file = File.OpenRead(fileName);
+            var buffer = new byte[256];
+            var result = new ImageInfo(fileName);
 
-                    return result;
+            while (true)
+            {
+                if (
+                        file.Read(buffer, 0, 13) != 13
+                        || !_Compare(buffer, 0, 0x47, 0x49, 0x46)
+                    )
+                {
+                    break;
                 }
 
-                throw new ApplicationException();
+                var version = Encoding.ASCII.GetString(buffer, 3, 3);
+                if (version != "87a" && version != "89a")
+                {
+                    break;
+                }
+
+                result.Version = version;
+                result.Width = buffer[6] + buffer[7] * 256;
+                result.Height = buffer[8] + buffer[9] * 256;
+                var packed = buffer[10];
+                result.Colors = 1 << ((packed & 7) + 1);
+
+                return result;
             }
+
+            throw new ApplicationException();
         }
 
         private static ImageInfo _GetJpegImageInfo
@@ -241,61 +246,64 @@ namespace AM.Drawing
                 string fileName
             )
         {
-            using (var file = File.OpenRead(fileName))
+            using var file = File.OpenRead(fileName);
+            var buffer = new byte[256];
+            if (
+                    file.Read(buffer, 0, 2) != 2
+                    || !_Compare(buffer, 0, 0xFF, 0xD8)
+                )
             {
-                var buffer = new byte[256];
-                if ((file.Read(buffer, 0, 2) != 2)
-                   || !_Compare(buffer, 0, 0xFF, 0xD8)
-                   )
+                throw new ApplicationException();
+            }
+
+            var result = new ImageInfo(fileName)
+            {
+                Colors = 1 << 24
+            };
+            while (true)
+            {
+                if (
+                        file.Read(buffer, 0, 2) != 2
+                        || buffer[0] != 0xFF
+                    )
                 {
-                    throw new ApplicationException();
+                    break;
                 }
 
-                var result = new ImageInfo(fileName);
-                result.Colors = 1 << 24;
-                while (true)
+                var position = file.Position;
+                var blockCode = buffer[1];
+                int blockLength = _ReadUInt16(file);
+                if (blockCode.IsOneOf<byte>(0xE0))
                 {
-                    if ((file.Read(buffer, 0, 2) != 2)
-                       || (buffer[0] != 0xFF)
-                       )
+                    var toRead = Math.Min(blockLength, buffer.Length);
+                    if (file.Read(buffer, 0, toRead) != toRead
+                        || !_Compare(buffer, 0, 0x4A, 0x46, 0x49, 0x46, 0x00)
+                    )
                     {
                         break;
                     }
-                    var position = file.Position;
-                    var blockCode = buffer[1];
-                    int blockLength = _ReadUInt16(file);
-                    if (blockCode.IsOneOf<byte>(0xE0))
-                    {
-                        var toRead = Math.Min(blockLength, buffer.Length);
-                        if ((file.Read(buffer, 0, toRead) != toRead)
-                           || !_Compare(buffer, 0, 0x4A, 0x46, 0x49, 0x46, 0x00)
-                           )
-                        {
-                            break;
-                        }
-                        result.Version
-                            = new Version(buffer[5], buffer[6]).ToString();
-                        result.HorizontalResolution
-                            = (short)(buffer[8] * 256 + buffer[9]);
-                        result.VerticalResolution
-                            = (short)(buffer[10] * 256 + buffer[11]);
-                    }
-                    if (blockCode.IsOneOf<byte>(0xC0, 0xC1,
-                        0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB,
-                        0xCD, 0xCE, 0xCF))
-                    {
-                        if (file.ReadByte() < 0)
-                        {
-                            throw new IOException();
-                        }
-                        result.Height = _ReadUInt16(file);
-                        result.Width = _ReadUInt16(file);
-
-                        return result;
-                    }
-                    file.Position = position + blockLength;
-                    continue;
+                    result.Version
+                        = new Version(buffer[5], buffer[6]).ToString();
+                    result.HorizontalResolution
+                        = (short)(buffer[8] * 256 + buffer[9]);
+                    result.VerticalResolution
+                        = (short)(buffer[10] * 256 + buffer[11]);
                 }
+
+                if (blockCode.IsOneOf<byte>(0xC0, 0xC1,
+                    0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB,
+                    0xCD, 0xCE, 0xCF))
+                {
+                    if (file.ReadByte() < 0)
+                    {
+                        throw new IOException();
+                    }
+                    result.Height = _ReadUInt16(file);
+                    result.Width = _ReadUInt16(file);
+
+                    return result;
+                }
+                file.Position = position + blockLength;
             }
 
             throw new ApplicationException();
@@ -386,16 +394,7 @@ namespace AM.Drawing
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "Width={0} Height={1} Colors={2}",
-                    Width,
-                    Height,
-                    Colors
-                );
-        }
+        public override string ToString() => $"Width={Width} Height={Height} Colors={Colors}";
 
         #endregion
     }

@@ -4,35 +4,35 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 
-/* FieldItem.cs --
+/* FieldItem.cs -- содержимое редактируемого поля.
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-#endregion
 
 #nullable enable
 
 namespace ManagedIrbis.WinForms.Editors
 {
+    /// <summary>
+    /// Содержимое редактируемого поля для <see cref="SimplestMarcEditor"/>.
+    /// </summary>
     sealed class FieldItem
     {
         #region Properties
 
+        /// <summary>
+        /// Метка поля.
+        /// </summary>
         public int Tag { get; set; }
 
-        public string Text { get; set; }
+        /// <summary>
+        /// Значение поля.
+        /// </summary>
+        public string? Text { get; set; }
 
         #endregion
-    }
-}
+
+    } // class FieldItem
+
+} // namespace ManagedIrbis.WinForms.Editors

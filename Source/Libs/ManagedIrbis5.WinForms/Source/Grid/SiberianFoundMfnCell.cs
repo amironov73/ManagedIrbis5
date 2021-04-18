@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianFoundMfnCell.cs --
+/* SiberianFoundMfnCell.cs -- ячейка, отображающая MFN найденного документа
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,49 +25,53 @@ using AM;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Ячейка, отображающая MFN найденного документа.
     /// </summary>
     public class SiberianFoundMfnCell
         : SiberianCell
     {
         #region SiberianCell members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.Paint" />
         public override void Paint
             (
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint?
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
             var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var found = (FoundLine)Row.Data;
-            var column = (SiberianFoundMfnColumn) Column;
-
+            var found = (FoundLine?)Row?.Data;
+            var column = (SiberianFoundMfnColumn?) Column;
             if (!ReferenceEquals(found, null))
             {
-                var number = column.UseSerialNumber
+                var useSerial = column?.UseSerialNumber ?? false;
+                var number = useSerial
                     ? found.SerialNumber
                     : found.Mfn;
                 var text = number.ToInvariantString();
 
-                var flags
-                    = TextFormatFlags.TextBoxControl
+                var flags = TextFormatFlags.TextBoxControl
                       | TextFormatFlags.EndEllipsis
                       | TextFormatFlags.NoPrefix
                       | TextFormatFlags.VerticalCenter;
@@ -76,7 +80,7 @@ namespace ManagedIrbis.WinForms.Grid
                     (
                         graphics,
                         text,
-                        Grid.Font,
+                        grid.Font,
                         rectangle,
                         foreColor,
                         flags
@@ -88,35 +92,24 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            var row = Row?.Index ?? -1;
+            var column = Column?.Index ?? -1;
 
-            var found = (FoundLine)Row.Data;
+            var found = (FoundLine?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(found, null))
             {
-                text = string.Format
-                    (
-                        "{0}: {1}",
-                        found.Mfn,
-                        found.Description
-                    );
+                text = $"{found.Mfn}: {found.Description}";
             }
 
-            return string.Format
-                (
-                    "FoundMfnCell [{0}, {1}]: {2}",
-                    column,
-                    row,
-                    text
-                );
+            return $"FoundMfnCell [{column}, {row}]: {text}";
         }
 
         #endregion
-    }
-}
+
+    } // class SiberianFoundMfnCell
+
+} // namespace ManagedIrbis.WinForms.Grid

@@ -29,7 +29,7 @@ namespace ManagedIrbis
         /// Значение по умолчанию <c>"127.0.0.1"</c>, что соответствует
         /// серверу, расположенному на том же хосте, что и клиент.
         /// </summary>
-        string Host { get; set; }
+        string? Host { get; set; }
 
         /// <summary>
         /// Порт, на котором сервер ИРБИС64 принимает подключения.
@@ -45,7 +45,7 @@ namespace ManagedIrbis
         /// После подключения к серверу менять логин нельзя.
         /// Сервер ИРБИС64 <b>не различает</b> регистр символов в логине.
         /// </summary>
-        string Username { get; set; }
+        string? Username { get; set; }
 
         /// <summary>
         /// Пароль пользователя АБИС ИРБИС64.
@@ -54,7 +54,7 @@ namespace ManagedIrbis
         /// После подключения к серверу менять пароль нельзя.
         /// Сервер ИРБИС64 <b>различает</b> регистр символов в логине.
         /// </summary>
-        string Password { get; set; }
+        string? Password { get; set; }
 
         /// <summary>
         /// Код АРМ АБИС ИРБИС64. Значение по умолчанию <c>"C"</c>
@@ -63,7 +63,7 @@ namespace ManagedIrbis
         /// из АРМ АБИС ИРБИС64 (см. перечисление <see cref="Workstation"/>.
         /// После подключения к серверу менять код АРМ нельзя.
         /// </summary>
-        string Workstation { get; set; }
+        string? Workstation { get; set; }
 
         /// <summary>
         /// Целое число -- идентификатор клиента.

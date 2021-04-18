@@ -89,7 +89,7 @@ namespace ManagedIrbis.Client
         }
 
         public event EventHandler? BusyChanged;
-        public string Database { get; set; } = "IBIS";
+        public string? Database { get; set; } = "IBIS";
         public bool Connected { get; }
         public bool Busy { get; }
         public int LastError { get; }

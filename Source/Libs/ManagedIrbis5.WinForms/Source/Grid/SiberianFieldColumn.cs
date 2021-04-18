@@ -46,7 +46,7 @@ namespace ManagedIrbis.WinForms.Grid
 
         private void Editor_KeyDown
             (
-                object sender,
+                object? sender,
                 KeyEventArgs args
             )
         {
@@ -105,12 +105,18 @@ namespace ManagedIrbis.WinForms.Grid
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                return default;
+            }
+
             var fieldCell = (SiberianFieldCell)cell;
 
-            var field = (SiberianField) fieldCell.Row.Data;
+            var field = (SiberianField?) fieldCell.Row?.Data;
             if (ReferenceEquals(field, null))
             {
                 return null;
@@ -118,7 +124,7 @@ namespace ManagedIrbis.WinForms.Grid
 
             var text = field.Value;
 
-            var rectangle = Grid.GetCellRectangle(cell);
+            var rectangle = grid.GetCellRectangle(cell);
             rectangle.Inflate(-1, -1);
 
             var result = new TextBoxWithButton
@@ -126,20 +132,20 @@ namespace ManagedIrbis.WinForms.Grid
                 AutoSize = false,
                 Location = rectangle.Location,
                 Size = rectangle.Size,
-                Font = Grid.Font,
+                Font = grid.Font,
                 BorderStyle = BorderStyle.FixedSingle
             };
             result.TextBox.KeyDown += Editor_KeyDown;
 
             if (edit)
             {
-                result.Text = text;
+                result.Text = text ?? string.Empty;
             }
             else
             {
                 if (!ReferenceEquals(state, null))
                 {
-                    result.Text = state.ToString();
+                    result.Text = state.ToString() ?? string.Empty;
                     result.SelectionStart = result.TextLength;
                 }
             }
@@ -153,5 +159,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-    }
-}
+    } // class SiberianFieldColumn
+
+} // namespace ManagedIrbis.WinForms.Grid

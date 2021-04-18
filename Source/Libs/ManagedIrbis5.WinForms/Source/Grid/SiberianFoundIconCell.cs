@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianFoundIconCell.cs --
+/* SiberianFoundIconCell.cs -- ячейка, отображающая иконку найденного документа
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,42 +23,40 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Ячейка, отображающая иконку найденного документа (если таковая имеется).
     /// </summary>
     public class SiberianFoundIconCell
         : SiberianCell
     {
         #region SiberianCell members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.Paint" />
         public override void Paint
             (
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint?
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
-            var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
-            {
-                foreColor = Color.White;
-            }
-
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var found = (FoundLine)Row.Data;
-
-            if (!ReferenceEquals(found, null))
+            var found = (FoundLine?)Row?.Data;
+            if (found is {Icon: Image icon})
             {
-                // Draw the icon
+                graphics.DrawImage(icon, rectangle);
             }
         }
 
@@ -66,35 +64,24 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            var rowIndex = Row?.Index ?? -1;
+            var columnIndex = Column?.Index ?? -1;
 
-            var found = (FoundLine)Row.Data;
+            var found = (FoundLine?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(found, null))
             {
-                text = string.Format
-                    (
-                        "{0}: {1}",
-                        found.Mfn,
-                        found.Icon
-                    );
+                text = $"{found.Mfn}: {found.Icon}";
             }
 
-            return string.Format
-                (
-                    "FoundIconCell [{0}, {1}]: {2}",
-                    column,
-                    row,
-                    text
-                );
+            return $"FoundIconCell [{columnIndex}, {rowIndex}]: {text}";
         }
 
         #endregion
-    }
-}
+
+    } // class SiberianFoundIconCell
+
+} // namespace ManagedIrbis.WinForms.Grid

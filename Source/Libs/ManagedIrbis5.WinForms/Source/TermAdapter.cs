@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 /* TermAdapter.cs --
@@ -198,7 +199,8 @@ namespace ManagedIrbis.WinForms
                 ReverseOrder = backward
             };
             var terms = Connection.ReadTerms(parameters);
-            if (terms?.Length <= 1)
+            if (terms is null
+                || terms.Length <= 1)
             {
                 return false;
             }
@@ -212,7 +214,7 @@ namespace ManagedIrbis.WinForms
             var prefixLength = prefix.Length;
             if (prefixLength != 0)
             {
-                var goodTerms = new List<Term>(terms?.Length ?? 0);
+                var goodTerms = new List<Term>(terms.Length);
                 foreach (var term in terms)
                 {
                     if (term.Count < 1)

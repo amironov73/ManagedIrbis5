@@ -36,11 +36,11 @@ namespace ManagedIrbis.WinForms.Grid
                 bool accept
             )
         {
-            if (!ReferenceEquals(Grid.Editor, null))
+            if (!ReferenceEquals(Grid?.Editor, null))
             {
                 if (accept)
                 {
-                    var field = (SiberianField)Row.Data;
+                    var field = (SiberianField?)Row?.Data;
                     if (!ReferenceEquals(field, null))
                     {
                         field.Value = Grid.Editor.Text;
@@ -51,47 +51,43 @@ namespace ManagedIrbis.WinForms.Grid
             base.CloseEditor(accept);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.Paint" />
         public override void Paint
             (
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint?
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
             var foreColor = Color.Black;
             var codeColor = Color.FromArgb(220, 0, 0);
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
                 codeColor = Color.FromArgb(0, 255, 255);
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var field = (SiberianField) Row.Data;
-
+            var field = (SiberianField?) Row?.Data;
             if (!ReferenceEquals(field, null))
             {
                 var text = field.Value;
-
                 if (!string.IsNullOrEmpty(text))
                 {
-
-                    var flags = TextFormatFlags.TextBoxControl
-                          | TextFormatFlags.EndEllipsis
-                          | TextFormatFlags.NoPrefix
-                          | TextFormatFlags.VerticalCenter;
-
-
                     using var painter = new FieldPainter
                     {
                         CodeColor = codeColor,
@@ -101,21 +97,10 @@ namespace ManagedIrbis.WinForms.Grid
                     painter.DrawLine
                         (
                             graphics,
-                            Grid.Font,
+                            grid.Font,
                             rectangle,
                             text
                         );
-
-                    /* TextRenderer.DrawText
-                        (
-                            graphics,
-                            text,
-                            Grid.Font,
-                            rectangle,
-                            foreColor,
-                            flags
-                        );
-                        */
                 }
             }
         }
@@ -124,37 +109,24 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            var rowIndex = Row?.Index ?? -1;
+            var columnIndex = Column?.Index ?? -1;
 
-            var field = (SiberianField)Row.Data;
+            var field = (SiberianField?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(field, null))
             {
-                text = string.Format
-                    (
-                        "{0}/{1}: {2} ({3})",
-                        field.Tag,
-                        field.Repeat,
-                        field.Value,
-                        field.OriginalValue
-                    );
+                text = $"{field.Tag}/{field.Repeat}: {field.Value} ({field.OriginalValue})";
             }
 
-            return string.Format
-                (
-                    "FieldCell [{0}, {1}]: {2}",
-                    column,
-                    row,
-                    text
-                );
+            return $"FieldCell [{columnIndex}, {rowIndex}]: {text}";
         }
 
         #endregion
-    }
-}
+
+    } // class SiberianFieldCell
+
+} // namespace ManagedIrbis.WinForms.Grid

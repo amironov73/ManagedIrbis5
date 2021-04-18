@@ -4,12 +4,14 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable CompareOfFloatsByEqualityOperator
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* HslColor.cs -- color in HSL colorspace.
+/* HslColor.cs -- цветовая модель "тон, насыщенность, яркость"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,20 +26,30 @@ using System.Diagnostics;
 
 namespace AM.Drawing
 {
+    //
+    // https://ru.wikipedia.org/wiki/HSL
+    //
+    // HSL, HLS или HSI (от англ. hue, saturation,
+    // lightness (intensity)) — цветовая модель, в которой цветовыми
+    // координатами являются тон, насыщенность и светлота.
+    // Следует отметить, что HSV и HSL — две разные цветовые модели
+    // (lightness — светлота, что отличается от яркости).
+    //
+
     /// <summary>
-    /// Color in HSL colorspace.
+    /// Цветовая модель "тон, насыщенность, яркость".
     /// </summary>
     public struct HslColor
     {
         #region Constants
 
         /// <summary>
-        /// Minimum value of <see cref="HslColor"/> component.
+        /// Минимальное значение компонента.
         /// </summary>
         public const float MinComponentValue = 0f;
 
         /// <summary>
-        /// Maximum value of <see cref="HslColor"/> component.
+        /// Максимальное значение компонента.
         /// </summary>
         public const float MaxComponentValue = 1f;
 
@@ -48,61 +60,34 @@ namespace AM.Drawing
         private float _h;
 
         /// <summary>
-        /// Gets or sets H component value of the <see cref="HslColor"/>.
+        /// Цветовой тон.
         /// </summary>
-        /// <value>H component value.</value>
         public float H
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _h;
-            }
-            set
-            {
-                _CheckComponent(value, "H");
-                _h = value;
-            }
+            get => _h;
+            set => _h = _CheckComponent(value, "H");
         }
 
         private float _l;
 
         /// <summary>
-        /// Gets or sets L component value of the <see cref="HslColor"/>.
+        /// Насыщенность.
         /// </summary>
-        /// <value>L component value.</value>
         public float L
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _l;
-            }
-            set
-            {
-                _CheckComponent(value, "L");
-                _l = value;
-            }
+            get => _l;
+            set => _l = _CheckComponent(value, "L");
         }
 
         private float _s;
 
         /// <summary>
-        /// Gets or sets S component value of the <see cref="HslColor"/>.
+        /// Яркость (светлота).
         /// </summary>
-        /// <value>S component value.</value>
         public float S
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _s;
-            }
-            set
-            {
-                _CheckComponent(value, "S");
-                _s = value;
-            }
+            get => _s;
+            set => _s = _CheckComponent(value, "S");
         }
 
         #endregion
@@ -110,68 +95,57 @@ namespace AM.Drawing
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:HslColor"/> class.
+        /// Конструктор.
         /// </summary>
-        /// <param name="h">The h.</param>
-        /// <param name="s">The s.</param>
-        /// <param name="l">The l.</param>
-        public HslColor(float h, float s, float l)
+        public HslColor
+            (
+                float h,
+                float s,
+                float l
+            )
         {
-            _CheckComponent(h, "H");
-            _CheckComponent(s, "S");
-            _CheckComponent(l, "L");
-            _h = h;
-            _s = s;
-            _l = l;
+            _h = _CheckComponent(h, "H");
+            _s = _CheckComponent(s, "S");
+            _l = _CheckComponent(l, "L");
         }
 
         #endregion
 
         #region Private members
 
-        private static void _CheckComponent(float value, string name)
+        private static float _CheckComponent
+            (
+                float value,
+                string name
+            )
         {
-            if ((value < MinComponentValue)
-                 || (value > MaxComponentValue))
+            if (value < MinComponentValue || value > MaxComponentValue)
             {
                 throw new ArgumentOutOfRangeException(name);
             }
+
+            return value;
         }
 
         #endregion
 
         #region Object members
 
-        /// <summary>
-        /// Indicates whether this instance and a specified object are equal.
-        /// </summary>
-        /// <param name="obj">Another object to compare to.</param>
-        /// <returns>
-        /// <c>true</c> if obj and this instance are the same type
-        /// and represent the same value; otherwise, <c>false</c>.
-        /// </returns>
+        /// <inheritdoc cref="object.Equals(object?)"/>
         public override bool Equals
             (
-                object obj
+                object? obj
             )
         {
-            if (!(obj is HslColor))
+            if (obj is HslColor other)
             {
-                return false;
+                return H == other.H && L == other.L && S == other.S;
             }
-            var other = (HslColor)obj;
 
-            // ReSharper disable CompareOfFloatsByEqualityOperator
-            return (H == other.H) && (L == other.L) && (S == other.S); //-V3024
-            // ReSharper restore CompareOfFloatsByEqualityOperator
+            return false;
         }
 
-        /// <summary>
-        /// Returns the hash code for this instance.
-        /// </summary>
-        /// <returns>
-        /// A 32-bit signed integer that is the hash code for this instance.
-        /// </returns>
+        /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode()
         {
             var result = H.GetHashCode();
@@ -181,18 +155,8 @@ namespace AM.Drawing
             return result;
         }
 
-        /// <summary>
-        /// Returns a <see cref="T:System.String"/> that represents
-        /// the current <see cref="T:System.Object" />.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="T:System.String"/> that represents
-        /// the current <see cref="T:System.Object"/>.
-        /// </returns>
-        public override string ToString()
-        {
-            return string.Format("H: {0}; S: {1}; L: {2}", H, S, L);
-        }
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"H: {H}; S: {S}; L: {L}";
 
         #endregion
 

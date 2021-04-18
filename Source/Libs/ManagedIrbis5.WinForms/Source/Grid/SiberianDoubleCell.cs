@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianDoubleCell.cs --
+/* SiberianDoubleCell.cs -- ячейка, отображающее число с плавающей точкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Ячейка, отображающая число с плавающей точкой двойной точности.
     /// </summary>
     public class SiberianDoubleCell
         : SiberianCell
@@ -36,13 +36,9 @@ namespace ManagedIrbis.WinForms.Grid
         /// </summary>
         public double Value
         {
-            get { return _value; }
-            set { _SetValue(value); }
+            get => _value;
+            set => _SetValue(value);
         }
-
-        #endregion
-
-        #region Construction
 
         #endregion
 
@@ -56,13 +52,9 @@ namespace ManagedIrbis.WinForms.Grid
             )
         {
             _value = value;
-            Column.PutData(Row.Data, this);
-            Grid.Invalidate();
+            Column?.PutData(Row?.Data, this);
+            Grid?.Invalidate();
         }
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 
@@ -74,7 +66,7 @@ namespace ManagedIrbis.WinForms.Grid
                 bool accept
             )
         {
-            if (!ReferenceEquals(Grid.Editor, null))
+            if (!ReferenceEquals(Grid?.Editor, null))
             {
                 if (accept)
                 {
@@ -85,12 +77,19 @@ namespace ManagedIrbis.WinForms.Grid
             base.CloseEditor(accept);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.Paint" />
         public override void Paint
             (
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
             var textRectangle = new Rectangle
@@ -102,33 +101,29 @@ namespace ManagedIrbis.WinForms.Grid
                 );
 
             var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
             var text = Value.ToString(CultureInfo.InvariantCulture);
-
-            var flags
-                = TextFormatFlags.TextBoxControl
-                | TextFormatFlags.EndEllipsis
-                | TextFormatFlags.NoPrefix
-                | TextFormatFlags.VerticalCenter;
+            var flags = TextFormatFlags.TextBoxControl
+                        | TextFormatFlags.EndEllipsis
+                        | TextFormatFlags.NoPrefix
+                        | TextFormatFlags.VerticalCenter;
 
             TextRenderer.DrawText
                 (
                     graphics,
                     text,
-                    Grid.Font,
+                    grid.Font,
                     textRectangle,
                     foreColor,
                     flags
@@ -138,9 +133,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-        #region Object members
+    } // class SiberianDoubleCell
 
-        #endregion
-
-    }
-}
+} // namespace ManagedIrbis.WinForms.Grid

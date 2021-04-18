@@ -4,6 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Local
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -38,7 +41,7 @@ namespace ManagedIrbis.WinForms
 
             public int Repeat { get; set; }
 
-            public string Text { get; set; }
+            public string? Text { get; set; }
 
             #endregion
 
@@ -49,7 +52,7 @@ namespace ManagedIrbis.WinForms
                     Field field
                 )
             {
-                FieldInfo result = new FieldInfo
+                var result = new FieldInfo
                 {
                     Tag = field.Tag,
                     Repeat = field.Repeat,

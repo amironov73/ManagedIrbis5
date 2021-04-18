@@ -4,6 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -13,18 +16,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 using ManagedIrbis.Workspace;
 
@@ -88,14 +80,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
         #region Public methods
 
         /// <summary>
@@ -109,7 +93,7 @@ namespace ManagedIrbis.WinForms.Grid
         {
             var result = new SiberianField
             {
-                Tag = item.Tag.ParseInt32(),
+                Tag = item.Tag?.ParseInt32() ?? 0,
                 Title = item.Title,
                 Repeatable = item.Repeatable
             };

@@ -7,17 +7,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianSubFieldGrid.cs --
+/* SiberianSubFieldGrid.cs -- таблица, отображающая подполя MARC-записи
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AM;
 
 using ManagedIrbis.Workspace;
 
@@ -28,7 +24,7 @@ using ManagedIrbis.Workspace;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Таблица, отображающая подполя MARC-записи.
     /// </summary>
     public class SiberianSubFieldGrid
         : SiberianGrid
@@ -86,17 +82,9 @@ namespace ManagedIrbis.WinForms.Grid
 
             foreach (var item in worksheet.Items)
             {
-                var code = item.Tag[0];
-
-                var subField = field.Subfields
-                    .GetFirstSubField(code);
-
-                var line = SiberianSubField
-                    .FromWorksheetItem
-                    (
-                        item
-                    );
-
+                var code = item.Tag.FirstChar();
+                var subField = field.Subfields.GetFirstSubField(code);
+                var line = SiberianSubField.FromWorksheetItem ( item );
                 if (!ReferenceEquals(subField, null))
                 {
                     line.Value = subField.Value.ToString();
@@ -112,7 +100,7 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region SiberianGrid members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="SiberianGrid.CreateRow()" />
         protected override SiberianRow CreateRow()
         {
             var result = base.CreateRow();
@@ -123,8 +111,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-        #region Object members
+    } // class SiberianSubFieldGrid
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.WinForms.Grid

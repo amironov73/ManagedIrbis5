@@ -4,9 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridMouseEventArgs.cs
+/* TreeGridMouseEventArgs.cs -- событие мыши в TreeGrid
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +22,7 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///
+    /// Событие мыши в <see cref="TreeGrid"/>.
     /// </summary>
     public class TreeGridMouseEventArgs
         : MouseEventArgs
@@ -30,13 +31,8 @@ namespace AM.Windows.Forms
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TreeGridMouseEventArgs"/> class.
+        /// Конструктор.
         /// </summary>
-        /// <param name="button">One of the <see cref="T:System.Windows.Forms.MouseButtons"/> values indicating which mouse button was pressed.</param>
-        /// <param name="clicks">The number of times a mouse button was pressed.</param>
-        /// <param name="x">The x-coordinate of a mouse click, in pixels.</param>
-        /// <param name="y"></param>
-        /// <param name="delta">A signed count of the number of detents the wheel has rotated.</param>
         public TreeGridMouseEventArgs
             (
                 MouseButtons button,
@@ -50,12 +46,11 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TreeGridMouseEventArgs"/> class.
+        /// Конструктор.
         /// </summary>
-        /// <param name="args">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
         public TreeGridMouseEventArgs
             (
-            MouseEventArgs args
+                MouseEventArgs args
             )
             : base
             (
@@ -73,23 +68,22 @@ namespace AM.Windows.Forms
         #region Properties
 
         /// <summary>
-        /// Gets or sets the tree grid.
+        /// Грид, в котором произошло событие.
         /// </summary>
-        /// <value>The tree grid.</value>
-        public TreeGrid TreeGrid { get; set; }
+        public TreeGrid? TreeGrid { get; set; }
 
         /// <summary>
-        /// Gets or sets the node.
+        /// Нода, в которой произошло событие (возможно, <c>null</c>).
         /// </summary>
-        /// <value>The node.</value>
-        public TreeGridNode Node { get; set; }
+        public TreeGridNode? Node { get; set; }
 
         /// <summary>
-        /// Gets or sets the column.
+        /// Колонка, в которой произошло событие (возможно, <c>null</c>).
         /// </summary>
-        /// <value>The column.</value>
-        public TreeGridColumn Column { get; set; }
+        public TreeGridColumn? Column { get; set; }
 
         #endregion
-    }
-}
+
+    } // class TreeGridMouseEventArgs
+
+} // namespace AM.Windows.Forms

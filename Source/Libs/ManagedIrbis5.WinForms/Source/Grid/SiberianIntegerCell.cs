@@ -57,8 +57,8 @@ namespace ManagedIrbis.WinForms.Grid
             )
         {
             _value = value;
-            Column.PutData(Row.Data, this);
-            Grid.Invalidate();
+            Column?.PutData(Row?.Data, this);
+            Grid?.Invalidate();
         }
 
         #endregion
@@ -71,7 +71,7 @@ namespace ManagedIrbis.WinForms.Grid
                 bool accept
             )
         {
-            if (!ReferenceEquals(Grid.Editor, null))
+            if (!ReferenceEquals(Grid?.Editor, null))
             {
                 if (accept)
                 {
@@ -88,6 +88,13 @@ namespace ManagedIrbis.WinForms.Grid
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
             var textRectangle = new Rectangle
@@ -99,24 +106,21 @@ namespace ManagedIrbis.WinForms.Grid
                 );
 
             var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
             var text = Value.ToInvariantString();
 
-            var flags
-                = TextFormatFlags.TextBoxControl
+            var flags = TextFormatFlags.TextBoxControl
                 | TextFormatFlags.EndEllipsis
                 | TextFormatFlags.NoPrefix
                 | TextFormatFlags.VerticalCenter;
@@ -125,7 +129,7 @@ namespace ManagedIrbis.WinForms.Grid
                 (
                     graphics,
                     text,
-                    Grid.Font,
+                    grid.Font,
                     textRectangle,
                     foreColor,
                     flags

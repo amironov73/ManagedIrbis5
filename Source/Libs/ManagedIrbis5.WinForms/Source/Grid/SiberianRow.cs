@@ -2,12 +2,14 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianRow.cs --
+/* SiberianRow.cs -- строка грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,7 +20,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-using AM;
 using AM.Collections;
 
 #endregion
@@ -28,7 +29,7 @@ using AM.Collections;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Строка грида.
     /// </summary>
     public class SiberianRow
     {
@@ -46,7 +47,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <summary>
         /// Fired on click.
         /// </summary>
-        public event EventHandler<SiberianClickEventArgs> Click;
+        public event EventHandler<SiberianClickEventArgs>? Click;
 
         #endregion
 
@@ -65,7 +66,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <summary>
         /// Grid.
         /// </summary>
-        public SiberianGrid Grid { get; internal set; }
+        public SiberianGrid? Grid { get; internal set; }
 
         /// <summary>
         /// Cells.
@@ -98,13 +99,8 @@ namespace ManagedIrbis.WinForms.Grid
         /// <summary>
         /// Handle <see cref="Click"/> event.
         /// </summary>
-        protected internal void HandleClick
-            (
-                SiberianClickEventArgs eventArgs
-            )
-        {
-             Click.Raise(this, eventArgs);
-        }
+        protected internal void HandleClick ( SiberianClickEventArgs eventArgs ) =>
+            Click?.Invoke(this, eventArgs);
 
         #endregion
 
@@ -118,11 +114,7 @@ namespace ManagedIrbis.WinForms.Grid
         {
             foreach (var cell in Cells)
             {
-                cell.Column.GetData
-                    (
-                        Data,
-                        cell
-                    );
+                cell.Column?.GetData ( Data, cell );
             }
         }
 
@@ -133,7 +125,7 @@ namespace ManagedIrbis.WinForms.Grid
         {
             foreach (var cell in Cells)
             {
-                if (!cell.Column.ReadOnly)
+                if (!(cell.Column?.ReadOnly ?? true))
                 {
                     return cell;
                 }
@@ -153,7 +145,7 @@ namespace ManagedIrbis.WinForms.Grid
             {
                 var dimensions = new SiberianDimensions
                 {
-                    Width = cell.Column.Width,
+                    Width = cell.Column?.Width ?? 0,
                     Height = height
                 };
 
@@ -169,13 +161,8 @@ namespace ManagedIrbis.WinForms.Grid
         /// <summary>
         /// Handles click on the row.
         /// </summary>
-        public virtual void OnClick
-            (
-                SiberianClickEventArgs eventArgs
-            )
-        {
-            // Nothing to do here?
-        }
+        public virtual void OnClick ( SiberianClickEventArgs eventArgs ) =>
+            Click?.Invoke(this, eventArgs);
 
         /// <summary>
         /// Draw the column.
@@ -188,12 +175,12 @@ namespace ManagedIrbis.WinForms.Grid
             var graphics = args.Graphics;
             var clip = args.ClipRectangle;
 
-            if (ReferenceEquals(this, Grid.CurrentRow))
+            // TODO: разобраться, почему не перерисовывается с белым фоном
+            if (ReferenceEquals(this, Grid?.CurrentRow))
             {
-                using (Brush brush = new SolidBrush(Color.DarkBlue))
-                {
-                    graphics.FillRectangle(brush, clip);
-                }
+                var backColor = Color.DarkBlue;
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, clip);
             }
         }
 
@@ -205,23 +192,25 @@ namespace ManagedIrbis.WinForms.Grid
         {
             foreach (var cell in Cells)
             {
-                cell.Column.PutData
+                cell.Column?.PutData
                     (
                         Data,
                         cell
                     );
             }
 
-            Grid.Invalidate();
+            Grid?.Invalidate();
         }
 
         #endregion
 
         #region Object members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString() => $"Index: {Index}, Data: {Data}";
 
         #endregion
-    }
-}
+
+    } // class SiberianRow
+
+} // namespace ManagedIrbis.WinForms.Grid

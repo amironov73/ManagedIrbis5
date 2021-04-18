@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianImageColumn.cs --
+/* SiberianImageColumn.cs -- колонка, отображающая картинки
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,35 +26,11 @@ using AM.Reflection;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Колонка, отображающая картинки.
     /// </summary>
     public class SiberianImageColumn
         : SiberianColumn
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SiberianImageColumn()
-        {
-            //BackColor = Color.White;
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region SiberianColumn members
 
         /// <inheritdoc/>
@@ -66,18 +42,18 @@ namespace ManagedIrbis.WinForms.Grid
             return result;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="SiberianColumn.CreateEditor" />
         public override Control? CreateEditor
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
-            return null;
+            return default;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="SiberianColumn.GetData" />
         public override void GetData
             (
                 object? theObject,
@@ -98,13 +74,11 @@ namespace ManagedIrbis.WinForms.Grid
                     );
 
                 var value = property.GetValue(theObject);
-                imageCell.Picture = ReferenceEquals(value, null)
-                    ? null
-                    : (Image)value;
+                imageCell.Picture = (Image?) value;
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="SiberianColumn.PutData" />
         public override void PutData
             (
                 object? theObject,
@@ -130,8 +104,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-        #region Object members
+    } // class SiberianImageColumn
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.WinForms.Grid

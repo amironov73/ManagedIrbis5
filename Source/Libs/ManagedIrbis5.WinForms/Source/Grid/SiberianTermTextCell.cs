@@ -13,20 +13,8 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
@@ -40,63 +28,50 @@ namespace ManagedIrbis.WinForms.Grid
     public class SiberianTermTextCell
         : SiberianCell
     {
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region SiberianCell members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.Paint" />
         public override void Paint
             (
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint?
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
             var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var term = (Term?)Row.Data;
-
+            var term = (Term?)Row?.Data;
             if (!ReferenceEquals(term, null))
             {
-                var flags
-                    = TextFormatFlags.TextBoxControl
-                      | TextFormatFlags.EndEllipsis
-                      | TextFormatFlags.NoPrefix
-                      | TextFormatFlags.VerticalCenter;
+                var flags = TextFormatFlags.TextBoxControl
+                            | TextFormatFlags.EndEllipsis
+                            | TextFormatFlags.NoPrefix
+                            | TextFormatFlags.VerticalCenter;
 
                 TextRenderer.DrawText
                     (
                         graphics,
                         term.Text,
-                        Grid.Font,
+                        grid.Font,
                         rectangle,
                         foreColor,
                         flags
@@ -108,15 +83,13 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            int row = Row?.Index ?? -1,
+                column = Column?.Index ?? -1;
 
-            var term = (Term?)Row.Data;
+            var term = (Term?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(term, null))
             {
@@ -127,5 +100,7 @@ namespace ManagedIrbis.WinForms.Grid
         }
 
         #endregion
-    }
-}
+
+    } // class SiberianTermTextCell
+
+} // namespace ManagedIrbis.WinForms.Grid

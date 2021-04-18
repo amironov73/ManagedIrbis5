@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianCheckColumn.cs --
+/* SiberianCheckColumn.cs -- колонка, отображающая "галки" для логических значений
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,7 +26,7 @@ using AM.Reflection;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Колонка, отображающая "галки" для логических значений.
     /// </summary>
     public class SiberianCheckColumn
         : SiberianColumn
@@ -47,10 +47,10 @@ namespace ManagedIrbis.WinForms.Grid
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
-            return null;
+            return default;
         }
 
         /// <inheritdoc />
@@ -104,5 +104,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-    }
-}
+    } // class SiberianCheckColumn
+
+} // namespace ManagedIrbis.WinForms.Grid

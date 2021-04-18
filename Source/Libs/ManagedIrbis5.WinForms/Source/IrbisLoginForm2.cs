@@ -142,7 +142,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public ConnectionSettings GatherSettings()
         {
-            ConnectionSettings result = new ConnectionSettings
+            var result = new ConnectionSettings
             {
                 Host = Host,
                 Port = Port.ThrowIfNull().ParseUInt16(),

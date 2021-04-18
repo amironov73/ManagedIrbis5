@@ -3,11 +3,16 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
-/* SiberianGrid.cs --
+/* SiberianGrid.cs -- самописный грид для редактирования MARC-записей
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,7 +24,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-using AM;
 using AM.Collections;
 
 #endregion
@@ -29,7 +33,7 @@ using AM.Collections;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Самописный грид для редактирования записей.
     /// </summary>
     public partial class SiberianGrid
         : Control
@@ -37,12 +41,12 @@ namespace ManagedIrbis.WinForms.Grid
         #region Events
 
         /// <summary>
-        /// Fired on click.
+        /// Событие, возникающее при щелчке мышкой по гриду.
         /// </summary>
         public event EventHandler<SiberianClickEventArgs>? GridClick;
 
         /// <summary>
-        /// Fired on navigation.
+        /// Событие, возникающее при навигации.
         /// </summary>
         public event EventHandler<SiberianNavigationEventArgs>? Navigation;
 
@@ -53,7 +57,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <inheritdoc/>
         public override Color BackColor
         {
-            get { return Palette.BackColor; }
+            get => Palette.BackColor;
             set
             {
                 Palette.BackColor = value;
@@ -65,7 +69,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <inheritdoc/>
         public override Color ForeColor
         {
-            get { return Palette.ForeColor; }
+            get => Palette.ForeColor;
             set
             {
                 Palette.ForeColor = value;
@@ -149,7 +153,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <summary>
         /// Count of visible rows.
         /// </summary>
-        public int VisibleRows { get { return _visibleRows; } }
+        public int VisibleRows => _visibleRows;
 
         #endregion
 
@@ -160,8 +164,6 @@ namespace ManagedIrbis.WinForms.Grid
         /// </summary>
         public SiberianGrid()
         {
-            // ReSharper disable DoNotCallOverridableMethodsInConstructor
-
             Palette = SiberianPalette.DefaultPalette.Clone();
 
             Columns = new NonNullCollection<SiberianColumn>();
@@ -200,7 +202,7 @@ namespace ManagedIrbis.WinForms.Grid
         private bool _autoSizeWatch;
 
         private readonly ToolTip _toolTip;
-        private string _previousToolTipText;
+        private string? _previousToolTipText;
 
         private int _visibleRows;
 
@@ -285,7 +287,7 @@ namespace ManagedIrbis.WinForms.Grid
 
         private int _DoScroll
             (
-                ScrollBar scrollBar,
+                ScrollBar? scrollBar,
                 ScrollEventArgs args
             )
         {
@@ -341,7 +343,7 @@ namespace ManagedIrbis.WinForms.Grid
 
         private void _horizontalScroll_Scroll
             (
-                object sender,
+                object? sender,
                 ScrollEventArgs e
             )
         {
@@ -367,7 +369,7 @@ namespace ManagedIrbis.WinForms.Grid
 
         private void _verticalScroll_Scroll
             (
-                object sender,
+                object? sender,
                 ScrollEventArgs e
             )
         {
@@ -400,12 +402,8 @@ namespace ManagedIrbis.WinForms.Grid
                 ref int row
             )
         {
-            var oldColumn = ReferenceEquals(CurrentColumn, null)
-                ? -1
-                : CurrentColumn.Index;
-            var oldRow = ReferenceEquals(CurrentRow, null)
-                ? -1
-                : CurrentRow.Index;
+            var oldColumn = CurrentColumn?.Index ?? -1;
+            var oldRow = CurrentRow?.Index ?? -1;
 
             var handler = Navigation;
             if (!ReferenceEquals(handler, null))
@@ -479,10 +477,7 @@ namespace ManagedIrbis.WinForms.Grid
                 Index = Columns.Count
             };
 
-            if (ReferenceEquals(CurrentColumn, null))
-            {
-                CurrentColumn = result;
-            }
+            CurrentColumn ??= result;
 
             foreach (var row in Rows)
             {
@@ -523,7 +518,7 @@ namespace ManagedIrbis.WinForms.Grid
         public Control? OpenEditor
             (
                 bool edit,
-                object state
+                object? state
             )
         {
             if (!ReferenceEquals(Editor, null))
@@ -570,10 +565,7 @@ namespace ManagedIrbis.WinForms.Grid
             result.Index = Rows.Count;
             result.Grid = this;
 
-            if (ReferenceEquals(CurrentRow, null))
-            {
-                CurrentRow = result;
-            }
+            CurrentRow ??= result;
 
             foreach (var column in Columns)
             {
@@ -716,28 +708,33 @@ namespace ManagedIrbis.WinForms.Grid
                 SiberianCell cell
             )
         {
-            var column = cell.Column.Index;
-            var x = 0;
-            for (var i = _leftColumn; i < column; i++)
+            var column = cell.Column;
+            var row = cell.Row;
+            if (column is null || row is null)
             {
-                x += Columns[i].Width;
+                return default;
             }
 
-            var row = cell.Row.Index;
-            var y = HeaderHeight;
-            for (var i = _topRow; i < row; i++)
+            var columnIndex = column.Index;
+            var left = 0;
+            for (var i = _leftColumn; i < columnIndex; i++)
             {
-                y += Rows[i].Height;
+                left += Columns[i].Width;
             }
-            var width = cell.Column.Width;
-            var height = cell.Row.Height;
+
+            var rowIndex = row.Index;
+            var top = HeaderHeight;
+            for (var i = _topRow; i < rowIndex; i++)
+            {
+                top += Rows[i].Height;
+            }
 
             var result = new Rectangle
                 (
-                    x,
-                    y,
-                    width,
-                    height
+                    left,
+                    top,
+                    column.Width,
+                    row.Height
                 );
 
             return result;
@@ -754,13 +751,8 @@ namespace ManagedIrbis.WinForms.Grid
         {
             CloseEditor(true);
 
-            SiberianCell result;
-
-            if (!HandleNavigation
-                (
-                    ref column,
-                    ref row
-                ))
+            SiberianCell? result;
+            if (!HandleNavigation ( ref column, ref row ))
             {
                 result = GetCell(column, row);
 
@@ -771,14 +763,17 @@ namespace ManagedIrbis.WinForms.Grid
             {
                 column = Columns.Count - 1;
             }
+
             if (column < 0)
             {
                 column = 0;
             }
+
             if (row >= Rows.Count)
             {
                 row = Rows.Count - 1;
             }
+
             if (row < 0)
             {
                 row = 0;
@@ -797,21 +792,29 @@ namespace ManagedIrbis.WinForms.Grid
                 if (!ReferenceEquals(_horizontalScroll, null))
                 {
                     _horizontalScroll.Maximum = Columns.Count;
-                    _horizontalScroll.Value = CurrentColumn.Index;
+                    if (CurrentColumn is not null)
+                    {
+                        _horizontalScroll.Value = CurrentColumn.Index;
+                    }
                 }
 
                 if (!ReferenceEquals(_verticalScroll, null))
                 {
                     _verticalScroll.Maximum = Rows.Count;
-                    _verticalScroll.Value = CurrentRow.Index;
+                    if (CurrentRow is not null)
+                    {
+                        _verticalScroll.Value = CurrentRow.Index;
+                    }
                 }
 
-                if (CurrentColumn.Index < _leftColumn)
+                if (CurrentColumn is not null
+                    && CurrentColumn.Index < _leftColumn)
                 {
                     _leftColumn = CurrentColumn.Index;
                 }
 
-                if (CurrentRow.Index < _topRow)
+                if (CurrentRow is not null
+                    && CurrentRow.Index < _topRow)
                 {
                     _topRow = CurrentRow.Index;
                 }
@@ -820,12 +823,17 @@ namespace ManagedIrbis.WinForms.Grid
                 while (Columns.Count != 0)
                 {
                     var x = 0;
+                    var currentColumnIndex = CurrentColumn?.Index ?? -1;
 
-                    for (var i = _leftColumn; i < CurrentColumn.Index; i++)
+                    for (var i = _leftColumn; i < currentColumnIndex; i++)
                     {
                         x += Columns[i].Width;
                     }
-                    x += Columns[CurrentColumn.Index].Width;
+
+                    if (CurrentColumn != null)
+                    {
+                        x += Columns[CurrentColumn.Index].Width;
+                    }
 
                     if (x < usableSize.Width)
                     {
@@ -844,12 +852,17 @@ namespace ManagedIrbis.WinForms.Grid
                 while (Rows.Count != 0)
                 {
                     var y = HeaderHeight;
+                    var currentRowIndex = CurrentRow?.Index ?? -1;
 
-                    for (var i = _topRow; i < CurrentRow.Index; i++)
+                    for (var i = _topRow; i < currentRowIndex; i++)
                     {
                         y += Rows[i].Height;
                     }
-                    y += Rows[CurrentRow.Index].Height;
+
+                    if (CurrentRow is not null)
+                    {
+                        y += Rows[CurrentRow.Index].Height;
+                    }
 
                     if (y < usableSize.Height)
                     {
@@ -946,10 +959,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// </summary>
         public SiberianCell? MoveOnePageDown()
         {
-            var delta = ReferenceEquals(_verticalScroll, null)
-                ? 10
-                : _verticalScroll.LargeChange;
-
+            var delta = _verticalScroll?.LargeChange ?? 10;
             var result = MoveRelative(0, delta);
 
             return result;
@@ -960,10 +970,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// </summary>
         public SiberianCell? MoveOnePageUp()
         {
-            var delta = ReferenceEquals(_verticalScroll, null)
-                ? 10
-                : _verticalScroll.LargeChange;
-
+            var delta = _verticalScroll?.LargeChange ?? 10;
             var result = MoveRelative(0, delta);
 
             return result;
@@ -978,16 +985,29 @@ namespace ManagedIrbis.WinForms.Grid
                 int rowDelta
             )
         {
-            var current = CurrentCell;
-            if (ReferenceEquals(current, null))
+            var currentCell = CurrentCell;
+            if (ReferenceEquals(currentCell, null))
             {
-                return null;
+                return default;
             }
 
-            var column = current.Column.Index + columnDelta;
-            var row = current.Row.Index + rowDelta;
+            var currentColumn = currentCell.Column;
+            if (currentColumn is null)
+            {
+                return default;
+            }
 
-            var result = Goto(column, row);
+            var columnIndex = currentColumn.Index + columnDelta;
+
+            var currentRow = currentCell.Row;
+            if (currentRow is null)
+            {
+                return default;
+            }
+
+            var rowIndex = currentRow.Index + rowDelta;
+
+            var result = Goto(columnIndex, rowIndex);
 
             return result;
         }
@@ -1007,25 +1027,31 @@ namespace ManagedIrbis.WinForms.Grid
             {
                 cell.HandleClick(eventArgs);
 
-                if (cell.Column.ReadOnly)
+                var column = cell.Column;
+                var row = cell.Row;
+                if (column is not null && row is not null)
                 {
-                    cell = cell.Row.GetFirstEditableCell();
-                    if (!ReferenceEquals(cell, null))
+                    if (column.ReadOnly)
+                    {
+
+                        cell = row.GetFirstEditableCell();
+                        if (!ReferenceEquals(cell, null))
+                        {
+                            Goto
+                                (
+                                    cell.Column!.Index,
+                                    cell.Row!.Index
+                                );
+                        }
+                    }
+                    else
                     {
                         Goto
                             (
-                                cell.Column.Index,
-                                cell.Row.Index
+                                column.Index,
+                                row.Index
                             );
                     }
-                }
-                else
-                {
-                    Goto
-                        (
-                            cell.Column.Index,
-                            cell.Row.Index
-                        );
                 }
             }
 

@@ -59,9 +59,9 @@ namespace ManagedIrbis.WinForms.Editors
 
         #region Private members
 
-        private List<Field> _originalFields;
+        private List<Field>? _originalFields;
 
-        private List<FieldItem> _items;
+        private List<FieldItem>? _items;
 
         #endregion
 
@@ -79,16 +79,19 @@ namespace ManagedIrbis.WinForms.Editors
             collection.Clear();
             //collection.EnsureCapacity(_items.Count);
 
-            foreach (var item in _items)
+            if (_items is not null)
             {
-                var tag = item.Tag;
-                var text = item.Text;
-
-                var field = new Field(tag);
-                field.DecodeBody(text);
-                if (field.Verify(false))
+                foreach (var item in _items)
                 {
-                    collection.Add(field);
+                    var tag = item.Tag;
+                    var text = item.Text;
+
+                    var field = new Field(tag);
+                    field.DecodeBody(text);
+                    if (field.Verify(false))
+                    {
+                        collection.Add(field);
+                    }
                 }
             }
 

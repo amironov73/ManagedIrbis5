@@ -33,26 +33,30 @@ namespace ManagedIrbis.WinForms.Grid
     {
         #region SiberianCell members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.Paint" />
         public override void Paint
             (
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint?
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var found = (FoundLine)Row.Data;
-
+            var found = (FoundLine?)Row?.Data;
             if (!ReferenceEquals(found, null))
             {
                 var state = found.Selected
@@ -78,35 +82,24 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            int row = Row?.Index ?? -1,
+                column = Column?.Index ?? -1;
 
-            var found = (FoundLine)Row.Data;
+            var found = (FoundLine?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(found, null))
             {
-                text = string.Format
-                    (
-                        "{0}: {1}",
-                        found.Mfn,
-                        found.Selected
-                    );
+                text = $"{found.Mfn}: {found.Selected}";
             }
 
-            return string.Format
-                (
-                    "FoundCheckCell [{0}, {1}]: {2}",
-                    column,
-                    row,
-                    text
-                );
+            return $"FoundCheckCell [{column}, {row}]: {text}";
         }
 
         #endregion
-    }
-}
+
+    } // class SiberianFoundCheckCell
+
+} // namespace ManagedIrbis.WinForms.Grid

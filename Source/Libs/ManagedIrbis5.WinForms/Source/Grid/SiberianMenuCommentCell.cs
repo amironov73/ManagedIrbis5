@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianMenuCommentCell.cs --
+/* SiberianMenuCommentCell.cs -- ячейка, отображающая комментарий из элемента меню
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,43 +25,46 @@ using ManagedIrbis.Menus;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Ячейка, отображающая комментарий из элемента меню.
     /// </summary>
     public class SiberianMenuCommentCell
         : SiberianCell
     {
         #region SiberianCell members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.Paint" />
         public override void Paint
             (
                 PaintEventArgs args
             )
         {
+            var grid = Grid;
+            if (grid is null)
+            {
+                // TODO: some paint?
+                return;
+            }
+
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
             var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using var brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var entry = (MenuEntry)Row.Data;
-
+            var entry = (MenuEntry?)Row?.Data;
             if (!ReferenceEquals(entry, null))
             {
-                var flags
-                    = TextFormatFlags.TextBoxControl
+                var flags = TextFormatFlags.TextBoxControl
                       | TextFormatFlags.EndEllipsis
                       | TextFormatFlags.NoPrefix
                       | TextFormatFlags.VerticalCenter;
@@ -70,7 +73,7 @@ namespace ManagedIrbis.WinForms.Grid
                     (
                         graphics,
                         entry.Comment,
-                        Grid.Font,
+                        grid.Font,
                         rectangle,
                         foreColor,
                         flags
@@ -82,30 +85,24 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            var row = Row?.Index ?? -1;
+            var column = Column?.Index ?? -1;
 
-            var entry = (MenuEntry)Row.Data;
+            var entry = (MenuEntry?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(entry, null))
             {
                 text = entry.Comment;
             }
 
-            return string.Format
-                (
-                    "MenuCommentCell [{0}, {1}]: {2}",
-                    column,
-                    row,
-                    text
-                );
+            return $"MenuCommentCell [{column}, {row}]: {text}";
         }
 
         #endregion
-    }
-}
+
+    } // class SiberianMenuCommentCell
+
+} // namespace ManagedIrbis.WinForms.Grid

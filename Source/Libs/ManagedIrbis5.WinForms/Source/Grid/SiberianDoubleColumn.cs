@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianDoubleColumn.cs --
+/* SiberianDoubleColumn.cs -- колонка, отображающая числа с плавающей точкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,34 +25,14 @@ using AM.Reflection;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Колонка, отображающая числа с плавающей точкой двойной точности.
     /// </summary>
     public class SiberianDoubleColumn
         : SiberianColumn
     {
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public SiberianDoubleColumn()
-        {
-            //BackColor = Color.White;
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region SiberianColumn members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="SiberianColumn.CreateCell" />
         public override SiberianCell CreateCell()
         {
             SiberianCell result = new SiberianDoubleCell();
@@ -61,15 +41,15 @@ namespace ManagedIrbis.WinForms.Grid
             return result;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="SiberianColumn.CreateEditor" />
         public override Control? CreateEditor
             (
                 SiberianCell cell,
                 bool edit,
-                object state
+                object? state
             )
         {
-            return null;
+            return default;
         }
 
         /// <inheritdoc />
@@ -93,9 +73,7 @@ namespace ManagedIrbis.WinForms.Grid
                     );
 
                 var value = property.GetValue(theObject);
-                doubleCell.Value = ReferenceEquals(value, null)
-                    ? 0
-                    : (double)value;
+                doubleCell.Value = (double?) value ?? 0;
             }
         }
 
@@ -125,5 +103,6 @@ namespace ManagedIrbis.WinForms.Grid
 
         #endregion
 
-    }
-}
+    } // class SiberianDoubleColumn
+
+} // namespace ManagedIrbis.WinForms.Grid

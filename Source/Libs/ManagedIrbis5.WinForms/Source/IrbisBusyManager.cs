@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -91,10 +93,10 @@ namespace ManagedIrbis.WinForms
 
         #region Private members
 
-        private Thread _uiThread;
-        private IrbisBusyForm _waitForm;
+        private Thread? _uiThread;
+        private IrbisBusyForm? _waitForm;
         private bool _workDone;
-        private ManualResetEvent _waitEvent;
+        private ManualResetEvent? _waitEvent;
         private static int _counter;
         private static string? _formTitle;
         private static string? _formMessage;
@@ -127,7 +129,7 @@ namespace ManagedIrbis.WinForms
             Debug.WriteLine("ENTER IrbisBusyManager._BreakPressed");
             _DebugThreadName();
 
-            if (!ReferenceEquals(Connection, null))
+            //if (!ReferenceEquals(Connection, null))
             {
                 // TODO Connection.Interrupted
                 // Connection.Interrupted = true;
@@ -248,11 +250,11 @@ namespace ManagedIrbis.WinForms
             Debug.WriteLine("ENTER IrbisBusyManager._ClientCleanup");
             _DebugThreadName();
 
-            if (!ReferenceEquals(Connection, null))
+            //if (!ReferenceEquals(Connection, null))
             {
                 Connection.BusyChanged -= _BusyChanged;
                 Connection.Disposing -= _ClientDisposing;
-                Connection = null;
+                //Connection = null;
             }
 
             Debug.WriteLine("LEAVE IrbisBusyManager._ClientCleanup");

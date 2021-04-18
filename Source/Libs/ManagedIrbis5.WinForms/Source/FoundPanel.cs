@@ -16,8 +16,6 @@
 using System;
 using System.Windows.Forms;
 
-using AM;
-
 #endregion
 
 #nullable enable
@@ -25,7 +23,7 @@ using AM;
 namespace ManagedIrbis.WinForms
 {
     /// <summary>
-    /// Grid with found documents list.
+    /// Список найденных документов.
     /// </summary>
     public partial class FoundPanel
         : UserControl
@@ -35,7 +33,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Raised when the term is choosed.
         /// </summary>
-        public event EventHandler Choosed;
+        public event EventHandler? Choosed;
 
         #endregion
 
@@ -203,7 +201,7 @@ namespace ManagedIrbis.WinForms
 
         private void _RaiseChoosed()
         {
-            Choosed.Raise(this);
+            Choosed?.Invoke(this, EventArgs.Empty);
         }
 
         private void _grid_DoubleClick

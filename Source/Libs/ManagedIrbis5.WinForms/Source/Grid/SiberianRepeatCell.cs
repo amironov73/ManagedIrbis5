@@ -4,10 +4,11 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianRepeatCell.cs --
+/* SiberianRepeatCell.cs -- ячейка, отображающая номер повторения поля
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,14 +25,14 @@ using System.Windows.Forms.VisualStyles;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Ячейка, отображающая номер повторения поля.
     /// </summary>
     public class SiberianRepeatCell
         : SiberianCell
     {
         #region SiberianCell members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="SiberianCell.HandleClick"/>
         protected internal override void HandleClick
             (
                 SiberianClickEventArgs eventArgs
@@ -42,10 +43,10 @@ namespace ManagedIrbis.WinForms.Grid
             var row = eventArgs.Row;
             if (!ReferenceEquals(row, null))
             {
-                var field = (SiberianField) row.Data;
-                if (!ReferenceEquals(field, null)
-                    && field.Repeatable)
+                var field = (SiberianField?) row.Data;
+                if (field is {Repeatable: true})
                 {
+                    // TODO: implement
                     MessageBox.Show("Make repeat");
                 }
             }
@@ -59,59 +60,46 @@ namespace ManagedIrbis.WinForms.Grid
         {
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
-
-            var foreColor = Color.Black;
-            if (ReferenceEquals(Row, Grid.CurrentRow))
+            var grid = Grid;
+            if (grid is null)
             {
-                foreColor = Color.White;
+                // TODO: some paint
+                return;
             }
 
-            if (ReferenceEquals(this, Grid.CurrentCell))
+            // var foreColor = Color.Black;
+            // if (ReferenceEquals(Row, Grid.CurrentRow))
+            // {
+            //     foreColor = Color.White;
+            // }
+
+            if (ReferenceEquals(this, grid.CurrentCell))
             {
                 var backColor = Color.Blue;
-                using (Brush brush = new SolidBrush(backColor))
-                {
-                    graphics.FillRectangle(brush, rectangle);
-                }
+                using Brush brush = new SolidBrush(backColor);
+                graphics.FillRectangle(brush, rectangle);
             }
 
-            var field = (SiberianField)Row.Data;
-
-            if (!ReferenceEquals(field, null)
-                && field.Repeatable)
+            var field = (SiberianField?)Row?.Data;
+            if (field is {Repeatable: true})
             {
-                var text = string.Format
-                    (
-                        "{0}",
-                        field.Repeat
-                    );
+                var text = $"{field.Repeat}";
 
-                var flags
-                    = TextFormatFlags.TextBoxControl
-                      | TextFormatFlags.EndEllipsis
-                      | TextFormatFlags.NoPrefix
-                      | TextFormatFlags.VerticalCenter;
+                var flags = TextFormatFlags.TextBoxControl
+                            | TextFormatFlags.EndEllipsis
+                            | TextFormatFlags.NoPrefix
+                            | TextFormatFlags.VerticalCenter;
 
                 ButtonRenderer.DrawButton
                     (
                         graphics,
                         rectangle,
                         text,
-                        Grid.Font,
+                        grid.Font,
                         flags,
                         false,
                         PushButtonState.Normal
                     );
-
-                //TextRenderer.DrawText
-                //    (
-                //        graphics,
-                //        text,
-                //        Grid.Font,
-                //        rectangle,
-                //        foreColor,
-                //        flags
-                //    );
             }
         }
 
@@ -119,33 +107,20 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Object members
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
-            // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            int row = ReferenceEquals(Row, null) ? -1 : Row.Index,
-                column = ReferenceEquals(Column, null) ? -1 : Column.Index;
-            // ReSharper restore ConditionIsAlwaysTrueOrFalse
+            int rowIndex = Row?.Index ?? -1,
+                columnIndex = Column?.Index ?? -1;
 
-            var field = (SiberianField)Row.Data;
+            var field = (SiberianField?)Row?.Data;
             var text = string.Empty;
             if (!ReferenceEquals(field, null))
             {
-                text = string.Format
-                    (
-                        "{0}/{1}",
-                        field.Tag,
-                        field.Repeat
-                    );
+                text = $"{field.Tag}/{field.Repeat}";
             }
 
-            return string.Format
-                (
-                    "RepeatCell [{0}, {1}]: {2}",
-                    column,
-                    row,
-                    text
-                );
+            return $"RepeatCell [{columnIndex}, {rowIndex}]: {text}";
         }
 
         #endregion

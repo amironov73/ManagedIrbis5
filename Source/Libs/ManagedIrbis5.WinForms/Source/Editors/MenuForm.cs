@@ -4,23 +4,17 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* MenuForm.cs --
+/* MenuForm.cs -- форма для отображения меню
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using ManagedIrbis.Menus;
@@ -32,7 +26,7 @@ using ManagedIrbis.Menus;
 namespace ManagedIrbis.WinForms.Editors
 {
     /// <summary>
-    ///
+    /// Форма для отображения меню (MNU-файла).
     /// </summary>
     public partial class MenuForm
         : Form
@@ -42,22 +36,7 @@ namespace ManagedIrbis.WinForms.Editors
         /// <summary>
         /// Current menu entry.
         /// </summary>
-        public MenuEntry? CurrentEntry
-        {
-            get
-            {
-                var row = _grid.CurrentRow;
-
-                if (ReferenceEquals(row, null))
-                {
-                    return null;
-                }
-
-                MenuEntry result = (MenuEntry) row.Data;
-
-                return result;
-            }
-        }
+        public MenuEntry? CurrentEntry => (MenuEntry?) _grid.CurrentRow?.Data;
 
         /// <summary>
         /// Entries
@@ -75,20 +54,18 @@ namespace ManagedIrbis.WinForms.Editors
         {
             InitializeComponent();
 
-            Entries = new MenuEntry[0];
+            Entries = Array.Empty<MenuEntry>();
             _grid.Focus();
+            _grid.DoubleClick += _grid_DoubleClick;
+            _grid.PreviewKeyDown += _grid_PreviewKeyDown;
         }
-
-        #endregion
-
-        #region Private members
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Set entries.
+        /// Заполнение грида меню.
         /// </summary>
         public void SetEntries
             (
@@ -99,11 +76,35 @@ namespace ManagedIrbis.WinForms.Editors
             _grid.Load(entries);
         }
 
+        /// <summary>
+        /// Выбор значения.
+        /// </summary>
+        public static MenuEntry? SelectEntry
+            (
+                MenuEntry[] entries,
+                MenuEntry? current = default,
+                IWin32Window? owner = default
+            )
+        {
+            // TODO: установить первоначальную выбранную строку
+
+            using var form = new MenuForm();
+            form.SetEntries(entries);
+            if (form.ShowDialog(owner) == DialogResult.OK)
+            {
+                return form.CurrentEntry;
+            }
+
+            return default;
+        }
+
         #endregion
+
+        #region Private members
 
         private void _grid_DoubleClick
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -112,7 +113,7 @@ namespace ManagedIrbis.WinForms.Editors
 
         private void _grid_PreviewKeyDown
             (
-                object sender,
+                object? sender,
                 PreviewKeyDownEventArgs e
             )
         {
@@ -122,5 +123,7 @@ namespace ManagedIrbis.WinForms.Editors
                 DialogResult = DialogResult.OK;
             }
         }
+
+        #endregion
     }
 }
