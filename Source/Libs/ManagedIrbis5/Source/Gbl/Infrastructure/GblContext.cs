@@ -4,29 +4,13 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 /* GblContext.cs -- контекст исполнения GBL-программа
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-#endregion
 
 #nullable enable
 
@@ -47,33 +31,17 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; set; }
+        public ISyncIrbisProvider? Provider { get; set; }
 
         /// <summary>
         /// Record source.
         /// </summary>
-        public IRecordSource RecordSource { get; set; }
+        public IRecordSource? RecordSource { get; set; }
 
         /// <summary>
         /// Logger.
         /// </summary>
-        public GblLogger Logger { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region Object members
+        public GblLogger? Logger { get; set; }
 
         #endregion
 

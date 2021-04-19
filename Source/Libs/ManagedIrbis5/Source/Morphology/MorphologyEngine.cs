@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -17,9 +18,6 @@ using System;
 using System.Collections.Generic;
 
 using AM;
-
-using ManagedIrbis.Client;
-using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -85,7 +83,7 @@ namespace ManagedIrbis.Morphology
                 string queryText
             )
         {
-            MorphologyProvider provider = Morphology.ThrowIfNull("Provider");
+            var provider = Morphology.ThrowIfNull("Provider");
 
             return provider.RewriteQuery(queryText);
         }
@@ -99,9 +97,9 @@ namespace ManagedIrbis.Morphology
                 params object[] args
             )
         {
-            string original = string.Format(format, args);
-            string rewritten = RewriteQuery(original);
-            int[] result = Connection.Search(rewritten);
+            var original = string.Format(format, args);
+            var rewritten = RewriteQuery(original);
+            var result = Connection.Search(rewritten);
 
             return result;
         }
@@ -115,16 +113,16 @@ namespace ManagedIrbis.Morphology
                 params object[] args
             )
         {
-            string original = string.Format(format, args);
-            string rewritten = RewriteQuery(original);
-            int[] found = Connection.Search(rewritten);
+            var original = string.Format(format, args);
+            var rewritten = RewriteQuery(original);
+            var found = Connection.Search(rewritten);
             if (found.Length == 0)
             {
                 return Array.Empty<Record>();
             }
 
             var result = new List<Record>(found.Length);
-            foreach (int mfn in found)
+            foreach (var mfn in found)
             {
                 var record = Connection.ReadRecord(mfn);
                 if (!ReferenceEquals(record, null))
@@ -149,9 +147,9 @@ namespace ManagedIrbis.Morphology
                 params object[] args
             )
         {
-            string original = string.Format(format, args);
-            string rewritten = RewriteQuery(original);
-            int[] found = Connection.Search(rewritten);
+            var original = string.Format(format, args);
+            var rewritten = RewriteQuery(original);
+            var found = Connection.Search(rewritten);
             if (found.Length == 0)
             {
                 return null;
@@ -171,23 +169,23 @@ namespace ManagedIrbis.Morphology
                 string format
             )
         {
-            string rewritten = RewriteQuery(expression);
-            int[] found = Connection.Search(rewritten);
+            var rewritten = RewriteQuery(expression);
+            var found = Connection.Search(rewritten);
             if (found.Length == 0)
             {
                 return Array.Empty<FoundItem>();
             }
 
             var result = new List<FoundItem>(found.Length);
-            foreach (int mfn in found)
+            foreach (var mfn in found)
             {
                 var record = Connection.ReadRecord(mfn);
                 if (!ReferenceEquals(record, null))
                 {
-                    string text = Connection.FormatRecord(format, record);
+                    var text = Connection.FormatRecord(format, record);
                     if (!string.IsNullOrEmpty(text))
                     {
-                        FoundItem item = new FoundItem
+                        var item = new FoundItem
                         {
                             Mfn = mfn,
                             Text = text

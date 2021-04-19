@@ -7,6 +7,8 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
 /* InvertedFile64.cs -- read inverted (index) file

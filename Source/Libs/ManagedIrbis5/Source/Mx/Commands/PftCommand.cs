@@ -76,7 +76,7 @@ namespace ManagedIrbis.Mx.Commands
 
             if (!string.IsNullOrEmpty(source))
             {
-                string text = executive.FormatRemote(source);
+                var text = executive.FormatRemote(source);
                 executive.WriteLine(text);
             }
 

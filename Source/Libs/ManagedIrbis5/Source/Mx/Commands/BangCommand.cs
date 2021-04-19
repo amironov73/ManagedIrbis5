@@ -64,7 +64,7 @@ namespace ManagedIrbis.Mx.Commands
                 context.ClearAll();
                 var formatter = new PftFormatter(context);
                 formatter.ParseProgram(source);
-                string output = formatter.FormatRecord(new Record());
+                var output = formatter.FormatRecord(new Record());
                 executive.WriteLine(output);
             }
 

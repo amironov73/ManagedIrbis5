@@ -119,7 +119,7 @@ namespace ManagedIrbis.Marc.Schema
                 XElement element
             )
         {
-            FieldSchema result = new FieldSchema
+            var result = new FieldSchema
             {
                 Tag = element.GetAttributeText("tag"),
                 Name = element.GetAttributeText("name"),
@@ -131,37 +131,37 @@ namespace ManagedIrbis.Marc.Schema
                 Display = element.GetAttributeBoolean("display", false)
             };
 
-            foreach (XElement subElement in element.Elements("SUBFIELD"))
+            foreach (var subElement in element.Elements("SUBFIELD"))
             {
-                SubFieldSchema subField
+                var subField
                     = SubFieldSchema.ParseElement(subElement);
                 result.SubFields.Add(subField);
             }
 
-            foreach (XElement subElement in element.Elements("RELATED"))
+            foreach (var subElement in element.Elements("RELATED"))
             {
-                RelatedField relatedField
+                var relatedField
                     = RelatedField.ParseElement(subElement);
                 result.RelatedFields.Add(relatedField);
             }
 
-            XElement examples = element.Element("EXAMPLES");
+            var examples = element.Element("EXAMPLES");
             if (!ReferenceEquals(examples, null))
             {
-                foreach (XElement subElement in examples.Elements("EX"))
+                foreach (var subElement in examples.Elements("EX"))
                 {
-                    Example example = Example.ParseElement(subElement);
+                    var example = Example.ParseElement(subElement);
                     result.Examples.Add(example);
                 }
             }
 
-            XElement indicator1 = element.Element("IND1");
+            var indicator1 = element.Element("IND1");
             if (!ReferenceEquals(indicator1, null))
             {
                 result.Indicator1 = IndicatorSchema.ParseElement(indicator1);
             }
 
-            XElement indicator2 = element.Element("IND2");
+            var indicator2 = element.Element("IND2");
             if (!ReferenceEquals(indicator2, null))
             {
                 result.Indicator2 = IndicatorSchema.ParseElement(indicator2);

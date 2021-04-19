@@ -73,7 +73,7 @@ namespace ManagedIrbis.Identifiers
         /// <summary>
         /// Identifier.
         /// </summary>
-        public string Identifier { get; set; }
+        public string? Identifier { get; set; }
 
         #endregion
 

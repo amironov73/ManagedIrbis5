@@ -68,7 +68,7 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            string name = null;
+            string? name = null;
             if (arguments.Length != 0)
             {
                 name = arguments[0].Text;
@@ -76,25 +76,17 @@ namespace ManagedIrbis.Mx.Commands
 
             if (string.IsNullOrEmpty(name))
             {
-                foreach (MxCommand command in executive.Commands)
+                foreach (var command in executive.Commands)
                 {
-                    executive.WriteMessage(string.Format
-                        (
-                            "{0} {1}",
-                            command.Name, command.GetShortHelp()
-                        ));
+                    executive.WriteMessage($"{command.Name} {command.GetShortHelp()}");
                 }
             }
             else
             {
-                MxCommand command = executive.GetCommand(name);
+                var command = executive.GetCommand(name);
                 if (ReferenceEquals(command, null))
                 {
-                    executive.WriteError(string.Format
-                        (
-                            "Unknown command '{0}'",
-                            name
-                        ));
+                    executive.WriteError($"Unknown command '{name}'");
                 }
                 else
                 {

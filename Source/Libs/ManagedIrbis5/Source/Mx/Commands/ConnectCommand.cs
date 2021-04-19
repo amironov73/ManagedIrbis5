@@ -92,7 +92,7 @@ namespace ManagedIrbis.Mx.Commands
 
             if (arguments.Length != 0)
             {
-                string argument = arguments[0].Text;
+                var argument = arguments[0].Text;
                 executive.Provider.Dispose();
                 if (string.IsNullOrEmpty(argument))
                 {

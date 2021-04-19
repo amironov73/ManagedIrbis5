@@ -73,7 +73,7 @@ namespace ManagedIrbis.Mx.Commands
         {
             OnBeforeExecute();
 
-            MxRecord[] records = executive.Records.ToArray();
+            var records = executive.Records.ToArray();
 
             if (records.Length == 0)
             {
@@ -83,9 +83,9 @@ namespace ManagedIrbis.Mx.Commands
             {
                 if (!string.IsNullOrEmpty(executive.OrderFormat))
                 {
-                    int[] mfns = records.Select(r => r.Mfn).ToArray();
-                    string[] order = executive.Provider.FormatRecords(mfns, executive.OrderFormat);
-                    for (int i = 0; i < order.Length; i++)
+                    var mfns = records.Select(r => r.Mfn).ToArray();
+                    var order = executive.Provider.FormatRecords(mfns, executive.OrderFormat);
+                    for (var i = 0; i < order.Length; i++)
                     {
                         records[i].Order = order[i];
                     }
@@ -95,15 +95,15 @@ namespace ManagedIrbis.Mx.Commands
 
                 if (!string.IsNullOrEmpty(executive.DescriptionFormat))
                 {
-                    int[] mfns = records.Select(r => r.Mfn).ToArray();
-                    string[] formatted = executive.Provider.FormatRecords(mfns, executive.DescriptionFormat);
-                    for (int i = 0; i < formatted.Length; i++)
+                    var mfns = records.Select(r => r.Mfn).ToArray();
+                    var formatted = executive.Provider.FormatRecords(mfns, executive.DescriptionFormat);
+                    for (var i = 0; i < formatted.Length; i++)
                     {
                         records[i].Order = formatted[i];
                     }
                 }
 
-                foreach (MxRecord record in records)
+                foreach (var record in records)
                 {
                     if (string.IsNullOrEmpty(record.Description))
                     {

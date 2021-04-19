@@ -15,18 +15,9 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
@@ -75,15 +66,16 @@ namespace ManagedIrbis.Mx.Commands
         {
             OnBeforeExecute();
 
-            string fileName = "output.txt";
+            var fileName = "output.txt";
             if (arguments.Length != 0)
             {
                 fileName = arguments[0].Text;
             }
 
-            using (StreamWriter writer = File.CreateText(fileName))
+            if (!string.IsNullOrEmpty(fileName))
             {
-                foreach (MxRecord record in executive.Records)
+                using var writer = File.CreateText(fileName);
+                foreach (var record in executive.Records)
                 {
                     writer.WriteLine(record.Mfn.ToInvariantString());
                 }
@@ -96,8 +88,5 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

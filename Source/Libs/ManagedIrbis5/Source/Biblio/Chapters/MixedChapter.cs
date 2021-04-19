@@ -13,26 +13,12 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
-using AM.Text.Output;
 
-
-
-using ManagedIrbis.Client;
 using ManagedIrbis.Fields;
-using ManagedIrbis.Pft;
 
 #endregion
 
@@ -60,7 +46,6 @@ namespace ManagedIrbis.Biblio
             }
 
             var log = context.Log;
-            Record? record = null;
 
             log.WriteLine("Begin build items {0}", this);
             Items = new ItemCollection();
@@ -94,6 +79,7 @@ namespace ManagedIrbis.Biblio
                     .ThrowIfNull("generalFormat");
                 formatter.ParseProgram(generalFormat);
 
+                Record? record;
                 for (var i = 0; i < Records.Count; i++)
                 {
                     record = Records[i];
@@ -203,13 +189,16 @@ namespace ManagedIrbis.Biblio
                     {
                         foreach (var item in bookGroup)
                         {
-                            order = formatter.FormatRecord(item.Record.Mfn);
-                            if (!string.IsNullOrEmpty(order))
+                            if (item.Record is not null)
                             {
-                                order = order.Trim();
-                            }
+                                order = formatter.FormatRecord(item.Record.Mfn);
+                                if (!string.IsNullOrEmpty(order))
+                                {
+                                    order = order.Trim();
+                                }
 
-                            item.Order = order;
+                                item.Order = order;
+                            }
                         }
                     }
                 }

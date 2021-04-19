@@ -16,19 +16,8 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using AM;
-using AM.Collections;
 using AM.ConsoleIO;
-using AM.IO;
-using AM.Runtime;
-using AM.Text;
 
 #endregion
 
@@ -47,15 +36,15 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// <inheritdoc cref="IMxConsole.BackgroundColor" />
         public ConsoleColor BackgroundColor
         {
-            get { return ConsoleInput.BackgroundColor; }
-            set { ConsoleInput.BackgroundColor = value; }
+            get => ConsoleInput.BackgroundColor;
+            set => ConsoleInput.BackgroundColor = value;
         }
 
         /// <inheritdoc cref="IMxConsole.ForegroundColor" />
         public ConsoleColor ForegroundColor
         {
-            get { return ConsoleInput.ForegroundColor; }
-            set { ConsoleInput.ForegroundColor = value; }
+            get => ConsoleInput.ForegroundColor;
+            set => ConsoleInput.ForegroundColor = value;
         }
 
         /// <inheritdoc cref="IMxConsole.Write" />
@@ -68,7 +57,7 @@ namespace ManagedIrbis.Mx.Infrastructrure
         }
 
         /// <inheritdoc cref="IMxConsole.ReadLine" />
-        public string ReadLine()
+        public string? ReadLine()
         {
             return ConsoleInput.ReadLine();
         }

@@ -46,7 +46,7 @@ namespace ManagedIrbis.Mx.Infrastructrure
         /// <summary>
         /// Вввод.
         /// </summary>
-        string ReadLine();
+        string? ReadLine();
 
         /// <summary>
         /// Очистка.

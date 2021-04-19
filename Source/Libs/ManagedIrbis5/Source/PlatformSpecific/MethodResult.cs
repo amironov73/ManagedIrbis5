@@ -4,10 +4,12 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* MethodResult.cs --
+/* MethodResult.cs -- результат вызова внешнего метода
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +24,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace ManagedIrbis.PlatformSpecific
 {
     /// <summary>
-    /// Result of external method call.
+    /// Результат вызова внешнего метода.
     /// </summary>
     [ExcludeFromCodeCoverage]
     sealed class MethodResult
@@ -37,13 +39,15 @@ namespace ManagedIrbis.PlatformSpecific
         /// <summary>
         /// Input.
         /// </summary>
-        public string Input { get; set; }
+        public string? Input { get; set; }
 
         /// <summary>
         /// Output.
         /// </summary>
-        public string Output { get; set; }
+        public string? Output { get; set; }
 
         #endregion
-    }
-}
+
+    } // class MethodResult
+
+} // namespace ManagedIrbis.PlatformSpecific

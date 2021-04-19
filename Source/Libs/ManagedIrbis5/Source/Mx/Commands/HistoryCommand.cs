@@ -13,18 +13,9 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
@@ -73,23 +64,19 @@ namespace ManagedIrbis.Mx.Commands
         {
             OnBeforeExecute();
 
-            string command = null;
+            string? command = null;
             if (arguments.Length != 0)
             {
                 command = arguments[0].Text;
             }
 
-            string[] history = executive.History.ToArray();
+            var history = executive.History.ToArray();
 
             if (string.IsNullOrEmpty(command))
             {
-                for (int i = 0; i < history.Length; i++)
+                for (var i = 0; i < history.Length; i++)
                 {
-                    executive.WriteMessage(string.Format
-                        (
-                            "{0}: {1}",
-                            i + 1, history[i]
-                        ));
+                    executive.WriteMessage($"{i + 1}: {history[i]}");
                 }
             }
             else

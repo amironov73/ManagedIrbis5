@@ -6,13 +6,13 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
 /* PriceMenu.cs -- обертка над файлом IZC.MNU
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
@@ -125,7 +125,7 @@ namespace ManagedIrbis.Menus
                     Item? other
                 )
             {
-                return _Compare(Date, other.Date);
+                return _Compare(Date, other?.Date);
             }
 
             #endregion
@@ -169,7 +169,11 @@ namespace ManagedIrbis.Menus
 
         #region Private members
 
-        private static int _Compare(string left, string right)
+        private static int _Compare
+            (
+                string? left,
+                string? right
+            )
         {
             return string.Compare
                 (
@@ -228,20 +232,21 @@ namespace ManagedIrbis.Menus
         {
             if (string.IsNullOrEmpty(date))
             {
+                Magna.Warning("No date specified");
                 return 1.0m;
             }
 
             var result = 1.0m;
             if (Items.Count != 0)
             {
-                result = Items.Min().Coefficient.Value;
+                result = Items.Min()?.Coefficient ?? 1.0m;
             }
 
             foreach (var item in Items)
             {
                 if (_Compare(date, item.Date) >= 0)
                 {
-                    result = item.Coefficient.Value;
+                    result = item.Coefficient ?? 1.0m;
                 }
             }
 
@@ -263,7 +268,8 @@ namespace ManagedIrbis.Menus
 
             foreach (var item in Items)
             {
-                if (item.Date.StartsWith(date))
+                if (!string.IsNullOrEmpty(item.Date)
+                    && item.Date.StartsWith(date))
                 {
                     return true;
                 }

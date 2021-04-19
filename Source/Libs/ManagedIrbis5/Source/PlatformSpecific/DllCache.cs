@@ -109,14 +109,13 @@ namespace ManagedIrbis.PlatformSpecific
                 Type type
             )
         {
-            DynamicLibrary library = LoadLibrary(libraryName);
-            Pair<string, string> key = new Pair<string, string>
+            var library = LoadLibrary(libraryName);
+            var key = new Pair<string, string>
                 (
                     libraryName.ToUpperInvariant(),
                     functionName.ToUpperInvariant()
                 );
-            Delegate result;
-            if (!DelegateRegistry.TryGetValue(key, out result))
+            if (!DelegateRegistry.TryGetValue(key, out var result))
             {
                 result = library.CreateDelegate
                     (

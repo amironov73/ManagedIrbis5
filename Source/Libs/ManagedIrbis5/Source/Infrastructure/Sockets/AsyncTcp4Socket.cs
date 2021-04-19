@@ -51,7 +51,8 @@ namespace ManagedIrbis.Infrastructure.Sockets
             using var client = new TcpClient();
             try
             {
-                await client.ConnectAsync(connection.Host, connection.Port);
+                var host = connection.Host.ThrowIfNull("connection.Host");
+                await client.ConnectAsync(host, connection.Port);
             }
             catch (Exception exception)
             {

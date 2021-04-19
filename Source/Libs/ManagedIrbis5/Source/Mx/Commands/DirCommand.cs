@@ -72,7 +72,7 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            string fileName = "*.*";
+            var fileName = "*.*";
             if (arguments.Length != 0)
             {
                 fileName = arguments[0].Text;

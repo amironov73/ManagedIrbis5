@@ -83,7 +83,7 @@ namespace ManagedIrbis
         }
 
         public event EventHandler? BusyChanged;
-        public string Database { get; set; }
+        public string? Database { get; set; }
         public bool Connected { get; }
         public bool Busy { get; }
         public int LastError { get; }

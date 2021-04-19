@@ -13,23 +13,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
-#endregion
-
 #nullable enable
 
 namespace ManagedIrbis.Mx.Commands
@@ -40,10 +23,6 @@ namespace ManagedIrbis.Mx.Commands
     public sealed class DbCommand
         : MxCommand
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -53,14 +32,6 @@ namespace ManagedIrbis.Mx.Commands
             : base("db")
         {
         }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
 
         #endregion
 
@@ -81,8 +52,8 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            string saveDatabase = executive.Provider.Database;
-            string dbName = null;
+            var saveDatabase = executive.Provider.Database;
+            string? dbName = null;
             if (arguments.Length != 0)
             {
                 dbName = arguments[0].Text;
@@ -95,21 +66,12 @@ namespace ManagedIrbis.Mx.Commands
 
             try
             {
-                int maxMfn = executive.Provider.GetMaxMfn() - 1;
-                executive.WriteMessage(string.Format
-                    (
-                        "DB={0}, Max MFN={1}",
-                        executive.Provider.Database,
-                        maxMfn
-                    ));
+                var maxMfn = executive.Provider.GetMaxMfn() - 1;
+                executive.WriteMessage($"DB={executive.Provider.Database}, Max MFN={maxMfn}");
             }
             catch
             {
-                executive.WriteError(string.Format
-                    (
-                        "Error changing DB, restoring to {0}",
-                        saveDatabase
-                    ));
+                executive.WriteError($"Error changing DB, restoring to {saveDatabase}");
                 executive.Provider.Database = saveDatabase;
             }
 
@@ -120,8 +82,6 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
+    } // class DbCommand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Mx.Commands

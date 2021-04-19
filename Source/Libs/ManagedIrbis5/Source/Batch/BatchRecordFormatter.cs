@@ -104,7 +104,7 @@ namespace ManagedIrbis.Batch
                 string database,
                 string format,
                 int batchSize,
-                IEnumerable<int> range
+                IEnumerable<int>? range
             )
         {
             if (batchSize < 1)
@@ -124,6 +124,7 @@ namespace ManagedIrbis.Batch
             BatchSize = batchSize;
             Format = format;
 
+            range ??= Array.Empty<int>();
             _packages = range.Slice(batchSize).ToArray();
             TotalRecords = _packages.Sum(p => p.Length);
         } // constructor

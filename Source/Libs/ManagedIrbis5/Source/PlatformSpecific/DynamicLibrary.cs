@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -43,7 +44,7 @@ namespace ManagedIrbis.PlatformSpecific
         /// <summary>
         /// Raised when disposing.
         /// </summary>
-        public event EventHandler Disposing;
+        public event EventHandler? Disposing;
 
         #endregion
 
@@ -240,7 +241,7 @@ namespace ManagedIrbis.PlatformSpecific
                     + LibraryName.ToVisibleString()
                 );
 
-            Disposing.Raise(this);
+            Disposing?.Invoke(this, EventArgs.Empty);
             FreeLibrary(_handle);
         }
 

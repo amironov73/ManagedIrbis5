@@ -87,7 +87,7 @@ namespace ManagedIrbis.Magazines
             var batch = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database,
+                    Connection.Database.ThrowIfNull("Connection.Database"),
                     "VRL=J",
                     1000
                 );
@@ -95,7 +95,7 @@ namespace ManagedIrbis.Magazines
             {
                 if (!ReferenceEquals(record, null))
                 {
-                    MagazineInfo magazine = MagazineInfo.Parse(record);
+                    var magazine = MagazineInfo.Parse(record);
                     if (!ReferenceEquals(magazine, null))
                     {
                         result.Add(magazine);
@@ -174,7 +174,7 @@ namespace ManagedIrbis.Magazines
                 MagazineInfo magazine
             )
         {
-            string searchExpression = string.Format
+            var searchExpression = string.Format
                 (
                         "\"I933={0}/$\"",
                         magazine.Index
@@ -182,12 +182,12 @@ namespace ManagedIrbis.Magazines
             var records = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database,
+                    Connection.Database.ThrowIfNull("Connection.Database"),
                     searchExpression,
                     1000
                 );
 
-            MagazineIssueInfo[] result = records
+            var result = records
                 .Select(record => MagazineIssueInfo.Parse(record))
                 .NonNullItems()
                 .ToArray();
@@ -204,7 +204,7 @@ namespace ManagedIrbis.Magazines
                 string year
             )
         {
-            string searchExpression = string.Format
+            var searchExpression = string.Format
                 (
                         "\"I={0}/{1}/$\"",
                         magazine.Index,
@@ -213,12 +213,12 @@ namespace ManagedIrbis.Magazines
             var records = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database,
+                    Connection.Database.ThrowIfNull("Connection.Database"),
                     searchExpression,
                     1000
                 );
 
-            MagazineIssueInfo[] result = records
+            var result = records
                 .Select(record => MagazineIssueInfo.Parse(record))
                 .NonNullItems()
                 .ToArray();
@@ -234,7 +234,7 @@ namespace ManagedIrbis.Magazines
                 MagazineIssueInfo issue
             )
         {
-            string searchExpression = string.Format
+            var searchExpression = string.Format
                 (
                     "\"II={0}\"",
                     issue.Index
@@ -242,12 +242,12 @@ namespace ManagedIrbis.Magazines
             var records = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database,
+                    Connection.Database.ThrowIfNull("Connection.Database"),
                     searchExpression,
                     1000
                 );
 
-            MagazineArticleInfo[] result = records
+            var result = records
                 .Select(record => MagazineArticleInfo.ParseAsp(record))
                 .NonNullItems()
                 .ToArray();
@@ -289,8 +289,8 @@ namespace ManagedIrbis.Magazines
                 ExemplarInfo[]? exemplars
             )
         {
-            string fullIndex = magazine.Index + "/" + year + "/" + issue;
-            MagazineIssueInfo result = new MagazineIssueInfo
+            var fullIndex = magazine.Index + "/" + year + "/" + issue;
+            var result = new MagazineIssueInfo
             {
                 Index = fullIndex,
                 DocumentCode = fullIndex,

@@ -15,10 +15,10 @@
 
 #region Using directives
 
-using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM.Drawing.Barcodes;
@@ -37,17 +37,29 @@ namespace AM.Drawing.CardPrinting
     {
         #region Properties
 
+        /// <summary>
+        /// Ширина.
+        /// </summary>
         [XmlElement("width")]
         [DisplayName("Ширина")]
+        [JsonPropertyName("width")]
         public int Width { get; set; }
 
+        /// <summary>
+        /// Высота.
+        /// </summary>
         [XmlElement("height")]
         [DisplayName("Высота")]
+        [JsonPropertyName("height")]
         public int Height { get; set; }
 
+        /// <summary>
+        /// Текст штрих-кода.
+        /// </summary>
         [XmlElement("text")]
         [DisplayName("Текст")]
-        public String Text { get; set; }
+        [JsonPropertyName("text")]
+        public string? Text { get; set; }
 
         #endregion
 
@@ -58,7 +70,7 @@ namespace AM.Drawing.CardPrinting
                 DrawingContext context
             )
         {
-            var g = context.Graphics;
+            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
 
             if (!string.IsNullOrEmpty(Text))
             {
@@ -74,11 +86,11 @@ namespace AM.Drawing.CardPrinting
                     {
                         Data = data,
                         Bounds = new RectangleF(Left, Top, Width, Height),
-                        Graphics = g
+                        Graphics = graphics
                     };
-                    g.InterpolationMode = InterpolationMode.NearestNeighbor;
-                    g.SmoothingMode = SmoothingMode.None;
-                    g.PixelOffsetMode = PixelOffsetMode.None;
+                    graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    graphics.SmoothingMode = SmoothingMode.None;
+                    graphics.PixelOffsetMode = PixelOffsetMode.None;
                     barcode.DrawBarcode(barcodeContext);
                 }
             }
@@ -88,11 +100,11 @@ namespace AM.Drawing.CardPrinting
 
         #region Object members
 
-        public override string ToString()
-        {
-            return string.Format("Штрих-код: {0}", Text);
-        }
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"Штрих-код: {Text}";
 
         #endregion
-    }
-}
+
+    } // class CardBarcode
+
+} // namespace AM.Drawing.CardPrinting

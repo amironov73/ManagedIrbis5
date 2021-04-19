@@ -4,6 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -37,7 +41,7 @@ namespace ManagedIrbis.Gbl
         /// Вызывается после обработки очередной порции записей
         /// и в конце общей обработки.
         /// </summary>
-        public event EventHandler PortionProcessed;
+        public event EventHandler? PortionProcessed;
 
         #endregion
 
@@ -99,7 +103,7 @@ namespace ManagedIrbis.Gbl
             : this
             (
                 connection,
-                connection.ThrowIfNull("connection").Database,
+                connection.ThrowIfNull("connection").Database.ThrowIfNull("Database"),
                 100
             )
         {
@@ -171,7 +175,7 @@ namespace ManagedIrbis.Gbl
         {
             var result = new GlobalCorrector(connection)
             {
-                Database = settings.Database ?? connection.Database,
+                Database = settings.Database ?? connection.Database.ThrowIfNull("connection.Database"),
                 Actualize = settings.Actualize,
                 Autoin = settings.Autoin,
                 FormalControl = settings.FormalControl
@@ -258,12 +262,13 @@ namespace ManagedIrbis.Gbl
                     settings.MinMfn = startMfn;
                     settings.MaxMfn = endMfn;
 
-                    var intermediateResult
-                        = Connection.GlobalCorrection (settings);
-                    Result.MergeResult(intermediateResult);
+                    var intermediateResult = Connection.GlobalCorrection (settings);
+                    if (intermediateResult is not null)
+                    {
+                        Result.MergeResult(intermediateResult);
+                    }
 
-                    Result.TimeElapsed = DateTime.Now
-                        - Result.TimeStarted;
+                    Result.TimeElapsed = DateTime.Now - Result.TimeStarted;
 
                     PortionProcessed.Raise(this);
 
@@ -320,21 +325,22 @@ namespace ManagedIrbis.Gbl
 
             while (list.Count > 0)
             {
-                int[] portion = list.Take(ChunkSize).ToArray();
+                var portion = list.Take(ChunkSize).ToArray();
                 list = list.Skip(ChunkSize).ToList();
                 try
                 {
-                    GblSettings settings = ToSettings(statements);
+                    var settings = ToSettings(statements);
                     settings.FirstRecord = 0;
                     settings.NumberOfRecords = 0;
                     settings.MfnList = portion;
 
-                    GblResult intermediateResult
-                        = Connection.GlobalCorrection(settings);
-                    Result.MergeResult(intermediateResult);
+                    var intermediateResult = Connection.GlobalCorrection(settings);
+                    if (intermediateResult is not null)
+                    {
+                        Result.MergeResult(intermediateResult);
+                    }
 
-                    Result.TimeElapsed = DateTime.Now
-                        - Result.TimeStarted;
+                    Result.TimeElapsed = DateTime.Now - Result.TimeStarted;
 
                     PortionProcessed.Raise(this);
 

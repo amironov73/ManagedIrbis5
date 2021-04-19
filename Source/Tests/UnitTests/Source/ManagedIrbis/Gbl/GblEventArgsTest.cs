@@ -21,7 +21,9 @@ namespace UnitTests.ManagedIrbis.Gbl
         public void GblEventArgs_Construction()
         {
             var mock = new Mock<ISyncIrbisProvider>();
+            mock.SetupAllProperties();
             var connection = mock.Object;
+            connection.Database = "IBIS";
             var corrector = new GlobalCorrector(connection);
             var args = new GblEventArgs(corrector);
 

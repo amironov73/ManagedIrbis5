@@ -13,18 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
@@ -82,19 +71,19 @@ namespace ManagedIrbis.Mx.Commands
             if (arguments.Length != 0
                 && executive.History.Count != 0)
             {
-                string argument = arguments[0].Text;
-                string previous = executive.History.Peek();
+                var argument = arguments[0].Text;
+                var previous = executive.History.Peek();
                 argument = string.Format("({0}) * ({1})", previous, argument);
 
                 if (!string.IsNullOrEmpty(argument))
                 {
-                    SearchCommand searchCommand = executive.Commands
+                    var searchCommand = executive.Commands
                         .OfType<SearchCommand>().FirstOrDefault();
                     if (!ReferenceEquals(searchCommand, null))
                     {
                         MxArgument[] newArguments =
                         {
-                            new MxArgument {Text = argument}
+                            new() { Text = argument }
                         };
                         searchCommand.Execute(executive, newArguments);
                     }
@@ -108,8 +97,5 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
-
-        #endregion
     }
 }

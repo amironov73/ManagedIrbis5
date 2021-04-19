@@ -77,7 +77,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
         {
             Name = name;
-            foreach (PftNode child in body)
+            foreach (var child in body)
             {
                 Children.Add(child);
             }
@@ -95,8 +95,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftUnifor otherUnifor = (PftUnifor) otherNode;
-            bool result = Name == otherUnifor.Name;
+            var otherUnifor = (PftUnifor) otherNode;
+            var result = Name == otherUnifor.Name;
             if (!result)
             {
                 throw new PftSerializationException();
@@ -111,7 +111,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             compiler.CompileNodes(Children);
 
-            string actionName = compiler.CompileAction(Children);
+            var actionName = compiler.CompileAction(Children);
 
             compiler.StartMethod(this);
 
@@ -153,9 +153,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             string expression;
 
-            using (PftContextGuard guard = new PftContextGuard(context))
+            using (var guard = new PftContextGuard(context))
             {
-                PftContext subContext = guard.ChildContext;
+                var subContext = guard.ChildContext;
                 subContext.Execute(Children);
                 expression = subContext.Text;
             }
@@ -172,19 +172,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "FormatExit"
             };
-            PftNodeInfo body = new PftNodeInfo
+            var body = new PftNodeInfo
             {
                 Name = "Body"
             };
             result.Children.Add(body);
-            foreach (PftNode node in Children)
+            foreach (var node in Children)
             {
-                PftNodeInfo info = node.GetNodeInfo();
+                var info = node.GetNodeInfo();
                 body.Children.Add(info);
             }
 
@@ -241,7 +241,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append('&');
             result.Append(Name);
             result.Append('(');

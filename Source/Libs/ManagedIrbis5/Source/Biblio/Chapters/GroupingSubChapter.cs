@@ -4,6 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -82,7 +85,7 @@ namespace ManagedIrbis.Biblio
 
         #region Private members
 
-        private static char[] _lineDelimiters = { '\r', '\n' };
+        private static readonly char[] _lineDelimiters = { '\r', '\n' };
 
         private void _OrderGroup
             (
@@ -103,23 +106,18 @@ namespace ManagedIrbis.Biblio
                     return;
                 }
 
-                var processor = context.Processor
-                    .ThrowIfNull("context.Processor");
-                using (var formatter
-                    = processor.AcquireFormatter(context))
-                {
-                    orderFormat = processor.GetText(context, orderFormat)
-                        .ThrowIfNull("orderFormat");
-                    formatter.ParseProgram(orderFormat);
+                var processor = context.Processor.ThrowIfNull("context.Processor");
+                using var formatter = processor.AcquireFormatter(context);
+                orderFormat = processor.GetText(context, orderFormat).ThrowIfNull("orderFormat");
+                formatter.ParseProgram(orderFormat);
 
-                    foreach (var item in bookGroup)
-                    {
-                        var record = item.Record
-                            .ThrowIfNull("item.Record");
-                        var order = formatter.FormatRecord(record.Mfn);
-                        //item.Order = RichText.Decode(order);
-                        item.Order = order;
-                    }
+                foreach (var item in bookGroup)
+                {
+                    var record = item.Record
+                        .ThrowIfNull("item.Record");
+                    var order = formatter.FormatRecord(record.Mfn);
+                    //item.Order = RichText.Decode(order);
+                    item.Order = order;
                 }
             }
 
@@ -145,6 +143,12 @@ namespace ManagedIrbis.Biblio
             )
         {
             base.BuildItems(context);
+
+            var items = Items;
+            if (items is null)
+            {
+                return;
+            }
 
             var settings = Settings;
             if (ReferenceEquals(settings, null))
@@ -180,24 +184,22 @@ namespace ManagedIrbis.Biblio
                 OtherGroup = true
             };
 
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            using (var formatter
-                = processor.AcquireFormatter(context))
+            var processor = context.Processor.ThrowIfNull("context.Processor");
+            using (var formatter = processor.AcquireFormatter(context))
             {
                 groupBy = processor.GetText(context, groupBy)
                     .ThrowIfNull("groupBy");
                 formatter.ParseProgram(groupBy);
 
-                foreach (var item in Items)
+                foreach (var item in items)
                 {
-                    var record = item.Record
-                        .ThrowIfNull("item.Record");
+                    var record = item.Record.ThrowIfNull("item.Record");
                     var text = formatter.FormatRecord(record.Mfn);
                     if (string.IsNullOrEmpty(text))
                     {
                         continue;
                     }
+
                     var keys = text.Trim()
                         .Split(_lineDelimiters)
                         .TrimLines()
@@ -281,7 +283,10 @@ namespace ManagedIrbis.Biblio
             foreach (var bookGroup in Groups)
             {
                 var name = bookGroup.Name;
-                log.WriteLine(name);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    log.WriteLine(name);
+                }
 
                 report.Body.Add(new ParagraphBand());
                 var groupTitle =

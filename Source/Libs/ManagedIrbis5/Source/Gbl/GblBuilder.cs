@@ -16,6 +16,7 @@
 #region Using directives
 
 using System.Collections.Generic;
+using AM;
 
 #endregion
 
@@ -261,7 +262,7 @@ namespace ManagedIrbis.Gbl
             return new GlobalCorrector
                 (
                     connection,
-                    connection.Database
+                    connection.Database.ThrowIfNull("connection.Database")
                 )
                 .ProcessWholeDatabase
                 (
@@ -328,7 +329,7 @@ namespace ManagedIrbis.Gbl
             return new GlobalCorrector
                 (
                     connection,
-                    connection.Database
+                    connection.Database.ThrowIfNull("connection.Database")
                 )
                 .ProcessInterval
                 (
@@ -372,7 +373,7 @@ namespace ManagedIrbis.Gbl
             return new GlobalCorrector
                 (
                     connection,
-                    connection.Database
+                    connection.Database.ThrowIfNull("connection.Database")
                 )
                 .ProcessRecordset
                 (

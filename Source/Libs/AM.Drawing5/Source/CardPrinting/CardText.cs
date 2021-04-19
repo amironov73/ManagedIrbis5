@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* CardText.cs --
+/* CardText.cs -- многострочный текст
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,6 +17,7 @@
 
 using System.ComponentModel;
 using System.Drawing;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 #endregion
@@ -33,54 +34,81 @@ namespace AM.Drawing.CardPrinting
     {
         #region Properties
 
+        /// <summary>
+        /// Ширина текста.
+        /// </summary>
         [XmlElement("width")]
         [DisplayName("Ширина")]
+        [JsonPropertyName("width")]
         public int Width { get; set; }
 
+        /// <summary>
+        /// Высота текста.
+        /// </summary>
         [XmlElement("height")]
         [DisplayName("Высота")]
+        [JsonPropertyName("height")]
         public int Height { get; set; }
 
+        /// <summary>
+        /// Шрифт.
+        /// </summary>
         [XmlElement("font")]
         [DisplayName("Шрифт")]
-        public string Font { get; set; }
+        [JsonPropertyName("font")]
+        public string? Font { get; set; }
 
+        /// <summary>
+        /// Цвет текста.
+        /// </summary>
         [XmlElement("color")]
         [DisplayName("Цвет")]
-        public string Color { get; set; }
+        [JsonPropertyName("color")]
+        public string? Color { get; set; }
 
+        /// <summary>
+        /// Собственно текст.
+        /// </summary>
         [XmlElement("text")]
         [DisplayName("Текст")]
-        public string Text { get; set; }
+        [JsonPropertyName("text")]
+        public string? Text { get; set; }
 
         #endregion
 
         #region CardItem members
 
-        public override void Draw(DrawingContext context)
+        /// <inheritdoc cref="CardItem.Draw"/>
+        public override void Draw
+            (
+                DrawingContext context
+            )
         {
-            Graphics g = context.Graphics;
+            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
+
+            if (string.IsNullOrEmpty(Font))
+            {
+                Magna.Warning("Font isn't specified");
+            }
+
+            if (string.IsNullOrEmpty(Color))
+            {
+                Magna.Warning("Color isn't specified");
+            }
 
             if (!string.IsNullOrEmpty(Font)
                 && !string.IsNullOrEmpty(Color)
                 && !string.IsNullOrEmpty(Text))
             {
-                FontConverter fontConverter = new FontConverter();
-                using (Font font = (Font) fontConverter.ConvertFromString(Font))
-                {
-                    ColorConverter colorConverter = new ColorConverter();
-                    // ReSharper disable PossibleNullReferenceException
-                    Color color = (Color) colorConverter.ConvertFromString(Color);
-                    // ReSharper restore PossibleNullReferenceException
-
-                    string text = context.ExpandText(Text);
-
-                    using (Brush brush = new SolidBrush(color))
-                    {
-                        Rectangle rectangle = new Rectangle(Left, Top, Width, Height);
-                        g.DrawString(text, font, brush, rectangle);
-                    }
-                }
+                var fontConverter = new FontConverter();
+                using var font = (Font) fontConverter.ConvertFromString(Font)
+                    .ThrowIfNull("fontConverter.ConvertFromString");
+                var colorConverter = new ColorConverter();
+                var color = (Color) colorConverter.ConvertFromString(Color);
+                var text = context.ExpandText(Text);
+                using var brush = new SolidBrush(color);
+                var rectangle = new Rectangle(Left, Top, Width, Height);
+                graphics.DrawString(text, font, brush, rectangle);
             }
         }
 
@@ -88,11 +116,11 @@ namespace AM.Drawing.CardPrinting
 
         #region Object members
 
-        public override string ToString()
-        {
-            return string.Format("Многострочный текст: {0}", Text);
-        }
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"Многострочный текст: {Text}";
 
         #endregion
-    }
-}
+
+    } // class CardText
+
+} // namespace AM.Drawing.CardPrinting

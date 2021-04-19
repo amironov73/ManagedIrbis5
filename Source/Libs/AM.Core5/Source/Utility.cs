@@ -2071,11 +2071,11 @@ namespace AM
         [Pure]
         public static T? SafeAt<T>
             (
-                this T?[] items,
+                this T?[]? items,
                 int index,
                 T? defaultValue = default
             )
-            => index < 0 || index >= items.Length ? defaultValue : items[index];
+            => index < 0 || index >= (items?.Length ?? 0) ? defaultValue : items![index];
 
         /// <summary>
         /// Определяет, равен ли данный объект

@@ -364,7 +364,11 @@ namespace ManagedIrbis.Biblio
                     record.UserData = _GetYear(record);
                 }
 
-                array = array.OrderBy(r => (int) r.UserData).ToArray();
+                array = array.OrderBy
+                    (
+                        r => (int?) r.UserData ?? 0
+                    )
+                    .ToArray();
 
                 var firstRecord = array[0];
                 var same = new RecordCollection();
@@ -442,25 +446,28 @@ namespace ManagedIrbis.Biblio
                         Expression = searchExpression
                     };
                     var found = provider.Search(searchParameters);
-                    log.WriteLine("Found: {0} record(s)", found.Length);
+                    log.WriteLine("Found: {0} record(s)", found?.Length ?? 0);
 
                     log.Write("Reading records");
 
-                    for (var i = 0; i < found.Length; i++)
+                    if (found is not null)
                     {
-                        log.Write(".");
-                        var recordParameters = new ReadRecordParameters
+                        for (var i = 0; i < found.Length; i++)
                         {
-                            Database = context.Provider.Database,
-                            Mfn = found[i].Mfn
-                        };
-                        record = provider.ReadRecord(recordParameters);
-                        if (!ReferenceEquals(record, null))
-                        {
-                            _Fix463(record);
-                            _BeautifyRecord(record);
-                            records.Add(record);
-                            context.Records.Add(record);
+                            log.Write(".");
+                            var recordParameters = new ReadRecordParameters
+                            {
+                                Database = context.Provider.Database,
+                                Mfn = found[i].Mfn
+                            };
+                            record = provider.ReadRecord(recordParameters);
+                            if (!ReferenceEquals(record, null))
+                            {
+                                _Fix463(record);
+                                _BeautifyRecord(record);
+                                records.Add(record);
+                                context.Records.Add(record);
+                            }
                         }
                     }
 

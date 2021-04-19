@@ -6,8 +6,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedType.Global
 
 /* Barman.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -18,9 +20,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Drawing.Printing;
-using System.Globalization;
 using System.IO;
 
 #endregion
@@ -39,7 +39,7 @@ namespace AM.Drawing.CardPrinting
         /// <summary>
         /// Occurs when [data changed].
         /// </summary>
-        public event EventHandler DataChanged;
+        public event EventHandler? DataChanged;
 
         #endregion
 
@@ -83,27 +83,14 @@ namespace AM.Drawing.CardPrinting
         /// <value>
         /// The card.
         /// </value>
-        public CardInfo Card
+        public CardInfo? Card
         {
-            get { return _card; }
+            get => _card;
             set
             {
                 _card = value;
                 OnDataChanged();
             }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Barman"/> class.
-        /// </summary>
-        public Barman()
-        {
-            //_human = new HumanInfo();
-            //_printer = PrinterInfo.GetDefaultPrinterInfo();
         }
 
         #endregion
@@ -114,26 +101,28 @@ namespace AM.Drawing.CardPrinting
 
         //private HumanInfo _human;
 
-        private CardInfo _card;
+        private CardInfo? _card;
 
-        private void OnDataChanged()
+        private void OnDataChanged() => DataChanged?.Invoke(this, EventArgs.Empty);
+
+        private Image? _image;
+
+        void document_PrintPage
+            (
+                object sender,
+                PrintPageEventArgs e
+            )
         {
-            var dataChanged = DataChanged;
-            if (dataChanged != null)
+            var graphics = e.Graphics.ThrowIfNull("Graphics");
+
+            if (_image is not null)
             {
-                dataChanged(this, EventArgs.Empty);
+                graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
+                graphics.SmoothingMode = SmoothingMode.None;
+                graphics.PixelOffsetMode = PixelOffsetMode.None;
+                graphics.DrawImage(_image, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
+                e.HasMorePages = false;
             }
-        }
-
-        private Image _image;
-
-        void document_PrintPage(object sender, PrintPageEventArgs e)
-        {
-            e.Graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
-            e.Graphics.SmoothingMode = SmoothingMode.None;
-            e.Graphics.PixelOffsetMode = PixelOffsetMode.None;
-            e.Graphics.DrawImage(_image, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
-            e.HasMorePages = false;
         }
 
         #endregion
@@ -147,7 +136,7 @@ namespace AM.Drawing.CardPrinting
         public void Load(string fileName)
         {
             var extension = Path.GetExtension(fileName);
-            if (extension != null)
+            if (!string.IsNullOrEmpty(extension))
             {
                 extension = extension.ToLowerInvariant();
             }
@@ -267,37 +256,32 @@ namespace AM.Drawing.CardPrinting
         /// Prints the card.
         /// </summary>
         /// <param name="image">The image.</param>
-        public void PrintCard(Image image)
+        public void PrintCard
+            (
+                Image image
+            )
         {
             Verify();
 
-            /*
-
             _image = image;
-            if (_image == null)
-            {
-                MessageBox.Show("Не сформировано изображение для печати!");
-                return;
-            }
-
             var document = new PrintDocument
             {
                 DocumentName = "Карточка читателя"
             };
             document.PrintPage += document_PrintPage;
 
+            /*
             document.PrinterSettings.PrinterName = Printer.Name;
             document.DefaultPageSettings.PaperSize = new PaperSize
-                (
-                    "Reader card",
-                    Printer.PageWidth,
-                    Printer.PageHeight
-                );
+            (
+                "Reader card",
+                Printer.PageWidth,
+                Printer.PageHeight
+            );
             document.DefaultPageSettings.Landscape = Printer.Landscape;
+            */
 
             document.Print();
-
-            */
         }
 
         /// <summary>

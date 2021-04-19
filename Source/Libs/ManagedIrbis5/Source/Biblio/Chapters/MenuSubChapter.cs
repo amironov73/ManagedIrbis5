@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 /* MenuSubChapter.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -15,9 +16,7 @@ using System;
 
 using AM;
 using AM.Text;
-using AM.Text.Output;
 
-using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
 #endregion
@@ -47,7 +46,7 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Value.
         /// </summary>
-        public string Value { get; set; }
+        public string? Value { get; set; }
 
         /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
         public override bool IsServiceChapter
@@ -172,92 +171,89 @@ namespace ManagedIrbis.Biblio
                 {
                     var processor = context.Processor
                         .ThrowIfNull("context.Processor");
-                    var mainChapter = MainChapter
-                        .ThrowIfNull("MainChapter");
+                    // var mainChapter = MainChapter.ThrowIfNull("MainChapter");
 
-                    using (var formatter = processor.AcquireFormatter(context))
+                    using var formatter = processor.AcquireFormatter(context);
+                    var descriptionFormat = GetDescriptionFormat();
+                    descriptionFormat = processor.GetText
+                        (
+                            context,
+                            descriptionFormat
+                        )
+                        .ThrowIfNull("processor.GetText");
+                    formatter.ParseProgram(descriptionFormat);
+                    //string[] formatted
+                    //    = FormatRecords(context, descriptionFormat);
+
+                    for (var i = 0; i < Records.Count; i++)
                     {
-                        var descriptionFormat = GetDescriptionFormat();
-                        descriptionFormat = processor.GetText
-                            (
-                                context,
-                                descriptionFormat
-                            )
-                            .ThrowIfNull("processor.GetText");
-                        formatter.ParseProgram(descriptionFormat);
-                        //string[] formatted
-                        //    = FormatRecords(context, descriptionFormat);
+                        log.Write(".");
+                        record = Records[i];
+                        //string description = formatted[i]
+                        //    .TrimEnd('\u001F');
+                        var description = formatter.FormatRecord(record)
+                            .TrimEnd('\u001F');
 
-                        for (var i = 0; i < Records.Count; i++)
+                        // TODO handle string.IsNullOrEmpty(description)
+
+                        description = BiblioUtility.AddTrailingDot(description);
+
+                        var item = new BiblioItem
                         {
-                            log.Write(".");
-                            record = Records[i];
-                            //string description = formatted[i]
-                            //    .TrimEnd('\u001F');
-                            var description = formatter.FormatRecord(record)
-                                .TrimEnd('\u001F');
+                            Chapter = this,
+                            Record = record,
+                            Description = description
+                        };
+                        Items.Add(item);
 
-                            // TODO handle string.IsNullOrEmpty(description)
-
-                            description = BiblioUtility.AddTrailingDot(description);
-
-                            var item = new BiblioItem
+                        var same = record.UserData as RecordCollection;
+                        if (!ReferenceEquals(same, null))
+                        {
+                            foreach (var oneRecord in same)
                             {
-                                Chapter = this,
-                                Record = record,
-                                Description = description
-                            };
-                            Items.Add(item);
-
-                            var same = record.UserData as RecordCollection;
-                            if (!ReferenceEquals(same, null))
-                            {
-                                foreach (var oneRecord in same)
-                                {
-                                    var desc = formatter.FormatRecord(oneRecord)
-                                        .TrimEnd('\u001F');
-                                    desc = BiblioUtility.AddTrailingDot(desc);
-                                    oneRecord.Description = desc;
-                                }
+                                var desc = formatter.FormatRecord(oneRecord)
+                                    .TrimEnd('\u001F');
+                                desc = BiblioUtility.AddTrailingDot(desc);
+                                oneRecord.Description = desc;
                             }
                         }
-
-                        log.WriteLine(" done");
-
-                        //string orderFormat = mainChapter.OrderBy
-                        //    .ThrowIfNull("mainChapter.OrderBy");
-                        var orderFormat = GetOrderFormat();
-                        orderFormat = processor.GetText
-                            (
-                                context,
-                                orderFormat
-                            )
-                            .ThrowIfNull("processor.GetText");
-                        formatter.ParseProgram(orderFormat);
-                        // formatted = FormatRecords(context, orderFormat);
-                        for (var i = 0; i < Items.Count; i++)
-                        {
-                            log.Write(".");
-                            var item = Items[i];
-                            record = item.Record;
-                            //string order = formatted[i].TrimEnd('\u001F');
-                            var order = formatter.FormatRecord(record)
-                                .TrimEnd('\u001F');
-
-                            // TODO handle string.IsNullOrEmpty(order)
-
-                            order = CleanOrder(order);
-
-                            //item.Order = RichText.Decode(order);
-                            item.Order = order;
-                        }
-
-                        log.WriteLine(" done");
-
-                        Items.SortByOrder();
-
-                        log.WriteLine("Items: {0}", Items.Count);
                     }
+
+                    log.WriteLine(" done");
+
+                    //string orderFormat = mainChapter.OrderBy
+                    //    .ThrowIfNull("mainChapter.OrderBy");
+                    var orderFormat = GetOrderFormat();
+                    orderFormat = processor.GetText
+                        (
+                            context,
+                            orderFormat
+                        )
+                        .ThrowIfNull("processor.GetText");
+                    formatter.ParseProgram(orderFormat);
+                    // formatted = FormatRecords(context, orderFormat);
+                    for (var i = 0; i < Items.Count; i++)
+                    {
+                        log.Write(".");
+                        var item = Items[i];
+                        record = item.Record;
+                        //string order = formatted[i].TrimEnd('\u001F');
+                        var order = formatter.FormatRecord(record)
+                            .TrimEnd('\u001F');
+
+                        // TODO handle string.IsNullOrEmpty(order)
+
+                        order = CleanOrder(order);
+
+                        //item.Order = RichText.Decode(order);
+                        item.Order = order;
+                    }
+
+                    log.WriteLine(" done");
+
+                    Items.SortByOrder();
+
+                    log.WriteLine("Items: {0}", Items.Count);
                 }
 
                 foreach (var chapter in Children)
@@ -295,6 +291,12 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            var items = Items;
+            if (items is null)
+            {
+                return;
+            }
+
             var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
@@ -314,10 +316,10 @@ namespace ManagedIrbis.Biblio
             {
                 RenderTitle(context);
 
-                for (var i = 0; i < Items.Count; i++)
+                for (var i = 0; i < items.Count; i++)
                 {
                     log.Write(".");
-                    var item = Items[i];
+                    var item = items[i];
                     var number = item.Number;
                     var description = item.Description.ThrowIfNull("item.Description");
 
@@ -329,13 +331,15 @@ namespace ManagedIrbis.Biblio
                         );
                     report.Body.Add(band);
 
-                    band.Cells.Add(new SimpleTextCell
-                        (
-                            // TODO implement properly!!!
-                            //RichText.Encode(description, UnicodeRange.Russian)
-                            //RichText.Encode2(description, UnicodeRange.Russian)
-                            RichText.Encode3(description, UnicodeRange.Russian, "\\f2")
-                        ));
+                    if (!string.IsNullOrEmpty(description))
+                    {
+                        // TODO implement properly!!!
+                        var encoded = RichText.Encode3(description, UnicodeRange.Russian, "\\f2");
+                        if (!string.IsNullOrEmpty(encoded))
+                        {
+                            band.Cells.Add(new SimpleTextCell(encoded));
+                        }
+                    }
 
                     var record = item.Record;
 

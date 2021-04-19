@@ -17,8 +17,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
+
+using AM.Collections;
 
 using ManagedIrbis.Infrastructure;
 
@@ -184,23 +185,23 @@ namespace ManagedIrbis
             while (flag)
             {
                 var terms = await connection.ReadTermsAsync(startTerm, 1024);
-                if (terms.Length == 0)
+                if (terms.IsNullOrEmpty())
                 {
                     break;
                 }
 
-                int startIndex = 0;
+                var startIndex = 0;
                 if (result.Count != 0)
                 {
                     var lastTerm = result[^1];
-                    var firstTerm = terms[0];
+                    var firstTerm = terms![0];
                     if (firstTerm.Text == lastTerm.Text)
                     {
                         startIndex = 1;
                     }
                 }
 
-                for (var i = startIndex; i < terms.Length; i++)
+                for (var i = startIndex; i < terms!.Length; i++)
                 {
                     var term = terms[i];
                     var text = term.Text;
@@ -275,6 +276,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Расширенный поиск.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Массив MFN найденных записей.</returns>
         public static async Task<int[]> SearchAsync
@@ -309,6 +311,7 @@ namespace ManagedIrbis
         /// Определение количества записей, удовлетворяющих
         /// заданному запросу.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
         public static async Task<int> SearchCountAsync
@@ -343,6 +346,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Поиск записей на сервере.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="expression"></param>
         /// <param name="limit"></param>
         /// <returns></returns>

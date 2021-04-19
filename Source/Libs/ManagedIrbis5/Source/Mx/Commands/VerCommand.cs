@@ -9,47 +9,24 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* VerCommand.cs --
+/* VerCommand.cs -- определение версии сервера
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
-
-using ManagedIrbis.Client;
-
-#endregion
 
 #nullable enable
 
 namespace ManagedIrbis.Mx.Commands
 {
     /// <summary>
-    ///
+    /// Определение версии сервера.
     /// </summary>
     public sealed class VerCommand
         : MxCommand
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public VerCommand()
             : base("ver")
@@ -58,22 +35,14 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region MxCommand members
 
         /// <inheritdoc cref="MxCommand.Execute" />
         public override bool Execute
-        (
-            MxExecutive executive,
-            MxArgument[] arguments
-        )
+            (
+                MxExecutive executive,
+                MxArgument[] arguments
+            )
         {
             OnBeforeExecute();
 
@@ -84,7 +53,8 @@ namespace ManagedIrbis.Mx.Commands
             }
 
             var version = executive.Provider.GetServerVersion();
-            executive.WriteLine(version.ToString());
+            var text = version?.ToString() ?? "Unknown version";
+            executive.WriteLine(text);
 
             OnAfterExecute();
 
@@ -93,8 +63,6 @@ namespace ManagedIrbis.Mx.Commands
 
         #endregion
 
-        #region Object members
+    } // class VerCommand
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Mx.Commands

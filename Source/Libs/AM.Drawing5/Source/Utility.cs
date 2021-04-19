@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -527,7 +528,8 @@ namespace AM.Drawing
                 string resourceName
             )
         {
-            using var stream = assembly.GetManifestResourceStream(resourceName);
+            using var stream = assembly.GetManifestResourceStream(resourceName)
+                .ThrowIfNull("assembly.GetManifestResourceStream");
 
             return Image.FromStream(stream);
         }
@@ -581,19 +583,19 @@ namespace AM.Drawing
         /// </summary>
         public static void SaveJpeg
             (
-                Image img,
+                Image image,
                 string fileName,
                 long quality
             )
         {
-            var ici = GetCodecInfo("image/jpeg");
-            var par0 = new EncoderParameter(Encoder.Quality,
-                quality);
-            var parms = new EncoderParameters(1);
-            parms.Param = new EncoderParameter[] {
-                par0
+            var ici = GetCodecInfo("image/jpeg")
+                .ThrowIfNull("GetCodecInfo('image/jpeg')");
+            var par0 = new EncoderParameter(Encoder.Quality, quality);
+            var parms = new EncoderParameters(1)
+            {
+                Param = new [] { par0 }
             };
-            img.Save(fileName, ici, parms);
+            image.Save(fileName, ici, parms);
         }
 
         /// <summary>

@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* SimplestTextPrinter.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -31,7 +32,8 @@ namespace AM.Drawing.Printing
     {
         #region Private members
 
-        private string _text;
+        private string? _text;
+
         private int _offset;
 
         /// <summary>
@@ -45,45 +47,48 @@ namespace AM.Drawing.Printing
         {
             base.OnPrintPage(sender, e);
 
-            Graphics g = e.Graphics;
-            string s = _text.Substring(_offset);
-            using (Brush brush = new SolidBrush(TextColor))
-            using (StringFormat format = new StringFormat())
+            if (_text is null)
             {
-                format.Alignment = StringAlignment.Near;
-                format.LineAlignment = StringAlignment.Near;
-                format.HotkeyPrefix = HotkeyPrefix.None;
-                format.Trimming = StringTrimming.Word;
-                format.FormatFlags = StringFormatFlags.LineLimit;
-                RectangleF rect = e.PageBounds;
-                rect.X += Borders.Left;
-                rect.Width -= (Borders.Left + Borders.Right);
-                rect.Y += Borders.Top;
-                rect.Height -= (Borders.Top + Borders.Bottom);
-                rect.Height = (rect.Height / TextFont.Size) * TextFont.Size;
-                g.DrawString(s, TextFont, brush, rect, format);
-                int charFitted, linesFilled;
-                g.MeasureString
-                    (
-                        s,
-                        TextFont,
-                        rect.Size,
-                        format,
-                        out charFitted,
-                        out linesFilled
-                    );
-                e.HasMorePages = (charFitted < s.Length);
-                _offset += charFitted;
+                return;
             }
+
+            var graphics = e.Graphics.ThrowIfNull("e.Graphics");
+            var text = _text.Substring(_offset);
+            using var brush = new SolidBrush(TextColor);
+            using var format = new StringFormat
+            {
+                Alignment = StringAlignment.Near,
+                LineAlignment = StringAlignment.Near,
+                HotkeyPrefix = HotkeyPrefix.None,
+                Trimming = StringTrimming.Word,
+                FormatFlags = StringFormatFlags.LineLimit
+            };
+
+            RectangleF rect = e.PageBounds;
+            rect.X += Borders.Left;
+            rect.Width -= (Borders.Left + Borders.Right);
+            rect.Y += Borders.Top;
+            rect.Height -= (Borders.Top + Borders.Bottom);
+            rect.Height = (rect.Height / TextFont.Size) * TextFont.Size;
+            graphics.DrawString(text, TextFont, brush, rect, format);
+            graphics.MeasureString
+                (
+                    text,
+                    TextFont,
+                    rect.Size,
+                    format,
+                    out var charFitted,
+                    out _
+                );
+            e.HasMorePages = (charFitted < text.Length);
+            _offset += charFitted;
         }
 
         #endregion
 
         #region Public methods
 
-        /// <summary>
-        /// Prints the specified text.
-        /// </summary>
+        /// <inheritdoc cref="TextPrinter.Print"/>
         public override bool Print
             (
                 string text
@@ -96,5 +101,7 @@ namespace AM.Drawing.Printing
         }
 
         #endregion
-    }
-}
+
+    } // class PlainTextPrinter
+
+} // namespace AM.Windows.Printing

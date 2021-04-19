@@ -2,8 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* GblLogger.cs -- абстрактный логгер для глобальной корректировки
@@ -53,7 +55,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// </summary>
         public string GetText()
         {
-            return ((StreamWriter) Output).ToString();
+            return Output.ToString() ?? string.Empty;
         }
 
         /// <summary>

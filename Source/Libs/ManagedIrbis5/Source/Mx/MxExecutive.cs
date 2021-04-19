@@ -4,12 +4,13 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* MxExecutive.cs --
+/* MxExecutive.cs -- исполняющая подсистема MX64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,24 +18,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
 using AM.ConsoleIO;
-using AM.IO;
 using AM.Json;
-using AM.Runtime;
 using AM.Text;
-using AM.Text.Output;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mx.Commands;
 using ManagedIrbis.Mx.Infrastructrure;
@@ -47,7 +42,7 @@ using ManagedIrbis.Pft.Infrastructure;
 namespace ManagedIrbis.Mx
 {
     /// <summary>
-    ///
+    /// Исполняющая подсистема MX64.
     /// </summary>
     public sealed class MxExecutive
         : IDisposable
@@ -112,22 +107,22 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Search history.
         /// </summary>
-        public Stack<string> History { get; private set; }
+        public Stack<string> History { get; }
 
         /// <summary>
         /// Stack of databases.
         /// </summary>
-        public Stack<string> Databases { get; private set; }
+        public Stack<string> Databases { get; }
 
         /// <summary>
         /// List of modules.
         /// </summary>
-        public List<MxModule> Modules { get; private set; }
+        public List<MxModule> Modules { get; }
 
         /// <summary>
         /// List of handlers.
         /// </summary>
-        public List<MxHandler> Handlers { get; private set; }
+        public List<MxHandler> Handlers { get; }
 
         /// <summary>
         /// Get version of the executive.
@@ -181,7 +176,7 @@ namespace ManagedIrbis.Mx
 
         private void _CancelKeyPress
             (
-                object sender,
+                object? sender,
                 ConsoleCancelEventArgs e
             )
         {
@@ -232,7 +227,7 @@ namespace ManagedIrbis.Mx
 
         private void _DisposeCommands()
         {
-            foreach (MxCommand command in Commands)
+            foreach (var command in Commands)
             {
                 command.Dispose();
             }
@@ -240,7 +235,7 @@ namespace ManagedIrbis.Mx
 
         private void _DisposeHandlers()
         {
-            foreach (MxHandler handler in Handlers)
+            foreach (var handler in Handlers)
             {
                 handler.Dispose();
             }
@@ -248,7 +243,7 @@ namespace ManagedIrbis.Mx
 
         private void _DisposeModules()
         {
-            foreach (MxModule module in Modules)
+            foreach (var module in Modules)
             {
                 module.Dispose();
             }
@@ -261,7 +256,7 @@ namespace ManagedIrbis.Mx
         {
             navigator.SkipWhitespace();
 
-            string line = navigator.ReadLine().ToString();
+            var line = navigator.ReadLine().ToString();
             if (string.IsNullOrEmpty(line))
             {
                 return true;
@@ -273,21 +268,21 @@ namespace ManagedIrbis.Mx
                 return true;
             }
 
-            List<MxHandler> detectedHandlers = new List<MxHandler>();
+            var detectedHandlers = new List<MxHandler>();
 
-            string[] prefixes = Handlers.Select(h => h.Prefix).ToArray();
+            var prefixes = Handlers.Select(h => h.Prefix).ToArray();
             if (prefixes.Length != 0)
             {
                 while (true)
                 {
-                    int index = Utility.LastIndexOfAny(line, prefixes);
+                    var index = Utility.LastIndexOfAny(line, prefixes);
                     if (index < 0)
                     {
                         break;
                     }
 
-                    string handlerCommand = line.Substring(index);
-                    foreach (MxHandler handler in Handlers)
+                    var handlerCommand = line.Substring(index);
+                    foreach (var handler in Handlers)
                     {
                         if (handlerCommand.StartsWith(handler.Prefix))
                         {
@@ -305,8 +300,8 @@ namespace ManagedIrbis.Mx
             line = line.Trim();
             detectedHandlers.Reverse();
 
-            string[] parts = line.Split(CommonSeparators.SpaceOrTab, 2);
-            string commandName = parts[0];
+            var parts = line.Split(CommonSeparators.SpaceOrTab, 2);
+            var commandName = parts[0];
             string? commandArgument = null;
             if (parts.Length != 1)
             {
@@ -336,11 +331,11 @@ namespace ManagedIrbis.Mx
                 }
             };
 
-            bool result = false;
+            var result = false;
 
             try
             {
-                foreach (MxHandler handler in detectedHandlers)
+                foreach (var handler in detectedHandlers)
                 {
                     handler.BeginOutput(this);
                 }
@@ -354,7 +349,7 @@ namespace ManagedIrbis.Mx
                     );
                 }
 
-                foreach (MxHandler handler in detectedHandlers)
+                foreach (var handler in detectedHandlers)
                 {
                     handler.EndOutput(this);
                 }
@@ -392,7 +387,7 @@ namespace ManagedIrbis.Mx
 
         private void _InitializeCommands()
         {
-            foreach (MxCommand command in Commands)
+            foreach (var command in Commands)
             {
                 command.Initialize(this);
             }
@@ -414,10 +409,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Clear the output.
         /// </summary>
-        public void ClearOutput()
-        {
-            _output.Length = 0;
-        }
+        public void ClearOutput() => _output.Clear();
 
         /// <summary>
         /// Execute initialization script.
@@ -438,8 +430,8 @@ namespace ManagedIrbis.Mx
             )
         {
 
-            string text = File.ReadAllText(fileName, IrbisEncoding.Utf8);
-            bool result = ExecuteLine(text);
+            var text = File.ReadAllText(fileName, IrbisEncoding.Utf8);
+            var result = ExecuteLine(text);
 
             return result;
         }
@@ -457,7 +449,7 @@ namespace ManagedIrbis.Mx
                 return true;
             }
 
-            TextNavigator navigator = new TextNavigator(text);
+            var navigator = new TextNavigator(text);
 
             while (!navigator.IsEOF)
             {
@@ -473,15 +465,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Get collected output.
         /// </summary>
-        public string? GetOutput()
-        {
-            if (ReferenceEquals(_output, null))
-            {
-                return null;
-            }
-
-            return _output.ToString();
-        }
+        public string GetOutput() => _output.ToString();
 
         /// <summary>
         /// Форматирование на сервере.
@@ -539,7 +523,7 @@ namespace ManagedIrbis.Mx
                 string modulePath
             )
         {
-            string extension = Path.GetExtension(modulePath);
+            var extension = Path.GetExtension(modulePath);
             if (string.IsNullOrEmpty(extension))
             {
                 modulePath = modulePath + ".mxmodule";
@@ -550,10 +534,10 @@ namespace ManagedIrbis.Mx
                 modulePath = Path.Combine("modules", modulePath);
             }
 
-            ModuleDefinition definition = JsonUtility.ReadObjectFromFile<ModuleDefinition>(modulePath);
+            var definition = JsonUtility.ReadObjectFromFile<ModuleDefinition>(modulePath);
 
             // Must not load twice
-            MxModule found = Modules.FirstOrDefault
+            var found = Modules.FirstOrDefault
                 (
                     m => m.GetType().FullName == definition.ClassName
                 );
@@ -562,11 +546,23 @@ namespace ManagedIrbis.Mx
                 return;
             }
 
-            Assembly assembly = Assembly.LoadFile(definition.AssemblyPath);
-            Type type = assembly.GetType(definition.ClassName);
-            MxModule module = (MxModule)Activator.CreateInstance(type);
-            module.Initialize(this);
-            Modules.Add(module);
+            var assemblyPath = definition.AssemblyPath;
+            var className = definition.ClassName;
+            if (!string.IsNullOrEmpty(assemblyPath)
+                && !string.IsNullOrEmpty(className))
+            {
+                var assembly = Assembly.LoadFile(assemblyPath);
+                var type = assembly.GetType(className);
+                if (type is not null)
+                {
+                    var module = (MxModule?) Activator.CreateInstance(type);
+                    if (module is not null)
+                    {
+                        module.Initialize(this);
+                        Modules.Add(module);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -574,7 +570,7 @@ namespace ManagedIrbis.Mx
         /// </summary>
         public string ReadLine()
         {
-            ConsoleColor saveColor = MxConsole.ForegroundColor;
+            var saveColor = MxConsole.ForegroundColor;
             try
             {
                 MxConsole.ForegroundColor = Palette.Command;
@@ -599,7 +595,7 @@ namespace ManagedIrbis.Mx
 
             while (!StopFlag)
             {
-                string line = ReadLine();
+                var line = ReadLine();
                 ExecuteLine(line);
                 WriteLine(string.Empty);
             }
@@ -637,7 +633,7 @@ namespace ManagedIrbis.Mx
                 string text
             )
         {
-            ConsoleColor saveColor = MxConsole.ForegroundColor;
+            var saveColor = MxConsole.ForegroundColor;
             try
             {
                 ConsoleInput.ForegroundColor = color;
@@ -663,7 +659,7 @@ namespace ManagedIrbis.Mx
                 return;
             }
 
-            ConsoleColor saveColor = MxConsole.ForegroundColor;
+            var saveColor = MxConsole.ForegroundColor;
             try
             {
                 MxConsole.ForegroundColor = Palette.Message;

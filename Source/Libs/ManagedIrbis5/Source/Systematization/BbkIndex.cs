@@ -119,7 +119,7 @@ namespace ManagedIrbis.Systematization
         {
             for (; offset < length; offset++)
             {
-                char c = text[offset];
+                var c = text[offset];
                 if (Array.IndexOf(_allowedSymbols, c) < 0)
                 {
                     break;
@@ -181,7 +181,7 @@ namespace ManagedIrbis.Systematization
                     offset++;
                     while (offset < length)
                     {
-                        char c = text[offset];
+                        var c = text[offset];
                         offset++;
                         if (c == ')')
                         {
@@ -191,7 +191,7 @@ namespace ManagedIrbis.Systematization
                         result.Append(c);
                     }
 
-                    if (result[result.Length - 1] != ')')
+                    if (result[^1] != ')')
                     {
                         Magna.Error
                             (
@@ -221,7 +221,7 @@ namespace ManagedIrbis.Systematization
         {
             if (offset < length)
             {
-                char c = text[offset];
+                var c = text[offset];
                 if (Array.IndexOf(_qualifierSymbols, c) >= 0)
                 {
                     result.Append(c);
@@ -366,7 +366,7 @@ namespace ManagedIrbis.Systematization
             return offset;
         }
 
-        private static string _NonEmpty
+        private static string? _EmptyToNull
             (
                 StringBuilder builder
             )
@@ -376,9 +376,9 @@ namespace ManagedIrbis.Systematization
                 : builder.ToString();
         }
 
-        private static string _Verify
+        private static string? _Verify
             (
-                string text,
+                string? text,
                 int skip
             )
         {
@@ -387,8 +387,8 @@ namespace ManagedIrbis.Systematization
                 return text;
             }
 
-            string copy = text;
-            char c = copy[0];
+            var copy = text;
+            var c = copy[0];
             if (c == '(')
             {
                 return text;
@@ -397,7 +397,7 @@ namespace ManagedIrbis.Systematization
             {
                 copy = copy.Substring(skip);
             }
-            if (copy[copy.Length - 1] == '.')
+            if (copy[^1] == '.')
             {
                 Magna.Error
                     (
@@ -412,7 +412,7 @@ namespace ManagedIrbis.Systematization
                     );
             }
 
-            int length = copy.Length;
+            var length = copy.Length;
             if (length > 2)
             {
                 if (copy[2] != '.')
@@ -431,8 +431,8 @@ namespace ManagedIrbis.Systematization
                 }
             }
 
-            int offset = 3;
-            int count = 0;
+            var offset = 3;
+            var count = 0;
 
             while (offset < length)
             {
@@ -532,7 +532,7 @@ namespace ManagedIrbis.Systematization
                 throw new BbkException("Пустой индекс ББК");
             }
 
-            int length = text.Length;
+            var length = text.Length;
             if (length < 2)
             {
                 Magna.Error
@@ -564,40 +564,40 @@ namespace ManagedIrbis.Systematization
                     );
             }
 
-            int offset = 2;
-            StringBuilder accumulator = new StringBuilder();
+            var offset = 2;
+            var accumulator = new StringBuilder();
             accumulator.Append(text, 0, 2);
             offset = _ParseSimple(text, offset, length, accumulator);
             result.MainIndex = _Verify(accumulator.ToString(), 0);
 
             while (offset < length)
             {
-                int previousOffset = offset;
+                var previousOffset = offset;
 
                 // Ищем комбинированный индекс
                 accumulator.Clear();
                 offset = _ParseCombined(text, offset, length, accumulator);
-                result.CombinedIndex = _Verify(_NonEmpty(accumulator), 1);
+                result.CombinedIndex = _Verify(_EmptyToNull(accumulator), 1);
 
                 // Ищем территориальный
                 accumulator.Clear();
                 offset = _ParseTerritorial(text, offset, length, accumulator);
-                result.TerritorialIndex = _NonEmpty(accumulator);
+                result.TerritorialIndex = _EmptyToNull(accumulator);
 
                 // Запятая
                 accumulator.Clear();
                 offset = _ParseComma(text, offset, length, accumulator);
-                result.Comma = _NonEmpty(accumulator);
+                result.Comma = _EmptyToNull(accumulator);
 
                 // Неведомая хрень
                 accumulator.Clear();
                 offset = _ParseHren(text, offset, length, accumulator);
-                result.Hren = _NonEmpty(accumulator);
+                result.Hren = _EmptyToNull(accumulator);
 
                 // Определитель
                 accumulator.Clear();
                 offset = _ParseQualifier(text, offset, length, accumulator);
-                string qualifier = _NonEmpty(accumulator);
+                var qualifier = _EmptyToNull(accumulator);
                 if (!string.IsNullOrEmpty(qualifier))
                 {
                     result.Qualifiers.Add(qualifier);
@@ -606,7 +606,7 @@ namespace ManagedIrbis.Systematization
                 // Специальное типовое деление
                 accumulator.Clear();
                 offset = _ParseSpecial(text, offset, length, accumulator);
-                string specialIndex = _NonEmpty(accumulator);
+                var specialIndex = _EmptyToNull(accumulator);
                 if (!string.IsNullOrEmpty(specialIndex))
                 {
                     result.SpecialIndex.Add(specialIndex);
@@ -615,7 +615,7 @@ namespace ManagedIrbis.Systematization
                 // Код социальной системы
                 accumulator.Clear();
                 offset = _ParseSocial(text, offset, length, accumulator);
-                result.SocialIndex = _NonEmpty(accumulator);
+                result.SocialIndex = _EmptyToNull(accumulator);
 
                 if (offset == previousOffset)
                 {
@@ -653,12 +653,12 @@ namespace ManagedIrbis.Systematization
             _Dump(writer, "Некая хрень", Hren, prefix);
             _Dump(writer, "Запятая", Comma, prefix);
 
-            foreach (string qualifier in Qualifiers)
+            foreach (var qualifier in Qualifiers)
             {
                 _Dump(writer, "Определитель", qualifier, prefix);
             }
 
-            foreach (string specialIndex in SpecialIndex)
+            foreach (var specialIndex in SpecialIndex)
             {
                 _Dump(writer, "Специальное деление", specialIndex, prefix);
             }

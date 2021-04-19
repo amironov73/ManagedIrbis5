@@ -63,20 +63,12 @@ namespace AM.Drawing.Printing
         public int PageHeight { get; set; }
 
         /// <summary>
-        /// Landscape or portrait?
+        /// Ландшафтная ориентация страницы?
         /// </summary>
         [XmlElement("landscape")]
         [JsonPropertyName("landscape")]
-        [DisplayName("Портретная ориентация")]
+        [DisplayName("Ландшафтная ориентация")]
         public bool Landscape { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
 
         #endregion
 
@@ -99,39 +91,23 @@ namespace AM.Drawing.Printing
         }
 
         /// <summary>
-        /// Load <see cref="PrinterDefinition"/>
-        /// from the JSON-file.
+        /// Загрузка определения принтера из JSON-файла.
         /// </summary>
-        public static PrinterDefinition LoadJson
-            (
-                string fileName
-            )
-        {
-            var result = JsonUtility.ReadObjectFromFile<PrinterDefinition>
-                (
-                    fileName
-                );
-
-            return result;
-        }
+        public static PrinterDefinition LoadJson ( string fileName ) =>
+            JsonUtility.ReadObjectFromFile<PrinterDefinition> (fileName);
 
         /// <summary>
-        /// Load <see cref="PrinterDefinition"/>
-        /// from the XML file.
+        /// Загрузка определения принтера из XML-файла.
         /// </summary>
         public static PrinterDefinition LoadXml
             (
                 string fileName
             )
         {
-            using (Stream stream = File.OpenRead(fileName))
-            {
-                var serializer
-                    = new XmlSerializer(typeof(PrinterDefinition));
+            using var stream = File.OpenRead(fileName);
+            var serializer = new XmlSerializer(typeof(PrinterDefinition));
 
-                return (PrinterDefinition)serializer
-                    .Deserialize(stream);
-            }
+            return (PrinterDefinition)serializer.Deserialize(stream).ThrowIfNull("Deserialize");
         }
 
         /// <summary>
@@ -159,21 +135,16 @@ namespace AM.Drawing.Printing
                 string fileName
             )
         {
-            using (Stream stream = File.Create(fileName))
-            {
-                var serializer
-                    = new XmlSerializer(typeof(PrinterDefinition));
-                serializer.Serialize(stream, this);
-            }
+            using var stream = File.Create(fileName);
+            var serializer = new XmlSerializer(typeof(PrinterDefinition));
+            serializer.Serialize(stream, this);
         }
 
         #endregion
 
         #region IHandmadeSerializable members
 
-        /// <summary>
-        /// Restore the object state from the specified stream.
-        /// </summary>
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
         public void RestoreFromStream
             (
                 BinaryReader reader
@@ -185,9 +156,7 @@ namespace AM.Drawing.Printing
             Landscape = reader.ReadBoolean();
         }
 
-        /// <summary>
-        /// Save the object state to the specified stream.
-        /// </summary>
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
         public void SaveToStream
             (
                 BinaryWriter writer
@@ -231,23 +200,11 @@ namespace AM.Drawing.Printing
 
         #region Object members
 
-        /// <summary>
-        /// Returns a <see cref="System.String" />
-        /// that represents this instance.
-        /// </summary>
-        /// <returns>A <see cref="System.String" />
-        /// that represents this instance.</returns>
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "{0}: {1} x {2}",
-                    Name,
-                    PageWidth,
-                    PageHeight
-                );
-        }
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"{Name}: {PageWidth} x {PageHeight}";
 
         #endregion
-    }
-}
+
+    } // class PrinterDefinition
+
+} // namespace AM.Drawing.Printing

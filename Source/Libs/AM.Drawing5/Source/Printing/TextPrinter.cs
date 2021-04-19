@@ -1,12 +1,19 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberHierarchy.Global
+// ReSharper disable VirtualMemberNeverOverridden.Global
 
-/* TextPrinter.cs --
+/* TextPrinter.cs -- абстрактный класс для вывода текста на печать.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,34 +30,35 @@ using System.Drawing.Printing;
 namespace AM.Drawing.Printing
 {
     /// <summary>
-    ///
+    /// Абстрактный класс для вывода текста на печать.
     /// </summary>
-    // ReSharper disable once RedundantNameQualifier
+    // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
+    // ReSharper restore RedundantNameQualifier
     public abstract class TextPrinter
         : Component
     {
         #region Events
 
         /// <summary>
-        ///
+        /// Возникает перед началом печати документа.
         /// </summary>
-        public event PrintEventHandler BeginPrint;
+        public event PrintEventHandler? BeginPrint;
 
         /// <summary>
-        ///
+        /// Возникает после окончания печати документа.
         /// </summary>
-        public event PrintEventHandler EndPrint;
+        public event PrintEventHandler? EndPrint;
 
         /// <summary>
-        ///
+        /// Возникает при печати каждой страницы документа.
         /// </summary>
-        public event PrintPageEventHandler PrintPage;
+        public event PrintPageEventHandler? PrintPage;
 
         /// <summary>
-        ///
+        /// Возникает при необходимости настроить страницы перед печатью.
         /// </summary>
-        public event QueryPageSettingsEventHandler QueryPageSettings;
+        public event QueryPageSettingsEventHandler? QueryPageSettings;
 
         #endregion
 
@@ -77,17 +85,17 @@ namespace AM.Drawing.Printing
         /// <summary>
         /// Gets or sets the page settings.
         /// </summary>
-        public PageSettings PageSettings { get; set; }
+        public PageSettings? PageSettings { get; set; }
 
         /// <summary>
         /// Gets or sets the print controller.
         /// </summary>
-        public PrintController PrintController { get; set; }
+        public PrintController? PrintController { get; set; }
 
         /// <summary>
         /// Gets or sets the printer settings.
         /// </summary>
-        public PrinterSettings PrinterSettings { get; set; }
+        public PrinterSettings? PrinterSettings { get; set; }
 
         /// <summary>
         /// Gets or sets the color of the text.
@@ -104,8 +112,7 @@ namespace AM.Drawing.Printing
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TextPrinter"/> class.
+        /// Конструктор.
         /// </summary>
         protected TextPrinter()
         {
@@ -120,52 +127,22 @@ namespace AM.Drawing.Printing
         #region Private members
 
         /// <summary>
-        /// Called when [begin print].
+        /// Вызывается перед началом печати документа.
         /// </summary>
-        protected virtual void OnBeginPrint
-            (
-                object sender,
-                PrintEventArgs e
-            )
-        {
-            PrintEventHandler handler = BeginPrint;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
+        protected virtual void OnBeginPrint ( object sender, PrintEventArgs e ) =>
+            BeginPrint?.Invoke(this, e);
 
         /// <summary>
-        /// Called when [end print].
+        /// Вызывается по окончании печати документа.
         /// </summary>
-        protected virtual void OnEndPrint
-            (
-                object sender,
-                PrintEventArgs e
-            )
-        {
-            PrintEventHandler handler = EndPrint;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
+        protected virtual void OnEndPrint ( object sender, PrintEventArgs e ) =>
+            EndPrint?.Invoke(this, e);
 
         /// <summary>
-        /// Called when [print page].
+        /// Вызывается при печати каждой страницы документа.
         /// </summary>
-        protected virtual void OnPrintPage
-            (
-                object sender,
-                PrintPageEventArgs ea
-            )
-        {
-            PrintPageEventHandler handler = PrintPage;
-            if (handler != null)
-            {
-                handler(this, ea);
-            }
-        }
+        protected virtual void OnPrintPage ( object sender, PrintPageEventArgs ea ) =>
+            PrintPage?.Invoke(this, ea);
 
         /// <summary>
         /// Called when [query page settings].
@@ -177,7 +154,7 @@ namespace AM.Drawing.Printing
             )
         {
             ++PageNumber;
-            QueryPageSettingsEventHandler handler = QueryPageSettings;
+            var handler = QueryPageSettings;
             if (handler != null)
             {
                 handler(this, e);
@@ -189,37 +166,47 @@ namespace AM.Drawing.Printing
         #region Public methods
 
         /// <summary>
-        /// Prints the specified text.
+        /// Выводит на печать заданный текст.
         /// </summary>
-        public virtual bool Print(string text)
+        public virtual bool Print
+            (
+                string text
+            )
         {
-            using (PrintDocument document = new PrintDocument())
+            using var document = new PrintDocument
             {
-                document.DocumentName = DocumentName;
-                document.OriginAtMargins = false; // ???
-                if (PageSettings != null)
-                {
-                    document.DefaultPageSettings = PageSettings;
-                }
-                if (PrintController != null)
-                {
-                    document.PrintController = PrintController;
-                }
-                if (PrinterSettings != null)
-                {
-                    document.PrinterSettings = PrinterSettings;
-                }
-                document.BeginPrint += OnBeginPrint;
-                document.EndPrint += OnEndPrint;
-                document.PrintPage += OnPrintPage;
-                document.QueryPageSettings += OnQueryPageSettings;
-                PageNumber = 1;
-                document.Print();
+                DocumentName = DocumentName,
+                OriginAtMargins = false // TODO: зачем?
+            };
 
-                return true;
+            if (PageSettings is not null)
+            {
+                document.DefaultPageSettings = PageSettings;
             }
+
+            if (PrintController is not null)
+            {
+                document.PrintController = PrintController;
+            }
+
+            if (PrinterSettings is not null)
+            {
+                document.PrinterSettings = PrinterSettings;
+            }
+
+            document.BeginPrint += OnBeginPrint;
+            document.EndPrint += OnEndPrint;
+            document.PrintPage += OnPrintPage;
+            document.QueryPageSettings += OnQueryPageSettings;
+            PageNumber = 1;
+
+            document.Print();
+
+            return true;
         }
 
         #endregion
-    }
-}
+
+    } // class Text Printer
+
+} // namespace AM.Drawing.Printing

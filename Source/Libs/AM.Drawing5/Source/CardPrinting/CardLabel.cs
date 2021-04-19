@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* CardLabel.cs --
+/* CardLabel.cs -- однострочный текст
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,23 +27,32 @@ using System.Xml.Serialization;
 namespace AM.Drawing.CardPrinting
 {
     /// <summary>
-    /// Однострочный текст
+    /// Однострочный текст.
     /// </summary>
     public sealed class CardLabel
         : CardItem
     {
         #region Properties
 
+        /// <summary>
+        /// Шрифт.
+        /// </summary>
         [XmlElement("font")]
         [DisplayName("Шрифт")]
         [JsonPropertyName("font")]
         public string? Font { get; set; }
 
+        /// <summary>
+        /// Цвет текста.
+        /// </summary>
         [XmlElement("color")]
         [DisplayName("Цвет")]
         [JsonPropertyName("color")]
         public string? Color { get; set; }
 
+        /// <summary>
+        /// Собственно текст.
+        /// </summary>
         [XmlElement("text")]
         [DisplayName("Текст")]
         [JsonPropertyName("text")]
@@ -53,15 +62,17 @@ namespace AM.Drawing.CardPrinting
 
         #region CardItem members
 
-        public override void Draw(DrawingContext context)
+        /// <inheritdoc cref="CardItem.Draw"/>
+        public override void Draw
+            (
+                DrawingContext context
+            )
         {
-            var g = context.Graphics;
+            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
 
-            if (
-                    !string.IsNullOrEmpty(Font)
-                    && !string.IsNullOrEmpty(Color)
-                    && !string.IsNullOrEmpty(Text)
-               )
+            if (!string.IsNullOrEmpty(Font)
+                && !string.IsNullOrEmpty(Color)
+                && !string.IsNullOrEmpty(Text))
             {
                 var fontConverter = new FontConverter();
                 using var font = (Font) fontConverter.ConvertFromString(Font).ThrowIfNull("Font");
@@ -69,9 +80,11 @@ namespace AM.Drawing.CardPrinting
                 var color = (Color) colorConverter.ConvertFromString(Color).ThrowIfNull("Color");
 
                 var text = context.ExpandText(Text);
-
-                using Brush brush = new SolidBrush(color);
-                g.DrawString(text, font, brush, Left, Top);
+                if (!string.IsNullOrEmpty(text))
+                {
+                    using var brush = new SolidBrush(color);
+                    graphics.DrawString(text, font, brush, Left, Top);
+                }
             }
         }
 
@@ -83,5 +96,7 @@ namespace AM.Drawing.CardPrinting
         public override string ToString() => $"Однострочный текст: {Text}";
 
         #endregion
-    }
-}
+
+    } // class CardLabel
+
+} // namespace AM.Drawing.CardPrinting

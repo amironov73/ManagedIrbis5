@@ -134,7 +134,7 @@ namespace ManagedIrbis.Biblio
             {
                 log.WriteLine("Gather terms from chapter {0}", chapter);
 
-                var mfns = items.Select(i => i.Record.Mfn)
+                var mfns = items.Select(i => i.Record?.Mfn ?? 0)
                     .Where(mfn => mfn > 0)
                     .ToArray();
                 if (mfns.Length == 0)
@@ -370,12 +370,16 @@ namespace ManagedIrbis.Biblio
                 }
                 builder.Append('}');
 
-                band.Cells.Add(new SimpleTextCell
-                    (
-                        // TODO implement properly!!!
-                        //RichText.Encode2(builder.ToString(), UnicodeRange.Russian)
-                        RichText.Encode3(builder.ToString(), UnicodeRange.Russian, "\\f2")
-                    ));
+                var description = builder.ToString();
+                if (!string.IsNullOrEmpty(description))
+                {
+                    // TODO implement properly!!!
+                    var encoded = RichText.Encode3(builder.ToString(), UnicodeRange.Russian, "\\f2");
+                    if (!string.IsNullOrEmpty(encoded))
+                    {
+                        band.Cells.Add(new SimpleTextCell(encoded));
+                    }
+                }
             }
 
             log.WriteLine(" done");

@@ -4,9 +4,12 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
-/* PicturePrinter.cs --
+/* PicturePrinter.cs -- простая распечатка изображений.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,7 +17,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
 
@@ -25,10 +27,11 @@ using System.Drawing.Printing;
 namespace AM.Drawing.Printing
 {
     /// <summary>
-    ///
+    /// Простая распечатка изображений.
     /// </summary>
-    // ReSharper disable once RedundantNameQualifier
+    // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
+    // ReSharper restore RedundantNameQualifier
     public class PicturePrinter
         : Component
     {
@@ -37,32 +40,18 @@ namespace AM.Drawing.Printing
         /// <summary>
         /// Gets or sets the document.
         /// </summary>
-        public PrintDocument Document { get; set; }
+        public PrintDocument? Document { get; set; }
 
         /// <summary>
         /// Gets or sets the picture.
         /// </summary>
-        public Image Image { get; set; }
-
-        private float _imageScale = 1f;
+        public Image? Image { get; set; }
 
         /// <summary>
         /// Gets or sets the image scale.
         /// </summary>
         [DefaultValue(1f)]
-        public float ImageScale
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _imageScale;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                _imageScale = value;
-            }
-        }
+        public float ImageScale { get; set; } = 1f;
 
         /// <summary>
         /// Gets or sets the image position.
@@ -72,7 +61,7 @@ namespace AM.Drawing.Printing
         /// <summary>
         /// Gets or sets the title.
         /// </summary>
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         #endregion
 
@@ -80,15 +69,14 @@ namespace AM.Drawing.Printing
 
         private void _Print(bool preview)
         {
-            if (ReferenceEquals(Document, null))
-            {
-                Document = new PrintDocument();
-            }
+            Document ??= new PrintDocument();
+
             if (preview)
             {
                 Document.PrintController = new PreviewPrintController();
             }
-            Document.DocumentName = Title;
+
+            Document.DocumentName = Title ?? "Unnamed document";
             Document.PrintPage += _PrintPage;
             Document.Print();
         }
@@ -99,13 +87,19 @@ namespace AM.Drawing.Printing
                 PrintPageEventArgs args
             )
         {
+            var image = Image;
+            if (image is null)
+            {
+                return;
+            }
+
             var scale = ImageScale;
             var boundLeft = args.MarginBounds.Left / 100f;
             var boundTop = args.MarginBounds.Top / 100f;
             var boundWidth = args.MarginBounds.Width / 100f;
             var boundHeight = args.MarginBounds.Height / 100f;
-            var imageWidth = Image.Width / Image.HorizontalResolution;
-            var imageHeight = Image.Height / Image.VerticalResolution;
+            var imageWidth = image.Width / image.HorizontalResolution;
+            var imageHeight = image.Height / image.VerticalResolution;
             if (scale <= 0f)
             {
                 scale = Math.Min
@@ -133,11 +127,12 @@ namespace AM.Drawing.Printing
                 default:
                     throw new ApplicationException();
             }
-            Graphics g = args.Graphics;
-            g.PageUnit = GraphicsUnit.Inch;
-            g.DrawImage
+
+            var graphics = args.Graphics.ThrowIfNull("args.Graphics");
+            graphics.PageUnit = GraphicsUnit.Inch;
+            graphics.DrawImage
                 (
-                    Image,
+                    image,
                     new RectangleF(location, size)
                 );
             args.HasMorePages = false;
@@ -164,5 +159,7 @@ namespace AM.Drawing.Printing
         }
 
         #endregion
-    }
-}
+
+    } // class PicturePrinter
+
+} // namespace AM.Drawing.Printing

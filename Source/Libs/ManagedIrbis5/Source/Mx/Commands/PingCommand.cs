@@ -74,7 +74,7 @@ namespace ManagedIrbis.Mx.Commands
             try
             {
 
-                Stopwatch stopwatch = new Stopwatch();
+                var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 executive.Provider.NoOperation();
                 stopwatch.Stop();
@@ -116,16 +116,16 @@ namespace ManagedIrbis.Mx.Commands
             }
 
             long sum = 0;
-            int ntries = 4;
+            var ntries = 4;
             if (arguments.Length != 0)
             {
-                int n = arguments[0].Text.SafeToInt32();
+                var n = arguments[0].Text.SafeToInt32();
                 if (n > 1)
                 {
                     ntries = n;
                 }
             }
-            for (int i = 0; i < ntries; i++)
+            for (var i = 0; i < ntries; i++)
             {
                 sum += DoPing(i + 1, executive);
             }

@@ -54,7 +54,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Признак окончания.
         /// </summary>
-        public bool Stop { get { return _AllDone(); } }
+        public bool IsStop => _AllDone();
 
         #endregion
 
@@ -77,7 +77,7 @@ namespace ManagedIrbis.Batch
             )
             : this
                 (
-                    -1,
+                    parallelism,
                     ConnectionUtility.GetStandardConnectionString()
                 )
         {
@@ -93,7 +93,7 @@ namespace ManagedIrbis.Batch
             )
             : this
                 (
-                    -1,
+                    parallelism,
                     connectionString,
                     _GetMfnList(connectionString)
                 )
@@ -135,27 +135,25 @@ namespace ManagedIrbis.Batch
 
         private AutoResetEvent? _event;
 
-        private object? _lock;
+        // private object? _lock;
 
         private static int[] _GetMfnList
             (
                 string connectionString
             )
         {
-            using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
+            using var connection = ConnectionFactory.Shared.CreateSyncConnection();
+            connection.ParseConnectionString(connectionString);
+            connection.Connect();
+
+            var maxMfn = connection.GetMaxMfn() - 1;
+            if (maxMfn <= 0)
             {
-                connection.ParseConnectionString(connectionString);
-                connection.Connect();
-
-                int maxMfn = connection.GetMaxMfn() - 1;
-                if (maxMfn <= 0)
-                {
-                    throw new IrbisException("MaxMFN=0");
-                }
-                int[] result = Enumerable.Range(1, maxMfn).ToArray();
-
-                return result;
+                throw new IrbisException("MaxMFN=0");
             }
+            var result = Enumerable.Range(1, maxMfn).ToArray();
+
+            return result;
         }
 
         private void _Run
@@ -165,10 +163,10 @@ namespace ManagedIrbis.Batch
         {
             _queue = new ConcurrentQueue<Record>();
             _event = new AutoResetEvent(false);
-            _lock = new object();
+            // _lock = new object();
 
             _tasks = new Task[Parallelism];
-            int[][] chunks = ArrayUtility.SplitArray
+            var chunks = ArrayUtility.SplitArray
                 (
                     mfnList,
                     Parallelism
@@ -184,7 +182,7 @@ namespace ManagedIrbis.Batch
                 _tasks[i] = task;
             }
 
-            foreach (Task task in _tasks)
+            foreach (var task in _tasks)
             {
                 Thread.Sleep(50);
                 task.Start();
@@ -196,9 +194,9 @@ namespace ManagedIrbis.Batch
                 object state
             )
         {
-            int[] chunk = (int[])state;
-            int first = chunk.SafeAt(0, -1);
-            int threadId = Thread.CurrentThread.ManagedThreadId;
+            var chunk = (int[])state;
+            var first = chunk.SafeAt(0, -1);
+            var threadId = Thread.CurrentThread.ManagedThreadId;
 
             Magna.Trace
                 (
@@ -211,16 +209,16 @@ namespace ManagedIrbis.Batch
                     + threadId
                 );
 
-            string connectionString = ConnectionString.ThrowIfNull();
+            var connectionString = ConnectionString.ThrowIfNull();
             using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
             {
                 connection.ParseConnectionString(connectionString);
                 connection.Connect();
 
-                BatchRecordReader batch = new BatchRecordReader
+                var batch = new BatchRecordReader
                     (
                         connection,
-                        connection.Database,
+                        connection.Database.ThrowIfNull("connection.Database"),
                         1000,
                         chunk
                     );
@@ -255,8 +253,8 @@ namespace ManagedIrbis.Batch
 
         private bool _AllDone()
         {
-            return _queue.IsEmpty
-                   && _tasks.All(t => t.IsCompleted);
+            return _queue.ThrowIfNull("_queue").IsEmpty
+                   && _tasks.ThrowIfNull("_tasks").All(t => t.IsCompleted);
         }
 
         #endregion
@@ -268,7 +266,7 @@ namespace ManagedIrbis.Batch
         {
             while (true)
             {
-                if (Stop)
+                if (IsStop)
                 {
                     yield break;
                 }
@@ -298,7 +296,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public Record[] ReadAll()
         {
-            List<Record> result = new List<Record>();
+            var result = new List<Record>();
 
             foreach (var record in this)
             {
@@ -318,7 +316,7 @@ namespace ManagedIrbis.Batch
             _event?.Dispose();
             if (_tasks is not null)
             {
-                foreach (Task task in _tasks)
+                foreach (var task in _tasks)
                 {
                     task.Dispose();
                 }

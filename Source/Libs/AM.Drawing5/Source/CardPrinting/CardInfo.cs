@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* CardInfo.cs --
+/* CardInfo.cs -- описание карточки, на которую будет выведена информация
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,9 +17,9 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Drawing;
 using System.IO;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 #endregion
@@ -28,23 +28,41 @@ using System.Xml.Serialization;
 
 namespace AM.Drawing.CardPrinting
 {
+    /// <summary>
+    /// Описание карточки, на которую будет выведена информация.
+    /// </summary>
     [XmlRoot("card")]
     public class CardInfo
     {
         #region Properties
 
+        /// <summary>
+        /// Ширина.
+        /// </summary>
         [XmlElement("width")]
         [DisplayName("Ширина")]
+        [JsonPropertyName("width")]
         public int Width { get; set; }
 
+        /// <summary>
+        /// Высота.
+        /// </summary>
         [XmlElement("height")]
         [DisplayName("Высота")]
+        [JsonPropertyName("height")]
         public int Height { get; set; }
 
+        /// <summary>
+        /// Фоновый рисунок.
+        /// </summary>
         [XmlElement("background")]
         [DisplayName("Фоновый рисунок")]
-        public string Background { get; set; }
+        [JsonPropertyName("background")]
+        public string? Background { get; set; }
 
+        /// <summary>
+        /// Элементы карточки.
+        /// </summary>
         [XmlArray("items")]
         [DisplayName("Элементы")]
         //[Editor(typeof(CardItemCollectionEditor), typeof(CollectionEditor))]
@@ -53,25 +71,18 @@ namespace AM.Drawing.CardPrinting
         [XmlArrayItem(typeof(CardPicture), ElementName = "picture")]
         [XmlArrayItem(typeof(CardBarcode), ElementName = "barcode")]
         [XmlArrayItem(typeof(CardRectangle), ElementName = "rectangle")]
-        public List<CardItem> Items
-        {
-            get { return _items; }
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly List<CardItem> _items
-            = new List<CardItem>();
+        public List<CardItem> Items { get; } = new List<CardItem>();
 
         #endregion
 
         #region Public methods
 
+        /// <summary>
+        /// Карточка по умолчанию (для ИРНИТУ).
+        /// </summary>
         public static CardInfo CreateDefaultCard()
         {
-            CardInfo card = new CardInfo
+            var card = new CardInfo
             {
                 Background = "Bottom_texture_hf.bmp",
                 Width = 3508,
@@ -90,6 +101,7 @@ namespace AM.Drawing.CardPrinting
                         Top = 50,
                         Text = "Иркутский государственный технический университет"
                     },
+
                     new CardLabel
                     {
                         Font = "Segoe UI; 96pt; style=Bold",
@@ -104,42 +116,56 @@ namespace AM.Drawing.CardPrinting
             return card;
         }
 
+        /// <summary>
+        /// Проверка карточки.
+        /// </summary>
         public void Verify()
         {
             // Nothing to do yet
         }
 
-        public void SaveXml(string fileName)
+        /// <summary>
+        /// Сохранение карточки со всеми элементами в указанный XML-файл.
+        /// </summary>
+        public void SaveXml
+            (
+                string fileName
+            )
         {
-            using (Stream stream = File.Create(fileName))
-            {
-                XmlSerializer serializer
-                    = new XmlSerializer(typeof(CardInfo));
-                serializer.Serialize(stream, this);
-            }
+            using var stream = File.Create(fileName);
+            var serializer = new XmlSerializer(typeof(CardInfo));
+            serializer.Serialize(stream, this);
         }
 
-        public static CardInfo LoadXml(string fileName)
+        /// <summary>
+        /// Загрузка карточки из указанного файла.
+        /// </summary>
+        public static CardInfo LoadXml
+            (
+                string fileName
+            )
         {
-            using (Stream stream = File.OpenRead(fileName))
-            {
-                XmlSerializer serializer
-                    = new XmlSerializer(typeof(CardInfo));
-                return (CardInfo) serializer.Deserialize(stream);
-            }
+            using var stream = File.OpenRead(fileName);
+            var serializer = new XmlSerializer(typeof(CardInfo));
+            return (CardInfo) serializer.Deserialize(stream)
+                .ThrowIfNull("serializer.Deserialize");
         }
 
-        public Image Draw(DrawingContext context)
+        /// <summary>
+        /// Отрисовка карточки.
+        /// </summary>
+        public Image Draw
+            (
+                DrawingContext context
+            )
         {
-            Bitmap bitmap = new Bitmap(Width, Height);
-
-            using (Graphics graphics = Graphics.FromImage(bitmap))
+            var bitmap = new Bitmap(Width, Height);
+            using var graphics = Graphics.FromImage(bitmap);
+            context.Graphics = graphics;
+            if (!string.IsNullOrEmpty(Background))
             {
-                context.Graphics = graphics;
-                if (!string.IsNullOrEmpty(Background))
-                {
-                    Image backImage = Image.FromFile(Background);
-                    graphics.DrawImage
+                var backImage = Image.FromFile(Background);
+                graphics.DrawImage
                     (
                         backImage,
                         0,
@@ -147,19 +173,20 @@ namespace AM.Drawing.CardPrinting
                         Width,
                         Height
                     );
-                }
-
-                foreach (CardItem item in Items)
-                {
-                    item.Draw(context);
-                }
-
-                context.Graphics = null;
             }
+
+            foreach (var item in Items)
+            {
+                item.Draw(context);
+            }
+
+            context.Graphics = null;
 
             return bitmap;
         }
 
         #endregion
-    }
-}
+
+    } // class CardInfo
+
+} // namespace AM.Drawing.CardPrinting

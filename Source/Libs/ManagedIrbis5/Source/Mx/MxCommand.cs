@@ -16,17 +16,8 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
@@ -45,12 +36,12 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Fired before <see cref="Execute"/>.
         /// </summary>
-        public event EventHandler BeforeExecute;
+        public event EventHandler? BeforeExecute;
 
         /// <summary>
         /// Fired after <see cref="Execute"/>.
         /// </summary>
-        public event EventHandler AfterExecute;
+        public event EventHandler? AfterExecute;
 
         #endregion
 
@@ -59,7 +50,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Main name of the command.
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; }
 
         #endregion
 
@@ -93,18 +84,14 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Raises <see cref="BeforeExecute"/> event.
         /// </summary>
-        protected virtual void OnBeforeExecute()
-        {
-            BeforeExecute.Raise(this);
-        }
+        protected virtual void OnBeforeExecute() =>
+            BeforeExecute?.Invoke(this, EventArgs.Empty);
 
         /// <summary>
         /// Raises <see cref="AfterExecute"/> event.
         /// </summary>
-        protected virtual void OnAfterExecute()
-        {
-            AfterExecute.Raise(this);
-        }
+        protected virtual void OnAfterExecute() =>
+            AfterExecute?.Invoke(this, EventArgs.Empty);
 
         #endregion
 

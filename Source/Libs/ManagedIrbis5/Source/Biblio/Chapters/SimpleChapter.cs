@@ -4,7 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -20,10 +22,7 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 using AM;
-using AM.Text.Output;
 
-using ManagedIrbis.Client;
-using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
 #endregion
@@ -98,8 +97,8 @@ namespace ManagedIrbis.Biblio
 
         static string Propis(int number)
         {
-            var array_int = new int[4];
-            var array_string = new string[4, 3]
+            var integers = new int[4];
+            var strings = new string[4, 3]
             {
                 {" миллиард", " миллиарда", " миллиардов"},
                 {" миллион", " миллиона", " миллионов"},
@@ -107,17 +106,17 @@ namespace ManagedIrbis.Biblio
                 {"", "", ""}
 
             };
-            array_int[0] = (number - (number % 1000000000)) / 1000000000;
-            array_int[1] = ((number % 1000000000) - (number % 1000000)) / 1000000;
-            array_int[2] = ((number % 1000000) - (number % 1000)) / 1000;
-            array_int[3] = number % 1000;
+            integers[0] = (number - (number % 1000000000)) / 1000000000;
+            integers[1] = ((number % 1000000000) - (number % 1000000)) / 1000000;
+            integers[2] = ((number % 1000000) - (number % 1000)) / 1000;
+            integers[3] = number % 1000;
             var result = "";
             for (var i = 0; i < 4; i++)
             {
-                if (array_int[i] != 0)
+                if (integers[i] != 0)
                 {
-                    if (((array_int[i] - (array_int[i] % 100)) / 100) != 0)
-                        switch (((array_int[i] - (array_int[i] % 100)) / 100))
+                    if (((integers[i] - (integers[i] % 100)) / 100) != 0)
+                        switch (((integers[i] - (integers[i] % 100)) / 100))
                         {
                             case 1: result += " сто"; break;
                             case 2: result += " двести"; break;
@@ -129,9 +128,9 @@ namespace ManagedIrbis.Biblio
                             case 8: result += " восемьсот"; break;
                             case 9: result += " девятьсот"; break;
                         }
-                    if (((array_int[i] % 100) - ((array_int[i] % 100) % 10)) / 10 != 1)
+                    if (((integers[i] % 100) - ((integers[i] % 100) % 10)) / 10 != 1)
                     {
-                        switch (((array_int[i] % 100) - ((array_int[i] % 100) % 10)) / 10)
+                        switch (((integers[i] % 100) - ((integers[i] % 100) % 10)) / 10)
                         {
                             case 2: result += " двадцать"; break;
                             case 3: result += " тридцать"; break;
@@ -143,7 +142,7 @@ namespace ManagedIrbis.Biblio
                             case 9: result += " девяносто"; break;
                         }
                     }
-                    switch (array_int[i] % 100)
+                    switch (integers[i] % 100)
                     {
                         case 1: if (i == 2) result += " одна"; else result += " один"; break;
                         case 2: if (i == 2) result += " две"; else result += " два"; break;
@@ -166,23 +165,23 @@ namespace ManagedIrbis.Biblio
                         case 19: result += " девятнадцать"; break;
                     }
 
-                    if (array_int[i] % 100 >= 10 && array_int[i] % 100 <= 19)
+                    if (integers[i] % 100 >= 10 && integers[i] % 100 <= 19)
                     {
-                        result += " " + array_string[i, 2] + " ";
+                        result += " " + strings[i, 2] + " ";
                     }
                     else
                     {
-                        switch (array_int[i] % 100)
+                        switch (integers[i] % 100)
                         {
-                            case 1: result += " " + array_string[i, 0] + " "; break;
+                            case 1: result += " " + strings[i, 0] + " "; break;
                             case 2:
                             case 3:
-                            case 4: result += " " + array_string[i, 1] + " "; break;
+                            case 4: result += " " + strings[i, 1] + " "; break;
                             case 5:
                             case 6:
                             case 7:
                             case 8:
-                            case 9: result += " " + array_string[i, 2] + " "; break;
+                            case 9: result += " " + strings[i, 2] + " "; break;
 
                         }
                     }
@@ -345,7 +344,7 @@ namespace ManagedIrbis.Biblio
         {
             var log = context.Log;
             log.WriteLine("Begin gather records {0}", this);
-            Record? record = null;
+            Record? record;
 
             try
             {
@@ -440,7 +439,7 @@ namespace ManagedIrbis.Biblio
             {
                 RenderTitle(context);
 
-                for (var i = 0; i < Items.Count; i++)
+                for (var i = 0; i < Items?.Count; i++)
                 {
                     log.Write(".");
                     var item = Items[i];

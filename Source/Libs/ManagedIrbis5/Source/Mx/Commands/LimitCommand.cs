@@ -75,7 +75,7 @@ namespace ManagedIrbis.Mx.Commands
 
             if (arguments.Length != 0)
             {
-                string argument = arguments[0].Text;
+                var argument = arguments[0].Text;
                 if (!string.IsNullOrEmpty(argument))
                 {
                     if (!int.TryParse(argument, out var newLimit))

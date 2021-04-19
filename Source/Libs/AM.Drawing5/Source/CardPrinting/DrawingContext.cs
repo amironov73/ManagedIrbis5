@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* DrawingContext.cs --
+/* DrawingContext.cs -- контекст рисования на карточке
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 namespace AM.Drawing.CardPrinting
 {
     /// <summary>
-    /// Контекст рисования
+    /// Контекст рисования на карточке.
     /// </summary>
     public class DrawingContext
     {
@@ -35,11 +35,11 @@ namespace AM.Drawing.CardPrinting
 
         //public PrinterInfo Printer { get; set; }
 
-        public CardInfo Card { get; set; }
+        public CardInfo? Card { get; set; }
 
         // public HumanInfo Human { get; set; }
 
-        public Graphics Graphics { get; set; }
+        public Graphics? Graphics { get; set; }
 
         #endregion
 
@@ -47,7 +47,7 @@ namespace AM.Drawing.CardPrinting
 
         private string _Evaluator(Match match)
         {
-            string name = match.Groups["name"].Value;
+            var name = match.Groups["name"].Value;
 
             switch (name)
             {
@@ -86,17 +86,18 @@ namespace AM.Drawing.CardPrinting
 
         #region Public methods
 
-        public string ExpandText(string input)
-        {
-            Regex regex = new Regex(@"{(?<name>\w+)}");
-            string result = regex.Replace
+        public string ExpandText
             (
-                input,
-                _Evaluator
-            );
+                string input
+            )
+        {
+            var regex = new Regex(@"{(?<name>\w+)}");
+            var result = regex.Replace ( input, _Evaluator );
             return result;
         }
 
         #endregion
-    }
-}
+
+    } // class DrawingContext
+
+} // namespace AM.Drawing.CardPrinting

@@ -7,6 +7,8 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedParameter.Local
 
 /* SyncConnection.cs -- синхронное подключение к серверу ИРБИС64
@@ -18,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,8 +30,6 @@ using AM.PlatformAbstraction;
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
-using ManagedIrbis.Menus;
-using ManagedIrbis.Pft;
 
 using Microsoft.Extensions.Logging;
 
@@ -840,7 +839,7 @@ namespace ManagedIrbis
             var response = ExecuteSync
                 (
                     CommandCode.ReloadDictionary,
-                    databaseName ?? Database
+                    databaseName ?? Database.ThrowIfNull("Database")
                 );
 
             return response?.CheckReturnCode() ?? false;
@@ -855,7 +854,7 @@ namespace ManagedIrbis
             var response = ExecuteSync
                 (
                     CommandCode.ReloadMasterFile,
-                    databaseName ?? Database
+                    databaseName ?? Database.ThrowIfNull("Database")
                 );
 
             return response?.CheckReturnCode() ?? false;
@@ -901,7 +900,7 @@ namespace ManagedIrbis
             var response = ExecuteSync
                 (
                     CommandCode.EmptyDatabase,
-                    databaseName ?? Database
+                    databaseName ?? Database.ThrowIfNull("Database")
                 );
 
             return response is not null && response.CheckReturnCode();
@@ -916,7 +915,7 @@ namespace ManagedIrbis
             var response = ExecuteSync
                 (
                     CommandCode.UnlockDatabase,
-                    databaseName ?? Database
+                    databaseName ?? Database.ThrowIfNull("Database")
                 );
 
             return response is not null && response.CheckReturnCode();

@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* CardPicture.cs --
+/* CardPicture.cs -- картинка, например, фото читателя
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,6 +17,7 @@
 
 using System.ComponentModel;
 using System.Drawing;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 #endregion
@@ -33,17 +34,29 @@ namespace AM.Drawing.CardPrinting
     {
         #region Properties
 
+        /// <summary>
+        /// Ширина.
+        /// </summary>
         [XmlElement("width")]
         [DisplayName("Ширина")]
+        [JsonPropertyName("width")]
         public int Width { get; set; }
 
+        /// <summary>
+        /// Высота.
+        /// </summary>
         [XmlElement("height")]
         [DisplayName("Высота")]
+        [JsonPropertyName("height")]
         public int Height { get; set; }
 
+        /// <summary>
+        /// Источник картинки, например, путь к файлу.
+        /// </summary>
         [XmlElement("source")]
         [DisplayName("Файл")]
-        public string Source { get; set; }
+        [JsonPropertyName("source")]
+        public string? Source { get; set; }
 
         #endregion
 
@@ -53,7 +66,7 @@ namespace AM.Drawing.CardPrinting
         /// Пропорционально масштабирует изображение так, чтобы оно
         /// вписывалось в указанные размеры.
         /// </summary>
-        private static void _ProportionalResize
+        private static void _ProportionalPrint
             (
                 Graphics graphics,
                 Image image,
@@ -70,14 +83,12 @@ namespace AM.Drawing.CardPrinting
             double imageAspect = imageWidth / imageHeight;
             double panelAspect = windowWidth / windowHeight;
             double superAspect = imageAspect / panelAspect;
-            double ratio = (superAspect > 1.0)
+            double ratio = superAspect > 1.0
                 ? windowWidth / imageWidth
                 : windowHeight / imageHeight;
             imageWidth *= ratio;
             imageHeight *= ratio;
-            //Bitmap result = new Bitmap(image, (int)imageWidth,
-            //	(int)imageHeight);
-            //return result;
+
             graphics.DrawImage
                 (
                     image,
@@ -94,57 +105,36 @@ namespace AM.Drawing.CardPrinting
 
         public override void Draw(DrawingContext context)
         {
-            /*
+            Graphics graphics = context.Graphics.ThrowIfNull("context.Graphics");
 
-            Graphics g = context.Graphics;
-
-            if ((Width > 0) && (Height > 0))
+            if (Width > 0 && Height > 0 && !string.IsNullOrEmpty(Source))
             {
-                if (!string.IsNullOrEmpty(Source))
+                var source = context.ExpandText(Source);
+                if (!string.IsNullOrEmpty(source))
                 {
-                    string source = context.ExpandText(Source);
-                    if (!string.IsNullOrEmpty(source))
-                    {
-                        using (Image bitmap = Image.FromFile(source))
-                        {
-                            _ProportionalResize
-                            (
-                                g,
-                                bitmap,
-                                Left,
-                                Top,
-                                Width,
-                                Height
-                            );
-                        }
-                    }
-                }
-                else if (context.Human.ActualImage != null)
-                {
-                    _ProportionalResize
-                    (
-                        g,
-                        context.Human.ActualImage,
-                        Left,
-                        Top,
-                        Width,
-                        Height
-                    );
+                    using Image bitmap = Image.FromFile(source);
+                    _ProportionalPrint
+                        (
+                            graphics,
+                            bitmap,
+                            Left,
+                            Top,
+                            Width,
+                            Height
+                        );
                 }
             }
-
-            */
         }
 
         #endregion
 
         #region Object members
 
-        public override string ToString()
-        {
-            return string.Format("Картинка: {0}", Source);
-        }
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"Картинка: {Source}";
 
         #endregion
-    }
-}
+
+    } // class CardPicture
+
+} // namespace AM.Drawing.CardPrinting

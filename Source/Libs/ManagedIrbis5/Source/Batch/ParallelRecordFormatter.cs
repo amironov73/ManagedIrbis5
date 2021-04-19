@@ -54,7 +54,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Признак окончания.
         /// </summary>
-        public bool Stop { get { return _AllDone(); } }
+        public bool IsStop => _AllDone();
 
         /// <summary>
         /// Используемый формат.
@@ -103,7 +103,7 @@ namespace ManagedIrbis.Batch
 
         private AutoResetEvent? _event;
 
-        private object? _lock;
+        // private object? _lock;
 
         private void _Run
             (
@@ -112,7 +112,7 @@ namespace ManagedIrbis.Batch
         {
             _queue = new ConcurrentQueue<string>();
             _event = new AutoResetEvent(false);
-            _lock = new object();
+            // _lock = new object();
 
             _tasks = new Task[Parallelism];
             var chunks = ArrayUtility.SplitArray
@@ -138,11 +138,11 @@ namespace ManagedIrbis.Batch
 
         private void _Worker
             (
-                object state
+                object? state
             )
         {
-            var chunk = (int[])state;
-            var first = chunk.SafeAt(0, -1);
+            var chunk = (int[]?)state;
+            var first = chunk?.SafeAt(0, -1);
             var threadId = Thread.CurrentThread.ManagedThreadId;
 
             Magna.Trace
@@ -151,7 +151,7 @@ namespace ManagedIrbis.Batch
                     + "first="
                     + first
                     + ", length="
-                    + chunk.Length
+                    + chunk?.Length
                     + ", thread="
                     + threadId
                 );
@@ -165,7 +165,7 @@ namespace ManagedIrbis.Batch
                 var batch = new BatchRecordFormatter
                     (
                         connection,
-                        connection.Database,
+                        connection.Database.ThrowIfNull("connection.Database"),
                         Format,
                         1000,
                         chunk
@@ -185,7 +185,7 @@ namespace ManagedIrbis.Batch
                     + "first="
                     + first
                     + ", length="
-                    + chunk.Length
+                    + chunk?.Length
                     + ", thread="
                     + threadId
                 );
@@ -202,8 +202,8 @@ namespace ManagedIrbis.Batch
 
         private bool _AllDone()
         {
-            return _queue.IsEmpty
-                   && _tasks.All(t => t.IsCompleted);
+            return _queue.ThrowIfNull("_queue").IsEmpty
+                   && _tasks.ThrowIfNull("_tasks").All(t => t.IsCompleted);
         }
 
         #endregion
@@ -234,7 +234,7 @@ namespace ManagedIrbis.Batch
         {
             while (true)
             {
-                if (Stop)
+                if (IsStop)
                 {
                     yield break;
                 }

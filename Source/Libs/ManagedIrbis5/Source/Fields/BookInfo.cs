@@ -15,12 +15,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 using AM;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Pft.Infrastructure.Unifors;
 
@@ -88,8 +86,8 @@ namespace ManagedIrbis.Fields
         {
             get
             {
-                string result = Record.Description
-                                ?? _ExecuteScript(_descriptionScript);
+                var result = Record.Description
+                             ?? _ExecuteScript(_descriptionScript);
                 result = UniforPlusS.DecodeTitle("1" + result);
 
                 return result;
@@ -162,14 +160,16 @@ namespace ManagedIrbis.Fields
             get
             {
                 var result = 0;
-                foreach (ExemplarInfo exemplar in Exemplars)
+                foreach (var exemplar in Exemplars)
                 {
-                    string status = exemplar.Status;
+                    var status = exemplar.Status;
                     if (status != "0"
                         && status != "1"
                         && status != "5"
                         && status != "9")
+                    {
                         continue;
+                    }
 
                     var amount = exemplar.Amount.SafeToInt32();
                     if (amount == 0)
@@ -247,7 +247,7 @@ namespace ManagedIrbis.Fields
         {
             get
             {
-                TitleInfo[] result = TitleInfo.Parse(Record);
+                var result = TitleInfo.Parse(Record);
 
                 return result[0];
             }
@@ -358,7 +358,7 @@ namespace ManagedIrbis.Fields
             var formatter = new PftFormatter();
             formatter.SetProvider(Provider);
             formatter.ParseProgram(script);
-            string result = formatter.FormatRecord(Record);
+            var result = formatter.FormatRecord(Record);
 
             return result;
         }

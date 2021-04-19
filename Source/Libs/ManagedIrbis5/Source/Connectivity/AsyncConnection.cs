@@ -6,7 +6,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedParameter.Local
 
 /* AsyncConnection.cs -- асинхронное подключение к серверу ИРБИС64
@@ -73,7 +76,7 @@ namespace ManagedIrbis
         public string? Database { get; set; } = "IBIS";
 
         /// <inheritdoc cref="IIrbisConnectionSettings.Workstation"/>
-        public string Workstation { get; set; } = "C";
+        public string? Workstation { get; set; } = "C";
 
         /// <inheritdoc cref="IIrbisConnectionSettings.ClientId"/>
         public int ClientId { get; protected internal set; }
@@ -839,7 +842,7 @@ namespace ManagedIrbis
             var response = await ExecuteAsync
                 (
                     CommandCode.ReloadDictionary,
-                    databaseName ?? Database
+                    databaseName ?? Database.ThrowIfNull("Database")
                 );
 
             return response?.CheckReturnCode() ?? false;
@@ -854,7 +857,7 @@ namespace ManagedIrbis
             var response = await ExecuteAsync
                 (
                     CommandCode.ReloadMasterFile,
-                    databaseName ?? Database
+                    databaseName ?? Database.ThrowIfNull("Database")
                 );
 
             return response?.CheckReturnCode() ?? false;
@@ -900,7 +903,7 @@ namespace ManagedIrbis
             var response = await ExecuteAsync
                 (
                     CommandCode.EmptyDatabase,
-                    databaseName ?? Database
+                    databaseName ?? Database.ThrowIfNull("Database")
                 );
 
             return response is not null && response.CheckReturnCode();
@@ -915,7 +918,7 @@ namespace ManagedIrbis
             var response = await ExecuteAsync
                 (
                     CommandCode.UnlockDatabase,
-                    databaseName ?? Database
+                    databaseName ?? Database.ThrowIfNull("Database")
                 );
 
             return response is not null && response.CheckReturnCode();

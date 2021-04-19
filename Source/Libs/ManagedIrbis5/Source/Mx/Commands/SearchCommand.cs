@@ -82,16 +82,12 @@ namespace ManagedIrbis.Mx.Commands
 
             if (arguments.Length != 0)
             {
-                string argument = arguments[0].Text;
+                var argument = arguments[0].Text;
                 if (!string.IsNullOrEmpty(argument))
                 {
-                    int[] found = executive.Provider.Search(argument);
-                    int foundCount = found.Length;
-                    executive.WriteMessage(string.Format
-                        (
-                            "Found: {0}",
-                            found.Length
-                        ));
+                    var found = executive.Provider.Search(argument);
+                    var foundCount = found.Length;
+                    executive.WriteMessage($"Found: {found.Length}");
 
                     if (executive.Limit > 0)
                     {
@@ -106,10 +102,10 @@ namespace ManagedIrbis.Mx.Commands
                         }
                     }
                     executive.Records.Clear();
-                    for (int i = 0; i < found.Length; i++)
+                    for (var i = 0; i < found.Length; i++)
                     {
-                        int mfn = found[i];
-                        MxRecord record = new MxRecord
+                        var mfn = found[i];
+                        var record = new MxRecord
                         {
                             Database = executive.Provider.Database,
                             Mfn = mfn,

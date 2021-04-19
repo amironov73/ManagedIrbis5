@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Palette.cs -- palette of colors
+/* Palette.cs -- палитра цветов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -34,7 +34,7 @@ using System.Xml.Serialization;
 namespace AM.Drawing
 {
     /// <summary>
-    ///
+    /// Палитра цветов.
     /// </summary>
     [XmlRoot("palette")]
     // ReSharper disable RedundantNameQualifier
@@ -51,10 +51,7 @@ namespace AM.Drawing
         ///
         /// </summary>
         /// <param name="name"></param>
-        public Tube this[string name]
-        {
-            get { return _dictionary[name]; }
-        }
+        public Tube this[string name] => _dictionary[name];
 
         #endregion
 
@@ -88,21 +85,21 @@ namespace AM.Drawing
         #region Public methods
 
         /// <summary>
-        /// Adds the specified name.
+        /// Добавляет указанный цвет с уникальным именем.
         /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="color">The color.</param>
-        /// <returns></returns>
-        public Tube Add(string name, Color color)
+        public Tube Add
+            (
+                string name,
+                Color color
+            )
         {
-            Tube result = new Tube(name, color);
+            var result = new Tube(name, color);
             Add(result);
+
             return result;
         }
 
-        /// <summary>
-        /// Removes all elements from the <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
-        /// </summary>
+        /// <inheritdoc cref="Collection{T}.ClearItems"/>
         protected override void ClearItems()
         {
             Dispose();
@@ -115,20 +112,20 @@ namespace AM.Drawing
         /// </summary>
         public void InitializeFromAttributes()
         {
-            PropertyInfo[] properties = GetType()
+            var properties = GetType()
                 .GetProperties(BindingFlags.Instance
                                | BindingFlags.Public);
-            foreach (PropertyInfo property in properties)
+            foreach (var property in properties)
             {
-                object[] attributes = property.GetCustomAttributes
+                var attributes = property.GetCustomAttributes
                     (
                         typeof(PaletteColorAttribute),
                         true
                     );
                 foreach (PaletteColorAttribute attribute in attributes)
                 {
-                    string name = property.Name;
-                    Color color = Color.FromName(attribute.Color);
+                    var name = property.Name;
+                    var color = Color.FromName(attribute.Color);
                     Add(name, color);
                 }
             }
@@ -140,72 +137,42 @@ namespace AM.Drawing
         /// <returns></returns>
         public Tube GetTubeFromReflection ()
         {
-            StackFrame frame = new StackFrame(1,false);
-            //string funcName = _functionRegex
-            //    .Match(frame.GetMethod().Name)
-            //    .Groups[1].Value;
-            string funcName = frame.GetMethod().Name.Substring(4);
+            var frame = new StackFrame(1,false);
+            var funcName = frame.GetMethod()!.Name.Substring(4);
             return this[funcName];
         }
 
-        /// <summary>
-        /// Inserts an element into the <see cref="T:System.Collections.ObjectModel.Collection`1"/> at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
-        /// <param name="item">The object to insert. The value can be null for reference types.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void InsertItem(int index, Tube item)
+        /// <inheritdoc cref="Collection{T}.InsertItem"/>
+        protected override void InsertItem
+            (
+                int index,
+                Tube item
+            )
         {
-            if (item == null)
-            {
-                throw new ArgumentNullException("item");
-            }
             if (_dictionary.ContainsKey(item.Name))
             {
                 _dictionary.Remove(item.Name);
-                //Remove(item.Name);
             }
             _dictionary.Add(item.Name,item);
             base.InsertItem(index, item);
         }
 
-        /// <summary>
-        /// Removes the element at the specified index of the <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to remove.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is equal to or greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
+        /// <inheritdoc cref="Collection{T}.RemoveItem"/>
         protected override void RemoveItem(int index)
         {
-            Tube item = this[index];
+            var item = this[index];
             _dictionary.Remove(item.Name);
             item.Dispose();
             base.RemoveItem(index);
         }
 
-        /// <summary>
-        /// Replaces the element at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to replace.</param>
-        /// <param name="item">The new value for the element at the specified index. The value can be null for reference types.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void SetItem(int index, Tube item)
+        /// <inheritdoc cref="Collection{T}.SetItem"/>
+        protected override void SetItem
+            (
+                int index,
+                Tube item
+            )
         {
-            if (item == null)
-            {
-                throw new ArgumentNullException("item");
-            }
             if (_dictionary.ContainsKey(item.Name))
             {
                 _dictionary.Remove(item.Name);
@@ -221,11 +188,9 @@ namespace AM.Drawing
         /// <param name="fileName">Name of the file.</param>
         public void Save(string fileName)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(Palette));
-            using (StreamWriter writer = new StreamWriter(fileName))
-            {
-                serializer.Serialize(writer, this);
-            }
+            var serializer = new XmlSerializer(typeof(Palette));
+            using var writer = new StreamWriter(fileName);
+            serializer.Serialize(writer, this);
         }
 
         /// <summary>
@@ -235,12 +200,11 @@ namespace AM.Drawing
         /// <returns></returns>
         public static Palette Read(string fileName)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(Palette));
-            using (StreamReader reader = new StreamReader(fileName))
-            {
-                Palette result = (Palette)serializer.Deserialize(reader);
-                return result;
-            }
+            var serializer = new XmlSerializer(typeof(Palette));
+            using var reader = new StreamReader(fileName);
+            var result = (Palette)serializer.Deserialize(reader)
+                .ThrowIfNull("serializer.Deserialize");
+            return result;
         }
 
         /// <summary>
@@ -268,14 +232,10 @@ namespace AM.Drawing
 
         #region IDisposable members
 
-        /// <summary>
-        /// Performs application-defined tasks associated
-        /// with freeing, releasing, or resetting unmanaged
-        /// resources.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            foreach (Tube tube in Items)
+            foreach (var tube in Items)
             {
                 tube.Dispose();
             }
@@ -285,21 +245,13 @@ namespace AM.Drawing
 
         #region IXmlSerializable members
 
-        /// <summary>
-        /// This method is reserved and should not be used. When implementing the IXmlSerializable interface, you should return null (Nothing in Visual Basic) from this method, and instead, if specifying a custom schema is required, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
-        /// </returns>
-        XmlSchema IXmlSerializable.GetSchema()
+        /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
+        XmlSchema? IXmlSerializable.GetSchema()
         {
             return null;
         }
 
-        /// <summary>
-        /// Generates an object from its XML representation.
-        /// </summary>
-        /// <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized.</param>
+        /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
         void IXmlSerializable.ReadXml(XmlReader reader)
         {
             reader.Read();
@@ -309,19 +261,19 @@ namespace AM.Drawing
                 {
                     break;
                 }
-                Tube tube = new Tube();
+                var tube = new Tube();
                 ((IXmlSerializable)tube).ReadXml(reader);
                 Add(tube);
             }
         }
 
-        /// <summary>
-        /// Converts an object into its XML representation.
-        /// </summary>
-        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized.</param>
-        void IXmlSerializable.WriteXml(XmlWriter writer)
+        /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
+        void IXmlSerializable.WriteXml
+            (
+                XmlWriter writer
+            )
         {
-            foreach (Tube tube in Items)
+            foreach (var tube in Items)
             {
                 writer.WriteStartElement("tube");
                 ((IXmlSerializable)tube).WriteXml(writer);
@@ -333,17 +285,12 @@ namespace AM.Drawing
 
         #region Object members
 
-        /// <summary>
-        /// Returns a <see cref="System.String" />
-        /// that represents this instance.
-        /// </summary>
-        /// <returns>A <see cref="System.String" />
-        /// that represents this instance.</returns>
+        /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
-            foreach (Tube item in Items)
+            foreach (var item in Items)
             {
                 result.AppendFormat
                     (
@@ -357,5 +304,7 @@ namespace AM.Drawing
         }
 
         #endregion
-    }
-}
+
+    } // class Palette
+
+} // namespace AM.Drawing

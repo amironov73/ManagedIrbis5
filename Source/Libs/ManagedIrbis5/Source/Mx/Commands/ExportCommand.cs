@@ -82,15 +82,15 @@ namespace ManagedIrbis.Mx.Commands
 
             if (!string.IsNullOrEmpty(fileName))
             {
-                using (StreamWriter writer
+                using (var writer
                     = TextWriterUtility.Create(fileName, IrbisEncoding.Utf8))
                 {
-                    foreach (MxRecord mxRecord in executive.Records)
+                    foreach (var mxRecord in executive.Records)
                     {
                         var record = executive.Provider.ReadRecord(mxRecord.Mfn);
                         if (!ReferenceEquals(record, null))
                         {
-                            string text = record.ToPlainText();
+                            var text = record.ToPlainText();
                             writer.Write(text);
                             writer.WriteLine("*****");
                         }

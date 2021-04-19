@@ -72,9 +72,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Private members
 
         private int _index;
-        private PftGroup _currentGroup;
-        private PftField _currentField;
-        private Record _record;
+        private PftGroup? _currentGroup;
+        private PftField? _currentField;
+        private Record? _record;
 
         #endregion
 

@@ -107,11 +107,11 @@ namespace ManagedIrbis.Direct
                     long saveOffset = _stream.Position;
                     long endOffset = leader.Base + entry.Position;
                     _stream.Seek(position + endOffset, SeekOrigin.Begin);
-                    entry.Bytes = StreamUtility.ReadBytes(_stream, entry.Length);
-                    if (!ReferenceEquals(entry.Bytes, null))
+                    var bytes = StreamUtility.ReadBytes(_stream, entry.Length);
+                    if (!ReferenceEquals(bytes, null))
                     {
-                        byte[] buffer = entry.Bytes;
-                        entry.Text = encoding.GetString(buffer, 0, buffer.Length);
+                        entry.Bytes = bytes;
+                        entry.Text = encoding.GetString(bytes, 0, bytes.Length);
                     }
                     _stream.Seek(saveOffset, SeekOrigin.Begin);
                     dictionary.Add(entry);

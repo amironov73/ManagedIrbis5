@@ -75,7 +75,7 @@ namespace ManagedIrbis.Mx.Commands
 
             executive.ClearOutput();
 
-            MxRecord[] records = executive.Records.ToArray();
+            var records = executive.Records.ToArray();
 
             if (records.Length == 0)
             {
@@ -83,7 +83,7 @@ namespace ManagedIrbis.Mx.Commands
             }
             else
             {
-                foreach (MxRecord record in records)
+                foreach (var record in records)
                 {
                     executive.WriteOutput(record.Mfn.ToInvariantString());
                 }

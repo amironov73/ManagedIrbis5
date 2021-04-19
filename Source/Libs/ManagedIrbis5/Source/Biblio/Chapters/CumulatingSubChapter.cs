@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBeProtected.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -19,7 +21,6 @@ using System.Linq;
 using AM;
 using AM.Text;
 
-using ManagedIrbis.Pft;
 using ManagedIrbis.Reports;
 
 #endregion
@@ -121,6 +122,12 @@ namespace ManagedIrbis.Biblio
         {
             base.BuildItems(context);
 
+            var items = Items;
+            if (items is null)
+            {
+                return;
+            }
+
             var settings = Settings;
             if (ReferenceEquals(settings, null))
             {
@@ -138,19 +145,16 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin grouping {0}", this);
 
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            using (var formatter
-                = processor.AcquireFormatter(context))
+            var processor = context.Processor.ThrowIfNull("context.Processor");
+            using (var formatter = processor.AcquireFormatter(context))
             {
                 generalFormat = processor.GetText(context, generalFormat)
                     .ThrowIfNull("generalFormat");
                 formatter.ParseProgram(generalFormat);
 
-                foreach (var item in Items)
+                foreach (var item in items)
                 {
-                    var record = item.Record
-                        .ThrowIfNull("item.Record");
+                    var record = item.Record.ThrowIfNull("item.Record");
                     var header = formatter.FormatRecord(record.Mfn);
                     if (!string.IsNullOrEmpty(header))
                     {
@@ -192,7 +196,7 @@ namespace ManagedIrbis.Biblio
             }
 
             Groups = Groups.OrderBy(x => x.Order).ToList();
-            Items.Clear();
+            items.Clear();
             foreach (var bookGroup in Groups)
             {
                 OrderGroup(bookGroup);
@@ -203,7 +207,7 @@ namespace ManagedIrbis.Biblio
                     UserData = bookGroup
                 };
                 bookGroup.Item = item;
-                Items.Add(item);
+                items.Add(item);
             }
 
 
@@ -233,7 +237,10 @@ namespace ManagedIrbis.Biblio
             foreach (var bookGroup in Groups)
             {
                 var header = bookGroup.Header;
-                log.WriteLine(header);
+                if (!string.IsNullOrEmpty(header))
+                {
+                    log.WriteLine(header);
+                }
 
                 header = RichText.Encode3(header, UnicodeRange.Russian, "\\f2");
 
@@ -248,13 +255,15 @@ namespace ManagedIrbis.Biblio
                     );
                 report.Body.Add(band);
 
-                // Для отладки: проверить упорядоч    ение
                 // Для отладки: проверить упорядочение
                 if (showOrder)
                 {
-                    band = new ParagraphBand(bookGroup.Order);
-                    report.Body.Add(band);
-                    report.Body.Add(new ParagraphBand());
+                    if (!string.IsNullOrEmpty(bookGroup.Order))
+                    {
+                        band = new ParagraphBand(bookGroup.Order);
+                        report.Body.Add(band);
+                        report.Body.Add(new ParagraphBand());
+                    }
                 }
 
                 if (!bookGroup.Single)
@@ -263,11 +272,9 @@ namespace ManagedIrbis.Biblio
                     {
                         log.Write(".");
                         item = bookGroup[i];
-                        var description = item.Description
+                        var description = item.Description.ThrowIfNull("item.Description");
+                        description = RichText.Encode3 ( description, UnicodeRange.Russian, "\\f2" )
                             .ThrowIfNull("item.Description");
-                        description = RichText.Encode3(description,
-                            UnicodeRange.Russian, "\\f2")
-                            .ThrowIfNull();
                         band = new ParagraphBand(description);
                         report.Body.Add(band);
                     }

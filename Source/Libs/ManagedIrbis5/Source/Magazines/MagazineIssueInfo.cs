@@ -61,7 +61,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         [XmlAttribute("index")]
         [JsonPropertyName("index")]
-        public string Index { get; set; }
+        public string? Index { get; set; }
 
         /// <summary>
         /// Библиографическое описание.
@@ -114,8 +114,7 @@ namespace ManagedIrbis.Magazines
         {
             get
             {
-                string result = Number;
-
+                var result = Number;
                 if (!string.IsNullOrEmpty(result))
                 {
                     result = result.Trim();
@@ -241,19 +240,19 @@ namespace ManagedIrbis.Magazines
                 .AddNonEmptyField(920, Worksheet)
                 .AddNonEmptyField(999, LoanCount.ToString());
 
-            MagazineArticleInfo[] articles = Articles;
+            var articles = Articles;
             if (!ReferenceEquals(articles, null))
             {
-                foreach (MagazineArticleInfo article in articles)
+                foreach (var article in articles)
                 {
                     result.Fields.Add(article.ToField());
                 }
             }
 
-            ExemplarInfo[] exemplars = Exemplars;
+            var exemplars = Exemplars;
             if (!ReferenceEquals(exemplars, null))
             {
-                foreach (ExemplarInfo exemplar in exemplars)
+                foreach (var exemplar in exemplars)
                 {
                     result.Fields.Add(exemplar.ToField());
                 }
@@ -367,7 +366,7 @@ namespace ManagedIrbis.Magazines
                 bool throwOnError
             )
         {
-            Verifier<MagazineIssueInfo> verifier
+            var verifier
                 = new Verifier<MagazineIssueInfo>(this, throwOnError);
 
             verifier
@@ -384,21 +383,9 @@ namespace ManagedIrbis.Magazines
         #region Object info
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            if (!string.IsNullOrEmpty(Supplement))
-            {
-                return string
-                    .Format
-                        (
-                            "{0} ({1})",
-                            Number.ToVisibleString(),
-                            Supplement
-                        )
-                    .Trim();
-            }
-            return Number.ToVisibleString().Trim();
-        }
+        public override string ToString() => string.IsNullOrEmpty(Supplement)
+                ? Number.ToVisibleString().Trim()
+                : $"{Number.ToVisibleString()} ({Supplement})".Trim();
 
         #endregion
 
