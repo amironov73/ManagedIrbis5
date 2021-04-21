@@ -57,7 +57,7 @@ namespace AM
                 TResult value
             )
         {
-            return new Result<TResult, TError>
+            return new ()
                 {
                     Value = value,
                     Success = true,
@@ -75,12 +75,33 @@ namespace AM
                 TError error
             )
         {
-            return new Result<TResult, TError>
+            return new ()
                 {
                     Value = default,
                     Success = false,
                     Error = error
                 };
+        }
+
+        /// <summary>
+        /// Конструирование значения для неуспешного завершения.
+        /// </summary>
+        /// <param name="code">Код ошибки</param>
+        /// <param name="description">Описание ошибки.</param>
+        /// <typeparam name="T">Тип для кода ошибки</typeparam>
+        /// <returns>Сконструированная структура.</returns>
+        public static Result<TResult, ErrorInfo<T>> FailureWithInfo<T>
+            (
+                T code,
+                string description
+            )
+        {
+            return new ()
+            {
+                Value = default,
+                Success = false,
+                Error = new ErrorInfo<T>(code, description)
+            };
         }
 
         /// <summary>
@@ -142,12 +163,8 @@ namespace AM
         #region Object members
 
         /// <inheritdoc cref="Object.ToString" />
-        public override string ToString()
-        {
-            return Success
-                ? $"Success: {Value}"
-                : $"Failure: {Error}";
-        }
+        public override string ToString() =>
+            Success ? $"Success: {Value}" : $"Failure: {Error}";
 
         #endregion
     }
