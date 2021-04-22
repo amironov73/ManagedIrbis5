@@ -46,7 +46,7 @@ namespace AM.Drawing.Barcodes
         /// </summary>
         public abstract string Encode
             (
-                string text
+                BarcodeData data
             );
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace AM.Drawing.Barcodes
                 return;
             }
 
-            var encoded = Encode(data.Message.ThrowIfNull("data.Message"));
+            var encoded = Encode(data);
             encoded = "00" + encoded + "00";
             var graphics = context.Graphics.ThrowIfNull("context.Graphics");
             var bounds = context.Bounds;

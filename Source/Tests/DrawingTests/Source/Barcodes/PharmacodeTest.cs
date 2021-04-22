@@ -1,8 +1,10 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable StringLiteralTypo
 
 using System.Drawing;
 
@@ -15,20 +17,20 @@ using AM.Drawing.Barcodes;
 namespace UnitTests.AM.Drawing.Barcodes
 {
     [TestClass]
-    public class Ean8Test
+    public class PharmacodeTest
         : DrawingTests.CommonUnitTest
     {
         [TestMethod]
-        public void Ean8_DrawBarcode_1()
+        public void Pharmacode_DrawBarcode_1()
         {
             using var image = new Bitmap(500, 100);
             using var graphics = Graphics.FromImage(image);
             graphics.Clear(Color.Lime);
 
-            var barcode = new Ean8();
+            var barcode = new Pharmacode();
             var data = new BarcodeData
             {
-                Message = "46009333"
+                Message = "123456"
             };
             var bounds = new RectangleF(0, 0, image.Width, image.Height);
             bounds.Inflate(-5, - 5);
@@ -41,17 +43,17 @@ namespace UnitTests.AM.Drawing.Barcodes
             barcode.DrawBarcode(context);
 
             graphics.Dispose();
-            image.Save("Ean8.bmp");
+            image.Save("Pharmacode.bmp");
         }
 
         [TestMethod]
-        public void Ean8_Encode_1()
+        public void Pharmacode_Encode_1()
         {
-            var barcode = new Ean8();
-            var expected = "1010100011010111100011010001101010101110100100001010000101000010101";
+            var barcode = new Pharmacode();
+            var expected = "1110011100111001001001001110010010011100100100100100100111";
             var data = new BarcodeData
             {
-                Message = "46009333"
+                Message = "123456"
             };
             var actual = barcode.Encode(data);
             ShowDifference(expected, actual);

@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 
 /* QualityRule.cs -- abstract base class for all the quality rules
@@ -23,7 +24,6 @@ using System.Xml.Serialization;
 
 using AM;
 
-using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
 #endregion
@@ -111,7 +111,7 @@ namespace ManagedIrbis.Quality
                 params object[] args
             )
         {
-            FieldDefect defect = new FieldDefect
+            var defect = new FieldDefect
             {
                 Field = tag,
                 Damage = damage,
@@ -131,7 +131,7 @@ namespace ManagedIrbis.Quality
                 params object[] args
             )
         {
-            FieldDefect defect = new FieldDefect
+            var defect = new FieldDefect
             {
                 Field = field.Tag,
                 Repeat = field.Repeat,
@@ -154,7 +154,7 @@ namespace ManagedIrbis.Quality
                 params object[] args
             )
         {
-            FieldDefect defect = new FieldDefect
+            var defect = new FieldDefect
             {
                 Field = field.Tag,
                 Repeat = field.Repeat,
@@ -221,7 +221,7 @@ namespace ManagedIrbis.Quality
                 return true;
             }
 
-            MenuEntry entry = menu.GetEntrySensitive(value);
+            var entry = menu.GetEntrySensitive(value);
 
             return !ReferenceEquals(entry, null);
         }
@@ -413,7 +413,7 @@ namespace ManagedIrbis.Quality
                 */
             }
 
-            foreach (SubField subfield in field.Subfields)
+            foreach (var subfield in field.Subfields)
             {
                 CheckWhitespace
                     (
@@ -428,7 +428,7 @@ namespace ManagedIrbis.Quality
         /// </summary>
         protected RuleReport EndCheck()
         {
-            RuleReport result = Report.ThrowIfNull("Report");
+            var result = Report.ThrowIfNull("Report");
             result.Damage = result.Defects.Sum(defect => defect.Damage);
 
             return result;
@@ -448,7 +448,7 @@ namespace ManagedIrbis.Quality
         /// </summary>
         protected bool IsBook()
         {
-            string worksheet = Worksheet;
+            var worksheet = Worksheet;
             return worksheet.SameString("PAZK")
                    || worksheet.SameString("SPEC")
                    || worksheet.SameString("PVK");
@@ -596,7 +596,7 @@ namespace ManagedIrbis.Quality
             var selected = field.Subfields
                 .GetSubField(new[] {code})
                 .Where(sf => sf.Value.IsEmpty);
-            foreach (SubField subField in selected)
+            foreach (var subField in selected)
             {
                 AddDefect
                     (

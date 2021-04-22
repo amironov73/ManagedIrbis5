@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -68,13 +70,16 @@ namespace ManagedIrbis.Systematization
             var result = new AthrbRecord
             {
                 MainHeading = AthrbHeading.Parse(record.Fields.GetFirstField(210)),
+
                 LinkedHeadings = record.Fields
                     .GetField(510)
-                    .Select(field => AthrbHeading.Parse(field))
+                    .Select(AthrbHeading.Parse)
+                    .NonNullItems()
                     .ToArray(),
+
                 Guidelines = record.Fields
                     .GetField(300)
-                    .Select(field => AthrbGuidelines.Parse(field))
+                    .Select(AthrbGuidelines.Parse)
                     .ToArray()
             };
 
@@ -89,5 +94,7 @@ namespace ManagedIrbis.Systematization
         public override string ToString() => MainHeading.ToVisibleString();
 
         #endregion
-    }
-}
+
+    } // class AthruRecord
+
+} // namespace ManagedIrbis.Systematization

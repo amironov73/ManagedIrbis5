@@ -242,7 +242,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             {
                 if (Context.UpperMode)
                 {
-                    value = IrbisText.ToUpper(value);
+                    value = IrbisText.ToUpper(value)!;
                 }
                 Context.Write(null, value);
             }

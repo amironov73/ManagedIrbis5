@@ -7,16 +7,13 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* Ean8.cs --
+/* Standard2of5.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 
 #endregion
 
@@ -25,44 +22,30 @@ using System.Linq;
 namespace AM.Drawing.Barcodes
 {
     /// <summary>
-    /// EAN 8
+    ///
     /// </summary>
-    public class Ean8
+    public class Standard2of5
         : LinearBarcodeBase
     {
         #region Private members
 
-        private static readonly string[] _codesA =
+        private static readonly string[] _patterns =
         {
-            "0001101",
-            "0011001",
-            "0010011",
-            "0111101",
-            "0100011",
-            "0110001",
-            "0101111",
-            "0111011",
-            "0110111",
-            "0001011"
-        };
-
-        private readonly string[] _codesB =
-        {
-            "1110010",
-            "1100110",
-            "1101100",
-            "1000010",
-            "1011100",
-            "1001110",
-            "1010000",
-            "1000100",
-            "1001000",
-            "1110100"
+            "10101110111010",
+            "11101010101110",
+            "10111010101110",
+            "11101110101010",
+            "10101110101110",
+            "11101011101010",
+            "10111011101010",
+            "10101011101110",
+            "11101010111010",
+            "10111010111010"
         };
 
         #endregion
 
-        #region LinearBarcodeBase methods
+        #region LinearBarcodeBase members
 
         /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
         public override string Encode
@@ -73,25 +56,15 @@ namespace AM.Drawing.Barcodes
             var text = data.Message.ThrowIfNull("data.Message");
             var result = new List<char>();
 
-            result.AddRange("101"); // открывающая последовательность
+            result.AddRange("11011010");
 
-            var half = text.Length / 2;
-
-            for (var i = 0; i < half; i++)
+            foreach (var c in text)
             {
-                var c = text[i] - '0';
-                result.AddRange(_codesA[c]);
+                var digit = c - '0';
+                result.AddRange(_patterns[digit]);
             }
 
-            result.AddRange("01010"); // разделитель
-
-            for (var i = half; i < text.Length; i++)
-            {
-                var c = text[i] - '0';
-                result.AddRange(_codesB[c]);
-            }
-
-            result.AddRange("101"); // закрывающая последовательность
+            result.AddRange("1101011");
 
             return new string(result.ToArray());
         }
@@ -102,6 +75,7 @@ namespace AM.Drawing.Barcodes
                 BarcodeData data
             )
         {
+
             var message = data.Message;
 
             if (string.IsNullOrWhiteSpace(message))
@@ -120,8 +94,8 @@ namespace AM.Drawing.Barcodes
             return true;
         }
 
-        /// <inheritdoc cref="IBarcode.Symbology"/>
-        public override string Symbology { get; } = "EAN13";
+        /// <inheritdoc cref="LinearBarcodeBase.Symbology"/>
+        public override string Symbology { get; } = "Standard 2 of 5";
 
         #endregion
     }

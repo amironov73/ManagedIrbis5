@@ -15,20 +15,20 @@ using AM.Drawing.Barcodes;
 namespace UnitTests.AM.Drawing.Barcodes
 {
     [TestClass]
-    public class Ean8Test
+    public class UpcATest
         : DrawingTests.CommonUnitTest
     {
         [TestMethod]
-        public void Ean8_DrawBarcode_1()
+        public void UpcA_DrawBarcode_1()
         {
             using var image = new Bitmap(500, 100);
             using var graphics = Graphics.FromImage(image);
             graphics.Clear(Color.Lime);
 
-            var barcode = new Ean8();
+            var barcode = new UpcA();
             var data = new BarcodeData
             {
-                Message = "46009333"
+                Message = "03600029145"
             };
             var bounds = new RectangleF(0, 0, image.Width, image.Height);
             bounds.Inflate(-5, - 5);
@@ -41,17 +41,17 @@ namespace UnitTests.AM.Drawing.Barcodes
             barcode.DrawBarcode(context);
 
             graphics.Dispose();
-            image.Save("Ean8.bmp");
+            image.Save("UpcA.bmp");
         }
 
         [TestMethod]
-        public void Ean8_Encode_1()
+        public void UpcA_Encode_1()
         {
-            var barcode = new Ean8();
-            var expected = "1010100011010111100011010001101010101110100100001010000101000010101";
+            var barcode = new UpcA();
+            var expected = "10100011010111101010111100011010001101000110101010110110011101001100110101110010011101101100101";
             var data = new BarcodeData
             {
-                Message = "46009333"
+                Message = "03600029145"
             };
             var actual = barcode.Encode(data);
             ShowDifference(expected, actual);

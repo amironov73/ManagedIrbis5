@@ -71,7 +71,7 @@ namespace ManagedIrbis.Identifiers
             {
                 sum = sum + (digits[i] - '0') * _coefficients[i];
             }
-            var result = (char)(10 - sum % 10 + '0');
+            var result = (char)((10 - sum % 10) % 10 + '0');
 
             return result;
         }

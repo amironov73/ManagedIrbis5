@@ -3,6 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnassignedGetOnlyAutoProperty
 
 /* PftFormatter.cs -- PFT-форматтер
@@ -11,7 +14,6 @@
 
 #region Using directives
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
@@ -32,7 +34,10 @@ namespace ManagedIrbis.Pft
         {
         }
 
-        public PftFormatter(object context)
+        public PftFormatter
+            (
+                object context
+            )
         {
             Context = context;
         }
@@ -46,7 +51,7 @@ namespace ManagedIrbis.Pft
 
         public virtual bool SupportsExtendedSyntax { get; }
 
-        public object Context { get; }
+        public object? Context { get; }
 
         public virtual string FormatRecord(Record? record) =>
             throw new System.NotImplementedException();
@@ -71,6 +76,6 @@ namespace ManagedIrbis.Pft
 
         #endregion
 
-    } // class IPftFormatter
+    } // class PftFormatter
 
 } // namespace ManagedIrbis.Pft

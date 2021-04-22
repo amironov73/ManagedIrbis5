@@ -68,7 +68,7 @@ namespace ManagedIrbis.Mx.Commands
                 return false;
             }
 
-            string source = null;
+            string? source = null;
             if (arguments.Length != 0)
             {
                 source = arguments[0].Text;

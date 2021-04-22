@@ -13,10 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using System.Text;
 
 #endregion
 
@@ -25,29 +22,59 @@ using System.Linq;
 namespace AM.Drawing.Barcodes
 {
     /// <summary>
-    /// EAN 13
+    /// Pharmacode
     /// </summary>
     public class Pharmacode
         : LinearBarcodeBase
     {
+        #region Constants
+
+        private const string Thin = "1";
+        private const string Gap = "00";
+        private const string Thick = "111";
+
+        #endregion
+
         #region LinearBarcodeBase methods
 
         /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
         public override string Encode
             (
-                string text
+                BarcodeData data
             )
         {
-            var result = new List<char>();
+            var text = data.Message.ThrowIfNull("data.Message");
+            var result = new StringBuilder();
+            var number = text.ParseInt32();
 
-            return new string(result.ToArray());
+            do
+            {
+                if ((number & 1) == 0)
+                {
+                    result.Insert(0, Thick);
+                    number = (number - 2) / 2;
+                }
+                else
+                {
+                    result.Insert(0, Thin);
+                    number = (number - 1) / 2;
+                }
+
+                if (number != 0)
+                {
+                    result.Insert(0, Gap);
+                }
+
+            } while (number != 0);
+
+            return result.ToString();
         }
 
         /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
         public override bool Verify
-        (
-            BarcodeData data
-        )
+            (
+                BarcodeData data
+            )
         {
             var message = data.Message;
 
@@ -56,11 +83,9 @@ namespace AM.Drawing.Barcodes
                 return false;
             }
 
-            foreach (var c in message)
-            {
-            }
+            var number = message.ParseInt32();
 
-            return true;
+            return number > 2 && number < 131071;
         }
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
