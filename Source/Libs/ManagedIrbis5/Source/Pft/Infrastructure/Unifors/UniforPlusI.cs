@@ -80,14 +80,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var navigator = new TextNavigator(expression);
             var delimiter = navigator.ReadChar();
-            string firstPart = navigator.ReadUntil(delimiter).ToString();
+            var firstPart = navigator.ReadUntil(delimiter).ToString();
             if (string.IsNullOrEmpty(firstPart)
                 || navigator.ReadChar() != delimiter)
             {
                 return;
             }
 
-            string title = navigator.GetRemainingText().ToString();
+            var title = navigator.GetRemainingText().ToString();
 
             var output = string.Format
                 (

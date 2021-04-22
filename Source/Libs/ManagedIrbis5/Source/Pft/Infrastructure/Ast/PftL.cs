@@ -79,7 +79,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 params PftNode[] body
             )
         {
-            foreach (PftNode node in body)
+            foreach (var node in body)
             {
                 Children.Add(node);
             }
@@ -97,7 +97,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             compiler.CompileNodes(Children);
 
-            string actionName = compiler.CompileAction(Children);
+            var actionName = compiler.CompileAction(Children);
 
             compiler.StartMethod(this);
 
@@ -149,12 +149,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             OnBeforeExecution(context);
 
             Value = 0;
-            string expression = context.Evaluate(Children);
+            var expression = context.Evaluate(Children);
             if (!string.IsNullOrEmpty(expression))
             {
                 // TODO get the first found item only
 
-                int[] found = context.Provider.Search(expression);
+                var found = context.Provider.Search(expression);
                 if (found.Length != 0)
                 {
                     Value = found[0];

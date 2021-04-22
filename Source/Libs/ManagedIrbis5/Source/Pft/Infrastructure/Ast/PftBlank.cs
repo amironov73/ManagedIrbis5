@@ -88,7 +88,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 return true;
             }
 
-            foreach (char c in text)
+            foreach (var c in text)
             {
                 if (!char.IsWhiteSpace(c))
                 {
@@ -111,7 +111,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             compiler.CompileNodes(Children);
 
-            string actionName = compiler.CompileAction(Children);
+            var actionName = compiler.CompileAction(Children);
 
             compiler.StartMethod(this);
 
@@ -184,7 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             StringBuilder result = new StringBuilder();
             result.Append("blank(");
-            bool first = true;
+            var first = true;
             foreach (PftNode child in Children)
             {
                 if (!first)

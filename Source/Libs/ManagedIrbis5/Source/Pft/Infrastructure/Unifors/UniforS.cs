@@ -95,7 +95,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             if (!string.IsNullOrEmpty(expression))
             {
                 var navigator = new TextNavigator(expression);
-                string text = navigator.ReadInteger().ToString();
+                var text = navigator.ReadInteger().ToString();
                 if (Utility.TryParseInt32(text, out var delta))
                 {
                     //ibatrak при значении 0 - сбросить счетчик

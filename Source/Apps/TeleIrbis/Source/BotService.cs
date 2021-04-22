@@ -122,7 +122,7 @@ namespace TeleIrbis
                 NumberOfRecords = 20
             };
             var found = await connection.SearchAsync(parameters);
-            if (found.Length == 0)
+            if (found is null || found.Length == 0)
             {
                 return new[] {"Ничего не найдено"};
             }

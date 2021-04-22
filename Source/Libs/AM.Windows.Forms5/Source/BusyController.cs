@@ -3,10 +3,14 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
 /* BusyController.cs --
@@ -99,7 +103,7 @@ namespace AM.Windows.Forms
 
         #region Private members
 
-        private BusyState _state;
+        private BusyState? _state;
 
         /// <summary>
         /// Initialize <see cref="State"/> with specified value.
@@ -123,7 +127,7 @@ namespace AM.Windows.Forms
 
         private void _StateChanged
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {

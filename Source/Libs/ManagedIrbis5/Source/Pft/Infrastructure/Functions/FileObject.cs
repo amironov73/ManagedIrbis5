@@ -117,21 +117,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result;
         }
 
-        public void Write
-            (
-                string text
-            )
-        {
-            _writer?.Write(text);
-        }
+        public void Write ( string text ) => _writer?.Write(text);
 
-        public void WriteLine
-            (
-                string text
-            )
-        {
-            _writer.WriteLine(text);
-        }
+        public void WriteLine ( string text ) => _writer?.WriteLine(text);
 
         #endregion
 

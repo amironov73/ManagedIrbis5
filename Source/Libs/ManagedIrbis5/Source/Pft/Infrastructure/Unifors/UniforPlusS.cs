@@ -105,7 +105,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 var navigator = new TextNavigator(expression);
                 var index = navigator.ReadChar();
-                string input = navigator.GetRemainingText().ToString();
+                var input = navigator.GetRemainingText().ToString();
                 if (!string.IsNullOrEmpty(input))
                 {
                     MatchEvaluator evaluator = _SecondEvaluator;

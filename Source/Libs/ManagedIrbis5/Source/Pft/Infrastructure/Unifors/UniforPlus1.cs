@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -21,8 +22,6 @@ using System.Text;
 using AM;
 using AM.Collections;
 using AM.Text;
-
-using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -109,7 +108,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 goto DONE;
             }
 
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.Comma,
                     2
@@ -173,7 +172,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 goto DONE;
             }
 
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.NumberSign,
                     2
@@ -183,7 +182,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 goto DONE;
             }
 
-            string[] subs = parts[0].Split
+            var subs = parts[0].Split
                 (
                     CommonSeparators.Comma,
                     2
@@ -543,8 +542,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var count = one[1];
 
             var list = new List<string>(count);
-            var dictionary
-                = new CaseInsensitiveDictionary<object>();
+            var dictionary = new CaseInsensitiveDictionary<object?>();
             while (count > 0)
             {
                 if (context.Globals.HaveVariable(index))
@@ -607,12 +605,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            var dictionary
-                = new CaseInsensitiveDictionary<object>();
+            var dictionary = new CaseInsensitiveDictionary<object?>();
 
             foreach (var line in original)
             {
-                var copy = line ?? string.Empty;
+                var copy = line;
                 if (!dictionary.ContainsKey(copy))
                 {
                     dictionary.Add(copy, null);
@@ -904,7 +901,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = expression.Split
+            var parts = expression.Split
                     (
                         CommonSeparators.NumberSign,
                         2
@@ -914,7 +911,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var valueText = string.Empty;
             if (parts.Length == 2)
             {
-                valueText = parts[1] ?? string.Empty;
+                valueText = parts[1];
             }
 
             parts = indexText.Split

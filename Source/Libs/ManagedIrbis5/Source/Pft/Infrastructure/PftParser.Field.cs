@@ -13,17 +13,9 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Text;
 
 #endregion
 
@@ -37,9 +29,9 @@ namespace ManagedIrbis.Pft.Infrastructure
     {
         private PftField ParseField()
         {
-            List<PftNode> leftHand = new List<PftNode>();
+            var leftHand = new List<PftNode>();
             PftField result;
-            PftNode node;
+            PftNode? node;
             PftRepeatableLiteral literal;
             PftToken token;
 
@@ -120,8 +112,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 throw new PftSyntaxException(token);
             }
 
-            FieldSpecification specification
-                = (FieldSpecification)token.UserData;
+            var specification = token.UserData as FieldSpecification;
             if (ReferenceEquals(specification, null))
             {
                 Magna.Error
@@ -176,7 +167,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 if (!Tokens.IsEof)
                 {
-                    bool plus = false;
+                    var plus = false;
                     token = Tokens.Current;
                     if (token.Kind == PftTokenKind.Plus)
                     {
@@ -231,8 +222,8 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNode ParseFieldAssignment()
         {
-            PftToken headToken = Tokens.Current;
-            PftField field = ParseField();
+            var headToken = Tokens.Current;
+            var field = ParseField();
             PftNode result = field;
 
             if (!Tokens.IsEof
@@ -240,12 +231,12 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 Tokens.RequireNext();
 
-                PftFieldAssignment assignment = new PftFieldAssignment(headToken)
+                var assignment = new PftFieldAssignment(headToken)
                 {
                     Field = field
                 };
 
-                PftTokenList tokens = Tokens.Segment(_semicolonStop)
+                var tokens = Tokens.Segment(_semicolonStop)
                     .ThrowIfNull("tokens");
                 NestedContext
                     (

@@ -47,9 +47,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             token.MustBe(PftTokenKind.V);
 
-            FieldSpecification specification
-                = ((FieldSpecification)token.UserData)
-                .ThrowIfNull("token.UserData");
+            var specification = ((FieldSpecification?) token.UserData).ThrowIfNull("token.UserData");
             Apply(specification);
         }
 
@@ -121,7 +119,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 context.CurrentField = this;
 
-                string value = GetValue(context);
+                var value = GetValue(context);
                 if (string.IsNullOrEmpty(value))
                 {
                     context.Execute(LeftHand);
@@ -180,7 +178,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else
             {
-                PftContext childContext = new PftContext(context)
+                var childContext = new PftContext(context)
                 {
                     FieldOutputMode = context.FieldOutputMode,
                     UpperMode = context.UpperMode,

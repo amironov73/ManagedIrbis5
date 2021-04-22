@@ -136,7 +136,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             var navigator = new TextNavigator(expression);
-            string[] words = SplitToWords(navigator, _GoodCharacters);
+            var words = SplitToWords(navigator, _GoodCharacters);
             if (words.Length == 0)
             {
                 return;
@@ -161,7 +161,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     if (charOffset < words[wordIndex].Length)
                     {
                         flag = true;
-                        char c = char.ToUpperInvariant
+                        var c = char.ToUpperInvariant
                         (
                             words[wordIndex][charOffset]
                         );

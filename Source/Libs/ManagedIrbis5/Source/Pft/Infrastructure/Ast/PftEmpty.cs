@@ -87,7 +87,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             compiler.CompileNodes(Children);
 
-            string actionName = compiler.CompileAction(Children);
+            var actionName = compiler.CompileAction(Children);
 
             compiler.StartMethod(this);
 
@@ -125,7 +125,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            string text = context.Evaluate(Children);
+            var text = context.Evaluate(Children);
 
             Value = string.IsNullOrEmpty(text);
 
@@ -157,8 +157,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             var result = new StringBuilder();
             result.Append("empty(");
-            bool first = true;
-            foreach (PftNode child in Children)
+            var first = true;
+            foreach (var child in Children)
             {
                 if (!first)
                 {

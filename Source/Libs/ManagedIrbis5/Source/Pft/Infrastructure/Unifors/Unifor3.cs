@@ -80,19 +80,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     {
         #region Private members
 
-        private static readonly string[] monthNames1 =
+        private static readonly string[] _russianNominative =
         {
             "январь", "февраль", "март", "апрель", "май", "июнь",
             "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"
         };
 
-        private static readonly string[] monthNames2 =
+        private static readonly string[] _russianGenitive =
         {
             "января", "февраля", "марта", "апреля", "мая", "июня",
             "июля", "августа", "сентября", "октября", "ноября", "декабря"
         };
 
-        private static readonly string[] monthNames3 =
+        private static readonly string[] _englishMonthNames =
         {
             "january", "february", "march", "april", "may", "june",
             "july", "august", "september", "october", "november", "december"
@@ -104,14 +104,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string[] table
             )
         {
-            int index;
-
             if (expression.Length != 3)
             {
                 return null;
             }
 
-            if (!Utility.TryParseInt32(expression.Substring(1), out index))
+            if (!Utility.TryParseInt32(expression.Substring(1), out var index))
             {
                 return null;
             }
@@ -151,8 +149,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             var deltaString = expression.Substring(10);
-            int delta;
-            if (!Utility.TryParseInt32(deltaString, out delta))
+            if (!Utility.TryParseInt32(deltaString, out var delta))
             {
                 return null;
             }
@@ -175,14 +172,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return null;
             }
 
-            DateTime date;
             if (!DateTime.TryParseExact
                 (
                     expression.Substring(1),
                     "yyyyMMdd",
                     null,
                     DateTimeStyles.None,
-                    out date
+                    out var date
                 ))
             {
                 return null;
@@ -241,7 +237,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             //
 
             expression = expression.Substring(1);
-            var days = expression.SafeToDouble(0);
+            var days = expression.SafeToDouble();
             var result = new DateTime(1899, 12, 30)
                 .AddDays(Math.Truncate(days))
                 .AddDays(Math.Abs(days - Math.Truncate(days)));
@@ -263,10 +259,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
-            expression = expression ?? string.Empty;
+            expression ??= string.Empty;
 
             var secondChar = expression.FirstChar();
-            string format;
+            string? format;
             var now = context.Provider.PlatformAbstraction.Now();
             switch (secondChar)
             {
@@ -299,15 +295,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     break;
 
                 case '6':
-                    format = _GetMonthName(expression, monthNames1);
+                    format = _GetMonthName(expression, _russianNominative);
                     break;
 
                 case '7':
-                    format = _GetMonthName(expression, monthNames2);
+                    format = _GetMonthName(expression, _russianGenitive);
                     break;
 
                 case '8':
-                    format = _GetMonthName(expression, monthNames3);
+                    format = _GetMonthName(expression, _englishMonthNames);
                     break;
 
                 case '9':

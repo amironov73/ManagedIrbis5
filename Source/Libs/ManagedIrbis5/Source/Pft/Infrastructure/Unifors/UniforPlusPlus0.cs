@@ -56,7 +56,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var tagsToSkip = new List<int> { 953 };
             if (!string.IsNullOrEmpty(expression))
             {
-                foreach (string item in expression.Split(','))
+                foreach (var item in expression.Split(','))
                 {
                     if (Utility.TryParseInt32(item, out var tag))
                     {
@@ -96,7 +96,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         output.Append(fieldValue);
                     }
 
-                    foreach (SubField subField in field.Subfields)
+                    foreach (var subField in field.Subfields)
                     {
                         output.Append(" ");
                         output.Append(subField.Value);

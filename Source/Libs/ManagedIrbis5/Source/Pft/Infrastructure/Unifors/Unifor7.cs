@@ -14,9 +14,8 @@
 #region Using directives
 
 using System;
+using AM;
 using AM.Text;
-
-using ManagedIrbis.Client;
 
 #endregion
 
@@ -103,7 +102,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             var navigator = new TextNavigator(expression);
-            string database = navigator.ReadUntil(',').ToString();
+            var database = navigator.ReadUntil(',').ToString();
             if (navigator.ReadChar() == TextNavigator.EOF)
             {
                 return;
@@ -111,14 +110,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var provider = context.Provider;
             if (string.IsNullOrEmpty(database))
             {
-                database = provider.Database;
+                database = provider.Database.ThrowIfNull("provider.Database");
             }
+
             var delimiter = navigator.ReadChar();
             if (delimiter == TextNavigator.EOF)
             {
                 return;
             }
-            string term = navigator.ReadUntil(delimiter).ToString();
+            var term = navigator.ReadUntil(delimiter).ToString();
             if (string.IsNullOrEmpty(term))
             {
                 return;
@@ -128,7 +128,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 return;
             }
-            string format = navigator.GetRemainingText().ToString();
+            var format = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(format))
             {
                 return;

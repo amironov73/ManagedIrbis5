@@ -51,7 +51,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.NumberSign,
                     2

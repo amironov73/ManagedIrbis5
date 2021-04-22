@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -48,12 +49,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Text driver.
         /// </summary>
-        public TextDriver Driver { get; private set; }
+        public TextDriver Driver { get; }
 
         /// <summary>
         /// Родительский контекст.
         /// </summary>
-        public PftContext? Parent { get { return _parent; } }
+        public PftContext? Parent { get; }
 
         /// <summary>
         /// Текущая форматируемая запись.
@@ -63,7 +64,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Alternative record (for nested context).
         /// </summary>
-        public Record AlternativeRecord { get; set; }
+        public Record? AlternativeRecord { get; set; }
 
         /// <summary>
         /// Выходной буфер, в котором накапливается результат
@@ -75,7 +76,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// Накопленный текст в основном потоке выходного буфера,
         /// т. е. собственно результат расформатирования записи.
         /// </summary>
-        public string Text { get { return Output.ToString(); } }
+        public string Text => Output.ToString();
 
         #region Режим вывода
 
@@ -179,15 +180,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             Magna.Trace("PftContext::Constructor");
 
-            _parent = parent;
+            Parent = parent;
 
             Provider = ReferenceEquals(parent, null)
                 ? new LocalProvider(string.Empty)
                 : parent.Provider;
 
-            var parentBuffer = ReferenceEquals(parent, null)
-                ? null
-                : parent.Output;
+            var parentBuffer = parent?.Output;
 
             Output = new PftOutput(parentBuffer);
 
@@ -218,22 +217,16 @@ namespace ManagedIrbis.Pft.Infrastructure
                 ? new Record()
                 : parent.Record;
 
-            AlternativeRecord = ReferenceEquals(parent, null)
-                ? null
-                : parent.AlternativeRecord;
+            AlternativeRecord = parent?.AlternativeRecord;
 
             Functions = new PftFunctionManager();
 
-            Debugger = ReferenceEquals(parent, null)
-                ? null
-                : parent.Debugger;
+            Debugger = parent?.Debugger;
         }
 
         #endregion
 
         #region Private members
-
-        private readonly PftContext? _parent;
 
         #endregion
 
@@ -293,7 +286,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public void DoRepeatableAction
             (
                 Action<PftContext> action,
-                int count
+                int count = int.MaxValue
             )
         {
             Magna.Trace("PftContext::DoRepeatableAction");
@@ -314,18 +307,6 @@ namespace ManagedIrbis.Pft.Infrastructure
         }
 
         /// <summary>
-        /// Выполнить повторяющуюся группу
-        /// максимально возможное число раз.
-        /// </summary>
-        public void DoRepeatableAction
-            (
-                Action<PftContext> action
-            )
-        {
-            DoRepeatableAction(action, int.MaxValue);
-        }
-
-        /// <summary>
         /// Вычисление выражения во временной копии контекста.
         /// </summary>
         public string Evaluate
@@ -335,10 +316,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             Magna.Trace("PftContext::Evaluate");
 
-            using PftContextGuard guard = new PftContextGuard(this);
+            using var guard = new PftContextGuard(this);
             var copy = guard.ChildContext;
             node.Execute(copy);
-            string result = copy.ToString();
+            var result = copy.ToString();
 
             return result;
         }
@@ -353,13 +334,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             Magna.Trace("PftContext::Evaluate");
 
-            using PftContextGuard guard = new PftContextGuard(this);
+            using var guard = new PftContextGuard(this);
             var copy = guard.ChildContext;
             foreach (var node in items)
             {
                 node.Execute(copy);
             }
-            string result = copy.ToString();
+            var result = copy.ToString();
 
             return result;
         }
@@ -376,7 +357,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             if (!ReferenceEquals(nodes, null))
             {
-                foreach (PftNode node in nodes)
+                foreach (var node in nodes)
                 {
                     node.Execute(this);
                 }
@@ -388,7 +369,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public string GetProcessedOutput()
         {
-            string? result = Output.Text;
+            var result = Output.Text;
 
             if ((PostProcessing & PftCleanup.Rtf) != 0)
             {
@@ -410,12 +391,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 result = IrbisText.CleanupMarkup(result);
             }
 
-            if (ReferenceEquals(result, null))
-            {
-                result = string.Empty;
-            }
-
-            return result;
+            return result ?? string.Empty;
         }
 
         //=================================================
@@ -425,7 +401,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext GetRootContext()
         {
-            PftContext result = this;
+            var result = this;
 
             while (!ReferenceEquals(result.Parent, null))
             {
@@ -454,10 +430,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             bool? result = null;
 
-            PftCondition condition = node as PftCondition;
-            if (ReferenceEquals(condition, null))
+            if (!(node is PftCondition condition))
             {
-                string text = GetStringArgument(arguments, index);
+                var text = GetStringArgument(arguments, index);
                 if (bool.TryParse(text, out var boolVal))
                 {
                     result = boolVal;
@@ -525,13 +500,13 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int index
             )
         {
-            PftNode node = arguments.GetOccurrence(index);
+            var node = arguments.GetOccurrence(index);
             if (ReferenceEquals(node, null))
             {
                 return null;
             }
 
-            string result = Evaluate(node);
+            var result = Evaluate(node);
 
             return result;
         }
@@ -547,13 +522,13 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int index
             )
         {
-            string result = GetStringArgument(arguments, index);
+            var result = GetStringArgument(arguments, index);
             if (!string.IsNullOrEmpty(result))
             {
                 return result;
             }
 
-            double? number = GetNumericArgument(arguments, index);
+            var number = GetNumericArgument(arguments, index);
             if (number.HasValue)
             {
                 result = number.Value.ToInvariantString();
@@ -570,7 +545,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext Push()
         {
-            PftContext result = new PftContext(this);
+            var result = new PftContext(this);
 
             return result;
         }

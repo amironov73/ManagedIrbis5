@@ -110,7 +110,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 return;
             }
-            var tag = Utility.SafeToInt32(tagText);
+            var tag = tagText.SafeToInt32();
             if (tag == IrbisGuid.Tag)
             {
                 // Поле GUID не выводится
@@ -190,7 +190,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string output = null;
+            string? output;
 
             var items = text.Split(left, right);
             if (mode == 'R' || mode == 'r')

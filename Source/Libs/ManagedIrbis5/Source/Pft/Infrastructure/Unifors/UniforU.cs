@@ -61,7 +61,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = expression.Split
+                var parts = expression.Split
                     (
                         CommonSeparators.Comma,
                         2

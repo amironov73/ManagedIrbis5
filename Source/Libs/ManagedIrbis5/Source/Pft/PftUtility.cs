@@ -25,12 +25,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using AM;
-using AM.Collections;
 using AM.ConsoleIO;
 using AM.Text;
 
-
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
@@ -1575,10 +1572,10 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Set array item according to index specification
         /// </summary>
-        public static T[] SetArrayItem<T>
+        public static T?[] SetArrayItem<T>
             (
                 PftContext context,
-                T[] array,
+                T?[] array,
                 IndexSpecification index,
                 T? value
             )

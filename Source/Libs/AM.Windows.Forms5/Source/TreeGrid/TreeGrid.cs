@@ -348,7 +348,7 @@ namespace AM.Windows.Forms
             for (int i = _topNodeIndex; i < flattenedNodes.Length; i++)
             {
                 TreeGridNode currentNode = flattenedNodes[i];
-                currentNode._top = top;
+                currentNode.Top = top;
                 top += currentNode.Height;
                 runningHeight += currentNode.Height;
                 if (runningHeight >= totalHeight)
@@ -374,7 +374,7 @@ namespace AM.Windows.Forms
             }
             for (int i = 0; i < result.Count; i++)
             {
-                result[i]._flatIndex = i;
+                result[i].FlatIndex = i;
             }
             return result.ToArray();
         }
@@ -448,7 +448,7 @@ namespace AM.Windows.Forms
                 {
                     int left = visibleColumns.First().Left;
                     int right = visibleColumns.Last().Right;
-                    int top = node._top;
+                    int top = node.Top;
                     int nodeHeight = node.Height;
 
                     Rectangle r = new Rectangle
@@ -519,7 +519,7 @@ namespace AM.Windows.Forms
             HorizontalScroll.Maximum = Columns.Count;
             if (CurrentNode != null)
             {
-                GotoLine(CurrentNode._flatIndex);
+                GotoLine(CurrentNode.FlatIndex);
             }
         }
 
@@ -733,11 +733,11 @@ namespace AM.Windows.Forms
                 TreeGridNode first = currentNode.Nodes.FirstOrDefault();
                 if (first != null)
                 {
-                    GotoLine(first._flatIndex);
+                    GotoLine(first.FlatIndex);
                 }
                 else
                 {
-                    GotoLine(currentNode._flatIndex + 1);
+                    GotoLine(currentNode.FlatIndex + 1);
                 }
             }
             else
@@ -753,7 +753,7 @@ namespace AM.Windows.Forms
                         if (currentNode.Parent != null)
                         {
                             currentNode.Parent.Expanded = false;
-                            GotoLine(currentNode.Parent._flatIndex);
+                            GotoLine(currentNode.Parent.FlatIndex);
                         }
                     }
                     ResetFlattenedNodes();
@@ -763,7 +763,7 @@ namespace AM.Windows.Forms
                     if (currentNode.Parent != null)
                     {
                         currentNode.Parent.Expanded = false;
-                        GotoLine(currentNode.Parent._flatIndex);
+                        GotoLine(currentNode.Parent.FlatIndex);
                     }
                 }
             }
@@ -787,7 +787,7 @@ namespace AM.Windows.Forms
         {
             TreeGridNodeState result = TreeGridNodeState.Normal;
 
-            if (node._flatIndex == CurrentLine)
+            if (node.FlatIndex == CurrentLine)
             {
                 result |= TreeGridNodeState.Selected;
             }
@@ -956,7 +956,7 @@ namespace AM.Windows.Forms
                 return;
             }
 
-            GotoLine(args.Node._flatIndex);
+            GotoLine(args.Node.FlatIndex);
             TreeGridNode currentNode = CurrentNode;
             if (currentNode != null)
             {

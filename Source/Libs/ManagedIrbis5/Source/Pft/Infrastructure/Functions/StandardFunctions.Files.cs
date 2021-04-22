@@ -27,11 +27,8 @@ namespace ManagedIrbis.Pft.Infrastructure
     {
         #region Private members
 
-        private static readonly Dictionary<string, FileObject> Files
-            = new Dictionary<string, FileObject>
-                (
-                    StringComparer.CurrentCultureIgnoreCase
-                );
+        private static readonly Dictionary<string, FileObject> _files
+            = new (StringComparer.CurrentCultureIgnoreCase);
 
         //================================================================
         // INTERNAL METHODS
@@ -42,13 +39,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string fileName
             )
         {
-            string fullPath = GetFullPath(fileName);
+            var fullPath = GetFullPath(fileName);
 
-            FileObject file;
-            if (Files.TryGetValue(fullPath, out file))
+            if (_files.TryGetValue(fullPath, out var file))
             {
                 file.Dispose();
-                Files.Remove(fullPath);
+                _files.Remove(fullPath);
             }
         }
 
@@ -57,7 +53,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string fileName
             )
         {
-            string result = Path.GetFullPath(fileName);
+            var result = Path.GetFullPath(fileName);
 
             return result;
         }
@@ -72,7 +68,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return false;
             }
 
-            bool result = Files.ContainsKey(fileName);
+            var result = _files.ContainsKey(fileName);
 
             return result;
         }
@@ -84,14 +80,14 @@ namespace ManagedIrbis.Pft.Infrastructure
                 bool append
             )
         {
-            string fullPath = GetFullPath(fileName);
+            var fullPath = GetFullPath(fileName);
             if (HaveOpenFile(fileName))
             {
                 return string.Empty;
             }
 
-            FileObject file = new FileObject(fullPath, write, append);
-            Files.Add(fullPath, file);
+            var file = new FileObject(fullPath, write, append);
+            _files.Add(fullPath, file);
 
             return fullPath;
         }
@@ -101,7 +97,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string fileName
             )
         {
-            string result = OpenInternal(fileName, true, true);
+            var result = OpenInternal(fileName, true, true);
 
             return result;
         }
@@ -111,7 +107,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string fileName
             )
         {
-            string result = OpenInternal(fileName, false, false);
+            var result = OpenInternal(fileName, false, false);
 
             return result;
         }
@@ -121,7 +117,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string fileName
             )
         {
-            string result = OpenInternal(fileName, true, false);
+            var result = OpenInternal(fileName, true, false);
 
             return result;
         }
@@ -131,11 +127,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string fileName
             )
         {
-            string fullPath = GetFullPath(fileName);
-            FileObject file;
-            if (Files.TryGetValue(fullPath, out file))
+            var fullPath = GetFullPath(fileName);
+            if (_files.TryGetValue(fullPath, out var file))
             {
-                string result = file.ReadAll();
+                var result = file.ReadAll();
 
                 return result;
             }
@@ -148,13 +143,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string fileName
             )
         {
-            string fullPath = GetFullPath(fileName);
-            FileObject file;
-            if (Files.TryGetValue(fullPath, out file))
+            var fullPath = GetFullPath(fileName);
+            if (_files.TryGetValue(fullPath, out var file))
             {
-                string result = file.ReadLine();
+                var result = file.ReadLine();
 
-                return result;
+                return result ?? string.Empty;
             }
 
             return string.Empty;
@@ -166,9 +160,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            string fullPath = GetFullPath(fileName);
-            FileObject file;
-            if (Files.TryGetValue(fullPath, out file))
+            var fullPath = GetFullPath(fileName);
+            if (_files.TryGetValue(fullPath, out var file))
             {
                 file.Write(text);
             }
@@ -180,8 +173,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            string fullPath = GetFullPath(fileName);
-            if (Files.TryGetValue(fullPath, out FileObject? file))
+            var fullPath = GetFullPath(fileName);
+            if (_files.TryGetValue(fullPath, out var file))
             {
                 file.WriteLine(text);
             }
@@ -193,7 +186,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void Close(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
+            var fileName = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(fileName))
             {
                 CloseFile(fileName);
@@ -202,8 +195,8 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void IsOpen(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
-            string output = HaveOpenFile(fileName)
+            var fileName = context.GetStringArgument(arguments, 0);
+            var output = HaveOpenFile(fileName)
                 ? "1"
                 : "0";
             context.Write(node, output);
@@ -211,58 +204,58 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void OpenAppend(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
+            var fileName = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(fileName))
             {
-                string output = OpenAppend(fileName);
+                var output = OpenAppend(fileName);
                 context.Write(node, output);
             }
         }
 
         private static void OpenRead(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
+            var fileName = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(fileName))
             {
-                string output = OpenRead(fileName);
+                var output = OpenRead(fileName);
                 context.Write(node, output);
             }
         }
 
         private static void OpenWrite(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
+            var fileName = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(fileName))
             {
-                string output = OpenWrite(fileName);
+                var output = OpenWrite(fileName);
                 context.Write(node, output);
             }
         }
 
         private static void ReadAll(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
+            var fileName = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(fileName))
             {
-                string output = ReadAll(fileName);
+                var output = ReadAll(fileName);
                 context.Write(node, output);
             }
         }
 
         private static void ReadLine(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
+            var fileName = context.GetStringArgument(arguments, 0);
             if (!string.IsNullOrEmpty(fileName))
             {
-                string output = ReadLine(fileName);
+                var output = ReadLine(fileName);
                 context.Write(node, output);
             }
         }
 
         private static void Write(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
-            string text = context.GetStringArgument(arguments, 1);
+            var fileName = context.GetStringArgument(arguments, 0);
+            var text = context.GetStringArgument(arguments, 1);
             if (!string.IsNullOrEmpty(fileName)
                 && !ReferenceEquals(text, null))
             {
@@ -272,8 +265,8 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private static void WriteLine(PftContext context, PftNode node, PftNode[] arguments)
         {
-            string fileName = context.GetStringArgument(arguments, 0);
-            string text = context.GetStringArgument(arguments, 1);
+            var fileName = context.GetStringArgument(arguments, 0);
+            var text = context.GetStringArgument(arguments, 1);
             if (!string.IsNullOrEmpty(fileName)
                 && !ReferenceEquals(text, null))
             {

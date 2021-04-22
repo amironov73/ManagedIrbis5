@@ -53,10 +53,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var navigator = new TextNavigator(expression);
 
-            string database = navigator.ReadUntil(',').ToString();
+            var database = navigator.ReadUntil(',').ToString();
             if (string.IsNullOrEmpty(database))
             {
-                database = context.Provider.Database;
+                database = context.Provider.Database.ThrowIfNull("context.Provider.Database");
             }
 
             if (navigator.ReadChar() != ',')
@@ -64,7 +64,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string term = navigator.GetRemainingText().ToString();
+            var term = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(term))
             {
                 return;

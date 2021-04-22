@@ -119,8 +119,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftRsum otherRsum = (PftRsum)otherNode;
-            bool result = Name == otherRsum.Name;
+            var otherRsum = (PftRsum)otherNode;
+            var result = Name == otherRsum.Name;
             if (!result)
             {
                 throw new PftSerializationException();
@@ -135,32 +135,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             compiler.CompileNodes(Children);
 
-            string actionName = compiler.CompileAction(Children);
+            var actionName = compiler.CompileAction(Children);
 
             compiler.StartMethod(this);
 
-            string functionName;
-            switch (Name)
+            var functionName = Name switch
             {
-                case "rsum":
-                    functionName = "Sum";
-                    break;
-
-                case "rmin":
-                    functionName = "Min";
-                    break;
-
-                case "rmax":
-                    functionName = "Max";
-                    break;
-
-                case "ravr":
-                    functionName = "Average";
-                    break;
-
-                default:
-                    throw new PftCompilerException();
-            }
+                "rsum" => "Sum",
+                "rmin" => "Min",
+                "rmax" => "Max",
+                "ravr" => "Average",
+                _ => throw new PftCompilerException()
+            };
 
             compiler
                 .WriteIndent()
@@ -233,8 +219,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 var nestedContext = guard.ChildContext;
                 nestedContext.Reset();
 
-                string text = nestedContext.Evaluate(Children);
-                double[] values = PftUtility.ExtractNumericValues(text);
+                var text = nestedContext.Evaluate(Children);
+                var values = PftUtility.ExtractNumericValues(text);
                 if (values.Length != 0)
                 {
                     switch (Name)

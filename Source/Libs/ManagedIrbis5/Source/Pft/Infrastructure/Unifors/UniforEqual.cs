@@ -73,14 +73,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string maskSpecifiaction = navigator.ReadUntil(delimiter).ToString();
+            var maskSpecifiaction = navigator.ReadUntil(delimiter).ToString();
             if (ReferenceEquals(maskSpecifiaction, null)
                 || navigator.ReadChar() == TextNavigator.EOF)
             {
                 return;
             }
 
-            string text = navigator.GetRemainingText().ToString();
+            var text = navigator.GetRemainingText().ToString();
             var mask = new PftMask(maskSpecifiaction);
             var result = mask.Match(text);
             var output = result ? "1" : "0";

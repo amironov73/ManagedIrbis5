@@ -136,6 +136,8 @@ namespace AM.Windows.Forms
             //ParentForm.CancelButton = cancelButton;
         }
 
+        #nullable disable
+
         private void InitializeComponent()
         {
             this.drawBox = new System.Windows.Forms.CheckBox();

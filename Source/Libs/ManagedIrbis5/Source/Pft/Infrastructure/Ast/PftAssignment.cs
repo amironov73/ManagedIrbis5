@@ -57,16 +57,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public IndexSpecification Index { get; set; }
 
         /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression
-        {
-            get { return true; }
-        }
+        public override bool ComplexExpression => true;
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -102,7 +96,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             IsNumeric = isNumeric;
             Name = name;
-            foreach (PftNode node in body)
+            foreach (var node in body)
             {
                 Children.Add(node);
             }
@@ -135,20 +129,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             // TODO handle indexing
             //
 
-            string name = Name.ThrowIfNull("name");
+            var name = Name.ThrowIfNull("name");
 
             if (Children.Count == 1)
             {
                 var reference = Children.First() as PftVariableReference;
                 if (!ReferenceEquals(reference, null))
                 {
-                    PftVariable donor;
-                    string donorName = reference.Name
-                        .ThrowIfNull("reference.Name");
+                    var donorName = reference.Name.ThrowIfNull("reference.Name");
                     if (context.Variables.Registry.TryGetValue
                         (
                             donorName,
-                            out donor
+                            out var donor
                         ))
                     {
                         if (donor.IsNumeric)
@@ -183,7 +175,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftAssignment result = (PftAssignment)base.Clone();
+            var result = (PftAssignment)base.Clone();
             result.IsNumeric = IsNumeric;
             result.Index = (IndexSpecification)Index.Clone();
 
@@ -202,7 +194,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftAssignment otherAssignment = (PftAssignment) otherNode;
+            var otherAssignment = (PftAssignment) otherNode;
             if (Name != otherAssignment.Name
                 || !IndexSpecification.Compare(Index, otherAssignment.Index)
                 || IsNumeric != otherAssignment.IsNumeric)
@@ -236,7 +228,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (IsNumeric)
             {
-                PftNumeric numeric =
+                var numeric =
                     (
                         Children.FirstOrDefault() as PftNumeric
                     )
@@ -253,7 +245,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         (
                             "Context.Variables.SetVariable("
                             + "\"{0}\", value);",
-                            CompilerUtility.Escape(Name)
+                            CompilerUtility.Escape(Name)!
                         );
             }
             else
@@ -278,8 +270,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                                 + "Context, \"{0}\", "
                                 + "{1}, "
                                 + "value);",
-                                CompilerUtility.Escape(Name),
-                                index.Reference
+                                CompilerUtility.Escape(Name)!,
+                                index?.Reference
                             );
                 }
             }
@@ -311,17 +303,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (!HandleDirectAssignment(context))
             {
-                string name = Name.ThrowIfNull("name");
-                string stringValue = context.Evaluate(Children);
+                var name = Name.ThrowIfNull("name");
+                var stringValue = context.Evaluate(Children);
 
                 if (IsNumeric)
                 {
-                    PftNumeric numeric =
+                    var numeric =
                         (
                             Children.FirstOrDefault() as PftNumeric
                         )
                         .ThrowIfNull("numeric");
-                    double numericValue = numeric.Value;
+                    var numericValue = numeric.Value;
                     context.Variables.SetVariable
                         (
                             name,
@@ -346,13 +338,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)
             };
 
-            PftNodeInfo name = new PftNodeInfo
+            var name = new PftNodeInfo
             {
                 Name = "Name",
                 Value = Name
@@ -364,14 +356,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 result.Children.Add(Index.GetNodeInfo());
             }
 
-            PftNodeInfo numeric = new PftNodeInfo
+            var numeric = new PftNodeInfo
             {
                 Name = "IsNumeric",
                 Value = IsNumeric.ToString()
             };
             result.Children.Add(numeric);
 
-            foreach (PftNode node in Children)
+            foreach (var node in Children)
             {
                 result.Children.Add(node.GetNodeInfo());
             }

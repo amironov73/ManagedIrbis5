@@ -15,14 +15,6 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM.IO;
 
 using ManagedIrbis.Infrastructure;
@@ -74,7 +66,7 @@ namespace ManagedIrbis.Mx.Commands
         {
             OnBeforeExecute();
 
-            string fileName = null;
+            string? fileName = null;
             if (arguments.Length != 0)
             {
                 fileName = arguments[0].Text;
@@ -82,18 +74,15 @@ namespace ManagedIrbis.Mx.Commands
 
             if (!string.IsNullOrEmpty(fileName))
             {
-                using (var writer
-                    = TextWriterUtility.Create(fileName, IrbisEncoding.Utf8))
+                using var writer = TextWriterUtility.Create(fileName, IrbisEncoding.Utf8);
+                foreach (var mxRecord in executive.Records)
                 {
-                    foreach (var mxRecord in executive.Records)
+                    var record = executive.Provider.ReadRecord(mxRecord.Mfn);
+                    if (!ReferenceEquals(record, null))
                     {
-                        var record = executive.Provider.ReadRecord(mxRecord.Mfn);
-                        if (!ReferenceEquals(record, null))
-                        {
-                            var text = record.ToPlainText();
-                            writer.Write(text);
-                            writer.WriteLine("*****");
-                        }
+                        var text = record.ToPlainText();
+                        writer.Write(text);
+                        writer.WriteLine("*****");
                     }
                 }
             }

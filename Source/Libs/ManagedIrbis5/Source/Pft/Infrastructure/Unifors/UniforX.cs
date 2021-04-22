@@ -61,7 +61,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     var navigator = new TextNavigator(expression);
                     while (!navigator.IsEOF)
                     {
-                        string text = navigator.ReadUntil('<').ToString();
+                        var text = navigator.ReadUntil('<').ToString();
                         builder.Append(text);
                         var c = navigator.ReadChar();
                         if (c != '<')

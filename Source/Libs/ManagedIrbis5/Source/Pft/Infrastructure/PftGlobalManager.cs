@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -49,15 +50,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public string? this[int index]
         {
-                get
-            {
-                PftGlobal result;
-
-                return Registry.TryGetValue(index, out result)
-                    ? result.ToString()
-                    : string.Empty;
-            }
-            set
+                get => Registry.TryGetValue(index, out var result)
+                        ? result.ToString()
+                        : string.Empty;
+                set
             {
                 if (ReferenceEquals(value, null))
                 {
@@ -96,8 +92,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int index
             )
         {
-            PftGlobal result;
-            if (!Registry.TryGetValue(index, out result))
+            if (!Registry.TryGetValue(index, out var result))
             {
                 result = new PftGlobal(index);
                 Registry.Add(index, result);

@@ -59,7 +59,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Field, null))
                     {
                         nodes.Add(Field);
@@ -70,31 +70,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
 
-                Magna.Error
-                    (
-                        "PftFieldAssignment::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            [ExcludeFromCodeCoverage]
+            protected set => Magna.Error
+                (
+                    "PftFieldAssignment::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
         }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         /// <inheritdoc cref="PftNode.ComplexExpression" />
-        public override bool ComplexExpression
-        {
-            get { return true; }
-        }
+        public override bool ComplexExpression => true;
 
         #endregion
 
@@ -143,7 +133,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
             : base(token)
         {
-            Field = new PftV(token.Text);
+            Field = new PftV(token.Text.ThrowIfNull("token.Text"));
             Expression = new PftNodeCollection(this);
         }
 
@@ -160,7 +150,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftFieldAssignment result
+            var result
                 = (PftFieldAssignment) base.Clone();
 
             if (!ReferenceEquals(Field, null))
@@ -185,7 +175,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftFieldAssignment otherAssignment
+            var otherAssignment
                 = (PftFieldAssignment) otherNode;
             PftSerializationUtility.CompareNodes
                 (
@@ -207,7 +197,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            Field = (PftField) PftSerializer.DeserializeNullable(reader);
+            Field = (PftField?) PftSerializer.DeserializeNullable(reader);
             PftSerializer.Deserialize(reader, Expression);
         }
 
@@ -219,7 +209,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            PftField field = Field;
+            var field = Field;
             if (ReferenceEquals(field, null))
             {
                 Magna.Error
@@ -230,7 +220,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 throw new IrbisException("Field is null");
             }
-            string fieldTag = field.Tag;
+            var fieldTag = field.Tag;
             if (string.IsNullOrEmpty(fieldTag))
             {
                 Magna.Error
@@ -242,9 +232,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new IrbisException("Field tag is null");
             }
 
-            string value = context.Evaluate(Expression);
-            char command = field.Command;
-            int tag = fieldTag.SafeToInt32();
+            var value = context.Evaluate(Expression);
+            var command = field.Command;
+            var tag = fieldTag.SafeToInt32();
             if (command == 'g' || command == 'G')
             {
                 // TODO support field repeat
@@ -282,7 +272,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "FieldAssignment"
@@ -295,13 +285,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Expression.Count != 0)
             {
-                PftNodeInfo expression = new PftNodeInfo
+                var expression = new PftNodeInfo
                 {
                     Name = "Expression"
                 };
                 result.Children.Add(expression);
 
-                foreach (PftNode node in Expression)
+                foreach (var node in Expression)
                 {
                     expression.Children.Add(node.GetNodeInfo());
                 }
@@ -322,7 +312,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 Field.PrettyPrint(printer);
             }
             printer.Write('=');
-            foreach (PftNode node in Expression)
+            foreach (var node in Expression)
             {
                 node.PrettyPrint(printer);
             }

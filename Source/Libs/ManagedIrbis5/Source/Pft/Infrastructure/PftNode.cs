@@ -4,8 +4,12 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* PftNode.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -75,18 +79,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public virtual IList<PftNode> Children
         {
-            get
-            {
-                if (ReferenceEquals(_children, null))
-                {
-                    _children = new PftNodeCollection(this);
-                }
-
-                return _children;
-            }
+            get => _children ??= new PftNodeCollection(this);
             protected set
             {
-                PftNodeCollection collection = (PftNodeCollection)value;
+                var collection = (PftNodeCollection)value;
                 collection.Parent = this;
                 collection.EnsureParent();
                 _children = collection;
@@ -112,32 +108,32 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Whether the node is complex expression?
         /// </summary>
-        public virtual bool ComplexExpression { get { return false; } }
+        public virtual bool ComplexExpression => false;
 
         /// <summary>
         /// Whether the node is constant expression?
         /// </summary>
-        public virtual bool ConstantExpression { get { return false; } }
+        public virtual bool ConstantExpression => false;
 
         /// <summary>
         /// Node uses extended syntax?
         /// </summary>
-        public virtual bool ExtendedSyntax { get { return false; } }
+        public virtual bool ExtendedSyntax => false;
 
         /// <summary>
         /// Help for the node.
         /// </summary>
-        public virtual string? Help { get { return null; } }
+        public virtual string? Help => null;
 
         /// <summary>
         /// Whether the node requires server connection to evaluate.
         /// </summary>
-        public virtual bool RequiresConnection { get { return true; } }
+        public virtual bool RequiresConnection => true;
 
         /// <summary>
         /// Kind of the node.
         /// </summary>
-        public virtual PftNodeKind Kind { get { return PftNodeKind.None; } }
+        public virtual PftNodeKind Kind => PftNodeKind.None;
 
         #endregion
 
@@ -153,7 +149,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Constructor.
         /// </summary>
-        public PftNode
+        protected PftNode
             (
                 PftToken token
             )
@@ -166,12 +162,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Constructor.
         /// </summary>
-        public PftNode
+        protected PftNode
             (
                 params PftNode[] children
             )
         {
-            foreach (PftNode child in children)
+            foreach (var child in children)
             {
                 Children.Add(child);
             }
@@ -181,7 +177,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         #region Private members
 
-        private PftNodeCollection _children;
+        private PftNodeCollection? _children;
 
         /// <summary>
         /// Check deserialization result.
@@ -215,8 +211,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     for (var i = 0; i < Children.Count; i++)
                     {
-                        PftNode our = Children[i];
-                        PftNode their = otherNode.Children[i];
+                        var our = Children[i];
+                        var their = otherNode.Children[i];
 
                         if (!ReferenceEquals(our.GetType(), their.GetType()))
                         {
@@ -395,7 +391,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return false;
             }
 
-            foreach (PftNode child in Children)
+            foreach (var child in Children)
             {
                 if (!child.AcceptVisitor(visitor))
                 {
@@ -442,7 +438,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             OnBeforeExecution(context);
 
-            foreach (PftNode child in Children)
+            foreach (var child in Children)
             {
                 child.Execute(context);
             }
@@ -457,7 +453,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <returns>Found parent node or <c>null</c>.</returns>
         public PftNode? FindParent<T>()
         {
-            PftNode candidate = Parent;
+            var candidate = Parent;
 
             while (!ReferenceEquals(candidate, null))
             {
@@ -479,11 +475,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public virtual int[] GetAffectedFields()
         {
-            int[] result = new int[0];
+            var result = new int[0];
 
-            foreach (PftNode child in Children)
+            foreach (var child in Children)
             {
-                int[] sub = child.GetAffectedFields();
+                var sub = child.GetAffectedFields();
                 if (sub.Length != 0)
                 {
                     result = result
@@ -503,11 +499,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         public NonNullCollection<T> GetDescendants<T>()
             where T : PftNode
         {
-            NonNullCollection<T> result = new NonNullCollection<T>();
+            var result = new NonNullCollection<T>();
 
-            foreach (PftNode child in Children)
+            foreach (var child in Children)
             {
-                T item = child as T;
+                var item = child as T;
                 if (item != null)
                 {
                     result.Add(item);
@@ -532,7 +528,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return new[] { this };
             }
 
-            PftNode[] result = Children
+            var result = Children
                 .SelectMany(child => child.GetLeafs())
                 .ToArray();
 
@@ -544,16 +540,16 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public virtual PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Name = SimplifyTypeName(GetType().Name),
                 Node = this,
                 Value = Text
             };
 
-            foreach (PftNode child in Children)
+            foreach (var child in Children)
             {
-                PftNodeInfo info = child.GetNodeInfo();
+                var info = child.GetNodeInfo();
                 result.Children.Add(info);
             }
 
@@ -648,14 +644,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="ICloneable.Clone" />
         public virtual object Clone()
         {
-            PftNode result = (PftNode)MemberwiseClone();
+            var result = (PftNode)MemberwiseClone();
             result.Parent = null;
 
-            PftNodeCollection children
-                = Children as PftNodeCollection;
-            if (!ReferenceEquals(children, null))
+            if (Children is PftNodeCollection children)
             {
-                result.Children = children.CloneNodes(result);
+                result._children = children.CloneNodes(result);
             }
 
             return result;
@@ -724,7 +718,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             var result = new StringBuilder();
 
-            foreach (PftNode child in Children)
+            foreach (var child in Children)
             {
                 result.Append(child);
             }

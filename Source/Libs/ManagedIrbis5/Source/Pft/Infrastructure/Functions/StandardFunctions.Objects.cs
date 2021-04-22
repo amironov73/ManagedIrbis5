@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -15,12 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 
@@ -34,11 +29,8 @@ namespace ManagedIrbis.Pft.Infrastructure
     {
         #region Private members
 
-        private static readonly Dictionary<string, OuterObject> Objects
-            = new Dictionary<string, OuterObject>
-                (
-                    StringComparer.CurrentCultureIgnoreCase
-                );
+        private static readonly Dictionary<string, OuterObject> _objects
+            = new (StringComparer.CurrentCultureIgnoreCase);
 
         //================================================================
         // INTERNAL METHODS
@@ -55,10 +47,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             var type = Type.GetType(className, true, true)
                 .ThrowIfNull("Type.GetType");
             var name = Guid.NewGuid().ToString("N");
-            var result
-                = (OuterObject) Activator.CreateInstance(type, name);
+            var result = (OuterObject) Activator.CreateInstance(type, name)
+                .ThrowIfNull("Activator.CreateInstance");
             result.IncreaseCounter();
-
             RegisterObject(result);
 
             return result;
@@ -72,7 +63,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string name
             )
         {
-            Objects.TryGetValue(name, out var result);
+            _objects.TryGetValue(name, out var result);
 
             return result;
         }
@@ -82,7 +73,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 OuterObject obj
             )
         {
-            Objects.Add(obj.Name, obj);
+            _objects.Add(obj.Name, obj);
         }
 
         internal static void UnregisterObject
@@ -90,7 +81,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string name
             )
         {
-            Objects.Remove(name);
+            _objects.Remove(name);
         }
 
         //================================================================

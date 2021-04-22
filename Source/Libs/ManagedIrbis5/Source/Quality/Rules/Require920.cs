@@ -47,10 +47,7 @@ namespace ManagedIrbis.Quality.Rules
         #region QualityRule members
 
         /// <inheritdoc />
-        public override string FieldSpec
-        {
-            get { return "920"; }
-        }
+        public override string FieldSpec => "920";
 
         /// <inheritdoc />
         public override RuleReport CheckRecord
@@ -60,8 +57,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            string worksheet = Worksheet;
-
+            var worksheet = Worksheet;
             if (string.IsNullOrEmpty(worksheet))
             {
                 AddDefect
@@ -72,7 +68,7 @@ namespace ManagedIrbis.Quality.Rules
                     );
             }
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (fields.Length > 1)
             {
                 AddDefect
@@ -82,7 +78,7 @@ namespace ManagedIrbis.Quality.Rules
                         "Повторяется поле 920: Рабочий лист"
                     );
             }
-            foreach (Field field in fields)
+            foreach (var field in fields)
             {
                 MustNotContainSubfields
                     (

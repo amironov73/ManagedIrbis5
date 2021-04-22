@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -40,12 +41,12 @@ namespace ManagedIrbis.Reports
         /// <summary>
         /// Raised after <see cref="Compute"/>.
         /// </summary>
-        public event EventHandler<ReportEventArgs> AfterCompute;
+        public event EventHandler<ReportEventArgs>? AfterCompute;
 
         /// <summary>
         /// Raised before <see cref="Compute"/>.
         /// </summary>
-        public event EventHandler<ReportEventArgs> BeforeCompute;
+        public event EventHandler<ReportEventArgs>? BeforeCompute;
 
         #endregion
 
@@ -104,7 +105,11 @@ namespace ManagedIrbis.Reports
         {
             foreach (ReportAttribute attribute in attributes)
             {
-                Attributes.Add(attribute.Name, attribute.Value);
+                Attributes.Add
+                    (
+                        attribute.Name.ThrowIfNull("attribute.Name"),
+                        attribute.Value.ThrowIfNull("attribute.Value")
+                    );
             }
         }
 

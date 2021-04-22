@@ -18,7 +18,6 @@ using System.Collections.Generic;
 
 using AM;
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
 #endregion
 
@@ -431,7 +430,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         {
             var field = spec.Command == 'g'
                 ? Context.Globals.Get(spec.Tag).GetOccurrence(Context.Index)
-                : Context.Record.Fields.GetField(spec.Tag, Context.Index);
+                : Context.Record?.Fields.GetField(spec.Tag, Context.Index);
             if (ReferenceEquals(field, null))
             {
                 return null;
@@ -485,7 +484,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 FieldSpecification spec
             )
         {
-            var field = Context.Record.Fields.GetField
+            var field = Context.Record?.Fields.GetField
                 (
                     spec.Tag,
                     Context.Index
@@ -537,7 +536,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         {
             // ReSharper disable once PossibleNullReferenceException
 
-            var count = Context.Record.Fields.GetFieldCount(field.Tag);
+            var count = Context.Record?.Fields.GetFieldCount(field.Tag);
 
             return Context.Index >= count - 1;
         }

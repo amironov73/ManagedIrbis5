@@ -333,7 +333,12 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         //=================================================
 
-        private static void IOcc(PftContext context, PftNode node, PftNode[] arguments)
+        private static void IOcc
+            (
+                PftContext context,
+                PftNode node,
+                PftNode[] arguments
+            )
         {
             var index = context.Index;
             if (!ReferenceEquals(context.CurrentGroup, null))
@@ -717,7 +722,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string output = text.SafeSubstring
+            var output = text.SafeSubstring
                 (
                     (int)offset.Value,
                     (int)length.Value

@@ -60,12 +60,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Registry.
         /// </summary>
-        public static CaseInsensitiveDictionary<Action<PftContext, PftNode, string>> Registry { get; private set; }
+        public static CaseInsensitiveDictionary<Action<PftContext, PftNode?, string>> Registry { get; } = new();
 
         /// <summary>
         /// Throw exception on unknown key.
         /// </summary>
-        public static bool ThrowOnUnknown { get; set; }
+        public static bool ThrowOnUnknown { get; set; } = false;
 
         #endregion
 
@@ -73,10 +73,6 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         static Umarci()
         {
-            ThrowOnUnknown = false;
-
-            Registry = new CaseInsensitiveDictionary<Action<PftContext, PftNode, string>>();
-
             RegisterActions();
         }
 
@@ -101,16 +97,16 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Find action for specified expression.
         /// </summary>
-        public static Action<PftContext, PftNode, string>? FindAction
+        public static Action<PftContext, PftNode?, string>? FindAction
             (
                 ref string expression
             )
         {
             var keys = Registry.Keys;
-            int bestMatch = 0;
-            Action<PftContext, PftNode, string> result = null;
+            var bestMatch = 0;
+            Action<PftContext, PftNode?, string>? result = null;
 
-            foreach (string key in keys)
+            foreach (var key in keys)
             {
                 if (key.Length > bestMatch
                     && expression.StartsWith(key))
@@ -134,7 +130,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public static void Umarci0
             (
                 PftContext context,
-                PftNode node,
+                PftNode? node,
                 string expression
             )
         {
@@ -147,7 +143,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public static void Umarci1
             (
                 PftContext context,
-                PftNode node,
+                PftNode? node,
                 string expression
             )
         {
@@ -163,14 +159,14 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string[] parts = expression.Split('#');
+            var parts = expression.Split('#');
             if (parts.Length != 3)
             {
                 return;
             }
 
-            string tag = parts[0];
-            string code = parts[1];
+            var tag = parts[0];
+            var code = parts[1];
             if (string.IsNullOrEmpty(tag)
                 || code.Length != 1)
             {
@@ -208,7 +204,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public static void Umarci2
             (
                 PftContext context,
-                PftNode node,
+                PftNode? node,
                 string expression
             )
         {
@@ -226,7 +222,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string[] parts = expression.Split('#');
+            var parts = expression.Split('#');
             if (parts.Length != 2)
             {
                 context.Write(node, "0");
@@ -234,8 +230,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string tag = parts[0];
-            string substring = parts[1];
+            var tag = parts[0];
+            var substring = parts[1];
             if (string.IsNullOrEmpty(tag)
                 || string.IsNullOrEmpty(substring))
             {
@@ -253,7 +249,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string text = field.ToText();
+            var text = field.ToText();
             if (string.IsNullOrEmpty(text))
             {
                 context.Write(node, "0");
@@ -261,7 +257,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            int result = text.CountSubstrings(substring);
+            var result = text.CountSubstrings(substring);
             context.Write(node, result.ToInvariantString());
         }
 
@@ -271,7 +267,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public static void Umarci3
             (
                 PftContext context,
-                PftNode node,
+                PftNode? node,
                 string expression
             )
         {
@@ -298,15 +294,15 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string[] parts = expression.Split('#');
+            var parts = expression.Split('#');
             if (parts.Length != 3)
             {
                 return;
             }
 
-            string tag = parts[0];
-            string indexText = parts[1];
-            string separator = parts[2];
+            var tag = parts[0];
+            var indexText = parts[1];
+            var separator = parts[2];
             if (string.IsNullOrEmpty(tag)
                 || string.IsNullOrEmpty(indexText)
                 || string.IsNullOrEmpty(separator)
@@ -322,7 +318,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string text = field.ToText();
+            var text = field.ToText();
             if (string.IsNullOrEmpty(text))
             {
                 return;
@@ -340,7 +336,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             index--;
 
-            int[] positions = UniforE.GetPositions(text, separator[0]);
+            var positions = UniforE.GetPositions(text, separator[0]);
 
             if (positions.Length == 0)
             {
@@ -388,7 +384,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public static void Umarci4
             (
                 PftContext context,
-                PftNode node,
+                PftNode? node,
                 string expression
             )
         {
@@ -404,14 +400,14 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return;
             }
 
-            string[] parts = expression.Split('/');
+            var parts = expression.Split('/');
             if (parts.Length != 2)
             {
                 return;
             }
 
-            string tag = parts[0];
-            string embed = parts[1];
+            var tag = parts[0];
+            var embed = parts[1];
             if (string.IsNullOrEmpty(tag)
                 || string.IsNullOrEmpty(embed))
             {
@@ -419,7 +415,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
 
             parts = embed.Split('^');
-            char code = '\0';
+            var code = '\0';
             if (parts.Length == 2)
             {
                 embed = parts[0];
@@ -459,19 +455,19 @@ namespace ManagedIrbis.Pft.Infrastructure
         public static void Umarci5
             (
                 PftContext context,
-                PftNode node,
+                PftNode? node,
                 string expression
             )
         {
             //ibatrak простая очистка за один проход
             //первого повторения подполей d e f c от скобок и завершающих разделителей
-            Record record = context.Record;
+            var record = context.Record;
             if (ReferenceEquals(record, null))
             {
                 return;
             }
 
-            string tag = expression;
+            var tag = expression;
             if (string.IsNullOrEmpty(tag))
             {
                 return;
@@ -486,13 +482,13 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 return;
             }
-            string text = field.ToText();
+            var text = field.ToText();
             string[] subfields = { "^d", "^e", "^f", "^c" };
             string[] substrings = { ":^", ";^", " : ^", " ; ^", ")^", ")" };
 
-            for (int i = 0; i < subfields.Length; i++)
+            for (var i = 0; i < subfields.Length; i++)
             {
-                int index = text.IndexOf(subfields[i]);
+                var index = text.IndexOf(subfields[i], StringComparison.InvariantCulture);
                 if (index < 0 || text.Length == index + 2)
                 {
                     continue;
@@ -509,9 +505,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                     }
                 }
                 //цикл по подстрокам в конце подполя, которые надо убрать
-                for (int j = 0; j < substrings.Length; j++)
+                for (var j = 0; j < substrings.Length; j++)
                 {
-                    int subIndex = text.IndexOf(substrings[j], index);
+                    var subIndex = text.IndexOf(substrings[j], index, StringComparison.InvariantCulture);
                     if (subIndex < 0)
                     {
                         continue;

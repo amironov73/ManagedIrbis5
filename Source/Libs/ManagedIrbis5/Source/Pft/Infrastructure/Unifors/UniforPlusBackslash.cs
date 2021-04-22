@@ -66,7 +66,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 var navigator = new TextNavigator(expression);
                 var command = navigator.ReadChar();
-                string text = navigator.GetRemainingText().ToString();
+                var text = navigator.GetRemainingText().ToString();
                 if (string.IsNullOrEmpty(text))
                 {
                     return;
@@ -88,7 +88,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         break;
                     }
 
-                    string chunk = navigator.ReadWhile('\\').ToString();
+                    var chunk = navigator.ReadWhile('\\').ToString();
                     var length = chunk.Length;
                     if (command == '1')
                     {
@@ -121,7 +121,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 navigator = new TextNavigator(text);
                 while (!navigator.IsEOF)
                 {
-                    string chunk = navigator.ReadUntil('\\').ToString();
+                    var chunk = navigator.ReadUntil('\\').ToString();
                     result.Append(chunk);
                     if (navigator.PeekChar() != '\\')
                     {

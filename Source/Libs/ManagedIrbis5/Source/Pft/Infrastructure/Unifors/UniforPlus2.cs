@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforPlus2.cs --
+/* UniforPlus2.cs -- выполнить внешнее приложение
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -48,13 +48,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = expression.Split(new[] {' ', '\t'}, 2);
-                string fileName = parts[0];
-                string arguments = parts.Length == 2
+                var parts = expression.Split(new[] {' ', '\t'}, 2);
+                var fileName = parts[0];
+                var arguments = parts.Length == 2
                     ? parts[1]
                     : string.Empty;
 
-                ProcessStartInfo startInfo = new ProcessStartInfo
+                var startInfo = new ProcessStartInfo
                     (
                         fileName,
                         arguments
@@ -64,7 +64,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     UseShellExecute = false
                 };
 
-                Process process = Process.Start(startInfo);
+                var process = Process.Start(startInfo);
                 if (!ReferenceEquals(process, null))
                 {
                     process.Dispose();

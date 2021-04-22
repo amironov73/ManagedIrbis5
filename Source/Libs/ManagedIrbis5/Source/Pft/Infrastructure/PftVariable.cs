@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -62,7 +63,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Строковое значение.
         /// </summary>
-        public string StringValue { get; set; }
+        public string? StringValue { get; set; }
 
         #endregion
 

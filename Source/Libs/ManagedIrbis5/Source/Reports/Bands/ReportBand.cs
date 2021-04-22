@@ -145,7 +145,11 @@ namespace ManagedIrbis.Reports
         {
             foreach (var attribute in attributes)
             {
-                Attributes.Add(attribute.Name, attribute.Value);
+                Attributes.Add
+                    (
+                        attribute.Name.ThrowIfNull("attribute.Name"),
+                        attribute.Value.ThrowIfNull("attribute.Value")
+                    );
             }
         } // constructor
 

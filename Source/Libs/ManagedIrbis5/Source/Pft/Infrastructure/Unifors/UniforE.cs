@@ -58,7 +58,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             // ibatrak через ISISACW.TAB делать смысла нет
             // irbis64 ищет одиночные пробелы
 
-            int[] positions = GetPositions(text, ' ');
+            var positions = GetPositions(text, ' ');
 
             if (wordCount >= positions.Length)
             {
@@ -84,12 +84,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             if (!string.IsNullOrEmpty(text))
             {
-                int start = 0;
-                int length = text.Length;
+                var start = 0;
+                var length = text.Length;
 
                 while (start < length)
                 {
-                    int position = text.IndexOf(c, start);
+                    var position = text.IndexOf(c, start);
                     if (position < 0)
                     {
                         break;
@@ -127,7 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                 if (Utility.TryParseInt32(countText, out var wordCount))
                 {
-                    string text = navigator.GetRemainingText().ToString();
+                    var text = navigator.GetRemainingText().ToString();
                     var output = GetFirstWords(text, wordCount);
                     context.WriteAndSetFlag(node, output);
                 }

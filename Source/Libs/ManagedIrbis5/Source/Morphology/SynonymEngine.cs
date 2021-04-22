@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -18,8 +19,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AM;
-
-using ManagedIrbis.Client;
 
 #endregion
 
@@ -92,27 +91,22 @@ namespace ManagedIrbis.Morphology
                 string word
             )
         {
-            string previousDatabase = Provider.Database;
+            var previousDatabase = Provider.Database.ThrowIfNull("Provider.Database");
             string[] result;
             try
             {
                 Provider.Database = Database;
-                string expression = string.Format
-                    (
-                        "\"{0}{1}\"",
-                        Prefix,
-                        word
-                    );
-
-                int[] found = Provider.Search(expression);
+                var expression = "\"" + Prefix + word + "\"";
+                var found = Provider.Search(expression);
                 if (found.Length == 0)
                 {
                     return Array.Empty<string>();
                 }
 
                 var records = new List<Record>(found.Length);
-                foreach (int mfn in found)
+                foreach (var mfn in found)
                 {
+                    // TODO: считывать большими порциями
                     var record = Provider.ReadRecord(mfn);
                     if (!ReferenceEquals(record, null))
                     {
@@ -125,7 +119,8 @@ namespace ManagedIrbis.Morphology
                     .ToArray();
 
                 result = entries
-                    .SelectMany(entry => entry.Synonyms)
+                    .NonNullItems()
+                    .SelectMany(entry => entry.Synonyms!)
                     .Distinct()
                     .ToArray();
             }
@@ -138,5 +133,7 @@ namespace ManagedIrbis.Morphology
         }
 
         #endregion
-    }
-}
+
+    } // class SynonymEngine
+
+} // namespace ManagedIrbis.Morphology

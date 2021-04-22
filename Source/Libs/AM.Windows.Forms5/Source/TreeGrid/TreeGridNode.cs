@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
 /* TreeGridNode.cs
@@ -29,18 +30,12 @@ namespace AM.Windows.Forms
     ///
     /// </summary>
     // ReSharper disable RedundantNameQualifier
-// ReSharper disable LocalizableElement
     [System.ComponentModel.DesignerCategory("Code")]
-// ReSharper restore LocalizableElement
     // ReSharper restore RedundantNameQualifier
     [DesignTimeVisible(false)]
     public class TreeGridNode
         : Component
     {
-        #region Event
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -51,8 +46,8 @@ namespace AM.Windows.Forms
         {
             Enabled = true;
 
-            _nodes = new TreeGridNodeCollection(null, this);
-            _data = new TreeGridDataCollection(this);
+            Nodes = new TreeGridNodeCollection(null, this);
+            Data = new TreeGridDataCollection(this);
 
             _backgroundColor = Color.Empty;
             _foregroundColor = Color.Empty;
@@ -62,7 +57,10 @@ namespace AM.Windows.Forms
         /// Initializes a new instance of the <see cref="TreeGridNode"/> class.
         /// </summary>
         /// <param name="title">The title.</param>
-        public TreeGridNode(string title)
+        public TreeGridNode
+            (
+                string title
+            )
             : this()
         {
             _title = title;
@@ -80,7 +78,7 @@ namespace AM.Windows.Forms
             )
             : this(title)
         {
-            _data.AddRange(data);
+            Data.AddRange(data);
         }
 
         #endregion
@@ -103,21 +101,16 @@ namespace AM.Windows.Forms
 
         private Color _backgroundColor;
         private bool _checked;
-        private TreeGridDataCollection _data;
         private bool _enabled;
         private bool _expanded;
-        private Font _font;
+        private Font? _font;
         private Color _foregroundColor;
-        private Icon _icon;
+        private Icon? _icon;
         private int _height;
-        internal int _top;
 
-        private readonly TreeGridNodeCollection _nodes;
-        internal TreeGridNode _parent;
         private bool _readOnly;
 
-        private string _title;
-        internal TreeGrid _treeGrid;
+        private string? _title;
 
         private Type _editorType = typeof(TreeGridTextBox);
 
@@ -138,30 +131,26 @@ namespace AM.Windows.Forms
                 TreeGridDrawNodeEventArgs args
             )
         {
-            if (args != null)
+            var grid = args.TreeGrid;
+            if (grid != null)
             {
-                TreeGrid grid = args.TreeGrid;
-                if (grid != null)
+                foreach (var column in grid.VisibleColumns)
                 {
-                    foreach (TreeGridColumn column in grid.VisibleColumns)
-                    {
-                        Rectangle bounds = args.Bounds;
-                        bounds.X = column.Left;
-                        bounds.Width = column.Width;
+                    var bounds = args.Bounds;
+                    bounds.X = column.Left;
+                    bounds.Width = column.Width;
 
-                        TreeGridDrawCellEventArgs tgdc
-                            = new TreeGridDrawCellEventArgs
-                            {
-                                Graphics = args.Graphics,
-                                TreeGrid = grid,
-                                Node = args.Node,
-                                Column = column,
-                                Bounds = bounds,
-                                State = args.State
-                            };
+                    var tgdcea = new TreeGridDrawCellEventArgs
+                        {
+                            Graphics = args.Graphics,
+                            TreeGrid = grid,
+                            Node = args.Node,
+                            Column = column,
+                            Bounds = bounds,
+                            State = args.State
+                        };
 
-                        column.OnDrawCell(tgdc);
-                    }
+                    column.OnDrawCell(tgdcea);
                 }
             }
         }
@@ -171,19 +160,19 @@ namespace AM.Windows.Forms
                 TreeGridDrawCellEventArgs args
             )
         {
-            if (args != null)
-            {
-                args.DrawBackground();
-                args.DrawText();
-                args.DrawSelection();
-            }
+            args.DrawBackground();
+            args.DrawText();
+            args.DrawSelection();
         }
 
-        internal void _SetTreeGrid(TreeGrid value)
+        internal void _SetTreeGrid
+            (
+                TreeGrid? value
+            )
         {
-            _treeGrid = value;
-            _nodes._grid = value;
-            foreach (TreeGridNode child in Nodes)
+            TreeGrid = value;
+            Nodes._grid = value;
+            foreach (var child in Nodes)
             {
                 child._SetTreeGrid(value);
             }
@@ -203,7 +192,7 @@ namespace AM.Windows.Forms
                 TreeGridMouseEventArgs args
             )
         {
-            args.Column.OnMouseClick(args);
+            args.Column?.OnMouseClick(args);
         }
 
         protected internal virtual void OnMouseDoubleClick
@@ -211,7 +200,7 @@ namespace AM.Windows.Forms
                 TreeGridMouseEventArgs args
             )
         {
-            args.Column.OnMouseDoubleClick(args);
+            args.Column?.OnMouseDoubleClick(args);
         }
 
         protected internal virtual TreeGridEditor? CreateEditor
@@ -226,21 +215,20 @@ namespace AM.Windows.Forms
                 return null;
             }
 
-            TreeGridEditor result = (TreeGridEditor) Activator
-                    .CreateInstance(EditorType);
+            var result = (TreeGridEditor?) Activator.CreateInstance(EditorType);
 
-            //if (result != null)
-            //{
-            result.Control.Bounds = bounds;
-            result.SetValue(initialValue
-                            ?? (string) Data.SafeGet(0));
-            if (!string.IsNullOrEmpty(initialValue))
+            if (result != null)
             {
-                result.SelectText(initialValue.Length,0);
+                result.Control.Bounds = bounds;
+                result.SetValue(initialValue
+                                ?? (string) Data.SafeGet(0));
+                if (!string.IsNullOrEmpty(initialValue))
+                {
+                    result.SelectText(initialValue.Length,0);
+                }
+                result.Control.PreviewKeyDown
+                    += _editor_PreviewKeyDown;
             }
-            result.Control.PreviewKeyDown
-                += _editor_PreviewKeyDown;
-            //}
 
             return result;
         }
@@ -260,32 +248,32 @@ namespace AM.Windows.Forms
 
         void _editor_PreviewKeyDown
             (
-                object sender,
+                object? sender,
                 PreviewKeyDownEventArgs e
             )
         {
             switch (e.KeyData)
             {
                 case Keys.Enter:
-                    TreeGrid.EndEdit(true);
-                    TreeGrid.GotoLine(TreeGrid.CurrentLine + 1);
+                    TreeGrid?.EndEdit(true);
+                    TreeGrid?.GotoLine(TreeGrid.CurrentLine + 1);
                     e.IsInputKey = false;
                     break;
 
                 case Keys.Escape:
-                    TreeGrid.EndEdit(false);
+                    TreeGrid?.EndEdit(false);
                     e.IsInputKey = false;
                     break;
 
                 case Keys.Down:
-                    TreeGrid.EndEdit(true);
-                    TreeGrid.GotoLine(TreeGrid.CurrentLine + 1);
+                    TreeGrid?.EndEdit(true);
+                    TreeGrid?.GotoLine(TreeGrid.CurrentLine + 1);
                     e.IsInputKey = false;
                     break;
 
                 case Keys.Up:
-                    TreeGrid.EndEdit(true);
-                    TreeGrid.GotoLine(TreeGrid.CurrentLine - 1);
+                    TreeGrid?.EndEdit(true);
+                    TreeGrid?.GotoLine(TreeGrid.CurrentLine - 1);
                     e.IsInputKey = false;
                     break;
             }
@@ -310,10 +298,7 @@ namespace AM.Windows.Forms
         [DefaultValue(typeof(Color),"Empty")]
         public virtual Color BackgroundColor
         {
-            get
-            {
-                return _backgroundColor;
-            }
+            get => _backgroundColor;
             set
             {
                 _backgroundColor = value;
@@ -328,10 +313,7 @@ namespace AM.Windows.Forms
         [DefaultValue(typeof(Color),"Empty")]
         public virtual Color ForegroundColor
         {
-            get
-            {
-                return _foregroundColor;
-            }
+            get => _foregroundColor;
             set
             {
                 _foregroundColor = value;
@@ -346,8 +328,8 @@ namespace AM.Windows.Forms
         [DefaultValue(null)]
         public Font Font
         {
-            get { return _font ?? TreeGrid.Font; }
-            set { _font = value; }
+            get => _font ?? TreeGrid?.Font ?? throw new ApplicationException();
+            set => _font = value;
         }
 
         /// <summary>
@@ -370,10 +352,7 @@ namespace AM.Windows.Forms
         [DefaultValue(false)]
         public bool Checked
         {
-            get
-            {
-                return _checked;
-            }
+            get => _checked;
             set
             {
                 _checked = value;
@@ -388,10 +367,7 @@ namespace AM.Windows.Forms
         [DefaultValue(false)]
         public bool Enabled
         {
-            get
-            {
-                return _enabled;
-            }
+            get => _enabled;
             set
             {
                 _enabled = value;
@@ -403,12 +379,9 @@ namespace AM.Windows.Forms
         /// Gets or sets the icon.
         /// </summary>
         /// <value>The icon.</value>
-        public Icon Icon
+        public Icon? Icon
         {
-            get
-            {
-                return _icon;
-            }
+            get => _icon;
             set
             {
                 _icon = value;
@@ -425,10 +398,7 @@ namespace AM.Windows.Forms
         [DefaultValue(false)]
         public bool Expanded
         {
-            get
-            {
-                return _expanded;
-            }
+            get => _expanded;
             set
             {
                 _expanded = value;
@@ -443,10 +413,7 @@ namespace AM.Windows.Forms
         [DefaultValue(false)]
         public virtual bool ReadOnly
         {
-            get
-            {
-                return _readOnly;
-            }
+            get => _readOnly;
             set
             {
                 _readOnly = value;
@@ -462,7 +429,7 @@ namespace AM.Windows.Forms
         {
             get
             {
-                int result = _height;
+                var result = _height;
                 if (result <= 0)
                 {
                     result = (TreeGrid != null)
@@ -484,10 +451,7 @@ namespace AM.Windows.Forms
         /// <value>The title.</value>
         public virtual string Title
         {
-            get
-            {
-                return _title;
-            }
+            get => _title;
             set
             {
                 _title = value;
@@ -499,19 +463,13 @@ namespace AM.Windows.Forms
         /// Gets the top.
         /// </summary>
         /// <value>The top.</value>
-        public int Top
-        {
-            get { return _top; }
-        }
+        public int Top { get; internal set; }
 
         /// <summary>
         /// Gets the bottom.
         /// </summary>
         /// <value>The bottom.</value>
-        public int Bottom
-        {
-            get { return (Top + Height); }
-        }
+        public int Bottom => (Top + Height);
 
         /// <summary>
         /// Gets or sets the type of the editor.
@@ -538,13 +496,7 @@ namespace AM.Windows.Forms
         /// </summary>
         /// <value>The data.</value>
         [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
-        public TreeGridDataCollection Data
-        {
-            get
-            {
-                return _data;
-            }
-        }
+        public TreeGridDataCollection Data { get; private set; }
 
         /// <summary>
         /// Gets or sets the tree grid.
@@ -552,13 +504,7 @@ namespace AM.Windows.Forms
         /// <value>The tree grid.</value>
         [Browsable(false)]
         [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public TreeGrid TreeGrid
-        {
-            get
-            {
-                return _treeGrid;
-            }
-        }
+        public TreeGrid? TreeGrid { get; internal set; }
 
         /// <summary>
         /// Gets or sets the parent.
@@ -566,13 +512,7 @@ namespace AM.Windows.Forms
         /// <value>The parent.</value>
         [Browsable(false)]
         [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-        public TreeGridNode Parent
-        {
-            get
-            {
-                return _parent;
-            }
-        }
+        public TreeGridNode? Parent { get; internal set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance has children.
@@ -594,8 +534,8 @@ namespace AM.Windows.Forms
         {
             get
             {
-                int result = 0;
-                for (TreeGridNode node = this; node.Parent != null;
+                var result = 0;
+                for (var node = this; node.Parent != null;
                     node = node.Parent)
                     result++;
                 return result;
@@ -606,15 +546,8 @@ namespace AM.Windows.Forms
         /// Gets the children.
         /// </summary>
         /// <value>The children.</value>
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Content)]
-        public TreeGridNodeCollection Nodes
-        {
-            get
-            {
-                return _nodes;
-            }
-        }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public TreeGridNodeCollection Nodes { get; }
 
         /// <summary>
         /// Gets the bounds.
@@ -624,7 +557,7 @@ namespace AM.Windows.Forms
         {
             get
             {
-                Rectangle result = new Rectangle
+                var result = new Rectangle
                     (
                         0,
                         Top,
@@ -640,14 +573,14 @@ namespace AM.Windows.Forms
         /// Gets the index of the flat.
         /// </summary>
         /// <value>The index of the flat.</value>
-        public int FlatIndex { get { return _flatIndex; } }
+        public int FlatIndex { get; internal set; }
 
         /// <summary>
         /// Gets or sets the user data.
         /// </summary>
         /// <value>The user data.</value>
         [DefaultValue(null)]
-        public object UserData { get; set; }
+        public object? UserData { get; set; }
 
         #endregion
 
@@ -662,7 +595,7 @@ namespace AM.Windows.Forms
             var result = new List<TreeGridNode> { this };
             if (Expanded)
             {
-                foreach (TreeGridNode child in Nodes)
+                foreach (var child in Nodes)
                 {
                     result.AddRange(child.Flatten());
                 }
@@ -677,7 +610,7 @@ namespace AM.Windows.Forms
         public void ExpandAll(bool expand)
         {
             Expanded = expand;
-            foreach (TreeGridNode node in Nodes)
+            foreach (var node in Nodes)
             {
                 node.ExpandAll(expand);
             }
@@ -690,21 +623,21 @@ namespace AM.Windows.Forms
         /// <returns></returns>
         public TreeGridNode Clone ( bool withData )
         {
-            TreeGridNode result = (TreeGridNode) MemberwiseClone();
+            var result = (TreeGridNode) MemberwiseClone();
 
-            result._data = new TreeGridDataCollection(result);
+            result.Data = new TreeGridDataCollection(result);
             if (withData)
             {
-                for (int i = 0; i < Data.Count; i++)
+                for (var i = 0; i < Data.Count; i++)
                 {
                     result.Data.SafeSet(i,Data.SafeGet(i));
                 }
             }
 
-            for ( int i = 0; i < Nodes.Count; i++ )
+            for ( var i = 0; i < Nodes.Count; i++ )
                 {
-                    TreeGridNode node = Nodes[i];
-                    TreeGridNode clone = node.Clone(withData);
+                    var node = Nodes[i];
+                    var clone = node.Clone(withData);
                     result.Nodes.Add(clone);
                 }
             result._SetTreeGrid(TreeGrid);
@@ -716,7 +649,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public void Select ()
         {
-            TreeGrid.GotoLine(_flatIndex);
+            TreeGrid.GotoLine(FlatIndex);
         }
 
         /// <summary>
@@ -736,7 +669,7 @@ namespace AM.Windows.Forms
                 }
                 else
                 {
-                    foreach (TreeGridNode child in Nodes)
+                    foreach (var child in Nodes)
                     {
                         if (!child.ReadOnly)
                         {
@@ -776,8 +709,6 @@ namespace AM.Windows.Forms
         {
             return Title;
         }
-
-        internal int _flatIndex;
 
         #endregion
     }

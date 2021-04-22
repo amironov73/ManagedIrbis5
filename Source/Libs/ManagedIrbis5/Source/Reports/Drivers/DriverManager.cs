@@ -144,7 +144,7 @@ namespace ManagedIrbis.Reports
                 return null;
             }
 
-            var result = (ReportDriver) Activator.CreateInstance(type);
+            var result = (ReportDriver?) Activator.CreateInstance(type);
 
             return result;
         }

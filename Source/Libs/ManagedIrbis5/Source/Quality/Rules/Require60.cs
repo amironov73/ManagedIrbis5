@@ -31,17 +31,14 @@ namespace ManagedIrbis.Quality.Rules
     {
         #region Private members
 
-        private MenuFile _menu;
+        private MenuFile? _menu;
 
         #endregion
 
         #region QualityRule members
 
         /// <inheritdoc />
-        public override string FieldSpec
-        {
-            get { return "60"; }
-        }
+        public override string FieldSpec => "60";
 
         /// <inheritdoc />
         public override RuleReport CheckRecord

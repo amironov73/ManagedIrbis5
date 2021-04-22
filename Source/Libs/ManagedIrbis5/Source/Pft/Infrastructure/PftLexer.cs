@@ -15,11 +15,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 using AM;
-using AM.Collections;
 using AM.Text;
 
 #endregion
@@ -36,14 +34,14 @@ namespace ManagedIrbis.Pft.Infrastructure
     {
         #region Private members
 
-        private TextNavigator _navigator;
+        private TextNavigator? _navigator;
 
         private static char[] Integer =
             {
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
             };
 
-        private static char[] Identifier =
+        private static readonly char[] Identifier =
             {
                 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
                 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
@@ -64,26 +62,23 @@ namespace ManagedIrbis.Pft.Infrastructure
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'
             };
 
-        private int Column { get { return _navigator.Column; } }
+        private int Column => _navigator?.Column ?? 0;
 
-        private bool IsEOF { get { return _navigator.IsEOF; } }
+        private bool IsEOF => _navigator?.IsEOF ?? true;
 
-        private int Line { get { return _navigator.Line; } }
+        private int Line => _navigator?.Line ?? 0;
 
-        private char PeekChar()
-        {
-            //return _navigator.PeekChar();
-            return _navigator.PeekCharNoCrLf();
-        }
+        private char PeekChar() => _navigator?.PeekCharNoCrLf() ?? '\0';
 
-        private char ReadChar()
-        {
-            //return _navigator.ReadChar();
-            return _navigator.ReadCharNoCrLf();
-        }
+        private char ReadChar() => _navigator?.ReadCharNoCrLf() ?? '\0';
 
         private FieldSpecification? ReadField()
         {
+            if (_navigator is null)
+            {
+                return null;
+            }
+
             var result = new FieldSpecification();
             var position = _navigator.SavePosition();
             _navigator.Move(-1);
@@ -99,17 +94,17 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private string? ReadIdentifier()
         {
-            if (IsEOF)
+            if (_navigator is null || IsEOF)
             {
                 return null;
             }
 
-            StringBuilder result = new StringBuilder();
-            string[] reserved = PftUtility.GetReservedWords();
+            var result = new StringBuilder();
+            var reserved = PftUtility.GetReservedWords();
 
             while (true)
             {
-                char c = PeekChar();
+                var c = PeekChar();
                 if (c == TextNavigator.EOF
                     || Array.IndexOf(Identifier, c) < 0)
                 {
@@ -133,18 +128,18 @@ namespace ManagedIrbis.Pft.Infrastructure
                 char initialLetter
             )
         {
-            if (IsEOF)
+            if (_navigator is null || IsEOF)
             {
                 return initialLetter.ToString();
             }
 
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append(initialLetter);
-            string[] reserved = PftUtility.GetReservedWords();
+            var reserved = PftUtility.GetReservedWords();
 
             while (true)
             {
-                char c = PeekChar();
+                var c = PeekChar();
                 if (c == TextNavigator.EOF
                     || Array.IndexOf(Identifier, c) < 0)
                 {
@@ -165,9 +160,9 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private string? ReadInteger()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
-            char c = PeekChar();
+            var c = PeekChar();
             if (!c.IsArabicDigit())
             {
                 return null;
@@ -191,12 +186,12 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private string? ReadFloat()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
-            bool dotFound = false;
-            bool digitFound = false;
+            var dotFound = false;
+            var digitFound = false;
 
-            char c = PeekChar();
+            var c = PeekChar();
             //if (c != '+'
             //    && c != '-'
             //    && c != '.'
@@ -290,29 +285,26 @@ namespace ManagedIrbis.Pft.Infrastructure
                 char stop
             )
         {
-            string? result = _navigator.ReadUntilNoCrLf(stop);
+            var result = _navigator?.ReadUntilNoCrLf(stop);
             if (ReferenceEquals(result, null))
             {
                 ThrowSyntax();
             }
 
-            char c = ReadChar();
+            var c = ReadChar();
             if (c != stop)
             {
                 ThrowSyntax();
             }
 
-            return result;
+            return result!;
         }
 
-        private void SkipWhitespace()
-        {
-            _navigator.SkipWhitespace();
-        }
+        private void SkipWhitespace() => _navigator?.SkipWhitespace();
 
         private void ThrowSyntax()
         {
-            string message = string.Format
+            var message = string.Format
                 (
                     "Syntax error at line {0}, column{1}",
                     Line,
@@ -351,12 +343,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                     break;
                 }
 
-                int line = Line;
-                int column = Column;
-                char c = ReadChar();
+                var line = Line;
+                var column = Column;
+                var c = ReadChar();
                 char c2, c3;
-                string value = null;
-                FieldSpecification field = null;
+                string? value = null;
+                FieldSpecification? field = null;
                 PftTokenKind kind;
                 switch (c)
                 {
@@ -768,19 +760,19 @@ namespace ManagedIrbis.Pft.Infrastructure
                     case 'm':
                     case 'M':
                         value = ReadIdentifier(c);
-                        string value2 = value.ToLower();
+                        var value2 = value.ToLower();
                         if (value2.Length == 3)
                         {
                             if (value2 == "mfn")
                             {
-                                StringBuilder builder = new StringBuilder();
+                                var builder = new StringBuilder();
 
                                 if (PeekChar() == '(')
                                 {
                                     builder.Append('(');
                                     ReadChar();
 
-                                    bool ok = false;
+                                    var ok = false;
                                     while (!IsEOF)
                                     {
                                         c3 = PeekChar();
@@ -1184,7 +1176,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     ThrowSyntax();
                 }
 
-                PftToken token = new PftToken(kind, line, column, value);
+                var token = new PftToken(kind, line, column, value);
                 if (kind == PftTokenKind.V)
                 {
                     token.UserData = field;

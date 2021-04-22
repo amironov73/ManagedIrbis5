@@ -71,7 +71,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 var navigator = new TextNavigator(expression);
                 var code = navigator.ReadChar();
                 var symbol = navigator.ReadChar();
-                string text = navigator.GetRemainingText().ToString();
+                var text = navigator.GetRemainingText().ToString();
                 if (!string.IsNullOrEmpty(text))
                 {
                     int firstOffset, lastOffset;

@@ -15,15 +15,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
-using AM.IO;
-using AM.Text;
 
 #endregion
 
@@ -52,16 +46,16 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftTokenList newTokens
             )
         {
-            NonNullCollection<PftNode> result
+            var result
                 = new NonNullCollection<PftNode>();
-            PftTokenList saveTokens = Tokens;
+            var saveTokens = Tokens;
             Tokens = newTokens;
 
             try
             {
                 while (!Tokens.IsEof)
                 {
-                    PftNode node = ParseNext();
+                    var node = ParseNext();
                     result.Add(node);
                 }
             }
@@ -79,14 +73,14 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftTokenList newTokens
             )
         {
-            PftTokenList saveTokens = Tokens;
+            var saveTokens = Tokens;
             Tokens = newTokens;
 
             try
             {
                 while (!Tokens.IsEof)
                 {
-                    PftNode node = ParseNext();
+                    var node = ParseNext();
                     result.Add(node);
                 }
             }
@@ -102,8 +96,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 Func<PftNode> function
             )
         {
-            PftNode result = null;
-            PftTokenList saveTokens = Tokens;
+            PftNode? result = null;
+            var saveTokens = Tokens;
             Tokens = newTokens;
 
             try
@@ -130,13 +124,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftTokenKind[] expectedTokens
             )
         {
-            PftNode result = null;
-            PftToken token = Tokens.Current;
+            PftNode? result = null;
+            var token = Tokens.Current;
 
             if (Array.IndexOf(expectedTokens, token.Kind) >= 0)
             {
-                Func<PftNode> function;
-                if (!map.TryGetValue(token.Kind, out function))
+                if (!map.TryGetValue(token.Kind, out var function))
                 {
                     Magna.Error
                         (
@@ -172,7 +165,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNode ParseCall2(PftNode result)
         {
-            PftToken token = Tokens.Current;
+            var token = Tokens.Current;
             token.MustBe(PftTokenKind.LeftParenthesis);
             Tokens.RequireNext();
             return ParseCall3(result);
@@ -180,7 +173,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNode ParseCall3(PftNode result)
         {
-            PftTokenList innerTokens = Tokens.Segment
+            var innerTokens = Tokens.Segment
                 (
                     _parenthesisOpen,
                     _parenthesisClose,
@@ -188,14 +181,14 @@ namespace ManagedIrbis.Pft.Infrastructure
                 )
                 .ThrowIfNull("innerTokens");
 
-            PftTokenList saveTokens = Tokens;
+            var saveTokens = Tokens;
             Tokens = innerTokens;
 
             try
             {
                 while (!Tokens.IsEof)
                 {
-                    PftNode node = ParseNext();
+                    var node = ParseNext();
                     result.Children.Add(node);
                 }
             }
@@ -210,7 +203,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private IndexSpecification ParseIndex()
         {
-            IndexSpecification result = new IndexSpecification
+            var result = new IndexSpecification
             {
                 Kind = IndexKind.None,
             };
@@ -220,7 +213,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 Tokens.MoveNext();
                 Tokens.MoveNext();
 
-                PftTokenList indexTokens = Tokens.Segment
+                var indexTokens = Tokens.Segment
                     (
                         _squareOpen,
                         _squareClose,
@@ -228,7 +221,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     )
                     .ThrowIfNull("indexTokens");
 
-                string expression = indexTokens.ToText();
+                var expression = indexTokens.ToText();
 
                 result.Kind = IndexKind.Expression;
                 result.Expression = expression;
@@ -243,12 +236,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                 }
                 else
                 {
-                    result.Program = (PftNumeric)NestedContext
+                    result.Program = (PftNumeric?)NestedContext
                         (
                             indexTokens,
                             ParseArithmetic
                         );
-                    PftNumericLiteral literal = result.Program as PftNumericLiteral;
+                    var literal = result.Program as PftNumericLiteral;
                     if (!ReferenceEquals(literal, null))
                     {
                         result.Kind = IndexKind.Literal;
@@ -267,7 +260,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 Tokens.RequireNext();
                 Tokens.RequireNext();
 
-                string text = Tokens.Current.Text
+                var text = Tokens.Current.Text
                     .ThrowIfNull("Tokens.Current.Text");
 
                 return text[0];
@@ -278,7 +271,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNode ParseNext()
         {
-            PftNode result = Get(MainModeMap, MainModeItems);
+            var result = Get(MainModeMap, MainModeItems);
 
             if (!ReferenceEquals(result, null))
             {

@@ -82,21 +82,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 winApi = true;
                 navigator.ReadChar();
             }
-            string dllName = navigator.ReadUntil(',').ToString();
+            var dllName = navigator.ReadUntil(',').ToString();
             if (string.IsNullOrEmpty(dllName))
             {
                 return;
             }
 
             navigator.ReadChar(); // eat the comma
-            string methodName = navigator.ReadUntil(',').ToString();
+            var methodName = navigator.ReadUntil(',').ToString();
             if (string.IsNullOrEmpty(methodName))
             {
                 return;
             }
 
             navigator.ReadChar(); // eat the comma
-            string input = navigator.GetRemainingText().ToString();
+            var input = navigator.GetRemainingText().ToString();
 
             var result = MethodRunner.RunMethod
                 (

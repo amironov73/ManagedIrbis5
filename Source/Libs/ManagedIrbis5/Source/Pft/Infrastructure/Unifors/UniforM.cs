@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -48,9 +49,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         class FieldToSort
         {
-            public Field Field { get; set; }
+            public Field? Field { get; set; }
 
-            public string Text { get; set; }
+            public string? Text { get; set; }
         }
 
         static void SortField
@@ -90,6 +91,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         (
                             field => field.Field
                         )
+                    .NonNullItems()
                     .ToArray()
                 );
         }
@@ -115,13 +117,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     return;
                 }
 
-                string tagText = navigator.ReadUntil('^').ToString();
+                var tagText = navigator.ReadUntil('^').ToString();
                 if (string.IsNullOrEmpty(tagText))
                 {
                     return;
                 }
 
-                int tag = tagText.SafeToInt32();
+                var tag = tagText.SafeToInt32();
                 var code = '\0';
                 if (!navigator.IsEOF)
                 {

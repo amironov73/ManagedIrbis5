@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -15,17 +16,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using AM;
 using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 
 #endregion
 
@@ -44,36 +37,18 @@ namespace ManagedIrbis.PlatformSpecific
         /// <summary>
         /// DLL registry.
         /// </summary>
-        public static Dictionary<string, DynamicLibrary> DllRegistry { get; private set; }
+        public static Dictionary<string, DynamicLibrary> DllRegistry { get; } = new();
 
         /// <summary>
         /// Delegate registry.
         /// </summary>
-        public static Dictionary<Pair<string, string>, Delegate> DelegateRegistry
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        #region Construction
-
-        static DllCache()
-        {
-            DllRegistry = new Dictionary<string, DynamicLibrary>
-                (
-                    StringComparer.InvariantCultureIgnoreCase
-                );
-            DelegateRegistry = new Dictionary<Pair<string, string>, Delegate>();
-            _sync = new object();
-        }
+        public static Dictionary<Pair<string, string>, Delegate> DelegateRegistry { get; } = new();
 
         #endregion
 
         #region Private members
 
-        private static object _sync;
+        private static readonly object _sync = new object();
 
         #endregion
 
@@ -89,9 +64,7 @@ namespace ManagedIrbis.PlatformSpecific
         {
             lock (_sync)
             {
-                DynamicLibrary library;
-
-                if (DllRegistry.TryGetValue(libraryName, out library))
+                if (DllRegistry.TryGetValue(libraryName, out var library))
                 {
                     DllRegistry.Remove(libraryName);
                     library.Dispose();
@@ -136,7 +109,7 @@ namespace ManagedIrbis.PlatformSpecific
                 string libraryName
             )
         {
-            DynamicLibrary result;
+            DynamicLibrary? result;
 
             lock (_sync)
             {

@@ -17,11 +17,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using AM;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
@@ -65,18 +65,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
 
-                Magna.Error
-                    (
-                        "PftP::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            [ExcludeFromCodeCoverage]
+            protected set => Magna.Error
+                (
+                    "PftP::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
         }
 
         #endregion
@@ -140,7 +136,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         /// <summary>
         /// Limit text.
@@ -156,14 +152,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 return text;
             }
 
-            int offset = field.Offset;
-            int length = 100000000;
+            var offset = field.Offset;
+            var length = 100000000;
             if (field.Length != 0)
             {
                 length = field.Length;
             }
 
-            string result = PftUtility.SafeSubString
+            var result = PftUtility.SafeSubString
                 (
                     text,
                     offset,
@@ -192,8 +188,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             var field = fields.GetOccurrence(index);
             if (!ReferenceEquals(field, null))
             {
-                char code = specification.SubField;
-                string result;
+                var code = specification.SubField;
+                string? result;
 
                 if (code == SubField.NoCode)
                 {
@@ -251,7 +247,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 return true;
             }
 
-            bool result = field.HaveSubField(code);
+            var result = field.HaveSubField(code);
 
             return result;
         }
@@ -309,7 +305,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (Field.Command == 'g')
             {
-                int number = FastNumber.ParseInt32(Field.Tag.ThrowIfNull());
+                var number = FastNumber.ParseInt32(Field.Tag.ThrowIfNull());
                 compiler
                     .WriteIndent()
                     .WriteLine
@@ -381,7 +377,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            Field = (PftField)PftSerializer.DeserializeNullable(reader);
+            Field = (PftField?) PftSerializer.DeserializeNullable(reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -405,11 +401,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             string tag = Field.Tag.ThrowIfNull("Field.Tag");
             var record = context.Record;
-            int index = context.Index;
+            var index = context.Index;
 
             if (Field.Command == 'g')
             {
-                int number = FastNumber.ParseInt32(tag);
+                var number = FastNumber.ParseInt32(tag);
                 var fields = context.Globals.Get(number);
                 Value = HaveGlobal
                     (

@@ -101,7 +101,7 @@ namespace AM.Windows.Forms
             {
                 throw new ArgumentNullException("item");
             }
-            item._parent = _parent;
+            item.Parent = _parent;
             item._SetTreeGrid ( _grid );
             base.InsertItem(index,item);
             _UpdateGrid();
@@ -139,7 +139,7 @@ namespace AM.Windows.Forms
             {
                 throw new ArgumentNullException("item");
             }
-            item._parent = _parent;
+            item.Parent = _parent;
             item._SetTreeGrid ( _grid );
             base.SetItem(index,item);
             _UpdateGrid();

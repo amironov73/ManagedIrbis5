@@ -50,7 +50,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.NumberSign,
                     2
@@ -67,7 +67,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string output = parts[1].SafeSubstring(0, length);
+            var output = parts[1].SafeSubstring(0, length);
             context.WriteAndSetFlag(node, output);
         }
 

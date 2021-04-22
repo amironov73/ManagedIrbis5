@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -36,23 +37,23 @@ namespace ManagedIrbis.Pft.Infrastructure
     {
         #region Properties
 
-        public PftGroup Group { get; private set; }
+        public PftGroup? Group { get; }
 
-        public object Data { get; private set; }
+        public object Data { get; }
 
-        public PftNodeCollection Nodes { get; set; }
+        public PftNodeCollection? Nodes { get; set; }
 
         public PftContext Context { get; set; }
 
-        public int Index { get; private set; }
+        public int Index { get; }
 
-        public Task Task { get; private set; }
+        public Task Task { get; }
 
-        public Exception Exception { get; private set; }
+        public Exception? Exception { get; private set; }
 
-        public string Result { get { return Context.Text; } }
+        public string Result => Context.Text;
 
-        private Action<PftIteration, object> _Action { get; set; }
+        private Action<PftIteration, object>? TheAction { get; set; }
 
         #endregion
 
@@ -63,7 +64,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftContext context,
                 PftNodeCollection nodes,
                 int index,
-                Action<PftIteration, object> action,
+                Action<PftIteration, object> theAction,
                 object data,
                 bool withGroup
             )
@@ -78,7 +79,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             Context.Index = Index;
             Exception = null;
-            _Action = action;
+            TheAction = theAction;
             Data = data;
 
             Task = new Task(_Run);
@@ -93,7 +94,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             try
             {
-                _Action(this, Data);
+                TheAction?.Invoke(this, Data);
             }
             catch (Exception exception)
             {

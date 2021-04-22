@@ -37,7 +37,7 @@ internal class Program
     {
         try
         {
-            using var connection = ConnectionFactory.Shared
+            await using var connection = ConnectionFactory.Shared
                 .CreateAsyncConnection();
 
             connection.Host = args.Length == 0
@@ -60,7 +60,7 @@ internal class Program
 
             var processes = await connection.ListProcessesAsync();
             WriteLine("Processes: "
-                + string.Join<ProcessInfo>(" | ", processes));
+                + string.Join<ProcessInfo>(" | ", processes!));
 
             var maxMfn = await connection.GetMaxMfnAsync();
             WriteLine($"Max MFN={maxMfn}");
@@ -72,12 +72,12 @@ internal class Program
             WriteLine("Found: " + string.Join(", ", found));
 
             var terms = await connection.ReadTermsAsync("K=БЕТОН", 10);
-            WriteLine("Terms: " + string.Join<Term>(", ", terms));
+            WriteLine("Terms: " + string.Join<Term>(", ", terms!));
 
-            if (terms.Length != 0)
+            if (terms!.Length != 0)
             {
                 var postings = await connection.ReadPostingsAsync(terms[0].Text!, 10);
-                WriteLine("Postings: " + string.Join<TermPosting>(", ", postings));
+                WriteLine("Postings: " + string.Join<TermPosting>(", ", postings!));
             }
 
             var record = await connection.ReadRecordAsync(1);
@@ -92,7 +92,7 @@ internal class Program
                 Database = connection.Database,
                 FileName = "*.mnu"
             });
-            WriteLine("Files: " + string.Join(",", files));
+            WriteLine("Files: " + string.Join(",", files!));
 
             var fileText = await connection.ReadTextFileAsync(new FileSpecification
             {

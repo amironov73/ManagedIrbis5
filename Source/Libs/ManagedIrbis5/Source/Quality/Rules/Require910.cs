@@ -32,8 +32,8 @@ namespace ManagedIrbis.Quality.Rules
     {
         #region Private members
 
-        private MenuFile _statusMenu;
-        private MenuFile _placeMenu;
+        private MenuFile? _statusMenu;
+        private MenuFile? _placeMenu;
 
         private void CheckField
             (
@@ -76,10 +76,7 @@ namespace ManagedIrbis.Quality.Rules
         #region QualityRule members
 
         /// <inheritdoc />
-        public override string FieldSpec
-        {
-            get { return "910"; }
-        }
+        public override string FieldSpec => "910";
 
         /// <inheritdoc />
         public override RuleReport CheckRecord

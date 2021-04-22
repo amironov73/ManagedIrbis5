@@ -17,8 +17,6 @@ using System;
 
 using AM;
 
-using ManagedIrbis.Client;
-
 #endregion
 
 #nullable enable
@@ -65,7 +63,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 NumberOfTerms = 10
             };
 
-            Term[] terms;
+            Term[]? terms;
             try
             {
                 terms = provider.ReadTerms(parameters);
@@ -81,12 +79,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            if (terms.Length == 0)
+            if (terms is null || terms.Length == 0)
             {
                 return;
             }
 
-            string firstTerm = terms[0].Text;
+            var firstTerm = terms[0].Text;
             if (string.IsNullOrEmpty(firstTerm))
             {
                 return;

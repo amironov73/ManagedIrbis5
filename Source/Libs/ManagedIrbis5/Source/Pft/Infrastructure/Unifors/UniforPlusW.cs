@@ -62,7 +62,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             // ibatrak
             // если в строке больше, чем 1 символ #, лишние части отбрасываются
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.NumberSign,
                     StringSplitOptions.None

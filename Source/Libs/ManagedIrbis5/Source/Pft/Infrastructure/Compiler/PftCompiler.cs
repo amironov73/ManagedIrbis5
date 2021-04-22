@@ -4,6 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -352,7 +355,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                         WriteLine
                             (
                                 "Expression = \"{0}\",",
-                                CompilerUtility.Escape(specification.Expression)
+                                CompilerUtility.Escape(specification.Expression)!
                             );
                     }
                     DecreaseIndent();
@@ -555,7 +558,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         {
             var result = Output.ToString();
 
-            return result;
+            return result ?? string.Empty;
         }
 
         /// <summary>
@@ -854,7 +857,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <inheritdoc cref="TextWriter.WriteLine(object)" />
         public PftCompiler WriteLine
             (
-                object value
+                object? value
             )
         {
             Output.WriteLine(value);
@@ -866,7 +869,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         public PftCompiler WriteLine
             (
                 string format,
-                params object[] arg
+                params object?[] arg
             )
         {
             Output.WriteLine(format, arg);

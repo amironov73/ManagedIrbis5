@@ -32,19 +32,19 @@ namespace AM.Windows.Forms
         /// Gets or sets the graphics.
         /// </summary>
         /// <value>The graphics.</value>
-        public Graphics Graphics { get; set; }
+        public Graphics? Graphics { get; set; }
 
         /// <summary>
         /// Gets or sets the tree grid.
         /// </summary>
         /// <value>The tree grid.</value>
-        public TreeGrid TreeGrid { get; set; }
+        public TreeGrid? TreeGrid { get; set; }
 
         /// <summary>
         /// Gets or sets the node.
         /// </summary>
         /// <value>The node.</value>
-        public TreeGridNode Node { get; set; }
+        public TreeGridNode? Node { get; set; }
 
         /// <summary>
         /// Gets or sets the bounds.
@@ -62,13 +62,13 @@ namespace AM.Windows.Forms
         /// Gets or sets the background override.
         /// </summary>
         /// <value>The background override.</value>
-        public Brush BackgroundOverride { get; set; }
+        public Brush? BackgroundOverride { get; set; }
 
         /// <summary>
         /// Gets or sets the foreground override.
         /// </summary>
         /// <value>The foreground override.</value>
-        public Brush ForegroundOverride { get; set; }
+        public Brush? ForegroundOverride { get; set; }
 
         /// <summary>
         /// Draws the background.
@@ -77,16 +77,16 @@ namespace AM.Windows.Forms
         {
             Brush brush = ForegroundOverride
                 ?? TreeGridUtilities.GetBackgroundBrush
-                (
-                    TreeGrid,
-                    Node,
-                    State
-                );
+                    (
+                        TreeGrid,
+                        Node,
+                        State
+                    );
 
-            Graphics.FillRectangle
+            Graphics?.FillRectangle
                 (
-                brush,
-                Bounds
+                    brush,
+                    Bounds
                 );
         }
 

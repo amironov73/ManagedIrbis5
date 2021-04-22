@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -20,7 +21,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using AM;
-using AM.IO;
 using AM.Text;
 
 using ManagedIrbis.Fields;
@@ -45,22 +45,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             string address
         )
         {
-            using (var client = new System.Net.WebClient())
+            using var client = new System.Net.WebClient();
+            try
             {
-                try
-                {
-                    client.DownloadString(address);
+                client.DownloadString(address);
 
-                    return true;
-                }
-                catch (Exception exception)
-                {
-                    Magna.TraceException
-                        (
-                            "UniforPlus9::_CheckUrlExist",
-                            exception
-                        );
-                }
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Magna.TraceException
+                (
+                    "UniforPlus9::_CheckUrlExist",
+                    exception
+                );
             }
 
             return false;
@@ -74,7 +72,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var navigator = new TextNavigator(expression);
             var pathText = navigator.ReadUntil(',').ToString();
             navigator.ReadChar();
-            string dbName = null;
+            string? dbName = null;
             if (pathText == "0"
                 || pathText == "1"
                 || pathText == "11")
@@ -660,10 +658,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             if (!string.IsNullOrEmpty(expression))
             {
                 var words = PftUtility.ExtractWords(expression);
-                for (var i = 0; i < words.Length; i++)
+                foreach (var word in words)
                 {
-                    var word = words[i].ToUpperInvariant();
-                    context.WriteAndSetFlag(node, word);
+                    var upper = word.ToUpperInvariant();
+                    context.WriteAndSetFlag(node, upper);
                     context.WriteLine(node);
                 }
             }
@@ -702,7 +700,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string output;
+                string? output;
                 var parts = expression.Split
                     (
                         CommonSeparators.NumberSign,
@@ -981,7 +979,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 goto DONE;
             }
 
-            var size = expression.SafeToDouble(0.0);
+            var size = expression.SafeToDouble();
             if (size <= 0)
             {
                 goto DONE;
@@ -1348,7 +1346,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 ReverseOrder = reverseOrder
             };
             var terms = provider.ReadTerms(parameters);
-            if (terms.Length != 0)
+            if (terms is { Length: not 0 })
             {
                 string? output;
 
@@ -1408,7 +1406,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         static readonly string[] _replaceRom = { "CM", "CD", "XC", "XL", "IX", "IV" };
         static readonly string[] _replaceNum = { "DCCCC", "CCCC", "LXXXX", "XXXX", "VIIII", "IIII" };
         static readonly string[] _roman = { "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" };
-        static readonly int[] arabic = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
+        static readonly int[] _arabic = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
 
         //
         // Borrowed from
@@ -1437,7 +1435,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         (agg, cur) =>
                             {
                                 var idx = Array.IndexOf(_roman, cur.ToString());
-                                return idx < 0 ? 0 : agg + arabic[idx];
+                                return idx < 0 ? 0 : agg + _arabic[idx];
                             },
                         agg => agg
                     );

@@ -66,7 +66,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 var navigator = new TextNavigator(expression);
                 while (navigator.SkipTo('<'))
                 {
-                    string chunk = navigator.ReadTo('>').ToString();
+                    var chunk = navigator.ReadTo('>').ToString();
 
                     if (chunk.LastChar() == '>')
                     {

@@ -53,10 +53,6 @@ namespace AM.Text.Output
 
         #endregion
 
-        #region Public methods
-
-        #endregion
-
         #region AbstractOutput members
 
         /// <inheritdoc cref="AbstractOutput.HaveError" />

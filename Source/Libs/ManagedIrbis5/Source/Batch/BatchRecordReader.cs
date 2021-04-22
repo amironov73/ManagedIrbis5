@@ -6,6 +6,11 @@
 // ReSharper disable DelegateSubtraction
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+
+#pragma warning disable 67
 
 /* BatchRecordReader.cs -- batch record reader
  * Ars Magna project, http://arsmagna.ru
@@ -57,12 +62,12 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Batch size.
         /// </summary>
-        public int BatchSize { get; private set; }
+        public int BatchSize { get; }
 
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; private set; }
+        public ISyncIrbisProvider Connection { get; }
 
         /// <summary>
         /// Database name.
@@ -291,14 +296,10 @@ namespace ManagedIrbis.Batch
 
             if (!ReferenceEquals(action, null))
             {
-                EventHandler batchHandler
-                    = (sender, args) => action(result);
+                EventHandler batchHandler = (_, _) => action(result);
                 result.BatchRead += batchHandler;
 
-                EventHandler completeHandler = (sender, args) =>
-                {
-                    result.BatchRead -= batchHandler;
-                };
+                EventHandler completeHandler = (_, _) => result.BatchRead -= batchHandler;
                 result.ReadComplete += completeHandler;
             }
 
@@ -579,10 +580,7 @@ namespace ManagedIrbis.Batch
 
 
         [ExcludeFromCodeCoverage]
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
 

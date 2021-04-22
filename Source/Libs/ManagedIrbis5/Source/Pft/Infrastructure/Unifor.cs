@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -38,20 +39,17 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Registry.
         /// </summary>
-        public static CaseInsensitiveDictionary<Action<PftContext, PftNode, string>> Registry
-        {
-            get; private set;
-        }
+        public static CaseInsensitiveDictionary<Action<PftContext, PftNode?, string>> Registry { get; } = new();
 
         /// <summary>
         /// Throw an exception on empty UNIFOR?
         /// </summary>
-        public static bool ThrowOnEmpty { get; set; }
+        public static bool ThrowOnEmpty { get; set; } = false;
 
         /// <summary>
         /// Throw an exception on unknown key?
         /// </summary>
-        public static bool ThrowOnUnknown { get; set; }
+        public static bool ThrowOnUnknown { get; set; } = false;
 
         #endregion
 
@@ -59,11 +57,6 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         static Unifor()
         {
-            ThrowOnEmpty = false;
-            ThrowOnUnknown = false;
-
-            Registry = new CaseInsensitiveDictionary<Action<PftContext, PftNode, string>>();
-
             RegisterActions();
         }
 
@@ -222,14 +215,14 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Find action for specified expression.
         /// </summary>
-        public static Action<PftContext, PftNode, string>? FindAction
+        public static Action<PftContext, PftNode?, string>? FindAction
             (
                 ref string expression
             )
         {
             var keys = Registry.Keys;
             int bestMatch = 0;
-            Action<PftContext, PftNode, string> result = null;
+            Action<PftContext, PftNode?, string>? result = null;
 
             var comparison = StringComparison.OrdinalIgnoreCase;
             foreach (string key in keys)
@@ -257,7 +250,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region IFormatExit members
 
         /// <inheritdoc cref="IFormatExit.Name" />
-        public string Name { get { return "unifor"; } }
+        public string Name => "unifor";
 
         /// <inheritdoc cref="IFormatExit.Execute" />
         public void Execute

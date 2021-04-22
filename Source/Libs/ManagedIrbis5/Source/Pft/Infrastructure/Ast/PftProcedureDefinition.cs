@@ -48,7 +48,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Procedure, null))
                     {
                         nodes.AddRange(Procedure.Body);
@@ -95,7 +95,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private VirtualChildren _virtualChildren;
+        private VirtualChildren? _virtualChildren;
 
         #endregion
 
@@ -104,8 +104,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            PftProcedureDefinition result
-                = (PftProcedureDefinition) base.Clone();
+            var result = (PftProcedureDefinition) base.Clone();
 
             if (!ReferenceEquals(Procedure, null))
             {
@@ -127,7 +126,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.Deserialize(reader);
 
-            bool flag = reader.ReadBoolean();
+            var flag = reader.ReadBoolean();
             if (flag)
             {
                 Procedure = new PftProcedure();
@@ -151,7 +150,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = "Procedure"
@@ -161,13 +160,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 result.Value = Procedure.Name;
 
-                PftNodeInfo body = new PftNodeInfo
+                var body = new PftNodeInfo
                 {
                     Name = "Body"
                 };
                 result.Children.Add(body);
 
-                foreach (PftNode node in Procedure.Body)
+                foreach (var node in Procedure.Body)
                 {
                     body.Children.Add(node.GetNodeInfo());
                 }

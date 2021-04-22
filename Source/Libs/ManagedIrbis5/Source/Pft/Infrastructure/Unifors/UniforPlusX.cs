@@ -59,7 +59,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             // если в строке больше, чем 1 символ #, лишние части отбрасываются
-            string[] parts = expression.Split
+            var parts = expression.Split
                 (
                     CommonSeparators.NumberSign,
                     StringSplitOptions.None
@@ -89,17 +89,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     NumberOfTerms = 10
                 };
                 var terms = provider.ReadTerms(parameters);
-                if (terms.Length == 0)
+                if (terms is not null)
                 {
-                    break;
-                }
-                for (var i = 0; i < terms.Length; i++)
-                {
-                    result = string.CompareOrdinal(terms[i].Text, parts[0]);
-                    term = terms[i].Text;
-                    if (result == 1)
+                    foreach (var one in terms)
                     {
-                        break;
+                        result = string.CompareOrdinal(one.Text, parts[0]);
+                        term = one.Text;
+                        if (result == 1)
+                        {
+                            break;
+                        }
                     }
                 }
 

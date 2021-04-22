@@ -39,7 +39,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 Field oneField
             )
         {
-            string text = oneField.ToText();
+            var text = oneField.ToText();
             foreach (var field in fields)
             {
                 if (field.ToText() == text)
@@ -79,7 +79,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = expression.Split
+                var parts = expression.Split
                     (
                         CommonSeparators.NumberSign,
                         2
@@ -146,9 +146,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 if (Utility.TryParseInt32(expression, out var index))
                 {
-                    Field[] fields = context.Globals.Get(index);
-                    List<Field> result = new List<Field>();
-                    foreach (Field field in fields)
+                    var fields = context.Globals.Get(index);
+                    var result = new List<Field>();
+                    foreach (var field in fields)
                     {
                         if (!_Contains(result, field))
                         {
@@ -241,7 +241,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             if (!string.IsNullOrEmpty(expression))
             {
-                string[] parts = expression.Split
+                var parts = expression.Split
                     (
                         CommonSeparators.NumberSign,
                         2
@@ -270,7 +270,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         var field = fields.GetOccurrence(repeat);
                         if (!ReferenceEquals(field, null))
                         {
-                            string output = field.ToText();
+                            var output = field.ToText();
                             context.WriteAndSetFlag(node, output);
                         }
                     }
@@ -278,7 +278,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     {
                         var output = new StringBuilder();
                         var first = true;
-                        foreach (Field field in fields)
+                        foreach (var field in fields)
                         {
                             if (!first)
                             {
@@ -321,7 +321,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 if (Utility.TryParseInt32(expression, out var index))
                 {
-                    Field[] fields = context.Globals.Get(index);
+                    var fields = context.Globals.Get(index);
                     Array.Sort
                         (
                             fields,
@@ -429,7 +429,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 var first = context.Globals.Get(firstIndex);
                 var second = context.Globals.Get(secondIndex);
                 var result = new List<Field>(second);
-                foreach (Field field in first)
+                foreach (var field in first)
                 {
                     if (!_Contains(result, field))
                     {
@@ -469,7 +469,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             if (!string.IsNullOrEmpty(expression))
             {
 
-                string[] parts = expression.Split
+                var parts = expression.Split
                     (
                         CommonSeparators.NumberSign,
                         2

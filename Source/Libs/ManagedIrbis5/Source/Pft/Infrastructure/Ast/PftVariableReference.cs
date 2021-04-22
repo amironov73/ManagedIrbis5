@@ -118,7 +118,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             token.MustBe(PftTokenKind.Variable);
 
-            string text = token.Text.ThrowIfNull("token.Text");
+            var text = token.Text.ThrowIfNull("token.Text");
             if (text.StartsWith("$"))
             {
                 text = text.Substring(1);
@@ -136,7 +136,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 char delimiter
             )
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             while (true)
             {
@@ -233,11 +233,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else
             {
-                string output = variable.StringValue;
+                var output = variable.StringValue ?? string.Empty;
 
                 if (index.Kind != IndexKind.None)
                 {
-                    string[] lines = output.SplitLines();
+                    var lines = output.SplitLines();
 
                     lines = PftUtility.GetArrayItem
                         (
@@ -250,7 +250,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     {
                         var list = new List<string>();
 
-                        foreach (string line in lines)
+                        foreach (var line in lines)
                         {
                             var field = _ParseLine(line);
                             var text = field.GetFirstSubFieldValue
@@ -280,7 +280,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                         var list = new List<string>();
 
-                        foreach (string line in lines)
+                        foreach (var line in lines)
                         {
                             var field = _ParseLine(line);
                             var text = field.GetFirstSubFieldValue
@@ -315,7 +315,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftVariableReference result
+            var result
                 = (PftVariableReference)base.Clone();
 
             result.Index = (IndexSpecification)Index.Clone();
@@ -335,7 +335,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftVariableReference otherVariable
+            var otherVariable
                 = (PftVariableReference)otherNode;
             if (Name != otherVariable.Name
                 || !IndexSpecification.Compare(Index, otherVariable.Index)
@@ -356,7 +356,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftCompilerException();
             }
 
-            IndexInfo index = compiler.CompileIndex(Index);
+            var index = compiler.CompileIndex(Index);
 
             compiler.StartMethod(this);
 
@@ -413,7 +413,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = base.GetNodeInfo();
+            var result = base.GetNodeInfo();
 
             if (Index.Kind != IndexKind.None)
             {
@@ -455,7 +455,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             result.Append("$");
             result.Append(Name);

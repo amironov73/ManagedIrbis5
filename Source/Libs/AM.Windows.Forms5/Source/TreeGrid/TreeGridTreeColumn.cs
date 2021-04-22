@@ -43,22 +43,25 @@ namespace AM.Windows.Forms
             )
         {
             //base.OnMouseClick(args);
-            TreeGridNode node = args.Node;
+            var node = args.Node;
             if (node != null)
             {
-                TreeGridDrawLayout layout = MakeLayout(node,node.Bounds);
-                TreeGridClickKind clickKind = layout.DetermineClickKind(args.Location);
+                var layout = MakeLayout(node,node.Bounds);
+                var clickKind = layout.DetermineClickKind(args.Location);
                 switch (clickKind)
                 {
                     case TreeGridClickKind.Expand:
                         node.Expanded = !node.Expanded;
                         break;
+
                     case TreeGridClickKind.Check:
                         node.Checked = !node.Checked;
                         break;
+
                     case TreeGridClickKind.Icon:
                         // Do not know what to do
                         break;
+
                     case TreeGridClickKind.Text:
                         if (node.Checkable)
                         {
@@ -68,9 +71,6 @@ namespace AM.Windows.Forms
                         {
                             node.Expanded = !node.Expanded;
                         }
-                        break;
-                    default:
-                        // Do not know what to do
                         break;
                 }
             }
@@ -82,11 +82,11 @@ namespace AM.Windows.Forms
                 Rectangle bounds
             )
         {
-            TreeGridDrawLayout result = new TreeGridDrawLayout();
+            var result = new TreeGridDrawLayout();
 
             //TreeGridNode node = args.Node;
             //Rectangle bounds = args.Bounds;
-            int left = 0;
+            var left = 0;
 
             left += node.Level * 16;
 
@@ -148,9 +148,9 @@ namespace AM.Windows.Forms
                 TreeGridDrawCellEventArgs args
             )
         {
-            TreeGridNode node = args.Node;
-            Rectangle bounds = args.Bounds;
-            TreeGridDrawLayout layout = MakeLayout(node,bounds);
+            var node = args.Node;
+            var bounds = args.Bounds;
+            var layout = MakeLayout(node,bounds);
             TreeGridUtilities.DrawTreeCell
                 (
                     args,

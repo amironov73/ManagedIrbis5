@@ -75,11 +75,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public string DumpToText()
         {
-            AbstractOutput output = new TextOutput();
-            PftNodeInfo nodeInfo = GetNodeInfo();
+            var output = new TextOutput();
+            var nodeInfo = GetNodeInfo();
             PftNodeInfo.Dump(output, nodeInfo, 0);
 
-            return output.ToString();
+            return output.ToString() ?? string.Empty;
         }
 
         #endregion

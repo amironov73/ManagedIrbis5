@@ -128,7 +128,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #region Private members
 
-        private bool _valueAlreadySpecified;
+        private readonly bool _valueAlreadySpecified;
 
         #endregion
 
@@ -142,7 +142,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             compiler.CompileNodes(Children);
 
-            string actionName = compiler.CompileAction(Children);
+            var actionName = compiler.CompileAction(Children);
 
             compiler.StartMethod(this);
             if (string.IsNullOrEmpty(actionName))
@@ -189,7 +189,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 }
                 else
                 {
-                    string text = context.Evaluate(Children);
+                    var text = context.Evaluate(Children);
                     Value = PftUtility.ExtractNumericValue(text);
                 }
             }
@@ -225,7 +225,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("val(");
             if (_valueAlreadySpecified)
             {
@@ -233,8 +233,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else
             {
-                bool first = true;
-                foreach (PftNode child in Children)
+                var first = true;
+                foreach (var child in Children)
                 {
                     if (!first)
                     {

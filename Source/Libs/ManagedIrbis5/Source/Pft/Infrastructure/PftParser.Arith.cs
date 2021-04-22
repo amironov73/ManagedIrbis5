@@ -13,16 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.IO;
-using AM.Text;
 
 #endregion
 
@@ -37,7 +28,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         internal PftNumeric ParseArithmetic()
         {
-            PftNumeric result = ParseAddition();
+            var result = ParseAddition();
 
             return result;
         }
@@ -47,7 +38,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 params PftTokenKind[] stop
             )
         {
-            PftTokenList newTokens = Tokens.Segment
+            var newTokens = Tokens.Segment
                 (
                     _parenthesisOpen,
                     _parenthesisClose,
@@ -64,7 +55,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 throw new PftSyntaxException(Tokens);
             }
 
-            PftTokenList saveTokens = Tokens;
+            var saveTokens = Tokens;
             try
             {
                 Tokens = newTokens;
@@ -79,10 +70,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNumeric ParseAddition()
         {
-            PftNumeric left = ParseMultiplication();
+            var left = ParseMultiplication();
             while (!Tokens.IsEof)
             {
-                PftToken token = Tokens.Current;
+                var token = Tokens.Current;
                 if (token.Kind != PftTokenKind.Plus
                     && token.Kind != PftTokenKind.Minus
                    )
@@ -103,10 +94,10 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNumeric ParseMultiplication()
         {
-            PftNumeric left = ParseValue();
+            var left = ParseValue();
             while (!Tokens.IsEof)
             {
-                PftToken token = Tokens.Current;
+                var token = Tokens.Current;
                 if (token.Kind != PftTokenKind.Star
                     && token.Kind != PftTokenKind.Slash
                     && token.Kind != PftTokenKind.Percent
@@ -115,7 +106,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     break;
                 }
+
                 Tokens.RequireNext();
+
                 left = new PftNumericExpression
                 {
                     LeftOperand = left,
@@ -124,10 +117,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 };
             }
 
-            return left;
+            return left.ThrowIfNull("return left");
         }
 
-        private PftNumeric ParseValue()
+        private PftNumeric? ParseValue()
         {
             if (Tokens.IsEof)
             {
@@ -140,12 +133,12 @@ namespace ManagedIrbis.Pft.Infrastructure
                 throw new PftSyntaxException(Tokens);
             }
 
-            PftToken token = Tokens.Current;
+            var token = Tokens.Current;
 
             if (token.Kind == PftTokenKind.LeftParenthesis)
             {
                 Tokens.RequireNext();
-                PftNumeric inner = ParseArithmetic
+                var inner = ParseArithmetic
                     (
                         PftTokenKind.RightParenthesis
                     );
@@ -155,19 +148,18 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             if (token.Kind == PftTokenKind.Minus)
             {
-                PftMinus minus = new PftMinus(token);
+                var minus = new PftMinus(token);
                 Tokens.RequireNext();
-                PftNumeric child = ParseValue();
-                minus.Children.Add(child);
+                var child = ParseValue();
+                if (child is not null)
+                {
+                    minus.Children.Add(child);
+                }
 
                 return minus;
             }
 
-            PftNumeric result = (PftNumeric)Get
-                (
-                    NumericMap,
-                    NumericModeItems
-                );
+            var result = (PftNumeric?) Get (NumericMap, NumericModeItems);
 
             return result;
         }
@@ -179,7 +171,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             Tokens.RequireNext(PftTokenKind.LeftParenthesis);
             Tokens.RequireNext();
-            PftNumeric expression = ParseArithmetic
+            var expression = ParseArithmetic
                 (
                     PftTokenKind.RightParenthesis
                 );
@@ -204,11 +196,11 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNumeric ParseFirst()
         {
-            PftFirst result = new PftFirst(Tokens.Current);
+            var result = new PftFirst(Tokens.Current);
             Tokens.RequireNext(PftTokenKind.LeftParenthesis);
             Tokens.MoveNext();
 
-            PftTokenList conditionTokens = Tokens.Segment
+            var conditionTokens = Tokens.Segment
                 (
                     _parenthesisOpen,
                     _parenthesisClose,
@@ -217,8 +209,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 .ThrowIfNull("conditionTokens");
             Tokens.Current.MustBe(PftTokenKind.RightParenthesis);
 
-            PftCondition condition
-                = (PftCondition)NestedContext
+            var condition = (PftCondition?) NestedContext
                 (
                     conditionTokens,
                     ParseCondition
@@ -243,11 +234,11 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNumeric ParseLast()
         {
-            PftLast result = new PftLast(Tokens.Current);
+            var result = new PftLast(Tokens.Current);
             Tokens.RequireNext(PftTokenKind.LeftParenthesis);
             Tokens.MoveNext();
 
-            PftTokenList conditionTokens = Tokens.Segment
+            var conditionTokens = Tokens.Segment
                 (
                     _parenthesisOpen,
                     _parenthesisClose,
@@ -256,8 +247,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 .ThrowIfNull("conditionTokens");
             Tokens.Current.MustBe(PftTokenKind.RightParenthesis);
 
-            PftCondition condition
-                = (PftCondition)NestedContext
+            var condition = (PftCondition?) NestedContext
                 (
                     conditionTokens,
                     ParseCondition
@@ -270,7 +260,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private PftNumeric ParsePow()
         {
-            PftPow result = new PftPow(Tokens.Current);
+            var result = new PftPow(Tokens.Current);
 
             Tokens.RequireNext(PftTokenKind.LeftParenthesis);
             Tokens.RequireNext();
@@ -284,22 +274,10 @@ namespace ManagedIrbis.Pft.Infrastructure
             return result;
         }
 
-        private PftNumeric ParseRound()
-        {
-            PftNumeric result = new PftRound(Tokens.Current);
-            return ParseFunction(result);
-        }
+        private PftNumeric ParseRound() => ParseFunction(new PftRound(Tokens.Current));
 
-        private PftNumeric ParseSign()
-        {
-            PftNumeric result = new PftSign(Tokens.Current);
-            return ParseFunction(result);
-        }
+        private PftNumeric ParseSign() => ParseFunction(new PftSign(Tokens.Current));
 
-        private PftNumeric ParseTrunc()
-        {
-            PftNumeric result = new PftTrunc(Tokens.Current);
-            return ParseFunction(result);
-        }
+        private PftNumeric ParseTrunc() => ParseFunction(new PftTrunc(Tokens.Current));
     }
 }

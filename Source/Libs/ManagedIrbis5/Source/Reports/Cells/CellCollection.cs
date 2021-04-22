@@ -65,7 +65,7 @@ namespace ManagedIrbis.Reports
 
         internal CellCollection SetReport
             (
-                IrbisReport report
+                IrbisReport? report
             )
         {
             Report = report;

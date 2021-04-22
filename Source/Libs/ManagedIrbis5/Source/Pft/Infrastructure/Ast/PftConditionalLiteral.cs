@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -169,10 +170,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 }
 
                 var info = compiler.Fields.Get(field);
-                //if (ReferenceEquals(info, null))
-                //{
-                //    throw new PftCompilerException();
-                //}
+                if (ReferenceEquals(info, null))
+                {
+                    throw new PftCompilerException();
+                }
 
                 compiler
                     .WriteIndent()

@@ -7,12 +7,16 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Global
 
 /* FormatError.cs -- коды ошибок PFT-форматтера
  * Ars Magna project, http://arsmagna.ru
  */
+
+using AM;
 
 #nullable enable
 
@@ -28,67 +32,90 @@ namespace ManagedIrbis.Pft
 
         class Pair
         {
-            // ReSharper disable UnusedAutoPropertyAccessor.Local
-
             public int Code { get; set; }
 
-            public string Message { get; set; }
+            public string? Message { get; set; }
+        }
 
-            // ReSharper restore UnusedAutoPropertyAccessor.Local
+        #endregion
+
+        #region Public methods
+
+        public static string GetMessageForCode
+            (
+                int code
+            )
+        {
+            foreach (var pair in _knownCodes)
+            {
+                if (pair.Code == code)
+                {
+                    return pair.Message.ThrowIfNull("pair.Message");
+                }
+            }
+
+            return "Неизвестная ошибка";
         }
 
         #endregion
 
         #region Private members
 
-        private static Pair[] _knownCodes =
+        private static readonly Pair[] _knownCodes =
         {
-            new Pair {Code = 1, Message = "Обнаружен конец формата " +
-                "в процессе обработки повторяющейся группы. Возможно, " +
-                "пропущена закрывающая скобка повторяющейся группы." },
-            new Pair {Code = 2, Message = "Вложенность повторяющейся " +
-                "группы (т.е. одна повторяющаяся группа расположена " +
-                "внутри другой повторяющейся группы)."},
-            new Pair {Code = 8, Message = "Команда IF без THEN." },
-            new Pair {Code = 19, Message = "Непарная открывающаяся " +
-                "скобка (." },
-            new Pair {Code = 20, Message = "Непарная закрывающаяся " +
-                "скобка ). Также может быть вызвано наличием " +
-                "неправильного операнда в выражении."},
-            new Pair {Code = 26, Message = "Два операнда различных " +
-                "типов в одном операторе (например, попытка сложить " +
-                "строковый операнд с числом)."},
-            new Pair {Code = 28, Message = "Первый аргумент функции " +
-                "REF - нечисловое выражение."},
-            new Pair {Code = 51, Message = "Слишком много литералов " +
-               "и/или условных команд связано с командой вывода поля."},
-            new Pair {Code = 53, Message = "IF команда не завершена " +
-               "ключевым словом FI."},
-            new Pair {Code = 54, Message = "Знак + не соответствует " +
-               "контексту: CDS/ISIS предполагает наличие " +
-               "повторяющегося литерала за знаком +."},
-            new Pair {Code = 55, Message = "Непарное ключевое слово FI."},
-            new Pair {Code = 56, Message = "Переполнение рабочей " +
-                "области: формат создает слишком большой выходной " +
-                "текст, который система не может обработать."},
-            new Pair {Code = 57, Message = "Зацикливание повторяющейся" +
-                " группы"},
-            new Pair {Code =58,Message = "Один или более аргументов " +
-                "функции F - нечисловые выражения."},
-            new Pair {Code =60, Message = "Нестроковая функция " +
-                "используется как команда (только строковые функции " +
-                "могут быть использованы в качестве команды)."},
-            new Pair {Code =61, Message = "Аргумент функции A или Р " +
-                "- не команда вывода поля."},
-            new Pair {Code =99, Message = "Неизвестная команда " +
-                "(например, ошибка в правильности написания имени " +
-                "функции или команды), возможен также пропуск " +
-                "закрывающего ограничителя литерала."},
-            new Pair {Code =101, Message = "Переполнение стека " +
-                "(возможно из-за наличия слишком сложного выражения)."},
-            new Pair {Code =102, Message = "Некорректная работа " +
-                "со стеком (может быть из-за непарной открывающей " +
-                "скобки)."}
+            new() { Code = 1, Message = "Обнаружен конец формата " +
+                                 "в процессе обработки повторяющейся группы. Возможно, " +
+                                 "пропущена закрывающая скобка повторяющейся группы." },
+
+            new() { Code = 2, Message = "Вложенность повторяющейся " +
+                                 "группы (т.е. одна повторяющаяся группа расположена " +
+                                 "внутри другой повторяющейся группы)."},
+
+            new() { Code = 8, Message = "Команда IF без THEN." },
+
+            new() { Code = 19, Message = "Непарная открывающаяся скобка (." },
+
+            new() { Code = 20, Message = "Непарная закрывающаяся скобка ). Также может быть вызвано наличием " +
+                                  "неправильного операнда в выражении."},
+
+            new() { Code = 26, Message = "Два операнда различных " +
+                                        "типов в одном операторе (например, попытка сложить " +
+                                        "строковый операнд с числом)."},
+            new() { Code = 28, Message = "Первый аргумент функции " +
+                                        "REF - нечисловое выражение."},
+
+            new() { Code = 51, Message = "Слишком много литералов " +
+                                  "и/или условных команд связано с командой вывода поля."},
+
+            new() { Code = 53, Message = "IF команда не завершена ключевым словом FI."},
+
+            new() { Code = 54, Message = "Знак + не соответствует контексту: CDS/ISIS предполагает наличие " +
+                                  "повторяющегося литерала за знаком +."},
+            new() { Code = 55, Message = "Непарное ключевое слово FI."},
+
+            new() { Code = 56, Message = "Переполнение рабочей " +
+                                  "области: формат создает слишком большой выходной " +
+                                  "текст, который система не может обработать."},
+
+            new() { Code = 57, Message = "Зацикливание повторяющейся" +
+                                        " группы"},
+
+            new() { Code =58,Message = "Один или более аргументов функции F - нечисловые выражения."},
+
+            new() { Code =60, Message = "Нестроковая функция используется как команда (только строковые функции " +
+                                 "могут быть использованы в качестве команды)."},
+
+            new() { Code =61, Message = "Аргумент функции A или Р - не команда вывода поля."},
+
+            new() { Code =99, Message = "Неизвестная команда " +
+                                 "(например, ошибка в правильности написания имени " +
+                                 "функции или команды), возможен также пропуск " +
+                                 "закрывающего ограничителя литерала."},
+
+            new() { Code =101, Message = "Переполнение стека (возможно из-за наличия слишком сложного выражения)."},
+
+            new() { Code =102, Message = "Некорректная работа со стеком (может быть из-за непарной открывающей " +
+                                  "скобки)." }
         };
 
         #endregion

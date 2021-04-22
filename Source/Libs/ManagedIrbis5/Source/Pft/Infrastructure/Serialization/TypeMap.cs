@@ -16,7 +16,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
-
+using AM;
 using ManagedIrbis.Pft.Infrastructure.Ast;
 
 #endregion
@@ -41,15 +41,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
 
         static TypeMap()
         {
-            for (int i = 0; i < Map.Length; i++)
+            for (var i = 0; i < Map.Length; i++)
             {
-                TypeMap entry = Map[i];
+                var entry = Map[i];
 
-                ConstructorInfo constructor                     = entry.Type.GetConstructor(Type.EmptyTypes);
+                var constructor = entry.Type.GetConstructor(Type.EmptyTypes);
                 if (ReferenceEquals(constructor, null))
                 {
+                    Magna.Error("Can't find constructor for " + entry.Type);
                     throw new IrbisException();
                 }
+
                 entry.Create = Expression.Lambda<Func<PftNode>>
                     (
                         Expression.New(constructor)
@@ -161,8 +163,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
 
             while (lo <= hi)
             {
-                int mid = (lo + hi) / 2;
-                int delta = Map[mid].Code - code;
+                var mid = (lo + hi) / 2;
+                var delta = Map[mid].Code - code;
                 if (delta == 0)
                 {
                     return Map[mid];
@@ -193,7 +195,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 Type nodeType
             )
         {
-            for (int i = 0; i < Map.Length; i++)
+            for (var i = 0; i < Map.Length; i++)
             {
                 if (ReferenceEquals(nodeType, Map[i].Type))
                 {

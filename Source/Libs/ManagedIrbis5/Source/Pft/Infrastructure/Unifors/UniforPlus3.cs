@@ -22,8 +22,6 @@ using System.Text.RegularExpressions;
 using AM;
 using AM.Text;
 
-using ManagedIrbis.Client;
-using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -320,7 +318,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 NumberOfTerms = 10
             };
             var terms = provider.ReadTerms(parameters);
-            if (terms.Length != 0)
+            if (terms is { Length: not 0 })
             {
                 var info = terms[0];
                 if (info.Text?.StartsWith(key) ?? false)

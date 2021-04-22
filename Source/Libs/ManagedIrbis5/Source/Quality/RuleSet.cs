@@ -8,6 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 /* RuleSet.cs -- набор правил
  * Ars Magna project, http://arsmagna.ru
@@ -17,10 +18,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json.Serialization;
+
+using AM;
 
 #endregion
 
@@ -39,7 +41,7 @@ namespace ManagedIrbis.Quality
         /// Правила, входящие в набор.
         /// </summary>
         [JsonPropertyName("rules")]
-        public QualityRule[] Rules { get; set; }
+        public QualityRule[]? Rules { get; set; }
 
         #endregion
 
@@ -61,7 +63,7 @@ namespace ManagedIrbis.Quality
                 RecordReport second
             )
         {
-            RecordReport result = new RecordReport
+            var result = new RecordReport
             {
                 Defects = new DefectList (first.Defects.Concat(second.Defects)),
                 Description = first.Description,
@@ -82,30 +84,31 @@ namespace ManagedIrbis.Quality
                 RuleContext context
             )
         {
-            RecordReport result = new RecordReport
+            var record = context.Record.ThrowIfNull("context.Record");
+            var result = new RecordReport
             {
-                Description = context.Connection.FormatRecord
+                Description = context.Connection.ThrowIfNull("context.Connection").FormatRecord
                     (
-                        context.BriefFormat,
-                        context.Record.Mfn
+                        context.BriefFormat.ThrowIfNull("context.BriefFormat"),
+                        record.Mfn
                     ),
-                Index = context.Record.FM(903).ToString(),
-                Mfn = context.Record.Mfn
+                Index = record.FM(903).ToString(),
+                Mfn = record.Mfn
             };
-            RuleUtility.RenumberFields
-                (
-                    context.Record
-                );
+            RuleUtility.RenumberFields (record);
 
             result.Quality = 1000;
-            int bonus = 0;
+            var bonus = 0;
 
-            foreach (QualityRule rule in Rules)
+            if (Rules is not null)
             {
-                RuleReport oneReport = rule.CheckRecord(context);
-                result.Defects.AddRange(oneReport.Defects);
-                result.Quality -= oneReport.Damage;
-                bonus += oneReport.Bonus;
+                foreach (var rule in Rules)
+                {
+                    var oneReport = rule.CheckRecord(context);
+                    result.Defects.AddRange(oneReport.Defects);
+                    result.Quality -= oneReport.Damage;
+                    bonus += oneReport.Bonus;
+                }
             }
 
             if (result.Quality >= 900)
@@ -124,17 +127,18 @@ namespace ManagedIrbis.Quality
                 string name
             )
         {
-            Type ruleType;
             if (!_registeredRules.TryGetValue
                 (
                     name,
-                    out ruleType
+                    out var ruleType
                 ))
             {
                 return null;
             }
 
-            QualityRule result = (QualityRule)Activator.CreateInstance
+            ruleType = ruleType.ThrowIfNull("ruleType");
+
+            var result = (QualityRule?) Activator.CreateInstance
                 (
                     ruleType
                 );
@@ -185,13 +189,13 @@ namespace ManagedIrbis.Quality
                 Assembly assembly
             )
         {
-            Type[] types = assembly
+            var types = assembly
                 .GetTypes()
                 .Where(t => t.IsPublic)
                 .Where(t => !t.IsAbstract)
                 .Where(t => t.IsSubclassOf(typeof(QualityRule)))
                 .ToArray();
-            foreach (Type ruleType in types)
+            foreach (var ruleType in types)
             {
                 RegisterRule(ruleType);
             }
@@ -213,7 +217,7 @@ namespace ManagedIrbis.Quality
                 Type ruleType
             )
         {
-            string ruleName = ruleType.Name;
+            var ruleName = ruleType.Name;
 
             _registeredRules.Add
                 (

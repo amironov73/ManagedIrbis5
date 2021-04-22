@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -77,15 +78,15 @@ namespace ManagedIrbis.Pft.Infrastructure
             )
         {
             for (
-                    PftVariableManager manager = this;
+                    var manager = this;
                     !ReferenceEquals(manager, null);
                     manager = manager.Parent
                 )
             {
                 var keys = manager.Registry.Keys.OrderBy(key=>key);
-                foreach (string key in keys)
+                foreach (var key in keys)
                 {
-                    PftVariable variable = manager.Registry[key];
+                    var variable = manager.Registry[key];
                     writer.WriteLine(variable.ToString());
                 }
                 writer.WriteLine(new string('=', 60));
@@ -97,18 +98,18 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftVariable[] GetAllVariables()
         {
-            List<PftVariable> result = new List<PftVariable>();
+            var result = new List<PftVariable>();
 
             for (
-                    PftVariableManager manager = this;
+                    var manager = this;
                     !ReferenceEquals(manager, null);
                     manager = manager.Parent
                 )
             {
                 var keys = manager.Registry.Keys.OrderBy(key => key);
-                foreach (string key in keys)
+                foreach (var key in keys)
                 {
-                    PftVariable variable = manager.Registry[key];
+                    var variable = manager.Registry[key];
                     result.Add(variable);
                 }
             }
@@ -126,7 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             PftVariable? result = null;
             for (
-                    PftVariableManager manager = this;
+                    var manager = this;
                     !ReferenceEquals(manager, null);
                     manager = manager.Parent
                 )
@@ -149,7 +150,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 bool isNumeric
             )
         {
-            PftVariable result = GetExistingVariable(name);
+            var result = GetExistingVariable(name);
             if (ReferenceEquals(result, null))
             {
                 result = new PftVariable(name, isNumeric);
@@ -175,7 +176,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string? value
             )
         {
-            PftVariable result = GetOrCreateVariable(name, false);
+            var result = GetOrCreateVariable(name, false);
             result.IsNumeric = false;
             result.StringValue = value;
 
@@ -193,7 +194,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string? value
             )
         {
-            PftVariable result = GetOrCreateVariable(name, false);
+            var result = GetOrCreateVariable(name, false);
             result.IsNumeric = false;
 
             if (index.Kind == IndexKind.None)
@@ -202,8 +203,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             else
             {
-                string text = result.StringValue ?? string.Empty;
-                string[] lines = text.SplitLines();
+                var text = result.StringValue ?? string.Empty;
+                string?[] lines = text.SplitLines();
                 lines = PftUtility.SetArrayItem
                     (
                         context,
@@ -231,7 +232,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 double value
             )
         {
-            PftVariable result = GetOrCreateVariable(name, true);
+            var result = GetOrCreateVariable(name, true);
             result.IsNumeric = true;
             result.NumericValue = value;
 

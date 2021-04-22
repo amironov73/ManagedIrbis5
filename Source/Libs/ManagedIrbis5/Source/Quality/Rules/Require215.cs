@@ -36,10 +36,10 @@ namespace ManagedIrbis.Quality.Rules
                 Field field
             )
         {
-            SubField volume = field.GetFirstSubField('a');
-            SubField units = field.GetFirstSubField('1');
+            var volume = field.GetFirstSubField('a');
+            var units = field.GetFirstSubField('1');
 
-            if (volume == null)
+            if (volume is null)
             {
                 AddDefect
                     (
@@ -49,9 +49,9 @@ namespace ManagedIrbis.Quality.Rules
                     );
             }
 
-            if (units != null)
+            if (units is not null)
             {
-                if (Utility.SameString(units.Value, "С.", "С"))
+                if (units.Value.SameString("С.", "С"))
                 {
                     AddDefect
                         (
@@ -69,10 +69,7 @@ namespace ManagedIrbis.Quality.Rules
         #region QualityRule members
 
         /// <inheritdoc />
-        public override string FieldSpec
-        {
-            get { return "215"; }
-        }
+        public override string FieldSpec => "215";
 
         /// <inheritdoc />
         public override RuleReport CheckRecord
@@ -82,7 +79,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (fields.Length == 0)
             {
                 AddDefect
@@ -92,7 +89,7 @@ namespace ManagedIrbis.Quality.Rules
                         "Отсутствует поле 215: Количественные характеристики"
                     );
             }
-            foreach (Field field in fields)
+            foreach (var field in fields)
             {
                 CheckField(field);
             }

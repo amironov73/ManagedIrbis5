@@ -47,11 +47,12 @@ namespace ManagedIrbis.Reports
             settings.Verify(true);
 
             var assemblies = settings.Assemblies.ToArray();
-            foreach (string path in assemblies)
+            foreach (var path in assemblies)
             {
                 Assembly.LoadFile(path);
             }
-            string providerFullName = settings.RegisterProvider;
+
+            var providerFullName = settings.RegisterProvider;
             if (!string.IsNullOrEmpty(providerFullName))
             {
                 var providerType = Type.GetType
@@ -60,11 +61,11 @@ namespace ManagedIrbis.Reports
                         true
                     )
                     .ThrowIfNull("providerType");
-                string key = providerType.Name;
+                var key = providerType.Name;
                 ProviderManager.Registry[key] = providerType;
             }
 
-            string driverFullName = settings.DriverName;
+            var driverFullName = settings.DriverName;
             if (!string.IsNullOrEmpty(driverFullName))
             {
                 var driverType = Type.GetType
@@ -73,12 +74,11 @@ namespace ManagedIrbis.Reports
                         true
                     )
                     .ThrowIfNull("driverType");
-                string key = driverType.Name;
+                var key = driverType.Name;
                 DriverManager.Registry[key] = driverType;
             }
 
-            string providerName = settings.ProviderName
-                .ThrowIfNull("providerName not specified");
+            var providerName = settings.ProviderName.ThrowIfNull("providerName not specified");
             var provider = ProviderManager.GetProvider
                 (
                     providerName,
@@ -86,18 +86,20 @@ namespace ManagedIrbis.Reports
                 )
                 .ThrowIfNull("can't get provider");
 
-            string driverName = settings.DriverName
-                .ThrowIfNull("driverName not specified");
-            ReportDriver driver = DriverManager.GetDriver
+            var driverName = settings.DriverName.ThrowIfNull("driverName not specified");
+            var driver = DriverManager.GetDriver
                 (
                     driverName,
                     true
                 )
                 .ThrowIfNull("can't get driver");
 
-            ReportContext context = new ReportContext(provider);
+            var context = new ReportContext(provider)
+            {
+                Driver = driver
+            };
 
-            string filterExpression = settings.Filter;
+            var filterExpression = settings.Filter;
             if (!string.IsNullOrEmpty(filterExpression))
             {
                 provider.Search(filterExpression);

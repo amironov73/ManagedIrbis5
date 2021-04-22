@@ -94,9 +94,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     };
                     var nodes = new List<PftNode>
                     {
-                        LeftOperand,
+                        LeftOperand!, // TODO: исправить логику
                         operationNode,
-                        RightOperand
+                        RightOperand! // TODO: исправить логику
                     };
                     _virtualChildren.SetChildren(nodes);
                 }

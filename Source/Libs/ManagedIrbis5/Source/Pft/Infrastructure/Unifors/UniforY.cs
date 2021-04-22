@@ -52,7 +52,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 Record record
             )
         {
-            ExemplarInfo[] exemplars = ExemplarInfo.Parse(record);
+            var exemplars = ExemplarInfo.Parse(record);
             var counter
                 = new DictionaryCounterInt32<string>();
 
@@ -110,7 +110,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         public static void FreeExemplars
             (
                 PftContext context,
-                PftNode node,
+                PftNode? node,
                 string expression
             )
         {

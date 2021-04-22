@@ -124,7 +124,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 context.CurrentField = this;
 
-                string value = GetValue(context);
+                var value = GetValue(context);
                 if (!string.IsNullOrEmpty(value))
                 {
                     context.Execute(LeftHand);
@@ -174,7 +174,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else
             {
-                PftContext childContext = new PftContext(context)
+                var childContext = new PftContext(context)
                 {
                     FieldOutputMode = context.FieldOutputMode,
                     UpperMode = context.UpperMode,

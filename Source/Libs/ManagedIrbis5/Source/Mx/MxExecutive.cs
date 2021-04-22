@@ -568,7 +568,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Read one line.
         /// </summary>
-        public string ReadLine()
+        public string? ReadLine()
         {
             var saveColor = MxConsole.ForegroundColor;
             try

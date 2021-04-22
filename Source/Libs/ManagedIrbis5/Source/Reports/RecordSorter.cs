@@ -7,6 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
 /* RecordSorter.cs -- сортировщик библиографических записей
@@ -21,10 +22,6 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
-using AM.Collections;
-using AM.Text;
-
-using ManagedIrbis.Batch;
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft;
 
@@ -105,7 +102,7 @@ namespace ManagedIrbis.Reports
 
         #region Private members
 
-        private string _expression;
+        private string? _expression;
 
         private IPftFormatter? _formatter;
 

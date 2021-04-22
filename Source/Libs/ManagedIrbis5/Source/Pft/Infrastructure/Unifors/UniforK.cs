@@ -57,7 +57,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         public static void GetMenuEntry
             (
                 PftContext context,
-                PftNode node,
+                PftNode? node,
                 string? expression
             )
         {
