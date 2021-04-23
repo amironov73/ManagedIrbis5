@@ -1,5 +1,18 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/* Program.cs -- точка входа в программу
+ * Ars Magna project, http://arsmagna.ru
+ */
 
 using System;
 using System.IO;
@@ -8,11 +21,13 @@ using System.Linq;
 using ManagedIrbis.Client;
 using ManagedIrbis.Pft.Infrastructure.Testing;
 
+#nullable enable
+
 namespace PftTests
 {
     static class Program
     {
-        private static string _testsRoot;
+        private static string? _testsRoot;
 
         private static string? FindTestsFolder
             (
@@ -41,9 +56,9 @@ namespace PftTests
 
         private static void DiscoverAndRunTests()
         {
-            var provider = new LocalProvider(_testsRoot);
+            var provider = new LocalProvider(_testsRoot!);
 
-            var tester = new PftTester(_testsRoot);
+            var tester = new PftTester(_testsRoot!);
             tester.SetEnvironment(provider);
 
             tester.DiscoverTests();

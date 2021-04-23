@@ -101,6 +101,47 @@ namespace AM.ConsoleIO
 
         #endregion
 
+        #region Public methods
+
+        /// <summary>
+        /// Убирает из буфера все (возможно) накопившиеся там нажатия клавиш.
+        /// </summary>
+        /// <param name="intercept">С возможностью прерывания?</param>
+        public static void FlushInputBuffer
+            (
+                bool intercept = true
+            )
+        {
+            while (Console.KeyAvailable)
+            {
+                Console.ReadKey(intercept);
+
+            }
+        } // method FlushInputBuffer
+
+        /// <summary>
+        /// Задерживает выполнение программы,
+        /// пока не будет нажата указанная клавиша.
+        /// </summary>
+        /// <param name="key">Клавиша.</param>
+        public static void PressToContinue
+            (
+                ConsoleKey key = ConsoleKey.Enter
+            )
+        {
+            if (!Enum.IsDefined(typeof(ConsoleKey), key))
+            {
+                throw new ApplicationException();
+            }
+
+            while (Console.ReadKey(true).Key != key)
+            {
+                continue;
+            }
+        } // method PressToContinue
+
+        #endregion
+
     } // class SystemConsole
 
 } // namespace AM.ConsoleIO

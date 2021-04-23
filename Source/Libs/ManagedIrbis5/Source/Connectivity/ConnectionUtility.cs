@@ -17,7 +17,11 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading;
+using AM.Configuration;
 
 #endregion
 
@@ -88,36 +92,31 @@ namespace ManagedIrbis
         }
 
         /// <summary>
-        /// Получаем строку подключения в app.settings.
+        /// Получаем строку подключения в AppSettings.
         /// </summary>
-        public static string GetStandardConnectionString()
+        public static string? GetStandardConnectionString()
         {
             if (!ReferenceEquals(DefaultConnectionString, null))
             {
                 return DefaultConnectionString;
             }
 
-            /*
-
             var candidate = ConfigurationUtility.FindSetting
-            (
-                ListStandardConnectionStrings()
-            );
+                (
+                    StandardConnectionStrings
+                );
             if (string.IsNullOrEmpty(candidate))
             {
                 return candidate;
             }
+
             var result = IrbisUtility.DecryptConnectionString
-            (
-                candidate,
-                null
-            );
+                (
+                    candidate,
+                    null
+                );
 
             return result;
-
-            */
-
-            throw new NotImplementedException();
         } // method GetStandardConnectionString
 
         /// <summary>
@@ -143,6 +142,29 @@ namespace ManagedIrbis
             return result;
         } // method GetConnectionFromConfig
 
+        /// <summary>
+        /// Получаем подключение из файла.
+        /// </summary>
+        /// <param name="fileName">Имя файла со строкой подключения.</param>
+        /// <returns>Настроенный клиент.</returns>
+        public static ISyncIrbisProvider GetConnectionFromFile
+            (
+                string fileName = "connection.irbis"
+            )
+        {
+            var connectionString = File.ReadLines(fileName, Encoding.UTF8)
+                .First().Trim();
+
+            var result = ConnectionFactory.Shared.CreateSyncConnection();
+            connectionString = IrbisUtility.DecryptConnectionString
+                (
+                    connectionString,
+                    null
+                );
+            result.ParseConnectionString(connectionString);
+
+            return result;
+        } // method GetConnectionFromFile
 
         /// <summary>
         /// Разбор строки подключения.

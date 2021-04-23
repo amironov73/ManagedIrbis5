@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -14,15 +15,7 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 
@@ -33,7 +26,7 @@ using AM;
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
     /// <summary>
-    ///
+    /// Форматер, вынесенный в отдельный домен.
     /// </summary>
     public sealed class RemoteFormatter
         : IDisposable
@@ -48,12 +41,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Domain
         /// </summary>
-        public AppDomain Domain { get; private set; }
+        public AppDomain Domain { get; }
 
         /// <summary>
         /// Assembly.
         /// </summary>
-        public Assembly Assembly { get; private set; }
+        public Assembly Assembly { get; }
 
         /// <summary>
         /// Formatter type.
@@ -72,37 +65,32 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
                 string assemblyFile
             )
         {
-            string friendlyName = "RemoteFormatter"
-                + (++Counter).ToInvariantString();
+            var friendlyName = "RemoteFormatter"
+                               + (++Counter).ToInvariantString();
 
-            string directory = Path.GetDirectoryName(assemblyFile);
-            //AppDomainSetup setup = new AppDomainSetup
-            //{
-            //    ApplicationBase = directory,
-            //};
-            //Evidence evidence = AppDomain.CurrentDomain.Evidence;
-
-            //Domain = AppDomain.CreateDomain(friendlyName, evidence, setup);
             Domain = AppDomain.CreateDomain(friendlyName);
 
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            // подгружаем все наши сборки в свежесозданный домен
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 Domain.Load(assembly.GetName());
             }
 
-            Type proxyType = typeof(CompilerProxy);
-            CompilerProxy proxy = (CompilerProxy) Domain.CreateInstanceAndUnwrap
+            var proxyType = typeof(CompilerProxy);
+            var proxy = (CompilerProxy) Domain.CreateInstanceAndUnwrap
                 (
-                    proxyType.Assembly.FullName,
-                    proxyType.FullName
-                );
+                    proxyType.Assembly.FullName!,
+                    proxyType.FullName!
+                )
+                .ThrowIfNull("Domain.CreateInstanceAndUnwrap");
             Assembly = proxy.LoadAssembly(assemblyFile);
 
-            Type[] types = Assembly.GetTypes();
+            var types = Assembly.GetTypes();
             if (types.Length != 1)
             {
                 throw new PftCompilerException();
             }
+
             FormatterType  = types[0];
             if (!FormatterType.IsSubclassOf(typeof(PftPacket)))
             {

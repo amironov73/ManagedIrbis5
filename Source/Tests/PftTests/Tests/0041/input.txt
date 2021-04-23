@@ -1,0 +1,4 @@
+﻿if '':'' then '1' else '2' fi,
+if 'ABC':'A' then '1' else '2' fi,
+if '':'A' then '1' else '2' fi,
+if 'A': '' then '1' else '2' fi

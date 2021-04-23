@@ -56,6 +56,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         public const string ExpectedFileName = "expected.txt";
 
         /// <summary>
+        /// Если в папке с данными для теста находится
+        /// файл с таким именем, тест пропускается.
+        /// </summary>
+        public const string IgnoreFileName = "test.ignore";
+
+        /// <summary>
         /// Input file name.
         /// </summary>
         public const string InputFileName = "input.txt";
@@ -161,6 +167,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                         );
                     result.Description = description;
                     ConsoleInput.Write(description);
+                }
+
+                var ignoreFile = GetFullName(IgnoreFileName);
+                if (File.Exists(ignoreFile))
+                {
+                    ConsoleInput.Write(" IGNORED");
+                    goto DONE;
                 }
 
                 var recordFile = GetFullName(RecordFileName);
@@ -276,6 +289,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 result.Failed = true;
                 result.Exception = exception.ToString();
             }
+
+            DONE:
 
             result.FinishTime = DateTime.Now;
             result.Duration = result.FinishTime - result.StartTime;

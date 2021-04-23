@@ -1,0 +1,8 @@
+﻿proc SayHello 
+do
+    'Hello, ', $arg, '!'
+    #
+end 
+
+SayHello('PFT')
+SayHello('again')
