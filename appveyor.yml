@@ -18,7 +18,6 @@ dotnet_csproj:
   informational_version: '{version}'
 
 before_build:
-- cmd: choco install miktex
 - cmd: python -m pip install --upgrade pip
 - cmd: pip install --upgrade pygount sphinx sphinx_rtd_theme
 - cmd: pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
@@ -32,11 +31,11 @@ build_script:
 
 test_script:
 - cmd: dotnet test --no-restore --no-build --configuration Release --settings sequential.runsettings Source/ManagedIrbis5-windows.sln
-- cmd: dotnet run  --no-restore --no-build --configuration Release --project Source/Benchmarks/CoreBenchmarks/CoreBenchmarks.csproj
+- cmd: dotnet run  --no-restore --no-build --configuration Release --project Source/Tests/PftTests/PftTests.csproj
 
 after_build:
 - dotnet pack --no-restore --no-build --configuration Release Source/ManagedIrbis5-windows.sln
-- cd 
+- cd
 
 artifacts:
   - path: '**\*.nupkg'

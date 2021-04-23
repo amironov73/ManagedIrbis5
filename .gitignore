@@ -354,3 +354,6 @@ MigrationBackup/
 
 # sphinx
 _build/
+
+# debug break files
+debug.break

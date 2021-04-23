@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -14,14 +15,13 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
 using System.IO;
 
 using AM;
 using AM.ConsoleIO;
-using AM.IO;
 using AM.Text;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 
@@ -37,6 +37,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
     public sealed class PftTest
     {
         #region Constants
+
+        /// <summary>
+        /// Если в папке с данными для теста находится
+        /// файл с таким именем, тест вызовет отладчик
+        /// перед началом выполнения.
+        /// </summary>
+        public const string DebugBreakFileName = "debug.break";
 
         /// <summary>
         /// Description file name.
@@ -115,7 +122,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 string directory
             )
         {
-            bool result =
+            var result =
                 File.Exists(Path.Combine(directory, DescriptionFileName))
                 && File.Exists(Path.Combine(directory, RecordFileName))
                 && File.Exists(Path.Combine(directory, InputFileName));
@@ -131,7 +138,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 string name
             )
         {
-            PftTestResult result = new PftTestResult
+            var result = new PftTestResult
             {
                 Name = name,
                 StartTime = DateTime.Now
@@ -144,10 +151,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                     throw new PftException("environment not set");
                 }
 
-                string descriptionFile = GetFullName(DescriptionFileName);
+                var descriptionFile = GetFullName(DescriptionFileName);
                 if (File.Exists(descriptionFile))
                 {
-                    string description = File.ReadAllText
+                    var description = File.ReadAllText
                         (
                             descriptionFile,
                             IrbisEncoding.Utf8
@@ -156,7 +163,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                     ConsoleInput.Write(description);
                 }
 
-                string recordFile = GetFullName(RecordFileName);
+                var recordFile = GetFullName(RecordFileName);
 
                 if (ReferenceEquals(recordFile, null))
                 {
@@ -174,8 +181,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                     .ThrowIfNull("ReadOneRecord returns null");
                 record.Mfn = 1; // TODO some other value?
 
-                string pftFile = GetFullName(InputFileName);
-                string input = File.ReadAllText
+                var pftFile = GetFullName(InputFileName);
+                var input = File.ReadAllText
                     (
                         pftFile,
                         IrbisEncoding.Utf8
@@ -187,9 +194,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 //ConsoleInput.WriteLine(input);
                 //ConsoleInput.WriteLine();
 
-                PftLexer lexer = new PftLexer();
-                PftTokenList tokenList = lexer.Tokenize(input);
-                StringWriter writer = new StringWriter();
+                var lexer = new PftLexer();
+                var tokenList = lexer.Tokenize(input);
+                var writer = new StringWriter();
                 tokenList.Dump(writer);
                 result.Tokens = writer.ToString()
                     .DosToUnix()
@@ -198,14 +205,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 //ConsoleInput.WriteLine(result.Tokens);
                 //ConsoleInput.WriteLine();
 
-                PftParser parser = new PftParser(tokenList);
-                PftProgram program = parser.Parse();
+                var parser = new PftParser(tokenList);
+                var program = parser.Parse();
 
                 //result.Ast = program.DumpToText().DosToUnix();
                 //ConsoleInput.WriteLine(result.Ast);
                 //ConsoleInput.WriteLine();
 
-                string expectedFile = GetFullName(ExpectedFileName);
+                var expectedFile = GetFullName(ExpectedFileName);
                 string? expected = null;
                 if (File.Exists(expectedFile))
                 {
@@ -219,15 +226,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                     result.Expected = expected;
                 }
 
-                ISyncIrbisProvider provider = Provider.ThrowIfNull("Provider");
+                var provider = Provider.ThrowIfNull("Provider");
 
                 string output;
-                using (var formatter = new PftFormatter
-                {
-                    Program = program
-                })
+                using (var formatter = new PftFormatter { Program = program })
                 {
                     formatter.SetProvider(provider);
+
+                    var breakFile = GetFullName(DebugBreakFileName);
+                    if (File.Exists(breakFile))
+                    {
+                        Debugger.Break();
+                    }
+
                     output = formatter.FormatRecord(record)
                         .DosToUnix()
                         .ThrowIfNull("output");

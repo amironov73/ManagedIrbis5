@@ -90,18 +90,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public void DiscoverTests()
         {
-            string[] directories = Directory.GetDirectories
+            var directories = Directory.GetDirectories
                 (
                     Folder,
                     "*",
                     SearchOption.AllDirectories
                 );
 
-            foreach (string subDir in directories)
+            foreach (var subDir in directories)
             {
                 if (PftTest.IsDirectoryContainsTest(subDir))
                 {
-                    PftTest test = new PftTest(subDir);
+                    var test = new PftTest(subDir);
                     Tests.Add(test);
                 }
             }
@@ -117,12 +117,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         {
             PftTestResult? result = null;
 
-            string name = Path.GetFileName(test.Folder);
+            var name = Path.GetFileName(test.Folder);
 
-            ConsoleColor foreColor = ConsoleInput.ForegroundColor;
+            var foreColor = ConsoleInput.ForegroundColor;
             ConsoleInput.ForegroundColor = ConsoleColor.Cyan;
 
-            ConsoleInput.Write(string.Format("{0}: ", name));
+            ConsoleInput.Write(name + ": ");
 
             ConsoleInput.ForegroundColor = foreColor;
 
@@ -171,7 +171,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public void RunTests()
         {
-            foreach (PftTest test in Tests)
+            foreach (var test in Tests)
             {
                 test.Provider = Provider;
                 var result = RunTest(test);

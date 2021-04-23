@@ -14,6 +14,9 @@
 
 #region Using directives
 
+using System;
+using System.Diagnostics;
+using AM;
 using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
@@ -28,15 +31,32 @@ namespace ManagedIrbis.Pft
     public class PftFormatter
         : IPftFormatter
     {
+        #region Properties
+
+        /// <summary>
+        /// Сколько времени заняло форматирование.
+        /// </summary>
+        public TimeSpan Elapsed { get; private set; }
+
+        #endregion
+
         #region Construction
 
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public PftFormatter()
+            : this (new PftContext(null))
         {
         }
 
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="context">Корневой контекст.</param>
         public PftFormatter
             (
-                object context
+                PftContext context
             )
         {
             Context = context;
@@ -51,10 +71,39 @@ namespace ManagedIrbis.Pft
 
         public virtual bool SupportsExtendedSyntax { get; }
 
-        public object? Context { get; }
+        public PftContext Context { get; set; }
 
-        public virtual string FormatRecord(Record? record) =>
-            throw new System.NotImplementedException();
+        public virtual string FormatRecord
+            (
+                Record? record
+            )
+        {
+            if (ReferenceEquals(Program, null))
+            {
+                Magna.Error
+                    (
+                        "PftFormatter::Format: "
+                        + "program was not set"
+                    );
+
+                throw new PftException("Program was not set");
+            }
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            Context.ClearAll();
+            Context.Record = record;
+            Context.Procedures = Program.Procedures;
+            Program.Execute(Context);
+
+            var result = Context.GetProcessedOutput();
+
+            stopwatch.Stop();
+            Elapsed = stopwatch.Elapsed;
+
+            return result;
+        }
 
         public virtual string FormatRecord(int mfn) =>
             throw new System.NotImplementedException();
@@ -62,17 +111,27 @@ namespace ManagedIrbis.Pft
         public virtual string[] FormatRecords(int[] mfns) =>
             throw new System.NotImplementedException();
 
-        public virtual void ParseProgram(string source) =>
-            throw new System.NotImplementedException();
+        public virtual void ParseProgram(string source)
+        {
+            Program = PftUtility.CompileProgram(source);
+        }
 
-        public virtual void SetProvider(ISyncIrbisProvider contextProvider) =>
-            throw new System.NotImplementedException();
+        public virtual void SetProvider
+            (
+                ISyncIrbisProvider contextProvider
+            )
+        {
+            // TODO: implement
+        }
 
         #endregion
 
         #region IDisposable members
 
-        public virtual void Dispose() => throw new System.NotImplementedException();
+        public virtual void Dispose()
+        {
+            // TODO: implement
+        }
 
         #endregion
 

@@ -7,5 +7,5 @@ script:
   - dotnet restore                                               ./Source/ManagedIrbis5.sln
   - dotnet build --no-restore            --configuration Release ./Source/ManagedIrbis5.sln
   - dotnet test  --no-restore --no-build --configuration Release ./Source/ManagedIrbis5.sln
-  - dotnet run   --no-restore --no-build --configuration Release --project Source/Benchmarks/CoreBenchmarks/CoreBenchmarks.csproj
+  - dotnet run   --no-restore --no-build --configuration Release --project Source/Tests/PftTests/PftTests.csproj
   - dotnet pack  --no-restore --no-build --configuration Release ./Source/ManagedIrbis5.sln

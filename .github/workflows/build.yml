@@ -21,8 +21,8 @@ jobs:
     - name: Test
       run: dotnet test --no-build --no-restore --configuration Release Source/ManagedIrbis5.sln
 
-    - name: Benchmark
-      run: dotnet run --no-build --no-restore --configuration Release --project Source/Benchmarks/CoreBenchmarks/CoreBenchmarks.csproj
+    - name: PFT tests
+      run: dotnet run --no-build --no-restore --configuration Release --project Source/Tests/PftTests/PftTests.csproj
 
     - name: Pack
       run: dotnet pack --no-build --no-restore --configuration Release Source/ManagedIrbis5.sln

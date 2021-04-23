@@ -7,25 +7,83 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftCodeBlock.cs --
+/* PftCodeBlock.cs -- выполнение скриптов на C#
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using AM;
+
 using ManagedIrbis.Pft.Infrastructure.Text;
+
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 
 #endregion
 
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
+    //
+    // Предоставляет возможность вставить в PFT-скрипт
+    // фрагмент кода на C#. Выглядит это так:
+    //
+    // v100, v200,
+    // {{{context.Write(node, "Hello, world!");}}}
+    // v300, v400
+    //
+    // Внутри C#-фрагмента доступны следующие
+    // глобальные переменные
+    //
+    // * context - контекст форматирования
+    // * node - текущая нода с C#-кодом
+    // * record - текущая MARC-запись
+    //
+    // В C# заранее импортированы пространства имен
+    // System и ManagedIrbis
+    //
+
     /// <summary>
-    ///
+    /// Выполнение скриптов на C#.
     /// </summary>
     public sealed class PftCodeBlock
         : PftNode
     {
+        #region Nested classes
+
+        /// <summary>
+        /// Это специальный класс, для глобальных переменных,
+        /// доступных из скрипта.
+        /// </summary>
+        // ReSharper disable MemberCanBePrivate.Global
+        public class Globals
+        {
+            // ReSharper disable InconsistentNaming
+            // ReSharper disable NotAccessedField.Global
+
+            /// <summary>
+            /// Указатель на текущую ноду,
+            /// в которой сосредоточен C#-код.
+            /// </summary>
+            public PftNode node;
+
+            /// <summary>
+            /// Контекст форматирования.
+            /// </summary>
+            public PftContext context;
+
+            /// <summary>
+            /// Текущая MARC-запись.
+            /// </summary>
+            public Record record;
+
+            // ReSharper restore NotAccessedField.Global
+            // ReSharper restore InconsistentNaming
+        }
+        // ReSharper restore MemberCanBePrivate.Global
+
+        #endregion
+
         #region Properties
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
@@ -80,18 +138,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         #endregion
 
-        #region Private members
-
-#if CLASSIC || NETCORE
-
-        private bool _compiled;
-
-        private MethodInfo _method;
-
-#endif
-
-        #endregion
-
         #region PftNode members
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -102,34 +148,31 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-#if CLASSIC || NETCORE
+            Magna.Trace("PftCodeBlock::Execute: compile method");
 
-            if (!_compiled)
+            var text = Text;
+            if (!string.IsNullOrEmpty(text))
             {
-                Log.Trace("PftCodeBlock::Execute: compile method");
-
-                _compiled = true;
-
-                string text = Text;
-                if (!string.IsNullOrEmpty(text))
+                var globals = new Globals
                 {
-                    _method = SharpRunner.CompileSnippet
-                        (
-                            text,
-                            "PftNode node, PftContext context",
-                            err => context.WriteLine(this, err)
-                        );
-                }
+                    node = this,
+                    context = context,
+                    record = context.Record
+                };
+
+                var scriptOptions = ScriptOptions.Default
+                    .AddImports("System")
+                    .AddReferences(typeof(PftCodeBlock).Assembly)
+                    .AddImports("ManagedIrbis");
+
+                CSharpScript.RunAsync
+                    (
+                        Text,
+                        scriptOptions,
+                        globals
+                    );
+
             }
-
-            if (!ReferenceEquals(_method, null))
-            {
-                Log.Trace ("PftCodeBlock::Execute: invoke method");
-
-                _method.Invoke(null, new object[] {this, context});
-            }
-
-#endif
 
             OnAfterExecution(context);
         }
@@ -158,6 +201,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public override string ToString() => "{{{" + Text + "}}}";
 
         #endregion
-    }
-}
 
+    } // class PftCodeBlock
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast
