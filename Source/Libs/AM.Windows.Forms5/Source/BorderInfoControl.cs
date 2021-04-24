@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -16,7 +17,6 @@
 #region Using directives
 
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
@@ -30,35 +30,29 @@ namespace AM.Windows.Forms
     class BorderInfoControl
         : UserControl
     {
-        private IWindowsFormsEditorService _svc;
-        private ITypeDescriptorContext _context;
-        private IServiceProvider _provider;
+        private readonly IWindowsFormsEditorService _editorService;
 
-        private System.Windows.Forms.CheckBox drawBox;
-        private System.Windows.Forms.CheckBox draw3D;
-        private System.Windows.Forms.ComboBox style2D;
-        private System.Windows.Forms.ComboBox style3D;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button okButton;
-        private System.Windows.Forms.Button cancelButton;
-        private System.Windows.Forms.Panel color2D;
+        private CheckBox? drawBox;
+        private CheckBox? draw3D;
+        private ComboBox? style2D;
+        private ComboBox? style3D;
+        private Panel? panel1;
+        private Label? label1;
+        private Label? label2;
+        private Label? label3;
+        private Button? okButton;
+        private Button? cancelButton;
+        private Panel? color2D;
 
-        public BorderInfo? Result = null;
+        public BorderInfo? Result;
 
         public BorderInfoControl
             (
                 BorderInfo binfo,
-                IWindowsFormsEditorService svc,
-                ITypeDescriptorContext context,
-                IServiceProvider provider
+                IWindowsFormsEditorService editorService
             )
         {
-            _svc = svc;
-            _context = context;
-            _provider = provider;
+            _editorService = editorService;
             InitializeComponent();
 
             drawBox!.Checked = binfo.DrawBorder;
@@ -84,197 +78,219 @@ namespace AM.Windows.Forms
         {
             var result = new BorderInfo
             {
-                DrawBorder = drawBox.Checked,
-                Draw3D = draw3D.Checked,
-                Style2D = (ButtonBorderStyle) style2D.SelectedItem,
-                Style3D = (Border3DStyle) style3D.SelectedItem,
-                BorderColor = color2D.BackColor
+                DrawBorder = drawBox!.Checked,
+                Draw3D = draw3D!.Checked,
+                Style2D = (ButtonBorderStyle) style2D!.SelectedItem,
+                Style3D = (Border3DStyle) style3D!.SelectedItem,
+                BorderColor = color2D!.BackColor
             };
             return result;
         }
 
-        private void okButton_Click(object sender, EventArgs e)
+        private void okButton_Click
+            (
+                object? sender,
+                EventArgs e
+            )
         {
             Result = _Border();
-            _svc.CloseDropDown();
+            _editorService.CloseDropDown();
         }
 
-        private void cancelButton_Click(object sender, EventArgs e)
+        private void cancelButton_Click
+            (
+                object? sender,
+                EventArgs e
+            )
         {
             Result = null;
-            _svc.CloseDropDown();
+            _editorService.CloseDropDown();
         }
 
-        private void drawBox_CheckedChanged(object sender, EventArgs e)
+        private void drawBox_CheckedChanged
+            (
+                object? sender,
+                EventArgs e
+            )
         {
-            panel1.Invalidate();
+            panel1?.Invalidate();
         }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
+        private void panel1_Paint
+            (
+                object? sender,
+                PaintEventArgs e
+            )
         {
             var b = _Border();
-            b.Draw(e.Graphics, panel1.ClientRectangle);
+            b.Draw(e.Graphics, panel1!.ClientRectangle);
         }
 
-        private void color2D_Click(object sender, EventArgs e)
+        private void color2D_Click
+            (
+                object? sender,
+                EventArgs e
+            )
         {
-            using (var dialog = new ColorDialog())
+            using var dialog = new ColorDialog
             {
-                dialog.Color = color2D.BackColor;
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    color2D.BackColor = dialog.Color;
-                    drawBox_CheckedChanged(sender, e);
-                }
+                Color = color2D!.BackColor
+            };
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                color2D.BackColor = dialog.Color;
+                drawBox_CheckedChanged(sender, e);
             }
         }
 
-        private void BorderInfoControl_Load(object sender, EventArgs e)
+        private void BorderInfoControl_Load
+            (
+                object? sender,
+                EventArgs e
+            )
         {
             BackColor = SystemColors.Control;
             //ParentForm.AcceptButton = okButton;
             //ParentForm.CancelButton = cancelButton;
         }
 
-        #nullable disable
-
         private void InitializeComponent()
         {
-            this.drawBox = new System.Windows.Forms.CheckBox();
-            this.draw3D = new System.Windows.Forms.CheckBox();
-            this.style2D = new System.Windows.Forms.ComboBox();
-            this.style3D = new System.Windows.Forms.ComboBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.okButton = new System.Windows.Forms.Button();
-            this.cancelButton = new System.Windows.Forms.Button();
-            this.color2D = new System.Windows.Forms.Panel();
-            this.SuspendLayout();
+            drawBox = new CheckBox();
+            draw3D = new CheckBox();
+            style2D = new ComboBox();
+            style3D = new ComboBox();
+            panel1 = new Panel();
+            label1 = new Label();
+            label2 = new Label();
+            label3 = new Label();
+            okButton = new Button();
+            cancelButton = new Button();
+            color2D = new Panel();
+            SuspendLayout();
             //
             // drawBox
             //
-            this.drawBox.AutoSize = true;
-            this.drawBox.Location = new System.Drawing.Point(13, 13);
-            this.drawBox.Name = "drawBox";
-            this.drawBox.Size = new System.Drawing.Size(108, 21);
-            this.drawBox.TabIndex = 0;
-            this.drawBox.Text = "Draw border";
-            this.drawBox.CheckedChanged += new System.EventHandler(this.drawBox_CheckedChanged);
+            drawBox.AutoSize = true;
+            drawBox.Location = new Point(13, 13);
+            drawBox.Name = "drawBox";
+            drawBox.Size = new Size(108, 21);
+            drawBox.TabIndex = 0;
+            drawBox.Text = "Draw border";
+            drawBox.CheckedChanged += drawBox_CheckedChanged;
             //
             // draw3D
             //
-            this.draw3D.AutoSize = true;
-            this.draw3D.Location = new System.Drawing.Point(122, 13);
-            this.draw3D.Name = "draw3D";
-            this.draw3D.Size = new System.Drawing.Size(94, 21);
-            this.draw3D.TabIndex = 1;
-            this.draw3D.Text = "3D border";
-            this.draw3D.CheckedChanged += new System.EventHandler(this.drawBox_CheckedChanged);
+            draw3D.AutoSize = true;
+            draw3D.Location = new Point(122, 13);
+            draw3D.Name = "draw3D";
+            draw3D.Size = new Size(94, 21);
+            draw3D.TabIndex = 1;
+            draw3D.Text = "3D border";
+            draw3D.CheckedChanged += drawBox_CheckedChanged;
             //
             // style2D
             //
-            this.style2D.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.style2D.FormattingEnabled = true;
-            this.style2D.Location = new System.Drawing.Point(73, 37);
-            this.style2D.Margin = new System.Windows.Forms.Padding(2, 3, 3, 3);
-            this.style2D.Name = "style2D";
-            this.style2D.Size = new System.Drawing.Size(139, 24);
-            this.style2D.TabIndex = 2;
-            this.style2D.SelectedIndexChanged += new System.EventHandler(this.drawBox_CheckedChanged);
+            style2D.DropDownStyle = ComboBoxStyle.DropDownList;
+            style2D.FormattingEnabled = true;
+            style2D.Location = new Point(73, 37);
+            style2D.Margin = new Padding(2, 3, 3, 3);
+            style2D.Name = "style2D";
+            style2D.Size = new Size(139, 24);
+            style2D.TabIndex = 2;
+            style2D.SelectedIndexChanged += drawBox_CheckedChanged;
             //
             // style3D
             //
-            this.style3D.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.style3D.FormattingEnabled = true;
-            this.style3D.Location = new System.Drawing.Point(73, 95);
-            this.style3D.Name = "style3D";
-            this.style3D.Size = new System.Drawing.Size(139, 24);
-            this.style3D.TabIndex = 4;
-            this.style3D.SelectedIndexChanged += new System.EventHandler(this.drawBox_CheckedChanged);
+            style3D.DropDownStyle = ComboBoxStyle.DropDownList;
+            style3D.FormattingEnabled = true;
+            style3D.Location = new Point(73, 95);
+            style3D.Name = "style3D";
+            style3D.Size = new Size(139, 24);
+            style3D.TabIndex = 4;
+            style3D.SelectedIndexChanged += drawBox_CheckedChanged;
             //
             // panel1
             //
-            this.panel1.Location = new System.Drawing.Point(14, 124);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(198, 72);
-            this.panel1.TabIndex = 5;
-            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            panel1.Location = new Point(14, 124);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(198, 72);
+            panel1.TabIndex = 5;
+            panel1.Paint += panel1_Paint;
             //
             // label1
             //
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 44);
-            this.label1.Margin = new System.Windows.Forms.Padding(3, 3, 1, 3);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(59, 17);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "2D style";
+            label1.AutoSize = true;
+            label1.Location = new Point(15, 44);
+            label1.Margin = new Padding(3, 3, 1, 3);
+            label1.Name = "label1";
+            label1.Size = new Size(59, 17);
+            label1.TabIndex = 6;
+            label1.Text = "2D style";
             //
             // label2
             //
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(14, 74);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(61, 17);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "2D color";
+            label2.AutoSize = true;
+            label2.Location = new Point(14, 74);
+            label2.Name = "label2";
+            label2.Size = new Size(61, 17);
+            label2.TabIndex = 7;
+            label2.Text = "2D color";
             //
             // label3
             //
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 103);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(59, 17);
-            this.label3.TabIndex = 8;
-            this.label3.Text = "3D style";
+            label3.AutoSize = true;
+            label3.Location = new Point(13, 103);
+            label3.Name = "label3";
+            label3.Size = new Size(59, 17);
+            label3.TabIndex = 8;
+            label3.Text = "3D style";
             //
             // okButton
             //
-            this.okButton.Location = new System.Drawing.Point(14, 203);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(107, 23);
-            this.okButton.TabIndex = 9;
-            this.okButton.Text = "OK";
-            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            okButton.Location = new Point(14, 203);
+            okButton.Name = "okButton";
+            okButton.Size = new Size(107, 23);
+            okButton.TabIndex = 9;
+            okButton.Text = "OK";
+            okButton.Click += okButton_Click;
             //
             // cancelButton
             //
-            this.cancelButton.Location = new System.Drawing.Point(122, 203);
-            this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(90, 23);
-            this.cancelButton.TabIndex = 10;
-            this.cancelButton.Text = "Cancel";
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            cancelButton.Location = new Point(122, 203);
+            cancelButton.Name = "cancelButton";
+            cancelButton.Size = new Size(90, 23);
+            cancelButton.TabIndex = 10;
+            cancelButton.Text = "Cancel";
+            cancelButton.Click += cancelButton_Click;
             //
             // color2D
             //
-            this.color2D.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.color2D.Location = new System.Drawing.Point(73, 68);
-            this.color2D.Name = "color2D";
-            this.color2D.Size = new System.Drawing.Size(139, 19);
-            this.color2D.TabIndex = 11;
-            this.color2D.Click += new System.EventHandler(this.color2D_Click);
+            color2D.BorderStyle = BorderStyle.FixedSingle;
+            color2D.Location = new Point(73, 68);
+            color2D.Name = "color2D";
+            color2D.Size = new Size(139, 19);
+            color2D.TabIndex = 11;
+            color2D.Click += color2D_Click;
             //
             // BorderInfoControl
             //
-            this.Controls.Add(this.color2D);
-            this.Controls.Add(this.cancelButton);
-            this.Controls.Add(this.okButton);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.style3D);
-            this.Controls.Add(this.style2D);
-            this.Controls.Add(this.draw3D);
-            this.Controls.Add(this.drawBox);
-            this.Name = "BorderInfoControl";
-            this.Size = new System.Drawing.Size(224, 239);
-            this.Load += new System.EventHandler(this.BorderInfoControl_Load);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            Controls.Add(color2D);
+            Controls.Add(cancelButton);
+            Controls.Add(okButton);
+            Controls.Add(label3);
+            Controls.Add(label2);
+            Controls.Add(label1);
+            Controls.Add(panel1);
+            Controls.Add(style3D);
+            Controls.Add(style2D);
+            Controls.Add(draw3D);
+            Controls.Add(drawBox);
+            Name = "BorderInfoControl";
+            Size = new Size(224, 239);
+            Load += BorderInfoControl_Load;
+            ResumeLayout(false);
+            PerformLayout();
 
         }
     }

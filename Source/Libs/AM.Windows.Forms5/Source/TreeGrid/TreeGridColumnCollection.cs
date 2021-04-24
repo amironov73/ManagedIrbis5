@@ -37,21 +37,10 @@ namespace AM.Windows.Forms
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TreeGridColumnCollection"/> class.
+        /// Конструктор
         /// </summary>
-        public TreeGridColumnCollection()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TreeGridColumnCollection"/> class.
-        /// </summary>
-        /// <param name="grid">The grid.</param>
-        public TreeGridColumnCollection(TreeGrid grid)
-        {
-            _grid = grid;
-        }
+        /// <param name="grid">Грид, которому принадледат колонки</param>
+        public TreeGridColumnCollection (TreeGrid grid) => _grid = grid;
 
         #endregion
 
@@ -61,82 +50,49 @@ namespace AM.Windows.Forms
 
         protected internal void Update()
         {
-            if (_grid != null)
-            {
-                _grid.UpdateState();
-            }
+            _grid.UpdateState();
         }
 
-        /// <summary>
-        /// Removes all elements from the
-        /// <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
-        /// </summary>
+        /// <inheritdoc cref="Collection{T}.ClearItems"/>
         protected override void ClearItems()
         {
             base.ClearItems();
             Update();
         }
 
-        /// <summary>
-        /// Inserts an element into the <see cref="T:System.Collections.ObjectModel.Collection`1"/> at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
-        /// <param name="item">The object to insert. The value can be null for reference types.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
+        /// <inheritdoc cref="Collection{T}.InsertItem"/>
         protected override void InsertItem
             (
-            int index,
-            TreeGridColumn item
+                int index,
+                TreeGridColumn item
             )
         {
-            if (item == null)
-            {
-                throw new ArgumentNullException("item");
-            }
             base.InsertItem(index, item);
-            item._grid = TreeGrid;
+            item._grid = Grid;
             Update();
         }
 
-        /// <summary>
-        /// Removes the element at the specified index of the <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to remove.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is equal to or greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void RemoveItem(int index)
+        /// <inheritdoc cref="Collection{T}.RemoveItem"/>
+        protected override void RemoveItem
+            (
+                int index
+            )
         {
-            TreeGridColumn item = this[index];
+            var item = this[index];
             item._grid = null;
             base.RemoveItem(index);
             Update();
         }
 
-        /// <summary>
-        /// Replaces the element at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to replace.</param>
-        /// <param name="item">The new value for the element at the specified index. The value can be null for reference types.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void SetItem(int index, TreeGridColumn item)
+        /// <inheritdoc cref="Collection{T}.SetItem"/>
+        protected override void SetItem
+            (
+                int index,
+                TreeGridColumn item
+            )
         {
-            if (item == null)
-            {
-                throw new ArgumentNullException("item");
-            }
             base.SetItem(index, item);
-            item._grid = TreeGrid;
+            item._grid = Grid;
             Update();
         }
 
@@ -145,36 +101,27 @@ namespace AM.Windows.Forms
         #region Properties
 
         /// <summary>
-        /// Gets the tree grid.
+        /// Грид, которому принадлежат колонки.
         /// </summary>
-        /// <value>The tree grid.</value>
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Hidden)]
-        public TreeGrid TreeGrid
-        {
-            get
-            {
-                return _grid;
-            }
-        }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public TreeGrid Grid => _grid;
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Adds the specified title.
+        /// Добавляет колонку указанного типа с нужным заголовком.
         /// </summary>
-        /// <param name="title">The title.</param>
-        /// <returns></returns>
-        public TreeGridColumn Add<T>(string title)
+        public TreeGridColumn Add<T>
+            (
+                string title
+            )
              where T : TreeGridColumn, new()
         {
-            TreeGridColumn result = new T
-                                        {
-                                            Title = title
-                                        };
+            var result = new T { Title = title };
             Add(result);
+
             return result;
         }
 
@@ -183,7 +130,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public void Dump()
         {
-            foreach (TreeGridColumn item in Items)
+            foreach (var item in Items)
             {
                 Console.WriteLine(item);
             }
@@ -194,14 +141,14 @@ namespace AM.Windows.Forms
         /// Saves the specified file name.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
-        public void Save(string fileName)
+        public void Save
+            (
+                string fileName
+            )
         {
-            XmlSerializer serializer
-                = new XmlSerializer(typeof(TreeGridColumnCollection));
-            using (Stream stream = File.OpenWrite(fileName))
-            {
-                serializer.Serialize(stream, this);
-            }
+            var serializer = new XmlSerializer(typeof(TreeGridColumnCollection));
+            using var stream = File.OpenWrite(fileName);
+            serializer.Serialize(stream, this);
         }
 
         /// <summary>
@@ -214,60 +161,50 @@ namespace AM.Windows.Forms
                 string fileName
             )
         {
-            XmlSerializer serializer
-                = new XmlSerializer(typeof(TreeGridColumnCollection));
-            using (Stream stream = File.OpenRead(fileName))
-            {
-                TreeGridColumnCollection result
-                    = (TreeGridColumnCollection)serializer
-                    .Deserialize(stream);
-                return result;
-            }
+            var serializer = new XmlSerializer(typeof(TreeGridColumnCollection));
+            using var stream = File.OpenRead(fileName);
+            var result = (TreeGridColumnCollection)serializer
+                    .Deserialize(stream)
+                    .ThrowIfNull("serializer.Deserialize");
+
+            return result;
         }
 
         #endregion
 
         #region Implementation of IXmlSerializable
 
-        /// <summary>
-        /// This property is reserved, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class instead.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
-        /// </returns>
-        XmlSchema IXmlSerializable.GetSchema()
-        {
-            return null;
-        }
+        /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
+        XmlSchema? IXmlSerializable.GetSchema() => null;
 
-        /// <summary>
-        /// Generates an object from its XML representation.
-        /// </summary>
-        /// <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized. </param>
-        void IXmlSerializable.ReadXml(XmlReader reader)
+        /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
+        void IXmlSerializable.ReadXml
+            (
+                XmlReader reader
+            )
         {
             reader.Read();
             while (reader.LocalName == "column")
             {
-                string typeName = reader.GetAttribute("type");
+                var typeName = reader.GetAttribute("type");
                 if (!string.IsNullOrEmpty(typeName))
                 {
-                    Type type = Type.GetType(typeName);
-                    TreeGridColumn column = (TreeGridColumn)
-                                            Activator.CreateInstance(type);
+                    var type = Type.GetType(typeName).ThrowIfNull("Type.GetType");
+                    var column = (TreeGridColumn) Activator.CreateInstance(type)
+                        .ThrowIfNull("Activator.CreateInstance");
                     ((IXmlSerializable) column).ReadXml(reader);
                     Add(column);
                 }
             }
         }
 
-        /// <summary>
-        /// Converts an object into its XML representation.
-        /// </summary>
-        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized. </param>
-        void IXmlSerializable.WriteXml(XmlWriter writer)
+        /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
+        void IXmlSerializable.WriteXml
+            (
+                XmlWriter writer
+            )
         {
-            foreach (TreeGridColumn item in Items)
+            foreach (var item in Items)
             {
                 writer.WriteStartElement("column");
                 writer.WriteAttributeString
@@ -281,5 +218,7 @@ namespace AM.Windows.Forms
         }
 
         #endregion
-    }
-}
+
+    } // class TreeGridColumnCollection
+
+} // namespace AM.Windows.Forms

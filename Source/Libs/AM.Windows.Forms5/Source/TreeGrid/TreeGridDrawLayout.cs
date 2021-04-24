@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
 /* TreeGridDrawLayout.cs
@@ -44,7 +45,7 @@ namespace AM.Windows.Forms
 
         public Rectangle Text { get; set; }
 
-        public string TextOverride { get; set; }
+        public string? TextOverride { get; set; }
 
         #endregion
 

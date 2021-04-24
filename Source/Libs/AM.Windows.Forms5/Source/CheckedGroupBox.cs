@@ -120,7 +120,7 @@ namespace AM.Windows.Forms
 
         private void _checkBox_CheckedChanged
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {

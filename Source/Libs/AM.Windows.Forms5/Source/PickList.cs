@@ -6,9 +6,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* PickList.cs --
+/* PickList.cs -- отбор элементов с помощью двух списков: доступные и отобранные
    Ars Magna project, http://library.istu.edu/am
  */
 
@@ -17,7 +18,6 @@
 using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing.Design;
 using System.Windows.Forms;
 
@@ -28,7 +28,7 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///
+    /// Отбор элементов с помощью двух списков: доступные и отобранные.
     /// </summary>
     public class PickList
         : UserControl
@@ -36,62 +36,30 @@ namespace AM.Windows.Forms
         #region Properties
 
         /// <summary>
-        /// Gets the available list.
+        /// Список доступных элементов.
         /// </summary>
-        /// <value>The available list.</value>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ListBox AvailableList
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _available;
-            }
-        }
+        public ListBox AvailableList => _available.ThrowIfNull("AvailableList");
 
         ///<summary>
-        ///
+        /// Собственно доступные элементы.
         ///</summary>
-        [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-            typeof(UITypeEditor)),
-        DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ListBox.ObjectCollection AvailableItems
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _available.Items;
-            }
-        }
+        [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public ListBox.ObjectCollection AvailableItems => _available.ThrowIfNull("AvailableList").Items;
 
         /// <summary>
-        /// Gets the selected list.
+        /// Список отобранных элементов.
         /// </summary>
-        /// <value>The selected list.</value>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ListBox SelectedList
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _selected;
-            }
-        }
+        public ListBox SelectedList => _selected.ThrowIfNull("SelectedList");
 
         ///<summary>
-        ///
+        /// Собственно отобранные элементы.
         ///</summary>
-        [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
-            typeof(UITypeEditor)),
-        DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ListBox.ObjectCollection SelectedItems
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return _selected.Items;
-            }
-        }
+        [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public ListBox.ObjectCollection SelectedItems => _selected.ThrowIfNull("SelectedList").Items;
 
         #endregion
 
@@ -104,16 +72,16 @@ namespace AM.Windows.Forms
         {
             InitializeComponent();
 
-            _rightOne.Click += _rightOne_Click;
-            _rightAll.Click += _rightAll_Click;
-            _leftOne.Click += _leftOne_Click;
-            _leftAll.Click += _leftAll_Click;
-            _available.MouseDown += _available_MouseDown;
-            _available.DragEnter += _available_DragEnter;
-            _available.DragDrop += _available_DragDrop;
-            _selected.MouseDown += _selected_MouseDown;
-            _selected.DragEnter += _selected_DragEnter;
-            _selected.DragDrop += _selected_DragDrop;
+            _rightOne!.Click += _rightOne_Click;
+            _rightAll!.Click += _rightAll_Click;
+            _leftOne!.Click += _leftOne_Click;
+            _leftAll!.Click += _leftAll_Click;
+            _available!.MouseDown += _available_MouseDown;
+            _available!.DragEnter += _available_DragEnter;
+            _available!.DragDrop += _available_DragDrop;
+            _selected!.MouseDown += _selected_MouseDown;
+            _selected!.DragEnter += _selected_DragEnter;
+            _selected!.DragDrop += _selected_DragDrop;
         }
 
         #endregion
@@ -123,127 +91,179 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private readonly IContainer? components = null;
 
-        private System.Windows.Forms.ListBox _available;
-        private System.Windows.Forms.ListBox _selected;
-        private System.Windows.Forms.Panel _centerPanel;
-        private System.Windows.Forms.Button _rightOne;
-        private System.Windows.Forms.Button _rightAll;
-        private System.Windows.Forms.Button _leftOne;
-        private System.Windows.Forms.Button _leftAll;
+        private ListBox? _available;
+        private ListBox? _selected;
+        private Panel? _centerPanel;
+        private Button? _rightOne;
+        private Button? _rightAll;
+        private Button? _leftOne;
+        private Button? _leftAll;
 
-        private void _rightAll_Click(object sender, EventArgs e)
+        private void _rightAll_Click
+            (
+                object? sender,
+                EventArgs e
+            )
         {
             SelectedItems.AddRange(AvailableItems);
             AvailableItems.Clear();
         }
 
-        private void _leftAll_Click(object sender, EventArgs e)
+        private void _leftAll_Click
+            (
+                object? sender,
+                EventArgs e
+            )
         {
             AvailableItems.AddRange(SelectedItems);
             SelectedItems.Clear();
         }
 
-        private void _rightOne_Click(object sender, EventArgs e)
+        private void _rightOne_Click
+            (
+                object? sender,
+                EventArgs e
+            )
         {
-            ArrayList sel = new ArrayList(_available.SelectedItems);
-            foreach (object obj in sel)
+            var selected = new ArrayList(_available!.SelectedItems);
+            foreach (var obj in selected)
             {
                 SelectedItems.Add(obj);
                 AvailableItems.Remove(obj);
             }
         }
 
-        private void _leftOne_Click(object sender, EventArgs e)
+        private void _leftOne_Click
+            (
+                object? sender,
+                EventArgs e
+            )
         {
-            ArrayList sel = new ArrayList(_selected.SelectedItems);
-            foreach (object obj in sel)
+            var selected = new ArrayList(_selected!.SelectedItems);
+            foreach (var obj in selected)
             {
                 AvailableItems.Add(obj);
                 SelectedItems.Remove(obj);
             }
         }
 
-        private void _available_MouseDown(object sender, MouseEventArgs e)
+        private void _available_MouseDown
+            (
+                object? sender,
+                MouseEventArgs e
+            )
         {
-            DoDragDrop(_available, DragDropEffects.Move);
+            DoDragDrop(_available!, DragDropEffects.Move);
         }
 
-        private void _selected_MouseDown(object sender, MouseEventArgs e)
+        private void _selected_MouseDown
+            (
+                object? sender,
+                MouseEventArgs e
+            )
         {
-            DoDragDrop(_selected, DragDropEffects.Move);
+            DoDragDrop(_selected!, DragDropEffects.Move);
         }
 
-        private void _available_DragEnter(object sender, DragEventArgs e)
+        private void _available_DragEnter
+            (
+                object? sender,
+                DragEventArgs e
+            )
         {
-            object obj = e.Data.GetData(typeof(ListBox));
+            var obj = e.Data.GetData(typeof(ListBox));
             if (obj == _selected)
             {
                 e.Effect = DragDropEffects.Move;
             }
         }
 
-        private void _available_DragDrop(object sender, DragEventArgs e)
+        private void _available_DragDrop
+            (
+                object? sender,
+                DragEventArgs e
+            )
         {
             _leftOne_Click(null, EventArgs.Empty);
         }
 
-        private void _selected_DragEnter(object sender, DragEventArgs e)
+        private void _selected_DragEnter
+            (
+                object? sender,
+                DragEventArgs e
+            )
         {
-            object obj = e.Data.GetData(typeof(ListBox));
+            var obj = e.Data.GetData(typeof(ListBox));
             if (obj == _available)
             {
                 e.Effect = DragDropEffects.Move;
             }
         }
 
-        private void _selected_DragDrop(object sender, DragEventArgs e)
+        private void _selected_DragDrop
+            (
+                object? sender,
+                DragEventArgs e
+            )
         {
             _rightOne_Click(null, EventArgs.Empty);
         }
 
-        private void _available_DoubleClick(object sender, EventArgs e)
+        private void _available_DoubleClick
+            (
+                object? sender,
+                EventArgs e
+            )
         {
-            object selected = _available.SelectedItem;
-
-            if (!ReferenceEquals(selected, null))
+            var selectedItem = _available!.SelectedItem;
+            if (selectedItem is not null)
             {
-                SelectedItems.Add(selected);
-                AvailableItems.Remove(selected);
+                SelectedItems.Add(selectedItem);
+                AvailableItems.Remove(selectedItem);
             }
         }
 
-        private void _selected_DoubleClick(object sender, EventArgs e)
+        private void _selected_DoubleClick
+            (
+                object? sender,
+                EventArgs e
+            )
         {
-            object selected = _selected.SelectedItem;
-
-            if (!ReferenceEquals(selected, null))
+            var selectedItem = _selected!.SelectedItem;
+            if (selectedItem is not null)
             {
-                AvailableItems.Add(selected);
-                SelectedItems.Remove(selected);
+                AvailableItems.Add(selectedItem);
+                SelectedItems.Remove(selectedItem);
             }
         }
 
-        private void _available_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void _available_MouseDoubleClick
+            (
+                object? sender,
+                MouseEventArgs e
+            )
         {
-            object selected = _available.SelectedItem;
-
-            if (!ReferenceEquals(selected, null))
+            var selectedItem = _available!.SelectedItem;
+            if (selectedItem is not null)
             {
-                SelectedItems.Add(selected);
-                AvailableItems.Remove(selected);
+                SelectedItems.Add(selectedItem);
+                AvailableItems.Remove(selectedItem);
             }
         }
 
-        private void _selected_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void _selected_MouseDoubleClick
+            (
+                object? sender,
+                MouseEventArgs e
+            )
         {
-            object selected = _selected.SelectedItem;
-
-            if (!ReferenceEquals(selected, null))
+            var selectedItem = _selected!.SelectedItem;
+            if (selectedItem is not null)
             {
-                AvailableItems.Add(selected);
-                SelectedItems.Remove(selected);
+                AvailableItems.Add(selectedItem);
+                SelectedItems.Remove(selectedItem);
             }
         }
 
@@ -252,16 +272,22 @@ namespace AM.Windows.Forms
         #region UserControl members
 
         /// <inheritdoc />
-        protected override void OnResize(EventArgs e)
+        protected override void OnResize
+            (
+                EventArgs e
+            )
         {
             base.OnResize(e);
-            int width = (Width - _centerPanel.Width) / 2;
-            _available.Width = width;
-            _selected.Width = width;
+            var width = (Width - _centerPanel!.Width) / 2;
+            _available!.Width = width;
+            _selected!.Width = width;
         }
 
         /// <inheritdoc />
-        protected override void Dispose(bool disposing)
+        protected override void Dispose
+            (
+                bool disposing
+            )
         {
             if (disposing && (components != null))
             {
@@ -377,5 +403,7 @@ namespace AM.Windows.Forms
         }
 
         #endregion
-    }
-}
+
+    } // class PickList
+
+} // namespace AM.Windows.Forms

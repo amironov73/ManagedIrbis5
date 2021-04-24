@@ -14,14 +14,6 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 #endregion
@@ -44,19 +36,14 @@ namespace AM.Windows.Forms
         public PlainTextEditor Editor => _textControl;
 
         /// <inheritdoc cref="Control.Text" />
-        public override string Text
+        public override string? Text
         {
-            get
-            {
-                return ReferenceEquals(_textControl, null)
-                    ? string.Empty
-                    :_textControl.Text;
-            }
+            get => _textControl?.Text;
             set
             {
                 if (!ReferenceEquals(_textControl, null))
                 {
-                    _textControl.Text = value;
+                    _textControl.Text = value ?? string.Empty;
                 }
             }
         }

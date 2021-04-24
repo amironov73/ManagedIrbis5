@@ -371,7 +371,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public static void WaitFor
             (
-                IAsyncResult handle
+                this IAsyncResult handle
             )
         {
             Magna.Trace
@@ -480,7 +480,7 @@ namespace AM.Windows.Forms
         {
             get
             {
-                foreach (Screen screen in Screen.AllScreens)
+                foreach (var screen in Screen.AllScreens)
                 {
                     if (!screen.Primary)
                     {
@@ -526,7 +526,7 @@ namespace AM.Windows.Forms
                 Form form
             )
         {
-            Screen secondaryScreen = SecondaryScreen;
+            var secondaryScreen = SecondaryScreen;
             if (secondaryScreen != null)
             {
                 MoveToScreen(secondaryScreen, form);

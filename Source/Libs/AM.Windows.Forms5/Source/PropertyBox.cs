@@ -6,6 +6,8 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 
 /* PropertyBox.cs --
@@ -14,6 +16,7 @@
 
 #region Using directives
 
+using System;
 using System.Windows.Forms;
 
 #endregion
@@ -28,28 +31,29 @@ namespace AM.Windows.Forms
     public class PropertyBox
         : Form
     {
-        private System.Windows.Forms.Label _label1;
-        private System.Windows.Forms.Panel _panel1;
-        private System.Windows.Forms.Button _okButton;
-        private System.Windows.Forms.Button _cancelButton;
-        private System.Windows.Forms.PropertyGrid _propertyGrid;
+        private Label? _label1;
+        private Panel? _panel1;
+        private Button? _okButton;
+        private Button? _cancelButton;
+        private PropertyGrid? _propertyGrid;
+
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.Container _components = null;
+        private readonly System.ComponentModel.Container? _components = null;
 
         /// <summary>
         /// Property SelectedObject (object)
         /// </summary>
-        public object SelectedObject
+        public object? SelectedObject
         {
-            get
-            {
-                return _propertyGrid.SelectedObject;
-            }
+            get => _propertyGrid?.SelectedObject;
             set
             {
-                _propertyGrid.SelectedObject = value;
+                if (_propertyGrid != null)
+                {
+                    _propertyGrid.SelectedObject = value;
+                }
             }
         }
 
@@ -59,13 +63,13 @@ namespace AM.Windows.Forms
         /// <value>The selected objects.</value>
         public object[] SelectedObjects
         {
-            get
-            {
-                return _propertyGrid.SelectedObjects;
-            }
+            get => _propertyGrid?.SelectedObjects ?? Array.Empty<object>();
             set
             {
-                _propertyGrid.SelectedObjects = value;
+                if (_propertyGrid != null)
+                {
+                    _propertyGrid.SelectedObjects = value;
+                }
             }
         }
 
@@ -102,12 +106,9 @@ namespace AM.Windows.Forms
                 object obj
             )
         {
-            DialogResult result;
+            using var box = new PropertyBox(obj);
+            var result = box.ShowDialog(ownerWindow);
 
-            using (PropertyBox box = new PropertyBox(obj))
-            {
-                result = box.ShowDialog(ownerWindow);
-            }
             return result;
         }
 
@@ -120,12 +121,9 @@ namespace AM.Windows.Forms
                 object[] obj
             )
         {
-            DialogResult result;
+            using var box = new PropertyBox(obj);
+            var result = box.ShowDialog(ownerWindow);
 
-            using (PropertyBox box = new PropertyBox(obj))
-            {
-                result = box.ShowDialog(ownerWindow);
-            }
             return result;
         }
 
@@ -167,6 +165,8 @@ namespace AM.Windows.Forms
             }
             base.Dispose(disposing);
         }
+
+        #nullable disable
 
         #region Windows Form Designer generated code
         /// <summary>

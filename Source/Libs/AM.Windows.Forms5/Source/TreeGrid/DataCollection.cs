@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* DataCollection.cs
+/* DataCollection.cs -- набор данных, хранящихся в строке грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,135 +24,100 @@ using System.ComponentModel;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    /// Generic collection of some data with events.
+    /// Набор данных, хранящихся в строке грида.
+    /// При любом изменении данных грид перерисовывается.
     /// </summary>
     [Serializable]
     public sealed class DataCollection
-        : Collection<object>
+        : Collection<object?>
     {
+        #region Properties
+
+        /// <summary>
+        /// Нода, которой принадлежат данные.
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public TreeGridNode Node { get; }
+
+        /// <summary>
+        /// Gets the tree grid.
+        /// </summary>
+        /// <value>The tree grid.</value>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public TreeGrid Grid => Node.Grid.ThrowIfNull("Node.TreeGrid");
+
+        #endregion
+
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="DataCollection"/> class.
+        /// Конструктор.
         /// </summary>
-        /// <param name="node">The node.</param>
-        public DataCollection(TreeGridNode node)
+        /// <param name="node">Нода, которой принадлежат данные.</param>
+        public DataCollection
+            (
+                TreeGridNode node
+            )
         {
-            _node = node;
+            Node = node;
         }
 
         #endregion
 
-        #region Private members
+        #region Collection<T> members
 
-        internal TreeGridNode _node;
-
-        /// <summary>
-        /// Removes all elements from the
-        /// <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
-        /// </summary>
+        /// <inheritdoc cref="Collection{T}.ClearItems"/>
         protected override void ClearItems()
         {
             base.ClearItems();
             _UpdateNode();
         }
 
-        /// <summary>
-        /// Inserts an element into the <see cref="T:System.Collections.ObjectModel.Collection`1"/> at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
-        /// <param name="item">The object to insert. The value can be null for reference types.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void InsertItem(int index, object item)
+        /// <inheritdoc cref="Collection{T}.InsertItem"/>
+        protected override void InsertItem
+            (
+                int index,
+                object? item
+            )
         {
             base.InsertItem(index,item);
             _UpdateNode();
         }
 
-        /// <summary>
-        /// Removes the element at the specified index of the <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to remove.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is equal to or greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void RemoveItem(int index)
+        /// <inheritdoc cref="Collection{T}.RemoveItem"/>
+        protected override void RemoveItem
+            (
+                int index
+            )
         {
             base.RemoveItem(index);
             _UpdateNode();
         }
 
-        /// <summary>
-        /// Replaces the element at the specified index.
-        /// </summary>
-        /// <param name="index">The zero-based index of the element to replace.</param>
-        /// <param name="item">The new value for the element at the specified index. The value can be null for reference types.</param>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// 	<paramref name="index"/> is less than zero.
-        /// -or-
-        /// <paramref name="index"/> is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"/>.
-        /// </exception>
-        protected override void SetItem(int index, object item)
+        /// <inheritdoc cref="Collection{T}.SetItem"/>
+        protected override void SetItem
+            (
+                int index,
+                object? item
+            )
         {
             base.SetItem(index,item);
             _UpdateNode();
         }
 
-        internal void _UpdateNode ()
-        {
-            if (Node != null)
-            {
-                Node._UpdateGrid();
-            }
-        }
-
         #endregion
 
-        #region Properties
+        #region Private members
 
-        /// <summary>
-        /// Gets the node.
-        /// </summary>
-        /// <value>The node.</value>
-        public TreeGridNode Node
-        {
-            get
-            {
-                return _node;
-            }
-        }
-
-        /// <summary>
-        /// Gets the tree grid.
-        /// </summary>
-        /// <value>The tree grid.</value>
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Hidden)]
-        public TreeGrid TreeGrid
-        {
-            get
-            {
-                return ( _node == null )
-                           ? null
-                           : _node.TreeGrid;
-            }
-        }
+        internal void _UpdateNode () => Node._UpdateGrid();
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Adds the range.
+        /// Добавление множества элементов.
         /// </summary>
-        /// <param name="range">The range.</param>
         public void AddRange ( params object [] range )
         {
             foreach (object item in range)
@@ -162,9 +127,8 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Adds the range.
+        /// Добавление множества элементов.
         /// </summary>
-        /// <param name="range">The range.</param>
         public void AddRange ( IEnumerable range )
         {
             foreach (object item in range)
@@ -174,31 +138,30 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Safes the get.
+        /// Безопасный доступ к элементу по индексу.
         /// </summary>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
-        public object SafeGet ( int index )
-        {
-            return (index >= 0) && (index < Count)
-                       ? this[index]
-                       : null;
-        }
+        public object? SafeGet ( int index ) =>
+            index >= 0 && index < Count ? this[index] : null;
 
         /// <summary>
-        /// Safes the set.
+        /// Безопасное задание значения элемента по индексу.
         /// </summary>
-        /// <param name="index">The index.</param>
-        /// <param name="data">The data.</param>
-        public void SafeSet ( int index, object data )
+        public void SafeSet
+            (
+                int index,
+                object? data
+            )
         {
             while (Count <= index)
             {
                 Add(null);
             }
+
             this[index] = data;
         }
 
         #endregion
-    }
-}
+
+    } // class DataCollection
+
+} // namespace AM.Windows.Forms

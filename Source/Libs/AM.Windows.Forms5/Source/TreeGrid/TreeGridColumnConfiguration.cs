@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridColumnConfiguration.cs
+/* TreeGridColumnConfiguration.cs -- настройки колонок грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 #endregion
@@ -22,6 +23,9 @@ using System.Xml.Serialization;
 
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    /// Настройки колонок грида.
+    /// </summary>
     [XmlRoot("column")]
     public class TreeGridColumnConfiguration
     {
@@ -59,63 +63,59 @@ namespace AM.Windows.Forms
         #region Properties
 
         /// <summary>
-        /// Gets or sets the type of the column.
+        /// Тип колонки.
         /// </summary>
-        /// <value>The type of the column.</value>
         [XmlAttribute("type")]
-        public string ColumnType { get; set; }
+        [JsonPropertyName("type")]
+        public string? ColumnType { get; set; }
 
         /// <summary>
-        /// Gets or sets the title.
+        /// Заголовок колонки.
         /// </summary>
-        /// <value>The title.</value>
         [XmlAttribute("title")]
-        public string Title { get; set; }
+        [JsonPropertyName("title")]
+        public string? Title { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this
-        /// <see cref="TreeGridColumnConfiguration"/>
-        /// is resizeable.
+        /// Пользователь может менять ширину колонки?
         /// </summary>
-        /// <value><c>true</c> if resizeable; otherwise,
-        /// <c>false</c>.</value>
         [XmlAttribute("resizeable")]
+        [JsonPropertyName("resizeable")]
         public bool Resizeable { get; set; }
 
         /// <summary>
-        /// Gets or sets the fill factor.
+        /// Фактор заполнения.
         /// </summary>
-        /// <value>The fill factor.</value>
         [XmlAttribute("fill-factor")]
+        [JsonPropertyName("fillFactor")]
         public int FillFactor { get; set; }
 
         /// <summary>
-        /// Gets or sets the alignment.
+        /// Выравнивание данных в колонке.
         /// </summary>
-        /// <value>The alignment.</value>
         [XmlAttribute("alignment")]
+        [JsonPropertyName("alignment")]
         public TreeGridAlignment Alignment { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Колонка только для чтения?
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise,
-        /// <c>false</c>.</value>
         [XmlAttribute("read-only")]
+        [JsonPropertyName("readOnly")]
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets the width.
+        /// Ширина колонки.
         /// </summary>
-        /// <value>The width.</value>
         [XmlAttribute("width")]
+        [JsonPropertyName("width")]
         public int Width { get; set; }
 
         /// <summary>
-        /// Gets or sets the index of the data.
+        /// Индекс данных в массиве, образующем строку грида.
         /// </summary>
-        /// <value>The index of the data.</value>
         [XmlAttribute("data-index")]
+        [JsonPropertyName("dataIndex")]
         public int DataIndex { get; set; }
 
         #endregion
@@ -123,53 +123,42 @@ namespace AM.Windows.Forms
         #region Public methods
 
         /// <summary>
-        /// Saves the specified file name.
+        /// Сохраняет настройки колонки в указанный файл.
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        public void Save ( string fileName )
+        public void Save
+            (
+                string fileName
+            )
         {
-            XmlSerializer serializer
-                = new XmlSerializer
-                    (
-                        typeof(TreeGridColumnConfiguration)
-                    );
-            using (Stream stream = File.Create(fileName))
-            {
-                serializer.Serialize(stream,this);
-            }
+            var serializer = new XmlSerializer (typeof(TreeGridColumnConfiguration));
+            using var stream = File.Create(fileName);
+            serializer.Serialize(stream,this);
         }
 
         /// <summary>
-        /// Loads the specified file name.
+        /// Загружает настройки колонки в указанный файл.
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <returns></returns>
         public static TreeGridColumnConfiguration Load
             (
                 string fileName
             )
         {
-            XmlSerializer serializer
-                = new XmlSerializer
-                    (
-                        typeof(TreeGridColumnConfiguration)
-                    );
-            using (Stream stream = File.OpenRead(fileName))
-            {
-                return (TreeGridColumnConfiguration) serializer
-                    .Deserialize(stream);
-            }
+            var serializer = new XmlSerializer (typeof(TreeGridColumnConfiguration));
+            using var stream = File.OpenRead(fileName);
+            return (TreeGridColumnConfiguration) serializer
+                .Deserialize(stream)
+                .ThrowIfNull("serializer.Deserialize");
         }
 
         /// <summary>
-        /// Creates the column.
+        /// Создает колонку с текущими настройками.
         /// </summary>
-        /// <returns></returns>
         public TreeGridColumn CreateColumn ()
         {
-            Type columnType = Type.GetType(ColumnType);
-            TreeGridColumn result = (TreeGridColumn)
-                Activator.CreateInstance(columnType);
+            var columnType = Type.GetType(ColumnType.ThrowIfNull("ColumnType"))
+                .ThrowIfNull("Type.GetType");
+            var result = (TreeGridColumn) Activator.CreateInstance(columnType)
+                .ThrowIfNull("Activator.CreateInstance");
 
             result.Title = Title;
             result.Resizeable = Resizeable;
@@ -182,6 +171,26 @@ namespace AM.Windows.Forms
             return result;
         }
 
+        /// <summary>
+        /// Создает колонку с текущими настройками.
+        /// </summary>
+        public TreeGridColumn CreateColumn<T> ()
+            where  T: TreeGridColumn, new()
+        {
+            var result = Activator.CreateInstance<T>();
+            result.Title = Title;
+            result.Resizeable = Resizeable;
+            result.FillFactor = FillFactor;
+            result.Alignment = Alignment;
+            result.ReadOnly = ReadOnly;
+            result.Width = Width;
+            result.DataIndex = DataIndex;
+
+            return result;
+        }
+
         #endregion
-    }
-}
+
+    } // class TreeGridColumnConfiguration
+
+} // namespace AM.Windows.Forms

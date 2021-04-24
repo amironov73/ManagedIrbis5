@@ -46,10 +46,6 @@ namespace AM.Windows.Forms
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
         #region IDataGridViewEditingControl members
 
         /// <summary>
@@ -58,14 +54,10 @@ namespace AM.Windows.Forms
         /// </summary>
         public object EditingControlFormattedValue
         {
-            get
-            {
-                return Value.ToShortDateString();
-            }
+            get => Value.ToShortDateString();
             set
             {
-                var newValue = value as string;
-                if (newValue != null)
+                if (value is string newValue)
                 {
                     Value = DateTime.Parse(newValue);
                 }
@@ -147,13 +139,7 @@ namespace AM.Windows.Forms
         /// Gets or sets a value indicating whether the cell contents need
         /// to be repositioned whenever the value changes.
         /// </summary>
-        public bool RepositionEditingControlOnValueChange
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool RepositionEditingControlOnValueChange => false;
 
         /// <summary>
         /// Gets or sets the <see cref="DataGridView"/> that contains the cell.
@@ -170,10 +156,7 @@ namespace AM.Windows.Forms
         /// Gets the cursor used when the mouse pointer
         /// is over the <see cref="P:System.Windows.Forms.DataGridView.EditingPanel" /> but not over the editing control.
         /// </summary>
-        public Cursor EditingPanelCursor
-        {
-            get { return Cursor; }
-        }
+        public Cursor EditingPanelCursor => Cursor;
 
         /// <summary>
         /// Raises the

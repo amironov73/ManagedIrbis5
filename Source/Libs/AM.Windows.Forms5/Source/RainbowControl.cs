@@ -6,7 +6,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable VirtualMemberCallInConstructor
 
 /* RainbowControl.cs --
  * Ars Magna project, http://arsmagna.ru
@@ -17,7 +19,6 @@
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -41,7 +42,7 @@ namespace AM.Windows.Forms
         public RainbowItemList Items { get; private set; }
 
         //private Panel panel1;
-        private Bitmap _triangle;
+        private readonly Bitmap? _triangle;
 
         /// <summary>
         /// Initializes a new instance of the
@@ -51,10 +52,7 @@ namespace AM.Windows.Forms
         {
             const float delta = 1.0f / 6.0f;
 
-            // ReSharper disable VirtualMemberCallInConstructor
             DoubleBuffered = true;
-            // ReSharper restore VirtualMemberCallInConstructor
-
             Items = new RainbowItemList();
 
             ResizeRedraw = true;
@@ -69,20 +67,19 @@ namespace AM.Windows.Forms
             Items.Add(Color.LightBlue, delta * 4f);
             Items.Add(Color.DarkBlue, delta * 5f);
             Items.Add(Color.Violet, 1.00f);
-            using (Stream stream = Assembly.GetExecutingAssembly()
-                .GetManifestResourceStream("AM.Windows.Forms.Images.Triangle.bmp"))
+
+            using var stream = Assembly.GetExecutingAssembly()
+                .GetManifestResourceStream("AM.Windows.Forms.Images.Triangle.bmp");
+            if (stream is not null)
             {
-                if (!ReferenceEquals(stream, null))
-                {
-                    _triangle = (Bitmap) Image.FromStream(stream);
-                    _triangle.MakeTransparent(_triangle.GetPixel(0, 0));
-                }
+                _triangle = (Bitmap) Image.FromStream(stream);
+                _triangle.MakeTransparent(_triangle.GetPixel(0, 0));
             }
         }
 
         private int _ItemPos(RainbowItem item)
         {
-            return (int)(Width * item.Position) - _triangle.Width / 2;
+            return (int)(Width * item.Position) - (_triangle?.Width ?? 0) / 2;
         }
 
         /// <inheritdoc />
@@ -104,7 +101,7 @@ namespace AM.Windows.Forms
                 Items[0].Position = 0f;
             }
 
-            RainbowItem last = Items[Items.Count - 1];
+            RainbowItem last = Items[^1];
             // ReSharper disable CompareOfFloatsByEqualityOperator
             if (last.Position != 1f) //-v3024
             // ReSharper restore CompareOfFloatsByEqualityOperator
@@ -112,13 +109,13 @@ namespace AM.Windows.Forms
                 last.Position = 1f;
             }
 
-            Rectangle r = ClientRectangle;
-            r.Height -= _triangle.Height;
+            var r = ClientRectangle;
+            r.Height -= _triangle?.Height ?? 0;
             using (LinearGradientBrush brush = new LinearGradientBrush
                 (
                     r,
                     Items[0].Color,
-                    Items[Items.Count - 1].Color,
+                    Items[^1].Color,
                     0f
                 ))
             {
@@ -127,7 +124,7 @@ namespace AM.Windows.Forms
                     Colors = new Color[Items.Count]
                 };
 
-                for (int i = 0; i < Items.Count; i++)
+                for (var i = 0; i < Items.Count; i++)
                 {
                     blend.Colors[i] = Items[i].Color;
                     blend.Positions[i] = Items[i].Position;
@@ -135,15 +132,20 @@ namespace AM.Windows.Forms
                 brush.InterpolationColors = blend;
                 g.FillRectangle(brush, r);
             }
-            foreach (RainbowItem item in Items)
+
+            if (_triangle is not null)
             {
-                g.DrawImageUnscaled
-                    (
-                        _triangle,
-                        _ItemPos(item),
-                        Height - _triangle.Height
-                    );
+                foreach (var item in Items)
+                {
+                    g.DrawImageUnscaled
+                        (
+                            _triangle,
+                            _ItemPos(item),
+                            Height - _triangle.Height
+                        );
+                }
             }
+
             if (_drawMouse)
             {
                 g.DrawLine
@@ -158,7 +160,7 @@ namespace AM.Windows.Forms
             base.OnPaint(e);
         }
 
-        private RainbowItem _moving;
+        private RainbowItem? _moving;
         private int _startX, _minX, _maxX;
 
         /// <inheritdoc />
@@ -167,16 +169,16 @@ namespace AM.Windows.Forms
                 MouseEventArgs e
             )
         {
-            bool moving = false;
-            int previousIndex = 0;
-            bool badIndex = false;
-            for (int index = 0; index < Items.Count; index++)
+            var moving = false;
+            var previousIndex = 0;
+            var badIndex = false;
+            for (var index = 0; index < Items.Count; index++)
             {
                 RainbowItem item = Items[index];
-                int pos = _ItemPos(item);
-                if ((e.X >= pos) && (e.X <= pos + _triangle.Width))
+                var pos = _ItemPos(item);
+                if (e.X >= pos && e.X <= pos + _triangle?.Width)
                 {
-                    if ((index > 0) && (index < Items.Count - 1))
+                    if (index > 0 && index < Items.Count - 1)
                     {
                         Capture = true;
                         _moving = item;
@@ -200,7 +202,7 @@ namespace AM.Windows.Forms
             {
                 Items.Insert(previousIndex + 1,
                     new RainbowItem(Items[previousIndex].Color,
-                    ((float)e.X) / Width));
+                    (float)e.X / Width));
                 Invalidate();
                 OnMouseDown(e);
 
@@ -249,24 +251,24 @@ namespace AM.Windows.Forms
                 MouseEventArgs e
             )
         {
-            if (Capture)
+            if (Capture && _moving is not null)
             {
                 if (e.Y > Height)
                 {
-                    int index = Items.IndexOf(_moving);
-                    if ((index > 0) && (e.X == _startX)
-                        && (index < (Items.Count - 1)))
+                    var index = Items.IndexOf(_moving);
+                    if (index > 0 && e.X == _startX
+                                  && index < Items.Count - 1)
                     {
                         Items.RemoveAt(index);
                         Capture = false;
                     }
                 }
-                else if ((e.X >= 0) && (e.X < Width)
-                    && (e.X >= _minX) && (e.X <= _maxX))
+                else if (e.X >= 0 && e.X < Width
+                                  && e.X >= _minX && e.X <= _maxX)
                 {
                     if (_moving != null)
                     {
-                        _moving.Position = ((float)e.X) / Width;
+                        _moving.Position = (float)e.X / Width;
                     }
                 }
             }
@@ -283,8 +285,8 @@ namespace AM.Windows.Forms
         {
             foreach (RainbowItem item in Items)
             {
-                int pos = _ItemPos(item);
-                if ((mea.X >= pos) && (mea.X <= pos + _triangle.Width))
+                var pos = _ItemPos(item);
+                if (mea.X >= pos && mea.X <= pos + _triangle?.Width)
                 {
                     ColorDialog dialog = new ColorDialog
                     {

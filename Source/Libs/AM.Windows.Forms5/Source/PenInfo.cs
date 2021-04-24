@@ -250,30 +250,27 @@ namespace AM.Windows.Forms
             public override object EditValue
                 (
                     ITypeDescriptorContext context,
-                    IServiceProvider provider,
+                    IServiceProvider? provider,
                     object value
                 )
             {
-                PenInfo penInfo = (PenInfo)value;
+                var penInfo = (PenInfo)value;
 
                 if (ReferenceEquals(provider, null))
                 {
                     return penInfo;
                 }
 
-                IWindowsFormsEditorService edSvc
-                    = (IWindowsFormsEditorService)provider.GetService
+                var edSvc = (IWindowsFormsEditorService?) provider.GetService
                     (
                         typeof(IWindowsFormsEditorService)
                     );
                 if (edSvc != null)
                 {
-                    PenInfoControl form = new PenInfoControl
+                    var form = new PenInfoControl
                         (
                             penInfo,
-                            edSvc,
-                            context,
-                            provider
+                            edSvc
                         );
                     edSvc.DropDownControl(form);
 

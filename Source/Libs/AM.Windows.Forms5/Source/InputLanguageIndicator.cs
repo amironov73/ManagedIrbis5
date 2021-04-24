@@ -68,11 +68,11 @@ namespace AM.Windows.Forms
 
         #region Private members
 
-        private Form _form;
+        private Form? _form;
 
         private void _MenuClick
             (
-                object sender,
+                object? sender,
                 EventArgs ea
             )
         {
@@ -90,7 +90,7 @@ namespace AM.Windows.Forms
 
         private void _InputLanguageChanged
             (
-                object sender,
+                object? sender,
                 InputLanguageChangedEventArgs e
             )
         {

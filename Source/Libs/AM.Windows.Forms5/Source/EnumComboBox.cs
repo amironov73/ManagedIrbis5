@@ -4,8 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -17,7 +19,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Forms;
 
 using AM.Reflection;
@@ -39,7 +40,7 @@ namespace AM.Windows.Forms
     {
         #region Properties
 
-        private Type _enumType;
+        private Type? _enumType;
 
         /// <summary>
         /// Gets or sets the type of the enum.
@@ -47,17 +48,10 @@ namespace AM.Windows.Forms
         /// <value>The type of the enum.</value>
         [DefaultValue(null)]
         [TypeConverter(typeof(EnumTypeConverter))]
-        public Type EnumType
+        public Type? EnumType
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _enumType;
-            }
-            set
-            {
-                _SetEnumType(value);
-            }
+            get => _enumType;
+            set => _SetEnumType(value);
         }
 
         /// <summary>
@@ -69,7 +63,7 @@ namespace AM.Windows.Forms
             get
             {
                 int? result = null;
-                var member = (EnumMemberInfo)SelectedItem;
+                var member = (EnumMemberInfo?)SelectedItem;
                 if (member != null)
                 {
                     result = member.Value;
@@ -117,10 +111,15 @@ namespace AM.Windows.Forms
             DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
-        private void _SetEnumType(Type enumType)
+        private void _SetEnumType
+            (
+                Type? enumType
+            )
         {
             _enumType = enumType;
-            var members = EnumMemberInfo.Parse(enumType);
+            var members = enumType is null
+                ? Array.Empty<EnumMemberInfo>()
+                : EnumMemberInfo.Parse(enumType);
             Items.Clear();
             Items.AddRange(members);
         }

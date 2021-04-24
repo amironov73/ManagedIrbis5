@@ -69,7 +69,10 @@ namespace AM.Windows.Forms
         /// Sets the value.
         /// </summary>
         /// <param name="value">The value.</param>
-        public override void SetValue(string value)
+        public override void SetValue
+            (
+                string? value
+            )
         {
             _textBox.Text = value;
         }

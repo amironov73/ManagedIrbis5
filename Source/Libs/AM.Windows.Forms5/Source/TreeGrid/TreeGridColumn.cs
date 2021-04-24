@@ -4,9 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridColumn.cs
+/* TreeGridColumn.cs -- колонка грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,14 +21,15 @@ using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-using AM.Xml;
-
 #endregion
 
 #nullable enable
 
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    /// Колонка грида.
+    /// </summary>
     // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
     // ReSharper restore RedundantNameQualifier
@@ -36,35 +38,12 @@ namespace AM.Windows.Forms
         : Component,
         IXmlSerializable
     {
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TreeGridColumn"/> class.
-        /// </summary>
-        protected TreeGridColumn()
-            : this(null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TreeGridColumn"/> class.
-        /// </summary>
-        /// <param name="grid">The grid.</param>
-        protected TreeGridColumn(TreeGrid grid)
-        {
-            _width = DefaultWidth;
-            _grid = grid;
-        }
-
-        #endregion
-
         #region Events
 
         /// <summary>
         /// Occurs when [draw cell].
         /// </summary>
-        public event EventHandler<TreeGridDrawCellEventArgs> DrawCell;
+        public event EventHandler<TreeGridDrawCellEventArgs>? DrawCell;
 
         #endregion
 
@@ -73,16 +52,12 @@ namespace AM.Windows.Forms
         private const int DefaultWidth = 100;
 
         /// <summary>
-        /// Gets or sets the title.
+        /// Заголовок колонки.
         /// </summary>
-        /// <value>The title.</value>
         [DefaultValue(null)]
-        public string Title
+        public string? Title
         {
-            get
-            {
-                return _title;
-            }
+            get => _title;
             set
             {
                 _title = value;
@@ -91,16 +66,12 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Gets or sets the fill factor.
+        /// Фактор заполнения.
         /// </summary>
-        /// <value>The fill factor.</value>
         [DefaultValue(0)]
         public int FillFactor
         {
-            get
-            {
-                return _fillFactor;
-            }
+            get => _fillFactor;
             set
             {
                 _fillFactor = value;
@@ -109,16 +80,12 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Gets or sets the icon.
+        /// Иконка для колонки.
         /// </summary>
-        /// <value>The icon.</value>
         [DefaultValue(null)]
-        public Icon Icon
+        public Icon? Icon
         {
-            get
-            {
-                return _icon;
-            }
+            get => _icon;
             set
             {
                 _icon = value;
@@ -127,16 +94,12 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Gets or sets the alignment.
+        /// Выравнивание данных в колонке.
         /// </summary>
-        /// <value>The alignment.</value>
         [DefaultValue(TreeGridAlignment.Near)]
         public TreeGridAlignment Alignment
         {
-            get
-            {
-                return _alignment;
-            }
+            get => _alignment;
             set
             {
                 _alignment = value;
@@ -145,16 +108,13 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether [read only].
+        /// Колонка только для чтения
+        /// (пользователь не может редактировать данные)?.
         /// </summary>
-        /// <value><c>true</c> if [read only]; otherwise, <c>false</c>.</value>
         [DefaultValue(false)]
         public bool ReadOnly
         {
-            get
-            {
-                return _readOnly;
-            }
+            get => _readOnly;
             set
             {
                 _readOnly = value;
@@ -163,16 +123,12 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="TreeGridColumn"/> is resizeable.
+        /// Пользователь может менять ширину колонки?
         /// </summary>
-        /// <value><c>true</c> if resizeable; otherwise, <c>false</c>.</value>
         [DefaultValue(false)]
         public bool Resizeable
         {
-            get
-            {
-                return _resizeable;
-            }
+            get => _resizeable;
             set
             {
                 _resizeable = value;
@@ -181,140 +137,118 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Gets or sets the width.
+        /// Ширина колонки.
         /// </summary>
-        /// <value>The width.</value>
         [DefaultValue(DefaultWidth)]
         public int Width
         {
-            get
-            {
-                return _width;
-            }
+            get => _width;
             set
             {
-                if (value < 0)
-                {
-                    throw new ArgumentOutOfRangeException("value");
-                }
+                Sure.NonNegative(value, nameof(value));
+
                 _width = value;
                 Update();
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="TreeGridColumn"/> is editable.
+        /// Редактируемая колонка?
         /// </summary>
-        /// <value><c>true</c> if editable; otherwise, <c>false</c>.</value>
         [Browsable(false)]
         [DefaultValue(false)]
-        [DesignerSerializationVisibility
-            (
-            DesignerSerializationVisibility.Hidden
-            )]
-        public virtual bool Editable
-        {
-            get { return false; }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public virtual bool Editable => false;
 
         /// <summary>
-        /// Gets the type of the editor.
+        /// Тип редактора для ячеек колонки.
+        /// По умолчанию не задан.
         /// </summary>
-        /// <value>The type of the editor.</value>
         [Browsable(false)]
         [DefaultValue(null)]
-        [DesignerSerializationVisibility
-            (
-            DesignerSerializationVisibility.Hidden
-            )]
-        public virtual Type EditorType
-        {
-            get { return null; }
-        }
-
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public virtual Type? EditorType => null;
 
         /// <summary>
-        /// Gets the left.
+        /// Левая граница колонки.
         /// </summary>
-        /// <value>The left.</value>
         [Browsable(false)]
         [DefaultValue(0)]
-        [DesignerSerializationVisibility
-            (
-            DesignerSerializationVisibility.Hidden
-            )]
-        public int Left { get { return _left; } }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public int Left => _left;
 
         /// <summary>
-        /// Gets the right.
+        /// Правая граница колонки.
         /// </summary>
-        /// <value>The right.</value>
         [Browsable(false)]
         [DefaultValue(0)]
-        [DesignerSerializationVisibility
-            (
-            DesignerSerializationVisibility.Hidden
-            )]
-        public int Right { get { return _right; } }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public int Right => _right;
 
         /// <summary>
-        /// Gets the index.
+        /// Индекс колонки.
         /// </summary>
-        /// <value>The index.</value>
         [Browsable(false)]
         [DefaultValue(0)]
-        [DesignerSerializationVisibility
-            (
-            DesignerSerializationVisibility.Hidden
-            )]
-        public int Index { get { return _index; } }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public int Index => _index;
 
         public const int DefaultDataIndex = -1;
 
-        private int _dataIndex = DefaultDataIndex;
-
         /// <summary>
-        /// Gets or sets the index of the data.
+        /// Индекс в массиве данных строки грида.
         /// </summary>
-        /// <value>The index of the data.</value>
         [DefaultValue(DefaultDataIndex)]
-        public int DataIndex
-        {
-            get { return _dataIndex; }
-            set { _dataIndex = value; }
-        }
+        public int DataIndex { get; set; } = DefaultDataIndex;
 
         /// <summary>
         /// Gets the grid.
         /// </summary>
-        /// <value>The grid.</value>
-        /// <summary>
-        /// Gets the index.
-        /// </summary>
-        /// <value>The index.</value>
         [Browsable(false)]
         [DefaultValue(null)]
-        [DesignerSerializationVisibility
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public TreeGrid? Grid => _grid;
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор для внутреннего применения.
+        /// </summary>
+        protected TreeGridColumn()
+            : this(null)
+        {
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="grid">Грид, которому принадлежит колонка.</param>
+        protected TreeGridColumn
             (
-            DesignerSerializationVisibility.Hidden
-            )]
-        public TreeGrid Grid { get { return _grid; } }
+                TreeGrid? grid
+            )
+        {
+            _width = DefaultWidth;
+            _grid = grid;
+        }
 
         #endregion
 
         #region Private members
 
-        private TreeGridAlignment _alignment;
-        private Icon _icon;
-        private string _title;
+        private TreeGridAlignment _alignment = TreeGridAlignment.Near;
+        private Icon? _icon;
+        private string? _title;
         private int _fillFactor;
         internal int _left;
-        internal int _width = DefaultWidth;
+        internal int _width;
         private bool _readOnly;
         private bool _resizeable;
         internal int _right;
         internal int _index;
-        internal TreeGrid _grid;
+        internal TreeGrid? _grid;
 
 
         protected internal virtual void OnDrawHeader
@@ -335,13 +269,8 @@ namespace AM.Windows.Forms
                 TreeGridDrawCellEventArgs args
             )
         {
-            args.Node.OnDrawCell(args);
-
-            EventHandler<TreeGridDrawCellEventArgs> handler = DrawCell;
-            if (handler != null)
-            {
-                handler(this, args);
-            }
+            args.Node.ThrowIfNull("args.Node").OnDrawCell(args);
+            DrawCell?.Invoke(this, args);
         }
 
         /// <summary>
@@ -367,16 +296,11 @@ namespace AM.Windows.Forms
                 TreeGridMouseEventArgs args
             )
         {
-            TreeGridNode node = args.Node;
-            if (node.Enabled)
+            if (args.Node is { Enabled: true } node)
             {
                 if (Editable && !ReadOnly)
                 {
-                    string initialValue = Grid.GetInitialValue
-                        (
-                            node,
-                            this
-                        );
+                    var initialValue = Grid!.GetInitialValue ( node, this );
                     if (!Grid.BeginEdit(Index, initialValue))
                     {
                         node.Expanded = !node.Expanded;
@@ -394,65 +318,38 @@ namespace AM.Windows.Forms
         #region Public methods
 
         /// <summary>
-        /// Begins the edit.
+        /// Начинает редактирование ячейки.
         /// </summary>
-        /// <param name="initialValue">The initial value.</param>
-        public virtual void BeginEdit(string initialValue)
+        /// <param name="initialValue">Начальное значение ячейки.</param>
+        public virtual void BeginEdit
+            (
+                string? initialValue
+            )
         {
-            Grid.BeginEdit(Index, initialValue);
+            Grid?.BeginEdit(Index, initialValue);
         }
 
         /// <summary>
-        /// Ends the edit.
+        /// Завершает редактирование ячейки.
         /// </summary>
-        /// <param name="accept">if set to <c>true</c> [accept].</param>
+        /// <param name="accept">Пользователь принял результат редактирования?</param>
         public virtual void EndEdit(bool accept)
         {
-            Grid.EndEdit(accept);
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <summary>
-        /// Returns a <see cref="System.String"/> that represents
-        /// this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String"/> that represents this
-        /// instance.
-        /// </returns>
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "{0} ({1})",
-                    _title,
-                    _width
-                );
+            Grid?.EndEdit(accept);
         }
 
         #endregion
 
         #region Implementation of IXmlSerializable
 
-        /// <summary>
-        /// This property is reserved, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class instead.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
-        /// </returns>
-        public XmlSchema GetSchema()
-        {
-            return null;
-        }
+        /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
+        public XmlSchema? GetSchema() => null;
 
-        /// <summary>
-        /// Generates an object from its XML representation.
-        /// </summary>
-        /// <param name="reader">The <see cref="T:System.Xml.XmlReader"/> stream from which the object is deserialized. </param>
-        public void ReadXml(XmlReader reader)
+        /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
+        public void ReadXml
+            (
+                XmlReader reader
+            )
         {
             throw new NotImplementedException();
 
@@ -481,11 +378,11 @@ namespace AM.Windows.Forms
             */
         }
 
-        /// <summary>
-        /// Converts an object into its XML representation.
-        /// </summary>
-        /// <param name="writer">The <see cref="T:System.Xml.XmlWriter"/> stream to which the object is serialized. </param>
-        public void WriteXml(XmlWriter writer)
+        /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
+        public void WriteXml
+            (
+                XmlWriter writer
+            )
         {
             writer.WriteAttributeString("title", Title);
             writer.WriteAttributeString
@@ -493,39 +390,51 @@ namespace AM.Windows.Forms
                     "fill-factor",
                     FillFactor.ToString()
                 );
+
             writer.WriteAttributeString
                 (
                     "read-only",
                     ReadOnly.ToString()
                 );
+
             writer.WriteAttributeString
                 (
                     "resizeable",
                     Resizeable.ToString()
                 );
+
             writer.WriteAttributeString
                 (
                     "alignment",
                     Alignment.ToString()
                 );
+
             writer.WriteAttributeString
                 (
                     "width",
                     Width.ToString()
                 );
-            if (Icon != null)
+
+            if (Icon is not null)
             {
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    Icon.Save(stream);
-                    writer.WriteStartElement("icon");
-                    byte[] bytes = stream.ToArray();
-                    writer.WriteBase64(bytes, 0, bytes.Length);
-                    writer.WriteEndElement();
-                }
+                using var stream = new MemoryStream();
+                Icon.Save(stream);
+                writer.WriteStartElement("icon");
+                var bytes = stream.ToArray();
+                writer.WriteBase64(bytes, 0, bytes.Length);
+                writer.WriteEndElement();
             }
         }
 
         #endregion
-    }
-}
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"{_title} ({_width})";
+
+        #endregion
+
+    } // class TreeGridColumn
+
+} // namespace AM.Windows.Forms

@@ -4,9 +4,10 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridDrawColumnHeaderEventArgs.cs
+/* TreeGridDrawColumnHeaderEventArgs.cs -- аргументы события для перерисовки заголовка колонки грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,48 +23,58 @@ using System.Drawing;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///
+    /// Аргументы события для перерисовки заголовка колонки грида.
     /// </summary>
     public sealed class TreeGridDrawColumnHeaderEventArgs
         : EventArgs
     {
-        /// <summary>
-        /// Gets or sets the graphics.
-        /// </summary>
-        /// <value>The graphics.</value>
-        public Graphics Graphics { get; set; }
+        #region Properties
 
         /// <summary>
-        /// Gets or sets the tree grid.
+        /// Канва для рисования.
         /// </summary>
-        /// <value>The tree grid.</value>
-        public TreeGrid TreeGrid { get; set; }
+        public Graphics? Graphics { get; set; }
 
         /// <summary>
-        /// Gets or sets the node.
+        /// Грид.
         /// </summary>
-        /// <value>The node.</value>
-        public TreeGridNode Node { get; set; }
+        public TreeGrid? Grid { get; set; }
 
         /// <summary>
-        /// Gets or sets the column.
+        /// Колонка.
         /// </summary>
-        /// <value>The column.</value>
-        public TreeGridColumn Column { get; set; }
+        public TreeGridColumn? Column { get; set; }
 
         /// <summary>
-        /// Gets or sets the rectangle.
+        /// Прямоугольник, подлежащий перерисовке.
         /// </summary>
-        /// <value>The rectangle.</value>
         public Rectangle Bounds { get; set; }
 
+        #endregion
+
+        #region Public methods
+
         /// <summary>
-        /// Draws the background.
+        /// Отрисовка фона.
         /// </summary>
         public void DrawBackground()
         {
-            Brush brush = TreeGrid.Palette.HeaderBackground;
-            Graphics.FillRectangle
+            var graphics = Graphics;
+            if (graphics is null)
+            {
+                Magna.Debug("Graphics is null");
+                return;
+            }
+
+            var grid = Grid;
+            if (grid is null)
+            {
+                Magna.Debug("Grid is null");
+                return;
+            }
+
+            var brush = grid.Palette.HeaderBackground;
+            graphics.FillRectangle
                 (
                     brush,
                     Bounds
@@ -71,24 +82,54 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Draws the text.
+        /// Отрисовка текста.
         /// </summary>
         public void DrawText()
         {
-            Brush brush = TreeGrid.Palette.HeaderForeground;
-            using (StringFormat format = new StringFormat())
+            var graphics = Graphics;
+            if (graphics is null)
             {
-                format.Alignment = StringAlignment.Center;
-                format.LineAlignment = StringAlignment.Center;
-                Graphics.DrawString
+                Magna.Debug("Graphics is null");
+                return;
+            }
+
+            var grid = Grid;
+            if (grid is null)
+            {
+                Magna.Debug("Grid is null");
+                return;
+            }
+
+            var column = Column;
+            if (column is null)
+            {
+                Magna.Debug("Column is null");
+                return;
+            }
+
+            var brush = grid.Palette.HeaderForeground;
+            using var format = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
+            };
+
+            var title = column.Title;
+            if (!string.IsNullOrEmpty(title))
+            {
+                graphics.DrawString
                     (
-                        Column.Title,
-                        TreeGrid.Font,
+                        title,
+                        grid.Font,
                         brush,
                         Bounds,
                         format
                     );
             }
         }
-    }
-}
+
+        #endregion
+
+    } // class TreeGridDrawColumnHeaderEventArgs
+
+} // namespace AM.Windows.Forms

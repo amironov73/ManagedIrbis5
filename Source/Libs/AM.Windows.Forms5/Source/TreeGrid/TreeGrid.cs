@@ -426,7 +426,7 @@ namespace AM.Windows.Forms
                         Column = column,
                         Graphics = graphics,
                         Bounds = r,
-                        TreeGrid = this
+                        Grid = this
                     };
                 column.OnDrawHeader(dha);
 
@@ -463,7 +463,7 @@ namespace AM.Windows.Forms
                         = new TreeGridDrawNodeEventArgs
                               {
                                   Graphics = graphics,
-                                  TreeGrid = this,
+                                  Grid = this,
                                   Bounds = r,
                                   Node = node,
                                   State = GetNodeState(node)

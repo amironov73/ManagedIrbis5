@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -43,13 +44,6 @@ namespace AM.Windows.Forms
         #region Construction
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        public ListBoxOutput()
-        {
-        }
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         public ListBoxOutput
@@ -78,7 +72,8 @@ namespace AM.Windows.Forms
                 ListBox.InvokeIfRequired
                     (
                         () => ListBox.Items.Add(text)
-                    );
+                    )
+                    .WaitFor();
             }
 
             ListBox.InvokeIfRequired
@@ -91,7 +86,8 @@ namespace AM.Windows.Forms
                                     = ListBox.Items.Count - 1;
                             }
                         }
-                );
+                )
+                .WaitFor();
         }
 
         #endregion
@@ -113,7 +109,8 @@ namespace AM.Windows.Forms
             ListBox.InvokeIfRequired
                 (
                     () => ListBox.Items.Clear()
-                );
+                )
+                .WaitFor();
 
             return this;
         }

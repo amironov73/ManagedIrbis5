@@ -40,7 +40,7 @@ namespace AM.Windows.Forms
                 this TreeGridAlignment alignment
             )
         {
-            StringAlignment result = StringAlignment.Near;
+            var result = StringAlignment.Near;
             switch (alignment)
             {
                 case TreeGridAlignment.Center:
@@ -61,7 +61,7 @@ namespace AM.Windows.Forms
             )
         {
             Brush result = (node.ForegroundColor == Color.Empty)
-                ? (Brush)grid.Palette.Foreground
+                ? grid.Palette.Foreground
                 : new SolidBrush(node.ForegroundColor);
 
             if ((state & TreeGridNodeState.Selected) != 0)
@@ -88,7 +88,7 @@ namespace AM.Windows.Forms
             )
         {
             Brush result = (node.BackgroundColor == Color.Empty)
-                ? (Brush)grid.Palette.Backrground
+                ? grid.Palette.Backrground
                 : new SolidBrush(node.BackgroundColor);
 
             if ((state & TreeGridNodeState.Selected) != 0)
@@ -105,13 +105,31 @@ namespace AM.Windows.Forms
                 TreeGridDrawLayout layout
             )
         {
-            TreeGridNode node = args.Node;
-            TreeGrid grid = args.TreeGrid;
-            Graphics graphics = args.Graphics;
-            Rectangle bounds = args.Bounds;
-            string title = layout.TextOverride
-                ?? args.TextOverride
-                ?? node.Title;
+            var node = args.Node;
+            if (node is null)
+            {
+                Magna.Debug("Node is null");
+                return;
+            }
+
+            var grid = args.Grid;
+            if (grid is null)
+            {
+                Magna.Debug("Grid is null");
+                return;
+            }
+
+            var graphics = args.Graphics;
+            if (graphics is null)
+            {
+                Magna.Debug("Graphics is null");
+                return;
+            }
+
+            var bounds = args.Bounds;
+            var title = layout.TextOverride
+                        ?? args.TextOverride
+                        ?? node.Title;
 
             graphics.FillRectangle
                 (
@@ -121,9 +139,9 @@ namespace AM.Windows.Forms
 
             if (!layout.Expand.IsEmpty)
             {
-                Bitmap openOrClosed = args.GetStateBitmap();
-                int top = bounds.Top
-                    + (bounds.Height - openOrClosed.Height) / 2;
+                var openOrClosed = args.GetStateBitmap();
+                var top = bounds.Top
+                          + (bounds.Height - openOrClosed.Height) / 2;
 
                 graphics.DrawImage
                     (
@@ -137,8 +155,7 @@ namespace AM.Windows.Forms
 
             if (!layout.Check.IsEmpty)
             {
-                CheckBoxRenderer
-                    .DrawCheckBox
+                CheckBoxRenderer.DrawCheckBox
                     (
                         graphics,
                         layout.Check.Location,
@@ -152,7 +169,7 @@ namespace AM.Windows.Forms
             {
                 graphics.DrawIcon
                     (
-                       node.Icon,
+                       node.Icon!,
                        layout.Icon.Left,
                        layout.Icon.Top
                     );
@@ -160,22 +177,22 @@ namespace AM.Windows.Forms
 
             if (!string.IsNullOrEmpty(title))
             {
-                using (StringFormat format = new StringFormat())
+                using var format = new StringFormat
                 {
-                    format.LineAlignment = StringAlignment.Center;
-                    format.HotkeyPrefix = HotkeyPrefix.None;
-                    format.FormatFlags |= StringFormatFlags.NoWrap;
-                    format.Trimming = StringTrimming.EllipsisCharacter;
+                    LineAlignment = StringAlignment.Center,
+                    HotkeyPrefix = HotkeyPrefix.None
+                };
+                format.FormatFlags |= StringFormatFlags.NoWrap;
+                format.Trimming = StringTrimming.EllipsisCharacter;
 
-                    graphics.DrawString
-                        (
-                            title,
-                            grid.Font,
-                            args.GetForegroundBrush(),
-                            layout.Text,
-                            format
-                        );
-                }
+                graphics.DrawString
+                (
+                    title,
+                    grid.Font,
+                    args.GetForegroundBrush(),
+                    layout.Text,
+                    format
+                );
             }
         }
 

@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 /* ExceptionBox.cs --
@@ -16,7 +17,6 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 
-using AM;
 using AM.Drawing.Printing;
 
 #endregion
@@ -38,7 +38,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public Exception? Exception
         {
-            get { return _exception; }
+            get => _exception;
             set
             {
                 _exception = value;
@@ -64,9 +64,9 @@ namespace AM.Windows.Forms
 
         #region Private members
 
-        private Exception _exception;
+        private Exception? _exception;
 
-        private BinaryAttachment[] _attachments;
+        private BinaryAttachment[]?_attachments;
 
         private void _abortButton_Click
             (
@@ -101,12 +101,8 @@ namespace AM.Windows.Forms
                 EventArgs e
             )
         {
-            using (PlainTextPrinter printer
-                = new PlainTextPrinter())
-            {
-                printer.Print(_textBox.Text);
-            }
-
+            using var printer = new PlainTextPrinter();
+            printer.Print(_textBox.Text);
         }
 
         private void _saveButton_Click
@@ -133,11 +129,11 @@ namespace AM.Windows.Forms
                 EventArgs e
             )
         {
-            using (AttachmentBox box
-                = new AttachmentBox(_attachments))
-            {
-                box.ShowDialog(this);
-            }
+            using var box = new AttachmentBox
+                (
+                    _attachments ?? Array.Empty<BinaryAttachment>()
+                );
+            box.ShowDialog(this);
         }
 
         #endregion
@@ -153,24 +149,25 @@ namespace AM.Windows.Forms
                 Exception exception
             )
         {
-            using (ExceptionBox box = new ExceptionBox())
+            using var box = new ExceptionBox
             {
-                box._typeLabel.Text = exception.GetType().ToString();
-                box._messageLabel.Text = exception.Message;
-                box._textBox.Text = exception.ToString();
+                _typeLabel = {Text = exception.GetType().ToString()},
+                _messageLabel = {Text = exception.Message},
+                _textBox = {Text = exception.ToString()}
+            };
 
-                var container = exception as IAttachmentContainer;
-                if (!ReferenceEquals(container, null))
+            // ReSharper disable SuspiciousTypeConversion.Global
+            if (exception is IAttachmentContainer container)
+            {
+                box._attachments = container.ListAttachments();
+                if (box._attachments.Length != 0)
                 {
-                    box._attachments = container.ListAttachments();
-                    if (box._attachments.Length != 0)
-                    {
-                        box._attachmentsButton.Enabled = true;
-                    }
+                    box._attachmentsButton.Enabled = true;
                 }
-
-                box.ShowDialog(parent);
             }
+            // ReSharper restore SuspiciousTypeConversion.Global
+
+            box.ShowDialog(parent);
         }
 
         /// <summary>

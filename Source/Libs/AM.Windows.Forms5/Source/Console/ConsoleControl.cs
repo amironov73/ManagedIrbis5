@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
 /* ConsoleControl.cs --
@@ -111,12 +113,12 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Raised on input (Enter key).
         /// </summary>
-        public event EventHandler<ConsoleInputEventArgs> Input;
+        public event EventHandler<ConsoleInputEventArgs>? Input;
 
         /// <summary>
         /// Raised when TAB key pressed.
         /// </summary>
-        public event EventHandler<ConsoleInputEventArgs> TabPressed;
+        public event EventHandler<ConsoleInputEventArgs>? TabPressed;
 
         #endregion
 
@@ -139,7 +141,7 @@ namespace AM.Windows.Forms
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Font ItalicFont { get { return _italicFont; } }
+        public Font ItalicFont => _italicFont.ThrowIfNull(nameof(_italicFont));
 
         /// <summary>
         /// Cursor height.
@@ -148,13 +150,12 @@ namespace AM.Windows.Forms
         [DefaultValue(DefaultCursorHeight)]
         public int CursorHeight
         {
-            get { return _cursorHeight; }
+            get => _cursorHeight;
             set
             {
-                if (value < 1
-                    || value > _cellHeight)
+                if (value < 1 || value > _cellHeight)
                 {
-                    throw new ArgumentOutOfRangeException("value");
+                    throw new ArgumentOutOfRangeException(nameof(value));
                 }
 
                 _cursorHeight = value;
@@ -179,7 +180,7 @@ namespace AM.Windows.Forms
         [DefaultValue(true)]
         public bool CursorVisible
         {
-            get { return _cursorVisible; }
+            get => _cursorVisible;
             set
             {
                 _cursorVisible = value;
@@ -193,13 +194,12 @@ namespace AM.Windows.Forms
         [DefaultValue(DefaultWindowHeight)]
         public int WindowHeight
         {
-            get { return _windowHeight; }
+            get => _windowHeight;
             set
             {
-                if (value < MinimalWindowHeight
-                    || value > MaximalWindowHeight)
+                if (value < MinimalWindowHeight || value > MaximalWindowHeight)
                 {
-                    throw new ArgumentOutOfRangeException("value");
+                    throw new ArgumentOutOfRangeException(nameof(value));
                 }
 
                 _windowHeight = value;
@@ -213,13 +213,12 @@ namespace AM.Windows.Forms
         [DefaultValue(DefaultWindowWidth)]
         public int WindowWidth
         {
-            get { return _windowWidth; }
+            get => _windowWidth;
             set
             {
-                if (value < MinimalWindowWidth
-                    || value > MaximalWindowWidth)
+                if (value < MinimalWindowWidth || value > MaximalWindowWidth)
                 {
-                    throw new ArgumentOutOfRangeException("value");
+                    throw new ArgumentOutOfRangeException(nameof(value));
                 }
 
                 _windowWidth = value;
@@ -270,7 +269,7 @@ namespace AM.Windows.Forms
 
         #region Private members
 
-        private Cell[] _cells;
+        private Cell[]? _cells;
 
         private int _cellWidth;
         private int _cellHeight;
@@ -281,19 +280,19 @@ namespace AM.Windows.Forms
         private bool _cursorVisible;
         private bool _cursorVisibleNow;
 
-        private StringBuilder _inputBuffer;
+        private readonly StringBuilder _inputBuffer;
         private int _inputRow;
         private int _inputColumn;
 
-        private readonly Timer _cursorTimer;
+        private readonly Timer? _cursorTimer;
 
-        private Font _font;
-        private Font _italicFont;
+        private Font? _font;
+        private Font? _italicFont;
 
         private readonly List<string> _historyList;
         private int _historyPosition;
 
-        private static Color[] _egaColors =
+        private static readonly Color[] _egaColors =
         {
             /* 0x00 */ Color.Black,
             /* 0x01 */ Color.Blue,
@@ -328,20 +327,20 @@ namespace AM.Windows.Forms
             }
         }
 
-        private int _CellOffset
-        (
-            int row,
-            int column
-        )
-        {
-            int result = row * WindowWidth + column;
-
-            return result;
-        }
+        // private int _CellOffset
+        //     (
+        //         int row,
+        //         int column
+        //     )
+        // {
+        //     var result = row * WindowWidth + column;
+        //
+        //     return result;
+        // }
 
         private void _CursorHandler
             (
-                object sender,
+                object? sender,
                 EventArgs eventArgs
             )
         {
@@ -353,45 +352,41 @@ namespace AM.Windows.Forms
 
             _cursorVisibleNow = !_cursorVisibleNow;
 
-            using (Graphics graphics = Graphics.FromHwnd(Handle))
+            using var graphics = Graphics.FromHwnd(Handle);
+            var rectangle = new Rectangle
+                (
+                    _cellWidth * CursorLeft,
+                    _cellHeight * CursorTop,
+                    _cellWidth,
+                    _cellHeight
+                );
+
+            var cell = _cells![CursorTop * WindowWidth + CursorLeft];
+            using var foreBrush = new SolidBrush(cell.ForeColor);
+            using var backBrush = new SolidBrush(cell.BackColor);
+            using var cursorBrush = new SolidBrush(ForeColor);
+            var s = new string(cell.Character, 1);
+            graphics.FillRectangle(backBrush, rectangle);
+            graphics.DrawString
+                (
+                    s,
+                    cell.Emphasized ? ItalicFont : Font,
+                    foreBrush,
+                    rectangle.Left - 2,
+                    rectangle.Top
+                );
+
+            if (_cursorVisibleNow)
             {
-                Rectangle rectangle = new Rectangle
+                rectangle = new Rectangle
                     (
-                        _cellWidth * CursorLeft,
-                        _cellHeight * CursorTop,
-                        _cellWidth,
-                        _cellHeight
+                        rectangle.Left,
+                        rectangle.Top + _cellHeight - CursorHeight,
+                        rectangle.Width,
+                        CursorHeight
                     );
-
-                Cell cell = _cells[CursorTop * WindowWidth + CursorLeft];
-                using (Brush foreBrush = new SolidBrush(cell.ForeColor))
-                using (Brush backBrush = new SolidBrush(cell.BackColor))
-                using (Brush cursorBrush = new SolidBrush(ForeColor))
-                {
-                    string s = new string(cell.Character, 1);
-                    graphics.FillRectangle(backBrush, rectangle);
-                    graphics.DrawString
-                        (
-                            s,
-                            cell.Emphasized ? ItalicFont : Font,
-                            foreBrush,
-                            rectangle.Left - 2,
-                            rectangle.Top
-                        );
-
-                    if (_cursorVisibleNow)
-                    {
-                        rectangle = new Rectangle
-                            (
-                                rectangle.Left,
-                                rectangle.Top + _cellHeight - CursorHeight,
-                                rectangle.Width,
-                                CursorHeight
-                            );
-                        graphics.FillRectangle(cursorBrush, rectangle);
-                        SystemSounds.Asterisk.Play();
-                    }
-                }
+                graphics.FillRectangle(cursorBrush, rectangle);
+                SystemSounds.Asterisk.Play();
             }
         }
 
@@ -400,28 +395,25 @@ namespace AM.Windows.Forms
             _HideCursorTemporary();
             WriteLine();
 
-            string text = _inputBuffer.ToString();
-            ConsoleInputEventArgs eventArgs
-                = new ConsoleInputEventArgs
+            var text = _inputBuffer.ToString();
+            var eventArgs = new ConsoleInputEventArgs
                 {
                     Text = text
                 };
-            Input.Raise(this, eventArgs);
+            Input?.Invoke(this, eventArgs);
 
             AddHistoryEntry(text);
-
             _inputBuffer.Length = 0;
         }
 
         private void _HandleTab()
         {
-            string text = _inputBuffer.ToString();
-            ConsoleInputEventArgs eventArgs
-                = new ConsoleInputEventArgs
+            var text = _inputBuffer.ToString();
+            var eventArgs = new ConsoleInputEventArgs
                 {
                     Text = text
                 };
-            TabPressed.Raise(this, eventArgs);
+            TabPressed?.Invoke(this, eventArgs);
         }
 
         private void _HideCursorTemporary()
@@ -432,7 +424,7 @@ namespace AM.Windows.Forms
 
         private int _InputPosition()
         {
-            int result = (CursorTop - _inputRow) * WindowWidth
+            var result = (CursorTop - _inputRow) * WindowWidth
                          + CursorLeft - _inputColumn;
 
             return result;
@@ -440,9 +432,9 @@ namespace AM.Windows.Forms
 
         private void _MoveInput(int delta)
         {
-            int length = _inputBuffer.Length;
-            int currentPosition = _InputPosition();
-            int newPosition = currentPosition + delta;
+            var length = _inputBuffer.Length;
+            var currentPosition = _InputPosition();
+            var newPosition = currentPosition + delta;
             if (newPosition < 0)
             {
                 newPosition = 0;
@@ -451,39 +443,39 @@ namespace AM.Windows.Forms
             {
                 newPosition = length;
             }
-            int newDelta = newPosition - currentPosition;
+
+            var newDelta = newPosition - currentPosition;
             MoveCursor(newDelta, 0);
         }
 
         private void _SetupCells()
         {
-            if (WindowHeight == 0
-                || WindowWidth == 0)
+            if (WindowHeight == 0 || WindowWidth == 0)
             {
                 return;
             }
 
-            int cellCount = WindowHeight * WindowWidth;
+            var cellCount = WindowHeight * WindowWidth;
             _cells = new Cell[cellCount];
-            Cell empty = new Cell
+            var empty = new Cell
             {
                 Character = ' ',
                 ForeColor = ForeColor,
                 BackColor = BackColor
             };
-            for (int i = 0; i < cellCount; i++)
+            for (var i = 0; i < cellCount; i++)
             {
                 _cells[i] = empty;
             }
 
-            Size clientSize = ClientSize;
+            var clientSize = ClientSize;
             _cellHeight = clientSize.Height / WindowHeight;
             _cellWidth = clientSize.Width / WindowWidth;
         }
 
         private void _SetupFont()
         {
-            _italicFont = new Font(_font, FontStyle.Italic);
+            _italicFont = new Font(_font!, FontStyle.Italic);
 
             _SetupCells();
         }
@@ -505,8 +497,7 @@ namespace AM.Windows.Forms
                 string text
             )
         {
-            if (!string.IsNullOrEmpty(text)
-                && !_historyList.Contains(text))
+            if (!string.IsNullOrEmpty(text) && !_historyList.Contains(text))
             {
                 _historyList.Insert(0, text);
             }
@@ -518,8 +509,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public bool Backspace()
         {
-            int length = _inputBuffer.Length;
-
+            var length = _inputBuffer.Length;
             if (length == 0)
             {
                 return false;
@@ -527,15 +517,14 @@ namespace AM.Windows.Forms
 
             _HideCursorTemporary();
 
-            int position = _InputPosition();
+            var position = _InputPosition();
             if (position != 0)
             {
                 _inputBuffer.Remove(position - 1, 1);
             }
 
-            string text = _inputBuffer + " ";
+            var text = _inputBuffer + " ";
             Write(_inputRow, _inputColumn, text);
-
             MoveCursor(-1, 0);
 
             return true;
@@ -549,17 +538,17 @@ namespace AM.Windows.Forms
             CursorTop = 0;
             CursorLeft = 0;
 
-            int total = WindowWidth * WindowHeight;
+            var total = WindowWidth * WindowHeight;
 
-            Cell empty = new Cell
+            var empty = new Cell
             {
                 Character = ' ',
                 ForeColor = ForeColor,
                 BackColor = BackColor
             };
-            for (int i = 0; i < total; i++)
+            for (var i = 0; i < total; i++)
             {
-                _cells[i] = empty;
+                _cells![i] = empty;
             }
 
             _inputBuffer.Length = 0;
@@ -578,13 +567,14 @@ namespace AM.Windows.Forms
                 int column
             )
         {
-            for (int x = column; x < WindowWidth; x++)
+            for (var x = column; x < WindowWidth; x++)
             {
                 Write(row, x, ' ', ForeColor, BackColor, false);
             }
-            for (int y = row + 1; y < WindowHeight; y++)
+
+            for (var y = row + 1; y < WindowHeight; y++)
             {
-                for (int x = 0; x < WindowWidth; x++)
+                for (var x = 0; x < WindowWidth; x++)
                 {
                     Write(y, x, ' ', ForeColor, BackColor, false);
                 }
@@ -605,7 +595,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public bool DeleteCharacter()
         {
-            int length = _inputBuffer.Length;
+            var length = _inputBuffer.Length;
 
             if (length == 0)
             {
@@ -614,13 +604,13 @@ namespace AM.Windows.Forms
 
             _HideCursorTemporary();
 
-            int position = _InputPosition();
+            var position = _InputPosition();
             if (position < length)
             {
                 _inputBuffer.Remove(position, 1);
             }
 
-            string text = _inputBuffer + " ";
+            var text = _inputBuffer + " ";
             Write(_inputRow, _inputColumn, text);
 
             return true;
@@ -652,7 +642,7 @@ namespace AM.Windows.Forms
                 char c
             )
         {
-            int screenSize = WindowWidth * WindowHeight;
+            var screenSize = WindowWidth * WindowHeight;
             if (_inputBuffer.Length >= screenSize)
             {
                 return false;
@@ -660,7 +650,7 @@ namespace AM.Windows.Forms
 
             if (c >= ' ')
             {
-                int position = _InputPosition();
+                var position = _InputPosition();
 
                 if (_inputBuffer.Length == 0)
                 {
@@ -676,9 +666,10 @@ namespace AM.Windows.Forms
                 {
                     _inputBuffer.Insert(position, c);
                 }
+
                 if (EchoInput)
                 {
-                    string text = _inputBuffer.ToString();
+                    var text = _inputBuffer.ToString();
                     Write(_inputRow, _inputColumn, text);
                     _AdvanceCursor();
                 }
@@ -713,10 +704,12 @@ namespace AM.Windows.Forms
                 CursorTop++;
                 CursorLeft -= WindowWidth;
             }
+
             if (CursorTop < 0)
             {
                 CursorTop = 0;
             }
+
             if (CursorTop >= WindowHeight)
             {
                 CursorTop = WindowHeight - 1;
@@ -728,26 +721,24 @@ namespace AM.Windows.Forms
         /// </summary>
         public string? ReadLine()
         {
-            bool done = false;
-            string result = null;
-            EventHandler<ConsoleInputEventArgs> inputHandler
-                = (sender, args) =>
-                {
-                    result = args.Text;
-                    done = true;
-                };
-            EventHandler disposeHandler = (sender, args) =>
-            {
-                done = true;
-            };
+            var done = false;
+            string? result = null;
 
-            Input += inputHandler;
-            Disposed += disposeHandler;
+            void InputHandler(object? _, ConsoleInputEventArgs args)
+            {
+                result = args.Text;
+                done = true;
+            }
+
+            void DisposeHandler(object? o, EventArgs eventArgs) => done = true;
+
+            Input += InputHandler;
+            Disposed += DisposeHandler;
 
             ApplicationUtility.WaitFor(ref done);
 
-            Input -= inputHandler;
-            Disposed -= disposeHandler;
+            Input -= InputHandler;
+            Disposed -= DisposeHandler;
 
             return result;
         }
@@ -757,23 +748,24 @@ namespace AM.Windows.Forms
         /// </summary>
         public void ScrollUp()
         {
-            int total = WindowWidth * WindowHeight;
-            int scrollingEnd = total - WindowWidth;
+            var total = WindowWidth * WindowHeight;
+            var scrollingEnd = total - WindowWidth;
 
-            for (int i = 0; i < scrollingEnd; i++)
+            for (var i = 0; i < scrollingEnd; i++)
             {
-                _cells[i] = _cells[i + WindowWidth];
+                _cells![i] = _cells[i + WindowWidth];
             }
 
-            Cell empty = new Cell
+            var empty = new Cell
             {
                 Character = ' ',
                 ForeColor = ForeColor,
                 BackColor = BackColor
             };
-            for (int i = scrollingEnd; i < total; i++)
+
+            for (var i = scrollingEnd; i < total; i++)
             {
-                _cells[i] = empty;
+                _cells![i] = empty;
             }
 
             if (_inputRow != 0)
@@ -796,14 +788,14 @@ namespace AM.Windows.Forms
                 bool advanceAfter
             )
         {
-            int count = _historyList.Count;
+            var count = _historyList.Count;
             if (_historyPosition >= count)
             {
                 DropInput();
                 return;
             }
 
-            string text = _historyList[_historyPosition];
+            var text = _historyList[_historyPosition];
             SetInput(text);
 
             if (advanceAfter)
@@ -828,6 +820,7 @@ namespace AM.Windows.Forms
                 _inputRow = CursorTop;
                 _inputColumn = CursorLeft;
             }
+
             DropInput();
             _inputBuffer.Append(text);
             Write(text);
@@ -844,7 +837,7 @@ namespace AM.Windows.Forms
                 bool emphasize
             )
         {
-            Cell cell = new Cell
+            var cell = new Cell
             {
                 Character = c,
                 BackColor = backColor,
@@ -852,7 +845,7 @@ namespace AM.Windows.Forms
                 Emphasized = emphasize
             };
 
-            _cells[CursorTop * WindowWidth + CursorLeft] = cell;
+            _cells![CursorTop * WindowWidth + CursorLeft] = cell;
             _AdvanceCursor();
             Invalidate();
         }
@@ -870,24 +863,22 @@ namespace AM.Windows.Forms
                 bool emphasize
             )
         {
-            if (
-                row < 0
+            if (row < 0
                 || row >= WindowHeight
                 || column < 0
-                || column >= WindowWidth
-                )
+                || column >= WindowWidth)
             {
                 return;
             }
 
-            Cell cell = new Cell
+            var cell = new Cell
             {
                 Character = c,
                 BackColor = backColor,
                 ForeColor = foreColor,
                 Emphasized = emphasize
             };
-            _cells[row * WindowWidth + column] = cell;
+            _cells![row * WindowWidth + column] = cell;
             Invalidate();
         }
 
@@ -901,21 +892,17 @@ namespace AM.Windows.Forms
                 char c
             )
         {
-            if (
-                row < 0
+            if (row < 0
                 || row >= WindowHeight
                 || column < 0
-                || column >= WindowWidth
-                )
+                || column >= WindowWidth)
             {
                 return;
             }
 
-            int offset = row * WindowWidth + column;
-
-            Cell previousCell = _cells[offset];
-
-            Cell newCell = new Cell
+            var offset = row * WindowWidth + column;
+            var previousCell = _cells![offset];
+            var newCell = new Cell
             {
                 Character = c,
                 BackColor = previousCell.BackColor,
@@ -942,11 +929,11 @@ namespace AM.Windows.Forms
                 return;
             }
 
-            Color saveForeColor = foreColor;
-            Color saveBackColor = backColor;
-            int mode = 0;
+            var saveForeColor = foreColor;
+            var saveBackColor = backColor;
+            var mode = 0;
 
-            foreach (char c in text)
+            foreach (var c in text)
             {
                 if (mode == 1)
                 {
@@ -954,6 +941,7 @@ namespace AM.Windows.Forms
                     mode = 0;
                     continue;
                 }
+
                 if (mode == 2)
                 {
                     backColor = _egaColors[c % 16];
@@ -1035,13 +1023,7 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Write text.
         /// </summary>
-        public void Write
-            (
-                string? text
-            )
-        {
-            Write(ForeColor, BackColor, false, text);
-        }
+        public void Write (string? text) => Write (ForeColor, BackColor, false, text);
 
         /// <summary>
         /// Write text.
@@ -1058,7 +1040,7 @@ namespace AM.Windows.Forms
                 return;
             }
 
-            foreach (char c in text)
+            foreach (var c in text)
             {
                 Write(row, column, c, ForeColor, BackColor, false);
                 column++;
@@ -1134,12 +1116,12 @@ namespace AM.Windows.Forms
                 Color backColor
             )
         {
-            int count = CursorLeft % 8;
+            var count = CursorLeft % 8;
             if (count == 0)
             {
                 count = 8;
             }
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 Write(' ', ForeColor, backColor, false);
             }
@@ -1150,10 +1132,7 @@ namespace AM.Windows.Forms
         #region Control members
 
         /// <inheritdoc />
-        protected override Size DefaultSize
-        {
-            get { return new Size(640, 375); }
-        }
+        protected override Size DefaultSize => new Size(640, 375);
 
         /// <inheritdoc />
         protected override void Dispose
@@ -1177,7 +1156,7 @@ namespace AM.Windows.Forms
         /// <inheritdoc />
         public override Font Font
         {
-            get => _font;
+            get => _font.ThrowIfNull(nameof(_font));
             set
             {
                 _font = value;
@@ -1187,9 +1166,9 @@ namespace AM.Windows.Forms
 
         /// <inheritdoc />
         protected override void OnClientSizeChanged
-        (
-            EventArgs e
-        )
+            (
+                EventArgs e
+            )
         {
             base.OnClientSizeChanged(e);
 
@@ -1209,7 +1188,7 @@ namespace AM.Windows.Forms
                 return;
             }
 
-            char c = e.KeyChar;
+            var c = e.KeyChar;
             e.Handled = InputChar(c);
         }
 
@@ -1219,25 +1198,25 @@ namespace AM.Windows.Forms
                 PaintEventArgs paintEvent
             )
         {
-            Graphics graphics = paintEvent.Graphics;
+            var graphics = paintEvent.Graphics;
 
-            int cellOffset = 0;
-            int rowOffset = 0;
+            var cellOffset = 0;
+            var rowOffset = 0;
 
-            Color backColor = BackColor;
-            Brush backBrush = new SolidBrush(backColor);
-            Color foreColor = ForeColor;
-            Brush foreBrush = new SolidBrush(foreColor);
+            var backColor = BackColor;
+            var backBrush = new SolidBrush(backColor);
+            var foreColor = ForeColor;
+            var foreBrush = new SolidBrush(foreColor);
 
             try
             {
-                for (int row = 0; row < WindowHeight; row++)
+                for (var row = 0; row < WindowHeight; row++)
                 {
-                    int columnOffset = 0;
+                    var columnOffset = 0;
 
-                    for (int column = 0; column < WindowWidth; column++)
+                    for (var column = 0; column < WindowWidth; column++)
                     {
-                        Cell cell = _cells[cellOffset];
+                        var cell = _cells![cellOffset];
 
                         if (cell.BackColor != backColor)
                         {
@@ -1252,7 +1231,7 @@ namespace AM.Windows.Forms
                             foreBrush = new SolidBrush(foreColor);
                         }
 
-                        Rectangle rectangle = new Rectangle
+                        var rectangle = new Rectangle
                         (
                             columnOffset,
                             rowOffset,
@@ -1261,7 +1240,7 @@ namespace AM.Windows.Forms
                         );
 
                         graphics.FillRectangle(backBrush, rectangle);
-                        string s = new string(cell.Character, 1);
+                        var s = new string(cell.Character, 1);
                         graphics.DrawString
                         (
                             s,
@@ -1289,9 +1268,9 @@ namespace AM.Windows.Forms
 
         /// <inheritdoc />
         protected override void OnPreviewKeyDown
-        (
-            PreviewKeyDownEventArgs e
-        )
+            (
+                PreviewKeyDownEventArgs e
+            )
         {
             base.OnPreviewKeyDown(e);
 

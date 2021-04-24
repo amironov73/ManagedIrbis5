@@ -244,9 +244,9 @@
     <value>toolStrip1</value>
   </data>
   <data name="_openFileDialog.Filter" xml:space="preserve">
-    <value>Text files|*.txt|All files|*.*</value>
+    <value>Text files|*.text|All files|*.*</value>
   </data>
   <data name="_saveFileDialog.Filter" xml:space="preserve">
-    <value>Text files|*.txt|All files|*.*</value>
+    <value>Text files|*.text|All files|*.*</value>
   </data>
 </root>

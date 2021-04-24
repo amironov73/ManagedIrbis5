@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 /* TextBoxOutput.cs -- вывод в текстовое поле
@@ -42,13 +43,6 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public TextBoxOutput()
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
         public TextBoxOutput
             (
                 TextBox textBox
@@ -56,10 +50,6 @@ namespace AM.Windows.Forms
         {
             TextBox = textBox;
         }
-
-        #endregion
-
-        #region Private members
 
         #endregion
 
@@ -79,12 +69,15 @@ namespace AM.Windows.Forms
                 TextBox.InvokeIfRequired
                     (
                         () => TextBox.AppendText(text)
-                    );
+                    )
+                    .WaitFor();
             }
+
             TextBox.InvokeIfRequired
                 (
                     () => TextBox.SelectionStart = TextBox.TextLength
-                );
+                )
+                .WaitFor();
         }
 
         #endregion
@@ -106,7 +99,8 @@ namespace AM.Windows.Forms
             TextBox.InvokeIfRequired
                 (
                     () => TextBox.Clear()
-                );
+                )
+                .WaitFor();
 
             return this;
         }

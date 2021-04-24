@@ -7,9 +7,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* CheckBoxGroup.cs --
+/* CheckBoxGroup.cs -- группа флажков-переключателей
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +18,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -28,7 +28,7 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///
+    /// Группа флажков-переключателей.
     /// </summary>
     // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
@@ -36,24 +36,15 @@ namespace AM.Windows.Forms
     public class CheckBoxGroup
         : GroupBox
     {
-        private CheckBox[] _buttons = null;
+        private CheckBox[]? _buttons;
 
         /// <summary>
-        /// Called when current RadioButton changed.
-        /// </summary>
-        public delegate void CurrentChangedHandler
-            (
-                object sender,
-                long current
-            );
-
-        /// <summary>
-        /// Current CheckButton changed.
+        /// Событие, возникающее при переключении флажков.
         /// </summary>
         [Browsable(true)]
         [Category("Property Changed")]
         [Description("Current CheckButton changed")]
-        public event CurrentChangedHandler CurrentChanged;
+        public event EventHandler? CurrentChanged;
 
         private const int DefaultLeftIndent = 5;
         private int _leftIndent = DefaultLeftIndent;
@@ -65,12 +56,7 @@ namespace AM.Windows.Forms
         [DefaultValue(DefaultLeftIndent)]
         public virtual int LeftIndent
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _leftIndent;
-            }
-            [DebuggerStepThrough]
+            get => _leftIndent;
             set
             {
                 if (_leftIndent != value)
@@ -91,12 +77,7 @@ namespace AM.Windows.Forms
         [DefaultValue(DefaultLineIndent)]
         public virtual int LineIndent
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _lineIndent;
-            }
-            [DebuggerStepThrough]
+            get => _lineIndent;
             set
             {
                 if (_lineIndent != value)
@@ -117,12 +98,7 @@ namespace AM.Windows.Forms
         [DefaultValue(DefaultEvenly)]
         public virtual bool Evenly
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _evenly;
-            }
-            [DebuggerStepThrough]
+            get => _evenly;
             set
             {
                 if (_evenly != value)
@@ -136,20 +112,11 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Button count.
         /// </summary>
-        public virtual int Count
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                return (_buttons == null)
-                           ? 0
-                           : _buttons.Length;
-            }
-        }
+        public virtual int Count => _buttons?.Length ?? 0;
 
         private const long DefaultCurrent = 0;
         private long _current = DefaultCurrent;
-        private bool _inCurrent = false;
+        private bool _inCurrent;
 
         /// <summary>
         /// Current CheckBox selection.
@@ -158,18 +125,14 @@ namespace AM.Windows.Forms
         [DefaultValue(DefaultCurrent)]
         public virtual long Current
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _current;
-            }
+            get => _current;
             set
             {
                 if (_buttons != null)
                 {
                     _inCurrent = true;
                     long mask = 1;
-                    for (int i = 0; i < _buttons.Length; i++, mask <<= 1)
+                    for (var i = 0; i < _buttons.Length; i++, mask <<= 1)
                     {
                         _buttons[i].Checked = ((mask & value) != 0);
                     }
@@ -178,12 +141,7 @@ namespace AM.Windows.Forms
                 if (_current != value)
                 {
                     _current = value;
-
-                    CurrentChangedHandler handler = CurrentChanged;
-                    if (!ReferenceEquals(handler, null))
-                    {
-                        handler(this, _current);
-                    }
+                    CurrentChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -191,7 +149,7 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Lines of text.
         /// </summary>
-        public virtual string[] Lines
+        public virtual string[]? Lines
         {
             get
             {
@@ -199,8 +157,8 @@ namespace AM.Windows.Forms
                 {
                     return null;
                 }
-                string[] result = new string[_buttons.Length];
-                for (int i = 0; i < _buttons.Length; i++)
+                var result = new string[_buttons.Length];
+                for (var i = 0; i < _buttons.Length; i++)
                 {
                     result[i] = _buttons[i].Text;
                 }
@@ -208,7 +166,7 @@ namespace AM.Windows.Forms
             }
             set
             {
-                _CreateButtons(value, _current);
+                _CreateButtons(value.ThrowIfNull(nameof(value)), _current);
             }
         }
 
@@ -221,27 +179,26 @@ namespace AM.Windows.Forms
             {
                 if (_buttons == null)
                 {
-                    return null;
+                    return Array.Empty<bool>();
                 }
 
-                long mask = 1;
-                bool[] result = new bool[_buttons.Length];
-
-                for (int i = 0; i < _buttons.Length; i++, mask <<= 1)
+                var result = new bool[_buttons.Length];
+                for (var i = 0; i < _buttons.Length; i++)
                 {
                     result[i] = _buttons[i].Checked;
                 }
+
                 return result;
             }
             set
             {
-                long curpos = 0,
-                     mask = 1;
+                long curpos = 0;
+                long mask = 1;
 
                 if (_buttons != null)
                 {
                     _inCurrent = true;
-                    for (int i = 0; i < _buttons.Length; i++, mask <<= 1)
+                    for (var i = 0; i < _buttons.Length; i++, mask <<= 1)
                     {
                         if (value[i])
                         {
@@ -251,15 +208,11 @@ namespace AM.Windows.Forms
                     }
                     _inCurrent = false;
                 }
+
                 if (_current != curpos)
                 {
                     _current = curpos;
-
-                    CurrentChangedHandler handler = CurrentChanged;
-                    if (!ReferenceEquals(handler, null))
-                    {
-                        handler(this, _current);
-                    }
+                    CurrentChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -274,12 +227,7 @@ namespace AM.Windows.Forms
         [DefaultValue(DefaultAppearance)]
         public virtual Appearance Appearance
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _appearance;
-            }
-            [DebuggerStepThrough]
+            get => _appearance;
             set
             {
                 if (_appearance != value)
@@ -288,7 +236,8 @@ namespace AM.Windows.Forms
                     {
                         return;
                     }
-                    foreach (CheckBox button in _buttons)
+
+                    foreach (var button in _buttons)
                     {
                         button.Appearance = value;
                     }
@@ -303,7 +252,7 @@ namespace AM.Windows.Forms
             {
                 return;
             }
-            foreach (CheckBox button in _buttons)
+            foreach (var button in _buttons)
             {
                 Controls.Remove(button);
                 button.Dispose();
@@ -311,56 +260,61 @@ namespace AM.Windows.Forms
             _buttons = null;
         }
 
-        private void _CreateButtons(string[] lines, long curpos)
+        private void _CreateButtons
+            (
+                string[]? lines, long curpos
+            )
         {
             _DeleteButtons();
-            if ((lines == null)
-                 || (lines.Length == 0))
+            if (lines == null || lines.Length == 0)
             {
                 return;
             }
+
             _buttons = new CheckBox[lines.Length];
             long mask = 1;
-            int topIndent = Font.Height * 3 / 2;
-            int delta = (ClientSize.Height - topIndent) / lines.Length;
-            for (int i = 0; i < lines.Length; i++, mask <<= 1)
+            var topIndent = Font.Height * 3 / 2;
+            var delta = (ClientSize.Height - topIndent) / lines.Length;
+            for (var i = 0; i < lines.Length; i++, mask <<= 1)
             {
-                CheckBox button = new CheckBox();
-                button.Text = lines[i];
-                button.Location =
-                    new Point(_leftIndent, (button.Height + _lineIndent) * i);
+                var button = new CheckBox
+                {
+                    Text = lines[i],
+                    Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+                    Checked = (curpos & mask) != 0,
+                    ThreeState = false,
+                    Visible = true,
+                };
+                button.Location = new Point(_leftIndent, (button.Height + _lineIndent) * i);
                 if (_evenly)
                 {
                     button.Top = delta * i + topIndent;
                 }
+
                 button.Width = ClientSize.Width - button.Left - _leftIndent;
-                button.Anchor = AnchorStyles.Top | AnchorStyles.Left
-                                | AnchorStyles.Right;
-                button.ThreeState = false;
-                button.Checked = ((curpos & mask) != 0);
-                button.CheckedChanged += new EventHandler(button_CheckedChanged);
-                button.Visible = true;
+                button.CheckedChanged += button_CheckedChanged;
                 Controls.Add(button);
                 _buttons[i] = button;
             }
+
             if (curpos != _current)
             {
                 _current = curpos;
-
-                CurrentChangedHandler handler = CurrentChanged;
-                if (!ReferenceEquals(handler, null))
-                {
-                    handler(this, _current);
-                }
+                CurrentChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
-        private void button_CheckedChanged(object sender, EventArgs e)
+        private void button_CheckedChanged
+            (
+                object? sender,
+                EventArgs e
+            )
         {
-            if (_buttons == null)
+            if (_buttons is null)
             {
                 return;
             }
+
             if (_inCurrent)
             {
                 return;
@@ -368,27 +322,21 @@ namespace AM.Windows.Forms
 
             long newcurrent = 0;
             long mask = 1;
-            for (int i = 0; i < _buttons.Length; i++, mask <<= 1)
+            for (var i = 0; i < _buttons.Length; i++, mask <<= 1)
             {
-                if (_buttons[i] == null)
-                {
-                    break;
-                }
                 if (_buttons[i].Checked)
                 {
                     newcurrent |= mask;
                 }
             }
+
             if (newcurrent != _current)
             {
                 _current = newcurrent;
-
-                CurrentChangedHandler handler = CurrentChanged;
-                if (!ReferenceEquals(handler, null))
-                {
-                    handler(this, _current);
-                }
+                CurrentChanged?.Invoke(this, EventArgs.Empty);
             }
         }
-    }
-}
+
+    } // class CheckBoxGroup
+
+} // namespace AM.Windows.Forms

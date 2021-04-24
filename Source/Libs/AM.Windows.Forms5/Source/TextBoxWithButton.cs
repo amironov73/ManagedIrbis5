@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TextBoxWithButton.cs --
+/* TextBoxWithButton.cs -- однострочный текстовый редактор, снабженный кнопкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,6 +16,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+// ReSharper disable MemberCanBePrivate.Global
 
 #endregion
 
@@ -24,10 +25,12 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    /// <see cref="TextBox"/> with <see cref="Button"/>.
+    /// Однострочный текстовый редактор, снабженный кнопкой.
     /// </summary>
     [ToolboxBitmap(typeof(Clocks), "Images.TextBoxWithButton.bmp")]
+    // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
+    // ReSharper restore RedundantNameQualifier
     public partial class TextBoxWithButton
         : UserControl
     {
@@ -51,30 +54,33 @@ namespace AM.Windows.Forms
         /// Button.
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public Button Button => _button;
+        public Button? Button { get; private set; }
 
         /// <summary>
         /// Selection start.
         /// </summary>
         public int SelectionStart
         {
-            get { return TextBox.SelectionStart; }
-            set { TextBox.SelectionStart = value; }
+            get => TextBox?.SelectionStart ?? 0;
+            set
+            {
+                if (TextBox is not null)
+                {
+                    TextBox.SelectionStart = value;
+                }
+            }
         }
 
         /// <summary>
         /// Text box.
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public TextBox TextBox { get { return _textBox; } }
+        public TextBox? TextBox { get; private set; }
 
         /// <summary>
         /// Text length.
         /// </summary>
-        public int TextLength
-        {
-            get { return TextBox.TextLength; }
-        }
+        public int TextLength => TextBox?.TextLength ?? 0;
 
         #endregion
 
@@ -87,9 +93,9 @@ namespace AM.Windows.Forms
         {
             InitializeComponent();
 
-            Button.Click += _Button_Click;
+            Button!.Click += _Button_Click;
             Button.Width = 20;
-            TextBox.TextChanged += _TextBox_TextChanged;
+            TextBox!.TextChanged += _TextBox_TextChanged;
         }
 
         #endregion
@@ -98,7 +104,7 @@ namespace AM.Windows.Forms
 
         private void _Button_Click
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -107,7 +113,7 @@ namespace AM.Windows.Forms
 
         private void _TextBox_TextChanged
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
@@ -116,17 +122,19 @@ namespace AM.Windows.Forms
 
         #endregion
 
-        #region Public methods
-
-        #endregion
-
         #region Control members
 
         /// <inheritdoc/>
         public override string Text
         {
-            get { return TextBox.Text; }
-            set { TextBox.Text = value; }
+            get => TextBox?.Text ?? string.Empty;
+            set
+            {
+                if (TextBox != null)
+                {
+                    TextBox.Text = value;
+                }
+            }
         }
 
         #endregion

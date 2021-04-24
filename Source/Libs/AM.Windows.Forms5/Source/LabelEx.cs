@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -38,11 +39,7 @@ namespace AM.Windows.Forms
         /// </summary>
         /// <value>The buddy control.</value>
         [System.ComponentModel.DefaultValue(null)]
-        public Control BuddyControl { get; set; }
-
-        #endregion
-
-        #region Private members
+        public Control? BuddyControl { get; set; }
 
         #endregion
 
@@ -53,10 +50,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public void TransferFocusToBuddyControl()
         {
-            if (BuddyControl != null)
-            {
-                BuddyControl.Focus();
-            }
+            BuddyControl?.Focus();
         }
 
         #endregion

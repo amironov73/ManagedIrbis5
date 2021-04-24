@@ -149,7 +149,7 @@ namespace AM.Windows.Forms
 
         private void _timer_Tick
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {

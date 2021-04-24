@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
 /* TreeGridDataCollection.cs
@@ -32,7 +33,7 @@ namespace AM.Windows.Forms
     [Serializable]
     [XmlRoot("data")]
     public sealed class TreeGridDataCollection
-        : Collection<object>,
+        : Collection<object?>,
         IXmlSerializable
     {
         #region Events
@@ -40,28 +41,27 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Occurs when [data changed].
         /// </summary>
-        public event EventHandler DataChanged;
+        public event EventHandler? DataChanged;
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TreeGridDataCollection"/> class.
+        /// Конструктор
         /// </summary>
-        /// <remarks>This constructor is called during
-        /// the XML-deserialization.</remarks>
         public TreeGridDataCollection()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TreeGridDataCollection"/> class.
+        /// Конструктор.
         /// </summary>
-        /// <param name="node">The node.</param>
-        public TreeGridDataCollection(TreeGridNode node)
+        /// <param name="node"></param>
+        public TreeGridDataCollection
+            (
+                TreeGridNode node
+            )
         {
             Node = node;
         }
@@ -74,9 +74,9 @@ namespace AM.Windows.Forms
         /// Adds the range.
         /// </summary>
         /// <param name="range">The range.</param>
-        public void AddRange(params object[] range)
+        public void AddRange(params object?[] range)
         {
-            foreach (object item in range)
+            foreach (var item in range)
             {
                 Add(item);
             }
@@ -88,7 +88,7 @@ namespace AM.Windows.Forms
         /// <param name="range">The range.</param>
         public void AddRange(IEnumerable range)
         {
-            foreach (object item in range)
+            foreach (var item in range)
             {
                 Add(item);
             }
@@ -99,9 +99,9 @@ namespace AM.Windows.Forms
         /// </summary>
         public void Dump ()
         {
-            foreach (object item in Items)
+            foreach (var item in Items)
             {
-                if (item == null)
+                if (item is null)
                 {
                     Console.WriteLine("(null)");
                 }
@@ -126,20 +126,17 @@ namespace AM.Windows.Forms
         /// <returns></returns>
         public static TreeGridDataCollection Read
             (
-            string fileName,
-            TreeGridNode node
+                string fileName,
+                TreeGridNode node
             )
         {
-            XmlSerializer serializer
-                = new XmlSerializer(typeof(TreeGridDataCollection));
-            using (Stream stream = File.OpenRead(fileName))
-            {
-                TreeGridDataCollection result =
-                    (TreeGridDataCollection) serializer
-                                                 .Deserialize(stream);
-                result.Node = node;
-                return result;
-            }
+            var serializer = new XmlSerializer(typeof(TreeGridDataCollection));
+            using var stream = File.OpenRead(fileName);
+            var result = (TreeGridDataCollection) serializer
+                    .Deserialize(stream)
+                    .ThrowIfNull("serializer.Deserialize");
+            result.Node = node;
+            return result;
         }
 
         /// <summary>
@@ -148,32 +145,24 @@ namespace AM.Windows.Forms
         /// <param name="fileName">Name of the file.</param>
         public void Save ( string fileName )
         {
-            XmlSerializer serializer
-                = new XmlSerializer(typeof(TreeGridDataCollection));
-            using (Stream stream = File.OpenWrite(fileName))
-            {
-                serializer.Serialize(stream,this);
-            }
+            var serializer = new XmlSerializer(typeof(TreeGridDataCollection));
+            using var stream = File.OpenWrite(fileName);
+            serializer.Serialize(stream,this);
         }
 
         /// <summary>
-        /// Safes the get.
+        /// Безопасное получение элемента по его индексу.
         /// </summary>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
-        public object SafeGet(int index)
-        {
-            return (index >= 0) && (index < Count)
-                       ? this[index]
-                       : null;
-        }
+        public object? SafeGet(int index) => index >= 0 && index < Count ? this[index] : null;
 
         /// <summary>
-        /// Safes the set.
+        /// Безопасное задание данных по указанному индексу.
         /// </summary>
-        /// <param name="index">The index.</param>
-        /// <param name="data">The data.</param>
-        public void SafeSet(int index, object data)
+        public void SafeSet
+            (
+                int index,
+                object? data
+            )
         {
             if (index >= 0)
             {
@@ -181,16 +170,16 @@ namespace AM.Windows.Forms
                 {
                     Add(null);
                 }
+
                 this[index] = data;
             }
         }
-
 
         #endregion
 
         #region Private members
 
-        internal TreeGridNode Node;
+        internal TreeGridNode? Node;
 
         protected override void ClearItems()
         {
@@ -198,7 +187,11 @@ namespace AM.Windows.Forms
             Update();
         }
 
-        protected override void InsertItem(int index, object item)
+        protected override void InsertItem
+            (
+                int index,
+                object? item
+            )
         {
             base.InsertItem(index,item);
             Update();
@@ -210,7 +203,11 @@ namespace AM.Windows.Forms
             Update();
         }
 
-        protected override void SetItem(int index, object item)
+        protected override void SetItem
+            (
+                int index,
+                object? item
+            )
         {
             base.SetItem(index,item);
             Update();
@@ -221,73 +218,50 @@ namespace AM.Windows.Forms
             OnDataChanged();
         }
 
-        internal void OnDataChanged ()
-        {
-            EventHandler handler = DataChanged;
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
-        }
+        internal void OnDataChanged () => DataChanged?.Invoke(this, EventArgs.Empty);
 
         #endregion
 
         #region Implementation of IXmlSerializable
 
-        /// <summary>
-        /// This property is reserved, apply the <see cref="T:System.Xml.Serialization.XmlSchemaProviderAttribute"/> to the class instead.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Xml.Schema.XmlSchema"/> that describes the XML representation of the object that is produced by the <see cref="M:System.Xml.Serialization.IXmlSerializable.WriteXml(System.Xml.XmlWriter)"/> method and consumed by the <see cref="M:System.Xml.Serialization.IXmlSerializable.ReadXml(System.Xml.XmlReader)"/> method.
-        /// </returns>
-        XmlSchema IXmlSerializable.GetSchema()
-        {
-            return null;
-        }
+        /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
+        XmlSchema? IXmlSerializable.GetSchema() => null;
 
-        /// <summary>
-        /// Generates an object from its XML representation.
-        /// </summary>
-        /// <param name="reader">The
-        /// <see cref="T:System.Xml.XmlReader"/> stream from
-        /// which the object is deserialized. </param>
-        void IXmlSerializable.ReadXml(XmlReader reader)
+        /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
+        void IXmlSerializable.ReadXml
+            (
+                XmlReader reader
+            )
         {
             reader.Read();
             while (reader.LocalName == "item")
             {
-                string attribute = reader.GetAttribute("isnull");
+                var attribute = reader.GetAttribute("isnull");
                 if (!string.IsNullOrEmpty(attribute))
                 {
-                    Add(null);
+                    Add(null!);
                 }
                 else
                 {
-                    string typeName = reader.GetAttribute("type");
-                    if (typeName == null)
-                    {
-                        throw new ArgumentNullException();
-                    }
-                    Type type = Type.GetType(typeName);
-                    string value = reader.ReadString();
-                    object result = Convert.ChangeType(value, type);
+                    var typeName = reader.GetAttribute("type").ThrowIfNull("typeName");
+                    var type = Type.GetType(typeName).ThrowIfNull("Type.GetType(typeName)");
+                    var value = reader.ReadString();
+                    var result = Convert.ChangeType(value, type);
                     Add(result);
                 }
                 reader.Read();
             }
         }
 
-        /// <summary>
-        /// Converts an object into its XML representation.
-        /// </summary>
-        /// <param name="writer">The
-        ///  <see cref="T:System.Xml.XmlWriter"/> stream
-        /// to which the object is serialized. </param>
-        void IXmlSerializable.WriteXml(XmlWriter writer)
+        /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
+        void IXmlSerializable.WriteXml
+            (
+                XmlWriter writer
+            )
         {
-            foreach (object item in Items)
+            foreach (var item in Items)
             {
-                if (item == null)
+                if (item is null)
                 {
                     writer.WriteStartElement("item");
                     writer.WriteAttributeString("isnull","true");

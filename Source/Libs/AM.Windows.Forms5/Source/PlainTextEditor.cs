@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* PlainTextEditor.cs --
@@ -41,18 +42,15 @@ namespace AM.Windows.Forms
         /// <inheritdoc />
         public override string Text
         {
-            get { return _textBox.Text; }
-            set { _textBox.Text = value; }
+            get => _textBox.Text;
+            set => _textBox.Text = value;
         }
 
         /// <summary>
         /// Text box.
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public TextBox TextBox
-        {
-            get { return _textBox; }
-        }
+        public TextBox TextBox => _textBox;
 
         #endregion
 
@@ -212,7 +210,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public void Print()
         {
-            PlainTextPrinter printer = new PlainTextPrinter();
+            var printer = new PlainTextPrinter();
             printer.Print(Text);
         }
 

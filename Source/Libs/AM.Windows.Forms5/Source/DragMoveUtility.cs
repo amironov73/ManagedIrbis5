@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -72,7 +73,10 @@ namespace AM.Windows.Forms
                 IsTemporary = true;
             }
 
-            void Target_MouseDown(object sender, MouseEventArgs e)
+            void Target_MouseDown
+                (
+                    object? sender, MouseEventArgs e
+                )
             {
                 if (e.Button == MouseButtons.Left)
                 {
@@ -82,7 +86,11 @@ namespace AM.Windows.Forms
                 }
             }
 
-            void Target_MouseUp(object sender, MouseEventArgs e)
+            void Target_MouseUp
+                (
+                    object? sender,
+                    MouseEventArgs e
+                )
             {
                 IsMoving = false;
                 if (IsTemporary)
@@ -91,7 +99,11 @@ namespace AM.Windows.Forms
                 }
             }
 
-            private void Target_MouseMove(object sender, MouseEventArgs e)
+            private void Target_MouseMove
+                (
+                    object? sender,
+                    MouseEventArgs e
+                )
             {
                 if (IsMoving)
                 {
@@ -104,7 +116,11 @@ namespace AM.Windows.Forms
                 }
             }
 
-            void Target_Disposed(object sender, EventArgs e)
+            void Target_Disposed
+                (
+                    object? sender,
+                    EventArgs e
+                )
             {
                 Target?.EnableDragMove(false);
             }

@@ -53,9 +53,30 @@ namespace AM.Windows.Forms
                 TreeGridDrawCellEventArgs args
             )
         {
-            var text = args.Node.Data.SafeGet(args.Column.Index-1) as string;
+            var graphics = args.Graphics;
+            if (graphics is null)
+            {
+                Magna.Debug("Graphics is null");
+                return;
+            }
 
-            args.Graphics.FillRectangle
+            var node = args.Node;
+            if (node is null)
+            {
+                Magna.Debug("Node is null");
+                return;
+            }
+
+            var column = args.Column;
+            if (column is null)
+            {
+                Magna.Debug("Column is null");
+                return;
+            }
+
+            var text = node.Data.SafeGet(column.Index-1) as string;
+
+            graphics.FillRectangle
                 (
                     args.GetBackgroundBrush(),
                     args.Bounds
@@ -65,10 +86,10 @@ namespace AM.Windows.Forms
             {
                 ButtonRenderer.DrawButton
                     (
-                        args.Graphics,
+                        graphics,
                         args.Bounds,
                         text,
-                        args.Node.Font,
+                        node.Font,
                         false,
                         PushButtonState.Normal
                     );

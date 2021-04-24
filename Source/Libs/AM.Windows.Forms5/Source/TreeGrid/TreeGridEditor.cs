@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* TreeGridEditor.cs
+/* TreeGridEditor.cs -- редактор для иерархического грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///
+    /// Редактор для ирерархического грида.
     /// </summary>
     public abstract class TreeGridEditor
         : IDisposable
@@ -30,52 +30,41 @@ namespace AM.Windows.Forms
         #region Properties
 
         /// <summary>
-        /// Gets the control.
+        /// Получаем ассоциированный контрол.
         /// </summary>
-        /// <value>The control.</value>
-        public abstract Control Control { get; }
+        public abstract Control? Control { get; }
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Sets the value.
+        /// Установка значения.
         /// </summary>
-        /// <param name="value">The value.</param>
-        public abstract void SetValue(string value);
+        public abstract void SetValue(string? value);
 
         /// <summary>
-        /// Gets the value.
+        /// Получение значения.
         /// </summary>
-        /// <returns></returns>
-        public abstract string GetValue();
+        public abstract string? GetValue();
 
         /// <summary>
-        /// Selects the text.
+        /// Подсветка диапазона текста.
         /// </summary>
-        /// <param name="start">The start.</param>
-        /// <param name="length">The length.</param>
         public abstract void SelectText(int start, int length);
 
         #endregion
 
-        #region Implementation of IDisposable
+        #region IDisposable members
 
-        /// <summary>
-        /// Performs application-defined tasks associated
-        /// with freeing, releasing, or resetting unmanaged
-        /// resources.
-        /// </summary>
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public virtual void Dispose()
         {
-            Control control = Control;
-            if (control != null)
-            {
-                control.Dispose();
-            }
+            Control?.Dispose();
         }
 
         #endregion
-    }
-}
+
+    } // class TreeGridEditor
+
+} // namespace AM.Windows.Forms

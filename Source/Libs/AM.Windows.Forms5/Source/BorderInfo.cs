@@ -194,7 +194,7 @@ namespace AM.Windows.Forms
             public override object EditValue
                 (
                     ITypeDescriptorContext context,
-                    IServiceProvider provider,
+                    IServiceProvider? provider,
                     object value
                 )
             {
@@ -205,21 +205,18 @@ namespace AM.Windows.Forms
                     return borderInfo;
                 }
 
-                var edSvc
-                    = (IWindowsFormsEditorService)provider.GetService
+                var editorService = (IWindowsFormsEditorService?) provider.GetService
                     (
                         typeof(IWindowsFormsEditorService)
                     );
-                if (edSvc != null)
+                if (editorService != null)
                 {
                     var form = new BorderInfoControl
                         (
                             borderInfo,
-                            edSvc,
-                            context,
-                            provider
+                            editorService
                         );
-                    edSvc.DropDownControl(form);
+                    editorService.DropDownControl(form);
 
                     if (form.Result != null)
                     {
