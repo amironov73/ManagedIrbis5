@@ -13,7 +13,6 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.Windows.Forms;
 
 #endregion
@@ -40,15 +39,8 @@ namespace AM.Windows.Forms
         /// <value>Format of the date.</value>
         public string Format
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return Style.Format;
-            }
-            set
-            {
-                Style.Format = value;
-            }
+            get => Style.Format;
+            set => Style.Format = value;
         }
 
         #endregion
@@ -99,11 +91,10 @@ namespace AM.Windows.Forms
                     initialFormattedValue,
                     dataGridViewCellStyle
                 );
-            var dataGridViewCalendarControl
-                = DataGridView.EditingControl as DataGridViewCalendarEditingControl;
-            if (dataGridViewCalendarControl != null)
+
+            if (DataGridView?.EditingControl is DataGridViewCalendarEditingControl control)
             {
-                dataGridViewCalendarControl.Value = (DateTime)Value;
+                control.Value = (DateTime)Value;
             }
         }
 
@@ -114,14 +105,7 @@ namespace AM.Windows.Forms
         /// <returns>A <see cref="T:System.Type"/>
         /// representing the <see cref="DataGridViewCalendarEditingControl"/>
         /// type.</returns>
-        public override Type EditType
-        {
-            get
-            {
-                // Return the type of the editing contol that CalendarCell uses.
-                return typeof(DataGridViewCalendarEditingControl);
-            }
-        }
+        public override Type EditType => typeof (DataGridViewCalendarEditingControl);
 
         /// <summary>
         /// Gets or sets the data type of the values in the cell.
@@ -129,14 +113,7 @@ namespace AM.Windows.Forms
         /// <value></value>
         /// <returns>A <see cref="T:System.Type"/>
         /// representing the data type of the value in the cell.</returns>
-        public override Type ValueType
-        {
-            get
-            {
-                // Return the type of the value that CalendarCell contains.
-                return typeof(DateTime);
-            }
-        }
+        public override Type ValueType => typeof (DateTime);
 
         /// <summary>
         /// Gets the default value for a cell in the row for new records.
@@ -144,14 +121,7 @@ namespace AM.Windows.Forms
         /// <value></value>
         /// <returns>An <see cref="T:System.Object"/> representing
         /// the default value.</returns>
-        public override object DefaultNewRowValue
-        {
-            get
-            {
-                // Use the current date and time as the default value.
-                return DateTime.Now;
-            }
-        }
+        public override object DefaultNewRowValue => DateTime.Now;
 
         /// <summary>
         /// Creates an exact copy of this cell.
@@ -163,11 +133,11 @@ namespace AM.Windows.Forms
         public override object Clone()
         {
             var result = base.Clone();
-            var clone = result as DataGridViewCalendarCell;
-            if (clone != null)
+            if (result is DataGridViewCalendarCell clone)
             {
                 clone.Format = Format;
             }
+
             return result;
         }
 

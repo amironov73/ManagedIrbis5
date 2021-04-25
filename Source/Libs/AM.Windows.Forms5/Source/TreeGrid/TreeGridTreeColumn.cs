@@ -149,8 +149,14 @@ namespace AM.Windows.Forms
             )
         {
             var node = args.Node;
+            if (node is null)
+            {
+                Magna.Debug("Node is null");
+                return;
+            }
+
             var bounds = args.Bounds;
-            var layout = MakeLayout(node,bounds);
+            var layout = MakeLayout (node, bounds);
             TreeGridUtilities.DrawTreeCell
                 (
                     args,

@@ -26,7 +26,7 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace AM.Drawing.Printing
+namespace AM.Windows.Forms.Printing
 {
     /// <summary>
     /// Printer definition for saving/restoring.
@@ -207,4 +207,4 @@ namespace AM.Drawing.Printing
 
     } // class PrinterDefinition
 
-} // namespace AM.Drawing.Printing
+} // namespace AM.Windows.Forms.Printing

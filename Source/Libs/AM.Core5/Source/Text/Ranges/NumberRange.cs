@@ -11,7 +11,6 @@
 
 /* NumberRange.cs --range of numbers containing non-numeric fragments
  * Ars Magna project, http://arsmagna.ru
- * TODO make Delimiters and DelimitersOrMinus read-only
  */
 
 #region Using directives
@@ -45,12 +44,12 @@ namespace AM.Text.Ranges
         /// <summary>
         /// Delimiters.
         /// </summary>
-        public static char[] Delimiters => _delimiters;
+        public static char[] Delimiters { get; } = { ' ', '\t', '\r', '\n', ',', ';' };
 
         /// <summary>
         /// Delimiters or minus sign.
         /// </summary>
-        public static char[] DelimitersOrMinus => _delimitersOrMinus;
+        public static char[] DelimitersOrMinus { get; } = { ' ', '\t', '\r', '\n', ',', ';', '-' };
 
         /// <summary>
         /// Start value.
@@ -105,12 +104,6 @@ namespace AM.Text.Ranges
         #endregion
 
         #region Private members
-
-        private static readonly char[] _delimiters
-            = { ' ', '\t', '\r', '\n', ',', ';' };
-
-        private static readonly char[] _delimitersOrMinus
-            = { ' ', '\t', '\r', '\n', ',', ';', '-' };
 
         #endregion
 
@@ -280,8 +273,8 @@ namespace AM.Text.Ranges
             // coverity[SWAPPED_ARGUMENTS]
             return new NumberRange
                 (
-                    Stop,
-                    other.Start
+                    Stop.ThrowIfNull(nameof(Stop)),
+                    other.Start.ThrowIfNull(nameof(other.Start))
                 );
         }
 
@@ -303,8 +296,16 @@ namespace AM.Text.Ranges
         {
             return new NumberRange
                 (
-                    NumberText.Min(Start, other.Start),
-                    NumberText.Max(Stop, other.Stop)
+                    NumberText.Min
+                        (
+                            Start.ThrowIfNull(nameof(Start)),
+                            other.Start.ThrowIfNull(nameof(other.Start))
+                        ),
+                    NumberText.Max
+                        (
+                            Stop.ThrowIfNull(nameof(Stop)),
+                            other.Stop.ThrowIfNull(nameof(other.Stop))
+                        )
                 );
         }
 
@@ -312,10 +313,7 @@ namespace AM.Text.Ranges
 
         #region IEnumerable<NumberText> members
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
         /// Returns an enumerator that iterates through

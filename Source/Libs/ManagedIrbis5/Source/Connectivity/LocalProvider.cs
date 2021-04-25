@@ -8,6 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 
 /* LocalProvider.cs -- провайдер, работающий с локальными файлами
  * Ars Magna project, http://arsmagna.ru
@@ -75,12 +76,13 @@ namespace ManagedIrbis.Client
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Disposing?.Invoke(this, EventArgs.Empty);
         }
 
         public ValueTask DisposeAsync()
         {
-            throw new NotImplementedException();
+            Dispose();
+            return ValueTask.CompletedTask;
         }
 
         public object? GetService(Type serviceType)
@@ -88,11 +90,21 @@ namespace ManagedIrbis.Client
             throw new NotImplementedException();
         }
 
+        private void SetBusy(bool busy)
+        {
+            Busy = busy;
+            BusyChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void SetConnected(bool state) => Connected = state;
+
+        private void SetLastError(int code) => LastError = code;
+
         public event EventHandler? BusyChanged;
         public string? Database { get; set; } = "IBIS";
-        public bool Connected { get; }
-        public bool Busy { get; }
-        public int LastError { get; }
+        public bool Connected { get; private set; }
+        public bool Busy { get; private set; }
+        public int LastError { get; private set; }
         public void CancelOperation()
         {
             throw new NotImplementedException();

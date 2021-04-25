@@ -24,7 +24,7 @@ using System.Xml.Serialization;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Windows.Forms.Printing
 {
     /// <summary>
     /// Настройки принтера.
@@ -146,4 +146,4 @@ namespace AM.Windows.Forms
 
     } // class PrinterInfo
 
-} // namespace AM.Windows.Forms
+} // namespace AM.Windows.Forms.Printing

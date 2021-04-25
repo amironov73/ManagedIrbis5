@@ -170,16 +170,16 @@ namespace ManagedIrbis
 
         #region IIrbisConnectionSettings members
 
-        int IIrbisConnectionSettings.ClientId => _clientId;
+        int IIrbisConnectionSettings.ClientId => 0;
 
-        int IIrbisConnectionSettings.QueryId => _queryId;
+        int IIrbisConnectionSettings.QueryId => 0;
 
         #endregion
 
         #region Private members
 
-        private int _clientId;
-        private int _queryId;
+        //private int _clientId;
+        //private int _queryId;
 
         private static void _Add
             (
@@ -230,12 +230,9 @@ namespace ManagedIrbis
                 IIrbisConnectionSettings connection
             )
         {
-            if (connection is IBasicIrbisProvider basic)
+            if (connection is IBasicIrbisProvider {Connected: true})
             {
-                if (basic.Connected)
-                {
-                    throw new IrbisException("Already connected");
-                }
+                throw new IrbisException("Already connected");
             }
 
             if (!string.IsNullOrEmpty(Host))

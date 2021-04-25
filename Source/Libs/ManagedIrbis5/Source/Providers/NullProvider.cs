@@ -5,6 +5,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
@@ -68,12 +69,14 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public void Dispose()
+        void IDisposable.Dispose()
         {
+            Disposing?.Invoke(this, EventArgs.Empty);
         }
 
         public ValueTask DisposeAsync()
         {
+            Disposing?.Invoke(this, EventArgs.Empty);
             return ValueTask.CompletedTask;
         }
 
@@ -83,10 +86,22 @@ namespace ManagedIrbis
         }
 
         public event EventHandler? BusyChanged;
+
+
+        public void SetBusy(bool busy)
+        {
+            Busy = busy;
+            BusyChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void SetConnected(bool connected) => Connected = connected;
+
+        public void SetLastError(int code) => LastError = code;
+
         public string? Database { get; set; }
-        public bool Connected { get; }
-        public bool Busy { get; }
-        public int LastError { get; }
+        public bool Connected { get; private set; }
+        public bool Busy { get; private set; }
+        public int LastError { get; private set; }
         public void CancelOperation()
         {
             throw new NotImplementedException();

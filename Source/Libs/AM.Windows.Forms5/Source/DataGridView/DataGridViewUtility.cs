@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 /* DataGridViewUtility.cs --
@@ -76,9 +77,11 @@ namespace AM.Windows.Forms
                 columnType = Type.GetType(columnTypeName, true);
             }
 
-            var result = ReferenceEquals(columnType, null)
+            var result = columnType is null
                 ? new DataGridViewTextBoxColumn()
-                : (DataGridViewColumn?)Activator.CreateInstance(columnType);
+                : (DataGridViewColumn) Activator.CreateInstance(columnType)
+                    .ThrowIfNull("Activator.CreateInstance");
+
             result.DataPropertyName = column.Name;
             result.HeaderText = column.Title;
             result.DataPropertyName = column.Name;

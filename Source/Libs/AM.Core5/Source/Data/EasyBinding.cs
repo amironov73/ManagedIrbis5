@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -113,7 +114,7 @@ namespace AM.Data
         protected static bool SetValue
             (
                 Expression expr,
-                object value,
+                object? value,
                 int changeId
             )
         {
@@ -121,7 +122,7 @@ namespace AM.Data
                 var m = (MemberExpression)expr;
                 var mem = m.Member;
 
-                var target = Evaluator.EvalExpression (m.Expression);
+                var target = Evaluator.EvalExpression (m.Expression!);
 
                 var f = mem as FieldInfo;
                 var p = mem as PropertyInfo;
@@ -160,20 +161,20 @@ namespace AM.Data
         /// <param name="errorObject"></param>
         static void ReportError (object errorObject)
         {
-            ReportError (errorObject.ToString ());
+            ReportError (errorObject.ToString ()!);
         }
 
         #region Change Notification
 
         class MemberActions
         {
-            readonly object target;
+            readonly object? target;
             readonly MemberInfo member;
 
-            EventInfo eventInfo;
-            Delegate eventHandler;
+            EventInfo? eventInfo;
+            Delegate? eventHandler;
 
-            public MemberActions (object target, MemberInfo mem)
+            public MemberActions (object? target, MemberInfo mem)
             {
                 this.target = target;
                 member = mem;
@@ -181,12 +182,15 @@ namespace AM.Data
 
             void AddChangeNotificationEventHandler ()
             {
-                if (target != null) {
-                    var npc = target as INotifyPropertyChanged;
-                    if (npc != null && (member is PropertyInfo)) {
+                if (target != null)
+                {
+                    if (target is INotifyPropertyChanged npc
+                        && member is PropertyInfo)
+                    {
                         npc.PropertyChanged += HandleNotifyPropertyChanged;
                     }
-                    else {
+                    else
+                    {
                         AddHandlerForFirstExistingEvent (member.Name + "Changed", "EditingDidEnd", "ValueChanged", "Changed");
 //						if (!added) {
 //							Debug.WriteLine ("Failed to bind to change event for " + target);
@@ -197,16 +201,18 @@ namespace AM.Data
 
             bool AddHandlerForFirstExistingEvent (params string[] names)
             {
-                var type = target.GetType ();
-                foreach (var name in names) {
+                var type = target!.GetType ();
+                foreach (var name in names)
+                {
                     var ev = GetEvent (type, name);
 
-                    if (ev != null) {
+                    if (ev != null)
+                    {
                         eventInfo = ev;
-                        var isClassicHandler = typeof(EventHandler).GetTypeInfo ().IsAssignableFrom (ev.EventHandlerType.GetTypeInfo ());
+                        var isClassicHandler = typeof(EventHandler).GetTypeInfo ().IsAssignableFrom (ev.EventHandlerType!.GetTypeInfo ());
 
                         eventHandler = isClassicHandler ?
-                            (EventHandler)HandleAnyEvent :
+                            (EventHandler) HandleAnyEvent :
                             CreateGenericEventHandler (ev, () => HandleAnyEvent (null, EventArgs.Empty));
 
                         ev.AddEventHandler(target, eventHandler);
@@ -217,14 +223,18 @@ namespace AM.Data
                 return false;
             }
 
-            static EventInfo GetEvent (Type type, string eventName)
+            static EventInfo? GetEvent (Type type, string eventName)
             {
                 var t = type;
-                while (t != null && t != typeof(object)) {
+                while (t != null && t != typeof(object))
+                {
                     var ti = t.GetTypeInfo ();
                     var ev = t.GetTypeInfo ().GetDeclaredEvent (eventName);
                     if (ev != null)
+                    {
                         return ev;
+                    }
+
                     t = ti.BaseType;
                 }
                 return null;
@@ -233,23 +243,27 @@ namespace AM.Data
             static Delegate CreateGenericEventHandler (EventInfo evt, Action d)
             {
                 var handlerType = evt.EventHandlerType;
-                var handlerTypeInfo = handlerType.GetTypeInfo ();
+                var handlerTypeInfo = handlerType!.GetTypeInfo ();
                 var handlerInvokeInfo = handlerTypeInfo.GetDeclaredMethod ("Invoke");
-                var eventParams = handlerInvokeInfo.GetParameters();
+                var eventParams = handlerInvokeInfo!.GetParameters();
 
                 //lambda: (object x0, EventArgs x1) => d()
                 var parameters = eventParams.Select(p => Expression.Parameter(p.ParameterType, p.Name)).ToArray ();
-                var body = Expression.Call(Expression.Constant(d), d.GetType().GetTypeInfo ().GetDeclaredMethod ("Invoke"));
+                var body = Expression.Call
+                    (
+                        Expression.Constant(d),
+                        d.GetType().GetTypeInfo ().GetDeclaredMethod ("Invoke")!
+                    );
                 var lambda = Expression.Lambda(body, parameters);
 
                 var delegateInvokeInfo = lambda.Compile ().GetMethodInfo ();
-                return delegateInvokeInfo.CreateDelegate (handlerType, null);
+                return delegateInvokeInfo.CreateDelegate (handlerType!, null);
             }
 
             void UnsubscribeFromChangeNotificationEvent ()
             {
-                var npc = target as INotifyPropertyChanged;
-                if (npc != null && (member is PropertyInfo)) {
+                if (target is INotifyPropertyChanged npc && (member is PropertyInfo))
+                {
                     npc.PropertyChanged -= HandleNotifyPropertyChanged;
                     return;
                 }
@@ -265,13 +279,17 @@ namespace AM.Data
                 eventHandler = null;
             }
 
-            void HandleNotifyPropertyChanged (object sender, PropertyChangedEventArgs e)
+            void HandleNotifyPropertyChanged
+                (
+                    object? sender,
+                    PropertyChangedEventArgs e
+                )
             {
                 if (e.PropertyName == member.Name)
                     InvalidateMember (target, member);
             }
 
-            void HandleAnyEvent (object sender, EventArgs e)
+            void HandleAnyEvent (object? sender, EventArgs e)
             {
                 InvalidateMember (target, member);
             }
@@ -312,24 +330,24 @@ namespace AM.Data
             }
         }
 
-        static readonly Dictionary<Tuple<Object, MemberInfo>, MemberActions> objectSubs = new ();
+        static readonly Dictionary<Tuple<object?, MemberInfo>, MemberActions> objectSubs = new ();
 
         internal static MemberChangeAction AddMemberChangeAction
             (
-                object target,
+                object? target,
                 MemberInfo member,
                 Action<int> k
             )
         {
             var key = Tuple.Create (target, member);
-            MemberActions subs;
-            if (!objectSubs.TryGetValue (key, out subs)) {
+            if (!objectSubs.TryGetValue (key, out var subs))
+            {
                 subs = new MemberActions (target, member);
                 objectSubs.Add (key, subs);
             }
 
 //			Debug.WriteLine ("ADD CHANGE ACTION " + target + " " + member);
-            var sub = new MemberChangeAction (target, member, k);
+            var sub = new MemberChangeAction (target!, member, k);
             subs.AddAction (sub);
             return sub;
         }
@@ -337,8 +355,8 @@ namespace AM.Data
         internal static void RemoveMemberChangeAction (MemberChangeAction sub)
         {
             var key = Tuple.Create (sub.Target, sub.Member);
-            MemberActions subs;
-            if (objectSubs.TryGetValue (key, out subs)) {
+            if (objectSubs.TryGetValue (key, out var subs))
+            {
 //				Debug.WriteLine ("REMOVE CHANGE ACTION " + sub.Target + " " + sub.Member);
                 subs.RemoveAction (sub);
             }
@@ -352,11 +370,11 @@ namespace AM.Data
         /// <param name="target">Target object</param>
         /// <param name="member">Member of the object that changed</param>
         /// <param name="changeId">Change identifier</param>
-        public static void InvalidateMember (object target, MemberInfo member, int changeId = 0)
+        public static void InvalidateMember (object? target, MemberInfo member, int changeId = 0)
         {
             var key = Tuple.Create (target, member);
-            MemberActions subs;
-            if (objectSubs.TryGetValue (key, out subs)) {
+            if (objectSubs.TryGetValue (key, out var subs))
+            {
 //				Debug.WriteLine ("INVALIDATE {0} {1}", target, member.Name);
                 subs.Notify (changeId);
             }
@@ -372,10 +390,11 @@ namespace AM.Data
         public static void InvalidateMember<T>(Expression<Func<T>> lambdaExpr)
         {
             var body = lambdaExpr.Body;
-            if (body.NodeType == ExpressionType.MemberAccess) {
+            if (body.NodeType == ExpressionType.MemberAccess)
+            {
                 var m = (MemberExpression)body;
-                var obj = Evaluator.EvalExpression(m.Expression);
-                InvalidateMember(obj, m.Member, 0);
+                var obj = Evaluator.EvalExpression(m.Expression!);
+                InvalidateMember(obj, m.Member);
             }
         }
 

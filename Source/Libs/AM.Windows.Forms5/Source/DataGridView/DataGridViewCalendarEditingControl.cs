@@ -144,7 +144,7 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Gets or sets the <see cref="DataGridView"/> that contains the cell.
         /// </summary>
-        public DataGridView EditingControlDataGridView { get; set; }
+        public DataGridView? EditingControlDataGridView { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the value of the editing
@@ -169,7 +169,7 @@ namespace AM.Windows.Forms
             )
         {
             EditingControlValueChanged = true;
-            EditingControlDataGridView.NotifyCurrentCellDirty(true);
+            EditingControlDataGridView?.NotifyCurrentCellDirty(true);
             base.OnValueChanged(eventArgs);
         }
 

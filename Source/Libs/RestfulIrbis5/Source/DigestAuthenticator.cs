@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedType.Global
 
 /* DigestAuthenticator.cs -- костыль, позволяющий аутентифицироваться методом Digest
  * Ars Magna project, http://arsmagna.ru
@@ -11,6 +13,7 @@
 
 #region Using directives
 
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 using RestSharp;
@@ -20,23 +23,26 @@ using RestSharp.Authenticators;
 
 #nullable enable
 
+#pragma warning disable 618
+
 namespace RestfulIrbis
 {
     /// <summary>
-    /// Authenticator for Digest method.
+    /// Костыль, позволяющий аутентифицироваться методом Digest
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DigestAuthenticator
         : IAuthenticator
     {
         #region Properties
 
         /// <summary>
-        /// User name.
+        /// Имя пользователя.
         /// </summary>
         public string UserName { get; }
 
         /// <summary>
-        /// Password.
+        /// Пароль.
         /// </summary>
         public string Password { get; }
 
@@ -68,6 +74,8 @@ namespace RestfulIrbis
                 IRestRequest request
             )
         {
+            // TODO: нужен актуальный способ, а не костыль
+
             request.Credentials = new NetworkCredential
                 (
                     UserName,

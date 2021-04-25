@@ -36,7 +36,7 @@ namespace FormsTests
             )
         {
             using var font = new Font(FontFamily.GenericSerif, 12);
-            PropertyBox.ShowDialog(ownerWindow, font);
+            PropertyBox.ShowDialog (ownerWindow, font);
         }
 
         #endregion

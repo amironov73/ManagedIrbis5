@@ -557,7 +557,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// </summary>
         public SiberianRow CreateRow
             (
-                object data
+                object? data
             )
         {
             var result = CreateRow();

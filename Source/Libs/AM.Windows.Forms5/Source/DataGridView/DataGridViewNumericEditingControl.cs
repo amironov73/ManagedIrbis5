@@ -13,6 +13,7 @@
 #region Using directives
 
 using System;
+using System.Globalization;
 using System.Windows.Forms;
 
 #endregion
@@ -48,10 +49,6 @@ namespace AM.Windows.Forms
 
         #region Private members
 
-        private DataGridView _editingControlDataGridView;
-        private int _editingControlRowIndex;
-        private bool _editingControlValueChanged;
-
         #endregion
 
         #region Public methods
@@ -72,8 +69,8 @@ namespace AM.Windows.Forms
         {
             base.OnValueChanged(e);
 
-            _editingControlValueChanged = true;
-            EditingControlDataGridView.NotifyCurrentCellDirty(true);
+            EditingControlValueChanged = true;
+            EditingControlDataGridView?.NotifyCurrentCellDirty(true);
         }
 
         #endregion
@@ -177,17 +174,7 @@ namespace AM.Windows.Forms
         /// The <see cref="T:System.Windows.Forms.DataGridView"></see> that contains the <see cref="T:System.Windows.Forms.DataGridViewCell"></see> that is being edited; null if there is no associated <see cref="T:System.Windows.Forms.DataGridView"></see>.
         ///</returns>
         ///
-        public DataGridView EditingControlDataGridView
-        {
-            get
-            {
-                return _editingControlDataGridView;
-            }
-            set
-            {
-                _editingControlDataGridView = value;
-            }
-        }
+        public DataGridView? EditingControlDataGridView { get; set; }
 
         ///<summary>
         ///Gets or sets the formatted value of the cell being modified by the editor.
@@ -199,24 +186,15 @@ namespace AM.Windows.Forms
         ///
         public object EditingControlFormattedValue
         {
-            get
-            {
-                return Value.ToString();
-            }
+            get => Value.ToString(CultureInfo.InvariantCulture);
             set
             {
-                if (value is decimal)
+                Value = value switch
                 {
-                    Value = (decimal)value;
-                }
-                else if (value is string)
-                {
-                    Value = decimal.Parse((string)value);
-                }
-                else
-                {
-                    throw new InvalidCastException();
-                }
+                    decimal dValue => dValue,
+                    string sValue => sValue.ParseDecimal(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(value))
+                };
             }
         }
 
@@ -228,17 +206,7 @@ namespace AM.Windows.Forms
         ///The index of the row that contains the cell, or –1 if there is no parent row.
         ///</returns>
         ///
-        public int EditingControlRowIndex
-        {
-            get
-            {
-                return _editingControlRowIndex;
-            }
-            set
-            {
-                _editingControlRowIndex = value;
-            }
-        }
+        public int EditingControlRowIndex { get; set; }
 
         ///<summary>
         ///Gets or sets a value indicating whether the value of the editing control differs from the value of the hosting cell.
@@ -248,17 +216,7 @@ namespace AM.Windows.Forms
         ///true if the value of the control differs from the cell value; otherwise, false.
         ///</returns>
         ///
-        public bool EditingControlValueChanged
-        {
-            get
-            {
-                return _editingControlValueChanged;
-            }
-            set
-            {
-                _editingControlValueChanged = value;
-            }
-        }
+        public bool EditingControlValueChanged { get; set; }
 
         ///<summary>
         ///Gets the cursor used when the mouse pointer is over the <see cref="P:System.Windows.Forms.DataGridView.EditingPanel"></see> but not over the editing control.
@@ -268,13 +226,7 @@ namespace AM.Windows.Forms
         ///A <see cref="T:System.Windows.Forms.Cursor"></see> that represents the mouse pointer used for the editing panel.
         ///</returns>
         ///
-        public Cursor EditingPanelCursor
-        {
-            get
-            {
-                return base.Cursor;
-            }
-        }
+        public Cursor EditingPanelCursor => base.Cursor;
 
         ///<summary>
         ///Gets or sets a value indicating whether the cell contents need to be repositioned whenever the value changes.
@@ -284,13 +236,7 @@ namespace AM.Windows.Forms
         ///true if the contents need to be repositioned; otherwise, false.
         ///</returns>
         ///
-        public bool RepositionEditingControlOnValueChange
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool RepositionEditingControlOnValueChange => false;
 
         #endregion
     }

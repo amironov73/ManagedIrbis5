@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -15,8 +16,9 @@
 
 using System;
 using System.Linq.Expressions;
-using System.Reflection;
+
 using AM;
+
 using ManagedIrbis.Pft.Infrastructure.Ast;
 
 #endregion
@@ -31,9 +33,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
 
         public byte Code;
 
-        public Type Type;
+        public Type? Type;
 
-        public Func<PftNode> Create;
+        public Func<PftNode>? Create;
 
         #endregion
 
@@ -41,11 +43,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
 
         static TypeMap()
         {
-            for (var i = 0; i < Map.Length; i++)
+            foreach (var entry in Map)
             {
-                var entry = Map[i];
-
-                var constructor = entry.Type.GetConstructor(Type.EmptyTypes);
+                var constructor = entry.Type!.GetConstructor(Type.EmptyTypes);
                 if (ReferenceEquals(constructor, null))
                 {
                     Magna.Error("Can't find constructor for " + entry.Type);
@@ -154,7 +154,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
             new() { Code=83, Type=typeof(PftX) }
         };
 
-        public static TypeMap FindCode
+        public static TypeMap? FindCode
             (
                 byte code
             )
@@ -195,11 +195,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 Type nodeType
             )
         {
-            for (var i = 0; i < Map.Length; i++)
+            foreach (var entry in Map)
             {
-                if (ReferenceEquals(nodeType, Map[i].Type))
+                if (ReferenceEquals(nodeType, entry.Type))
                 {
-                    return Map[i];
+                    return entry;
                 }
             }
 

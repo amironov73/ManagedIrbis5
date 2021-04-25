@@ -9,21 +9,17 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
-/* TermGridTest.cs --
+/* TermGridTest.cs -- тест для грида, отображающего термины поискового словаря
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Text;
+using System;
 using System.Windows.Forms;
 
-using AM;
-
 using ManagedIrbis;
-using ManagedIrbis.ImportExport;
 using ManagedIrbis.WinForms.Grid;
-using ManagedIrbis.Workspace;
 
 #endregion
 
@@ -31,6 +27,9 @@ using ManagedIrbis.Workspace;
 
 namespace SiberianTests
 {
+    /// <summary>
+    /// Тест для грида, отображающего термины поискового словаря.
+    /// </summary>
     public sealed class TermGridTest
         : ISiberianTest
     {
@@ -67,7 +66,7 @@ namespace SiberianTests
                 //Format = null
             };
 
-            var terms = connection.ReadTerms(parameters);
+            var terms = connection.ReadTerms(parameters) ?? Array.Empty<Term>();
             terms = Term.TrimPrefix(terms, "K=");
             connection.Disconnect();
 

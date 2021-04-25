@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
@@ -19,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AM.Collections;
 
 #endregion
 
@@ -135,7 +137,7 @@ namespace AM.Reflection
             var length = columns.Length;
             foreach (var item in items)
             {
-                string[] line = new string[length];
+                var line = new string[length];
                 for (var i = 0; i < length; i++)
                 {
                     var value = columns[i].Property?.GetValue(item, null);
@@ -156,10 +158,10 @@ namespace AM.Reflection
                 Type type
             )
         {
-            List<Column> result = new List<Column>();
-            PropertyInfo[] properties
+            var result = new List<Column>();
+            var properties
                 = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            foreach (PropertyInfo property in properties)
+            foreach (var property in properties)
             {
                 var code = Type.GetTypeCode(property.PropertyType);
                 var index = 0;
@@ -189,7 +191,7 @@ namespace AM.Reflection
                         rightAlign = false;
                         break;
                 }
-                Column column = new Column
+                var column = new Column
                 {
                     Title = property.Name,
                     Index = index,
@@ -235,7 +237,7 @@ namespace AM.Reflection
             }
             writer.WriteLine();
 
-            for (var i = 0; i < cells.Length; i++)
+            foreach (var cell in cells)
             {
                 for (var j = 0; j < columns.Length; j++)
                 {
@@ -246,11 +248,11 @@ namespace AM.Reflection
 
                     if (columns[j].RightAlign)
                     {
-                        _RightAlign(writer, cells[i][j], columns[j].Width);
+                        _RightAlign(writer, cell[j], columns[j].Width);
                     }
                     else
                     {
-                        _LeftAlign(writer, cells[i][j], columns[j].Width);
+                        _LeftAlign(writer, cell[j], columns[j].Width);
                     }
                 }
                 writer.WriteLine();
@@ -266,9 +268,9 @@ namespace AM.Reflection
                 IEnumerable<T> items
             )
         {
-            Type type = typeof(T);
-            Column[] columns = GetColumns(type);
-            string[][] cells = GetCells(items, columns);
+            var type = typeof(T);
+            var columns = GetColumns(type);
+            var cells = GetCells(items, columns);
             AdjustColumns(columns, cells);
             Print(writer, columns, cells);
         }
@@ -288,15 +290,24 @@ namespace AM.Reflection
                 throw new ArgumentException();
             }
 
-            Type type = typeof(T);
-            Column[] columns = GetColumns(type);
+            var type = typeof(T);
+            var columns = GetColumns(type);
             if (properties.Any(p => columns.All(c => c.Title != p)))
             {
                 throw new ArgumentException();
             }
 
-            columns = columns.Where(c => c.Title.IsOneOf(properties)).ToArray();
-            string[][] cells = GetCells(items, columns);
+            columns = columns.Where
+                (
+                    column =>
+                    {
+                        var title = column.Title;
+
+                        return !string.IsNullOrEmpty(title) && title.IsOneOf(properties);
+                    }
+                )
+                .ToArray();
+            var cells = GetCells(items, columns);
             AdjustColumns(columns, cells);
             Print(writer, columns, cells);
         }
@@ -307,17 +318,17 @@ namespace AM.Reflection
         public string Print<T>
             (
                 IEnumerable<T> items,
-                params string[] properties
+                params string[]? properties
             )
         {
             var result = new StringWriter();
-            if (ReferenceEquals(properties, null) || properties.Length == 0)
+            if (properties.IsNullOrEmpty())
             {
                 Print(result, items);
             }
             else
             {
-                Print(result, items, properties);
+                Print(result, items, properties!);
             }
 
             return result.ToString();

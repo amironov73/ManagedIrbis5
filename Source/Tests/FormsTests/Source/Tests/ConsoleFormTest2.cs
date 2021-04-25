@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
 /* ConsoleFormTest2.cs --
@@ -25,7 +26,7 @@ namespace FormsTests
     public sealed class ConsoleFormTest2
         : IFormsTest
     {
-        static string[] knownCommands =
+        static readonly string[] _knownCommands =
         {
                 "Clear-Screen",
                 "Show-Help",
@@ -37,11 +38,11 @@ namespace FormsTests
 
         static void HandleTabKey
             (
-                object sender,
+                object? sender,
                 ConsoleInputEventArgs eventArgs
             )
         {
-            var console = (ConsoleControl) sender;
+            var console = (ConsoleControl) sender.ThrowIfNull(nameof(sender));
             var text = eventArgs.Text;
 
             if (string.IsNullOrEmpty(text))
@@ -51,12 +52,12 @@ namespace FormsTests
                     (
                         Color.Gray,
                         "Available commands are: "
-                        + string.Join(", ", knownCommands)
+                        + string.Join(", ", _knownCommands)
                     );
                 return;
             }
 
-            foreach (var command in knownCommands)
+            foreach (var command in _knownCommands)
             {
                 if (command.ToLower().StartsWith(text.ToLower()))
                 {
@@ -76,11 +77,11 @@ namespace FormsTests
 
         static void HandleInput
             (
-                object sender,
+                object? sender,
                 ConsoleInputEventArgs eventArgs
             )
         {
-            var console = (ConsoleControl)sender;
+            var console = (ConsoleControl) sender.ThrowIfNull(nameof(sender));
             var text = eventArgs.Text;
 
             if (string.IsNullOrEmpty(text))

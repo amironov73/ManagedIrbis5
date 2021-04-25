@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
@@ -20,6 +21,8 @@ using System.Windows.Forms;
 using AM.Windows.Forms;
 
 #endregion
+
+#nullable enable
 
 namespace FormsTests
 {

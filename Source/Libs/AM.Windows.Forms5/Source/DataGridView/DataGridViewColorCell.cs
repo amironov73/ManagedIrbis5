@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
 /* DataGridViewColorCell.cs --
@@ -32,8 +33,6 @@ namespace AM.Windows.Forms
     {
         #region Private members
 
-        private bool _valueChanged;
-
         #endregion
 
         #region Public methods
@@ -43,16 +42,12 @@ namespace AM.Windows.Forms
         /// </summary>
         public void ShowEditor()
         {
-            using (var dialog = new ColorDialog())
+            using var dialog = new ColorDialog { Color = (Color) Value };
+            if (dialog.ShowDialog (DataGridView?.FindForm()) == DialogResult.OK)
             {
-                dialog.Color = (Color)Value;
-                if (dialog.ShowDialog(DataGridView.FindForm())
-                     == DialogResult.OK)
-                {
-                    _valueChanged = true;
-                    DataGridView.NotifyCurrentCellDirty(true);
-                    SetValue(RowIndex, dialog.Color);
-                }
+                EditingCellValueChanged = true;
+                DataGridView?.NotifyCurrentCellDirty(true);
+                SetValue(RowIndex, dialog.Color);
             }
         }
 
@@ -95,19 +90,25 @@ namespace AM.Windows.Forms
             {
                 backColor = cellStyle.SelectionBackColor;
             }
-            using (Brush brush = new SolidBrush(backColor))
+
+            using (var brush = new SolidBrush(backColor))
             {
                 graphics.FillRectangle(brush, cellBounds);
             }
+
             if ((paintParts & DataGridViewPaintParts.Border)
                  != DataGridViewPaintParts.None)
             {
-                PaintBorder(graphics,
-                              clipBounds,
-                              cellBounds,
-                              cellStyle,
-                              advancedBorderStyle);
+                PaintBorder
+                    (
+                        graphics,
+                        clipBounds,
+                        cellBounds,
+                        cellStyle,
+                        advancedBorderStyle
+                    );
             }
+
             var colorRectangle = cellBounds;
             colorRectangle.Inflate(-2, -2);
             if ((cellState & DataGridViewElementStates.ReadOnly)
@@ -134,14 +135,14 @@ namespace AM.Windows.Forms
                     state
                     );
             }
+
             if (Value is Color)
             {
                 var color = (Color)Value;
-                using (Brush brush = new SolidBrush(color))
-                {
-                    graphics.FillRectangle(brush, colorRectangle);
-                }
+                using var brush = new SolidBrush(color);
+                graphics.FillRectangle(brush, colorRectangle);
             }
+
             base.Paint
                 (
                     graphics,
@@ -163,13 +164,7 @@ namespace AM.Windows.Forms
         /// </summary>
         /// <value></value>
         /// <returns>An <see cref="T:System.Object"></see> representing the default value.</returns>
-        public override object DefaultNewRowValue
-        {
-            get
-            {
-                return Color.Black;
-            }
-        }
+        public override object DefaultNewRowValue => Color.Black;
 
         /// <summary>
         /// Gets or sets the data type of the values in the cell.
@@ -178,14 +173,8 @@ namespace AM.Windows.Forms
         /// <returns>A <see cref="T:System.Type"></see> representing the data type of the value in the cell.</returns>
         public override Type ValueType
         {
-            get
-            {
-                return base.ValueType ?? typeof(Color);
-            }
-            set
-            {
-                base.ValueType = value;
-            }
+            get => base.ValueType ?? typeof(Color);
+            set => base.ValueType = value;
         }
 
         #region IDataGridViewEditingCell members
@@ -227,14 +216,8 @@ namespace AM.Windows.Forms
         ///
         public object EditingCellFormattedValue
         {
-            get
-            {
-                return Value;
-            }
-            set
-            {
-                Value = value;
-            }
+            get => Value;
+            set => Value = value;
         }
 
         ///<summary>
@@ -245,17 +228,7 @@ namespace AM.Windows.Forms
         ///true if the value of the cell has changed; otherwise, false.
         ///</returns>
         ///
-        public bool EditingCellValueChanged
-        {
-            get
-            {
-                return _valueChanged;
-            }
-            set
-            {
-                _valueChanged = value;
-            }
-        }
+        public bool EditingCellValueChanged { get; set; }
 
         #endregion
 

@@ -15,7 +15,7 @@
 
 using System.Drawing;
 using System.Windows.Forms;
-
+using AM;
 using AM.Windows.Forms;
 
 #endregion
@@ -135,7 +135,8 @@ namespace ManagedIrbis.WinForms.Grid
                 Font = grid.Font,
                 BorderStyle = BorderStyle.FixedSingle
             };
-            result.TextBox.KeyDown += Editor_KeyDown;
+
+            result.TextBox.ThrowIfNull("result.TextBox").KeyDown += Editor_KeyDown;
 
             if (edit)
             {

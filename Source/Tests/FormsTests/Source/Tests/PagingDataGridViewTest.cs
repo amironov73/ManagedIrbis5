@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
@@ -17,7 +18,7 @@
 using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-
+using AM;
 using AM.Windows.Forms;
 
 #endregion
@@ -71,11 +72,11 @@ namespace FormsTests
 
         private void Grid_Paging
             (
-                object sender,
+                object? sender,
                 PagingDataGridViewEventArgs e
             )
         {
-            var grid = (DataGridView) sender;
+            var grid = (DataGridView) sender.ThrowIfNull(nameof(sender));
 
             var table = new DataTable();
             var column3 = new DataColumn("Column1", typeof(int));

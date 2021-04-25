@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
@@ -16,13 +17,7 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using System.Runtime.Serialization.Formatters;
 using System.Xml.Serialization;
 
 using AM;
@@ -59,23 +54,23 @@ namespace ManagedIrbis.Reports
         public BandCollection<ReportBand> Body { get; set; }
 
         /// <summary>
-        /// Footer band.
+        /// Полоса подвала отчета.
         /// </summary>
         [XmlElement("footer")]
         [JsonPropertyName("footer")]
         public ReportBand? Footer
         {
-            get { return _footer; }
+            get => _footer;
             set
             {
-                if (!ReferenceEquals(_footer, null))
+                if (_footer is not null)
                 {
                     _footer.Report = null;
                     _footer.Parent = null;
                 }
 
                 _footer = value;
-                if (!ReferenceEquals(_footer, null))
+                if (_footer is not null)
                 {
                     _footer.Report = this;
                     _footer.Parent = null;
@@ -84,23 +79,23 @@ namespace ManagedIrbis.Reports
         }
 
         /// <summary>
-        /// Header band.
+        /// Полоса заголовка отчета.
         /// </summary>
         [XmlElement("header")]
         [JsonPropertyName("header")]
         public ReportBand? Header
         {
-            get { return _header; }
+            get => _header;
             set
             {
-                if (!ReferenceEquals(_header, null))
+                if (_header is not null)
                 {
                     _header.Report = null;
                     _header.Parent = null;
                 }
 
                 _header = value;
-                if (!ReferenceEquals(_header, null))
+                if (_header is not null)
                 {
                     _header.Report = this;
                     _header.Parent = null;
@@ -134,7 +129,8 @@ namespace ManagedIrbis.Reports
 
         #region Private members
 
-        private ReportBand _footer, _header;
+        private ReportBand? _footer;
+        private ReportBand? _header;
 
         #endregion
 

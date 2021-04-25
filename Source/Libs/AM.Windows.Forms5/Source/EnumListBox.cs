@@ -1,17 +1,18 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CoVariantArrayConversion
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+
 /* EnumListBox.cs --
  * Ars Magna project, http://arsmagna.ru
- * -------------------------------------------------------
- * Status: poor
  */
 
 #region Using directives
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows.Forms;
 
 using AM.Reflection;
@@ -33,7 +34,7 @@ namespace AM.Windows.Forms
     {
         #region Properties
 
-        private Type _enumType;
+        private Type? _enumType;
 
         /// <summary>
         /// Gets or sets the type of the enum.
@@ -41,17 +42,10 @@ namespace AM.Windows.Forms
         /// <value>The type of the enum.</value>
         [DefaultValue(null)]
         [TypeConverter(typeof(EnumTypeConverter))]
-        public Type EnumType
+        public Type? EnumType
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _enumType;
-            }
-            set
-            {
-                _SetEnumType(value);
-            }
+            get => _enumType;
+            set => _SetEnumType(value.ThrowIfNull(nameof(value)));
         }
 
         /// <summary>
@@ -60,14 +54,14 @@ namespace AM.Windows.Forms
         /// <value>The value.</value>
         public int Value
         {
-            [DebuggerStepThrough]
             get
             {
-                int result = 0;
+                var result = 0;
                 foreach (EnumMemberInfo item in SelectedItems)
                 {
                     result |= item.Value;
                 }
+
                 return result;
             }
         }
@@ -82,9 +76,13 @@ namespace AM.Windows.Forms
             )
         {
             _enumType = enumType;
-            EnumMemberInfo[] members = EnumMemberInfo.Parse(enumType);
-            Items.Clear();
-            Items.AddRange(members);
+
+            if (_enumType is not null)
+            {
+                var members = EnumMemberInfo.Parse (enumType);
+                Items.Clear();
+                Items.AddRange(members);
+            }
         }
 
         #endregion

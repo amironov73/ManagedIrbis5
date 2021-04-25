@@ -79,6 +79,7 @@ namespace ManagedIrbis.Batch
                 (
                     parallelism,
                     ConnectionUtility.GetStandardConnectionString()
+                        .ThrowIfNull("ConnectionUtility.GetStandardConnectionString")
                 )
         {
         }

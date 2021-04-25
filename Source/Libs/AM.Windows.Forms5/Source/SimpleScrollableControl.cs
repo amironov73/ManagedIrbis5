@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable UnusedMember.Global
 
 /*
@@ -35,7 +36,7 @@ namespace AM.Windows.Forms
         ///   Occurs when [scroll].
         /// </summary>
         [Category("Action")]
-        public event ScrollEventHandler Scroll;
+        public event ScrollEventHandler? Scroll;
 
         #endregion
 
@@ -43,16 +44,13 @@ namespace AM.Windows.Forms
 
         public SimpleScrollableControl()
         {
-            _horizontalScroll = new ScrollSettings(this, NativeMethods.ScrollBarKind.SB_HORZ);
-            _verticalScroll = new ScrollSettings(this, NativeMethods.ScrollBarKind.SB_VERT);
+            HorizontalScroll = new ScrollSettings(this, NativeMethods.ScrollBarKind.SB_HORZ);
+            VerticalScroll = new ScrollSettings(this, NativeMethods.ScrollBarKind.SB_VERT);
         }
 
         #endregion
 
         #region Private members
-
-        private readonly ScrollSettings _horizontalScroll;
-        private readonly ScrollSettings _verticalScroll;
 
         private void HandleScroll
             (
@@ -109,7 +107,7 @@ namespace AM.Windows.Forms
             settings.Position = newPosition;
 
             ScrollOrientation orientation =
-                (settings._kind == NativeMethods.ScrollBarKind.SB_HORZ)
+                settings._kind == NativeMethods.ScrollBarKind.SB_HORZ
                     ? ScrollOrientation.HorizontalScroll
                     : ScrollOrientation.VerticalScroll;
             ScrollEventArgs args = new ScrollEventArgs
@@ -128,17 +126,8 @@ namespace AM.Windows.Forms
         ///   Raises the <see cref = "Scroll" /> event.
         /// </summary>
         /// <param name = "args">The <see cref = "System.Windows.Forms.ScrollEventArgs" /> instance containing the event data.</param>
-        protected virtual void OnScroll
-            (
-            ScrollEventArgs args
-            )
-        {
-            ScrollEventHandler handler = Scroll;
-            if (handler != null)
-            {
-                handler(this, args);
-            }
-        }
+        protected virtual void OnScroll (ScrollEventArgs args)
+            => Scroll?.Invoke(this, args);
 
         /// <summary>
         ///   Processes Windows messages.
@@ -171,24 +160,16 @@ namespace AM.Windows.Forms
         /// </summary>
         /// <value>The horizontal scroll.</value>
         [Category("Layout")]
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Content)]
-        public ScrollSettings HorizontalScroll
-        {
-            get { return _horizontalScroll; }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+        public ScrollSettings HorizontalScroll { get; }
 
         /// <summary>
         ///   Gets the vertical scroll.
         /// </summary>
         /// <value>The vertical scroll.</value>
         [Category("Layout")]
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Content)]
-        public ScrollSettings VerticalScroll
-        {
-            get { return _verticalScroll; }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+        public ScrollSettings VerticalScroll { get; }
 
         /// <summary>
         ///   Gets the required creation parameters when the control handle is created.
@@ -202,8 +183,7 @@ namespace AM.Windows.Forms
             get
             {
                 CreateParams result = base.CreateParams;
-                result.Style |= (NativeMethods.WS_HSCROLL
-                                 | NativeMethods.WS_VSCROLL);
+                result.Style |= NativeMethods.WS_HSCROLL | NativeMethods.WS_VSCROLL;
                 return result;
             }
         }

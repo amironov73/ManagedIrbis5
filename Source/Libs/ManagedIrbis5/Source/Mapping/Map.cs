@@ -22,7 +22,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 
 using AM;
@@ -807,7 +806,7 @@ namespace ManagedIrbis.Mapping
         /// Преобразование в 32-битное целое число со знаком.
         /// </summary>
         public static int ToInt32(string? value)
-            => value.ParseInt32();
+            => string.IsNullOrWhiteSpace(value) ? 0 : value.ParseInt32();
 
         /// <summary>
         /// Преобразование в 32-битное целое число со знаком.
@@ -901,7 +900,7 @@ namespace ManagedIrbis.Mapping
         /// Преобразование в 64-битное целое число со знаком.
         /// </summary>
         public static long ToInt64(string? value)
-            => value.ParseInt64();
+            => string.IsNullOrWhiteSpace(value) ? 0 : value.ParseInt64();
 
         /// <summary>
         /// Преобразование в 64-битное целое число со знаком.

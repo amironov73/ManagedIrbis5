@@ -286,7 +286,7 @@ namespace ManagedIrbis.Reports
             )
         {
             context.Index = index;
-            context.CurrentRecord = context.Records.SafeAt(index);
+            context.CurrentRecord = context.Records!.SafeAt(index);
             context.SetVariables(formatter);
 
             _Render(context);

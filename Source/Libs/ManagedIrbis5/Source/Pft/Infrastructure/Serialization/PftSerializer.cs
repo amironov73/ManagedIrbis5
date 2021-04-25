@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -86,7 +87,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
 
             try
             {
-                result = mapping.Create();
+                result = mapping.Create.ThrowIfNull("mapping.Create") ();
             }
             catch (Exception exception)
             {
@@ -99,7 +100,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                     (
                         "PftSerializer::Deserialize: "
                         + "can't create instance of "
-                        + mapping.Type.AssemblyQualifiedName
+                        + mapping.Type!.AssemblyQualifiedName
                     );
                 Magna.Error
                     (
@@ -250,15 +251,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Serialization
                 string fileName
             )
         {
-            using (Stream stream = File.Create(fileName))
-
-            using (var compressor
-                = new DeflateStream(stream, CompressionMode.Compress))
-            using (var writer
-                = new BinaryWriter(compressor, IrbisEncoding.Utf8))
-            {
-                Save(rootNode, writer);
-            }
+            using var stream = File.Create(fileName);
+            using var compressor = new DeflateStream(stream, CompressionMode.Compress);
+            using var writer = new BinaryWriter(compressor, IrbisEncoding.Utf8);
+            Save(rootNode, writer);
         }
 
         /// <summary>

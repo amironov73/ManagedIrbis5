@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -19,7 +20,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Reflection;
 
 #endregion
 
@@ -89,7 +89,7 @@ namespace AM.Reflection
         private class MemberComparer
             : IComparer
         {
-            private SortBy _sortBy;
+            private readonly SortBy _sortBy;
 
             public MemberComparer(SortBy sortBy)
             {
@@ -127,7 +127,7 @@ namespace AM.Reflection
                 SortBy sortBy
             )
         {
-            MemberComparer comparer = new MemberComparer(sortBy);
+            var comparer = new MemberComparer(sortBy);
             Array.Sort(members, comparer);
         }
 
@@ -144,7 +144,7 @@ namespace AM.Reflection
                 Type enumType
             )
         {
-            List<EnumMemberInfo> result = new List<EnumMemberInfo>();
+            var result = new List<EnumMemberInfo>();
             if (!enumType.IsEnum)
             {
                 Magna.Error
@@ -158,7 +158,7 @@ namespace AM.Reflection
                 throw new ArgumentException("enumType");
             }
 
-            Type underlyingType = Enum.GetUnderlyingType(enumType);
+            var underlyingType = Enum.GetUnderlyingType(enumType);
             switch (underlyingType.Name)
             {
                 case "Byte":
@@ -179,21 +179,21 @@ namespace AM.Reflection
 
                     throw new ArgumentException("enumType");
             }
-            foreach (string name in Enum.GetNames(enumType))
-            {
-                FieldInfo field =
-                    enumType.GetField(name
-                        /*, BindingFlags.Public | BindingFlags.GetField */ );
 
-                DisplayNameAttribute titleAttribute = ReflectionUtility
+            foreach (var name in Enum.GetNames(enumType))
+            {
+                var field = enumType.GetField(name)
+                    .ThrowIfNull("enumType.GetField");
+
+                var titleAttribute = ReflectionUtility
                     .GetCustomAttribute<DisplayNameAttribute>(field);
 
-                string displayName = ReferenceEquals(titleAttribute, null)
+                var displayName = ReferenceEquals(titleAttribute, null)
                     ? name
                     : titleAttribute.DisplayName;
 
-                int value = (int)Enum.Parse(enumType, name, false);
-                EnumMemberInfo info = new EnumMemberInfo(name, displayName, value);
+                var value = (int)Enum.Parse(enumType, name, false);
+                var info = new EnumMemberInfo(name, displayName, value);
                 result.Add(info);
             }
 

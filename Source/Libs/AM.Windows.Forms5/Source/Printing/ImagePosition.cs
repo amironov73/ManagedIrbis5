@@ -10,7 +10,7 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Drawing.Printing
+namespace AM.Windows.Forms.Printing
 {
     /// <summary>
     /// Position of the image to print.
@@ -29,4 +29,4 @@ namespace AM.Drawing.Printing
 
     } // enum ImagePosition
 
-} // namespace AM.Drawing.Printing
+} // namespace AM.Windows.Forms.Printing

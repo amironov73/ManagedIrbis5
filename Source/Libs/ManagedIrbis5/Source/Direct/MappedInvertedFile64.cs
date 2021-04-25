@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* MappedInvertedFile64.cs --
@@ -671,7 +672,7 @@ namespace ManagedIrbis.Direct
                                 );
                             if (compareResult >= 0)
                             {
-                                var starts = item.Text.StartsWith(key);
+                                var starts = item.Text!.StartsWith(key);
                                 if (compareResult > 0 && !starts)
                                 {
                                     goto DONE;

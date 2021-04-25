@@ -55,7 +55,7 @@ namespace ManagedIrbis.WinForms.Pft
                     PftVariable variable
                 )
             {
-                object value = variable.StringValue;
+                object? value = variable.StringValue;
                 if (variable.IsNumeric)
                 {
                     value = variable.NumericValue;

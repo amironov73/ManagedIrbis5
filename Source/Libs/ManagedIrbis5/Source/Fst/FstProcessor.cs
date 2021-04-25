@@ -21,11 +21,11 @@ using System.Linq;
 using AM;
 using AM.Text;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Pft;
 
 #endregion
+
+#pragma warning disable 649
 
 #nullable enable
 
@@ -418,10 +418,10 @@ namespace ManagedIrbis.Fst
             var result = new List<string>(items.Length);
             foreach (var item in items)
             {
-                var words = _alphabetTable.SplitWords(item);
+                var words = _alphabetTable!.SplitWords(item);
                 foreach (var word in words)
                 {
-                    if (!_stopWords.IsStopWord(word))
+                    if (!_stopWords!.IsStopWord(word))
                     {
                         result.Add(word);
                     }

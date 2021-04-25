@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedAutoPropertyAccessor.Global
@@ -736,7 +737,7 @@ namespace ManagedIrbis.Direct
                                 );
                             if (compareResult >= 0)
                             {
-                                var starts = item.Text.StartsWith(key);
+                                var starts = item.Text!.StartsWith(key);
                                 if (compareResult > 0 && !starts)
                                 {
                                     goto DONE;

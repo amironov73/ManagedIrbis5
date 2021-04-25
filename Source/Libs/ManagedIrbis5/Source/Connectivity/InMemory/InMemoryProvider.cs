@@ -5,7 +5,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedType.Global
 
 /* InMemoryProvider.cs --
@@ -16,11 +18,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using AM;
+
 using AM.PlatformAbstraction;
+
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 
@@ -71,22 +73,35 @@ namespace ManagedIrbis.InMemory
 
         public void Dispose()
         {
-            // Ничего не нужно делать
+            Disposing?.Invoke(this, EventArgs.Empty);
         }
 
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return ValueTask.CompletedTask;
+        }
 
         public object? GetService(Type serviceType)
         {
             throw new NotImplementedException();
         }
 
+        private void SetBusy(bool busy)
+        {
+            Busy = busy;
+            BusyChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void SetLastError(int code) => LastError = code;
+
         public event EventHandler? BusyChanged;
         public event EventHandler? Disposing;
         public string? Database { get; set; }
-        public bool Connected { get; }
-        public bool Busy { get; }
-        public int LastError { get; }
+        public bool Connected { get; } = true;
+        public bool Busy { get; private set; }
+
+        public int LastError { get; private set; }
         public PlatformAbstractionLayer PlatformAbstraction { get; }
         public void CancelOperation()
         {

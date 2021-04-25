@@ -102,7 +102,7 @@ namespace AM.Windows.Forms
         /// </summary>
         public static DialogResult ShowDialog
             (
-                IWin32Window ownerWindow,
+                IWin32Window? ownerWindow,
                 object obj
             )
         {

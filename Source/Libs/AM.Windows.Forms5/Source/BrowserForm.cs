@@ -16,7 +16,6 @@
 #region Using directives
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
@@ -32,10 +31,6 @@ namespace AM.Windows.Forms
     public partial class BrowserForm
         : Form
     {
-        #region Events
-
-        #endregion
-
         #region Properties
 
         /// <summary>
@@ -45,18 +40,8 @@ namespace AM.Windows.Forms
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string DocumentText
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _webBrowser.DocumentText;
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                //_webBrowser.Navigate ( "about:blank" );
-                //_webBrowser.Document.Write ( value );
-                _webBrowser.DocumentText = value;
-            }
+            get => _webBrowser.DocumentText;
+            set => _webBrowser.DocumentText = value;
         }
 
         #endregion
@@ -99,16 +84,22 @@ namespace AM.Windows.Forms
             }
         }
 
-        private void _pageSetupButton_Click(object sender, System.EventArgs e)
+        private void _pageSetupButton_Click
+            (
+                object? sender,
+                System.EventArgs e
+            )
         {
             _webBrowser.ShowPageSetupDialog();
         }
 
-        private void _pasteButton_Click(object sender, System.EventArgs e)
+        private void _pasteButton_Click
+            (
+                object? sender,
+                System.EventArgs e
+            )
         {
-            string text = Clipboard.GetText(TextDataFormat.Html)
-                          ?? Clipboard.GetText(TextDataFormat.UnicodeText)
-                          ?? Clipboard.GetText();
+            var text = Clipboard.GetText(TextDataFormat.Html);
 
             if (!string.IsNullOrEmpty(text))
             {
@@ -128,14 +119,14 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Gets the document.
         /// </summary>
-        /// <returns></returns>
         public HtmlDocument GetDocument()
         {
             if (_webBrowser.Document == null)
             {
                 _webBrowser.Navigate("about:blank");
             }
-            return _webBrowser.Document;
+
+            return _webBrowser.Document.ThrowIfNull("_webBrowser.Document");
         }
 
         #endregion

@@ -29,13 +29,13 @@ namespace AM.Data
     /// </summary>
     class EqualityBinding : EasyBinding
     {
-        object Value;
+        object? Value;
 
         class Trigger
         {
-            public Expression Expression;
-            public MemberInfo Member;
-            public MemberChangeAction ChangeAction;
+            public Expression? Expression;
+            public MemberInfo? Member;
+            public MemberChangeAction? ChangeAction;
         }
 
         readonly List<Trigger> leftTriggers = new ();
@@ -80,17 +80,22 @@ namespace AM.Data
 
         void OnSideChanged (Expression expr, Expression dependentExpr, int causeChangeId)
         {
-            if (activeChangeIds.Contains (causeChangeId))
+            if (activeChangeIds.Contains(causeChangeId))
+            {
                 return;
+            }
 
             var v = Evaluator.EvalExpression (expr);
 
             if (v == null && Value == null)
+            {
                 return;
+            }
 
-            if ((v == null && Value != null) ||
-                (v != null && Value == null) ||
-                ((v is IComparable) && ((IComparable)v).CompareTo (Value) != 0)) {
+            if (v == null && Value != null ||
+                v != null && Value == null ||
+                v is IComparable comparable && comparable.CompareTo (Value) != 0)
+            {
 
                 Value = v;
 
@@ -106,8 +111,10 @@ namespace AM.Data
 
         static void Unsubscribe (List<Trigger> triggers)
         {
-            foreach (var t in triggers) {
-                if (t.ChangeAction != null) {
+            foreach (var t in triggers)
+            {
+                if (t.ChangeAction != null)
+                {
                     RemoveMemberChangeAction (t.ChangeAction);
                 }
             }
@@ -115,23 +122,32 @@ namespace AM.Data
 
         static void Subscribe (List<Trigger> triggers, Action<int> action)
         {
-            foreach (var t in triggers) {
-                t.ChangeAction = AddMemberChangeAction (Evaluator.EvalExpression (t.Expression), t.Member, action);
+            foreach (var t in triggers)
+            {
+                t.ChangeAction = AddMemberChangeAction
+                    (
+                        Evaluator.EvalExpression (t.Expression!)!,
+                        t.Member!,
+                        action!
+                    );
             }
         }
 
         void CollectTriggers (Expression s, List<Trigger> triggers)
         {
-            if (s.NodeType == ExpressionType.MemberAccess) {
+            if (s.NodeType == ExpressionType.MemberAccess)
+            {
 
                 var m = (MemberExpression)s;
-                CollectTriggers (m.Expression, triggers);
+                CollectTriggers (m.Expression!, triggers);
                 var t = new Trigger { Expression = m.Expression, Member = m.Member };
                 triggers.Add (t);
 
-            } else {
-                var b = s as BinaryExpression;
-                if (b != null) {
+            }
+            else
+            {
+                if (s is BinaryExpression b)
+                {
                     CollectTriggers (b.Left, triggers);
                     CollectTriggers (b.Right, triggers);
                 }

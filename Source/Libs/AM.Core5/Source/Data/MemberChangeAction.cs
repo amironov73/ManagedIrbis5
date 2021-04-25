@@ -29,7 +29,7 @@ namespace AM.Data
     {
         readonly Action<int> action;
 
-        public object Target { get; }
+        public object? Target { get; }
 
         public MemberInfo Member { get; }
 
@@ -37,16 +37,17 @@ namespace AM.Data
             (
                 object target,
                 MemberInfo member,
-                Action<int> action
+                Action<int>? action
             )
         {
             Target = target;
             if (member == null)
+            {
                 throw new ArgumentNullException (nameof(member));
+            }
+
             Member = member;
-            if (action == null)
-                throw new ArgumentNullException (nameof(action));
-            this.action = action;
+            this.action = action ?? throw new ArgumentNullException (nameof(action));
         }
 
         public void Notify (int changeId)

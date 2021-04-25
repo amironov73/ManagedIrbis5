@@ -21,7 +21,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
-using AM.Drawing.Printing;
+using AM.Windows.Forms.Printing;
 
 #endregion
 

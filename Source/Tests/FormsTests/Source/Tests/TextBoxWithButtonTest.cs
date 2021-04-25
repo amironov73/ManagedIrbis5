@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable UnusedMember.Global
 
 /* TextBoxWithButtonTest.cs --
@@ -12,7 +13,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-
+using AM;
 using AM.Windows.Forms;
 
 #endregion
@@ -49,11 +50,11 @@ namespace FormsTests
 
         void textBox_ButtonClick
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
-            var textBox = (TextBoxWithButton) sender;
+            var textBox = (TextBoxWithButton) sender.ThrowIfNull(nameof(sender));
             var form = textBox.FindForm();
 
             MessageBox.Show

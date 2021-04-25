@@ -17,6 +17,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 #endregion
 
@@ -53,8 +54,14 @@ namespace AM.ConsoleIO
         /// <inheritdoc cref="IConsoleDriver.Title" />
         public string Title
         {
-            get => Console.Title;
-            set => Console.Title = value;
+            get => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? Console.Title : string.Empty;
+            set
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Console.Title = value;
+                }
+            }
         }
 
         /// <inheritdoc cref="IConsoleDriver.Clear" />
@@ -136,7 +143,9 @@ namespace AM.ConsoleIO
 
             while (Console.ReadKey(true).Key != key)
             {
+                // ReSharper disable RedundantJumpStatement
                 continue;
+                // ReSharper restore RedundantJumpStatement
             }
         } // method PressToContinue
 
