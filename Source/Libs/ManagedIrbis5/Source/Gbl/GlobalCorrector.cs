@@ -50,7 +50,7 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; private set; }
+        public ISyncProvider Connection { get; private set; }
 
         /// <summary>
         /// Database name.
@@ -98,7 +98,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GlobalCorrector
             (
-                ISyncIrbisProvider connection
+                ISyncProvider connection
             )
             : this
             (
@@ -114,7 +114,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GlobalCorrector
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database
             )
             : this
@@ -131,7 +131,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public GlobalCorrector
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int chunkSize
             )
@@ -169,7 +169,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GlobalCorrector FromSettings
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 GblSettings settings
             )
         {

@@ -31,7 +31,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider? Provider { get; set; }
+        public ISyncProvider? Provider { get; set; }
 
         /// <summary>
         /// Record source.

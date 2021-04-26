@@ -26,10 +26,10 @@ namespace ManagedIrbis
         #region ConnectionFactory members
 
         /// <inheritdoc cref="ConnectionFactory.CreateSyncConnection"/>
-        public ISyncIrbisProvider CreateSyncConnection() =>
+        public ISyncProvider CreateSyncConnection() =>
             new NullProvider();
 
-        public IAsyncIrbisProvider CreateAsyncConnection() =>
+        public IAsyncProvider CreateAsyncConnection() =>
             new NullProvider();
 
         #endregion

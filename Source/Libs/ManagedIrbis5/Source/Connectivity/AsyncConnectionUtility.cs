@@ -46,7 +46,7 @@ namespace ManagedIrbis
         /// <returns>Признак успешности завершения операции.</returns>
         public static async Task<bool> ActualizeDatabaseAsync
             (
-                this IAsyncIrbisProvider connection,
+                this IAsyncProvider connection,
                 string? database = default
             )
         {
@@ -151,7 +151,7 @@ namespace ManagedIrbis
         /// </summary>
         public static async Task<Record?> ReadRecordAsync
             (
-                this IAsyncIrbisProvider connection,
+                this IAsyncProvider connection,
                 int mfn
             )
             =>
@@ -169,7 +169,7 @@ namespace ManagedIrbis
         /// </summary>
         public static async Task<Term[]> ReadAllTermsAsync
             (
-                this IAsyncIrbisProvider connection,
+                this IAsyncProvider connection,
                 string prefix
             )
         {
@@ -233,7 +233,7 @@ namespace ManagedIrbis
         /// <returns>Массив прочитанных постингов.</returns>
         public static async Task<TermPosting[]?> ReadPostingsAsync
             (
-                this IAsyncIrbisProvider connection,
+                this IAsyncProvider connection,
                 string term,
                 int numberOfPostings
             )
@@ -257,7 +257,7 @@ namespace ManagedIrbis
         /// <returns>Массив прочитанных терминов.</returns>
         public static async Task<Term[]?> ReadTermsAsync
             (
-                this IAsyncIrbisProvider connection,
+                this IAsyncProvider connection,
                 string startTerm,
                 int numberOfTerms
             )

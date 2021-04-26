@@ -33,8 +33,8 @@ namespace ManagedIrbis
     /// Интерфейс синхронного подключения.
     /// </summary>
     public interface ISyncConnection
-        : ISyncIrbisProvider,
-        IIrbisConnectionSettings
+        : ISyncProvider,
+        IConnectionSettings
     {
         Response? ExecuteSync(SyncQuery query);
     }

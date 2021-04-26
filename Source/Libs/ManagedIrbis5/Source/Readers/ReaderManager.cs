@@ -57,7 +57,7 @@ namespace ManagedIrbis.Readers
         /// <summary>
         /// Клиент, общающийся с сервером.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; }
+        public ISyncProvider Connection { get; }
 
         /// <summary>
         /// Omit deleted records?
@@ -73,7 +73,7 @@ namespace ManagedIrbis.Readers
         /// </summary>
         public ReaderManager
             (
-                ISyncIrbisProvider connection
+                ISyncProvider connection
             )
         {
             Connection = connection;

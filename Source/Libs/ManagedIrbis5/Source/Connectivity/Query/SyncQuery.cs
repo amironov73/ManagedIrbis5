@@ -54,7 +54,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public SyncQuery
             (
-                IIrbisConnectionSettings connection,
+                IConnectionSettings connection,
                 string commandCode
             )
             : this()

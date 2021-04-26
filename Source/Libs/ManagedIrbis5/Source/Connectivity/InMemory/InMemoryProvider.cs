@@ -36,7 +36,7 @@ namespace ManagedIrbis.InMemory
     /// InMemoryProvider
     /// </summary>
     public class InMemoryProvider
-        : ISyncIrbisProvider
+        : ISyncProvider
     {
         #region Properties
 
@@ -69,7 +69,7 @@ namespace ManagedIrbis.InMemory
 
         #endregion
 
-        #region ISyncIrbisProvider
+        #region ISyncProvider
 
         public void Dispose()
         {

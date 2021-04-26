@@ -35,7 +35,7 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Providr.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; }
+        public ISyncProvider Provider { get; }
 
         #endregion
 
@@ -47,7 +47,7 @@ namespace ManagedIrbis.Infrastructure
         public SearchContext
             (
                 SearchManager manager,
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Manager = manager;

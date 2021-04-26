@@ -125,7 +125,7 @@ namespace ManagedIrbis
         /// <exception cref="IrbisException">
         /// Если строка подключения в app.settings не найдена.
         /// </exception>
-        public static ISyncIrbisProvider GetConnectionFromConfig()
+        public static ISyncProvider GetConnectionFromConfig()
         {
             var connectionString = GetStandardConnectionString();
             if (string.IsNullOrEmpty(connectionString))
@@ -147,7 +147,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="fileName">Имя файла со строкой подключения.</param>
         /// <returns>Настроенный клиент.</returns>
-        public static ISyncIrbisProvider GetConnectionFromFile
+        public static ISyncProvider GetConnectionFromFile
             (
                 string fileName = "connection.irbis"
             )

@@ -20,7 +20,7 @@ namespace UnitTests.ManagedIrbis.Gbl
         [TestMethod]
         public void GblEventArgs_Construction()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             mock.SetupAllProperties();
             var connection = mock.Object;
             connection.Database = "IBIS";

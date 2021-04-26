@@ -42,7 +42,7 @@ namespace ManagedIrbis
     [XmlRoot("connection")]
     public sealed class ConnectionSettings
         : IHandmadeSerializable,
-        IIrbisConnectionSettings,
+        IConnectionSettings,
         IVerifiable
     {
         #region Constants
@@ -168,11 +168,11 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IIrbisConnectionSettings members
+        #region IConnectionSettings members
 
-        int IIrbisConnectionSettings.ClientId => 0;
+        int IConnectionSettings.ClientId => 0;
 
-        int IIrbisConnectionSettings.QueryId => 0;
+        int IConnectionSettings.QueryId => 0;
 
         #endregion
 
@@ -227,10 +227,10 @@ namespace ManagedIrbis
         /// <param name="connection">Неактивное подключение.</param>
         public void Apply
             (
-                IIrbisConnectionSettings connection
+                IConnectionSettings connection
             )
         {
-            if (connection is IBasicIrbisProvider {Connected: true})
+            if (connection is IIrbisProvider {Connected: true})
             {
                 throw new IrbisException("Already connected");
             }
@@ -258,7 +258,7 @@ namespace ManagedIrbis
             }
 
             if (!string.IsNullOrEmpty(Database)
-                && connection is IBasicIrbisProvider provider)
+                && connection is IIrbisProvider provider)
             {
                 provider.Database = Database;
             }
@@ -347,11 +347,11 @@ namespace ManagedIrbis
 
         /// <summary>
         /// Construct <see cref="ConnectionSettings"/>
-        /// from <see cref="IIrbisConnectionSettings"/>.
+        /// from <see cref="IConnectionSettings"/>.
         /// </summary>
         public static ConnectionSettings FromConnection
             (
-                IIrbisConnectionSettings connection
+                IConnectionSettings connection
             )
         {
             // TODO: устанавливать базу данных, если возможно

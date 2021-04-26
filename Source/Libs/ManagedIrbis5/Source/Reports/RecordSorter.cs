@@ -22,7 +22,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Direct;
 using ManagedIrbis.Pft;
 
 #endregion
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        public ISyncIrbisProvider Provider { get; internal set; }
+        public ISyncProvider Provider { get; internal set; }
 
         /// <summary>
         ///
@@ -71,7 +71,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordSorter()
         {
-            Provider = new LocalProvider(string.Empty);
+            Provider = new DirectProvider(string.Empty);
         } // constructor
 
         /// <summary>
@@ -79,7 +79,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordSorter
             (
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Provider = provider;
@@ -90,7 +90,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordSorter
             (
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 string expression
             )
         {

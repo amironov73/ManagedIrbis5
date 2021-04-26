@@ -160,7 +160,7 @@ namespace ManagedIrbis.Readers
         /// </summary>
         public static ChairInfo[] Read
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string fileName = ChairMenu,
                 bool addAllItem = true
             )

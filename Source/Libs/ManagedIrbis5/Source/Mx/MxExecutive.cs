@@ -67,7 +67,7 @@ namespace ManagedIrbis.Mx
         /// <summary>
         /// Client.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; internal set; }
+        public ISyncProvider Provider { get; internal set; }
 
         /// <summary>
         /// Commands.

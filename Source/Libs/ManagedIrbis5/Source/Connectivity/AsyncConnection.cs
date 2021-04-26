@@ -53,44 +53,44 @@ namespace ManagedIrbis
         /// </summary>
         public event EventHandler? BusyChanged;
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Disposing"/>
+        /// <inheritdoc cref="IIrbisProvider.Disposing"/>
         public event EventHandler? Disposing;
 
         #endregion
 
         #region Properties
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Host"/>
+        /// <inheritdoc cref="IConnectionSettings.Host"/>
         public string? Host { get; set; } = "127.0.0.1";
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Port"/>
+        /// <inheritdoc cref="IConnectionSettings.Port"/>
         public ushort Port { get; set; } = 6666;
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Username"/>
+        /// <inheritdoc cref="IConnectionSettings.Username"/>
         public string? Username { get; set; } = string.Empty;
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Password"/>
+        /// <inheritdoc cref="IConnectionSettings.Password"/>
         public string? Password { get; set; } = string.Empty;
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Database"/>
+        /// <inheritdoc cref="IIrbisProvider.Database"/>
         public string? Database { get; set; } = "IBIS";
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Workstation"/>
+        /// <inheritdoc cref="IConnectionSettings.Workstation"/>
         public string? Workstation { get; set; } = "C";
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.ClientId"/>
+        /// <inheritdoc cref="IConnectionSettings.ClientId"/>
         public int ClientId { get; protected internal set; }
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.QueryId"/>
+        /// <inheritdoc cref="IConnectionSettings.QueryId"/>
         public int QueryId { get; protected internal set; }
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Connected"/>
+        /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; protected internal set; }
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Busy"/>
+        /// <inheritdoc cref="IIrbisProvider.Busy"/>
         public bool Busy { get; protected internal set; }
 
-        /// <inheritdoc cref="IBasicIrbisProvider.LastError"/>
+        /// <inheritdoc cref="IIrbisProvider.LastError"/>
         public int LastError { get; protected internal set; }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace ManagedIrbis
             socket.Connection = this;
             _cancellation = new CancellationTokenSource();
             Cancellation = _cancellation.Token;
-            _logger = Magna.Factory.CreateLogger<IBasicIrbisProvider>();
+            _logger = Magna.Factory.CreateLogger<IIrbisProvider>();
             _provider = provider;
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
@@ -252,12 +252,12 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IBasicIrbisProvider members
+        #region IIrbisProvider members
 
-        /// <inheritdoc cref="IBasicIrbisProvider.CancelOperation"/>
+        /// <inheritdoc cref="IIrbisProvider.CancelOperation"/>
         public void CancelOperation() => _cancellation.Cancel();
 
-        /// <inheritdoc cref="IBasicIrbisProvider.CheckProviderState"/>
+        /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>
         public bool CheckProviderState()
         {
             if (!Connected)
@@ -268,16 +268,16 @@ namespace ManagedIrbis
             return Connected;
         } // method CheckConnection
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Configure"/>
+        /// <inheritdoc cref="IIrbisProvider.Configure"/>
         public void Configure(string configurationString)
         {
             // ParseConnectionString
         }
 
-        /// <inheritdoc cref="IBasicIrbisProvider.GetGeneration"/>
+        /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
         public string GetGeneration() => "64";
 
-        /// <inheritdoc cref="IBasicIrbisProvider.GetWaitHandle"/>
+        /// <inheritdoc cref="IIrbisProvider.GetWaitHandle"/>
         public WaitHandle GetWaitHandle()
         {
             throw new NotImplementedException();
@@ -350,9 +350,9 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IAsyncIrbisProvider members
+        #region IAsyncProvider members
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ActualizeRecordAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ActualizeRecordAsync"/>
         public async Task<bool> ActualizeRecordAsync
             (
                 ActualizeRecordParameters parameters
@@ -372,7 +372,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method ActualizeRecordAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ConnectAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ConnectAsync"/>
         public async Task<bool> ConnectAsync()
         {
             if (Connected)
@@ -411,7 +411,7 @@ namespace ManagedIrbis
             return true;
         } // method ConnectAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.CreateDatabaseAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.CreateDatabaseAsync"/>
         public async Task<bool> CreateDatabaseAsync
             (
                 CreateDatabaseParameters parameters
@@ -434,7 +434,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method CreateDatabaseAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.CreateDictionaryAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.CreateDictionaryAsync"/>
         public async Task<bool> CreateDictionaryAsync
             (
                 string? databaseName = default
@@ -455,7 +455,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method CreateDictionaryAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.DeleteDatabaseAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.DeleteDatabaseAsync"/>
         public async Task<bool> DeleteDatabaseAsync
             (
                 string? databaseName = default
@@ -476,7 +476,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method DeleteDatabaseAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.DisconnectAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.DisconnectAsync"/>
         public async Task<bool> DisconnectAsync()
         {
             if (Connected)
@@ -500,7 +500,7 @@ namespace ManagedIrbis
             return true;
         } // method DisconnectAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.FileExistAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.FileExistAsync"/>
         public Task<bool> FileExistAsync
             (
                 FileSpecification specification
@@ -509,7 +509,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method FileExistAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.FormatRecordsAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.FormatRecordsAsync"/>
         public Task<bool> FormatRecordsAsync
             (
                 FormatRecordParameters parameters
@@ -518,7 +518,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method FormatRecordsAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.FullTextSearchAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.FullTextSearchAsync"/>
         public async Task<FullTextResult?> FullTextSearchAsync
             (
                 SearchParameters searchParameters,
@@ -545,7 +545,7 @@ namespace ManagedIrbis
             return result;
         } // method FullTextSearchAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.GetDatabaseInfoAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.GetDatabaseInfoAsync"/>
         public Task<DatabaseInfo?> GetDatabaseInfoAsync
             (
                 string? databaseName = default
@@ -554,7 +554,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method GetDatabaseInfoAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.GetMaxMfnAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.GetMaxMfnAsync"/>
         public async Task<int> GetMaxMfnAsync
             (
                 string? databaseName = default
@@ -570,13 +570,13 @@ namespace ManagedIrbis
                 : 0;
         } // method GetMaxMfnAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.GetServerStatAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.GetServerStatAsync"/>
         public Task<ServerStat?> GetServerStatAsync()
         {
             throw new NotImplementedException();
         } // method GetServerStatAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.GetServerVersionAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.GetServerVersionAsync"/>
         public async Task<ServerVersion?> GetServerVersionAsync()
         {
             if (!CheckProviderState())
@@ -598,7 +598,7 @@ namespace ManagedIrbis
             return result;
         } // method GetServerVersionAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.GlobalCorrectionAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.GlobalCorrectionAsync"/>
         public Task<GblResult?> GlobalCorrectionAsync
             (
                 GblSettings settings
@@ -607,7 +607,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method GlobalCorrectionAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ListFilesAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ListFilesAsync"/>
         public async Task<string[]?> ListFilesAsync
             (
                 params FileSpecification[] specifications
@@ -658,7 +658,7 @@ namespace ManagedIrbis
             return result.ToArray();
         } // method ListFilesAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ListProcessesAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ListProcessesAsync"/>
         public async Task<ProcessInfo[]?> ListProcessesAsync()
         {
             if (!CheckProviderState())
@@ -679,13 +679,13 @@ namespace ManagedIrbis
             return result;
         } // method ListProcessesAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ListUsersAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ListUsersAsync"/>
         public Task<UserInfo[]?> ListUsersAsync()
         {
             throw new NotImplementedException();
         } // method ListUsersAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.NoOperationAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.NoOperationAsync"/>
         public async Task<bool> NoOperationAsync()
         {
             if (!CheckProviderState())
@@ -698,7 +698,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method NoOperationAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.PrintTableAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.PrintTableAsync"/>
         public Task<string?> PrintTableAsync
             (
                 TableDefinition definition
@@ -707,7 +707,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method PrintTableAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReadBinaryFileAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReadBinaryFileAsync"/>
         public Task<byte[]?> ReadBinaryFileAsync
             (
                 FileSpecification specification
@@ -716,7 +716,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method ReadBinaryFileAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReadPostingsAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReadPostingsAsync"/>
         public async Task<TermPosting[]?> ReadPostingsAsync
             (
                 PostingParameters parameters
@@ -739,7 +739,7 @@ namespace ManagedIrbis
             return TermPosting.Parse(response);
         } // method ReadPostingsAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReadRecordAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReadRecordAsync"/>
         public async Task<Record?> ReadRecordAsync
             (
                 ReadRecordParameters parameters
@@ -773,7 +773,7 @@ namespace ManagedIrbis
             return result;
         } // method ReadRecordAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReadRecordPostingsAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReadRecordPostingsAsync"/>
         public Task<TermPosting[]?> ReadRecordPostingsAsync
             (
                 ReadRecordParameters parameters,
@@ -783,7 +783,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method ReadRecordPostingsAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReadTermsAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReadTermsAsync"/>
         public async Task<Term[]?> ReadTermsAsync
             (
                 TermParameters parameters
@@ -809,7 +809,7 @@ namespace ManagedIrbis
             return Term.Parse(response);
         } // method ReadTermsAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReadTextFileAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReadTextFileAsync"/>
         public async Task<string?> ReadTextFileAsync
             (
                 FileSpecification specification
@@ -833,7 +833,7 @@ namespace ManagedIrbis
             return result;
         } // method ReadTextFileAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReloadDictionaryAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReloadDictionaryAsync"/>
         public async Task<bool> ReloadDictionaryAsync
             (
                 string? databaseName = default
@@ -848,7 +848,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method ReloadDictionaryAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReloadMasterFileAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReloadMasterFileAsync"/>
         public async Task<bool> ReloadMasterFileAsync
             (
                 string? databaseName = default
@@ -863,7 +863,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method ReloadMasterFileAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.RestartServerAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.RestartServerAsync"/>
         public async Task<bool> RestartServerAsync()
         {
             var response = await ExecuteAsync(CommandCode.RestartServer);
@@ -871,7 +871,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method RestartServerAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.SearchAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.SearchAsync"/>
         public async Task<FoundItem[]?> SearchAsync
             (
                 SearchParameters parameters
@@ -894,7 +894,7 @@ namespace ManagedIrbis
             return FoundItem.Parse(response);
         } // method SearchAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.TruncateDatabaseAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.TruncateDatabaseAsync"/>
         public async Task<bool> TruncateDatabaseAsync
             (
                 string? databaseName = default
@@ -909,7 +909,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method TruncateDatabaseAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.UnlockDatabaseAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.UnlockDatabaseAsync"/>
         public async Task<bool> UnlockDatabaseAsync
             (
                 string? databaseName = default
@@ -924,7 +924,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method UnlockDatabaseAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.UnlockRecordsAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.UnlockRecordsAsync"/>
         public async Task<bool> UnlockRecordsAsync
             (
                 IEnumerable<int> mfnList,
@@ -948,7 +948,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method UnlockRecordsAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.UpdateIniFileAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.UpdateIniFileAsync"/>
         public async Task<bool> UpdateIniFileAsync
             (
                 IEnumerable<string> lines
@@ -973,7 +973,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method UpdateIniFileAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.UpdateUserListAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.UpdateUserListAsync"/>
         public async Task<bool> UpdateUserListAsync
             (
                 IEnumerable<UserInfo> users
@@ -995,7 +995,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method UpdateUserListAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.WriteRecordAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.WriteRecordAsync"/>
         public async Task<bool> WriteRecordAsync
             (
                 WriteRecordParameters parameters
@@ -1033,7 +1033,7 @@ namespace ManagedIrbis
             return true;
         } // method WriteRecordAsync
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.WriteTextFileAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.WriteTextFileAsync"/>
         public async Task<bool> WriteTextFileAsync
             (
                 FileSpecification specification

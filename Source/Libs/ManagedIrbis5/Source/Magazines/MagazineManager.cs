@@ -56,7 +56,7 @@ namespace ManagedIrbis.Magazines
         /// Клиент для связи с сервером.
         /// </summary>
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local
-        public ISyncIrbisProvider Connection { get; private set; }
+        public ISyncProvider Connection { get; private set; }
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         public MagazineManager
             (
-                ISyncIrbisProvider connection
+                ISyncProvider connection
             )
         {
             Connection = connection;

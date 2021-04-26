@@ -7,24 +7,21 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftTester.cs --
+/* PftTester.cs -- автоматический тестировщик PFT-форматтера
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using AM;
 using AM.Collections;
 using AM.ConsoleIO;
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Direct;
 
 #endregion
 
@@ -33,7 +30,7 @@ using ManagedIrbis.Client;
 namespace ManagedIrbis.Pft.Infrastructure.Testing
 {
     /// <summary>
-    /// Test for PFT formatting.
+    /// Автоматический тестировщик PFT-форматтера.
     /// </summary>
     public sealed class PftTester
     {
@@ -42,7 +39,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; private set; }
+        public ISyncProvider Provider { get; private set; }
 
         /// <summary>
         /// Folder name.
@@ -71,7 +68,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 string folder
             )
         {
-            Provider = new LocalProvider(string.Empty);
+            Provider = new DirectProvider(string.Empty);
             Folder = folder;
             Tests = new NonNullCollection<PftTest>();
             Results = new NonNullCollection<PftTestResult>();
@@ -187,7 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// </summary>
         public void SetEnvironment
             (
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Provider = provider;

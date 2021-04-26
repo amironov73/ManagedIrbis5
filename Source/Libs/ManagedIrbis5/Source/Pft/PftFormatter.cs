@@ -118,7 +118,7 @@ namespace ManagedIrbis.Pft
 
         public virtual void SetProvider
             (
-                ISyncIrbisProvider contextProvider
+                ISyncProvider contextProvider
             )
         {
             // TODO: implement

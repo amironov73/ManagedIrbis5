@@ -129,7 +129,7 @@ namespace ManagedIrbis.Gbl
         /// Конструктор.
         /// </summary>
         /// <param name="connection">Настроенное подключение.</param>
-        public GblSettings (ISyncIrbisProvider connection) =>
+        public GblSettings (ISyncProvider connection) =>
             Database = connection.Database;
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace ManagedIrbis.Gbl
         /// <param name="statements">Операторы ГК.</param>
         public GblSettings
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 IEnumerable<GblStatement> statements
             )
             : this(connection) => Statements.AddRange(statements);
@@ -174,7 +174,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForInterval
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 int minMfn,
                 int maxMfn,
                 IEnumerable<GblStatement> statements
@@ -195,7 +195,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForInterval
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int minMfn,
                 int maxMfn,
@@ -218,7 +218,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForList
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 IEnumerable<int> mfnList,
                 IEnumerable<GblStatement> statements
             )
@@ -238,7 +238,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForList
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 IEnumerable<int> mfnList,
                 IEnumerable<GblStatement> statements
@@ -259,7 +259,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForList
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 IEnumerable<int> mfnList
             )
@@ -279,7 +279,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForSearchExpression
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string searchExpression,
                 IEnumerable<GblStatement> statements
             )
@@ -298,7 +298,7 @@ namespace ManagedIrbis.Gbl
         /// </summary>
         public static GblSettings ForSearchExpression
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 string searchExpression,
                 IEnumerable<GblStatement> statements

@@ -53,7 +53,7 @@ namespace ManagedIrbis.Morphology
         /// <summary>
         /// Client connection.
         /// </summary>
-        public ISyncIrbisProvider? Provider { get; set; }
+        public ISyncProvider? Provider { get; set; }
 
         /// <summary>
         /// Search prefix.
@@ -83,7 +83,7 @@ namespace ManagedIrbis.Morphology
         /// </summary>
         public IrbisMorphologyProvider
             (
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
             : this
                 (
@@ -101,7 +101,7 @@ namespace ManagedIrbis.Morphology
             (
                 string prefix,
                 string database,
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Prefix = prefix;

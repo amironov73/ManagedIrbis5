@@ -118,7 +118,7 @@ namespace ManagedIrbis.CommandLine
         /// <param name="arguments">Аргументы командной строки.</param>
         public static void ConfigureConnectionFromCommandLine
             (
-                IIrbisConnectionSettings connection,
+                IConnectionSettings connection,
                 string[] arguments
             )
         {
@@ -184,7 +184,7 @@ namespace ManagedIrbis.CommandLine
         /// <param name="environmentName">Имя переменной окружения.</param>
         public static void ConfigureConnectionFromEnvironment
             (
-                IIrbisConnectionSettings connection,
+                IConnectionSettings connection,
                 string? environmentName = default
             )
         {

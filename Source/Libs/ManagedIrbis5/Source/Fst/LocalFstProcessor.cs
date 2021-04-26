@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 
 using ManagedIrbis.Client;
+using ManagedIrbis.Direct;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Pft.Infrastructure;
@@ -40,7 +41,7 @@ namespace ManagedIrbis.Fst
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; private set; }
+        public ISyncProvider Provider { get; private set; }
 
         #endregion
 
@@ -55,7 +56,7 @@ namespace ManagedIrbis.Fst
                 string database
             )
         {
-            var environment = new LocalProvider(rootPath)
+            var environment = new DirectProvider(rootPath)
                 {
                     Database = database
                 };

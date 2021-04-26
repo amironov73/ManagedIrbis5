@@ -35,8 +35,8 @@ namespace ManagedIrbis
     /// Интерфейс асинхронного подключения.
     /// </summary>
     public interface IAsyncConnection
-        : IAsyncIrbisProvider,
-        IIrbisConnectionSettings
+        : IAsyncProvider,
+        IConnectionSettings
     {
         Task<Response?> ExecuteAsync(AsyncQuery query);
     }

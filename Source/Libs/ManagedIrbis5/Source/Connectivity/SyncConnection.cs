@@ -52,44 +52,44 @@ namespace ManagedIrbis
         /// </summary>
         public event EventHandler? BusyChanged;
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Disposing"/>
+        /// <inheritdoc cref="IIrbisProvider.Disposing"/>
         public event EventHandler? Disposing;
 
         #endregion
 
         #region Properties
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Host"/>
+        /// <inheritdoc cref="IConnectionSettings.Host"/>
         public string? Host { get; set; } = "127.0.0.1";
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Port"/>
+        /// <inheritdoc cref="IConnectionSettings.Port"/>
         public ushort Port { get; set; } = 6666;
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Username"/>
+        /// <inheritdoc cref="IConnectionSettings.Username"/>
         public string? Username { get; set; } = string.Empty;
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Password"/>
+        /// <inheritdoc cref="IConnectionSettings.Password"/>
         public string? Password { get; set; } = string.Empty;
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Database"/>
+        /// <inheritdoc cref="IIrbisProvider.Database"/>
         public string? Database { get; set; } = "IBIS";
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.Workstation"/>
+        /// <inheritdoc cref="IConnectionSettings.Workstation"/>
         public string? Workstation { get; set; } = "C";
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.ClientId"/>
+        /// <inheritdoc cref="IConnectionSettings.ClientId"/>
         public int ClientId { get; protected internal set; }
 
-        /// <inheritdoc cref="IIrbisConnectionSettings.QueryId"/>
+        /// <inheritdoc cref="IConnectionSettings.QueryId"/>
         public int QueryId { get; protected internal set; }
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Connected"/>
+        /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; protected internal set; }
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Busy"/>
+        /// <inheritdoc cref="IIrbisProvider.Busy"/>
         public bool Busy { get; protected internal set; }
 
-        /// <inheritdoc cref="IBasicIrbisProvider.LastError"/>
+        /// <inheritdoc cref="IIrbisProvider.LastError"/>
         public int LastError { get; protected internal set; }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace ManagedIrbis
             socket.Connection = this;
             _cancellation = new CancellationTokenSource();
             Cancellation = _cancellation.Token;
-            _logger = Magna.Factory.CreateLogger<IBasicIrbisProvider>();
+            _logger = Magna.Factory.CreateLogger<IIrbisProvider>();
             _provider = provider;
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
@@ -251,12 +251,12 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IBasicIrbisProvider members
+        #region IIrbisProvider members
 
-        /// <inheritdoc cref="IBasicIrbisProvider.CancelOperation"/>
+        /// <inheritdoc cref="IIrbisProvider.CancelOperation"/>
         public void CancelOperation() => _cancellation.Cancel();
 
-        /// <inheritdoc cref="IBasicIrbisProvider.CheckProviderState"/>
+        /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>
         public bool CheckProviderState()
         {
             if (!Connected)
@@ -267,16 +267,16 @@ namespace ManagedIrbis
             return Connected;
         } // method CheckConnection
 
-        /// <inheritdoc cref="IBasicIrbisProvider.Configure"/>
+        /// <inheritdoc cref="IIrbisProvider.Configure"/>
         public void Configure(string configurationString)
         {
             // ParseConnectionString
         }
 
-        /// <inheritdoc cref="IBasicIrbisProvider.GetGeneration"/>
+        /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
         public string GetGeneration() => "64";
 
-        /// <inheritdoc cref="IBasicIrbisProvider.GetWaitHandle"/>
+        /// <inheritdoc cref="IIrbisProvider.GetWaitHandle"/>
         public WaitHandle GetWaitHandle()
         {
             throw new NotImplementedException();
@@ -350,9 +350,9 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region ISyncIrbisProvider members
+        #region ISyncProvider members
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ActualizeRecord"/>
+        /// <inheritdoc cref="ISyncProvider.ActualizeRecord"/>
         public bool ActualizeRecord
             (
                 ActualizeRecordParameters parameters
@@ -411,7 +411,7 @@ namespace ManagedIrbis
             return true;
         } // method Connect
 
-        /// <inheritdoc cref="ISyncIrbisProvider.CreateDatabase"/>
+        /// <inheritdoc cref="ISyncProvider.CreateDatabase"/>
         public bool CreateDatabase
             (
                 CreateDatabaseParameters parameters
@@ -434,7 +434,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method CreateDatabase
 
-        /// <inheritdoc cref="ISyncIrbisProvider.CreateDictionary"/>
+        /// <inheritdoc cref="ISyncProvider.CreateDictionary"/>
         public bool CreateDictionary
             (
                 string? databaseName = default
@@ -455,7 +455,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method CreateDictionary
 
-        /// <inheritdoc cref="ISyncIrbisProvider.DeleteDatabase"/>
+        /// <inheritdoc cref="ISyncProvider.DeleteDatabase"/>
         public bool DeleteDatabase
             (
                 string? databaseName = default
@@ -476,7 +476,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method DeleteDatabase
 
-        /// <inheritdoc cref="ISyncIrbisProvider.Disconnect"/>
+        /// <inheritdoc cref="ISyncProvider.Disconnect"/>
         public bool Disconnect()
         {
             if (Connected)
@@ -500,13 +500,13 @@ namespace ManagedIrbis
             return true;
         } // method Disconnect
 
-        /// <inheritdoc cref="ISyncIrbisProvider.FileExist"/>
+        /// <inheritdoc cref="ISyncProvider.FileExist"/>
         public bool FileExist(FileSpecification specification)
         {
             throw new NotImplementedException();
         } // method FileExist
 
-        /// <inheritdoc cref="ISyncIrbisProvider.FormatRecords"/>
+        /// <inheritdoc cref="ISyncProvider.FormatRecords"/>
         public bool FormatRecords
             (
                 FormatRecordParameters parameters
@@ -515,7 +515,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method FormatRecords
 
-        /// <inheritdoc cref="ISyncIrbisProvider.FullTextSearch"/>
+        /// <inheritdoc cref="ISyncProvider.FullTextSearch"/>
         public FullTextResult? FullTextSearch
             (
                 SearchParameters searchParameters,
@@ -542,7 +542,7 @@ namespace ManagedIrbis
             return result;
         } // method FullTextSearch
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.GetDatabaseInfoAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.GetDatabaseInfoAsync"/>
         public DatabaseInfo? GetDatabaseInfo
             (
                 string? databaseName = default
@@ -551,7 +551,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method GetDatabaseInfo
 
-        /// <inheritdoc cref="ISyncIrbisProvider.GetMaxMfn"/>
+        /// <inheritdoc cref="ISyncProvider.GetMaxMfn"/>
         public int GetMaxMfn
             (
                 string? databaseName = default
@@ -567,13 +567,13 @@ namespace ManagedIrbis
                 : 0;
         } // method GetMaxMfn
 
-        /// <inheritdoc cref="ISyncIrbisProvider.GetServerStat"/>
+        /// <inheritdoc cref="ISyncProvider.GetServerStat"/>
         public ServerStat? GetServerStat()
         {
             throw new NotImplementedException();
         } // method GetServerStat
 
-        /// <inheritdoc cref="ISyncIrbisProvider.GetServerVersion"/>
+        /// <inheritdoc cref="ISyncProvider.GetServerVersion"/>
         public ServerVersion? GetServerVersion()
         {
             if (!CheckProviderState())
@@ -595,7 +595,7 @@ namespace ManagedIrbis
             return result;
         } // method GetServerVersion
 
-        /// <inheritdoc cref="ISyncIrbisProvider.GlobalCorrection"/>
+        /// <inheritdoc cref="ISyncProvider.GlobalCorrection"/>
         public GblResult? GlobalCorrection
             (
                 GblSettings settings
@@ -604,7 +604,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method GlobalCorrection
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ListFiles"/>
+        /// <inheritdoc cref="ISyncProvider.ListFiles"/>
         public string[]? ListFiles
             (
                 params FileSpecification[] specifications
@@ -655,7 +655,7 @@ namespace ManagedIrbis
             return result.ToArray();
         } // method ListFiles
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ListProcesses"/>
+        /// <inheritdoc cref="ISyncProvider.ListProcesses"/>
         public ProcessInfo[]? ListProcesses()
         {
             if (!CheckProviderState())
@@ -676,13 +676,13 @@ namespace ManagedIrbis
             return result;
         } // method ListProcesses
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ListUsers"/>
+        /// <inheritdoc cref="ISyncProvider.ListUsers"/>
         public UserInfo[]? ListUsers()
         {
             throw new NotImplementedException();
         } // method ListUsers
 
-        /// <inheritdoc cref="ISyncIrbisProvider.NoOperation"/>
+        /// <inheritdoc cref="ISyncProvider.NoOperation"/>
         public bool NoOperation()
         {
             if (!CheckProviderState())
@@ -695,7 +695,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method NoOperation
 
-        /// <inheritdoc cref="ISyncIrbisProvider.PrintTable"/>
+        /// <inheritdoc cref="ISyncProvider.PrintTable"/>
         public string? PrintTable
             (
                 TableDefinition definition
@@ -704,7 +704,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method PrintTableAsync
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ReadBinaryFile"/>
+        /// <inheritdoc cref="ISyncProvider.ReadBinaryFile"/>
         public byte[]? ReadBinaryFile
             (
                 FileSpecification specification
@@ -713,7 +713,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method ReadBinaryFile
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ReadPostings"/>
+        /// <inheritdoc cref="ISyncProvider.ReadPostings"/>
         public TermPosting[]? ReadPostings
             (
                 PostingParameters parameters
@@ -736,7 +736,7 @@ namespace ManagedIrbis
             return TermPosting.Parse(response);
         } // method ReadPosting
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ReadRecord"/>
+        /// <inheritdoc cref="ISyncProvider.ReadRecord"/>
         public Record? ReadRecord
             (
                 ReadRecordParameters parameters
@@ -770,7 +770,7 @@ namespace ManagedIrbis
             return result;
         } // method ReadRecord
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ReadRecordPostings"/>
+        /// <inheritdoc cref="ISyncProvider.ReadRecordPostings"/>
         public TermPosting[]? ReadRecordPostings
             (
                 ReadRecordParameters parameters,
@@ -780,7 +780,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method ReadRecordPostings
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ReadTerms"/>
+        /// <inheritdoc cref="ISyncProvider.ReadTerms"/>
         public Term[]? ReadTerms
             (
                 TermParameters parameters
@@ -806,7 +806,7 @@ namespace ManagedIrbis
             return Term.Parse(response);
         } // method ReadTerms
 
-        /// <inheritdoc cref="IAsyncIrbisProvider.ReadTextFileAsync"/>
+        /// <inheritdoc cref="IAsyncProvider.ReadTextFileAsync"/>
         public string? ReadTextFile
             (
                 FileSpecification specification
@@ -830,7 +830,7 @@ namespace ManagedIrbis
             return result;
         } // method ReadTextFile
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ReloadDictionary"/>
+        /// <inheritdoc cref="ISyncProvider.ReloadDictionary"/>
         public bool ReloadDictionary
             (
                 string? databaseName = default
@@ -845,7 +845,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method ReloadDictionary
 
-        /// <inheritdoc cref="ISyncIrbisProvider.ReloadMasterFile"/>
+        /// <inheritdoc cref="ISyncProvider.ReloadMasterFile"/>
         public bool ReloadMasterFile
             (
                 string? databaseName = default
@@ -860,7 +860,7 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false;
         } // method ReloadMasterFile
 
-        /// <inheritdoc cref="ISyncIrbisProvider.RestartServer"/>
+        /// <inheritdoc cref="ISyncProvider.RestartServer"/>
         public bool RestartServer()
         {
             var response = ExecuteSync(CommandCode.RestartServer);
@@ -868,7 +868,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method RestartServer
 
-        /// <inheritdoc cref="ISyncIrbisProvider.Search"/>
+        /// <inheritdoc cref="ISyncProvider.Search"/>
         public FoundItem[]? Search
             (
                 SearchParameters parameters
@@ -891,7 +891,7 @@ namespace ManagedIrbis
             return FoundItem.Parse(response);
         } // method Search
 
-        /// <inheritdoc cref="ISyncIrbisProvider.TruncateDatabase"/>
+        /// <inheritdoc cref="ISyncProvider.TruncateDatabase"/>
         public bool TruncateDatabase
             (
                 string? databaseName = default
@@ -906,7 +906,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method TruncateDatabase
 
-        /// <inheritdoc cref="ISyncIrbisProvider.UnlockDatabase"/>
+        /// <inheritdoc cref="ISyncProvider.UnlockDatabase"/>
         public bool UnlockDatabase
             (
                 string? databaseName = default
@@ -921,7 +921,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method UnlockDatabase
 
-        /// <inheritdoc cref="ISyncIrbisProvider.UnlockRecords"/>
+        /// <inheritdoc cref="ISyncProvider.UnlockRecords"/>
         public bool UnlockRecords
             (
                 IEnumerable<int> mfnList,
@@ -945,7 +945,7 @@ namespace ManagedIrbis
             return response is not null && response.CheckReturnCode();
         } // method UnlockRecords
 
-        /// <inheritdoc cref="ISyncIrbisProvider.UpdateIniFile"/>
+        /// <inheritdoc cref="ISyncProvider.UpdateIniFile"/>
         public bool UpdateIniFile
             (
                 IEnumerable<string> lines
@@ -970,7 +970,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method UpdateIniFile
 
-        /// <inheritdoc cref="ISyncIrbisProvider.UpdateUserList"/>
+        /// <inheritdoc cref="ISyncProvider.UpdateUserList"/>
         public bool UpdateUserList
             (
                 IEnumerable<UserInfo> users
@@ -992,7 +992,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method UpdateUserList
 
-        /// <inheritdoc cref="ISyncIrbisProvider.WriteRecord"/>
+        /// <inheritdoc cref="ISyncProvider.WriteRecord"/>
         public bool WriteRecord
             (
                 WriteRecordParameters parameters
@@ -1030,7 +1030,7 @@ namespace ManagedIrbis
             return true;
         } // method WriteRecord
 
-        /// <inheritdoc cref="ISyncIrbisProvider.WriteTextFile"/>
+        /// <inheritdoc cref="ISyncProvider.WriteTextFile"/>
         public bool WriteTextFile
             (
                 FileSpecification specification

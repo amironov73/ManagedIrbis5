@@ -67,7 +67,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; }
+        public ISyncProvider Connection { get; }
 
         /// <summary>
         /// Database name.
@@ -98,7 +98,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchRecordReader
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int batchSize,
                 IEnumerable<int> range
@@ -129,7 +129,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchRecordReader
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int batchSize,
                 bool omitDeletedRecords,
@@ -228,7 +228,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> Interval
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int firstMfn,
                 int lastMfn,
@@ -275,7 +275,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> Interval
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int firstMfn,
                 int lastMfn,
@@ -349,7 +349,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> Search
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 string searchExpression,
                 int batchSize
@@ -395,7 +395,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> Search
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 string searchExpression,
                 int batchSize,
@@ -424,7 +424,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> WholeDatabase
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int batchSize
             )
@@ -463,7 +463,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> WholeDatabase
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int batchSize,
                 Action<BatchRecordReader>? action
@@ -490,7 +490,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<Record> WholeDatabase
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 int batchSize,
                 bool omitDeletedRecords,

@@ -21,9 +21,9 @@ namespace UnitTests.ManagedIrbis.Flc
     public class FlcProcessorTest
         : Common.CommonUnitTest
     {
-        private new ISyncIrbisProvider GetProvider()
+        private new ISyncProvider GetProvider()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             var provider = mock.Object;
 
             return provider;

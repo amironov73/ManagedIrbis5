@@ -35,7 +35,7 @@ namespace ManagedIrbis.Morphology
         /// <summary>
         /// Client connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; private set; }
+        public ISyncProvider Connection { get; private set; }
 
         /// <summary>
         /// Morphology provider.
@@ -51,7 +51,7 @@ namespace ManagedIrbis.Morphology
         /// </summary>
         public MorphologyEngine
             (
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Connection = provider;
@@ -63,7 +63,7 @@ namespace ManagedIrbis.Morphology
         /// </summary>
         public MorphologyEngine
             (
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 MorphologyProvider morphology
             )
         {

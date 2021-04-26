@@ -50,7 +50,7 @@ namespace ManagedIrbis
         /// </summary>
         public SyncConnection Build()
         {
-            // TODO: делать ISyncIrbisProvider
+            // TODO: делать ISyncProvider
 
             var socket = _socket ?? new SyncTcp4Socket();
             var serviceProvider = _serviceProvider ?? Magna.Host.Services;

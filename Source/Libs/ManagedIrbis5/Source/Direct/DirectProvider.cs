@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedMember.Local
 
-/* LocalProvider.cs -- провайдер, работающий с локальными файлами
+/* DirectProvider.cs -- провайдер, работающий напрямую с файлами баз данных ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,22 +33,22 @@ using ManagedIrbis.Pft;
 
 #nullable enable
 
-namespace ManagedIrbis.Client
+namespace ManagedIrbis.Direct
 {
     /// <summary>
-    /// Провайдер, работающий с локальными файлами.
+    /// Провайдер, работающий напрямую с файлами баз данных ИРБИС64.
     /// </summary>
-    public class LocalProvider
-        : ISyncIrbisProvider
+    public class DirectProvider
+        : ISyncProvider
     {
         public event EventHandler? Disposing;
 
-        public LocalProvider()
+        public DirectProvider()
         {
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
-        public LocalProvider(string rootPath)
+        public DirectProvider(string rootPath)
         {
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
@@ -294,6 +294,6 @@ namespace ManagedIrbis.Client
         {
             throw new NotImplementedException();
         }
-    } // class LocalProvider
+    } // class DirectProvider
 
-} // namespace ManagedIrbis.Client
+} // namespace ManagedIrbis.Direct

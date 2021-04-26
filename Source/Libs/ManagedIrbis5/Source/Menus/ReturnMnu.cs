@@ -153,7 +153,7 @@ namespace ManagedIrbis.Menus
         /// </summary>
         public static ReturnMnu FromConnection
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string fileName = DefaultFileName
             )
         {

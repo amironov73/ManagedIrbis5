@@ -69,7 +69,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; }
+        public ISyncProvider Connection { get; }
 
         /// <summary>
         /// Database name.
@@ -100,7 +100,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchRecordFormatter
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 string format,
                 int batchSize,
@@ -199,7 +199,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<string> Interval
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 string format,
                 int firstMfn,
@@ -263,7 +263,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<string> Search
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 string format,
                 string searchExpression,
@@ -311,7 +311,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public static IEnumerable<string> WholeDatabase
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 string format,
                 int batchSize

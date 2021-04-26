@@ -41,7 +41,7 @@ namespace ManagedIrbis.Workspace
         /// <summary>
         /// Провайдер.
         /// </summary>
-        public ISyncIrbisProvider? Provider { get; set; }
+        public ISyncProvider? Provider { get; set; }
 
         /// <summary>
         /// Код режима редактирования.

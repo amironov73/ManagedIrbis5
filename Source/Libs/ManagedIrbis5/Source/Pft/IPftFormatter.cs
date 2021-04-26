@@ -76,7 +76,7 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Установка провайдера.
         /// </summary>
-        void SetProvider(ISyncIrbisProvider provider);
+        void SetProvider(ISyncProvider provider);
 
     } // interface IPftFormatter
 

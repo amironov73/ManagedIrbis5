@@ -158,7 +158,7 @@ namespace UnitTests.ManagedIrbis.CommandLine
                 "--workstation", "A"
             };
 
-            var mock = new Mock<IBasicIrbisConnection>();
+            var mock = new Mock<IConnection>();
             mock.SetupAllProperties();
             var connection = mock.Object;
             CommandLineUtility.ConfigureConnectionFromCommandLine
@@ -181,7 +181,7 @@ namespace UnitTests.ManagedIrbis.CommandLine
         public void CommandLineUtility_ConfigureConnectionFromCommandLine_2()
         {
             var arguments = Array.Empty<string>();
-            var mock = new Mock<IBasicIrbisConnection>();
+            var mock = new Mock<IConnection>();
             mock.SetupAllProperties();
             var connection = mock.Object;
             CommandLineUtility.ConfigureConnectionFromCommandLine
@@ -215,7 +215,7 @@ namespace UnitTests.ManagedIrbis.CommandLine
                 "--workstation", "A"
             };
 
-            var mock = new Mock<IBasicIrbisConnection>();
+            var mock = new Mock<IConnection>();
             mock.SetupAllProperties();
             var connection = mock.Object;
             CommandLineUtility.ConfigureConnectionFromCommandLine
@@ -274,7 +274,7 @@ namespace UnitTests.ManagedIrbis.CommandLine
 
             Environment.SetEnvironmentVariable("IRBIS64_CONNECTION", environmentValue);
 
-            var mock = new Mock<IBasicIrbisConnection>();
+            var mock = new Mock<IConnection>();
             mock.SetupAllProperties();
             var connection = mock.Object;
             CommandLineUtility.ConfigureConnectionFromEnvironment(connection);
@@ -294,7 +294,7 @@ namespace UnitTests.ManagedIrbis.CommandLine
         [TestMethod]
         public void CommandLineUtility_ConfigureConnectionFromEnvironment_2()
         {
-            var mock = new Mock<IBasicIrbisConnection>();
+            var mock = new Mock<IConnection>();
             mock.SetupAllProperties();
             var connection = mock.Object;
             CommandLineUtility.ConfigureConnectionFromEnvironment(connection);

@@ -8,10 +8,9 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable UnusedParameter.Local
 
-/* IAsyncIrbisProvider.cs -- интерфейс асинхронного ИРБИС-провайдера
+/* ISyncProvider.cs -- интерфейс синхронного ИРБИС-провайдера
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,8 +19,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using AM.IO;
+using AM.PlatformAbstraction;
+
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
+using ManagedIrbis.Pft;
 
 #endregion
 
@@ -30,17 +34,17 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Интерфейс асинхронного ИРБИС-провайдера.
+    /// Интерфейс синхронного ИРБИС-провайдера.
     /// </summary>
-    public interface IAsyncIrbisProvider
-        : IBasicIrbisProvider
+    public interface ISyncProvider
+        : IIrbisProvider
     {
         /// <summary>
         /// Актуализация записи.
         /// </summary>
         /// <param name="parameters">Параметры команды.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> ActualizeRecordAsync
+        bool ActualizeRecord
             (
                 ActualizeRecordParameters parameters
             );
@@ -49,14 +53,14 @@ namespace ManagedIrbis
         /// Подключение к серверу.
         /// </summary>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> ConnectAsync();
+        bool Connect();
 
         /// <summary>
         /// Создание базы данных на сервере.
         /// </summary>
         /// <param name="parameters">Параметры команды.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> CreateDatabaseAsync
+        bool CreateDatabase
             (
                 CreateDatabaseParameters parameters
             );
@@ -67,7 +71,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя базы данных.
         /// <c>null</c> означает текущую базу данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> CreateDictionaryAsync
+        bool CreateDictionary
             (
                 string? databaseName = default
             );
@@ -78,7 +82,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя удалаемой базы данных.
         /// <c>null</c> означает текущую базу данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> DeleteDatabaseAsync
+        bool DeleteDatabase
             (
                 string? databaseName = default
             );
@@ -88,21 +92,21 @@ namespace ManagedIrbis
         /// </summary>
         /// <returns>Признак успешного завершения операции.
         /// Как правило, его игнорируют.</returns>
-        Task<bool> DisconnectAsync();
+        bool Disconnect();
 
         /// <summary>
         /// Существует ли указанный файл?
         /// </summary>
         /// <param name="specification">Спецификация пути к файлу.</param>
         /// <returns>Результат проверки.</returns>
-        Task<bool> FileExistAsync(FileSpecification specification);
+        bool FileExist(FileSpecification specification);
 
         /// <summary>
         /// Форматирование записей.
         /// </summary>
         /// <param name="parameters">Параметры команды.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> FormatRecordsAsync
+        bool FormatRecords
             (
                 FormatRecordParameters parameters
             );
@@ -113,7 +117,7 @@ namespace ManagedIrbis
         /// <param name="searchParameters">Параметры поиска.</param>
         /// <param name="textParameters">Параметры полнотекстовых операций.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<FullTextResult?> FullTextSearchAsync
+        FullTextResult? FullTextSearch
             (
                 SearchParameters searchParameters,
                 TextParameters textParameters
@@ -125,7 +129,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя базы данных (опционально).
         /// <c>null</c> означает текущую базу данных.</param>
         /// <returns>Информация о базе данных.</returns>
-        Task<DatabaseInfo?> GetDatabaseInfoAsync
+        DatabaseInfo? GetDatabaseInfo
             (
                 string? databaseName = default
             );
@@ -137,7 +141,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя базы данных (опционально).
         /// <c>null</c> означает текущую базу данных.</param>
         /// <returns>Максимальный MFN либо код ошибки.</returns>
-        Task<int> GetMaxMfnAsync
+        int GetMaxMfn
             (
                 string? databaseName = default
             );
@@ -146,20 +150,20 @@ namespace ManagedIrbis
         /// Получение статистики с сервера.
         /// </summary>
         /// <returns>Серверная статистика.</returns>
-        Task<ServerStat?> GetServerStatAsync();
+        ServerStat? GetServerStat();
 
         /// <summary>
         /// Получение версии ИРБИС-сервера.
         /// </summary>
         /// <returns>Версия сервера.</returns>
-        Task<ServerVersion?> GetServerVersionAsync();
+        ServerVersion? GetServerVersion();
 
         /// <summary>
         /// Глобальная корректировка.
         /// </summary>
         /// <param name="settings">Настройки корректировки.</param>
         /// <returns>Результат корректировки.</returns>
-        Task<GblResult?> GlobalCorrectionAsync
+        GblResult? GlobalCorrection
             (
                 GblSettings settings
             );
@@ -170,7 +174,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="specifications">Массив спецификаций файлов.</param>
         /// <remarks>Массив найденных на сервере файлов.</remarks>
-        Task<string[]?> ListFilesAsync
+        string[]? ListFiles
             (
                 params FileSpecification[] specifications
             );
@@ -180,7 +184,7 @@ namespace ManagedIrbis
         /// на ИРБИС-сервере.
         /// </summary>
         /// <returns>Массив серверных процессов.</returns>
-        Task<ProcessInfo[]?> ListProcessesAsync();
+        ProcessInfo[]? ListProcesses();
 
         /// <summary>
         /// Получение списка пользователей, имеющих доступ к
@@ -188,7 +192,7 @@ namespace ManagedIrbis
         /// быть залогинены в данный момент.
         /// </summary>
         /// <remarks>Массив известных системе пользователей.</remarks>
-        Task<UserInfo[]?> ListUsersAsync();
+        UserInfo[]? ListUsers();
 
         /// <summary>
         /// Пустая операция, необходимая для поддержания связи
@@ -196,7 +200,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <returns>Признак успешного завершения операции
         /// (как правило, игнорируется).</returns>
-        Task<bool> NoOperationAsync();
+        bool NoOperation();
 
         /// <summary>
         /// Расформатирование таблицы на сервере
@@ -204,7 +208,7 @@ namespace ManagedIrbis
         /// <param name="definition">Определение таблицы.</param>
         /// <returns>RTF-текст, полученный в результате
         /// расформатирования.</returns>
-        Task<string?> PrintTableAsync
+        string? PrintTable
             (
                 TableDefinition definition
             );
@@ -214,7 +218,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="specification">Спецификация пути к файлу.</param>
         /// <returns>Содержимое файла.</returns>
-        Task<byte[]?> ReadBinaryFileAsync
+        byte[]? ReadBinaryFile
             (
                 FileSpecification specification
             );
@@ -224,7 +228,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры операции.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<TermPosting[]?> ReadPostingsAsync
+        TermPosting[]? ReadPostings
             (
                 PostingParameters parameters
             );
@@ -234,7 +238,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры операции.</param>
         /// <returns>Прочитанная запись.</returns>
-        Task<Record?> ReadRecordAsync
+        Record? ReadRecord
             (
                 ReadRecordParameters parameters
             );
@@ -245,7 +249,7 @@ namespace ManagedIrbis
         /// <param name="parameters">Параметры чтения записи.</param>
         /// <param name="prefix">Префикс в виде <c>"A=$"</c></param>
         /// <returns>Массив прочитанных постингов.</returns>
-        Task<TermPosting[]?> ReadRecordPostingsAsync
+        TermPosting[]? ReadRecordPostings
             (
                 ReadRecordParameters parameters,
                 string prefix
@@ -256,7 +260,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры операции.</param>
         /// <returns>Массив прочитанных терминов.</returns>
-        Task<Term[]?> ReadTermsAsync
+        Term[]? ReadTerms
             (
                 TermParameters parameters
             );
@@ -267,7 +271,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="specification">Спецификация пути к файлу.</param>
         /// <returns>Содержимое файла.</returns>
-        Task<string?> ReadTextFileAsync
+        string? ReadTextFile
             (
                 FileSpecification specification
             );
@@ -278,7 +282,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> ReloadDictionaryAsync
+        bool ReloadDictionary
             (
                 string? databaseName = default
             );
@@ -289,7 +293,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> ReloadMasterFileAsync
+        bool ReloadMasterFile
             (
                 string? databaseName = default
             );
@@ -298,14 +302,14 @@ namespace ManagedIrbis
         /// Асинхронный перезапуск сервера без утери подключенных клиентов.
         /// </summary>
         /// <returns>Признак успешного завергения операции.</returns>
-        Task<bool> RestartServerAsync();
+        bool RestartServer();
 
         /// <summary>
         /// Расширенный поиск.
         /// </summary>
         /// <param name="parameters">Параметры поиска.</param>
         /// <returns>Массив элементов, описывающих найденные записи.</returns>
-        Task<FoundItem[]?> SearchAsync
+        FoundItem[]? Search
             (
                 SearchParameters parameters
             );
@@ -316,7 +320,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> TruncateDatabaseAsync
+        bool TruncateDatabase
             (
                 string? databaseName = default
             );
@@ -327,7 +331,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> UnlockDatabaseAsync
+        bool UnlockDatabase
             (
                 string? databaseName = default
             );
@@ -339,7 +343,7 @@ namespace ManagedIrbis
         /// <param name="databaseName">Имя базы данных.
         /// По умолчанию текущая база данных.</param>
         /// <returns>Признак успешности завершения операции.</returns>
-        Task<bool> UnlockRecordsAsync
+        bool UnlockRecords
             (
                 IEnumerable<int> mfnList,
                 string? databaseName = default
@@ -350,7 +354,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="lines">Измененные строки INI-файла.</param>
         /// <returns>Признак успешности завершения операции.</returns>
-        Task<bool> UpdateIniFileAsync
+        bool UpdateIniFile
             (
                 IEnumerable<string> lines
             );
@@ -360,7 +364,7 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="users">Список известных системе пользователей.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> UpdateUserListAsync
+        bool UpdateUserList
             (
                 IEnumerable<UserInfo> users
             );
@@ -371,7 +375,7 @@ namespace ManagedIrbis
         /// <param name="specification">Спецификация файла
         /// (включает в себя содержимое файла).</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> WriteTextFileAsync
+        bool WriteTextFile
             (
                 FileSpecification specification
             );
@@ -381,11 +385,11 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры операции.</param>
         /// <returns>Признак успешного завершения операции.</returns>
-        Task<bool> WriteRecordAsync
+        bool WriteRecord
             (
                 WriteRecordParameters parameters
             );
 
-    } // interface IAsyncIrbisProvider
+    } // interface ISyncProvider
 
 } // namespace ManagedIrbis

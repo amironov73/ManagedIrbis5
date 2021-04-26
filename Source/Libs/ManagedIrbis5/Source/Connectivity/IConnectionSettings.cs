@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* IIrbisConnectionSettings.cs -- параметры подключения к серверу ИРБИС64
+/* IConnectionSettings.cs -- параметры подключения к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +20,7 @@ namespace ManagedIrbis
     /// <summary>
     /// Параметры подключения к серверу ИРБИС64
     /// </summary>
-    public interface IIrbisConnectionSettings
+    public interface IConnectionSettings
     {
         /// <summary>
         /// Адрес хоста ИРБИС64. Может задаваться как в числовой форме
@@ -79,6 +79,6 @@ namespace ManagedIrbis
         /// </summary>
         int QueryId { get; }
 
-    } // interface IIrbisConnectionSettings
+    } // interface IConnectionSettings
 
 } // namespace ManagedIrbis

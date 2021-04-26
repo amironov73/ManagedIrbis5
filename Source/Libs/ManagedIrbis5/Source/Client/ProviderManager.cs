@@ -24,6 +24,8 @@ using AM;
 using AM.Configuration;
 using AM.Parameters;
 
+using ManagedIrbis.Direct;
+
 #endregion
 
 #nullable enable
@@ -50,7 +52,7 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Local provider.
         /// </summary>
-        public const string Local = "Local";
+        public const string Direct = "Direct";
 
         /// <summary>
         /// Null provider.
@@ -84,7 +86,7 @@ namespace ManagedIrbis.Client
             Registry = new Dictionary<string, Type>
             {
                 {Null, typeof(NullProvider)},
-                {Local, typeof(LocalProvider)},
+                {Direct, typeof(DirectProvider)},
                 //{Connected, typeof(ConnectedClient)},
                 //{SemiConnected, typeof(SemiConnectedClient)},
                 //{Default, typeof(ConnectedClient)}
@@ -96,9 +98,9 @@ namespace ManagedIrbis.Client
         #region Public methods
 
         /// <summary>
-        /// Get <see cref="ISyncIrbisProvider" /> and configure it.
+        /// Get <see cref="ISyncProvider" /> and configure it.
         /// </summary>
-        public static ISyncIrbisProvider GetAndConfigureProvider
+        public static ISyncProvider GetAndConfigureProvider
             (
                 string configurationString
             )
@@ -153,9 +155,9 @@ namespace ManagedIrbis.Client
         }
 
         /// <summary>
-        /// Get <see cref="ISyncIrbisProvider"/> by name.
+        /// Get <see cref="ISyncProvider"/> by name.
         /// </summary>
-        public static ISyncIrbisProvider? GetProvider
+        public static ISyncProvider? GetProvider
             (
                 [NotNull] string name,
                 bool throwOnError
@@ -201,7 +203,7 @@ namespace ManagedIrbis.Client
                 return null;
             }
 
-            var result = (ISyncIrbisProvider?)Activator.CreateInstance(type);
+            var result = (ISyncProvider?)Activator.CreateInstance(type);
 
             return result;
         }
@@ -209,7 +211,7 @@ namespace ManagedIrbis.Client
         /// <summary>
         ///
         /// </summary>
-        public static ISyncIrbisProvider GetPreconfiguredProvider()
+        public static ISyncProvider GetPreconfiguredProvider()
         {
             var configurationString
                 = ConfigurationUtility.GetString

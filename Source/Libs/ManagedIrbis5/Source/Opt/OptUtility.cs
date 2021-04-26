@@ -109,7 +109,7 @@ namespace ManagedIrbis.Opt
         /// </summary>
         public static OptFile? ReadOptFile
             (
-                this ISyncIrbisProvider provider,
+                this ISyncProvider provider,
                 FileSpecification specification
             )
         {
@@ -129,7 +129,7 @@ namespace ManagedIrbis.Opt
         /// </summary>
         public static async Task<OptFile?> ReadOptFileAsync
             (
-                this IAsyncIrbisProvider provider,
+                this IAsyncProvider provider,
                 FileSpecification specification
             )
         {

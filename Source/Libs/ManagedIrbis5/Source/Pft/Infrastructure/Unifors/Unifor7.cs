@@ -60,7 +60,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
         private static TermLink[] ExtractLinks
             (
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 string term
             )
         {

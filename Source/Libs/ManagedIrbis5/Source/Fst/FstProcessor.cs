@@ -105,7 +105,7 @@ namespace ManagedIrbis.Fst
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; private set; }
+        public ISyncProvider Provider { get; private set; }
 
         /// <summary>
         /// FST file.
@@ -121,7 +121,7 @@ namespace ManagedIrbis.Fst
         /// </summary>
         public FstProcessor
             (
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 FileSpecification specification
             )
         {
@@ -146,7 +146,7 @@ namespace ManagedIrbis.Fst
         /// </summary>
         public FstProcessor
             (
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 FstFile file
             )
         {

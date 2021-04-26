@@ -37,7 +37,7 @@ namespace ManagedIrbis.Lng
         /// </summary>
         public static LngFile? ReadLngFile
             (
-                this ISyncIrbisProvider provider,
+                this ISyncProvider provider,
                 FileSpecification specification
             )
         {
@@ -59,7 +59,7 @@ namespace ManagedIrbis.Lng
         /// </summary>
         public static async Task<LngFile?> ReadOptFileAsync
             (
-                this IAsyncIrbisProvider provider,
+                this IAsyncProvider provider,
                 FileSpecification specification
             )
         {

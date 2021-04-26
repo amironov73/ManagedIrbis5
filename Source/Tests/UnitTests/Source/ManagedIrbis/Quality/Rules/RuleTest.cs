@@ -16,7 +16,7 @@ namespace UnitTests.ManagedIrbis.Quality.Rules
     {
         protected RuleContext GetContext()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             var connection = mock.Object;
             var record = new Record();
             var result = new RuleContext

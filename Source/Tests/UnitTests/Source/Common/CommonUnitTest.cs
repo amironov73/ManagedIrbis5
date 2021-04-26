@@ -13,7 +13,7 @@ using System.Linq;
 using AM.PlatformAbstraction;
 
 using ManagedIrbis;
-using ManagedIrbis.Client;
+using ManagedIrbis.Direct;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,7 +24,7 @@ namespace UnitTests.Common
     public class CommonUnitTest
     {
         /// <summary>
-        /// Контекст текста.
+        /// Контекст теста.
         /// </summary>
         public TestContext? TestContext { get; set; }
 
@@ -93,10 +93,10 @@ namespace UnitTests.Common
             }
         }
 
-        protected virtual ISyncIrbisProvider GetProvider()
+        protected virtual ISyncProvider GetProvider()
         {
-            string rootPath = Irbis64RootPath;
-            LocalProvider result = new LocalProvider(rootPath)
+            var rootPath = Irbis64RootPath;
+            var result = new DirectProvider(rootPath)
             {
                 Database = "IBIS",
                 PlatformAbstraction = new TestingPlatformAbstraction()

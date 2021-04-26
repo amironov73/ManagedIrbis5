@@ -67,7 +67,7 @@ namespace ManagedIrbis.Mx.Commands
         /// <summary>
         /// Initialize the provider.
         /// </summary>
-        public static ISyncIrbisProvider InitializeProvider
+        public static ISyncProvider InitializeProvider
             (
                 string argument
             )

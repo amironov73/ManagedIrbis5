@@ -78,7 +78,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider? Provider { get; set; }
+        public ISyncProvider? Provider { get; set; }
 
         /// <summary>
         /// Folder name.

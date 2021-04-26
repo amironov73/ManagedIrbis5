@@ -80,7 +80,7 @@ namespace ManagedIrbis.Infrastructure
         /// <param name="commandCode">Код команды.</param>
         public void AddHeader
             (
-                IIrbisConnectionSettings connection,
+                IConnectionSettings connection,
                 string commandCode
             )
         {

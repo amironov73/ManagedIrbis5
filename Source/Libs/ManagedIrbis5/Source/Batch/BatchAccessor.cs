@@ -55,7 +55,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; }
+        public ISyncProvider Connection { get; }
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchAccessor
             (
-                ISyncIrbisProvider connection
+                ISyncProvider connection
             )
         {
             Connection = connection;

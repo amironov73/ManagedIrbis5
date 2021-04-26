@@ -38,7 +38,7 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; private set; }
+        public ISyncProvider Provider { get; private set; }
 
         /// <summary>
         /// Record.
@@ -330,7 +330,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public BookInfo
             (
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 Record record
             )
         {

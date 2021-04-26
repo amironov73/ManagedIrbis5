@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using AM;
 using AM.Text;
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Direct;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; private set; }
+        public ISyncProvider Provider { get; private set; }
 
         /// <summary>
         /// Text driver.
@@ -183,7 +183,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             Parent = parent;
 
             Provider = ReferenceEquals(parent, null)
-                ? new LocalProvider(string.Empty)
+                ? new DirectProvider(string.Empty)
                 : parent.Provider;
 
             var parentBuffer = parent?.Output;
@@ -578,7 +578,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public void SetProvider
             (
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Provider = provider;

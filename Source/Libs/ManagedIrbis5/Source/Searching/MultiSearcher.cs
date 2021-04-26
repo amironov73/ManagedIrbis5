@@ -36,7 +36,7 @@ namespace ManagedIrbis.Searching
         /// <summary>
         /// Провайдер.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; }
+        public ISyncProvider Provider { get; }
 
         #endregion
 
@@ -48,7 +48,7 @@ namespace ManagedIrbis.Searching
         /// <param name="provider">Провайдер.</param>
         public MultiSearcher
             (
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Provider = provider;

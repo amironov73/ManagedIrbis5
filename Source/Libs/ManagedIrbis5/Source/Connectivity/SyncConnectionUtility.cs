@@ -45,7 +45,7 @@ namespace ManagedIrbis
         /// <returns>Признак успешности завершения операции.</returns>
         public static bool ActualizeDatabase
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 string? database = default
             )
         {
@@ -90,7 +90,7 @@ namespace ManagedIrbis
 
         public static string? FormatRecord
             (
-                this ISyncIrbisProvider conneciton,
+                this ISyncProvider conneciton,
                 string format,
                 int mfn
             )
@@ -100,7 +100,7 @@ namespace ManagedIrbis
 
         public static string? FormatRecord
             (
-                this ISyncIrbisProvider conneciton,
+                this ISyncProvider conneciton,
                 string format,
                 Record record
             )
@@ -110,7 +110,7 @@ namespace ManagedIrbis
 
         public static string[] FormatRecords
             (
-                this ISyncIrbisProvider conneciton,
+                this ISyncProvider conneciton,
                 int[] mfns,
                 string format
             )
@@ -136,7 +136,7 @@ namespace ManagedIrbis
         /// </summary>
         public static Record? ReadRecord
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 int mfn
             )
         {
@@ -210,7 +210,7 @@ namespace ManagedIrbis
         /// </summary>
         public static int[] Search
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 string expression
             )
         {
@@ -265,7 +265,7 @@ namespace ManagedIrbis
         /// </summary>
         public static bool WriteRecord
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 IRecord record,
                 bool actualize = true,
                 bool lockRecord = false,

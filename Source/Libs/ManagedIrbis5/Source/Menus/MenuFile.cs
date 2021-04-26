@@ -333,7 +333,7 @@ namespace ManagedIrbis.Menus
         /// </summary>
         public static MenuFile? ReadFromServer
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 FileSpecification fileSpecification
             )
         {

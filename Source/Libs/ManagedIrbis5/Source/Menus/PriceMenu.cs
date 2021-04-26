@@ -206,7 +206,7 @@ namespace ManagedIrbis.Menus
         /// </summary>
         public static PriceMenu ReadPrices
             (
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 string fileName
             )
         {

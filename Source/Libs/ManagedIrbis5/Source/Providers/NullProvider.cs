@@ -39,10 +39,10 @@ namespace ManagedIrbis
     /// Не выполняет никаких осмысленных действий.
     /// </summary>
     public sealed class NullProvider
-        : ISyncIrbisProvider,
-        IAsyncIrbisProvider
+        : ISyncProvider,
+        IAsyncProvider
     {
-        #region ISyncIrbisProvider members
+        #region ISyncProvider members
 
         public event EventHandler? Disposing;
 
@@ -294,7 +294,7 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IAsyncIrbisProvider members
+        #region IAsyncProvider members
 
         public Task<bool> ActualizeRecordAsync(ActualizeRecordParameters parameters)
         {

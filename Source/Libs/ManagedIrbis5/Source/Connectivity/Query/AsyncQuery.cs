@@ -38,7 +38,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public AsyncQuery
             (
-                IIrbisConnectionSettings connection,
+                IConnectionSettings connection,
                 string commandCode
             )
         {

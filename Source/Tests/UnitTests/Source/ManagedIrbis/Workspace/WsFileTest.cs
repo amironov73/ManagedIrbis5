@@ -150,7 +150,7 @@ namespace UnitTests.ManagedIrbis.Worksheet
         [TestMethod]
         public void WsFile_ReadFromServer_1()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             using var provider = mock.Object;
             var specification = new FileSpecification
             {
@@ -167,7 +167,7 @@ namespace UnitTests.ManagedIrbis.Worksheet
         [TestMethod]
         public void WsFile_ReadFromServer_2()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             using var provider = mock.Object;
             var specification = new FileSpecification
             {
@@ -183,7 +183,7 @@ namespace UnitTests.ManagedIrbis.Worksheet
         [TestMethod]
         public void WsFile_ReadFromServer_3()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             using var provider = mock.Object;
             var specification = new FileSpecification
             {

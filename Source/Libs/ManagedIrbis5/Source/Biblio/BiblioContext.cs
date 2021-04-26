@@ -57,7 +57,7 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; private set; }
+        public ISyncProvider Provider { get; private set; }
 
         /// <summary>
         /// Log.
@@ -94,7 +94,7 @@ namespace ManagedIrbis.Biblio
         public BiblioContext
             (
                 BiblioDocument document,
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 AbstractOutput log
             )
         {

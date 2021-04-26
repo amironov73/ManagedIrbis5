@@ -344,7 +344,7 @@ namespace ManagedIrbis.Menus
         /// <returns>Прочитанное меню либо <c>null</c></returns>
         public static MenuFile? ReadMenu
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 FileSpecification specification
             )
         {
@@ -368,7 +368,7 @@ namespace ManagedIrbis.Menus
         /// <returns>Прочитанное меню либо <c>null</c></returns>
         public static async Task<MenuFile?> ReadMenuAsync
             (
-                this IAsyncIrbisProvider connection,
+                this IAsyncProvider connection,
                 FileSpecification specification
             )
         {
@@ -392,7 +392,7 @@ namespace ManagedIrbis.Menus
         /// <returns>Прочитанное меню (либо выбрасывает исключение).</returns>
         public static MenuFile RequireMenu
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 FileSpecification specification
             )
             => connection.ReadMenu(specification).ThrowIfNull("RequireMenu");
@@ -405,7 +405,7 @@ namespace ManagedIrbis.Menus
         /// <returns>Прочитанное меню (либо выбрасывает исключение).</returns>
         public static async Task<MenuFile> RequireMenuAsync
             (
-                this IAsyncIrbisProvider connection,
+                this IAsyncProvider connection,
                 FileSpecification specification
             )
         {

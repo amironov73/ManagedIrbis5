@@ -1,0 +1,479 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="ManagedIrbis.ConnectionSettings">
+    <Position X="10.75" Y="5.5" Width="2.5" />
+    <Members>
+      <Method Name="_Add" Hidden="true" />
+      <Method Name="_Select" Hidden="true" />
+      <Method Name="Apply" Hidden="true" />
+      <Method Name="Clone" Hidden="true" />
+      <Method Name="Decrypt" Hidden="true" />
+      <Field Name="DefaultDatabase" Hidden="true" />
+      <Field Name="DefaultHost" Hidden="true" />
+      <Field Name="DefaultPort" Hidden="true" />
+      <Field Name="DefaultWorkstation" Hidden="true" />
+      <Method Name="Encode" Hidden="true" />
+      <Method Name="Encrypt" Hidden="true" />
+      <Method Name="FromConnection" Hidden="true" />
+      <Method Name="GetMissingElements" Hidden="true" />
+      <Property Name="IConnectionSettings.ClientId" Hidden="true" />
+      <Method Name="ParseConnectionString" Hidden="true" />
+      <Method Name="RestoreFromStream" Hidden="true" />
+      <Method Name="SaveToStream" Hidden="true" />
+      <Method Name="ToString" Hidden="true" />
+      <Method Name="Verify" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AUAAAAAAAHBAAZHUAQAAQAAACAAwWAACABACEAAICBQ=</HashCode>
+      <FileName>Source\Connectivity\ConnectionSettings.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.3" />
+  </Class>
+  <Class Name="ManagedIrbis.SyncConnection">
+    <Position X="10.75" Y="0.5" Width="2.5" />
+    <Members>
+      <Field Name="_cancellation" Hidden="true" />
+      <Field Name="_goodCodesForReadRecord" Hidden="true" />
+      <Field Name="_goodCodesForReadTerms" Hidden="true" />
+      <Field Name="_logger" Hidden="true" />
+      <Field Name="_provider" Hidden="true" />
+      <Method Name="ActualizeRecord" Hidden="true" />
+      <Event Name="BusyChanged" Hidden="true" />
+      <Method Name="CancelOperation" Hidden="true" />
+      <Method Name="CheckProviderState" Hidden="true" />
+      <Property Name="ClientId" Hidden="true" />
+      <Method Name="CreateDatabase" Hidden="true" />
+      <Method Name="CreateDictionary" Hidden="true" />
+      <Method Name="DeleteDatabase" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="DisposeAsync" Hidden="true" />
+      <Event Name="Disposing" Hidden="true" />
+      <Method Name="FileExist" Hidden="true" />
+      <Method Name="FullTextSearch" Hidden="true" />
+      <Method Name="GetDatabaseInfo" Hidden="true" />
+      <Method Name="GetGeneration" Hidden="true" />
+      <Method Name="GetMaxMfn" Hidden="true" />
+      <Method Name="GetServerStat" Hidden="true" />
+      <Method Name="GetServerVersion" Hidden="true" />
+      <Method Name="GetService" Hidden="true" />
+      <Method Name="GetWaitHandle" Hidden="true" />
+      <Method Name="GlobalCorrection" Hidden="true" />
+      <Property Name="Interval" Hidden="true" />
+      <Method Name="ListFiles" Hidden="true" />
+      <Method Name="ListProcesses" Hidden="true" />
+      <Method Name="ListUsers" Hidden="true" />
+      <Method Name="NoOperation" Hidden="true" />
+      <Property Name="PlatformAbstraction" Hidden="true" />
+      <Method Name="PrintTable" Hidden="true" />
+      <Property Name="QueryId" Hidden="true" />
+      <Method Name="ReadBinaryFile" Hidden="true" />
+      <Method Name="ReadPostings" Hidden="true" />
+      <Method Name="ReadRecordPostings" Hidden="true" />
+      <Method Name="ReadTerms" Hidden="true" />
+      <Method Name="ReadTextFile" Hidden="true" />
+      <Method Name="ReloadDictionary" Hidden="true" />
+      <Method Name="ReloadMasterFile" Hidden="true" />
+      <Method Name="RestartServer" Hidden="true" />
+      <Property Name="ServerVersion" Hidden="true" />
+      <Method Name="SetBusy" Hidden="true" />
+      <Property Name="Socket" Hidden="true" />
+      <Method Name="SyncConnection" Hidden="true" />
+      <Method Name="TruncateDatabase" Hidden="true" />
+      <Method Name="UnlockDatabase" Hidden="true" />
+      <Method Name="UnlockRecords" Hidden="true" />
+      <Method Name="UpdateIniFile" Hidden="true" />
+      <Method Name="UpdateUserList" Hidden="true" />
+      <Method Name="WriteTextFile" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>VAQSQACENGAAVIBNgYhAA5AMLEAAHYMCEAAGgKIwgsU=</HashCode>
+      <FileName>Source\Connectivity\SyncConnection.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.251" />
+  </Class>
+  <Class Name="ManagedIrbis.AsyncConnection">
+    <Position X="10.75" Y="9.75" Width="2.5" />
+    <Members>
+      <Field Name="_cancellation" Hidden="true" />
+      <Field Name="_goodCodesForReadRecord" Hidden="true" />
+      <Field Name="_goodCodesForReadTerms" Hidden="true" />
+      <Field Name="_logger" Hidden="true" />
+      <Field Name="_provider" Hidden="true" />
+      <Method Name="ActualizeRecordAsync" Hidden="true" />
+      <Method Name="AsyncConnection" Hidden="true" />
+      <Event Name="BusyChanged" Hidden="true" />
+      <Method Name="CancelOperation" Hidden="true" />
+      <Method Name="CheckProviderState" Hidden="true" />
+      <Property Name="ClientId" Hidden="true" />
+      <Property Name="Connected" Hidden="true" />
+      <Method Name="CreateDatabaseAsync" Hidden="true" />
+      <Method Name="CreateDictionaryAsync" Hidden="true" />
+      <Method Name="DeleteDatabaseAsync" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="DisposeAsync" Hidden="true" />
+      <Event Name="Disposing" Hidden="true" />
+      <Method Name="FileExistAsync" Hidden="true" />
+      <Method Name="FormatRecordsAsync" Hidden="true" />
+      <Method Name="FullTextSearchAsync" Hidden="true" />
+      <Method Name="GetDatabaseInfoAsync" Hidden="true" />
+      <Method Name="GetGeneration" Hidden="true" />
+      <Method Name="GetMaxMfnAsync" Hidden="true" />
+      <Method Name="GetServerStatAsync" Hidden="true" />
+      <Method Name="GetServerVersionAsync" Hidden="true" />
+      <Method Name="GetService" Hidden="true" />
+      <Method Name="GetWaitHandle" Hidden="true" />
+      <Method Name="GlobalCorrectionAsync" Hidden="true" />
+      <Property Name="Interval" Hidden="true" />
+      <Method Name="ListFilesAsync" Hidden="true" />
+      <Method Name="ListProcessesAsync" Hidden="true" />
+      <Method Name="ListUsersAsync" Hidden="true" />
+      <Method Name="NoOperationAsync" Hidden="true" />
+      <Property Name="PlatformAbstraction" Hidden="true" />
+      <Method Name="PrintTableAsync" Hidden="true" />
+      <Property Name="QueryId" Hidden="true" />
+      <Method Name="ReadBinaryFileAsync" Hidden="true" />
+      <Method Name="ReadPostingsAsync" Hidden="true" />
+      <Method Name="ReadRecordPostingsAsync" Hidden="true" />
+      <Method Name="ReadTermsAsync" Hidden="true" />
+      <Method Name="ReadTextFileAsync" Hidden="true" />
+      <Method Name="ReloadDictionaryAsync" Hidden="true" />
+      <Method Name="ReloadMasterFileAsync" Hidden="true" />
+      <Method Name="RestartServerAsync" Hidden="true" />
+      <Property Name="ServerVersion" Hidden="true" />
+      <Method Name="SetBusy" Hidden="true" />
+      <Property Name="Socket" Hidden="true" />
+      <Method Name="TruncateDatabaseAsync" Hidden="true" />
+      <Method Name="UnlockDatabaseAsync" Hidden="true" />
+      <Method Name="UnlockRecordsAsync" Hidden="true" />
+      <Method Name="UpdateIniFileAsync" Hidden="true" />
+      <Method Name="UpdateUserListAsync" Hidden="true" />
+      <Method Name="WriteTextFileAsync" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>BQAmBAAkJGBQXJAAgYhwA6AZKCpBTZOCAIFAiIMQEEQ=</HashCode>
+      <FileName>Source\Connectivity\AsyncConnection.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.1" />
+  </Class>
+  <Class Name="ManagedIrbis.InMemory.InMemoryProvider">
+    <Position X="14.5" Y="0.5" Width="2.25" />
+    <Members>
+      <Method Name="ActualizeRecord" Hidden="true" />
+      <Event Name="BusyChanged" Hidden="true" />
+      <Method Name="CancelOperation" Hidden="true" />
+      <Method Name="CheckProviderState" Hidden="true" />
+      <Method Name="CreateDatabase" Hidden="true" />
+      <Method Name="CreateDictionary" Hidden="true" />
+      <Property Name="Databases" Hidden="true" />
+      <Method Name="DeleteDatabase" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="DisposeAsync" Hidden="true" />
+      <Event Name="Disposing" Hidden="true" />
+      <Method Name="FileExist" Hidden="true" />
+      <Method Name="FullTextSearch" Hidden="true" />
+      <Method Name="GetDatabaseInfo" Hidden="true" />
+      <Method Name="GetGeneration" Hidden="true" />
+      <Method Name="GetMaxMfn" Hidden="true" />
+      <Method Name="GetServerStat" Hidden="true" />
+      <Method Name="GetServerVersion" Hidden="true" />
+      <Method Name="GetService" Hidden="true" />
+      <Method Name="GetWaitHandle" Hidden="true" />
+      <Method Name="GlobalCorrection" Hidden="true" />
+      <Method Name="InMemoryProvider" Hidden="true" />
+      <Method Name="ListFiles" Hidden="true" />
+      <Method Name="ListProcesses" Hidden="true" />
+      <Method Name="ListUsers" Hidden="true" />
+      <Method Name="NoOperation" Hidden="true" />
+      <Property Name="PlatformAbstraction" Hidden="true" />
+      <Method Name="PrintTable" Hidden="true" />
+      <Method Name="ReadBinaryFile" Hidden="true" />
+      <Method Name="ReadPostings" Hidden="true" />
+      <Method Name="ReadRecordPostings" Hidden="true" />
+      <Method Name="ReadTerms" Hidden="true" />
+      <Method Name="ReadTextFile" Hidden="true" />
+      <Method Name="ReloadDictionary" Hidden="true" />
+      <Method Name="ReloadMasterFile" Hidden="true" />
+      <Property Name="Resources" Hidden="true" />
+      <Method Name="RestartServer" Hidden="true" />
+      <Method Name="SetBusy" Hidden="true" />
+      <Method Name="SetLastError" Hidden="true" />
+      <Method Name="TruncateDatabase" Hidden="true" />
+      <Method Name="UnlockDatabase" Hidden="true" />
+      <Method Name="UnlockRecords" Hidden="true" />
+      <Method Name="UpdateIniFile" Hidden="true" />
+      <Method Name="UpdateUserList" Hidden="true" />
+      <Method Name="WriteTextFile" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>VAQSQACANGAARIBNAABAApAMJEAAFIkCEAAGgCIwgsE=</HashCode>
+      <FileName>Source\Connectivity\InMemory\InMemoryProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.1" />
+  </Class>
+  <Class Name="ManagedIrbis.Direct.DirectProvider">
+    <Position X="14.5" Y="4" Width="2.25" />
+    <Members>
+      <Method Name="ActualizeRecord" Hidden="true" />
+      <Event Name="BusyChanged" Hidden="true" />
+      <Method Name="CancelOperation" Hidden="true" />
+      <Method Name="CheckProviderState" Hidden="true" />
+      <Method Name="CreateDatabase" Hidden="true" />
+      <Method Name="CreateDictionary" Hidden="true" />
+      <Method Name="DeleteDatabase" Hidden="true" />
+      <Method Name="DirectProvider" Hidden="true" />
+      <Method Name="Dispose" Hidden="true" />
+      <Method Name="DisposeAsync" Hidden="true" />
+      <Event Name="Disposing" Hidden="true" />
+      <Method Name="FileExist" Hidden="true" />
+      <Method Name="FullTextSearch" Hidden="true" />
+      <Method Name="GetDatabaseInfo" Hidden="true" />
+      <Method Name="GetGeneration" Hidden="true" />
+      <Method Name="GetMaxMfn" Hidden="true" />
+      <Method Name="GetServerStat" Hidden="true" />
+      <Method Name="GetServerVersion" Hidden="true" />
+      <Method Name="GetService" Hidden="true" />
+      <Method Name="GetWaitHandle" Hidden="true" />
+      <Method Name="GlobalCorrection" Hidden="true" />
+      <Method Name="ListFiles" Hidden="true" />
+      <Method Name="ListProcesses" Hidden="true" />
+      <Method Name="ListUsers" Hidden="true" />
+      <Method Name="NoOperation" Hidden="true" />
+      <Property Name="PlatformAbstraction" Hidden="true" />
+      <Method Name="PrintTable" Hidden="true" />
+      <Method Name="ReadBinaryFile" Hidden="true" />
+      <Method Name="ReadPostings" Hidden="true" />
+      <Method Name="ReadRecordPostings" Hidden="true" />
+      <Method Name="ReadTerms" Hidden="true" />
+      <Method Name="ReadTextFile" Hidden="true" />
+      <Method Name="ReloadDictionary" Hidden="true" />
+      <Method Name="ReloadMasterFile" Hidden="true" />
+      <Method Name="RestartServer" Hidden="true" />
+      <Method Name="SetBusy" Hidden="true" />
+      <Method Name="SetConnected" Hidden="true" />
+      <Method Name="SetLastError" Hidden="true" />
+      <Method Name="TruncateDatabase" Hidden="true" />
+      <Method Name="UnlockDatabase" Hidden="true" />
+      <Method Name="UnlockRecords" Hidden="true" />
+      <Method Name="UpdateIniFile" Hidden="true" />
+      <Method Name="UpdateUserList" Hidden="true" />
+      <Method Name="WriteTextFile" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>VAQSQACANGAARIBNAABAApAMJEAAFIkCEAAGgCIwgsE=</HashCode>
+      <FileName>Source\Direct\DirectProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.1" />
+  </Class>
+  <Class Name="ManagedIrbis.NullProvider">
+    <Position X="14.5" Y="7.5" Width="2.25" />
+    <Members>
+      <Method Name="ActualizeRecord" Hidden="true" />
+      <Method Name="ActualizeRecordAsync" Hidden="true" />
+      <Event Name="BusyChanged" Hidden="true" />
+      <Method Name="CancelOperation" Hidden="true" />
+      <Method Name="CheckProviderState" Hidden="true" />
+      <Method Name="ConnectAsync" Hidden="true" />
+      <Method Name="CreateDatabase" Hidden="true" />
+      <Method Name="CreateDatabaseAsync" Hidden="true" />
+      <Method Name="CreateDictionary" Hidden="true" />
+      <Method Name="CreateDictionaryAsync" Hidden="true" />
+      <Method Name="DeleteDatabase" Hidden="true" />
+      <Method Name="DeleteDatabaseAsync" Hidden="true" />
+      <Method Name="DisconnectAsync" Hidden="true" />
+      <Method Name="DisposeAsync" Hidden="true" />
+      <Event Name="Disposing" Hidden="true" />
+      <Method Name="FileExist" Hidden="true" />
+      <Method Name="FileExistAsync" Hidden="true" />
+      <Method Name="FormatRecordsAsync" Hidden="true" />
+      <Method Name="FullTextSearch" Hidden="true" />
+      <Method Name="FullTextSearchAsync" Hidden="true" />
+      <Method Name="GetDatabaseInfo" Hidden="true" />
+      <Method Name="GetDatabaseInfoAsync" Hidden="true" />
+      <Method Name="GetGeneration" Hidden="true" />
+      <Method Name="GetMaxMfn" Hidden="true" />
+      <Method Name="GetMaxMfnAsync" Hidden="true" />
+      <Method Name="GetServerStat" Hidden="true" />
+      <Method Name="GetServerStatAsync" Hidden="true" />
+      <Method Name="GetServerVersion" Hidden="true" />
+      <Method Name="GetServerVersionAsync" Hidden="true" />
+      <Method Name="GetService" Hidden="true" />
+      <Method Name="GetWaitHandle" Hidden="true" />
+      <Method Name="GlobalCorrection" Hidden="true" />
+      <Method Name="GlobalCorrectionAsync" Hidden="true" />
+      <Method Name="IDisposable.Dispose" Hidden="true" />
+      <Method Name="ListFiles" Hidden="true" />
+      <Method Name="ListFilesAsync" Hidden="true" />
+      <Method Name="ListProcesses" Hidden="true" />
+      <Method Name="ListProcessesAsync" Hidden="true" />
+      <Method Name="ListUsers" Hidden="true" />
+      <Method Name="ListUsersAsync" Hidden="true" />
+      <Method Name="NoOperation" Hidden="true" />
+      <Method Name="NoOperationAsync" Hidden="true" />
+      <Property Name="PlatformAbstraction" Hidden="true" />
+      <Method Name="PrintTable" Hidden="true" />
+      <Method Name="PrintTableAsync" Hidden="true" />
+      <Method Name="ReadBinaryFile" Hidden="true" />
+      <Method Name="ReadBinaryFileAsync" Hidden="true" />
+      <Method Name="ReadPostings" Hidden="true" />
+      <Method Name="ReadPostingsAsync" Hidden="true" />
+      <Method Name="ReadRecordAsync" Hidden="true" />
+      <Method Name="ReadRecordPostings" Hidden="true" />
+      <Method Name="ReadRecordPostingsAsync" Hidden="true" />
+      <Method Name="ReadTerms" Hidden="true" />
+      <Method Name="ReadTermsAsync" Hidden="true" />
+      <Method Name="ReadTextFile" Hidden="true" />
+      <Method Name="ReadTextFileAsync" Hidden="true" />
+      <Method Name="ReloadDictionary" Hidden="true" />
+      <Method Name="ReloadDictionaryAsync" Hidden="true" />
+      <Method Name="ReloadMasterFile" Hidden="true" />
+      <Method Name="ReloadMasterFileAsync" Hidden="true" />
+      <Method Name="RestartServer" Hidden="true" />
+      <Method Name="RestartServerAsync" Hidden="true" />
+      <Method Name="SearchAsync" Hidden="true" />
+      <Method Name="SetBusy" Hidden="true" />
+      <Method Name="SetConnected" Hidden="true" />
+      <Method Name="SetLastError" Hidden="true" />
+      <Method Name="TruncateDatabase" Hidden="true" />
+      <Method Name="TruncateDatabaseAsync" Hidden="true" />
+      <Method Name="UnlockDatabase" Hidden="true" />
+      <Method Name="UnlockDatabaseAsync" Hidden="true" />
+      <Method Name="UnlockRecords" Hidden="true" />
+      <Method Name="UnlockRecordsAsync" Hidden="true" />
+      <Method Name="UpdateIniFile" Hidden="true" />
+      <Method Name="UpdateIniFileAsync" Hidden="true" />
+      <Method Name="UpdateUserList" Hidden="true" />
+      <Method Name="UpdateUserListAsync" Hidden="true" />
+      <Method Name="WriteRecordAsync" Hidden="true" />
+      <Method Name="WriteTextFile" Hidden="true" />
+      <Method Name="WriteTextFileAsync" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>VQQ2RACgNGBQTJBNgABwArAdJGpBVJuCEIFHiCMwksE=</HashCode>
+      <FileName>Source\Providers\NullProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Orientation="Left" Position="0.1" />
+  </Class>
+  <Interface Name="ManagedIrbis.IConnectionSettings">
+    <Position X="6.5" Y="5.5" Width="2.25" />
+    <Members>
+      <Property Name="ClientId" Hidden="true" />
+      <Property Name="QueryId" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgQAAAAAACAAACAICAAAAAAAAAAQ=</HashCode>
+      <FileName>Source\Connectivity\IConnectionSettings.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ManagedIrbis.IIrbisProvider">
+    <Position X="0.75" Y="5.5" Width="2.25" />
+    <Members>
+      <Event Name="BusyChanged" Hidden="true" />
+      <Event Name="Disposing" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAJEAAQAAAAABAAgAIAAAABIEAAAAAgAAQAAA=</HashCode>
+      <FileName>Source\Providers\IIrbisProvider.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ManagedIrbis.ISyncProvider">
+    <Position X="0.75" Y="0.5" Width="2.25" />
+    <Members>
+      <Method Name="ActualizeRecord" Hidden="true" />
+      <Method Name="CreateDatabase" Hidden="true" />
+      <Method Name="CreateDictionary" Hidden="true" />
+      <Method Name="DeleteDatabase" Hidden="true" />
+      <Method Name="FileExist" Hidden="true" />
+      <Method Name="FullTextSearch" Hidden="true" />
+      <Method Name="GetDatabaseInfo" Hidden="true" />
+      <Method Name="GetMaxMfn" Hidden="true" />
+      <Method Name="GetServerStat" Hidden="true" />
+      <Method Name="GetServerVersion" Hidden="true" />
+      <Method Name="GlobalCorrection" Hidden="true" />
+      <Method Name="ListFiles" Hidden="true" />
+      <Method Name="ListProcesses" Hidden="true" />
+      <Method Name="ListUsers" Hidden="true" />
+      <Method Name="NoOperation" Hidden="true" />
+      <Method Name="PrintTable" Hidden="true" />
+      <Method Name="ReadBinaryFile" Hidden="true" />
+      <Method Name="ReadPostings" Hidden="true" />
+      <Method Name="ReadRecordPostings" Hidden="true" />
+      <Method Name="ReadTerms" Hidden="true" />
+      <Method Name="ReadTextFile" Hidden="true" />
+      <Method Name="ReloadDictionary" Hidden="true" />
+      <Method Name="ReloadMasterFile" Hidden="true" />
+      <Method Name="RestartServer" Hidden="true" />
+      <Method Name="TruncateDatabase" Hidden="true" />
+      <Method Name="UnlockDatabase" Hidden="true" />
+      <Method Name="UnlockRecords" Hidden="true" />
+      <Method Name="UpdateIniFile" Hidden="true" />
+      <Method Name="UpdateUserList" Hidden="true" />
+      <Method Name="WriteTextFile" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>VAQSQACAECAABIBNAAAAAJAEJEAAEAACEAAGgCIggsE=</HashCode>
+      <FileName>Source\Providers\ISyncProvider.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ManagedIrbis.ISyncConnection">
+    <Position X="6.5" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Source\Connectivity\ISyncConnection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ManagedIrbis.IAsyncProvider">
+    <Position X="0.75" Y="9.75" Width="2.25" />
+    <Members>
+      <Method Name="ActualizeRecordAsync" Hidden="true" />
+      <Method Name="CreateDatabaseAsync" Hidden="true" />
+      <Method Name="CreateDictionaryAsync" Hidden="true" />
+      <Method Name="DeleteDatabaseAsync" Hidden="true" />
+      <Method Name="FileExistAsync" Hidden="true" />
+      <Method Name="FormatRecordsAsync" Hidden="true" />
+      <Method Name="FullTextSearchAsync" Hidden="true" />
+      <Method Name="GetDatabaseInfoAsync" Hidden="true" />
+      <Method Name="GetMaxMfnAsync" Hidden="true" />
+      <Method Name="GetServerStatAsync" Hidden="true" />
+      <Method Name="GetServerVersionAsync" Hidden="true" />
+      <Method Name="GlobalCorrectionAsync" Hidden="true" />
+      <Method Name="ListFilesAsync" Hidden="true" />
+      <Method Name="ListProcessesAsync" Hidden="true" />
+      <Method Name="ListUsersAsync" Hidden="true" />
+      <Method Name="NoOperationAsync" Hidden="true" />
+      <Method Name="PrintTableAsync" Hidden="true" />
+      <Method Name="ReadBinaryFileAsync" Hidden="true" />
+      <Method Name="ReadPostingsAsync" Hidden="true" />
+      <Method Name="ReadRecordPostingsAsync" Hidden="true" />
+      <Method Name="ReadTermsAsync" Hidden="true" />
+      <Method Name="ReadTextFileAsync" Hidden="true" />
+      <Method Name="ReloadDictionaryAsync" Hidden="true" />
+      <Method Name="ReloadMasterFileAsync" Hidden="true" />
+      <Method Name="RestartServerAsync" Hidden="true" />
+      <Method Name="TruncateDatabaseAsync" Hidden="true" />
+      <Method Name="UnlockDatabaseAsync" Hidden="true" />
+      <Method Name="UnlockRecordsAsync" Hidden="true" />
+      <Method Name="UpdateIniFileAsync" Hidden="true" />
+      <Method Name="UpdateUserListAsync" Hidden="true" />
+      <Method Name="WriteTextFileAsync" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>BQAkBAAgAABQDBAAgAAwAKARACpBQBKAAIFACAMAEAA=</HashCode>
+      <FileName>Source\Providers\IAsyncProvider.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ManagedIrbis.IConnection">
+    <Position X="3.5" Y="5.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Source\Connectivity\IConnection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="ManagedIrbis.IAsyncConnection">
+    <Position X="6.5" Y="9.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Source\Connectivity\IAsyncConnection.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Arial" Size="9.75" />
+</ClassDiagram>

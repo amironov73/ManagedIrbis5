@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftCompiler.cs --
+/* PftCompiler.cs -- компилятор PFT-скриптов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,8 +24,9 @@ using AM;
 using AM.Collections;
 using AM.Text.Output;
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Direct;
 using ManagedIrbis.Pft.Infrastructure.Ast;
+
 using Microsoft.CSharp;
 
 #endregion
@@ -35,7 +36,7 @@ using Microsoft.CSharp;
 namespace ManagedIrbis.Pft.Infrastructure.Compiler
 {
     /// <summary>
-    ///
+    /// Компилятор PFT-скриптов, создающий .NET-сборки.
     /// </summary>
     public sealed class PftCompiler
     {
@@ -53,7 +54,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// <summary>
         /// Provider.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; private set; }
+        public ISyncProvider Provider { get; private set; }
 
         internal FieldDictionary Fields { get; private set; }
 
@@ -112,7 +113,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             Nodes = new NodeDictionary();
             Indexes = new IndexDictionary();
             Output = new StringWriter();
-            Provider = new LocalProvider(string.Empty);
+            Provider = new DirectProvider(string.Empty);
             OutputPath = Path.GetTempPath();
             References = new NonNullCollection<string>
             {
@@ -617,7 +618,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
         /// </summary>
         public void SetProvider
             (
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Provider = provider;

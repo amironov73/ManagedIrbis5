@@ -50,7 +50,7 @@ namespace ManagedIrbis.Morphology
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Provider { get; private set; }
+        public ISyncProvider Provider { get; private set; }
 
         /// <summary>
         /// Database name.
@@ -71,7 +71,7 @@ namespace ManagedIrbis.Morphology
         /// </summary>
         public SynonymEngine
             (
-                ISyncIrbisProvider provider
+                ISyncProvider provider
             )
         {
             Provider = provider;

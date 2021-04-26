@@ -73,7 +73,7 @@ namespace UnitTests.ManagedIrbis.Readers
         [TestMethod]
         public void ChairInfo_Read_1()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             mock.Setup(c => c.ReadTextFile(It.IsAny<FileSpecification>()))
                 .Returns(_GetMenuText());
             var connection = mock.Object;
@@ -94,7 +94,7 @@ namespace UnitTests.ManagedIrbis.Readers
         [ExpectedException(typeof(IrbisException))]
         public void ChairInfo_Read_1a_Exception()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             mock.Setup(c => c.ReadTextFile(It.IsAny<FileSpecification>()))
                 .Returns(String.Empty);
             var connection = mock.Object;
@@ -104,7 +104,7 @@ namespace UnitTests.ManagedIrbis.Readers
         [TestMethod]
         public void ChairInfo_Read_2()
         {
-            var mock = new Mock<ISyncIrbisProvider>();
+            var mock = new Mock<ISyncProvider>();
             mock.Setup(c => c.ReadTextFile(It.IsAny<FileSpecification>()))
                 .Returns(_GetMenuText());
             var connection = mock.Object;

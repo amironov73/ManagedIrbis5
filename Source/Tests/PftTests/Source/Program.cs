@@ -18,7 +18,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Direct;
 using ManagedIrbis.Pft.Infrastructure.Testing;
 
 #nullable enable
@@ -56,7 +56,7 @@ namespace PftTests
 
         private static void DiscoverAndRunTests()
         {
-            var provider = new LocalProvider(_testsRoot!);
+            var provider = new DirectProvider(_testsRoot!);
 
             var tester = new PftTester(_testsRoot!);
             tester.SetEnvironment(provider);

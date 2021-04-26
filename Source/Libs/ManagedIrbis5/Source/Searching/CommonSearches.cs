@@ -65,7 +65,7 @@ namespace ManagedIrbis
         /// <returns></returns>
         public static Record? ByInventory
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 string inventory
             )
         {
@@ -83,7 +83,7 @@ namespace ManagedIrbis
         /// <returns>Найденную запись либо <c>null</c>.</returns>
         public static Record? FirstOrDefault
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 string prefix,
                 string value
             )
@@ -107,7 +107,7 @@ namespace ManagedIrbis
         /// <exception cref="IrbisException">Если найдено более одной записи.</exception>
         public static Record? SingleOrDefault
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 string prefix,
                 string value
             )
@@ -149,7 +149,7 @@ namespace ManagedIrbis
         /// либо вообще ничего не найдено.</exception>
         public static Record Required
             (
-                this ISyncIrbisProvider connection,
+                this ISyncProvider connection,
                 string prefix,
                 string value
             )

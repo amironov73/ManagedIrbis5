@@ -67,7 +67,7 @@ namespace ManagedIrbis.Batch
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; private set; }
+        public ISyncProvider Connection { get; private set; }
 
         /// <summary>
         /// Database name.
@@ -93,7 +93,7 @@ namespace ManagedIrbis.Batch
         /// </summary>
         public BatchSearcher
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database,
                 string? prefix
             )

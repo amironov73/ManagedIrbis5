@@ -158,7 +158,7 @@ namespace ManagedIrbis
         /// <param name="query">Пользовательский запрос.</param>
         public void Encode<TQuery>
             (
-                IIrbisConnectionSettings connection,
+                IConnectionSettings connection,
                 TQuery query
             )
             where TQuery: IQuery

@@ -65,7 +65,7 @@ namespace ManagedIrbis.Flc
         /// </summary>
         public FlcResult CheckRecord
             (
-                ISyncIrbisProvider provider,
+                ISyncProvider provider,
                 Record record,
                 string format
             )

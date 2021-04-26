@@ -11,7 +11,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* IBasicIrbisProvider.cs -- наиболее общий интерфейс подключения для мока
+/* IIrbisProvider.cs -- наиболее общий интерфейс подключения для мокирования
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,7 +31,7 @@ namespace ManagedIrbis
     /// Наиболее общий интерфейс подключения к серверу ИРБИС64
     /// для мокирования
     /// </summary>
-    public interface IBasicIrbisProvider
+    public interface IIrbisProvider
         : IDisposable,
         IAsyncDisposable,
         IServiceProvider
@@ -127,6 +127,6 @@ namespace ManagedIrbis
 
         #endregion
 
-    } // interface IBasicIrbisProvider
+    } // interface IIrbisProvider
 
 } // namespace ManagedIrbis
