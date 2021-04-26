@@ -137,7 +137,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public MagazineManager LoadMagazines
             (
-                ISyncIrbisProvider connection
+                ISyncProvider connection
             )
         {
             var result = new MagazineManager(connection);

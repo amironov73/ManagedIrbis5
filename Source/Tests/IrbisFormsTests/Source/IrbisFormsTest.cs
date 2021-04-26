@@ -51,7 +51,7 @@ namespace IrbisFormsTests
         public static IrbisFormsTest[] LoadFromFile (string fileName) =>
             JsonUtility.ReadObjectFromFile<IrbisFormsTest[]>(fileName);
 
-        public static ISyncIrbisProvider GetConnection()
+        public static ISyncProvider GetConnection()
         {
             var result = ConnectionFactory.Shared.CreateSyncConnection();
             result.ParseConnectionString

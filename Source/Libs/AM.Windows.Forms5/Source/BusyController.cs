@@ -11,6 +11,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* BusyController.cs --

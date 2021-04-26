@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -32,12 +33,13 @@ namespace AM.Threading
     /// Флаг, сигнализирующий о занятости некоторого ресурса.
     /// </summary>
     public sealed class BusyState
-        : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IDisposable
     {
         #region Events
 
         /// <summary>
-        /// Raised when the state has changed.
+        /// Событие, возникающее при изменении состояния занятости ресурса.
         /// </summary>
         public event EventHandler? StateChanged;
 
@@ -46,58 +48,38 @@ namespace AM.Threading
         #region Properties
 
         /// <summary>
-        /// The state itself.
+        /// Собственно состояние.
         /// </summary>
-        public bool Busy => _currentState;
+        public bool Busy => !_waitHandle.IsSet;
 
         /// <summary>
-        /// Whether to use asynchronous event handler.
+        /// Использовать асинхронный обработчик события?
         /// </summary>
         public bool UseAsync { get; set; }
 
         /// <summary>
         /// Хэндл для ожидания.
         /// </summary>
-        public WaitHandle WaitHandle => _waitHandle;
+        public WaitHandle WaitHandle => _waitHandle.WaitHandle;
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
+        /// Свежесозданное состояние "ресурс не занят".
         /// </summary>
         public BusyState()
         {
-            Magna.Trace("BusyState::Constructor");
-
-            _lock = new object();
-            _waitHandle = new ManualResetEvent(true);
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BusyState
-            (
-                bool initialState
-            )
-            : this()
-        {
-            _currentState = initialState;
+            _waitHandle = new ManualResetEventSlim(true);
         }
 
         #endregion
 
         #region Private members
 
-        private readonly object _lock;
-
-        private bool _currentState;
-
-        private Thread? _thread;
-
-        private ManualResetEvent _waitHandle;
+        private readonly ManualResetEventSlim _waitHandle;
 
         #endregion
 
@@ -156,30 +138,27 @@ namespace AM.Threading
                     + newState
                 );
 
-            lock (_lock)
+            if (newState != Busy)
             {
-                if (newState != _currentState)
+                if (newState)
                 {
-                    if (newState)
-                    {
-                        _waitHandle.Reset();
-                        _thread = Thread.CurrentThread;
-                    }
-                    else
-                    {
-                        _waitHandle.Set();
-                    }
+                    // считаемся занятыми
+                    _waitHandle.Reset();
+                }
+                else
+                {
+                    // считаемся свободными
+                    _waitHandle.Set();
+                }
 
-                    _currentState = newState;
 
-                    if (UseAsync)
-                    {
-                        StateChanged.RaiseAsync(this);
-                    }
-                    else
-                    {
-                        StateChanged.Raise(this);
-                    }
+                if (UseAsync)
+                {
+                    StateChanged.RaiseAsync(this);
+                }
+                else
+                {
+                    StateChanged.Raise(this);
                 }
             }
         }
@@ -189,24 +168,18 @@ namespace AM.Threading
         /// </summary>
         public void WaitAndGrab()
         {
-            lock (_lock)
-            {
-                while (true)
-                {
-                    if (!Busy)
-                    {
-                        SetState(true);
-                        goto DONE;
-                    }
+            Magna.Trace
+                (
+                    nameof(BusyState)
+                    + "::"
+                    + nameof(WaitAndGrab)
+                    +
+                    ": enter"
+                );
 
-                    if (!ReferenceEquals(_thread, Thread.CurrentThread))
-                    {
-                        WaitHandle.WaitOne();
-                    }
-                }
-            }
+            WaitHandle.WaitOne();
+            SetState(true);
 
-        DONE:
             Magna.Trace
                 (
                     nameof(BusyState)
@@ -225,52 +198,50 @@ namespace AM.Threading
                 TimeSpan timeout
             )
         {
-            lock (_lock)
-            {
-                if (!Busy)
-                {
-                    SetState(true);
-                    return true;
-                }
+            Magna.Trace
+                (
+                    nameof(BusyState)
+                    + "::"
+                    + nameof(WaitAndGrab)
+                    +
+                    ": enter"
+                );
 
-                var result = ReferenceEquals(_thread, Thread.CurrentThread)
-                              || WaitHandle.WaitOne(timeout);
+            var result = WaitHandle.WaitOne(timeout);
+            SetState(true);
 
-                if (result)
-                {
-                    SetState(true);
-                }
+            Magna.Trace
+                (
+                    nameof(BusyState)
+                    + "::"
+                    + nameof(WaitAndGrab)
+                    +
+                    ": return"
+                );
 
-                return result;
-            }
+            return result;
         }
 
         /// <summary>
         /// Ожидаем, пока не освободится.
         /// </summary>
-        public void WaitFreeState()
+        public void Wait()
         {
-            while (true)
-            {
-                if (!Busy)
-                {
-                    goto DONE;
-                }
-
-                if (ReferenceEquals(_thread, Thread.CurrentThread))
-                {
-                    goto DONE;
-                }
-
-                WaitHandle.WaitOne();
-            }
-
-        DONE:
             Magna.Trace
                 (
                     nameof(BusyState)
                     + "::"
-                    + nameof(WaitFreeState)
+                    + nameof(Wait)
+                    + ": enter"
+                );
+
+            WaitHandle.WaitOne();
+
+            Magna.Trace
+                (
+                    nameof(BusyState)
+                    + "::"
+                    + nameof(Wait)
                     + ": return"
                 );
         }
@@ -278,26 +249,34 @@ namespace AM.Threading
         /// <summary>
         /// Ожидаем, пока не освободится.
         /// </summary>
-        public bool WaitFreeState
+        public bool Wait
             (
                 TimeSpan timeout
             )
         {
-            if (!Busy)
-            {
-                return true;
-            }
+            Magna.Trace
+                (
+                    nameof(BusyState)
+                    + "::"
+                    + nameof(Wait)
+                    + ": enter"
+                );
 
-            if (ReferenceEquals(_thread, Thread.CurrentThread))
-            {
-                return true;
-            }
+            var result = WaitHandle.WaitOne(timeout);
 
-            return WaitHandle.WaitOne(timeout);
+            Magna.Trace
+                (
+                    nameof(BusyState)
+                    + "::"
+                    + nameof(Wait)
+                    + ": return"
+                );
+
+            return result;
         }
 
         /// <summary>
-        /// Implicit conversion operator.
+        /// Оператор неявного преобразования типа.
         /// </summary>
         public static implicit operator bool
             (
@@ -308,14 +287,17 @@ namespace AM.Threading
         }
 
         /// <summary>
-        /// Implicit conversion operator.
+        /// Оператор неявного преобразования типа.
         /// </summary>
         public static implicit operator BusyState
             (
                 bool value
             )
         {
-            return new BusyState(value);
+            var result = new BusyState();
+            result.SetState(value);
+
+            return result;
         }
 
         #endregion
@@ -328,7 +310,7 @@ namespace AM.Threading
                 BinaryReader reader
             )
         {
-            _currentState = reader.ReadBoolean();
+            SetState(reader.ReadBoolean());
             UseAsync = reader.ReadBoolean();
         }
 
@@ -338,20 +320,26 @@ namespace AM.Threading
                 BinaryWriter writer
             )
         {
-            writer.Write(_currentState);
+            writer.Write(Busy);
             writer.Write(UseAsync);
         }
+
+        #endregion
+
+        #region IDisposable methods
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose() => _waitHandle.Dispose();
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return $"Busy: {Busy}";
-        }
+        public override string ToString() => Busy.ToString();
 
         #endregion
-    }
-}
+
+    } // class BusyState
+
+} // namesapce AM.Threading

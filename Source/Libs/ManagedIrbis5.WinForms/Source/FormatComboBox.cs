@@ -48,7 +48,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public void FillWithFormats
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database
             )
         {

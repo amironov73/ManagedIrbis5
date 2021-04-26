@@ -45,7 +45,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; private set; }
+        public ISyncProvider Connection { get; private set; }
 
         /// <summary>
         /// Idle interval, milliseconds.
@@ -61,7 +61,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public IrbisIdleManager
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 int interval
             )
         {

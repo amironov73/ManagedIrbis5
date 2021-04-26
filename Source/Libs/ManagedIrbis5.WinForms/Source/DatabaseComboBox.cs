@@ -59,7 +59,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public void FillWithDatabases
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string listFile
             )
         {

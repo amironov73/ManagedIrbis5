@@ -59,7 +59,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public void FillWithChairs
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 bool addAllItem = false
             )
         {

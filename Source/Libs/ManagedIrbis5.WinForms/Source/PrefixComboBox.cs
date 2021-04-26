@@ -53,7 +53,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public void FillWithScenarios
             (
-                ISyncIrbisProvider connection,
+                ISyncProvider connection,
                 string database
             )
         {

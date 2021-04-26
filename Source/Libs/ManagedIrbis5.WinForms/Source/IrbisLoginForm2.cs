@@ -126,7 +126,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public IrbisLoginForm2 ApplySettings
             (
-                IIrbisConnectionSettings settings
+                IConnectionSettings settings
             )
         {
             Host = settings.Host;

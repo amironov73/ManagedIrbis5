@@ -60,7 +60,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Ссылка на клиент.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; private set; }
+        public ISyncProvider Connection { get; private set; }
 
         /// <summary>
         /// Задержка между началом запроса к серверу
@@ -79,7 +79,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public IrbisBusyManager
             (
-                ISyncIrbisProvider connection
+                ISyncProvider connection
             )
         {
             Delay = DefaultDelay;

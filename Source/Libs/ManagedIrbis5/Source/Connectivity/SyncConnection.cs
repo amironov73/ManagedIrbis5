@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -48,7 +49,7 @@ namespace ManagedIrbis
         #region Events
 
         /// <summary>
-        /// Fired when <see cref="Busy"/> changed.
+        /// Событие, возникающее при изменении состояния свойства <see cref="Busy"/>.
         /// </summary>
         public event EventHandler? BusyChanged;
 
@@ -127,12 +128,12 @@ namespace ManagedIrbis
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public SyncConnection
             (
                 ISyncClientSocket socket,
-                IServiceProvider provider
+                IServiceProvider serviceProvider
             )
         {
             Socket = socket;
@@ -140,7 +141,7 @@ namespace ManagedIrbis
             _cancellation = new CancellationTokenSource();
             Cancellation = _cancellation.Token;
             _logger = Magna.Factory.CreateLogger<IIrbisProvider>();
-            _provider = provider;
+            _serviceProvider = serviceProvider;
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
@@ -150,7 +151,7 @@ namespace ManagedIrbis
 
         protected internal ILogger _logger;
 
-        protected internal IServiceProvider _provider;
+        protected internal readonly IServiceProvider _serviceProvider;
 
         protected internal CancellationTokenSource _cancellation;
 
@@ -228,7 +229,7 @@ namespace ManagedIrbis
         /// Отправка запроса на сервер по упрощённой схеме.
         /// </summary>
         /// <param name="command">Код команды.</param>
-        /// <param name="arg1">Параметр команды.</param>
+        /// <param name="arg1">Первый и единственный параметр команды.</param>
         /// <returns>Ответ сервера.</returns>
         public Response? ExecuteSync
             (
@@ -268,9 +269,12 @@ namespace ManagedIrbis
         } // method CheckConnection
 
         /// <inheritdoc cref="IIrbisProvider.Configure"/>
-        public void Configure(string configurationString)
+        public void Configure
+            (
+                string configurationString
+            )
         {
-            // ParseConnectionString
+            this.ParseConnectionString(configurationString);
         }
 
         /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
@@ -1076,7 +1080,7 @@ namespace ManagedIrbis
 
         /// <inheritdoc cref="IServiceProvider.GetService"/>
         public object? GetService(Type serviceType) =>
-            _provider.GetService(serviceType);
+            _serviceProvider.GetService(serviceType);
 
         #endregion
 

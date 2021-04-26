@@ -2297,63 +2297,41 @@ namespace AM
 
             throw new FormatException
                 (
-                    "Bad value " + value
+                    "Bad value: " + value
                 );
         }
 
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
-        public static void Raise<T>
-            (
-                this EventHandler<T>? handler,
-                object? sender,
-                T args
-            )
+        public static void Raise<T> ( this EventHandler<T>? handler, object? sender, T args )
             where T : EventArgs
-        {
-            handler?.Invoke(sender, args);
-        }
+            => handler?.Invoke(sender, args);
 
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
-        public static void Raise<T>
-            (
-                this EventHandler<T>? handler,
-                object? sender
-            )
+        public static void Raise<T> ( this EventHandler<T>? handler, object? sender )
             where T : EventArgs
-        {
-            handler?.Invoke(sender, null!);
-        }
+            => handler?.Invoke(sender, null!);
 
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
-        public static void Raise
-            (
-                this EventHandler? handler,
-                object? sender
-            )
-        {
+        public static void Raise ( this EventHandler? handler, object? sender ) =>
             handler?.Invoke(sender, EventArgs.Empty);
-        }
 
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
-        public static Task RaiseAsync (this EventHandler? handler, object? sender,
-            EventArgs args) =>
-            Task.Factory
-                .StartNew (() => { handler?.Invoke(sender, args); });
+        public static Task RaiseAsync (this EventHandler? handler, object? sender, EventArgs args) =>
+            Task.Factory.StartNew (() => { handler?.Invoke(sender, args); });
 
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
         public static Task RaiseAsync (this EventHandler? handler, object? sender) =>
-            Task.Factory
-                .StartNew (() => { handler?.Invoke(sender, EventArgs.Empty); });
+            Task.Factory.StartNew (() => { handler?.Invoke(sender, EventArgs.Empty); });
 
         /// <summary>
         /// Is zero-length time span?

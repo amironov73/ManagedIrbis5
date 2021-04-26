@@ -55,7 +55,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Connection.
         /// </summary>
-        public ISyncIrbisProvider Connection { get; private set; }
+        public ISyncProvider Connection { get; private set; }
 
         /// <summary>
         /// First record.
@@ -76,7 +76,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public RecordAdapter
             (
-                ISyncIrbisProvider connection
+                ISyncProvider connection
             )
         {
             Source = new BindingSource(Array.Empty<Record>(), null);

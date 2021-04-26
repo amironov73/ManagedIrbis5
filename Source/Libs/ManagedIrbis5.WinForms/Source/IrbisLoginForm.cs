@@ -95,7 +95,7 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public IrbisLoginForm ApplySettings
             (
-                IIrbisConnectionSettings settings
+                IConnectionSettings settings
             )
         {
             Username = settings.Username;
