@@ -38,12 +38,23 @@ namespace ManagedIrbis.InMemory
         #region Public methods
 
         /// <summary>
+        /// Дамп мастер-файла.
+        /// </summary>
+        public void Dump
+            (
+                TextWriter output
+            )
+        {
+            // TODO: implement
+        }
+
+        /// <summary>
         /// Загрузка из потока.
         /// </summary>
         public void Read
-        (
-            BinaryReader reader
-        )
+            (
+                BinaryReader reader
+            )
         {
             // TODO: implement
         }
@@ -52,9 +63,9 @@ namespace ManagedIrbis.InMemory
         /// Сохранение в поток.
         /// </summary>
         public void Save
-        (
-            BinaryWriter writer
-        )
+            (
+                BinaryWriter writer
+            )
         {
             // TODO: implement
         }

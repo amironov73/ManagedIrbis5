@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -14,11 +15,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-using AM;
+using System.IO;
 
 #endregion
 
@@ -39,6 +36,11 @@ namespace ManagedIrbis.InMemory
         public string Name { get; }
 
         /// <summary>
+        /// База заблокирована?
+        /// </summary>
+        public bool Locked { get; set; }
+
+        /// <summary>
         /// Мастер-файл.
         /// </summary>
         public InMemoryMaster Master { get; }
@@ -47,6 +49,11 @@ namespace ManagedIrbis.InMemory
         /// Инвертированный файл.
         /// </summary>
         public InMemoryInverted Inverted { get; }
+
+        /// <summary>
+        /// Запрещено вносить изменения в базу?
+        /// </summary>
+        public bool ReadOnly { get; }
 
         #endregion
 
@@ -57,12 +64,30 @@ namespace ManagedIrbis.InMemory
         /// </summary>
         public InMemoryDatabase
             (
-                string name
+                string name,
+                bool readOnly = false
             )
         {
             Name = name;
+            ReadOnly = readOnly;
             Master = new InMemoryMaster();
             Inverted = new InMemoryInverted();
+        }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Дамп базы данных.
+        /// </summary>
+        public void Dump
+            (
+                TextWriter output
+            )
+        {
+            Master.Dump(output);
+            Inverted.Dump(output);
         }
 
         #endregion

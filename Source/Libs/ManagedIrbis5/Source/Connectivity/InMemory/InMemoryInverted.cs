@@ -30,12 +30,23 @@ using AM.Collections;
 namespace ManagedIrbis.InMemory
 {
     /// <summary>
-    /// Инвертированный файл, расположенный в оперативной памяти
+    /// Инвертированный файл, расположенный в оперативной памяти.
     /// </summary>
     public class InMemoryInverted
         : CaseInsensitiveDictionary <InMemoryTerm>
     {
         #region Public methods
+
+        /// <summary>
+        /// Дамп инвертированного файла.
+        /// </summary>
+        public void Dump
+            (
+                TextWriter output
+            )
+        {
+            // TODO: implement
+        }
 
         /// <summary>
         /// Загрузка из потока.

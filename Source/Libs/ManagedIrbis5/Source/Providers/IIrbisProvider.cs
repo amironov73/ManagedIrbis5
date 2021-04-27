@@ -41,13 +41,7 @@ namespace ManagedIrbis
         #region Events
 
         /// <summary>
-        /// Событие, возникающее при изменении состояния
-        /// свойства <see cref="Busy"/>.
-        /// </summary>
-        event EventHandler? BusyChanged;
-
-        /// <summary>
-        /// Событие, возникающее при освобождении провайдера.s
+        /// Событие, возникающее при освобождении провайдера.
         /// </summary>
         event EventHandler? Disposing;
 

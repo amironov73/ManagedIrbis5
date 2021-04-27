@@ -15,10 +15,12 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
+using System.IO;
+using System.Linq;
 
-using AM;
+using AM.Collections;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -32,7 +34,106 @@ namespace ManagedIrbis.InMemory
     public sealed class InMemoryResourceProvider
         : IResourceProvider
     {
+        #region Properties
+
+        /// <summary>
+        /// Провайдеру запрещено перезаписывать ресурсы?
+        /// </summary>
+        public bool ReadOnly { get; }
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public InMemoryResourceProvider
+            (
+                bool readOnly = false
+            )
+        {
+            ReadOnly = readOnly;
+            _directories = new();
+            _files = new();
+        }
+
+        #endregion
+
+        #region Private members
+
+        private readonly CaseInsensitiveDictionary<InMemoryResourceProvider> _directories;
+        private readonly CaseInsensitiveDictionary<string> _files;
+
+        internal (string fileName, InMemoryResourceProvider provider) FindFile
+            (
+                string path
+            )
+        {
+            var current = this;
+            var fileName = path;
+            if (path.Contains(Path.DirectorySeparatorChar))
+            {
+                var parts = path.Split(Path.DirectorySeparatorChar);
+                var subdirs = parts[..^1];
+                fileName = parts[^1];
+                foreach (var subdir in subdirs)
+                {
+                    if (!current._directories.TryGetValue(subdir, out var inner))
+                    {
+                        return default;
+                    }
+
+                    current = inner;
+                }
+            }
+
+            return (fileName, current);
+        }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Восстановление состояния провайдера из файловой системы.
+        /// </summary>
+        public void RestoreFrom
+            (
+                string path
+            )
+        {
+            _directories.Clear();
+            _files.Clear();
+
+            foreach (var fileName in Directory.EnumerateFiles(path))
+            {
+                var nameWithExtension = Path.GetFileName(fileName);
+                var content = File.ReadAllText(fileName, IrbisEncoding.Ansi);
+                _files.Add(nameWithExtension, content);
+            }
+
+            foreach (var subdir in Directory.EnumerateDirectories(path))
+            {
+                var nameWithExtension = Path.GetFileName(subdir);
+                var subitem = new InMemoryResourceProvider(ReadOnly);
+                _directories.Add(nameWithExtension, subitem);
+                subitem.RestoreFrom(subdir);
+            }
+        }
+
+        #endregion
+
         #region IResourceProvider members
+
+        /// <inheritdoc cref="IResourceProvider.Dump"/>
+        public void Dump
+            (
+                TextWriter output
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         /// <inheritdoc cref="IResourceProvider.ListResources"/>
         public string[] ListResources
@@ -40,7 +141,7 @@ namespace ManagedIrbis.InMemory
                 string path
             )
         {
-            throw new NotImplementedException();
+            return _files.Values.ToArray();
         }
 
         /// <inheritdoc cref="IResourceProvider.ReadResource"/>
@@ -49,7 +150,15 @@ namespace ManagedIrbis.InMemory
                 string fileName
             )
         {
-            throw new NotImplementedException();
+            InMemoryResourceProvider provider;
+            (fileName, provider) = FindFile(fileName);
+
+            if (provider._files.TryGetValue(fileName, out var content))
+            {
+                return content;
+            }
+
+            return default;
         }
 
         /// <inheritdoc cref="IResourceProvider.ResourceExists"/>
@@ -58,7 +167,34 @@ namespace ManagedIrbis.InMemory
                 string fileName
             )
         {
-            throw new NotImplementedException();
+            InMemoryResourceProvider provider;
+            (fileName, provider) = FindFile(fileName);
+
+            return provider._files.ContainsKey(fileName);
+        }
+
+        /// <inheritdoc cref="IResourceProvider.WriteResource"/>
+        public bool WriteResource
+            (
+                string fileName,
+                string? content
+            )
+        {
+            if (ReadOnly)
+            {
+                return false;
+            }
+
+            InMemoryResourceProvider provider;
+            (fileName, provider) = FindFile(fileName);
+            if (content is null)
+            {
+                return provider._files.Remove(fileName);
+            }
+
+            provider._files[fileName] = content;
+
+            return true;
         }
 
         #endregion

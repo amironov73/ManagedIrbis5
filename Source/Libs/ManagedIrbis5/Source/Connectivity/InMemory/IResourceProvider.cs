@@ -33,6 +33,11 @@ namespace ManagedIrbis.InMemory
     public interface IResourceProvider
     {
         /// <summary>
+        /// Дамп.
+        /// </summary>
+        public void Dump(TextWriter output);
+
+        /// <summary>
         /// Получение списка ресурсов по указанному пути.
         /// </summary>
         public string[] ListResources(string path);
@@ -46,6 +51,11 @@ namespace ManagedIrbis.InMemory
         /// Ресурс с указанным именем существует?
         /// </summary>
         public bool ResourceExists(string fileName);
+
+        /// <summary>
+        /// Перезапись указанного ресурса.
+        /// </summary>
+        public bool WriteResource(string fileName, string? content);
 
     } // interface IResourceProvider
 

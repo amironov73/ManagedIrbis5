@@ -708,6 +708,62 @@ namespace AM
             ThrowIfNull (value, "Null value detected");
 
         /// <summary>
+        /// Бросает исключение, если переданная строка пустая
+        /// или равна <c>null</c>.
+        /// </summary>
+        public static string ThrowIfNullOrEmpty(this string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentException();
+            }
+
+            return value!;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если переданная строка пустая
+        /// или равна <c>null</c>.
+        /// </summary>
+        public static ReadOnlySpan<char> ThrowIfNullOrEmpty(this ReadOnlySpan<char> value)
+        {
+            if (value.IsEmpty)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если переданная строка пробельная
+        /// или равна <c>null</c>.
+        /// </summary>
+        public static string ThrowIfNullOrWhiteSpace(this string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException();
+            }
+
+            return value!;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если переданная строка пробельная
+        /// или равна <c>null</c>.
+        /// </summary>
+        public static ReadOnlySpan<char> ThrowIfNullOrWhiteSpace(this ReadOnlySpan<char> value)
+        {
+            if (value.IsEmpty || value.IsWhiteSpace())
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
         /// Превращает объект в видимую строку.
         /// </summary>
         [Pure]

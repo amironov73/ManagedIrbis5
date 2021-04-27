@@ -121,15 +121,13 @@ namespace ManagedIrbis.Direct
 
         private void SetBusy(bool busy)
         {
-            Busy = busy;
-            BusyChanged?.Invoke(this, EventArgs.Empty);
+            Busy.SetState(busy);
         }
 
         private void SetConnected(bool state) => Connected = state;
 
         private void SetLastError(int code) => LastError = code;
 
-        public event EventHandler? BusyChanged;
         public string? Database { get; set; } = "IBIS";
         public bool Connected { get; private set; }
         public BusyState Busy { get; private set; }

@@ -49,11 +49,6 @@ namespace ManagedIrbis
     {
         #region Events
 
-        /// <summary>
-        /// Событие, возникающее при изменении состояния свойства <see cref="Busy"/>.
-        /// </summary>
-        public event EventHandler? BusyChanged;
-
         /// <inheritdoc cref="IIrbisProvider.Disposing"/>
         public event EventHandler? Disposing;
 
@@ -87,9 +82,6 @@ namespace ManagedIrbis
 
         /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; protected internal set; }
-
-        /// <inheritdoc cref="IIrbisProvider.Busy"/>
-        public BusyState Busy { get; protected internal set; }
 
         /// <inheritdoc cref="IIrbisProvider.LastError"/>
         public int LastError { get; protected internal set; }
@@ -169,7 +161,6 @@ namespace ManagedIrbis
             {
                 _logger.LogTrace($"SetBusy: {busy}");
                 Busy = busy;
-                BusyChanged?.Invoke(this, EventArgs.Empty);
             }
         } // method SetBusy
 
@@ -254,10 +245,17 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IIrbisProvider members
+        #region ICancellable members
+
+        /// <inheritdoc cref="ICancellable.Busy"/>
+        public BusyState Busy { get; protected internal set; }
 
         /// <inheritdoc cref="IIrbisProvider.CancelOperation"/>
         public void CancelOperation() => _cancellation.Cancel();
+
+        #endregion
+
+        #region IIrbisProvider members
 
         /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>
         public bool CheckProviderState()
