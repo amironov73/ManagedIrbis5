@@ -1,6 +1,6 @@
 ﻿namespace ManagedIrbis.WinForms
 {
-    partial class IrbisBusyForm
+    partial class BusyForm
     {
         /// <summary>
         /// Required designer variable.
@@ -62,7 +62,7 @@
             this.Controls.Add(this._messageLabel);
             this.Controls.Add(this._breakButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "IrbisBusyForm";
+            this.Name = "BusyForm";
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

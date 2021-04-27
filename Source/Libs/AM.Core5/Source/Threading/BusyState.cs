@@ -43,6 +43,11 @@ namespace AM.Threading
         /// </summary>
         public event EventHandler? StateChanged;
 
+        /// <summary>
+        /// Событие, возникающее при очистке.
+        /// </summary>
+        public event EventHandler? Disposing;
+
         #endregion
 
         #region Properties
@@ -329,7 +334,11 @@ namespace AM.Threading
         #region IDisposable methods
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => _waitHandle.Dispose();
+        public void Dispose()
+        {
+            Disposing.Raise(this);
+            _waitHandle.Dispose();
+        }
 
         #endregion
 

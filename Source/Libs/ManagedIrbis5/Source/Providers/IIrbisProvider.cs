@@ -20,6 +20,7 @@
 using System;
 using System.Threading;
 using AM.PlatformAbstraction;
+using AM.Threading;
 
 #endregion
 
@@ -34,7 +35,8 @@ namespace ManagedIrbis
     public interface IIrbisProvider
         : IDisposable,
         IAsyncDisposable,
-        IServiceProvider
+        IServiceProvider,
+        ICancellable
     {
         #region Events
 
@@ -74,11 +76,6 @@ namespace ManagedIrbis
         bool Connected { get; }
 
         /// <summary>
-        /// Провайдер занят выполнением операции?
-        /// </summary>
-        bool Busy { get; }
-
-        /// <summary>
         /// Код ошибки последней выполненной операции.
         /// Значение больше или равное 0 означает отсутствие ошибки.
         /// </summary>
@@ -92,11 +89,6 @@ namespace ManagedIrbis
         #endregion
 
         #region Methods
-
-        /// <summary>
-        /// Отмена текущей операции.
-        /// </summary>
-        void CancelOperation();
 
         /// <summary>
         /// Проверка состояния провайдера.

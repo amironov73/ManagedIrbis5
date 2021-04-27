@@ -17,15 +17,9 @@
 #region Using directives
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
-
-using AM.IO;
-using AM.PlatformAbstraction;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Menus;
-using ManagedIrbis.Pft;
 
 #endregion
 

@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* IrbisBusyForm.cs --
+/* BusyForm.cs -- диалог "ИРБИС занят, подождите"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,9 +23,9 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms
 {
     /// <summary>
-    ///
+    /// Диалог "ИРБИС занят, подождите"
     /// </summary>
-    public partial class IrbisBusyForm
+    public partial class BusyForm
         : Form
     {
         #region Events
@@ -42,7 +42,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Constructor.
         /// </summary>
-        public IrbisBusyForm()
+        public BusyForm()
         {
             InitializeComponent();
         }
@@ -81,5 +81,6 @@ namespace ManagedIrbis.WinForms
         }
 
         #endregion
+
     }
 }

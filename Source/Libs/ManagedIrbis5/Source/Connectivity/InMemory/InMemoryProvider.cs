@@ -22,7 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AM.PlatformAbstraction;
-
+using AM.Threading;
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 
@@ -62,6 +62,7 @@ namespace ManagedIrbis.InMemory
                 IResourceProvider resources
             )
         {
+            Busy = new BusyState();
             Resources = resources;
             Databases = new();
             PlatformAbstraction = PlatformAbstractionLayer.Current;
@@ -71,18 +72,24 @@ namespace ManagedIrbis.InMemory
 
         #region ISyncProvider
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             Disposing?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
         public ValueTask DisposeAsync()
         {
             Dispose();
             return ValueTask.CompletedTask;
         }
 
-        public object? GetService(Type serviceType)
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService
+            (
+                Type serviceType
+            )
         {
             throw new NotImplementedException();
         }
@@ -96,13 +103,19 @@ namespace ManagedIrbis.InMemory
         private void SetLastError(int code) => LastError = code;
 
         public event EventHandler? BusyChanged;
+
         public event EventHandler? Disposing;
+
         public string? Database { get; set; }
+
         public bool Connected { get; } = true;
-        public bool Busy { get; private set; }
+
+        public BusyState Busy { get; private set; }
 
         public int LastError { get; private set; }
+
         public PlatformAbstractionLayer PlatformAbstraction { get; }
+
         public void CancelOperation()
         {
             throw new NotImplementedException();

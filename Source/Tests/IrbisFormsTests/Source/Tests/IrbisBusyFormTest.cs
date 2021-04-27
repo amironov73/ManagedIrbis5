@@ -31,7 +31,7 @@ namespace IrbisFormsTests
                 IWin32Window? ownerWindow
             )
         {
-            using IrbisBusyForm form = new IrbisBusyForm();
+            using BusyForm form = new BusyForm();
             form.ShowDialog(ownerWindow);
         }
     }

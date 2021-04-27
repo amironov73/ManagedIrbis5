@@ -1,6 +1,8 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
@@ -9,7 +11,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* IrbisBusyManager.cs --
+/* BusyManager.cs -- управляет отображением диалога "ИРБИС занят"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,9 +19,11 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
+
+using AM;
+using AM.Threading;
 
 #endregion
 
@@ -28,12 +32,13 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms
 {
     /// <summary>
-    /// Управляет отображением окна "ИРБИС занят, подождите".
+    /// Управляет отображением диалога "ИРБИС занят, подождите"
+    /// или чего-нибудь аналогичного.
     /// </summary>
     // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
     // ReSharper restore RedundantNameQualifier
-    public sealed class IrbisBusyManager
+    public sealed class BusyManager
         : Component
     {
         #region Constants
@@ -55,12 +60,12 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Занят ли сейчас клиент обращением к ИРБИС-серверу.
         /// </summary>
-        public bool Busy => Connection.Busy;
+        public BusyState Busy => Connection.Busy;
 
         /// <summary>
-        /// Ссылка на клиент.
+        /// Ссылка на потенциально занятой объект.
         /// </summary>
-        public ISyncProvider Connection { get; private set; }
+        public ICancellable Connection { get; }
 
         /// <summary>
         /// Задержка между началом запроса к серверу
@@ -75,18 +80,17 @@ namespace ManagedIrbis.WinForms
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструкторs.
         /// </summary>
-        public IrbisBusyManager
+        public BusyManager
             (
-                ISyncProvider connection
+                ICancellable connection
             )
         {
             Delay = DefaultDelay;
-
             Connection = connection;
-            Connection.BusyChanged += _BusyChanged;
-            Connection.Disposing += _ClientDisposing;
+            Busy.StateChanged += _BusyChanged;
+            Busy.Disposing += _ConnectionDisposing;
         }
 
         #endregion
@@ -94,30 +98,30 @@ namespace ManagedIrbis.WinForms
         #region Private members
 
         private Thread? _uiThread;
-        private IrbisBusyForm? _waitForm;
+        private BusyForm? _waitForm;
         private bool _workDone;
-        private ManualResetEvent? _waitEvent;
+        private ManualResetEventSlim? _waitEvent;
         private static int _counter;
         private static string? _formTitle;
         private static string? _formMessage;
 
-        private void _DebugThreadName()
-        {
-            Debug.WriteLine("THREAD=" + Thread.CurrentThread.Name);
-        }
+        private void _DebugThreadId() =>
+            Magna.Debug(nameof(BusyManager)
+            + ": Thread name=" + Thread.CurrentThread.Name
+            + ", thread ID=" + Environment.CurrentManagedThreadId);
 
-        private void _ClientDisposing
+        private void _ConnectionDisposing
             (
                 object? sender,
                 EventArgs e
             )
         {
-            Debug.WriteLine("ENTER IrbisBusyManager._ClientDisposing");
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_ConnectionDisposing) + ": enter");
 
+            _DebugThreadId();
             Dispose(true);
 
-            Debug.WriteLine("LEAVE IrbisBusyManager._ClientDisposing");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_ConnectionDisposing) + ": leave");
         }
 
         private void _BreakPressed
@@ -126,16 +130,12 @@ namespace ManagedIrbis.WinForms
                 EventArgs e
             )
         {
-            Debug.WriteLine("ENTER IrbisBusyManager._BreakPressed");
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_BreakPressed) + ": enter");
 
-            //if (!ReferenceEquals(Connection, null))
-            {
-                // TODO Connection.Interrupted
-                // Connection.Interrupted = true;
-            }
+            _DebugThreadId();
+            Connection.CancelOperation();
 
-            Debug.WriteLine("LEAVE IrbisBusyManager._BreakPressed");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_BreakPressed) + ": leave");
         }
 
         private void _BusyChanged
@@ -144,21 +144,17 @@ namespace ManagedIrbis.WinForms
                 EventArgs e
             )
         {
-            Debug.WriteLine("ENTER IrbisBusyManager._BusyChanged");
-            Debug.WriteLine("BUSY=" + Busy);
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_BusyChanged) + ": enter");
+            Magna.Debug(nameof(BusyManager) + ": Busy=" + Busy);
 
-            if (!ReferenceEquals(sender, Connection))
-            {
-                throw new ApplicationException("Bad sender");
-            }
+            _DebugThreadId();
 
             if (Busy)
             {
                 // Началось обращение к серверу
                 _counter++;
                 _workDone = false;
-                _uiThread = new Thread(_ThreadMethod1)
+                _uiThread = new Thread(_UiThreadMethod)
                 {
                     IsBackground = true,
                     Name = "IrbisBusyManager" + _counter
@@ -177,7 +173,7 @@ namespace ManagedIrbis.WinForms
                 _FormCleanup();
             }
 
-            Debug.WriteLine("LEAVE IrbisBusyManager._BusyChanged");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_BusyChanged) + ": leave");
         }
 
         /// <summary>
@@ -187,30 +183,32 @@ namespace ManagedIrbis.WinForms
         /// Основной пользовательский интерфейс при этом
         /// может блокироваться клиентом.
         /// </summary>
-        private void _ThreadMethod1()
+        private void _UiThreadMethod()
         {
-            Debug.WriteLine("ENTER IrbisBusyManager._ThreadMethod1");
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_UiThreadMethod) + ": enter");
 
+            _DebugThreadId();
             if (Delay > 0)
             {
-                _waitEvent = new ManualResetEvent(false);
-                _waitEvent.WaitOne(Delay);
+                _waitEvent = new ManualResetEventSlim(false);
+                _waitEvent.Wait(Delay);
             }
 
             if (!_workDone)
             {
                 try
                 {
-                    _waitForm = new IrbisBusyForm();
+                    _waitForm = new BusyForm();
                     if (!ReferenceEquals(_formTitle, null))
                     {
                         _waitForm.SetTitle(_formTitle);
                     }
+
                     if (!ReferenceEquals(_formMessage, null))
                     {
                         _waitForm.SetMessage(_formMessage);
                     }
+
                     _waitForm.BreakPressed += _BreakPressed;
                     _waitForm.ShowDialog();
                 }
@@ -220,13 +218,14 @@ namespace ManagedIrbis.WinForms
                 }
             }
 
-            Debug.WriteLine("LEAVE IrbisBusyManager._ThreadMethod1");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_UiThreadMethod) + ": leave");
         }
 
         private void _FormCleanup()
         {
-            Debug.WriteLine("ENTER IrbisBusyManager._FormCleanup");
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_FormCleanup) + ": enter");
+
+            _DebugThreadId();
 
             if (!ReferenceEquals(_waitForm, null))
             {
@@ -242,22 +241,18 @@ namespace ManagedIrbis.WinForms
                 }
             }
 
-            Debug.WriteLine("LEAVE IrbisBusyManager._FormCleanup");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_FormCleanup) + ": leave");
         }
 
         private void _ClientCleanup()
         {
-            Debug.WriteLine("ENTER IrbisBusyManager._ClientCleanup");
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_ClientCleanup) + ": enter");
 
-            //if (!ReferenceEquals(Connection, null))
-            {
-                Connection.BusyChanged -= _BusyChanged;
-                Connection.Disposing -= _ClientDisposing;
-                //Connection = null;
-            }
+            _DebugThreadId();
+            Busy.StateChanged -= _BusyChanged;
+            Busy.Disposing -= _ConnectionDisposing;
 
-            Debug.WriteLine("LEAVE IrbisBusyManager._ClientCleanup");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(_ClientCleanup) + ": leave");
         }
 
         #endregion
@@ -272,9 +267,9 @@ namespace ManagedIrbis.WinForms
                 string title
             )
         {
-            Debug.WriteLine("ENTER IrbisBusyManager.SetTitle");
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(SetTitle) + ": enter");
 
+            _DebugThreadId();
             _formTitle = title;
 
             if (!ReferenceEquals(_waitForm, null))
@@ -282,7 +277,7 @@ namespace ManagedIrbis.WinForms
                 _waitForm.Invoke((MethodInvoker) (() => _waitForm.SetTitle(title)));
             }
 
-            Debug.WriteLine("LEAVE IrbisBusyManager.SetTitle");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(SetTitle) + ": leave");
         }
 
         /// <summary>
@@ -293,9 +288,9 @@ namespace ManagedIrbis.WinForms
                 string message
             )
         {
-            Debug.WriteLine("ENTER IrbisBusyManager.SetMessage");
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(SetMessage) + ": enter");
 
+            _DebugThreadId();
             _formMessage = message;
 
             if (!ReferenceEquals(_waitForm, null))
@@ -303,7 +298,7 @@ namespace ManagedIrbis.WinForms
                 _waitForm.Invoke((MethodInvoker) (() => _waitForm.SetMessage(message)));
             }
 
-            Debug.WriteLine("LEAVE IrbisBusyManager.SetMessage");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(SetMessage) + ": leave");
         }
 
         #endregion
@@ -316,17 +311,19 @@ namespace ManagedIrbis.WinForms
                 bool disposing
             )
         {
-            Debug.WriteLine("ENTER IrbisBusyManager.Dispose(bool)");
-            _DebugThreadName();
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(Dispose) + ": enter: disposing=" + disposing);
 
+            _DebugThreadId();
             _FormCleanup();
             _ClientCleanup();
 
             base.Dispose(disposing);
 
-            Debug.WriteLine("LEAVE IrbisBusyManager.Dispose(bool)");
+            Magna.Debug(nameof(BusyManager) + "::" + nameof(Dispose) + ": leave");
         }
 
         #endregion
-    }
-}
+
+    } // class BusyManager
+
+} //

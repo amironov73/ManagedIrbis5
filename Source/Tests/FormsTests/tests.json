@@ -225,7 +225,7 @@
   },
   {
     "class": "FormsTests.BusyControllerTest",
-    "title": "BusyControllerTest"
+    "title": "BusyController"
   },
   {
     "class": "FormsTests.InputLanguageIndicatorTest",

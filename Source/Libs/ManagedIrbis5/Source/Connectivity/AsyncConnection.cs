@@ -27,7 +27,7 @@ using System.Threading.Tasks;
 using AM;
 using AM.IO;
 using AM.PlatformAbstraction;
-
+using AM.Threading;
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
@@ -88,7 +88,7 @@ namespace ManagedIrbis
         public bool Connected { get; protected internal set; }
 
         /// <inheritdoc cref="IIrbisProvider.Busy"/>
-        public bool Busy { get; protected internal set; }
+        public BusyState Busy { get; protected internal set; }
 
         /// <inheritdoc cref="IIrbisProvider.LastError"/>
         public int LastError { get; protected internal set; }
@@ -136,6 +136,7 @@ namespace ManagedIrbis
                 IServiceProvider provider
             )
         {
+            Busy = new BusyState();
             Socket = socket;
             socket.Connection = this;
             _cancellation = new CancellationTokenSource();
@@ -1061,7 +1062,9 @@ namespace ManagedIrbis
         {
             if (Connected)
             {
+                await Disposing.RaiseAsync(this);
                 await DisconnectAsync().ConfigureAwait(false);
+                Busy.Dispose();
             }
         } // method DisposeAsync
 

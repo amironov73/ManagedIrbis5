@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
@@ -14,12 +15,10 @@
 
 #region Using directives
 
-using System;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
-using AM;
 using AM.Threading;
 using AM.Windows.Forms;
 
@@ -76,24 +75,24 @@ namespace FormsTests
             };
             controller.Controls.Add(firstButton);
             controller.Controls.Add(secondButton);
-            controller.ExceptionOccur += (sender, args) =>
+            controller.ExceptionOccur += (_, args) =>
             {
                 ExceptionBox.Show(ownerWindow, args.Exception);
             };
 
-            Action action = () =>
+            void SleepAction()
             {
                 Thread.Sleep(3000);
+            }
+
+            firstButton.Click += (_, _) =>
+            {
+                controller.Run(SleepAction);
             };
 
-            firstButton.Click += (sender, args) =>
+            secondButton.Click += (_, _) =>
             {
-                controller.Run(action);
-            };
-
-            secondButton.Click += (sender, args) =>
-            {
-                controller.RunAsync(action);
+                controller.RunAsync(SleepAction);
             };
 
             form.ShowDialog(ownerWindow);

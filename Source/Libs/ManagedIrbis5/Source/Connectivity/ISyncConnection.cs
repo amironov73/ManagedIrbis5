@@ -16,12 +16,7 @@
 
 #region Using directives
 
-using AM.IO;
-using AM.PlatformAbstraction;
-
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Menus;
-using ManagedIrbis.Pft;
 
 #endregion
 
@@ -36,6 +31,15 @@ namespace ManagedIrbis
         : ISyncProvider,
         IConnectionSettings
     {
+        /// <summary>
+        /// Обращение к серверу ИРБИС64 синхронным образом.
+        /// </summary>
+        /// <param name="query">Запрос.</param>
+        /// <returns>Возвращенный сервером ответ
+        /// либо <c>null</c>, если произошла
+        /// ошибка сетевого обмена.</returns>
         Response? ExecuteSync(SyncQuery query);
-    }
-}
+
+    } // interface ISyncConnection
+
+} // namespace ManagedIrbis

@@ -20,13 +20,12 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AM.IO;
+using AM;
 using AM.PlatformAbstraction;
+using AM.Threading;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Menus;
-using ManagedIrbis.Pft;
 
 #endregion
 
@@ -42,6 +41,18 @@ namespace ManagedIrbis
         : ISyncProvider,
         IAsyncProvider
     {
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public NullProvider()
+        {
+            Busy = new BusyState();
+        }
+
+        #endregion
+
         #region ISyncProvider members
 
         public event EventHandler? Disposing;
@@ -59,28 +70,39 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public string GetGeneration()
+        public string GetGeneration() => "64";
+
+        /// <inheritdoc cref="IIrbisProvider.Configure"/>
+        public void Configure
+            (
+                string configurationString
+            )
         {
             throw new NotImplementedException();
         }
 
-        public void Configure(string configurationString)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         void IDisposable.Dispose()
         {
-            Disposing?.Invoke(this, EventArgs.Empty);
+            Busy.Dispose();
+            Disposing.Raise(this);
         }
 
-        public ValueTask DisposeAsync()
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public async ValueTask DisposeAsync()
         {
-            Disposing?.Invoke(this, EventArgs.Empty);
-            return ValueTask.CompletedTask;
+            Busy.Dispose();
+            await Disposing.RaiseAsync(this);
         }
 
-        public object? GetService(Type serviceType)
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService
+            (
+                Type serviceType
+            )
         {
             throw new NotImplementedException();
         }
@@ -98,10 +120,18 @@ namespace ManagedIrbis
 
         public void SetLastError(int code) => LastError = code;
 
+        /// <inheritdoc cref="IIrbisProvider.Database"/>
         public string? Database { get; set; }
+
+        /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; private set; }
-        public bool Busy { get; private set; }
+
+        /// <inheritdoc cref="IIrbisProvider.Busy"/>
+        public BusyState Busy { get; private set; }
+
+        /// <inheritdoc cref="IIrbisProvider.LastError"/>
         public int LastError { get; private set; }
+
         public void CancelOperation()
         {
             throw new NotImplementedException();
@@ -456,20 +486,16 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateUserListAsync(IEnumerable<UserInfo> users)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<bool> UpdateUserListAsync(IEnumerable<UserInfo> users) =>
+            Task.FromResult<bool>(true);
 
-        public Task<bool> WriteTextFileAsync(FileSpecification specification)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc cref="IAsyncProvider.WriteTextFileAsync"/>
+        public Task<bool> WriteTextFileAsync ( FileSpecification specification ) =>
+            Task.FromResult<bool>(true);
 
-        public Task<bool> WriteRecordAsync(WriteRecordParameters parameters)
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc cref="IAsyncProvider.WriteRecordAsync"/>
+        public Task<bool> WriteRecordAsync ( WriteRecordParameters parameters ) =>
+            Task.FromResult(true);
 
         #endregion
 

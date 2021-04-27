@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -30,6 +31,11 @@ namespace AM.Windows.Forms
     public static class ApplicationUtility
     {
         #region Private members
+
+        /// <summary>
+        /// Здесь мы считаем фоновые потоки для UI.
+        /// </summary>
+        private static int _uiThreadCounter;
 
         private static void DiscoverExceptions
             (
@@ -276,6 +282,25 @@ namespace AM.Windows.Forms
 
             return result;
         } // method Run
+
+        /// <summary>
+        /// Запускает новый UI-поток.
+        /// </summary>
+        public static Thread RunNewUiThread
+            (
+                ThreadStart start
+            )
+        {
+            var result = new Thread(start)
+            {
+                IsBackground = true,
+                Name = "UiThread" + ++_uiThreadCounter
+            };
+            result.SetApartmentState(ApartmentState.STA);
+            result.Start();
+
+            return result;
+        } // method RunNewUiThread
 
         /// <summary>
         /// Небольшое ожидание

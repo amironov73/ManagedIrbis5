@@ -20,9 +20,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-
+using AM;
 using AM.IO;
 using AM.PlatformAbstraction;
+using AM.Threading;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
@@ -43,49 +44,77 @@ namespace ManagedIrbis.Direct
     {
         public event EventHandler? Disposing;
 
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
         public DirectProvider()
         {
+            Busy = new BusyState();
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
-        public DirectProvider(string rootPath)
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="rootPath">Корневой путь.</param>
+        public DirectProvider
+            (
+                string rootPath
+            )
         {
+            Busy = new BusyState();
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
-        public bool FileExist(FileSpecification specification)
+        /// <inheritdoc cref="ISyncProvider.FileExist"/>
+        public bool FileExist
+            (
+                FileSpecification specification
+            )
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
         public string GetGeneration()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc cref="IIrbisProvider.PlatformAbstraction"/>
         public PlatformAbstractionLayer PlatformAbstraction
         {
             get;
             set;
         }
 
-        public void Configure(string configurationString)
+        /// <inheritdoc cref="IIrbisProvider.Configure"/>
+        public void Configure
+            (
+                string configurationString
+            )
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            Disposing?.Invoke(this, EventArgs.Empty);
+            Disposing.Raise(this);
         }
 
+        /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
         public ValueTask DisposeAsync()
         {
             Dispose();
             return ValueTask.CompletedTask;
         }
 
-        public object? GetService(Type serviceType)
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService
+            (
+                Type serviceType
+            )
         {
             throw new NotImplementedException();
         }
@@ -103,7 +132,7 @@ namespace ManagedIrbis.Direct
         public event EventHandler? BusyChanged;
         public string? Database { get; set; } = "IBIS";
         public bool Connected { get; private set; }
-        public bool Busy { get; private set; }
+        public BusyState Busy { get; private set; }
         public int LastError { get; private set; }
         public void CancelOperation()
         {
