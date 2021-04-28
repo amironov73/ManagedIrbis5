@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -26,7 +27,7 @@ namespace AM.Threading
     /// <summary>
     /// Обертка для захвата и освобождения <see cref="BusyState"/>.
     /// </summary>
-    public struct BusyGuard
+    public readonly struct BusyGuard
         : IDisposable
     {
         #region Properties
@@ -113,5 +114,7 @@ namespace AM.Threading
         }
 
         #endregion
-    }
-}
+
+    } // struct BusyGuard
+
+} // namespace AM.Threading
