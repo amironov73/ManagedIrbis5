@@ -22,6 +22,7 @@ using AM.Collections;
 using AM.ConsoleIO;
 
 using ManagedIrbis.Direct;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -68,15 +69,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 string folder
             )
         {
-            Provider = new DirectProvider(string.Empty);
+            Provider = new NullProvider();
             Folder = folder;
             Tests = new NonNullCollection<PftTest>();
             Results = new NonNullCollection<PftTestResult>();
         }
-
-        #endregion
-
-        #region Private members
 
         #endregion
 

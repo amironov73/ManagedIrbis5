@@ -5,6 +5,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
 using System;
 using System.IO;

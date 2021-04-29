@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 // ReSharper disable UnusedType.Global
 
 /* PftContext.cs -- контекст, в котором исполняется PFT-скрипт
@@ -20,11 +21,11 @@ using System.Collections.Generic;
 using AM;
 using AM.Text;
 
-using ManagedIrbis.Direct;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Text;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -33,7 +34,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// Контекст, в котором исполняется PFT-скрипт
+    /// Контекст, в котором исполняется PFT-скрипт.
     /// </summary>
     public sealed class PftContext
         : MarshalByRefObject,
@@ -42,12 +43,18 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Properties
 
         /// <summary>
-        /// Provider.
+        /// ИРБИС-провайдер.
+        /// По умолчанию пустой провайдер (ничего не делает).
+        /// Чтобы скрипт делал хоть что-нибудь осмысленное,
+        /// провайдер нужно заменить (установить с помощью
+        /// <see cref="SetProvider"/>) на нормальный,
+        /// например, <see cref="ManagedIrbis.Direct.DirectProvider"/>.
         /// </summary>
         public ISyncProvider Provider { get; private set; }
 
         /// <summary>
-        /// Text driver.
+        /// Драйвер вывода текста.
+        /// По умолчанию -- простой плоский текст.
         /// </summary>
         public TextDriver Driver { get; }
 
@@ -62,7 +69,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public Record? Record { get; set; }
 
         /// <summary>
-        /// Alternative record (for nested context).
+        /// Альтернативная форматируемая запись (для вложенного контекста).
         /// </summary>
         public Record? AlternativeRecord { get; set; }
 
@@ -171,19 +178,21 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
+        /// <param name="parent">Родительский контекст.
+        /// Если не <c>null</c>, то от него наследуются
+        /// ИРБИС-провайдер, драйвер текста, глобальные переменные
+        /// и прочее.</param>
         public PftContext
             (
                 PftContext? parent
             )
         {
-            Magna.Trace("PftContext::Constructor");
-
             Parent = parent;
 
             Provider = ReferenceEquals(parent, null)
-                ? new DirectProvider(string.Empty)
+                ? new NullProvider()
                 : parent.Provider;
 
             var parentBuffer = parent?.Output;
@@ -222,11 +231,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             Functions = new PftFunctionManager();
 
             Debugger = parent?.Debugger;
-        }
-
-        #endregion
-
-        #region Private members
+        } // constructor
 
         #endregion
 
@@ -240,9 +245,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftNode node
             )
         {
-            Magna.Trace("PftContext::ActivateDebugger");
+            Magna.Trace(nameof(PftContext) + "::" + nameof(ActivateDebugger));
 
-            if (!ReferenceEquals(Debugger, null))
+            if (Debugger is not null)
             {
                 var args = new PftDebugEventArgs
                     {
@@ -259,8 +264,6 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext ClearAll()
         {
-            Magna.Trace("PftContext::ClearAll");
-
             Output.ClearText();
             Output.ClearError();
             Output.ClearWarning();
@@ -273,8 +276,6 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext ClearText()
         {
-            Magna.Trace("PftContext::ClearText");
-
             Output.ClearText();
 
             return this;
@@ -289,10 +290,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int count = int.MaxValue
             )
         {
-            Magna.Trace("PftContext::DoRepeatableAction");
-
             count = Math.Min(count, PftConfig.MaxRepeat);
-
             for (Index = 0; Index < count; Index++)
             {
                 OutputFlag = false;
@@ -555,7 +553,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public void Pop()
         {
-            if (!ReferenceEquals(Parent, null))
+            if (Parent is not null)
             {
                 Parent.BreakFlag |= BreakFlag;
                 Parent.VMonitor |= VMonitor;
@@ -576,13 +574,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Set provider.
         /// </summary>
-        public void SetProvider
-            (
-                ISyncProvider provider
-            )
-        {
-            Provider = provider;
-        }
+        public void SetProvider (ISyncProvider provider) => Provider = provider;
 
         /// <summary>
         /// Set variables.
@@ -601,7 +593,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext Write
             (
-                PftNode? node,
+                PftNode? _,
                 string? output
             )
         {
@@ -619,7 +611,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftContext WriteAndSetFlag
             (
-                PftNode? node,
+                PftNode? _,
                 string? output
             )
         {
@@ -634,28 +626,28 @@ namespace ManagedIrbis.Pft.Infrastructure
         }
 
         /// <summary>
-        /// Write line.
+        /// Вывод текста с последующим переводом строки.
         /// </summary>
         public PftContext WriteLine
             (
-                PftNode? node,
-                string? value
+                PftNode? _,
+                string? text
             )
         {
-            if (!string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(text))
             {
-                Output.WriteLine(value);
+                Output.WriteLine(text);
             }
 
             return this;
         }
 
         /// <summary>
-        /// Write line.
+        /// Перевод строки.
         /// </summary>
         public PftContext WriteLine
             (
-                PftNode? node
+                PftNode? _
             )
         {
             Output.WriteLine();
@@ -668,23 +660,17 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose()
-        {
-            Magna.Trace("PftContext::Dispose");
-
-            Provider.Dispose();
-        }
+        public void Dispose() => Provider.Dispose();
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Output.ToString();
-        }
+        public override string ToString() => Output.ToString();
 
         #endregion
-    }
-}
+
+    } // class PftContext
+
+} // namespace ManagedIrbis.Pft.Infrastructure
