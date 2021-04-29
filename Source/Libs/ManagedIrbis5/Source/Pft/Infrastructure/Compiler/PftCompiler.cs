@@ -24,8 +24,8 @@ using AM;
 using AM.Collections;
 using AM.Text.Output;
 
-using ManagedIrbis.Direct;
 using ManagedIrbis.Pft.Infrastructure.Ast;
+using ManagedIrbis.Providers;
 
 using Microsoft.CSharp;
 
@@ -113,7 +113,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             Nodes = new NodeDictionary();
             Indexes = new IndexDictionary();
             Output = new StringWriter();
-            Provider = new DirectProvider(string.Empty);
+            Provider = new NullProvider();
             OutputPath = Path.GetTempPath();
             References = new NonNullCollection<string>
             {

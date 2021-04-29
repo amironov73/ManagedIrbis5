@@ -63,15 +63,6 @@ namespace ManagedIrbis.Direct
 
         #region Construction
 
-        // /// <summary>
-        // /// Конструктор.
-        // /// </summary>
-        // public DirectProvider()
-        // {
-        //     Busy = new BusyState();
-        //     PlatformAbstraction = PlatformAbstractionLayer.Current;
-        // }
-
         /// <summary>
         /// Конструктор.
         /// </summary>

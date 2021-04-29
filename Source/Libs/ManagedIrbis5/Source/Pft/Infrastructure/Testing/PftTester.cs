@@ -21,7 +21,6 @@ using AM;
 using AM.Collections;
 using AM.ConsoleIO;
 
-using ManagedIrbis.Direct;
 using ManagedIrbis.Providers;
 
 #endregion

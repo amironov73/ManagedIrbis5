@@ -22,8 +22,8 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
-using ManagedIrbis.Direct;
 using ManagedIrbis.Pft;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -71,7 +71,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordSorter()
         {
-            Provider = new DirectProvider(string.Empty);
+            Provider = new NullProvider();
         } // constructor
 
         /// <summary>

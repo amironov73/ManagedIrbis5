@@ -7,6 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
 /* RecordFilter.cs -- фильтр для библиографических записей
@@ -20,8 +21,8 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
-using ManagedIrbis.Direct;
 using ManagedIrbis.Pft;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -69,7 +70,7 @@ namespace ManagedIrbis.Reports
         /// </summary>
         public RecordFilter()
         {
-            Provider = new DirectProvider(string.Empty);
+            Provider = new NullProvider();
         } // constructor
 
         /// <summary>
