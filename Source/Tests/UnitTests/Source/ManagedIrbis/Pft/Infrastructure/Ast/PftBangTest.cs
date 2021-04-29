@@ -2,12 +2,12 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-using ManagedIrbis;
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Text;
+using ManagedIrbis.Providers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

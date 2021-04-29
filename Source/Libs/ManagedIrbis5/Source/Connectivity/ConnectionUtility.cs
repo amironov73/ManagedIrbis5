@@ -6,7 +6,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ConnectionUtility.cs -- разнообразные методы для работы с подключением
@@ -15,12 +18,10 @@
 
 #region Using directives
 
-using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
+
 using AM.Configuration;
 
 #endregion
@@ -55,7 +56,7 @@ namespace ManagedIrbis
         /// Стандартные наименования для ключа строки подключения
         /// к серверу ИРБИС64.
         /// </summary>
-        public static string[] StandardConnectionStrings =
+        public static readonly string[] StandardConnectionStrings =
             {
                 "irbis-connection",
                 "irbis-connection-string",
@@ -136,7 +137,7 @@ namespace ManagedIrbis
                     );
             }
 
-            var result = ConnectionFactory.Shared.CreateSyncConnection();
+            ISyncProvider result = ConnectionFactory.Shared.CreateSyncConnection();
             result.ParseConnectionString(connectionString);
 
             return result;
@@ -155,7 +156,7 @@ namespace ManagedIrbis
             var connectionString = File.ReadLines(fileName, Encoding.UTF8)
                 .First().Trim();
 
-            var result = ConnectionFactory.Shared.CreateSyncConnection();
+            ISyncProvider result = ConnectionFactory.Shared.CreateSyncConnection();
             connectionString = IrbisUtility.DecryptConnectionString
                 (
                     connectionString,
@@ -171,7 +172,7 @@ namespace ManagedIrbis
         /// </summary>
         public static void ParseConnectionString
             (
-                this SyncConnection connection,
+                this IConnectionSettings connection,
                 string? connectionString
             )
         {
@@ -190,7 +191,7 @@ namespace ManagedIrbis
         /// </summary>
         public static void ParseConnectionString
             (
-                this AsyncConnection connection,
+                this IIrbisProvider provider,
                 string? connectionString
             )
         {
@@ -201,8 +202,20 @@ namespace ManagedIrbis
 
             var settings = new ConnectionSettings();
             settings.ParseConnectionString(connectionString);
-            settings.Apply(connection);
+            settings.Apply(provider);
         }
+
+        /// <summary>
+        /// Разбор строки подключения.
+        /// </summary>
+        public static void ParseConnectionString(this IAsyncConnection connection, string? connectionString) =>
+            ParseConnectionString((IAsyncProvider) connection, connectionString);
+
+        /// <summary>
+        /// Разбор строки подключения.
+        /// </summary>
+        public static void ParseConnectionString(this ISyncConnection connection, string? connectionString) =>
+            ParseConnectionString((ISyncProvider) connection, connectionString);
 
         #endregion
 

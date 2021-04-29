@@ -31,7 +31,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
         /// <summary>
         /// Подключение.
         /// </summary>
-        AsyncConnection? Connection { get; set; }
+        IAsyncConnection? Connection { get; set; }
 
         /// <summary>
         /// Собственно общение с сервером -- в асинхронном режиме.

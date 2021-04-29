@@ -181,7 +181,7 @@ namespace UnitTests.AM.Threading
             var second = bytes.RestoreObjectFromMemory<BusyState>()!;
 
             Assert.IsNotNull(second);
-            Assert.AreEqual(first.Busy, second.Busy);
+            Assert.AreEqual(first.State, second.State);
             Assert.AreEqual(first.UseAsync, second.UseAsync);
         }
 
@@ -191,10 +191,10 @@ namespace UnitTests.AM.Threading
             using var state = new BusyState();
             _TestSerialization(state);
 
-            state.SetState(!state.Busy);
+            state.SetState(!state.State);
             _TestSerialization(state);
 
-            state.SetState(!state.Busy);
+            state.SetState(!state.State);
             _TestSerialization(state);
         }
 

@@ -1,13 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// ReSharper disable CheckNamespace
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Collections;
 
-// ReSharper disable CheckNamespace
+#nullable enable
 
 namespace UnitTests.AM.Collections
 {
     [TestClass]
-    public class CaseInsensitiveDictionaryTest
+    public sealed class CaseInsensitiveDictionaryTest
     {
         [TestMethod]
         public void CaseInsensitiveDictionary_Construction_1()

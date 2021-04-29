@@ -19,7 +19,7 @@ using System;
 using System.Reflection;
 using AM;
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Providers;
 
 #endregion
 

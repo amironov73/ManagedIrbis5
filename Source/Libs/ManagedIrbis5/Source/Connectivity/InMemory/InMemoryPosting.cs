@@ -9,39 +9,43 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* InMemoryTerm.cs -- термин поискового словаря в оперативной памяти
+/* InMemoryPosting.cs -- постинг термина в оперативной памяти
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System.Collections.Generic;
-
-#endregion
 
 #nullable enable
 
 namespace ManagedIrbis.InMemory
 {
     /// <summary>
-    /// Термин поискового словаря в оперативной памяти.
+    /// Постинг термина в оперативной памяти.
     /// </summary>
-    public class InMemoryTerm
+    public sealed class InMemoryPosting
     {
         #region Properties
 
         /// <summary>
-        /// Текст.
+        /// MFN.
         /// </summary>
-        public string? Text { get; set; }
+        public int Mfn { get; set; }
 
         /// <summary>
-        /// Постинги.
+        /// Метка поля.
         /// </summary>
-        public List<InMemoryPosting>? Postings { get; set; }
+        public int Tag { get; set; }
+
+        /// <summary>
+        /// Повторение поля.
+        /// </summary>
+        public int Occurrence { get; set; }
+
+        /// <summary>
+        /// Позиция в поле.
+        /// </summary>
+        public int Position { get; set; }
 
         #endregion
 
-    } // class InMemoryTerm
+    } // class InMemoryPosting
 
 } // namespace ManagedIrbis.InMemory

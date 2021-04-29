@@ -33,7 +33,7 @@ namespace ManagedIrbis.InMemory
     /// Инвертированный файл, расположенный в оперативной памяти.
     /// </summary>
     public class InMemoryInverted
-        : CaseInsensitiveDictionary <InMemoryTerm>
+        : CaseInsensitiveSortedList <InMemoryTerm>
     {
         #region Public methods
 

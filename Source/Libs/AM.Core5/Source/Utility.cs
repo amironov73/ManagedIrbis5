@@ -739,7 +739,10 @@ namespace AM
         /// Бросает исключение, если переданная строка пробельная
         /// или равна <c>null</c>.
         /// </summary>
-        public static string ThrowIfNullOrWhiteSpace(this string? value)
+        public static string ThrowIfNullOrWhiteSpace
+            (
+                this string? value
+            )
         {
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -753,7 +756,28 @@ namespace AM
         /// Бросает исключение, если переданная строка пробельная
         /// или равна <c>null</c>.
         /// </summary>
-        public static ReadOnlySpan<char> ThrowIfNullOrWhiteSpace(this ReadOnlySpan<char> value)
+        public static string ThrowIfNullOrWhiteSpace
+            (
+                this string? value,
+                string name
+            )
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value!;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если переданная строка пробельная
+        /// или равна <c>null</c>.
+        /// </summary>
+        public static ReadOnlySpan<char> ThrowIfNullOrWhiteSpace
+            (
+                this ReadOnlySpan<char> value
+            )
         {
             if (value.IsEmpty || value.IsWhiteSpace())
             {
@@ -762,6 +786,781 @@ namespace AM
 
             return value;
         }
+
+        /// <summary>
+        /// Бросает исключение, если переданная строка пробельная
+        /// или равна <c>null</c>.
+        /// </summary>
+        public static ReadOnlySpan<char> ThrowIfNullOrWhiteSpace
+            (
+                this ReadOnlySpan<char> value,
+                string name
+            )
+        {
+            if (value.IsEmpty || value.IsWhiteSpace())
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static int ThrowIfZero
+            (
+                this int value
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static int ThrowIfZero
+            (
+                this int value,
+                string message
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException(message);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static uint ThrowIfZero
+            (
+                this uint value
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static uint ThrowIfZero
+            (
+                this uint value,
+                string message
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException(message);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static short ThrowIfZero
+            (
+                this short value
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static short ThrowIfZero
+            (
+                this short value,
+                string message
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException(message);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static ushort ThrowIfZero
+            (
+                this ushort value
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static ushort ThrowIfZero
+            (
+                this ushort value,
+                string message
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException(message);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static long ThrowIfZero
+            (
+                this long value
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static long ThrowIfZero
+            (
+                this long value,
+                string message
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException(message);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static ulong ThrowIfZero
+            (
+                this ulong value
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static ulong ThrowIfZero
+            (
+                this ulong value,
+                string message
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException(message);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static double ThrowIfZero
+            (
+                this double value
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static double ThrowIfZero
+            (
+                this double value,
+                string message
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException(message);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static decimal ThrowIfZero
+            (
+                this decimal value
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число равно нулю.
+        /// </summary>
+        public static decimal ThrowIfZero
+            (
+                this decimal value,
+                string message
+            )
+        {
+            if (value == 0)
+            {
+                throw new ArgumentException(message);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static int ThrowIfNegative
+            (
+                this int value
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static int ThrowIfNegative
+            (
+                this int value,
+                string name
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static short ThrowIfNegative
+            (
+                this short value
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static short ThrowIfNegative
+            (
+                this short value,
+                string name
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static long ThrowIfNegative
+            (
+                this long value
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static long ThrowIfNegative
+            (
+                this long value,
+                string name
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static double ThrowIfNegative
+            (
+                this double value
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static double ThrowIfNegative
+            (
+                this double value,
+                string name
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static decimal ThrowIfNegative
+            (
+                this decimal value
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число отрицательное.
+        /// </summary>
+        public static decimal ThrowIfNegative
+            (
+                this decimal value,
+                string name
+            )
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static int ThrowIfOutOfTheRange
+            (
+                this int value,
+                int minimum,
+                int maximum
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static int ThrowIfOutOfTheRange
+            (
+                this int value,
+                int minimum,
+                int maximum,
+                string name
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static uint ThrowIfOutOfTheRange
+            (
+                this uint value,
+                uint minimum,
+                uint maximum
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static uint ThrowIfOutOfTheRange
+            (
+                this uint value,
+                uint minimum,
+                uint maximum,
+                string name
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static short ThrowIfOutOfTheRange
+            (
+                this short value,
+                short minimum,
+                short maximum
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static short ThrowIfOutOfTheRange
+            (
+                this short value,
+                short minimum,
+                short maximum,
+                string name
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static ushort ThrowIfOutOfTheRange
+            (
+                this ushort value,
+                ushort minimum,
+                ushort maximum
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static ushort ThrowIfOutOfTheRange
+            (
+                this ushort value,
+                ushort minimum,
+                ushort maximum,
+                string name
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static long ThrowIfOutOfTheRange
+            (
+                this long value,
+                long minimum,
+                long maximum
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static long ThrowIfOutOfTheRange
+            (
+                this long value,
+                long minimum,
+                long maximum,
+                string name
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static ulong ThrowIfOutOfTheRange
+            (
+                this ulong value,
+                ulong minimum,
+                ulong maximum
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static ulong ThrowIfOutOfTheRange
+            (
+                this ulong value,
+                ulong minimum,
+                ulong maximum,
+                string name
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static double ThrowIfOutOfTheRange
+            (
+                this double value,
+                double minimum,
+                double maximum
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static double ThrowIfOutOfTheRange
+            (
+                this double value,
+                double minimum,
+                double maximum,
+                string name
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static decimal ThrowIfOutOfTheRange
+            (
+                this decimal value,
+                decimal minimum,
+                decimal maximum
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException();
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
+
+        /// <summary>
+        /// Бросает исключение, если число не попадает в указанный интервал.
+        /// </summary>
+        // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        public static decimal ThrowIfOutOfTheRange
+            (
+                this decimal value,
+                decimal minimum,
+                decimal maximum,
+                string name
+            )
+        {
+            if (value < minimum || value > maximum)
+            {
+                throw new ArgumentException(name);
+            }
+
+            return value;
+        }
+        // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Превращает объект в видимую строку.

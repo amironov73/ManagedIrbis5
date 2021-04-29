@@ -19,6 +19,7 @@
 
 using System;
 using System.Threading;
+using AM;
 using AM.PlatformAbstraction;
 using AM.Threading;
 
@@ -36,6 +37,7 @@ namespace ManagedIrbis
         : IDisposable,
         IAsyncDisposable,
         IServiceProvider,
+        IGetLastError,
         ICancellable
     {
         #region Events
@@ -68,12 +70,6 @@ namespace ManagedIrbis
         /// Автоматически устанавливается/сбрасывается клиентом.
         /// </summary>
         bool Connected { get; }
-
-        /// <summary>
-        /// Код ошибки последней выполненной операции.
-        /// Значение больше или равное 0 означает отсутствие ошибки.
-        /// </summary>
-        int LastError { get; }
 
         /// <summary>
         /// Слой абстракции от платформы.

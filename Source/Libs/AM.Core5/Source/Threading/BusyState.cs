@@ -55,7 +55,7 @@ namespace AM.Threading
         /// <summary>
         /// Собственно состояние.
         /// </summary>
-        public bool Busy => !_waitHandle.IsSet;
+        public bool State => !_waitHandle.IsSet;
 
         /// <summary>
         /// Использовать асинхронный обработчик события?
@@ -73,7 +73,7 @@ namespace AM.Threading
 
         /// <summary>
         /// Конструктор.
-        /// Свежесозданное состояние "ресурс не занят".
+        /// Начальное состояние "ресурс не занят".
         /// </summary>
         public BusyState()
         {
@@ -143,7 +143,7 @@ namespace AM.Threading
                     + newState
                 );
 
-            if (newState != Busy)
+            if (newState != State)
             {
                 if (newState)
                 {
@@ -288,7 +288,7 @@ namespace AM.Threading
                 BusyState state
             )
         {
-            return state.Busy;
+            return state.State;
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace AM.Threading
                 BinaryWriter writer
             )
         {
-            writer.Write(Busy);
+            writer.Write(State);
             writer.Write(UseAsync);
         }
 
@@ -345,7 +345,7 @@ namespace AM.Threading
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Busy.ToString();
+        public override string ToString() => State.ToString();
 
         #endregion
 

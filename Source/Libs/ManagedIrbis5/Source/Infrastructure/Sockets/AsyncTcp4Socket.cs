@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,7 +36,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
     {
         #region IAsyncClientSocket members
 
-        public AsyncConnection? Connection { get; set; }
+        public IAsyncConnection? Connection { get; set; }
 
         /// <inheritdoc cref="IAsyncClientSocket.TransactAsync"/>
         public async Task<Response?> TransactAsync
@@ -46,7 +45,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
             )
         {
             var connection = Connection.ThrowIfNull();
-            connection.Cancellation.ThrowIfCancellationRequested();
+            connection.ThrowIfCancelled();
 
             using var client = new TcpClient();
             try
@@ -56,10 +55,13 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
             catch (Exception exception)
             {
-                Debug.WriteLine(exception.Message);
-                connection.LastError = -100_002;
-                return null;
+                Magna.TraceException(nameof(SyncTcp4Socket), exception);
+                connection.SetLastError(-100_002);
+
+                return default;
             }
+
+            connection.ThrowIfCancelled();
 
             var socket = client.Client;
             var length = asyncQuery.GetLength();
@@ -77,9 +79,10 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
             catch (Exception exception)
             {
-                Debug.WriteLine(exception.Message);
-                connection.LastError = -100_002;
-                return null;
+                Magna.TraceException(nameof(SyncTcp4Socket), exception);
+                connection.SetLastError(-100_002);
+
+                return default;
             }
 
             var result = new Response();
@@ -87,6 +90,8 @@ namespace ManagedIrbis.Infrastructure.Sockets
             {
                 while (true)
                 {
+                    connection.ThrowIfCancelled();
+
                     var buffer = new byte[2048];
                     var chunk = new ArraySegment<byte>(buffer, 0, buffer.Length);
                     var read = await socket.ReceiveAsync(chunk, SocketFlags.None);
@@ -101,14 +106,17 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
             catch (Exception exception)
             {
-                Debug.WriteLine(exception.Message);
-                connection.LastError = -100_002;
-                return null;
+                Magna.TraceException(nameof(SyncTcp4Socket), exception);
+                connection.SetLastError(-100_002);
+
+                return default;
             }
 
             return result;
         } // method TransactAsync
 
         #endregion
-    }
-}
+
+    } // class AsyncTcp4Socket
+
+} // namespace ManagedIrbis.Infrastructure.Sockets

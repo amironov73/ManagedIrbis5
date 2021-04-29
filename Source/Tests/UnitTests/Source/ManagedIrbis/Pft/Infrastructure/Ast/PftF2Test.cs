@@ -7,11 +7,11 @@ using System.IO;
 
 using AM.Text;
 
-using ManagedIrbis;
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
+using ManagedIrbis.Providers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

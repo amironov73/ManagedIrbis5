@@ -159,7 +159,7 @@ namespace AM.Windows.Forms
                     (
                         "BusyController::OnStateChanged: "
                         + "busy="
-                        + state.Busy
+                        + state.State
                     );
 
                 var eventArgs

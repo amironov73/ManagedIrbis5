@@ -18,8 +18,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AM;
 using AM.IO;
 using AM.PlatformAbstraction;
@@ -40,18 +42,35 @@ namespace ManagedIrbis.Direct
     /// Провайдер, работающий напрямую с файлами баз данных ИРБИС64.
     /// </summary>
     public class DirectProvider
-        : ISyncProvider
+        : ISyncProvider,
+          ISetLastError
     {
+        #region Events
+
+        /// <inheritdoc cref="IIrbisProvider.Disposing"/>
         public event EventHandler? Disposing;
 
+        #endregion
+
+        #region Properties
+
         /// <summary>
-        /// Конструктор.
+        /// Корневой путь для текущейго экземпляра провайдера.
         /// </summary>
-        public DirectProvider()
-        {
-            Busy = new BusyState();
-            PlatformAbstraction = PlatformAbstractionLayer.Current;
-        }
+        public string RootPath { get; }
+
+        #endregion
+
+        #region Construction
+
+        // /// <summary>
+        // /// Конструктор.
+        // /// </summary>
+        // public DirectProvider()
+        // {
+        //     Busy = new BusyState();
+        //     PlatformAbstraction = PlatformAbstractionLayer.Current;
+        // }
 
         /// <summary>
         /// Конструктор.
@@ -62,9 +81,20 @@ namespace ManagedIrbis.Direct
                 string rootPath
             )
         {
+            var fullPath = Path.GetFullPath(rootPath);
+            if (!Directory.Exists(fullPath))
+            {
+                throw new FileNotFoundException(fullPath);
+            }
+
+            RootPath = fullPath;
             Busy = new BusyState();
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
+
+        #endregion
+
+        #region ISyncProvider members
 
         /// <inheritdoc cref="ISyncProvider.FileExist"/>
         public bool FileExist
@@ -131,8 +161,18 @@ namespace ManagedIrbis.Direct
         public string? Database { get; set; } = "IBIS";
         public bool Connected { get; private set; }
         public BusyState Busy { get; private set; }
-        public int LastError { get; private set; }
+
+        /// <inheritdoc cref="IIrbisProvider.LastError"/>
+        public int LastError { get; set; }
+
+        /// <inheritdoc cref="ICancellable.CancelOperation"/>
         public void CancelOperation()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc cref="ICancellable.ThrowIfCancelled"/>
+        public void ThrowIfCancelled()
         {
             throw new NotImplementedException();
         }
@@ -321,6 +361,16 @@ namespace ManagedIrbis.Direct
         {
             throw new NotImplementedException();
         }
+
+        #endregion
+
+        #region ISetLastError members
+
+        /// <inheritdoc cref="ISetLastError.SetLastError"/>
+        int ISetLastError.SetLastError(int code) => LastError = code;
+
+        #endregion
+
     } // class DirectProvider
 
 } // namespace ManagedIrbis.Direct

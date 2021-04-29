@@ -12,7 +12,7 @@
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis.Providers
 {
     // TODO: вернуть наследование от ConnectionFactory
 
@@ -36,4 +36,4 @@ namespace ManagedIrbis
 
     } // class NullFactory
 
-} // namespace ManagedIrbis
+} // namespace ManagedIrbis.Providers

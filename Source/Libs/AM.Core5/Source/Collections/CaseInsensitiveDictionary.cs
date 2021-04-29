@@ -75,5 +75,7 @@ namespace AM.Collections
         }
 
         #endregion
-    }
-}
+
+    } // CaseInsensitiveDictionary
+
+} // namespace AM.Collections

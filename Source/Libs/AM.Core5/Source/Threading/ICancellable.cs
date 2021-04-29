@@ -34,6 +34,11 @@ namespace AM.Threading
         /// </summary>
         void CancelOperation();
 
+        /// <summary>
+        /// Бросает исключение, если операция была отменена.
+        /// </summary>
+        void ThrowIfCancelled();
+
     } // interface ICancellable
 
 } // namespace AM.Threading

@@ -34,6 +34,7 @@ using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mx.Commands;
 using ManagedIrbis.Mx.Infrastructrure;
 using ManagedIrbis.Pft.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 

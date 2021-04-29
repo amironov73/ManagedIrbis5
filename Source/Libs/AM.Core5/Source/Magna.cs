@@ -18,6 +18,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -90,6 +91,11 @@ namespace AM
         /// Общий логгер.
         /// </summary>
         public static ILogger Logger { get; private set; } = new NullLogger<Magna>();
+
+        /// <summary>
+        /// Глобальные опции программы.
+        /// </summary>
+        public static Dictionary<string, object?> GlobalOptions { get; } = new();
 
         #endregion
 

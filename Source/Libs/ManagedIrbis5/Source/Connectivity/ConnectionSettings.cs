@@ -266,6 +266,49 @@ namespace ManagedIrbis
         } // method Apply
 
         /// <summary>
+        /// Применение настроек к подключению.
+        /// </summary>
+        /// <param name="provider">Неактивное подключение.</param>
+        public void Apply
+            (
+                IIrbisProvider provider
+            )
+        {
+            if (provider.Connected)
+            {
+                throw new IrbisException("Already connected");
+            }
+
+            provider.Database = Database;
+
+            if (provider is IConnectionSettings connection)
+            {
+                if (!string.IsNullOrEmpty(Host))
+                {
+                    connection.Host = Host;
+                }
+
+                connection.Port = Port;
+
+                if (!string.IsNullOrEmpty(Username))
+                {
+                    connection.Username = Username;
+                }
+
+                if (!string.IsNullOrEmpty(Password))
+                {
+                    connection.Password = Password;
+                }
+
+                if (!string.IsNullOrEmpty(Workstation))
+                {
+                    connection.Workstation = Workstation;
+                }
+            }
+
+        } // method Apply
+
+        /// <summary>
         /// Clone.
         /// </summary>
         public ConnectionSettings Clone() => (ConnectionSettings)MemberwiseClone();

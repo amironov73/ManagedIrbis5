@@ -60,6 +60,17 @@ namespace ManagedIrbis.InMemory
         }
 
         /// <summary>
+        /// Чтение записи с указанным MFN.
+        /// </summary>
+        public Record? ReadRecord
+            (
+                int mfn
+            )
+        {
+            return mfn <= 0 || mfn >= Count ? default : this[mfn - 1];
+        }
+
+        /// <summary>
         /// Сохранение в поток.
         /// </summary>
         public void Save
@@ -68,6 +79,34 @@ namespace ManagedIrbis.InMemory
             )
         {
             // TODO: implement
+        }
+
+        /// <summary>
+        /// Сохранение/обновление записи.
+        /// </summary>
+        public bool WriteRecord
+            (
+                Record record
+            )
+        {
+            if (record.Mfn == 0)
+            {
+                // это новая запись, помещаем ее в конец базы
+                Add(record);
+                record.Mfn = Count;
+            }
+            else
+            {
+                var mfn = record.Mfn;
+                if (mfn < 0 || mfn > Count)
+                {
+                    return false;
+                }
+
+                this[mfn - 1] = record;
+            }
+
+            return true;
         }
 
         #endregion

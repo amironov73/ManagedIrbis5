@@ -8,7 +8,7 @@ using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
-using ManagedIrbis.Direct;
+using ManagedIrbis.Providers;
 using ManagedIrbis.Reports;
 
 namespace UnitTests.ManagedIrbis.Reports
@@ -152,7 +152,7 @@ namespace UnitTests.ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            var provider = new DirectProvider();
+            var provider = new NullProvider();
             var context = new ReportContext(provider);
             context.Records.AddRange(_GetRecords());
             report.Render(context);
@@ -167,7 +167,7 @@ namespace UnitTests.ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            var client = new DirectProvider();
+            var client = new NullProvider();
             var context = new ReportContext(client);
             context.Records.AddRange(_GetRecords());
             context.SetDriver(new HtmlDriver());

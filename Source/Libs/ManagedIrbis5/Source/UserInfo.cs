@@ -20,11 +20,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
-using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
@@ -135,12 +135,7 @@ namespace ManagedIrbis
             {
                 return string.Empty;
             }
-            return string.Format
-                (
-                    "{0}={1};",
-                    prefix,
-                    value
-                );
+            return $"{prefix}={value};";
 
         }
 
@@ -151,6 +146,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Encode.
         /// </summary>
+        // ReSharper disable UseStringInterpolation
         public string Encode()
         {
             return string.Format
@@ -166,6 +162,45 @@ namespace ManagedIrbis
                     _FormatPair("A", Administrator, "irbisa.ini")
                 );
         }
+        // ReSharper restore UseStringInterpolation
+
+        /// <summary>
+        /// Парсинг текстового представления.
+        /// </summary>
+        public static UserInfo[] Parse
+            (
+                string text
+            )
+        {
+            var lines = text.SplitLines().Skip(2).ToArray();
+            var result = new List<UserInfo>();
+            while (true)
+            {
+                var current = lines.Take(9).ToArray();
+                if (current.Length != 9)
+                {
+                    break;
+                }
+
+                var user = new UserInfo
+                {
+                    Number = current[0].EmptyToNull(),
+                    Name = current[1].EmptyToNull(),
+                    Password = current[2].EmptyToNull(),
+                    Cataloger = current[3].EmptyToNull(),
+                    Reader = current[4].EmptyToNull(),
+                    Circulation = current[5].EmptyToNull(),
+                    Acquisitions = current[6].EmptyToNull(),
+                    Provision = current[7].EmptyToNull(),
+                    Administrator = current[8].EmptyToNull()
+                };
+                result.Add(user);
+
+                lines = lines.Skip(9).ToArray();
+            }
+
+            return result.ToArray();
+        }
 
         /// <summary>
         /// Разбор ответа сервера.
@@ -175,8 +210,6 @@ namespace ManagedIrbis
                 Response response
             )
         {
-            Sure.NotNull(response, nameof(response));
-
             var result = new List<UserInfo>();
             response.ReadAnsiStrings(2);
             while (true)
@@ -330,6 +363,7 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
+        // ReSharper disable UseStringInterpolation
         public override string ToString()
         {
             return string.Format
@@ -349,6 +383,7 @@ namespace ManagedIrbis
                     Administrator.ToVisibleString()
                 );
         }
+        // ReSharper restore UseStringInterpolation
 
         #endregion
     }

@@ -8,6 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable UnusedParameter.Local
 
 /* IAsyncConnection.cs -- интерфейс асинхронного подключения
@@ -18,12 +19,9 @@
 
 using System.Threading.Tasks;
 
-using AM.IO;
-using AM.PlatformAbstraction;
+using AM;
 
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Menus;
-using ManagedIrbis.Pft;
 
 #endregion
 
@@ -36,8 +34,18 @@ namespace ManagedIrbis
     /// </summary>
     public interface IAsyncConnection
         : IAsyncProvider,
-        IConnectionSettings
+        IConnectionSettings,
+        ISetLastError
     {
+        /// <summary>
+        /// Обращение к серверу ИРБИС64 асинхронным образом.
+        /// </summary>
+        /// <param name="query">Запрос.</param>
+        /// <returns>Возвращенный сервером ответ
+        /// либо <c>null</c>, если произошла
+        /// ошибка сетевого обмена.</returns>
         Task<Response?> ExecuteAsync(AsyncQuery query);
-    }
-}
+
+    } // interface IAsyncConnection
+
+} // namespace ManagedIrbis

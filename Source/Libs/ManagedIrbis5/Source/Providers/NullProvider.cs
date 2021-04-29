@@ -31,7 +31,7 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis.Providers
 {
     /// <summary>
     /// Пустой клиент для нужд тестирования.
@@ -79,6 +79,9 @@ namespace ManagedIrbis
 
         /// <inheritdoc cref="ICancellable.CancelOperation"/>
         public void CancelOperation() {}
+
+        /// <inheritdoc cref="ICancellable.ThrowIfCancelled"/>
+        public void ThrowIfCancelled() {}
 
         #endregion
 
@@ -369,4 +372,4 @@ namespace ManagedIrbis
 
     } // class NullProvider
 
-} // namespace ManagedIrbis
+} // namespace ManagedIrbis.Providers

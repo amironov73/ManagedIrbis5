@@ -10,6 +10,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* AsyncConnection.cs -- асинхронное подключение к серверу ИРБИС64
@@ -28,6 +29,7 @@ using AM;
 using AM.IO;
 using AM.PlatformAbstraction;
 using AM.Threading;
+
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
@@ -88,7 +90,7 @@ namespace ManagedIrbis
         public bool Connected { get; protected internal set; }
 
         /// <inheritdoc cref="IIrbisProvider.LastError"/>
-        public int LastError { get; protected internal set; }
+        public int LastError { get; private set; }
 
         /// <summary>
         /// Токен для отмены длительных операций.
@@ -147,9 +149,9 @@ namespace ManagedIrbis
 
         #region Private members
 
-        protected internal ILogger _logger;
+        protected internal readonly ILogger _logger;
 
-        protected internal IServiceProvider _provider;
+        protected internal readonly IServiceProvider _provider;
 
         protected internal CancellationTokenSource _cancellation;
 
@@ -161,10 +163,10 @@ namespace ManagedIrbis
                 bool busy
             )
         {
-            if (Busy != busy)
+            if (Busy.State != busy)
             {
                 _logger.LogTrace($"SetBusy: {busy}");
-                Busy = busy;
+                Busy.SetState(busy);
                 BusyChanged?.Invoke(this, EventArgs.Empty);
             }
         } // method SetBusy
@@ -255,8 +257,11 @@ namespace ManagedIrbis
         /// <inheritdoc cref="ICancellable.Busy"/>
         public BusyState Busy { get; protected internal set; }
 
-        /// <inheritdoc cref="IIrbisProvider.CancelOperation"/>
+        /// <inheritdoc cref="ICancellable.CancelOperation"/>
         public void CancelOperation() => _cancellation.Cancel();
+
+        /// <inheritdoc cref="ICancellable.ThrowIfCancelled"/>
+        public void ThrowIfCancelled() => Cancellation.ThrowIfCancellationRequested();
 
         #endregion
 
@@ -1071,6 +1076,13 @@ namespace ManagedIrbis
                 Busy.Dispose();
             }
         } // method DisposeAsync
+
+        #endregion
+
+        #region IAsyncConnection members
+
+        /// <inheritdoc cref="ISetLastError.SetLastError"/>
+        public int SetLastError(int code) => LastError = code;
 
         #endregion
 

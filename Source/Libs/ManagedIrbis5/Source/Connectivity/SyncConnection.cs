@@ -84,7 +84,7 @@ namespace ManagedIrbis
         public bool Connected { get; protected internal set; }
 
         /// <inheritdoc cref="IIrbisProvider.LastError"/>
-        public int LastError { get; protected internal set; }
+        public int LastError { get; private set; }
 
         /// <summary>
         /// Токен для отмены длительных операций.
@@ -157,10 +157,10 @@ namespace ManagedIrbis
                 bool busy
             )
         {
-            if (Busy != busy)
+            if (Busy.State != busy)
             {
                 _logger.LogTrace($"SetBusy: {busy}");
-                Busy = busy;
+                Busy.SetState(busy);
             }
         } // method SetBusy
 
@@ -250,8 +250,11 @@ namespace ManagedIrbis
         /// <inheritdoc cref="ICancellable.Busy"/>
         public BusyState Busy { get; protected internal set; }
 
-        /// <inheritdoc cref="IIrbisProvider.CancelOperation"/>
+        /// <inheritdoc cref="ICancellable.CancelOperation"/>
         public void CancelOperation() => _cancellation.Cancel();
+
+        /// <inheritdoc cref="ICancellable.ThrowIfCancelled"/>
+        public void ThrowIfCancelled() => Cancellation.ThrowIfCancellationRequested();
 
         #endregion
 
@@ -274,7 +277,7 @@ namespace ManagedIrbis
                 string configurationString
             )
         {
-            this.ParseConnectionString(configurationString);
+            ((ISyncProvider)this).ParseConnectionString(configurationString);
         }
 
         /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
@@ -1052,6 +1055,13 @@ namespace ManagedIrbis
 
             return response is not null;
         } // method WriteTextFile
+
+        #endregion
+
+        #region ISetLastError members
+
+        /// <inheritdoc cref="ISetLastError.SetLastError"/>
+        public int SetLastError(int code) => LastError = code;
 
         #endregion
 

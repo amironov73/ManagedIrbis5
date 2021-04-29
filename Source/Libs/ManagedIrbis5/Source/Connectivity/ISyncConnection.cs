@@ -16,6 +16,7 @@
 
 #region Using directives
 
+using AM;
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -29,7 +30,8 @@ namespace ManagedIrbis
     /// </summary>
     public interface ISyncConnection
         : ISyncProvider,
-        IConnectionSettings
+        IConnectionSettings,
+        ISetLastError
     {
         /// <summary>
         /// Обращение к серверу ИРБИС64 синхронным образом.

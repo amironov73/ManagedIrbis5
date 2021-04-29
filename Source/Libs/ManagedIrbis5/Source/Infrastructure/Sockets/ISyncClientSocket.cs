@@ -28,7 +28,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
     /// </summary>
     public interface ISyncClientSocket
     {
-        SyncConnection? Connection { get; set; }
+        ISyncConnection? Connection { get; set; }
 
         /// <summary>
         /// Собственно общение с сервером.

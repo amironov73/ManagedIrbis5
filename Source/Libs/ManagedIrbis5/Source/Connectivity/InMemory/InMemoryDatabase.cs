@@ -90,6 +90,16 @@ namespace ManagedIrbis.InMemory
             Inverted.Dump(output);
         }
 
+        /// <summary>
+        /// Чтение записи.
+        /// </summary>
+        public Record? ReadRecord (int mfn) => Master.ReadRecord(mfn);
+
+        /// <summary>
+        /// Сохранение/обновление записи.
+        /// </summary>
+        public bool WriteRecord(Record record) => Master.WriteRecord(record);
+
         #endregion
 
     } // class InMemoryDatabase
