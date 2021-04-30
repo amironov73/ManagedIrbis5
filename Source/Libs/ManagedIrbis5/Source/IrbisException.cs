@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -114,209 +115,204 @@ namespace ManagedIrbis
                 int code
             )
         {
-            return string.Empty;
-            /*
-
-            var result = Resources.ErrorDescription_UnknownError;
+            var result = "Unknown error";
 
             if (code > 0)
             {
-                result = Resources.ErrorDescription_NoError;
+                result = "No error";
             }
             else
             {
                 switch (code)
                 {
                     case 0:
-                        result = Resources.ErrorDescription_NormalReturn;
+                        result = "Normal return";
                         break;
 
                     case -100:
-                        result = Resources.ErrorDescription_GivenMfnOutsideTheDatabaseRange;
+                        result = "Given MFN is outside the database range";
                         break;
 
                     case -101:
-                        result = Resources.ErrorDescription_BadShelfSize;
+                        result = "Bad shelf size";
                         break;
 
                     case -102:
-                        result = Resources.ErrorDescription_BadShelfNumber;
+                        result = "Bad shelf number";
                         break;
 
                     case -140:
-                        result = Resources.ErrorDescription_MfnOutsideTheDatabaseRange;
+                        result = "MFN outside the database range";
                         break;
 
                     case -141:
-                        result = Resources.ErrorDescription_ReadError;
+                        result = "Read error";
                         break;
 
                     case -200:
-                        result = Resources.ErrorDescription_FieldIsAbsent;
+                        result = "The field is absent";
                         break;
 
                     case -201:
-                        result = Resources.ErrorDescription_NoPreviousVersionOfTheRecord;
+                        result = "No previous version of the record";
                         break;
 
                     case -202:
-                        result = Resources.ErrorDescription_TermNotExist;
+                        result = "Term doesn't exist";
                         break;
 
                     case -203:
-                        result = Resources.ErrorDescription_LastTerm;
+                        result = "Last term in the list";
                         break;
 
                     case -204:
-                        result = Resources.ErrorDescription_FirstTerm;
+                        result = "First term in the list";
                         break;
 
                     case -300:
-                        result = Resources.ErrorDescription_DatabaseIsLocked;
+                        result = "Database is exclusively locked";
                         break;
 
                     case -301:
-                        result = Resources.ErrorDescription_DatabaseIsLocked;
+                        result = "Database is exclusively locked";
                         break;
 
                     case -400:
-                        result = Resources.ErrorDescription_MstError;
+                        result = "Master file error";
                         break;
 
                     case -401:
-                        result = Resources.ErrorDescription_IfpError;
+                        result = "Index file error";
                         break;
 
                     case -402:
-                        result = Resources.ErrorDescription_WriteError;
+                        result = "Write error";
                         break;
 
                     case -403:
-                        result = Resources.ErrorDescription_ActualizationError;
+                        result = "Error during record actualization";
                         break;
 
                     case -600:
-                        result = Resources.ErrorDescription_RecordIsLogicallyDeleted;
+                        result = "The record is logically deleted";
                         break;
 
                     case -601:
-                        result = Resources.ErrorDescription_RecordIsPhysicallyDeleted;
+                        result = "The record is physically deleted";
                         break;
 
                     case -602:
-                        result = Resources.ErrorDescription_RecordIsBlocked;
+                        result = "The record is blocked";
                         break;
 
                     case -603:
-                        result = Resources.ErrorDescription_RecordIsLogicallyDeleted;
+                        result = "The record is logically deleted";
                         break;
 
                     case -605:
-                        result = Resources.ErrorDescription_RecordIsPhysicallyDeleted;
+                        result = "The record is physically deleted";
                         break;
 
                     case -607:
-                        result = Resources.ErrorDescription_AutoinGblError;
+                        result = "Error during autoin.gbl processing";
                         break;
 
                     case -608:
-                        result = Resources.ErrorDescription_RecordVersionError;
+                        result = "Record version mismatch";
                         break;
 
                     case -700:
-                        result = Resources.ErrorDescription_BackupCreationError;
+                        result = "Backup creation error";
                         break;
 
                     case -701:
-                        result = Resources.ErrorDescription_BackupRestoreError;
+                        result = "Backup restore error";
                         break;
 
                     case -702:
-                        result = Resources.ErrorDescription_SortingError;
+                        result = "Error during sorting";
                         break;
 
                     case -703:
-                        result = Resources.ErrorDescription_BadTerm;
+                        result = "Bad term";
                         break;
 
                     case -704:
-                        result = Resources.ErrorDescription_DictionaryCreationError;
+                        result = "Dictionary creation error";
                         break;
 
                     case -705:
-                        result = Resources.ErrorDescription_DictionaryLoadingError;
+                        result = "Dictionary loading error";
                         break;
 
                     case -800:
-                        result = Resources.ErrorDescription_GlobalCorrectionParameterError;
+                        result = "Global correction parameter error";
                         break;
 
                     case -801:
-                        result = Resources.ErrorDescription_ERR_GBL_REP;
+                        result = "Global correction: bad rep tag";
                         break;
 
                     case -802:
-                        result = Resources.ErrorDescription_ERR_GBL_MET;
+                        result = "Global correction: bad tag";
                         break;
 
                     case -1111:
-                        result = Resources.ErrorDescription_ServerExecutionError;
+                        result = "Server execution error";
                         break;
 
                     case -2222:
-                        result = Resources.ErrorDescription_ProtocolError;
+                        result = "Protocol error";
                         break;
 
                     case -3333:
-                        result = Resources.ErrorDescription_ClientNotRegistered;
+                        result = "Client not registered";
                         break;
 
                     case -3334:
-                        result = Resources.ErrorDescription_ClientNotInUse;
+                        result = "Client doesn't in use";
                         break;
 
                     case -3335:
-                        result = Resources.ErrorDescription_BadClientIdentifier;
+                        result = "Bad client identifier";
                         break;
 
                     case -3336:
-                        result = Resources.ErrorDescription_WorkstationAccesDenied;
+                        result = "Workstation access denied";
                         break;
 
                     case -3337:
-                        result = Resources.ErrorDescription_ClientAlreadyRegistered;
+                        result = "The client is already registered";
                         break;
 
                     case -3338:
-                        result = Resources.ErrorDescription_ClientNotAllowed;
+                        result = "Client not allowed";
                         break;
 
                     case -4444:
-                        result = Resources.ErrorDescription_BadPassword;
+                        result = "Bad password";
                         break;
 
                     case -5555:
-                        result = Resources.ErrorDescription_FileNotExist;
+                        result = "File not exist";
                         break;
 
                     case -6666:
-                        result = Resources.ErrorDescription_ServerOverloaded;
+                        result = "Server is overloaded";
                         break;
 
                     case -7777:
-                        result = Resources.ErrorDescription_ProcessError;
+                        result = "Administrator thread error";
                         break;
 
                     case -8888:
-                        result = Resources.ErrorDescription_GeneralError;
+                        result = "General error";
                         break;
                 }
             }
 
             return result;
-
-            */
-        }
+       }
 
         #endregion
 

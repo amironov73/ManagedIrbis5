@@ -387,7 +387,9 @@ namespace ManagedIrbis
                 return true;
             }
 
-            AGAIN: QueryId = 1;
+            AGAIN:
+            LastError = 0;
+            QueryId = 1;
             ClientId = new Random().Next(100000, 999999);
 
             var query = new SyncQuery(this, CommandCode.RegisterClient);
@@ -397,6 +399,7 @@ namespace ManagedIrbis
             var response = ExecuteSync(query);
             if (ReferenceEquals(response, null))
             {
+                LastError = -100_500;
                 return false;
             }
 
@@ -407,6 +410,7 @@ namespace ManagedIrbis
 
             if (response.ReturnCode < 0)
             {
+                LastError = response.ReturnCode;
                 return false;
             }
 
