@@ -7,6 +7,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

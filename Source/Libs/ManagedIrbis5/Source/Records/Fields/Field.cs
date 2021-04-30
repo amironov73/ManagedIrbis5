@@ -802,6 +802,37 @@ namespace ManagedIrbis
         } // method SetSubFieldValue
 
         /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue
+            (
+                char code,
+                string? value
+            )
+        {
+            if (code == ValueCode)
+            {
+                Value = value.AsMemory();
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    RemoveSubField(code);
+                }
+                else
+                {
+                    GetOrAddSubField(code).Value = value.AsMemory();
+                }
+            }
+
+            return this;
+        } // method SetSubFieldValue
+
+        /// <summary>
         /// Удаление подполей с указанным кодом.
         /// </summary>
         /// <param name="code">Искомый код подполя.</param>

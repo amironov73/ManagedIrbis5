@@ -30,6 +30,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+using AM.Collections;
 using AM.PlatformAbstraction;
 
 #endregion
@@ -3937,6 +3938,18 @@ namespace AM
         [Pure]
         public static MethodInfo GetMethodInfo<T1, T2, T3, T4>(Expression<Func<T1, T2, T3, T4>> expression)
             => ((MethodCallExpression) expression.Body).Method;
+
+        /// <summary>
+        /// Получение ссылочного перечислителя.
+        /// </summary>
+        [Pure]
+        public static RefEnumerable<T> AsRefEnumerable<T>(this Span<T> data) => new (data);
+
+        /// <summary>
+        /// Получение ссылочного перечислителя.
+        /// </summary>
+        [Pure]
+        public static RefEnumerable<T> AsRefEnumerable<T>(this T[] data) => new (data.AsSpan());
 
         #endregion
 
