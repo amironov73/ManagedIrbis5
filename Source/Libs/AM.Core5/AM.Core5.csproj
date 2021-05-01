@@ -15,8 +15,8 @@
     <Title>ArsMagna core services</Title>
     <Authors>Alexey Mironov</Authors>
     <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
-    <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>arsmagna-icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
   </PropertyGroup>
 
@@ -67,4 +67,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+    <ItemGroup>
+        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
 </Project>

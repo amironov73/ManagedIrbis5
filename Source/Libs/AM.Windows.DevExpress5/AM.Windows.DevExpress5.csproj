@@ -5,6 +5,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>AM.Windows.DevExpress5</AssemblyName>
     <ApplicationIcon>BlueBook.ico</ApplicationIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>arsmagna-icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,4 +21,8 @@
     <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
   </ItemGroup>
 
+    <ItemGroup>
+        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
 </Project>

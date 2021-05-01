@@ -9,8 +9,8 @@
         <Description>GTK-based controls and dialogs for Ars Magna project.</Description>
         <Copyright>Copyright Alexey Mironov 2019-2021</Copyright>
         <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-        <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
-        <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>arsmagna-icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -22,4 +22,8 @@
       <PackageReference Include="GtkSharp" Version="3.24.24.34" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
 </Project>

@@ -8,9 +8,8 @@
         <Description>Ars Magna SKIA-based drawing services.</Description>
         <Copyright>Copyright Alexey Mironov 2019-2021</Copyright>
         <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-        <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
-        <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
-        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>arsmagna-icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,4 +20,8 @@
       <PackageReference Include="SkiaSharp" Version="2.80.2" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
 </Project>

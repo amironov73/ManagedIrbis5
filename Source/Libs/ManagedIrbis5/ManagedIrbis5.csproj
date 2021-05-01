@@ -15,9 +15,8 @@
     <RootNamespace>ManagedIrbis</RootNamespace>
     <Title>Fully managed framework for IRBIS64</Title>
     <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
-    <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>arsmagna-icon.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -62,4 +61,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+    <ItemGroup>
+        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
 </Project>

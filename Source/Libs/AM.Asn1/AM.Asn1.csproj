@@ -8,9 +8,12 @@
         <Description>Ars Magnag ASN.1 handling</Description>
         <Copyright>Copyright Alexey Mironov 2019-2021</Copyright>
         <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-        <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
-        <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageIcon>arsmagna-icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+        <SignAssembly>true</SignAssembly>
+        <DelaySign>false</DelaySign>
+        <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,4 +24,8 @@
       <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
 </Project>
