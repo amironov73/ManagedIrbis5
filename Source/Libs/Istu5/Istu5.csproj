@@ -10,6 +10,15 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+    <PackageVersion>5.0.0</PackageVersion>
+    <Title>INRTU-specific services</Title>
+    <Authors>Alexey Mironov</Authors>
+    <Description>INTRTU-specific services</Description>
+    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
+    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
+    <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
   </PropertyGroup>
 
 </Project>

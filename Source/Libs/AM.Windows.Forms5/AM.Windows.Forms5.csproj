@@ -43,6 +43,15 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>AM.Windows.Forms</RootNamespace>
+    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+    <PackageVersion>5.0.0</PackageVersion>
+    <Title>WinForms general controls and dialogs for Ars Magna project</Title>
+    <Authors>Alexey Mironov</Authors>
+    <Description>WiForms general controls and dialogs for Ars Magna project.</Description>
+    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
+    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
+    <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
   </PropertyGroup>
 
 </Project>

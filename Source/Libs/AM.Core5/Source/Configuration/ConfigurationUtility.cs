@@ -541,6 +541,7 @@ namespace AM.Configuration
         }
 
         #endregion
-    }
-}
 
+    } // class ConfigurationUtility
+
+} // namespace AM.Configuration

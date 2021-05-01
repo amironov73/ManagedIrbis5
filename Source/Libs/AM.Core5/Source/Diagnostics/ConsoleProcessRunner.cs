@@ -1,13 +1,14 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* ConsoleProcessRunner.cs -- запускает консольный процесс и перехватывает его выдачу
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +18,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -25,9 +27,10 @@ using System.Diagnostics;
 namespace AM.Diagnostics
 {
     /// <summary>
-    /// Runs console process and intercepts its output
-    /// redirecting to text box.
+    /// Запускает консольный процесс и перехватывает его выдачу
+    /// для показа, например, в текстовом боксе.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class ConsoleProcessRunner
         : IDisposable
     {
@@ -36,16 +39,12 @@ namespace AM.Diagnostics
         /// <summary>
         /// Gets the receiver.
         /// </summary>
-        public IConsoleOutputReceiver? Receiver
-        {
-            get;
-            private set;
-        }
+        public IConsoleOutputReceiver? Receiver { get; private set; }
 
         /// <summary>
         /// Gets the running process.
         /// </summary>
-        public Process? RunningProcess => _runningProcess;
+        public Process? RunningProcess { get; private set; }
 
         #endregion
 
@@ -66,15 +65,13 @@ namespace AM.Diagnostics
 
         #region Private members
 
-        private Process? _runningProcess;
-
         private void _OutputDataReceived
             (
-                object sender,
+                object? sender,
                 DataReceivedEventArgs e
             )
         {
-            if (Receiver != null && e?.Data != null)
+            if (Receiver != null && e.Data != null)
             {
                 Receiver.ReceiveConsoleOutput(e.Data);
             }
@@ -82,18 +79,16 @@ namespace AM.Diagnostics
 
         private void _ProcessExited
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
             var process = RunningProcess;
             if (!ReferenceEquals(process, null))
             {
-#nullable disable
                 process.OutputDataReceived -= _OutputDataReceived;
                 process.Exited -= _ProcessExited;
-#nullable restore
-                _runningProcess = null;
+                RunningProcess = null;
             }
         }
 
@@ -112,13 +107,12 @@ namespace AM.Diagnostics
                 string arguments
             )
         {
-            if (!ReferenceEquals(RunningProcess, null)
-                 && !RunningProcess.HasExited)
+            if (RunningProcess is { HasExited: false })
             {
                 Magna.Error
                     (
-                        "ConsoleProcessRunner::Start: "
-                        + "process already running"
+                        nameof(ConsoleProcessRunner) + "::" + nameof(Start)
+                        + ": process already running"
                     );
 
                 throw new ArsMagnaException();
@@ -131,8 +125,6 @@ namespace AM.Diagnostics
                     CreateNoWindow = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-
-                    // ReSharper disable AssignNullToNotNullAttribute
                     StandardErrorEncoding = null,
 
                     // If the value of the StandardOutputEncoding property
@@ -140,46 +132,33 @@ namespace AM.Diagnostics
                     // output encoding for the standard output.
                     StandardOutputEncoding = null,
 
-                    // ReSharper restore AssignNullToNotNullAttribute
-
                     UseShellExecute = false
                 };
-            _runningProcess = new Process
+            RunningProcess = new Process
                 {
                     StartInfo = startInfo
                     //, SynchronizingObject = Receiver // Use this to event handler calls
                     // that are issued as a result of an Exited event on the process
                 };
-           //ISynchronizeInvoke synchronizingObject =
-           //         Receiver as ISynchronizeInvoke;
-           //if (synchronizingObject != null)
-           //{
-           //     _runningProcess.SynchronizingObject = synchronizingObject;
-           //}
-#nullable disable
-            _runningProcess.OutputDataReceived += _OutputDataReceived;
-            _runningProcess.ErrorDataReceived += _OutputDataReceived;
-            _runningProcess.Exited += _ProcessExited;
-#nullable restore
-            _runningProcess.Start();
-            _runningProcess.BeginOutputReadLine();
-            _runningProcess.BeginErrorReadLine();
+            RunningProcess.OutputDataReceived += _OutputDataReceived;
+            RunningProcess.ErrorDataReceived += _OutputDataReceived;
+            RunningProcess.Exited += _ProcessExited;
+            RunningProcess.Start();
+            RunningProcess.BeginOutputReadLine();
+            RunningProcess.BeginErrorReadLine();
         }
 
         /// <summary>
-        /// Stops running process if any.
+        /// Останавливает запущенный процесс, если это возможно.
         /// </summary>
         public void Stop()
         {
             // TODO: try to kill running process?
 
-            if (!ReferenceEquals(RunningProcess, null)
-                 && !RunningProcess.HasExited)
+            if (RunningProcess is { HasExited: false })
             {
-#nullable disable
                 RunningProcess.OutputDataReceived -= _OutputDataReceived;
                 RunningProcess.Exited -= _ProcessExited;
-#nullable restore
             }
         }
 
@@ -188,11 +167,10 @@ namespace AM.Diagnostics
         #region IDisposable
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            _runningProcess?.Dispose();
-        }
+        public void Dispose() => RunningProcess?.Dispose();
 
         #endregion
-    }
-}
+
+    } // class ConsoleProcessRunner
+
+} // namespace AM.Diagnostics

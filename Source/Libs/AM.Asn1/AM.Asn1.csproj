@@ -2,6 +2,15 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
+        <PackageVersion>5.0.0</PackageVersion>
+        <Title>Ars Magna ASN.1 handling</Title>
+        <Authors>Alexey Mironov</Authors>
+        <Description>Ars Magnag ASN.1 handling</Description>
+        <Copyright>Copyright Alexey Mironov 2019-2021</Copyright>
+        <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+        <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
+        <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
+        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>

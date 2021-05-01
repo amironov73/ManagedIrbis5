@@ -12,6 +12,12 @@
     <Description>Ars Magna core services</Description>
     <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
     <RootNamespace>AM.Core</RootNamespace>
+    <Title>ArsMagna core services</Title>
+    <Authors>Alexey Mironov</Authors>
+    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
+    <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

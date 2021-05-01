@@ -10,9 +10,14 @@
     <Authors>Alexey Mironov</Authors>
     <Company>Ars Magna Project</Company>
     <Product>Ars Magna</Product>
-    <Description>Managed framework for Irbis64</Description>
+    <Description>Fully managed framework for popular russian library automation system IRBIS64.</Description>
     <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
     <RootNamespace>ManagedIrbis</RootNamespace>
+    <Title>Fully managed framework for IRBIS64</Title>
+    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
+    <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

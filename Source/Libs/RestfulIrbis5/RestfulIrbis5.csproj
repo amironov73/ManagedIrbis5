@@ -11,6 +11,15 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <PackageVersion>5.0.0</PackageVersion>
+    <Title>REST server and client for popular russian library automation system IRBIS64</Title>
+    <Authors>Alexey Mironov</Authors>
+    <Description>REST server and client for popular russian library automation system IRBIS64.</Description>
+    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
+    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/mit-license.php</PackageLicenseUrl>
+    <PackageIconUrl>http://arsmagna.ru/images/arsmagna-icon.png</PackageIconUrl>
   </PropertyGroup>
 
 </Project>
