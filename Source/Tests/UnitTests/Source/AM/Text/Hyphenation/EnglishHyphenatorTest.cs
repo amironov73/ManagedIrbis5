@@ -24,6 +24,7 @@ namespace UnitTests.AM.Text.Hyphenation
         }
 
         [TestMethod]
+        [Description("Слова, состоящие из прописных букв, не разбиваются")]
         public void EnglishHyphenator_Hyphenate_2()
         {
             _TestHyphenate<EnglishHyphenator>("HERE", "HERE");

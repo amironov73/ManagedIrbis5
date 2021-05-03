@@ -2,12 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* BuiltinCultures.cs -- поддерживаемые встроенные культуры
  * Ars Magna project, http://arsmagna.ru
@@ -33,12 +28,12 @@ namespace AM.Globalization
         /// <summary>
         /// American English.
         /// </summary>
-        public static CultureInfo AmericanEnglish => new CultureInfo(CultureCode.AmericanEnglish);
+        public static CultureInfo AmericanEnglish => new (CultureCode.AmericanEnglish);
 
         /// <summary>
-        /// Russian culture (just russian, not ru-RU).
+        /// Русская культура (Русская-в-России!).
         /// </summary>
-        public static CultureInfo Russian => new CultureInfo(CultureCode.Russian);
+        public static CultureInfo Russian => new (CultureCode.Russian);
 
         #endregion
     }

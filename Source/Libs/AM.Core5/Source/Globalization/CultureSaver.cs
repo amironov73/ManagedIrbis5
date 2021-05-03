@@ -7,7 +7,9 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedType.Global
 
 /* CultureSaver.cs -- сохраняет и затем восстанавливает текущую культуру
  * Ars Magna project, http://arsmagna.ru
@@ -30,6 +32,7 @@ namespace AM.Globalization
     /// Сохраняет и затем восстанавливает текущую культуру
     /// в определенном контексте.
     /// </summary>
+    ///
     /// <example>
     /// <para>This example changes current thread culture to
     /// for a while.
@@ -52,7 +55,7 @@ namespace AM.Globalization
         #region Properties
 
         /// <summary>
-        /// Gets the previous culture.
+        /// Сохраненная культура.
         /// </summary>
         public CultureInfo PreviousCulture { get; }
 
@@ -61,7 +64,7 @@ namespace AM.Globalization
         #region Construction
 
         /// <summary>
-        /// Saves current thread culture for a while.
+        /// Констурктор.
         /// </summary>
         public CultureSaver()
         {
@@ -69,8 +72,7 @@ namespace AM.Globalization
         }
 
         /// <summary>
-        /// Sets new current thread culture to the given
-        /// <see cref="T:System.Globalization.CultureInfo"/>.
+        /// Конструктор. Устанавливает указанную культуру.
         /// </summary>
         public CultureSaver
             (
@@ -82,12 +84,8 @@ namespace AM.Globalization
         }
 
         /// <summary>
-        /// Sets current thread culture to based on the given name.
+        /// Конструктор. Устанавливает указанную культуру.
         /// </summary>
-        /// <param name="cultureName">Name of the culture.</param>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// <paramref name="cultureName"/> is <c>null</c>.
-        /// </exception>
         public CultureSaver
             (
                 string cultureName
@@ -97,9 +95,8 @@ namespace AM.Globalization
         }
 
         /// <summary>
-        /// Sets current thread culture to based on the given identifier.
+        /// Конструктор. Устанавливает указанную культуру.
         /// </summary>
-        /// <param name="cultureIdentifier">The culture identifier.</param>
         public CultureSaver
             (
                 int cultureIdentifier
@@ -113,25 +110,20 @@ namespace AM.Globalization
         #region Public methods
 
         /// <summary>
-        /// Temporary switch current thread culture for testing purposes.
+        /// Временно (для целей тестирования) устанавливает
+        /// культуру American-English.
         /// </summary>
-        public static CultureSaver ForTesting()
-        {
-            return new CultureSaver(BuiltinCultures.AmericanEnglish);
-        }
+        public static CultureSaver ForTesting() => new (BuiltinCultures.AmericanEnglish);
 
         #endregion
 
         #region IDisposable members
 
-        /// <summary>
-        /// Restores old current thread UI culture.
-        /// </summary>
-        public void Dispose()
-        {
-            Thread.CurrentThread.CurrentCulture = PreviousCulture;
-        }
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose() => Thread.CurrentThread.CurrentCulture = PreviousCulture;
 
         #endregion
-    }
-}
+
+    } // class CultureSaver
+
+} // namespace AM.Globalization

@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -33,14 +34,14 @@ namespace AM.Globalization
         #region Properties
 
         ///<summary>
-        /// Consider YO letter?
+        /// Считать Ё отдельной буквой (иначе - считать ее равной Е)?
         ///</summary>
-        public bool ConsiderYo { get; private set; }
+        public bool ConsiderYo { get; }
 
         ///<summary>
-        /// Ignore case?
+        /// Игнорировать регистр символов?
         ///</summary>
-        public bool IgnoreCase { get; private set; }
+        public bool IgnoreCase { get; }
 
         #endregion
 
@@ -49,14 +50,12 @@ namespace AM.Globalization
         /// <summary>
         /// Конструктор.
         /// </summary>
-        /// <param name="considerYo">if set to <c>true</c>
-        /// [consider yo].</param>
-        /// <param name="ignoreCase">if set to <c>true</c>
-        /// [ignore case].</param>
+        /// <param name="considerYo">Считать Ё отдельной буквой?</param>
+        /// <param name="ignoreCase">Игнорировать регистр символов?</param>
         public RussianStringComparer
             (
-                bool considerYo,
-                bool ignoreCase
+                bool considerYo = false,
+                bool ignoreCase = false
             )
         {
             ConsiderYo = considerYo;
@@ -95,8 +94,7 @@ namespace AM.Globalization
 
             if (ConsiderYo)
             {
-                str = str
-                    .Replace('ё', 'е')
+                str = str.Replace('ё', 'е')
                     .Replace('Ё', 'Е');
             }
 
@@ -117,11 +115,7 @@ namespace AM.Globalization
             var xCopy = _Replace(x);
             var yCopy = _Replace(y);
 
-            return _innerComparer
-                (
-                    xCopy,
-                    yCopy
-                 );
+            return _innerComparer ( xCopy, yCopy );
         }
 
         ///<inheritdoc/>
@@ -134,11 +128,7 @@ namespace AM.Globalization
             var xCopy = _Replace(x);
             var yCopy = _Replace(y);
 
-            return _innerComparer
-                (
-                    xCopy,
-                    yCopy
-                 ) == 0;
+            return _innerComparer ( xCopy, yCopy ) == 0;
         }
 
         ///<inheritdoc/>
@@ -161,5 +151,7 @@ namespace AM.Globalization
         }
 
         #endregion
-    }
-}
+
+    } // class RussianStringComparer
+
+} // namespace AM.Globalization
