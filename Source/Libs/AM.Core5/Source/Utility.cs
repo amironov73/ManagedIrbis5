@@ -3180,14 +3180,28 @@ namespace AM
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
-        public static Task RaiseAsync (this EventHandler? handler, object? sender, EventArgs args) =>
-            Task.Factory.StartNew (() => { handler?.Invoke(sender, args); });
+        public static Task RaiseAsync(this EventHandler? handler, object? sender, EventArgs args)
+        {
+            if (handler is null)
+            {
+                return Task.CompletedTask;
+            }
+
+            return Task.Factory.StartNew(() => { handler.Invoke(sender, args); });
+        } // method RaiseAsync
 
         /// <summary>
         /// Raises the specified handler.
         /// </summary>
-        public static Task RaiseAsync (this EventHandler? handler, object? sender) =>
-            Task.Factory.StartNew (() => { handler?.Invoke(sender, EventArgs.Empty); });
+        public static Task RaiseAsync(this EventHandler? handler, object? sender)
+        {
+            if (handler is null)
+            {
+                return Task.CompletedTask;
+            }
+
+            return Task.Factory.StartNew(() => { handler.Invoke(sender, EventArgs.Empty); });
+        } // method RaiseAsync
 
         /// <summary>
         /// Is zero-length time span?

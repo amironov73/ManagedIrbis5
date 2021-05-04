@@ -21,7 +21,7 @@ namespace UnitTests.AM.Globalization
                 string str2
             )
         {
-            var comparer = new RussianStringComparer(true, false);
+            var comparer = new RussianStringComparer(true);
 
             var actual = comparer.Compare(str1, str2);
 
@@ -63,7 +63,7 @@ namespace UnitTests.AM.Globalization
                 string str2
             )
         {
-            var comparer = new RussianStringComparer(true, false);
+            var comparer = new RussianStringComparer(true);
 
             var actual = comparer.Equals(str1, str2);
 
@@ -101,9 +101,9 @@ namespace UnitTests.AM.Globalization
         [TestMethod]
         public void RussianStringComparer_GetHashCode1()
         {
-            var comparer = new RussianStringComparer(false, false);
+            var comparer = new RussianStringComparer();
 
-            Assert.AreEqual(0, comparer.GetHashCode(null));
+            Assert.AreEqual(0, comparer.GetHashCode(null!));
 
             Assert.AreNotEqual
                 (
@@ -129,7 +129,7 @@ namespace UnitTests.AM.Globalization
         {
             var comparer = new RussianStringComparer(false, true);
 
-            Assert.AreEqual(0, comparer.GetHashCode(null));
+            Assert.AreEqual(0, comparer.GetHashCode(null!));
 
             Assert.AreNotEqual
                 (
@@ -153,9 +153,9 @@ namespace UnitTests.AM.Globalization
         [TestMethod]
         public void RussianStringComparer_GetHashCode3()
         {
-            var comparer = new RussianStringComparer(true, false);
+            var comparer = new RussianStringComparer(true);
 
-            Assert.AreEqual(0, comparer.GetHashCode(null));
+            Assert.AreEqual(0, comparer.GetHashCode(null!));
 
             Assert.AreEqual
                 (
@@ -181,7 +181,7 @@ namespace UnitTests.AM.Globalization
         {
             var comparer = new RussianStringComparer(true, true);
 
-            Assert.AreEqual(0, comparer.GetHashCode(null));
+            Assert.AreEqual(0, comparer.GetHashCode(null!));
 
             Assert.AreEqual
                 (
