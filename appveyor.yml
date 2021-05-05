@@ -18,6 +18,7 @@ dotnet_csproj:
   informational_version: '{version}'
 
 before_build:
+- systeminfo
 - python -m pip install --upgrade pip
 - pip install --upgrade pygount sphinx sphinx_rtd_theme
 - pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
@@ -36,8 +37,8 @@ test_script:
 
 after_build:
 - dotnet pack --no-restore --no-build --configuration Release Source/ManagedIrbis5-windows.sln
-- jb inspectcode -o=inspectcode-result.xml Source\ManagedIrbis5-windows.sln
-- jb dupfinder   -o=dupfinder-result.xml   Source\ManagedIrbis5-windows.sln
+- jb inspectcode --verbosity=OFF -o=inspectcode-result.xml Source\ManagedIrbis5-windows.sln
+- jb dupfinder   --verbosity=OFF -o=dupfinder-result.xml   Source\ManagedIrbis5-windows.sln
 - cd
 
 artifacts:
