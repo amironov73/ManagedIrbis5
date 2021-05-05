@@ -18,24 +18,29 @@ dotnet_csproj:
   informational_version: '{version}'
 
 before_build:
-- cmd: python -m pip install --upgrade pip
-- cmd: pip install --upgrade pygount sphinx sphinx_rtd_theme
-- cmd: pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
-- cmd: pygount -f summary Source/Tests -s cs -N "*.Designer.cs" -F "obj"
-- cmd: pygount -f summary Source/Apps -s cs -N "*.Designer.cs" -F "obj"
-- cmd: dotnet --info
+- python -m pip install --upgrade pip
+- pip install --upgrade pygount sphinx sphinx_rtd_theme
+- pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Tests -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Apps -s cs -N "*.Designer.cs" -F "obj"
+- dotnet --info
+- dotnet tool install -g JetBrains.ReSharper.GlobalTools
 
 build_script:
-- cmd: dotnet restore                                    Source/ManagedIrbis5-windows.sln
-- cmd: dotnet build --no-restore --configuration Release Source/ManagedIrbis5-windows.sln
+- dotnet restore                                    Source/ManagedIrbis5-windows.sln
+- dotnet build --no-restore --configuration Release Source/ManagedIrbis5-windows.sln
 
 test_script:
-- cmd: dotnet test --no-restore --no-build --configuration Release --settings sequential.runsettings Source/ManagedIrbis5-windows.sln
-- cmd: dotnet run  --no-restore --no-build --configuration Release --project Source/Tests/PftTests/PftTests.csproj
+- dotnet test --no-restore --no-build --configuration Release --settings sequential.runsettings Source/ManagedIrbis5-windows.sln
+- dotnet run  --no-restore --no-build --configuration Release --project Source/Tests/PftTests/PftTests.csproj
 
 after_build:
 - dotnet pack --no-restore --no-build --configuration Release Source/ManagedIrbis5-windows.sln
+- jb inspectcode -o=inspectcode-result.xml Source\ManagedIrbis5-windows.sln
+- jb dupfinder   -o=dupfinder-result.xml   Source\ManagedIrbis5-windows.sln
 - cd
 
 artifacts:
   - path: '**\*.nupkg'
+  - path: 'inspectcode-result.xml'
+  - path: 'dupfinder-result.xml'

@@ -34,38 +34,27 @@ namespace AM.Commands
     /// Некая команда (действие) приложения.
     /// </summary>
     public class Command
-        : IDisposable
+        : ICommand
     {
         #region Events
 
-        /// <summary>
-        /// Вызывается при выполнении команды.
-        /// </summary>
+        /// <inheritdoc cref="ICommand.Execute"/>
         public event EventHandler? Execute;
 
-        /// <summary>
-        /// Вызывается, когда команда должна обновить свое состояние.
-        /// </summary>
+        /// <inheritdoc cref="ICommand.Update"/>
         public event EventHandler? Update;
 
-        /// <summary>
-        /// Вызывается, когда в команде что-то поменялось
-        /// (например, состояние <see cref="Enabled"/>).
-        /// </summary>
+        /// <inheritdoc cref="ICommand.Changed"/>
         public event EventHandler? Changed;
 
-        /// <summary>
-        /// Вызывается при очистке команды.
-        /// </summary>
+        /// <inheritdoc cref="ICommand.Disposed"/>
         public event EventHandler? Disposed;
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Команда разрешена к выполнению?
-        /// </summary>
+        /// <inheritdoc cref="ICommand.Enabled"/>
         public bool Enabled
         {
             get => _enabled;
@@ -167,11 +156,8 @@ namespace AM.Commands
 
         #region Public methods
 
-        /// <summary>
-        /// Выполнение команды в синхронном режиме.
-        /// (учитывается состояние флага <see cref="Enabled"/>).
-        /// </summary>
-        public void PerformExecute()
+        /// <inheritdoc cref="ICommand.PerformExecute()"/>
+        public virtual void PerformExecute()
         {
             if (Enabled)
             {
@@ -179,12 +165,8 @@ namespace AM.Commands
             }
         } // method PerformExecute
 
-        /// <summary>
-        /// Выполнение команды в синхронном режиме
-        /// (учитывается состояние флага <see cref="Enabled"/>).
-        /// </summary>
-        /// <param name="eventArgs">Аргументы для события.</param>
-        public void PerformExecute
+        /// <inheritdoc cref="ICommand.PerformExecute(System.EventArgs)"/>
+        public virtual void PerformExecute
             (
                 EventArgs eventArgs
             )
@@ -195,11 +177,8 @@ namespace AM.Commands
             }
         } // method PerformExecute
 
-        /// <summary>
-        /// Выполнение команды в асинхронном режиме
-        /// (учитывается состояние флага <see cref="Enabled"/>).
-        /// </summary>
-        public Task PerformExecuteAsync()
+        /// <inheritdoc cref="ICommand.PerformExecuteAsync()"/>
+        public virtual Task PerformExecuteAsync()
         {
             if (Enabled)
             {
@@ -209,11 +188,8 @@ namespace AM.Commands
             return Task.CompletedTask;
         } // method PerformExecuteAsync
 
-        /// <summary>
-        /// Выполнение команды в асинхронном режиме.
-        /// </summary>
-        /// <param name="eventArgs">Аргументы для события.</param>
-        public Task PerformExecuteAsync
+        /// <inheritdoc cref="ICommand.PerformExecuteAsync(System.EventArgs)"/>
+        public virtual Task PerformExecuteAsync
             (
                 EventArgs eventArgs
             )
@@ -226,19 +202,14 @@ namespace AM.Commands
             return Task.CompletedTask;
         } // method PerformExecuteAsync
 
-        /// <summary>
-        /// Команда должна обновить свое состояние.
-        /// </summary>
-        public void PerformUpdate()
+        /// <inheritdoc cref="ICommand.PerformUpdate()"/>
+        public virtual void PerformUpdate()
         {
             Update?.Invoke(this, EventArgs.Empty);
         } // method PerformUpdate
 
-        /// <summary>
-        /// Команда должна обновить свое состояние.
-        /// </summary>
-        /// <param name="eventArgs">Аргументы для события.</param>
-        public void PerformUpdate
+        /// <inheritdoc cref="ICommand.PerformUpdate(System.EventArgs)"/>
+        public virtual void PerformUpdate
             (
                 EventArgs eventArgs
             )
@@ -246,25 +217,50 @@ namespace AM.Commands
             Update?.Invoke(this, eventArgs);
         } // method PerformUpdate
 
-        /// <summary>
-        /// Сигнал, что в команде что-то поменялось.
-        /// </summary>
-        public void PerformChange()
+        /// <inheritdoc cref="ICommand.PerformUpdateAsync()"/>
+        public virtual Task PerformUpdateAsync()
+        {
+            return Update.RaiseAsync(this);
+        } // method PerformUpdateAsync
+
+        /// <inheritdoc cref="ICommand.PerformUpdateAsync(System.EventArgs)"/>
+        public virtual Task PerformUpdateAsync
+            (
+                EventArgs eventArgs
+            )
+        {
+            return Update.RaiseAsync(this, eventArgs);
+        } // method PerformUpdateAsync
+
+        /// <inheritdoc cref="ICommand.PerformChange()"/>
+        public virtual void PerformChange()
         {
             Changed?.Invoke(this, EventArgs.Empty);
         } // method PerformChange
 
-        /// <summary>
-        /// Сигнал, что в команде что-то поменялось.
-        /// </summary>
-        /// <param name="eventArgs">Аргументы для события.</param>
-        public void PerformChange
+        /// <inheritdoc cref="ICommand.PerformChange(System.EventArgs)"/>
+        public virtual void PerformChange
             (
                 EventArgs eventArgs
             )
         {
             Changed?.Invoke(this, eventArgs);
         } // method PerformChange
+
+        /// <inheritdoc cref="ICommand.PerformChangeAsync()"/>
+        public virtual Task PerformChangeAsync()
+        {
+            return Changed.RaiseAsync(this);
+        } // method PerformChangeAsync
+
+        /// <inheritdoc cref="ICommand.PerformChangeAsync(System.EventArgs)"/>
+        public virtual Task PerformChangeAsync
+            (
+                EventArgs eventArgs
+            )
+        {
+            return Changed.RaiseAsync(this, eventArgs);
+        } // method PerformChangeAsync
 
         #endregion
 
