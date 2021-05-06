@@ -9,20 +9,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Delimiters.cs -- широко используемые разделители значений в строке.
+/* Delimiters.cs -- широко используемые разделители значений в строке
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
-using System.IO;
-using System.Text;
-
-#endregion
 
 #nullable enable
 
@@ -36,40 +25,42 @@ namespace AM
         #region Public members
 
         /// <summary>
-        /// Colon.
+        /// Двоеточие.
         /// </summary>
         public static readonly char[] Colon = { ':' };
 
         /// <summary>
-        /// Comma.
+        /// Запятая.
         /// </summary>
         public static readonly char[] Comma = { ',' };
 
         /// <summary>
-        /// Dot.
+        /// Точка.
         /// </summary>
         public static readonly char[] Dot = { '.' };
 
         /// <summary>
-        /// Semicolon.
+        /// Точка с запятой.
         /// </summary>
         public static readonly char[] Semicolon = { ';' };
 
         /// <summary>
-        /// Space.
+        /// Обычный пробел.
         /// </summary>
         public static readonly char[] Space = { ' ' };
 
         /// <summary>
-        /// Tab.
+        /// Горизонтальная табуляция.
         /// </summary>
         public static readonly char[] Tab = { '\t' };
 
         /// <summary>
-        /// Pipe sign.
+        /// Вертикальная черта.
         /// </summary>
         public static readonly char[] Pipe = { '|' };
 
         #endregion
-    }
-}
+
+    } // class Delimiters
+
+} // namespace AM

@@ -7,27 +7,29 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable UnusedParameter.Local
 
-/* IErrorInfo.cs -- интерфейс для информации об ошибке
+/* ObjectRegistry.cs -- реестр объектов для сопоставления с командами
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.Collections.Generic;
+
+#endregion
+
 #nullable enable
 
-namespace AM
+namespace AM.Commands
 {
     /// <summary>
-    /// Интерфейс для информации об ошибке.
+    /// Реестр объектов для сопоставления с командами.
     /// </summary>
-    public interface IErrorInfo
+    public sealed class ObjectRegistry
+        : Dictionary<string, object>
     {
-        /// <summary>
-        /// Описание ошибки.
-        /// </summary>
-        string ErrorDescription { get; }
 
-    } // interface IErrorInfo
+    } // class ObjectRegistry
 
-} // namespace AM
+} // namespace AM.Commands

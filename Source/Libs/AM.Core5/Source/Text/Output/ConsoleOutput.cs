@@ -9,12 +9,13 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* ConsoleOutput.cs -- консольный вывод.
+/* ConsoleOutput.cs -- вывод с помощью системной консоли.
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System.Diagnostics.CodeAnalysis;
 using AM.ConsoleIO;
 
 #endregion
@@ -24,8 +25,9 @@ using AM.ConsoleIO;
 namespace AM.Text.Output
 {
     /// <summary>
-    /// Консольный вывод.
+    /// Вывод с помощью системной консоли.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class ConsoleOutput
         : AbstractOutput
     {

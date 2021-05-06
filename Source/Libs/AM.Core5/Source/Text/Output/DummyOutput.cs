@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* DummyOutput.cs
+/* DummyOutput.cs -- выходной поток, который не дает закрыться другому потоку
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +29,7 @@ namespace AM.Text.Output
         /// <summary>
         /// Внутренний поток.
         /// </summary>
-        public AbstractOutput Inner { get { return _inner; } }
+        public AbstractOutput Inner { get; }
 
         #endregion
 
@@ -43,14 +43,8 @@ namespace AM.Text.Output
                 AbstractOutput inner
             )
         {
-            _inner = inner;
+            Inner = inner;
         }
-
-        #endregion
-
-        #region Private members
-
-        private readonly AbstractOutput _inner;
 
         #endregion
 
@@ -68,6 +62,7 @@ namespace AM.Text.Output
         public override AbstractOutput Clear()
         {
             Inner.Clear();
+            HaveError = false;
 
             return this;
         }
@@ -109,10 +104,13 @@ namespace AM.Text.Output
                     )
         {
             Inner.WriteError(text);
+            HaveError = true;
 
             return this;
         }
 
         #endregion
-    }
-}
+
+    } // class DummyOutput
+
+} // namespace AM.Text.Output

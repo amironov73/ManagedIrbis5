@@ -8,6 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMethodReturnValue.Global
 
 /* AbstractOutput.cs -- абстрактный объект текстового вывода
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +17,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -38,45 +40,31 @@ namespace AM.Text.Output
         public abstract bool HaveError { get; set; }
 
         /// <summary>
-        /// Current <see cref="AbstractOutput"/>.
+        /// Текущий общий экземпляр текстового вывода.
         /// </summary>
         public static AbstractOutput Current
         {
-            get
-            {
-                if (ReferenceEquals(_current, null))
-                {
-                    _current = Null;
-                }
-
-                return _current;
-            }
-            set
-            {
-                _current = value;
-            }
+            get => _current ??= Null;
+            set => _current = value;
         }
 
         /// <summary>
-        ///
+        /// Пустой поток.
         /// </summary>
-        public static AbstractOutput Null =>
-            _null ??= new NullOutput();
+        public static AbstractOutput Null => _null ??= new NullOutput();
 
         /// <summary>
-        ///
+        /// Системная консоль.
         /// </summary>
-        public static AbstractOutput Console =>
-            _console ??= new ConsoleOutput();
+        [ExcludeFromCodeCoverage]
+        public static AbstractOutput Console => _console ??= new ConsoleOutput();
 
         #endregion
 
         #region Private members
 
         private static AbstractOutput? _null;
-
         private static AbstractOutput? _console;
-
         private static AbstractOutput? _current;
 
         #endregion
@@ -85,139 +73,115 @@ namespace AM.Text.Output
 
         /// <summary>
         /// Очищает вывод, например, окно.
-        /// Надо переопределить в потомке.
+        /// Метод нужно переопределить в потомке.
         /// </summary>
-        /// <returns></returns>
         public abstract AbstractOutput Clear();
 
         /// <summary>
         /// Конфигурирование объекта.
-        /// Надо переопределить в потомке.
+        /// Метод нужно переопределить в потомке.
         /// </summary>
-        /// <param name="configuration"></param>
-        /// <returns></returns>
+        /// <param name="configuration">Некая строка конфигурации
+        /// (в общем случае зависит от конкретной реализации).
+        /// </param>
         public abstract AbstractOutput Configure
             (
                 string configuration
             );
 
         /// <summary>
-        /// Метод, который нужно переопределить
-        /// в потомке.
+        /// Вывод текста в стандартный выходной поток.
+        /// Метод нужно переопределить в потомке.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns>Возвращает сам объект
-        /// вывода.</returns>
+        /// <param name="text">Текст для вывода.</param>
         public abstract AbstractOutput Write
             (
                 string text
             );
 
         /// <summary>
-        /// Выводит ошибку. Например, красным цветом.
-        /// Надо переопределить в потомке.
+        /// Выводит текста в стандартный поток ошибок.
+        /// Например, красным цветом.
+        /// Метод нужно переопределить в потомке.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
+        /// <param name="text">Текст для вывода.</param>
         public abstract AbstractOutput WriteError
             (
                 string text
             );
 
         /// <summary>
-        ///
+        /// Форматированный вывод текста в стандартный выходной поток.
         /// </summary>
+        /// <param name="format">Строка формата.</param>
+        /// <param name="args">Подставляемые значения.</param>
         public AbstractOutput Write
             (
                 string format,
                 params object[] args
             )
         {
-            return Write
-                (
-                    string.Format
-                        (
-                            format,
-                            args
-                        )
-                );
+            return Write ( string.Format ( format, args ) );
         }
 
         /// <summary>
-        ///
+        /// Форматированный вывод текста в стандартный поток ошибок.
         /// </summary>
+        /// <param name="format">Строка формата.</param>
+        /// <param name="args">Подставляемые значения.</param>
         public AbstractOutput WriteError
             (
                 string format,
                 params object[] args
             )
         {
-            return WriteError
-                (
-                    string.Format
-                        (
-                            format,
-                            args
-                        )
-                );
+            return WriteError ( string.Format ( format, args ) );
         }
 
         /// <summary>
-        ///
+        /// Вывод текста в стандартный выходной поток
+        /// с последующим переводом строки.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
+        /// <param name="text">Текст для вывода.</param>
         public AbstractOutput WriteLine
             (
                 string text
             )
         {
-            return Write
-                (
-                    text
-                    + Environment.NewLine
-                );
+            return Write(text).Write(Environment.NewLine);
         }
 
         /// <summary>
-        ///
+        /// Вывод форматированного текста в стандартный
+        /// выходной поток с последующим переводом строки.
         /// </summary>
+        /// <param name="format">Строка формата.</param>
+        /// <param name="args">Подставляемые аргументы.</param>
         public AbstractOutput WriteLine
             (
                 string format,
                 params object[] args
             )
         {
-            return Write
-                (
-                    string.Format
-                        (
-                            format,
-                            args
-                        )
-                    + Environment.NewLine
-                );
+            return Write ( string.Format ( format, args ) )
+                .Write (Environment.NewLine);
         }
 
         /// <summary>
-        ///
+        /// Вывод форматированного текста в стандартный
+        /// поток ошибок с последующим переводом строки.
         /// </summary>
+        /// <param name="format">Строка формата.</param>
+        /// <param name="args">Подставляемые аргументы.</param>
         public AbstractOutput WriteErrorLine
             (
                 string format,
                 params object[] args
             )
         {
-            return WriteError
-                (
-                    string.Format
-                        (
-                            format,
-                            args
-                        )
-                    + Environment.NewLine
-                );
-        }
+            return WriteError ( string.Format ( format, args ) )
+                .WriteError (Environment.NewLine);
+        } // method WriteErrorLine
 
         #endregion
 
@@ -226,7 +190,9 @@ namespace AM.Text.Output
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public virtual void Dispose()
         {
-        }
+            // Здесь никаких действий не нужно.
+            // Вся очистка -- в потомках (если необходимо).
+        } // method Dispose
 
         #endregion
 

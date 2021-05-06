@@ -289,7 +289,7 @@ namespace AM.Collections
             )
             : this()
         {
-            Sure.NotNull(characters, nameof(characters));
+            Sure.NotNull((object?)characters, nameof(characters));
 
             foreach (char c in characters)
             {

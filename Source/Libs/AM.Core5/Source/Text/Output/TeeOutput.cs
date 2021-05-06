@@ -8,6 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* TeeOutput.cs -- расщепление (повтор) потока вывода
  * Ars Magna project, http://arsmagna.ru
@@ -33,12 +34,9 @@ namespace AM.Text.Output
         #region Properties
 
         /// <summary>
-        /// Подчинённые потоки
+        /// Подчинённые потоки.
         /// </summary>
-        public List<AbstractOutput> Output
-        {
-            get { return _output; }
-        }
+        public List<AbstractOutput> Output { get; } = new ();
 
         #endregion
 
@@ -49,8 +47,7 @@ namespace AM.Text.Output
         /// </summary>
         public TeeOutput()
         {
-            _output = new List<AbstractOutput>();
-        }
+        } // constructor
 
         /// <summary>
         /// Создание объекта с заранее установленным
@@ -61,45 +58,20 @@ namespace AM.Text.Output
                 params AbstractOutput[] children
             )
         {
-            _output = new List<AbstractOutput>
-                (
-                    children
-                );
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly List<AbstractOutput> _output;
-        private bool _haveError;
+            Output.AddRange(children);
+        } // constructor
 
         #endregion
 
         #region AbstractOutput members
 
-        /// <summary>
-        /// Есть ошибка?
-        /// </summary>
-        public override bool HaveError
-        {
-            get { return _haveError; }
-            set
-            {
-                _haveError = value;
-                foreach (AbstractOutput output in Output)
-                {
-                    output.HaveError = value;
-                }
-            }
-        }
+        /// <inheritdoc cref="AbstractOutput.HaveError"/>
+        public override bool HaveError { get; set; }
 
-        /// <summary>
-        /// Очистка.
-        /// </summary>
+        /// <inheritdoc cref="AbstractOutput.Clear"/>
         public override AbstractOutput Clear()
         {
-            _haveError = false;
+            HaveError = false;
             foreach (AbstractOutput output in Output)
             {
                 output.Clear();
@@ -107,25 +79,21 @@ namespace AM.Text.Output
             return this;
         }
 
-        /// <summary>
-        /// Конфигурация.
-        /// </summary>
+        /// <inheritdoc cref="AbstractOutput.Configure"/>
         public override AbstractOutput Configure
             (
                 string configuration
             )
         {
-            // TODO: implement properly
             foreach (AbstractOutput output in Output)
             {
                 output.Configure(configuration);
             }
+
             return this;
         }
 
-        /// <summary>
-        /// Вывод.
-        /// </summary>
+        /// <inheritdoc cref="AbstractOutput.Write(string)"/>
         public override AbstractOutput Write
             (
                 string text
@@ -138,19 +106,18 @@ namespace AM.Text.Output
             return this;
         }
 
-        /// <summary>
-        /// Вывод.
-        /// </summary>
+        /// <inheritdoc cref="AbstractOutput.WriteError(string)"/>
         public override AbstractOutput WriteError
             (
                 string text
             )
         {
-            _haveError = true;
+            HaveError = true;
             foreach (AbstractOutput output in Output)
             {
                 output.WriteError(text);
             }
+
             return this;
         }
 
@@ -165,9 +132,12 @@ namespace AM.Text.Output
             {
                 output.Dispose();
             }
+
             base.Dispose();
         }
 
         #endregion
-    }
-}
+
+    } // class TeeOutput
+
+} // namespace AM.Text.Output

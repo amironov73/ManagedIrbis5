@@ -15,6 +15,14 @@ namespace UnitTests.AM.Text.Output
     public class TextOutputTest
     {
         [TestMethod]
+        public void TextOutput_Construction_1()
+        {
+            var output = new TextOutput();
+
+            Assert.IsFalse(output.HaveError);
+        }
+
+        [TestMethod]
         public void TextOutput_ToString_1()
         {
             const string expected = "Quick brown fox";

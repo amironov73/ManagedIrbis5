@@ -3,11 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedMember.Global
 
 /* TextOutput.cs -- вывод в текстовую строку.
  * Ars Magna project, http://arsmagna.ru
@@ -15,7 +10,6 @@
 
 #region Using directives
 
-using System;
 using System.Text;
 
 #endregion
@@ -30,15 +24,10 @@ namespace AM.Text.Output
     public sealed class TextOutput
         : AbstractOutput
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TextOutput"/> class.
+        /// Конструктор.
         /// </summary>
         public TextOutput()
         {
@@ -65,7 +54,7 @@ namespace AM.Text.Output
             HaveError = false;
 
             return this;
-        }
+        } // method Clear
 
         /// <inheritdoc cref="AbstractOutput.Configure" />
         public override AbstractOutput Configure
@@ -76,7 +65,7 @@ namespace AM.Text.Output
             // TODO: implement
 
             return this;
-        }
+        } // method Configure
 
         /// <inheritdoc cref="AbstractOutput.Write(string)" />
         public override AbstractOutput Write
@@ -90,7 +79,7 @@ namespace AM.Text.Output
             }
 
             return this;
-        }
+        } // method Write
 
         /// <summary>
         /// Выводит ошибку. Например, красным цветом.
@@ -101,24 +90,24 @@ namespace AM.Text.Output
                 string text
             )
         {
+            HaveError = true;
             if (!string.IsNullOrEmpty(text))
             {
                 _builder.Append(text);
             }
 
             return this;
-        }
+        } // method WriteError
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return _builder.ToString();
-        }
+        public override string ToString() => _builder.ToString();
 
         #endregion
-    }
-}
+
+    } // class TextOutput
+
+} // namespace AM.Text.Output

@@ -3,10 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
 /* NullOutput.cs -- пустой объект вывода
@@ -16,15 +12,11 @@
 namespace AM.Text.Output
 {
     /// <summary>
-    /// Пустой объект вывода.
+    /// Пустой (нулевой) объект вывода.
     /// </summary>
     public sealed class NullOutput
         : AbstractOutput
     {
-        #region Private members
-
-        #endregion
-
         #region AbstractOutput members
 
         /// <inheritdoc cref="AbstractOutput.HaveError" />
@@ -36,7 +28,7 @@ namespace AM.Text.Output
             HaveError = false;
 
             return this;
-        }
+        } // method Clear
 
         /// <inheritdoc cref="AbstractOutput.Configure" />
         public override AbstractOutput Configure
@@ -44,10 +36,10 @@ namespace AM.Text.Output
                 string configuration
             )
         {
-            // Noting to do here
+            // Ничего делать не надо
 
             return this;
-        }
+        } // method Configure
 
         /// <inheritdoc cref="AbstractOutput.Write(string)" />
         public override AbstractOutput Write
@@ -55,10 +47,10 @@ namespace AM.Text.Output
                 string text
             )
         {
-            // Nothing to do here
+            // Ничего не нужно делать
 
             return this;
-        }
+        } // method Write
 
         /// <inheritdoc cref="AbstractOutput.WriteError(string)" />
         public override AbstractOutput WriteError
@@ -66,12 +58,14 @@ namespace AM.Text.Output
                 string text
             )
         {
-            // Nothing to do here
+            // Больше ничего не нужно делать
             HaveError = true;
 
             return this;
-        }
+        } // method WriteError
 
         #endregion
-    }
-}
+
+    } // class NullOutput
+
+} // namespace AM.Text.Output
