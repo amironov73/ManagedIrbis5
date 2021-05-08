@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable ReplaceSliceWithRangeIndexer
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -17,7 +18,6 @@
 
 using System;
 using System.Net.Sockets;
-using System.Text;
 
 using AM;
 
@@ -39,7 +39,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
         #region ISyncClientSocket members
 
         /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
-        public Response? TransactSync
+        public unsafe Response? TransactSync
             (
                 SyncQuery query
             )
@@ -65,16 +65,16 @@ namespace ManagedIrbis.Infrastructure.Sockets
 
             var socket = client.Client;
             var length = query.GetLength();
-            var prefix = Encoding.ASCII.GetBytes
-                (
-                    length.ToInvariantString() + "\n"
-                );
+            Span<byte> prefix = stackalloc byte[12];
+            length = FastNumber.Int32ToBytes(length, prefix);
+            prefix[length] = 10; // перевод строки
+            prefix = prefix.Slice(0, length + 1);
             var body = query.GetBody();
 
             try
             {
                 socket.Send(prefix, SocketFlags.None);
-                socket.Send(body, SocketFlags.None);
+                socket.Send(body.Span, SocketFlags.None);
                 socket.Shutdown(SocketShutdown.Send);
             }
             catch (Exception exception)

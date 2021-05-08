@@ -42,6 +42,8 @@ namespace AM
                 int number
             )
         {
+            // TODO: обработка отрицательных значений
+
             var buffer = stackalloc char[10];
             var offset = 9;
             if (number == 0)
@@ -70,6 +72,8 @@ namespace AM
                 Span<char> buffer
             )
         {
+            // TODO: обработка отрицательных значений
+
             fixed (char* start = buffer)
             {
                 var length = 0;
@@ -146,6 +150,8 @@ namespace AM
                 Span<byte> buffer
             )
         {
+            // TODO: обработка отрицательных значений
+
             fixed (byte* start = buffer)
             {
                 var length = 0;

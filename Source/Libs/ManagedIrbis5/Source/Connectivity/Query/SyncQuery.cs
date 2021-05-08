@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable ReplaceSliceWithRangeIndexer
 // ReSharper disable UnusedMember.Global
 
 /* SyncQuery.cs -- клиентский запрос к серверу ИРБИС64 (для синхронного сценария)
@@ -15,6 +16,11 @@
 
 using System;
 using System.IO;
+
+using AM;
+
+using Microsoft.Toolkit.HighPerformance;
+using Microsoft.Toolkit.HighPerformance.Buffers;
 
 #endregion
 
@@ -62,15 +68,26 @@ namespace ManagedIrbis.Infrastructure
             )
             : this()
         {
-            _stream = new QueryStream(1024);
-            _stream.AddHeader(connection, commandCode);
+            _writer = new ArrayPoolBufferWriter<byte>(1024);
+
+            // Заголовок запроса
+            AddAnsi(commandCode);
+            AddAnsi(connection.Workstation);
+            AddAnsi(commandCode);
+            Add(connection.ClientId);
+            Add(connection.QueryId);
+            AddAnsi(connection.Password);
+            AddAnsi(connection.Username);
+            NewLine();
+            NewLine();
+            NewLine();
         } // constructor
 
         #endregion
 
         #region Private members
 
-        private readonly QueryStream _stream;
+        private readonly ArrayPoolBufferWriter<byte> _writer;
 
         #endregion
 
@@ -79,58 +96,126 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Добавление строки с целым числом (плюс перевод строки).
         /// </summary>
-        public void Add (int value) => _stream.Add(value);
+        public unsafe void Add
+            (
+                int value
+            )
+        {
+            Span<byte> span = stackalloc byte[12];
+            var length = FastNumber.Int32ToBytes(value, span);
+            _writer.Write((ReadOnlySpan<byte>) span.Slice(0, length));
+            NewLine();
+        } // method Add
 
         /// <summary>
         /// Добавление строки в кодировке ANSI (плюс перевод строки).
         /// </summary>
-        public void AddAnsi (string? value) => _stream.AddAnsi(value);
+        public unsafe void AddAnsi
+            (
+                string? value
+            )
+        {
+            if (value is not null)
+            {
+                var length = value.Length;
+                Span<byte> span = length < 2048
+                    ? stackalloc byte[length]
+                    : new byte[length];
+                length = IrbisEncoding.Ansi.GetBytes(value, span);
+                _writer.Write((ReadOnlySpan<byte>) span.Slice(0, length));
+            }
+
+            NewLine();
+        } // method AddAnsi
 
         /// <summary>
         /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
         /// </summary>
-        public void AddUtf (string? value) => _stream.AddUtf(value);
+        public void AddUtf
+            (
+                string? value
+            )
+        {
+            if (value is not null)
+            {
+                var utf = IrbisEncoding.Utf8;
+                var length = utf.GetByteCount(value);
+                Span<byte> span = length < 2048
+                    ? stackalloc byte[length]
+                    : new byte[length];
+                length = IrbisEncoding.Ansi.GetBytes(value, span);
+                _writer.Write((ReadOnlySpan<byte>) span.Slice(0, length));
+            }
+            NewLine();
+        } // method AddUtf
 
         /// <summary>
         /// Добавление формата.
         /// </summary>
-        public void AddFormat (string? format) => _stream.AddFormat(format);
+        public void AddFormat
+            (
+                string? format
+            )
+        {
+            if (string.IsNullOrEmpty(format))
+            {
+                NewLine();
+            }
+            else
+            {
+                AddAnsi(format);
+            }
+
+        } // method AddFormat
 
         /// <summary>
         /// Отладочная печать.
         /// </summary>
-        public void Debug (TextWriter writer) => _stream.Debug(writer);
+        public void Debug
+            (
+                TextWriter writer
+            )
+        {
+            var span = GetBody().Span;
+            foreach (var b in span)
+            {
+                writer.Write($" {b:X2}");
+            }
+        } // method Debug
 
         /// <summary>
         /// Отладочная печать.
         /// </summary>
-        public void DebugUtf (TextWriter writer) => _stream.DebugUtf(writer);
+        public void DebugUtf
+            (
+                TextWriter writer
+            )
+        {
+            writer.WriteLine (IrbisEncoding.Utf8.GetString (_writer.WrittenSpan));
+        } // method DebugUtf
 
         /// <summary>
-        /// Получение массива фрагментов, из которых состоит
+        /// Получение массива байтов, из которых состоит
         /// клиентский запрос.
         /// </summary>
-        public byte[] GetBody() => _stream.GetBody();
+        public ReadOnlyMemory<byte> GetBody() => _writer.WrittenMemory;
 
         /// <summary>
         /// Подсчет общей длины запроса (в байтах).
         /// </summary>
-        public int GetLength() => _stream.GetLength();
+        public int GetLength() => _writer.WrittenCount;
 
         /// <summary>
         /// Добавление одного перевода строки.
         /// </summary>
-        public void NewLine() => _stream.NewLine();
+        public void NewLine() => _writer.Write((byte) 10);
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            // Nothing to do yet
-        }
+        public void Dispose() => _writer.Dispose();
 
         #endregion
 

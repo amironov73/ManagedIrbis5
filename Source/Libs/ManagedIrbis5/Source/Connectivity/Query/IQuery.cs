@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMemberInSuper.Global
 
 /* IQuery.cs -- интерфейс клиентского запроса к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
@@ -17,8 +14,6 @@
 
 using System;
 using System.IO;
-
-using AM;
 
 #endregion
 
@@ -57,10 +52,10 @@ namespace ManagedIrbis.Infrastructure
         void Debug (TextWriter writer);
 
         /// <summary>
-        /// Получение массива фрагментов, из которых состоит
+        /// Получение массива байтов, из которых состоит
         /// клиентский запрос.
         /// </summary>
-        byte[] GetBody();
+        ReadOnlyMemory<byte> GetBody();
 
         /// <summary>
         /// Подсчет общей длины запроса (в байтах).
@@ -71,5 +66,7 @@ namespace ManagedIrbis.Infrastructure
         /// Добавление одного перевода строки.
         /// </summary>
         void NewLine();
+
     } // interface IQuery
+
 } // namespace ManagedIrbis.Infrastructrue

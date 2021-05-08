@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System;
 using System.IO;
 
 #endregion
@@ -87,10 +88,10 @@ namespace ManagedIrbis.Infrastructure
         public void DebugUtf (TextWriter writer) => _stream.DebugUtf(writer);
 
         /// <summary>
-        /// Получение массива фрагментов, из которых состоит
+        /// Получение массива байтов, из которых состоит
         /// клиентский запрос.
         /// </summary>
-        public byte[] GetBody() => _stream.GetBody();
+        public ReadOnlyMemory<byte> GetBody() => _stream.GetBody();
 
         /// <summary>
         /// Подсчет общей длины запроса (в байтах).
