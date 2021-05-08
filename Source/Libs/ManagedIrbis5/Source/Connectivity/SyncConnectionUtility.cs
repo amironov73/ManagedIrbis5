@@ -70,7 +70,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(connection, CommandCode.FormatRecord);
+            using var query = new SyncQuery(connection, CommandCode.FormatRecord);
             query.AddAnsi(connection.Database);
             var prepared = IrbisFormat.PrepareFormat(format);
             query.AddAnsi(prepared);
@@ -188,7 +188,7 @@ namespace ManagedIrbis
                 return Array.Empty<int>();
             }
 
-            var query = new SyncQuery(connection, CommandCode.Search);
+            using var query = new SyncQuery(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
                 Database = connection.Database,
@@ -242,7 +242,7 @@ namespace ManagedIrbis
                 return -1;
             }
 
-            var query = new SyncQuery(connection, CommandCode.Search);
+            using var query = new SyncQuery(connection, CommandCode.Search);
             var parameters = new SearchParameters
             {
                 Database = connection.Database,

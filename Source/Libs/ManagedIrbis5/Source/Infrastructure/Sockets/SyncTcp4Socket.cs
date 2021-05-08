@@ -113,6 +113,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
 
             return result;
+
         } // method TransactSync
 
         #endregion

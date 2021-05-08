@@ -7,9 +7,11 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable ReturnTypeCanBeNotNullable
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* SyncConnection.cs -- синхронное подключение к серверу ИРБИС64
@@ -149,9 +151,6 @@ namespace ManagedIrbis
 
         protected internal CancellationTokenSource _cancellation;
 
-        private static readonly int[] _goodCodesForReadRecord = { -201, -600, -602, -603 };
-        private static readonly int[] _goodCodesForReadTerms = { -202, -203, -204 };
-
         protected internal void SetBusy
             (
                 bool busy
@@ -186,7 +185,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, command);
+            using var query = new SyncQuery(this, command);
             foreach (var arg in args)
             {
                 query.AddAnsi(arg.ToString());
@@ -212,7 +211,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, command);
+            using var query = new SyncQuery(this, command);
             var result = ExecuteSync(query);
 
             return result;
@@ -235,7 +234,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, command);
+            using var query = new SyncQuery(this, command);
             query.AddAnsi(arg1.ToString());
 
             var result = ExecuteSync(query);
@@ -392,15 +391,18 @@ namespace ManagedIrbis
             QueryId = 1;
             ClientId = new Random().Next(100000, 999999);
 
-            var query = new SyncQuery(this, CommandCode.RegisterClient);
-            query.AddAnsi(Username);
-            query.AddAnsi(Password);
-
-            var response = ExecuteSync(query);
-            if (ReferenceEquals(response, null))
+            Response? response;
+            using (var query = new SyncQuery(this, CommandCode.RegisterClient))
             {
-                LastError = -100_500;
-                return false;
+                query.AddAnsi(Username);
+                query.AddAnsi(Password);
+
+                response = ExecuteSync(query);
+                if (ReferenceEquals(response, null))
+                {
+                    LastError = -100_500;
+                    return false;
+                }
             }
 
             if (response.GetReturnCode() == -3337)
@@ -436,7 +438,7 @@ namespace ManagedIrbis
             var database = parameters.Database
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new SyncQuery(this, CommandCode.CreateDatabase);
+            using var query = new SyncQuery(this, CommandCode.CreateDatabase);
             query.AddAnsi(database);
             query.AddAnsi(parameters.Database);
             query.Add(parameters.ReaderAccess ? 1 : 0);
@@ -459,7 +461,7 @@ namespace ManagedIrbis
             var database = databaseName
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new SyncQuery(this, CommandCode.CreateDictionary);
+            using var query = new SyncQuery(this, CommandCode.CreateDictionary);
             query.AddAnsi(database);
             var response = ExecuteSync(query);
 
@@ -480,7 +482,7 @@ namespace ManagedIrbis
             var database = databaseName
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new SyncQuery(this, CommandCode.DeleteDatabase);
+            using var query = new SyncQuery(this, CommandCode.DeleteDatabase);
             query.AddAnsi(database);
             var response = ExecuteSync(query);
 
@@ -492,7 +494,7 @@ namespace ManagedIrbis
         {
             if (Connected)
             {
-                var query = new SyncQuery(this, CommandCode.UnregisterClient);
+                using var query = new SyncQuery(this, CommandCode.UnregisterClient);
                 query.AddAnsi(Username);
                 try
                 {
@@ -538,7 +540,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, CommandCode.NewFulltextSearch);
+            using var query = new SyncQuery(this, CommandCode.NewFulltextSearch);
             searchParameters.Encode(this, query);
             textParameters.Encode(this, query);
             var response = ExecuteSync(query);
@@ -592,7 +594,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, CommandCode.ServerInfo);
+            using var query = new SyncQuery(this, CommandCode.ServerInfo);
             var response = ExecuteSync(query);
             if (response is null)
             {
@@ -631,7 +633,7 @@ namespace ManagedIrbis
                 return Array.Empty<string>();
             }
 
-            var query = new SyncQuery(this, CommandCode.ListFiles);
+            using var query = new SyncQuery(this, CommandCode.ListFiles);
             foreach (var specification in specifications)
             {
                 query.AddAnsi(specification.ToString());
@@ -674,7 +676,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, CommandCode.GetProcessList);
+            using var query = new SyncQuery(this, CommandCode.GetProcessList);
             var response = ExecuteSync(query);
             if (response is null)
             {
@@ -735,7 +737,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, CommandCode.ReadPostings);
+            using var query = new SyncQuery(this, CommandCode.ReadPostings);
             parameters.Encode(this, query);
             var response = ExecuteSync(query);
             if (response is null
@@ -761,7 +763,7 @@ namespace ManagedIrbis
             var database = parameters.Database
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new SyncQuery(this, CommandCode.ReadRecord);
+            using var query = new SyncQuery(this, CommandCode.ReadRecord);
             query.AddAnsi(database);
             query.Add(parameters.Mfn);
             // TODO: добавить обработку прочих параметров
@@ -805,7 +807,7 @@ namespace ManagedIrbis
             var command = parameters.ReverseOrder
                 ? CommandCode.ReadTermsReverse
                 : CommandCode.ReadTerms;
-            var query = new SyncQuery(this, command);
+            using var query = new SyncQuery(this, command);
             parameters.Encode(this, query);
             var response = ExecuteSync(query);
             if (response is null
@@ -828,7 +830,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, CommandCode.ReadDocument);
+            using var query = new SyncQuery(this, CommandCode.ReadDocument);
             query.AddAnsi(specification.ToString());
             var response = ExecuteSync(query);
             if (response is null)
@@ -890,7 +892,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new SyncQuery(this, CommandCode.Search);
+            using var query = new SyncQuery(this, CommandCode.Search);
             parameters.Encode(this, query);
             var response = ExecuteSync(query);
             if (response is null
@@ -944,7 +946,7 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new SyncQuery(this, CommandCode.UnlockRecords);
+            using var query = new SyncQuery(this, CommandCode.UnlockRecords);
             query.AddAnsi(databaseName ?? Database);
             foreach (var mfn in mfnList)
             {
@@ -967,7 +969,7 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new SyncQuery(this, CommandCode.UpdateIniFile);
+            using var query = new SyncQuery(this, CommandCode.UpdateIniFile);
             foreach (var line in lines)
             {
                 if (!string.IsNullOrWhiteSpace(line))
@@ -992,7 +994,7 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new SyncQuery(this, CommandCode.SetUserList);
+            using var query = new SyncQuery(this, CommandCode.SetUserList);
             foreach (var user in users)
             {
                 query.AddAnsi(user.Encode());
@@ -1019,7 +1021,7 @@ namespace ManagedIrbis
             var database = record.Database
                            ?? Database
                            ?? throw new IrbisException();
-            var query = new SyncQuery(this, CommandCode.UpdateRecord);
+            using var query = new SyncQuery(this, CommandCode.UpdateRecord);
             query.AddAnsi(database);
             query.Add(parameters.Lock ? 1 : 0);
             query.Add(parameters.Actualize ? 1 : 0);
@@ -1052,7 +1054,7 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var query = new SyncQuery(this, CommandCode.ReadDocument);
+            using var query = new SyncQuery(this, CommandCode.ReadDocument);
             query.AddAnsi(specification.ToString());
 
             var response = ExecuteSync(query);

@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* SyncQuery.cs -- клиентский запрос к серверу ИРБИС64 (для синхронного сценария)
  * Ars Magna project, http://arsmagna.ru
@@ -12,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.IO;
 
 #endregion
@@ -45,7 +47,8 @@ namespace ManagedIrbis.Infrastructure
     /// (для синхронного сценария).
     /// </summary>
     public readonly struct SyncQuery
-        : IQuery
+        : IQuery,
+        IDisposable
     {
         #region Construction
 
@@ -118,6 +121,16 @@ namespace ManagedIrbis.Infrastructure
         /// Добавление одного перевода строки.
         /// </summary>
         public void NewLine() => _stream.NewLine();
+
+        #endregion
+
+        #region IDisposable members
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose()
+        {
+            // Nothing to do yet
+        }
 
         #endregion
 

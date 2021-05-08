@@ -3517,6 +3517,43 @@ namespace AM
         }
 
         /// <summary>
+        /// Усекает строку до указанной длины, добавляя при необходимости
+        /// многоточие в конце строки.
+        /// </summary>
+        /// <param name="text">Текст для усечения.</param>
+        /// <param name="length">Максимальная длина (без учета многоточия).
+        /// </param>
+        /// <returns>Результирующая строка.</returns>
+        [Pure]
+        public static string TruncateWithEllipsis
+            (
+                string? text,
+                int length
+            )
+        {
+            if (!string.IsNullOrEmpty(text))
+            {
+                text = text!.Trim();
+
+                if (text.Length > length)
+                {
+                    return text.Substring(0, length) + "…";
+                }
+            }
+
+            return text ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Получает результат выполнения задачи, если задача завершена,
+        /// иначе выдает значение по умолчанию.
+        /// </summary>
+        /// <param name="task">Проверяемая задача.</param>
+        [Pure]
+        public static T? GetResultOrDefault<T>(this Task<T?> task) =>
+            task.Status == TaskStatus.RanToCompletion ? task.Result : default;
+
+        /// <summary>
         /// Optimal degree of parallelism.
         /// </summary>
         [Pure]
