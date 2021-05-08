@@ -54,6 +54,17 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         [TestMethod]
+        public void PftCeil_Construction_3()
+        {
+            var value = new PftNumericLiteral(123.45);
+            var node = new PftCeil(value);
+            Assert.IsFalse(node.ConstantExpression);
+            Assert.IsTrue(node.RequiresConnection);
+            Assert.IsTrue(node.ExtendedSyntax);
+            Assert.AreSame(value, node.Children[0]);
+        }
+
+        [TestMethod]
         public void PftCeil_Compile_1()
         {
             var node = new PftCeil();

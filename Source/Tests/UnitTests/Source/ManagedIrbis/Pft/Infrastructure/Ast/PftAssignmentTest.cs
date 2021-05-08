@@ -57,7 +57,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
 
         private PftAssignment _GetNumericAssignment()
         {
-            return new PftAssignment
+            return new ()
             {
                 IsNumeric = true,
                 Name = "x",
@@ -78,9 +78,9 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             };
         }
 
-        private PftAssignment _GetDirectAssignment1()
+        private PftAssignment _GetDirectAssignment_1()
         {
-            return new PftAssignment
+            return new ()
             {
                 IsNumeric = true,
                 Name = "x",
@@ -91,9 +91,9 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             };
         }
 
-        private PftAssignment _GetDirectAssignment2()
+        private PftAssignment _GetDirectAssignment_2()
         {
-            return new PftAssignment
+            return new ()
             {
                 IsNumeric = false,
                 Name = "x",
@@ -106,7 +106,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
 
         private PftAssignment _GetStringAssignment()
         {
-            return new PftAssignment
+            return new ()
             {
                 IsNumeric = false,
                 Name = "x",
@@ -159,6 +159,25 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             Assert.IsTrue(node.ComplexExpression);
             Assert.AreSame(name, node.Name);
             Assert.AreEqual(0, node.Children.Count);
+        }
+
+        [TestMethod]
+        public void PftAssignment_Construction_4()
+        {
+            var name = "x";
+            var body = new PftNode[]
+            {
+                new PftUnconditionalLiteral("Hello,"),
+                new PftComma(),
+                new PftUnconditionalLiteral(" world!")
+            };
+            var node = new PftAssignment(false, name, body);
+            Assert.IsFalse(node.ConstantExpression);
+            Assert.IsTrue(node.RequiresConnection);
+            Assert.IsTrue(node.ExtendedSyntax);
+            Assert.IsTrue(node.ComplexExpression);
+            Assert.AreSame(name, node.Name);
+            Assert.AreEqual(body.Length, node.Children.Count);
         }
 
         [TestMethod]
@@ -270,14 +289,14 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         [TestMethod]
         public void PftAssignment_Execute_4()
         {
-            var node = _GetDirectAssignment1();
+            var node = _GetDirectAssignment_1();
             _Execute(node, 3.14);
         }
 
         [TestMethod]
         public void PftAssignment_Execute_5()
         {
-            var node = _GetDirectAssignment2();
+            var node = _GetDirectAssignment_2();
             _Execute(node, "hello");
         }
 

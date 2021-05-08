@@ -52,6 +52,21 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         [TestMethod]
+        public void PftBlank_Construction_3()
+        {
+            var children = new PftNode[]
+            {
+                new PftUnconditionalLiteral("123.45"),
+                new PftComma()
+            };
+            var node = new PftBlank(children);
+            Assert.IsFalse(node.ConstantExpression);
+            Assert.IsTrue(node.RequiresConnection);
+            Assert.IsTrue(node.ExtendedSyntax);
+            Assert.AreEqual(children.Length, node.Children.Count);
+        }
+
+        [TestMethod]
         public void PftBlank_Compile_1()
         {
             var node = new PftBlank();

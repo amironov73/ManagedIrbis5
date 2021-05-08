@@ -1,10 +1,10 @@
+// ReSharper disable CheckNamespace
+
 using System.Text;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Text;
-
-// ReSharper disable CheckNamespace
 
 #nullable enable
 
@@ -23,7 +23,11 @@ namespace UnitTests.AM.Text
                 Accumulator = new StringBuilder();
             }
 
-            protected override void HandleChunk(bool inner, string text)
+            protected override void HandleChunk
+                (
+                    bool inner,
+                    string text
+                )
             {
                 if (inner)
                 {
@@ -60,6 +64,26 @@ namespace UnitTests.AM.Text
             var separator = new TextSeparator();
             Assert.AreEqual(TextSeparator.DefaultOpen, separator.Open);
             Assert.AreEqual(TextSeparator.DefaultClose, separator.Close);
+        }
+
+        [TestMethod]
+        public void TextSeparator_Construction_2()
+        {
+            const string open = "<";
+            const string close = "<";
+            var separator = new TextSeparator(open, close);
+            Assert.AreEqual(open, separator.Open);
+            Assert.AreEqual(close, separator.Close);
+        }
+
+        [TestMethod]
+        public void TextSeparator_Construction_3()
+        {
+            const string open = "<";
+            const string close = "<";
+            var separator = new TextSeparator { Open = open, Close = close };
+            Assert.AreEqual(open, separator.Open);
+            Assert.AreEqual(close, separator.Close);
         }
 
         [TestMethod]

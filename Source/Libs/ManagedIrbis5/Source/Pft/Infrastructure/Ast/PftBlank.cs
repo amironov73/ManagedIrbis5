@@ -8,13 +8,14 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftBlank.cs --
+/* PftBlank.cs -- определяет, пуста ли указанная строка
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
@@ -27,7 +28,9 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Определяет, пуста ли указанная строка.
+    /// Пустой считается строка: 1) null, 2) "",
+    /// 3) состоящая только из пробельных символов.
     /// </summary>
     public sealed class PftBlank
         : PftCondition
@@ -76,28 +79,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Public methods
 
         /// <summary>
-        /// Is the string blank?
+        /// Пуста ли указанная строка?
+        /// Пустой считается строка: 1) null, 2) "",
+        /// 3) состоящая только из пробельных символов.
         /// </summary>
-        public static bool IsBlank
-            (
-                string? text
-            )
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return true;
-            }
-
-            foreach (var c in text)
-            {
-                if (!char.IsWhiteSpace(c))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
+        public static bool IsBlank ( string? text ) => string.IsNullOrWhiteSpace(text);
 
         #endregion
 
@@ -148,7 +134,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            string text = context.Evaluate(Children);
+            var text = context.Evaluate(Children);
 
             Value = IsBlank(text);
 
@@ -170,10 +156,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        [ExcludeFromCodeCoverage]
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -182,10 +166,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("blank(");
             var first = true;
-            foreach (PftNode child in Children)
+            foreach (var child in Children)
             {
                 if (!first)
                 {
@@ -200,5 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
+
+    } // class PftBlank
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

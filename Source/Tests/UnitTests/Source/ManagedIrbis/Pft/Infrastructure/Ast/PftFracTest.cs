@@ -10,6 +10,7 @@ using ManagedIrbis.Pft.Infrastructure.Ast;
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
 using ManagedIrbis.Providers;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #nullable enable

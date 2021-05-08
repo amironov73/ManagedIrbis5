@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftA.cs --
+/* PftA.cs -- проверка на отсутствие поля/подполя
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,7 +31,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Проверка на отсутствие поля/подполя.
     /// </summary>
     public sealed class PftA
         : PftCondition
@@ -375,5 +375,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public override string ToString() => "a(" + Field + ")";
 
         #endregion
-    }
-}
+
+    } // class PftA
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

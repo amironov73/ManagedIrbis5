@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftAny.cs --
+/* PftAny.cs -- проверяет, выполняется ли указанное условие хотя бы для одного повторения в группе
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,7 +33,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Проверяет, выполняется ли указанное условие хотя бы для одного повторения в группе.
     /// </summary>
     public sealed class PftAny
         : PftCondition
@@ -41,7 +41,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Properties
 
         /// <summary>
-        /// Condition
+        /// Проверяемое условие.
         /// </summary>
         public PftCondition? InnerCondition { get; set; }
 
@@ -66,25 +66,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
 
-                Magna.Error
-                    (
-                        "PftAny::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            [ExcludeFromCodeCoverage]
+            protected set => Magna.Error
+                (
+                    nameof(PftAny) + "::" + nameof(Children)
+                    + ": set value="
+                    + value.ToVisibleString()
+                );
         }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
-        public override bool ExtendedSyntax
-        {
-            get { return true; }
-        }
+        public override bool ExtendedSyntax => true;
 
         #endregion
 
@@ -305,5 +298,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
+
+    } // class PftAny
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

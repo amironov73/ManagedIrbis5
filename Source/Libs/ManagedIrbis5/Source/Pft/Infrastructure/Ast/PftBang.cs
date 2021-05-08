@@ -4,16 +4,15 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* PftBang.cs --
+/* PftBang.cs -- вызов отладчика из PFT-скрипта
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -25,7 +24,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Вызов отладчика из PFT-скрипта.
     /// </summary>
     public sealed class PftBang
         : PftNode
@@ -111,21 +110,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        [ExcludeFromCodeCoverage]
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return "!";
-        }
+        public override string ToString() => "!";
 
         #endregion
-    }
-}
+
+    } // class PftBang
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

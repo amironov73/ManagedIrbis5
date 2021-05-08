@@ -2,14 +2,12 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 
-/* TextSeparator.cs -- отделяет вложенный текст от внешнего
+/* TextSeparator.cs -- разделяет текст на вложенный и внешний
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +15,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 #endregion
 
@@ -26,19 +23,19 @@ using System.Text;
 namespace AM.Text
 {
     /// <summary>
-    /// Отделяет вложенный текст от внешнего.
+    /// Разделяет текст на вложенный и внешний.
     /// </summary>
     public class TextSeparator
     {
         #region Constants
 
         /// <summary>
-        /// Default closing sequence.
+        /// Закрывающая последовательность символов по умолчанию.
         /// </summary>
         public const string DefaultClose = "%>";
 
         /// <summary>
-        /// Default opening sequence.
+        /// Открывающая последовательность символов по умолчанию.
         /// </summary>
         public const string DefaultOpen = "<%";
 
@@ -47,11 +44,11 @@ namespace AM.Text
         #region Properties
 
         /// <summary>
-        /// Closing sequence.
+        /// Действующая закрывающая последовательность символов.
         /// </summary>
         public string Close
         {
-            get => new string(_close);
+            get => new (_close);
             set
             {
                 Sure.NotNullNorEmpty(value, nameof(value));
@@ -61,11 +58,11 @@ namespace AM.Text
         }
 
         /// <summary>
-        /// Nested text opening sequence.
+        /// Действующая открывающая последовательность символов.
         /// </summary>
         public string Open
         {
-            get => new string(_open);
+            get => new (_open);
             set
             {
                 Sure.NotNullNorEmpty(value, nameof(value));
@@ -79,12 +76,12 @@ namespace AM.Text
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public TextSeparator
             (
-                string open,
-                string close
+                string open = DefaultOpen,
+                string close = DefaultClose
             )
         {
             Sure.NotNullNorEmpty(open, nameof(open));
@@ -92,18 +89,6 @@ namespace AM.Text
 
             _close = close.ToCharArray();
             _open = open.ToCharArray();
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public TextSeparator()
-            : this
-            (
-                DefaultOpen,
-                DefaultClose
-            )
-        {
         }
 
         #endregion
@@ -117,9 +102,9 @@ namespace AM.Text
         //=================================================
 
         /// <summary>
-        /// Handle text chunk.
+        /// Обработка следующего куска текста.
+        /// Метод должен быть переопределен в классе-потомке.
         /// </summary>
-        /// <remarks>Must be overridden.</remarks>
         [ExcludeFromCodeCoverage]
         protected virtual void HandleChunk
             (
@@ -150,7 +135,7 @@ namespace AM.Text
         //=================================================
 
         /// <summary>
-        /// Separate text.
+        /// Разделение текста на внешний и внутренний.
         /// </summary>
         public bool SeparateText
             (
@@ -159,7 +144,7 @@ namespace AM.Text
         {
             var inner = false;
             var array = _open;
-            var buffer = new StringBuilder();
+            var buffer = StringBuilderPool.Shared.Get();
 
             while (true)
             {
@@ -214,11 +199,15 @@ namespace AM.Text
                     );
             }
 
+            StringBuilderPool.Shared.Return(buffer);
+
             return inner;
         }
 
         //=================================================
 
         #endregion
-    }
-}
+
+    } // class TextSeparator
+
+} // namespace AM.Text

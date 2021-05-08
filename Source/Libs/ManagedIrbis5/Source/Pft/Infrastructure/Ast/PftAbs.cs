@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftAbs.cs --
+/* PftAbs.cs -- вычисляет абсолютную величину числа
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,6 +15,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -28,7 +29,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Вычисляет абсолютную величину (модуль) указанного числа.
     /// </summary>
     public sealed class PftAbs
         : PftNumeric
@@ -131,10 +132,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        [ExcludeFromCodeCoverage]
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -156,5 +155,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
+
+    } // class PftAbs
+
+} // namespace ManagedIrbis.Pft.Inftastructure.Ast

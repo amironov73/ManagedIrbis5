@@ -7,11 +7,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftBreak.cs --
+/* PftBreak.cs -- досрочное прерывание цикла
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System.Diagnostics.CodeAnalysis;
 
 using AM;
 
@@ -69,7 +71,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
      */
 
     /// <summary>
-    ///
+    /// Досрочное прерывание цикла.
     /// </summary>
     public sealed class PftBreak
         : PftNode
@@ -184,8 +186,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
                     Magna.Trace
                         (
-                            "PftBreak::Execute: "
-                            + "break inside the group"
+                            nameof(PftBreak) + "::" + nameof(Execute)
+                            + ": break inside the group"
                         );
 
                     throw new PftBreakException(this);
@@ -194,13 +196,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 var possibleCondition = Parent;
                 if (possibleCondition is PftConditionalStatement)
                 {
-                    //PftNode possibleGroup = condition.Parent;
-                    //if ((possibleGroup is PftGroup)
-                    //    || (possibleGroup is PftParallelGroup))
-                    //{
-                        context.BreakFlag = true;
-                        handled = true;
-                    //}
+                    context.BreakFlag = true;
+                    handled = true;
                 }
 
                 if (!handled)
@@ -215,8 +212,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 Magna.Trace
                     (
-                        "PftBreak::Execute: "
-                        + "break outside the group"
+                        nameof(PftBreak) + "::" + nameof(Execute)
+                        + ": break outside the group"
                     );
 
                 throw new PftBreakException(this);
@@ -238,6 +235,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+        [ExcludeFromCodeCoverage]
         protected internal override bool ShouldSerializeText() => false;
 
         #endregion
@@ -251,5 +249,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
+
+    } // class PftBreak
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

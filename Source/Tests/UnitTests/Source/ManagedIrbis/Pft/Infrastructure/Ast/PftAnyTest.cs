@@ -40,7 +40,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         {
             var result = new Record();
 
-            var field = new Field { Tag = 700};
+            var field = new Field { Tag = 700 };
             field.Add('a', "Иванов");
             field.Add('b', "И. И.");
             result.Fields.Add(field);
@@ -101,6 +101,22 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             Assert.AreEqual(token.Column, node.Column);
             Assert.AreEqual(token.Line, node.LineNumber);
             Assert.AreEqual(token.Text, node.Text);
+        }
+
+        [TestMethod]
+        public void PftAny_Construction_3()
+        {
+            var innerCondition = new PftComparison
+            {
+                LeftOperand = new PftV("v300"),
+                Operation = ":",
+                RightOperand = new PftUnconditionalLiteral("примечание")
+            };
+            var node = new PftAny(innerCondition);
+            Assert.IsFalse(node.ConstantExpression);
+            Assert.IsTrue(node.RequiresConnection);
+            Assert.IsTrue(node.ExtendedSyntax);
+            Assert.AreSame(innerCondition, node.InnerCondition);
         }
 
         [TestMethod]

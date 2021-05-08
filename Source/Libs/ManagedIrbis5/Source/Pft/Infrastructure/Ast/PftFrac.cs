@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftFrac.cs --
+/* PftFrac.cs -- вычисление дробной части числа с плавающей точкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,7 +30,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Вычисление дробной части числа с плавающей точкой.
     /// </summary>
     public sealed class PftFrac
         : PftNumeric
@@ -45,14 +45,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public PftFrac()
         {
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftFrac
             (
@@ -157,5 +157,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
+
+    } // class PftFrac
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* InvariantFormat.cs -- форматирование текста, не зависящее от культуры
  * Ars Magna project, http://arsmagna.ru
@@ -31,176 +27,75 @@ namespace AM.Text
     {
         #region Private members
 
-        private static readonly IFormatProvider FormatProvider;
-
-        static InvariantFormat()
-        {
-            FormatProvider = CultureInfo.InvariantCulture;
-        }
+        private static readonly IFormatProvider _formatProvider
+            = CultureInfo.InvariantCulture;
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Format string.
+        /// Форматирование строки.
         /// </summary>
-        public static string Format
-            (
-                string format,
-                object? arg0
-            )
-        {
-            var result = string.Format
-                (
-                    FormatProvider,
-                    format,
-                    arg0
-                );
-
-            return result;
-        }
+        public static string Format ( string format, object? arg0 ) =>
+            string.Format ( _formatProvider, format, arg0 );
 
         /// <summary>
-        /// Format string.
+        /// Форматирование строки.
         /// </summary>
-        public static string Format
-            (
-                string format,
-                object? arg0,
-                object? arg1
-            )
-        {
-            var result = string.Format
-                (
-                    FormatProvider,
-                    format,
-                    arg0,
-                    arg1
-                );
-
-            return result;
-        }
+        public static string Format ( string format, object? arg0, object? arg1 ) =>
+            string.Format ( _formatProvider, format, arg0, arg1 );
 
         /// <summary>
-        /// Format string.
+        /// Форматирование строки.
         /// </summary>
-        public static string Format
-            (
-                string format,
-                object? arg0,
-                object? arg1,
-                object? arg2
-            )
-        {
-            var result = string.Format
-                (
-                    FormatProvider,
-                    format,
-                    arg0,
-                    arg1,
-                    arg2
-                );
-
-            return result;
-        }
+        public static string Format ( string format, object? arg0, object? arg1, object? arg2 ) =>
+            string.Format ( _formatProvider, format, arg0, arg1, arg2 );
 
         /// <summary>
-        /// Format string.
+        /// Форматирование строки.
         /// </summary>
-        public static string Format
-            (
-                string format,
-                params object[] args
-            )
-        {
-            var result = string.Format
-                (
-                    FormatProvider,
-                    format,
-                    args
-                );
-
-            return result;
-        }
+        public static string Format ( string format, params object[] args ) =>
+            string.Format ( _formatProvider, format, args );
 
         /// <summary>
-        /// Format integer.
+        /// Форматирование целого числа.
         /// </summary>
-        public static string Format
-            (
-                string format,
-                int arg0
-            )
-        {
-            var result = string.Format
-                (
-                    FormatProvider,
-                    format,
-                    arg0
-                );
-
-            return result;
-        }
+        public static string Format ( string format, int arg0 ) =>
+            string.Format ( _formatProvider, format, arg0 );
 
         /// <summary>
-        /// Format double.
+        /// Форматирование числа с плавающей точкой.
         /// </summary>
-        public static string Format
-            (
-                string format,
-                double arg0
-            )
-        {
-            var result = string.Format
-                (
-                    FormatProvider,
-                    format,
-                    arg0
-                );
-
-            return result;
-        }
+        public static string Format ( string format, double arg0 ) =>
+            string.Format ( _formatProvider, format, arg0 );
 
         /// <summary>
-        /// Format integer.
+        /// Форматирование числа с фиксированной точкой.
         /// </summary>
-        public static string Format
-            (
-                int arg0
-            )
-        {
-            var result = arg0.ToString(FormatProvider);
-
-            return result;
-        }
+        public static string Format ( string format, decimal arg0 ) =>
+            string.Format ( _formatProvider, format, arg0 );
 
         /// <summary>
-        /// Format double.
+        /// Форматирование целого числа.
         /// </summary>
-        public static string Format
-            (
-                double arg0
-            )
-        {
-            var result = arg0.ToString(FormatProvider);
-
-            return result;
-        }
+        public static string Format ( int arg0 ) =>
+            arg0.ToString(_formatProvider);
 
         /// <summary>
-        /// Format decimal.
+        /// Форматирование числа с плавающей точкой.
         /// </summary>
-        public static string Format
-            (
-                decimal arg0
-            )
-        {
-            var result = arg0.ToString(FormatProvider);
+        public static string Format ( double arg0 ) =>
+            arg0.ToString(_formatProvider);
 
-            return result;
-        }
+        /// <summary>
+        /// Форматирование числа с фиксированной точкой.
+        /// </summary>
+        public static string Format ( decimal arg0 ) =>
+            arg0.ToString(_formatProvider);
 
         #endregion
-    }
-}
+
+    } // class InvariantFormat
+
+} // namespace AM.Text

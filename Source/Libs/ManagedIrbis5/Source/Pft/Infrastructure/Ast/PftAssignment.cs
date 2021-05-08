@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftAssignment.cs --
+/* PftAssignment.cs -- операция присваивания переменной вычисленного значения выражения
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -34,7 +34,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Операция присваивания переменной вычисленного значения выражения.
     /// </summary>
     public sealed class PftAssignment
         : PftNode
@@ -129,7 +129,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             // TODO handle indexing
             //
 
-            var name = Name.ThrowIfNull("name");
+            var name = Name.ThrowIfNull(nameof(Name));
 
             if (Children.Count == 1)
             {
@@ -423,6 +423,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
 
+    } // class PftAssingnment
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

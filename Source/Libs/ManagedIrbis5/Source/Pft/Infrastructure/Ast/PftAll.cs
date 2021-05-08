@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftAll.cs --
+/* PftAll.cs -- проверяет, выполняется ли указанное условие для всех повторений группы
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,7 +33,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Проверяет, выполняется ли указанное условие для всех повторений группы.
     /// </summary>
     public sealed class PftAll
         : PftCondition
@@ -41,7 +41,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Properties
 
         /// <summary>
-        /// Condition
+        /// Проверяемое условие.
         /// </summary>
         public PftCondition? InnerCondition { get; set; }
 
@@ -56,7 +56,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     _virtualChildren = new VirtualChildren();
                     if (!ReferenceEquals(InnerCondition, null))
                     {
-                        List<PftNode> nodes = new List<PftNode>
+                        var nodes = new List<PftNode>
                         {
                             InnerCondition
                         };
@@ -66,18 +66,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
 
-                Magna.Error
-                    (
-                        "PftAll::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            [ExcludeFromCodeCoverage]
+            protected set => Magna.Error
+                (
+                    nameof(PftAll) + "::" + nameof(Children)
+                    + ": set value="
+                    + value.ToVisibleString()
+                );
         }
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
@@ -130,7 +126,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftAll result = (PftAll)base.Clone();
+            var result = (PftAll)base.Clone();
 
             if (!ReferenceEquals(InnerCondition, null))
             {
@@ -181,17 +177,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 Magna.Error
                     (
-                        "PftAll::Execute: "
-                        + "nested group detected"
+                        nameof(PftAll) + "::" + nameof(Execute)
+                        + ": nested group detected"
                     );
 
                 throw new PftSemanticException("Nested group");
             }
 
-            PftCondition condition = InnerCondition
-                .ThrowIfNull("Condition");
+            var condition = InnerCondition.ThrowIfNull(nameof(InnerCondition));
 
-            PftGroup group = new PftGroup();
+            var group = new PftGroup();
 
             try
             {
@@ -200,7 +195,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 OnBeforeExecution(context);
 
-                bool value = false;
+                var value = false;
 
                 for (
                         context.Index = 0;
@@ -237,7 +232,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
                 Name = SimplifyTypeName(GetType().Name)
@@ -298,5 +293,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
+
+    } // class PftAll
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

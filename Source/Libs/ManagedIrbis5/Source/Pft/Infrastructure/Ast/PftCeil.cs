@@ -7,13 +7,14 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftCeil.cs --
+/* PftCeil.cs -- округление вверх
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -27,7 +28,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    ///
+    /// Округление вверх.
     /// </summary>
     public sealed class PftCeil
         : PftNumeric
@@ -113,8 +114,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             OnBeforeExecution(context);
 
-            var child = Children.FirstOrDefault() as PftNumeric;
-            if (!ReferenceEquals(child, null))
+            if (Children.FirstOrDefault() is PftNumeric child)
             {
                 child.Execute(context);
                 Value = Math.Ceiling(child.Value);
@@ -137,6 +137,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
+        [ExcludeFromCodeCoverage]
         protected internal override bool ShouldSerializeText() => false;
 
         #endregion
@@ -159,5 +160,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         #endregion
-    }
-}
+
+    } // class PftCeil
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

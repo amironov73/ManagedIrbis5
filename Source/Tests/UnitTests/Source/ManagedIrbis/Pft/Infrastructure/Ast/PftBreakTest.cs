@@ -159,6 +159,65 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         [TestMethod]
+        public void PftBreak_Execute_4()
+        {
+            var record = _GetRecord();
+            var node = new PftGroup
+            {
+                Children =
+                {
+                    new PftConditionalStatement
+                    {
+                        Condition = new PftTrue(),
+                        ThenBranch =
+                        {
+                            new PftV(300),
+                            new PftBreak(),
+                            new PftUnconditionalLiteral(" == ")
+                        }
+                    }
+                }
+            };
+            var saveBreak = PftConfig.BreakImmediate;
+            try
+            {
+                PftConfig.BreakImmediate = false;
+                _Execute(record, node, "Первое примечание == ");
+            }
+            finally
+            {
+                PftConfig.BreakImmediate = saveBreak;
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(PftBreakException))]
+        public void PftBreak_Execute_5()
+        {
+            var record = _GetRecord();
+            var node = new PftConditionalStatement
+            {
+                Condition = new PftTrue(),
+                ThenBranch =
+                {
+                    new PftV(300),
+                    new PftBreak(),
+                    new PftUnconditionalLiteral(" == ")
+                }
+            };
+            var saveBreak = PftConfig.BreakImmediate;
+            try
+            {
+                PftConfig.BreakImmediate = true;
+                _Execute(record, node, "Первое примечание");
+            }
+            finally
+            {
+                PftConfig.BreakImmediate = saveBreak;
+            }
+        }
+
+        [TestMethod]
         public void PftBreak_PrettyPrint_1()
         {
             var node = new PftBreak();

@@ -22,7 +22,7 @@ using System.IO;
 using System.Text;
 
 using AM;
-
+using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -109,18 +109,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 return _virtualChildren;
             }
-            [ExcludeFromCodeCoverage]
-            protected set
-            {
-                // Nothing to do here
 
-                Magna.Error
-                    (
-                        "PftFrom::Children: "
-                        + "set value="
-                        + value.ToVisibleString()
-                    );
-            }
+            [ExcludeFromCodeCoverage]
+            protected set => Magna.Error
+                (
+                    "PftFrom::Children: "
+                    + "set value="
+                    + value.ToVisibleString()
+                );
         }
 
         #endregion
@@ -228,34 +224,32 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 );
         } // method CompareNode
 
-        ///// <inheritdoc cref="PftNode.Compile" />
-        //public override void Compile
-        //    (
-        //        PftCompiler compiler
-        //    )
-        //{
-        //    if (ReferenceEquals(Variable, null)
-        //        || Source.Count == 0
-        //        || Select.Count == 0)
-        //    {
-        //        throw new PftCompilerException();
-        //    }
+        /// <inheritdoc cref="PftNode.Compile" />
+        public override void Compile
+            (
+                PftCompiler compiler
+            )
+        {
+            if (ReferenceEquals(Variable, null)
+                || Source.Count == 0
+                || Select.Count == 0)
+            {
+                throw new PftCompilerException();
+            }
 
-        //    // TODO implement
+            compiler.CompileNodes(Source);
+            if (!ReferenceEquals(Where, null))
+            {
+                Where.Compile(compiler);
+            }
+            compiler.CompileNodes(Select);
+            compiler.CompileNodes(Order);
 
-        //    compiler.CompileNodes(Source);
-        //    if (!ReferenceEquals(Where, null))
-        //    {
-        //        Where.Compile(compiler);
-        //    }
-        //    compiler.CompileNodes(Select);
-        //    compiler.CompileNodes(Order);
+            compiler.StartMethod(this);
 
-        //    compiler.StartMethod(this);
-
-        //    compiler.EndMethod(this);
-        //    compiler.MarkReady(this);
-        //}
+            compiler.EndMethod(this);
+            compiler.MarkReady(this);
+        }
 
         /// <inheritdoc cref="PftNode.Deserialize" />
         protected internal override void Deserialize

@@ -104,6 +104,22 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
         }
 
         [TestMethod]
+        public void PftAll_Construction_3()
+        {
+            var innerConditon = new PftComparison
+            {
+                LeftOperand = new PftV("v300"),
+                Operation = ":",
+                RightOperand = new PftUnconditionalLiteral("примечание")
+            };
+            var node = new PftAll(innerConditon);
+            Assert.IsFalse(node.ConstantExpression);
+            Assert.IsTrue(node.RequiresConnection);
+            Assert.IsTrue(node.ExtendedSyntax);
+            Assert.AreSame(node.InnerCondition, innerConditon);
+        }
+
+        [TestMethod]
         public void PftAll_Clone_1()
         {
             var first = new PftAll();
