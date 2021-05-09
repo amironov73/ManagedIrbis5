@@ -26,14 +26,14 @@ namespace ManagedIrbis.Pft.Infrastructure
     partial class PftParser
     {
 
-        internal PftNumeric ParseArithmetic()
+        internal PftNumeric? ParseArithmetic()
         {
             var result = ParseAddition();
 
             return result;
         }
 
-        private PftNumeric ParseArithmetic
+        private PftNumeric? ParseArithmetic
             (
                 params PftTokenKind[] stop
             )
@@ -68,9 +68,14 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
         }
 
-        private PftNumeric ParseAddition()
+        private PftNumeric? ParseAddition()
         {
             var left = ParseMultiplication();
+            if (left is null)
+            {
+                return default;
+            }
+
             while (!Tokens.IsEof)
             {
                 var token = Tokens.Current;
@@ -80,6 +85,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     break;
                 }
+
                 Tokens.RequireNext();
                 left = new PftNumericExpression
                 {
@@ -92,9 +98,14 @@ namespace ManagedIrbis.Pft.Infrastructure
             return left;
         }
 
-        private PftNumeric ParseMultiplication()
+        private PftNumeric? ParseMultiplication()
         {
             var left = ParseValue();
+            if (left is null)
+            {
+                return default;
+            }
+
             while (!Tokens.IsEof)
             {
                 var token = Tokens.Current;
@@ -175,7 +186,10 @@ namespace ManagedIrbis.Pft.Infrastructure
                 (
                     PftTokenKind.RightParenthesis
                 );
-            result.Children.Add(expression);
+            if (expression is not null)
+            {
+                result.Children.Add(expression);
+            }
             Tokens.Current.MustBe(PftTokenKind.RightParenthesis);
             Tokens.MoveNext();
 

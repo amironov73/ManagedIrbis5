@@ -260,8 +260,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     _tagProgram = parser.ParseArithmetic();
                 }
 
-                var textValue = context.Evaluate(_tagProgram);
-                var integerValue = (int)_tagProgram.Value;
+                var textValue = context.Evaluate(_tagProgram!);
+                var integerValue = (int)_tagProgram!.Value;
                 Tag = integerValue != 0
                     ? integerValue.ToInvariantString()
                     : textValue;

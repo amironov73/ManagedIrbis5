@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* IndexSpecification.cs -- спецификация индекса для поля/подполя
  * Ars Magna project, http://arsmagna.ru
@@ -44,7 +42,7 @@ namespace ManagedIrbis.Pft.Infrastructure
     //
 
     /// <summary>
-    /// Index specification (for fields).
+    /// Спецификация индекса для поля/подполя.
     /// </summary>
     public struct IndexSpecification
         : ICloneable
@@ -52,17 +50,17 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Properties
 
         /// <summary>
-        /// Index kind.
+        /// Вид индекса (литерал, все повторения и т. д.).
         /// </summary>
         public IndexKind Kind { get; set; }
 
         /// <summary>
-        /// Index specified by literal.
+        /// Литеральное значение индекса (только если вид = литерал).
         /// </summary>
         public int Literal { get; set; }
 
         /// <summary>
-        /// Index specified by expression.
+        /// Выражение, задающее значение индекса (только).
         /// </summary>
         public string? Expression { get; set; }
 
@@ -75,19 +73,19 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         #region Private members
 
-        private PftNumeric CompileProgram()
+        private PftNumeric? CompileProgram()
         {
             if (!ReferenceEquals(Program, null))
             {
                 return Program;
             }
 
-            string expression = Expression
+            var expression = Expression
                 .ThrowIfNull("Expression");
 
-            PftLexer lexer = new PftLexer();
-            PftTokenList tokens = lexer.Tokenize(expression);
-            PftParser parser = new PftParser(tokens);
+            var lexer = new PftLexer();
+            var tokens = lexer.Tokenize(expression);
+            var parser = new PftParser(tokens);
             Program = parser.ParseArithmetic();
 
             return Program;
@@ -98,7 +96,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Public methods
 
         /// <summary>
-        /// Compare two specifications.
+        /// Сравнение двух спецификаций.
         /// </summary>
         public static bool Compare
             (
@@ -108,13 +106,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             // TODO more intelligent compare
 
-            bool result = left.Kind == right.Kind
-                && left.Literal == right.Literal
-                && PftSerializationUtility.CompareStrings
-                    (
-                        left.Expression,
-                        right.Expression
-                    );
+            var result = left.Kind == right.Kind
+                         && left.Literal == right.Literal
+                         && PftSerializationUtility.CompareStrings
+                         (
+                             left.Expression,
+                             right.Expression
+                         );
 
             return result;
         }
@@ -128,7 +126,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 T[] array
             )
         {
-            int result = 0;
+            var result = 0;
 
             switch (Kind)
             {
@@ -164,15 +162,17 @@ namespace ManagedIrbis.Pft.Infrastructure
 
                 case IndexKind.Expression:
 
-                    PftNumeric program = CompileProgram();
+                    var program = CompileProgram()
+                        .ThrowIfNull(nameof(CompileProgram));
                     context.Evaluate(program);
                     result = (int)program.Value - 1;
 
                     break;
-            }
+            } // switch
 
             return result;
-        }
+
+        } // method ComputeValue
 
         /// <summary>
         /// Deserialize the specification.
@@ -191,13 +191,8 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get "all repeats" value.
         /// </summary>
-        public static IndexSpecification GetAll()
-        {
-            return new IndexSpecification
-            {
-                Kind = IndexKind.AllRepeats
-            };
-        }
+        public static IndexSpecification GetAll() =>
+            new () { Kind = IndexKind.AllRepeats };
 
         /// <summary>
         /// Get literal value.
@@ -207,7 +202,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 int i
             )
         {
-            return new IndexSpecification
+            return new ()
             {
                 Kind = IndexKind.Literal,
                 Literal = i,
@@ -220,11 +215,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Name = "Index"
             };
-            PftNodeInfo kind = new PftNodeInfo
+            var kind = new PftNodeInfo
             {
                 Name = "Kind",
                 Value = Kind.ToString()
@@ -232,7 +227,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             result.Children.Add(kind);
             if (Kind == IndexKind.Literal)
             {
-                PftNodeInfo literal = new PftNodeInfo
+                var literal = new PftNodeInfo
                 {
                     Name = "Literal",
                     Value = Literal.ToInvariantString()
@@ -241,7 +236,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
             if (Kind == IndexKind.Expression)
             {
-                PftNodeInfo expression = new PftNodeInfo
+                var expression = new PftNodeInfo
                 {
                     Name = "Expression",
                     Value = Expression
@@ -316,13 +311,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Implicit conversion.
         /// </summary>
-        public static implicit operator IndexSpecification
-            (
-                int i
-            )
-        {
-            return GetLiteral(i);
-        }
+        public static implicit operator IndexSpecification ( int i ) => GetLiteral(i);
 
         #endregion
 

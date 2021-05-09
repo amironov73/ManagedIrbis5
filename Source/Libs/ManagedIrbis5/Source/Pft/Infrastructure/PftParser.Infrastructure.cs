@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -35,7 +36,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private bool _inAssignment, _inProcedure, _inLoop, _inGroup;
 
-        private PftProcedureManager _procedures;
+        private readonly PftProcedureManager _procedures;
 
         //================================================================
         // Service routines
@@ -46,8 +47,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 PftTokenList newTokens
             )
         {
-            var result
-                = new NonNullCollection<PftNode>();
+            var result = new NonNullCollection<PftNode>();
             var saveTokens = Tokens;
             Tokens = newTokens;
 
@@ -93,7 +93,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         private PftNode? NestedContext
             (
                 PftTokenList newTokens,
-                Func<PftNode> function
+                Func<PftNode?> function
             )
         {
             PftNode? result = null;

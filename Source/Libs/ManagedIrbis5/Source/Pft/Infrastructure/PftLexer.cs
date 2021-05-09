@@ -74,13 +74,8 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private FieldSpecification? ReadField()
         {
-            if (_navigator is null)
-            {
-                return null;
-            }
-
             var result = new FieldSpecification();
-            var position = _navigator.SavePosition();
+            var position = _navigator!.SavePosition();
             _navigator.Move(-1);
 
             if (!result.Parse(_navigator))
@@ -94,7 +89,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
         private string? ReadIdentifier()
         {
-            if (_navigator is null || IsEOF)
+            if (IsEOF)
             {
                 return null;
             }
@@ -112,7 +107,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 }
                 result.Append(c);
                 ReadChar();
-                c = _navigator.PeekChar();
+                c = _navigator!.PeekChar();
                 if ((c == '\r' || c == '\n')
                     && Array.IndexOf(reserved, result.ToString()) >= 0)
                 {
@@ -128,7 +123,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 char initialLetter
             )
         {
-            if (_navigator is null || IsEOF)
+            if (IsEOF)
             {
                 return initialLetter.ToString();
             }
@@ -147,7 +142,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 }
                 result.Append(c);
                 ReadChar();
-                c = _navigator.PeekChar();
+                c = _navigator!.PeekChar();
                 if ((c == '\r' || c == '\n')
                     && Array.IndexOf(reserved, result.ToString()) >= 0)
                 {
@@ -609,7 +604,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                                 ReadChar();
                                 kind = PftTokenKind.TripleLess;
                                 value = _navigator.ReadTo(">>>").ToString();
-                                if (ReferenceEquals(value, null))
+                                if (string.IsNullOrEmpty(value))
                                 {
                                     ThrowSyntax();
                                 }

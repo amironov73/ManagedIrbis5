@@ -16,7 +16,9 @@
 
 using System;
 using System.Diagnostics;
+
 using AM;
+
 using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
@@ -73,6 +75,32 @@ namespace ManagedIrbis.Pft
 
         public PftContext Context { get; set; }
 
+        /// <summary>
+        /// Нормальный результат расформатирования.
+        /// </summary>
+        public string Output => Context.Text;
+
+        /// <summary>
+        /// Поток ошибок.
+        /// </summary>
+        public string Error => Context.Output.ErrorText;
+
+        /// <summary>
+        /// Поток предупреждений.
+        /// </summary>
+        public string Warning => Context.Output.WarningText;
+
+        /// <summary>
+        /// Have error?
+        /// </summary>
+        public bool HaveError => Context.Output.HaveError;
+
+        /// <summary>
+        /// Have warning.
+        /// </summary>
+        public bool HaveWarning => Context.Output.HaveWarning;
+
+
         public virtual string FormatRecord
             (
                 Record? record
@@ -106,10 +134,10 @@ namespace ManagedIrbis.Pft
         }
 
         public virtual string FormatRecord(int mfn) =>
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
 
         public virtual string[] FormatRecords(int[] mfns) =>
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
 
         public virtual void ParseProgram(string source)
         {
@@ -118,10 +146,10 @@ namespace ManagedIrbis.Pft
 
         public virtual void SetProvider
             (
-                ISyncProvider contextProvider
+                ISyncProvider provider
             )
         {
-            // TODO: implement
+            Context.SetProvider(provider);
         }
 
         #endregion

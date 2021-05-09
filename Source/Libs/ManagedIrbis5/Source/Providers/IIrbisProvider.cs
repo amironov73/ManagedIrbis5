@@ -74,7 +74,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Слой абстракции от платформы.
         /// </summary>
-        PlatformAbstractionLayer PlatformAbstraction { get; }
+        PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
         #endregion
 

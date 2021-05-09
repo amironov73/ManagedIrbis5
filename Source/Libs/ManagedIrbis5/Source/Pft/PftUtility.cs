@@ -161,7 +161,7 @@ namespace ManagedIrbis.Pft
                 PftContext context,
                 int tag,
                 IndexSpecification index,
-                string value
+                string? value
             )
         {
             var record = context.Record;

@@ -1,40 +1,44 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* IndexKind.cs --
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
+/* IndexKind.cs -- вид индекса в спецификации повторения
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// Kind of index in <see cref="IndexSpecification"/>.
+    /// Вид индекса в спецификации <see cref="IndexSpecification"/>.
     /// </summary>
     public enum IndexKind
     {
         /// <summary>
-        /// Not specified.
+        /// Нет никакого индекса.
         /// </summary>
         None,
 
         /// <summary>
-        /// Specified by literal.
+        /// Индекс задан константой-литералом.
         /// </summary>
         /// <remarks>
-        /// E. g.: 3
+        /// Например: 3
         /// </remarks>
         Literal,
 
         /// <summary>
-        /// Specified by expression.
+        /// Индекс задан выражением.
         /// </summary>
         /// <remarks>
-        /// E. g.: $x + 1
+        /// Например: $x + 1
         /// </remarks>
         Expression,
 
         /// <summary>
-        /// Last repeat.
+        /// Последнее повторение.
         /// </summary>
         /// <remarks>
         /// *
@@ -42,7 +46,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         LastRepeat,
 
         /// <summary>
-        /// New repeat.
+        /// Новое (вновь созданное) повторение.
         /// </summary>
         /// <remarks>
         /// +
@@ -50,7 +54,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         NewRepeat,
 
         /// <summary>
-        /// Current repeat.
+        /// Текущее повторение.
         /// </summary>
         /// <remarks>
         /// .
@@ -58,11 +62,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         CurrentRepeat,
 
         /// <summary>
-        /// All repeats.
+        /// Все повторения.
         /// </summary>
         /// <remarks>
         /// -
         /// </remarks>
         AllRepeats
-    }
-}
+
+    } // enum IndexKind
+
+} // namespace ManagedIrbis.Pft.Infrastructure

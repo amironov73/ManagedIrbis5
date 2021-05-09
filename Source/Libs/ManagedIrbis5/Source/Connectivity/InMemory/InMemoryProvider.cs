@@ -202,7 +202,7 @@ namespace ManagedIrbis.InMemory
         /// <inheritdoc cref="IIrbisProvider.LastError"/>
         public int LastError { get; private set; }
 
-        public PlatformAbstractionLayer PlatformAbstraction { get; }
+        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
         /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>
         public bool CheckProviderState() => true;

@@ -91,7 +91,7 @@ namespace ManagedIrbis.Providers
         public event EventHandler? Disposing;
 
         /// <inheritdoc cref="IIrbisProvider.PlatformAbstraction"/>
-        public PlatformAbstractionLayer PlatformAbstraction =>
+        public PlatformAbstractionLayer PlatformAbstraction { get; set; } =
             PlatformAbstractionLayer.Current;
 
         /// <inheritdoc cref="IIrbisProvider.Database"/>

@@ -54,7 +54,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             var position = Tokens.SavePosition();
 
-            PftNode result;
+            PftNode? result;
 
             try
             {

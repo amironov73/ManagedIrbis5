@@ -163,11 +163,14 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             try
             {
-                PftNode node;
+                PftNode? node;
                 try
                 {
                     node = ParseArithmetic();
-                    result.Children.Add(node);
+                    if (node is not null)
+                    {
+                        result.Children.Add(node);
+                    }
                     if (!Tokens.IsEof)
                     {
                         Magna.Error
@@ -720,7 +723,7 @@ namespace ManagedIrbis.Pft.Infrastructure
 
             try
             {
-                PftNode superNode = ParseArithmetic();
+                PftNode? superNode = ParseArithmetic();
 
                 if (ReferenceEquals(superNode, null))
                 {
