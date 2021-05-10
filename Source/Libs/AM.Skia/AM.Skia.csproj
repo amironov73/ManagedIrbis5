@@ -10,6 +10,7 @@
         <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>arsmagna-icon.png</PackageIcon>
+        <ApplicationIcon>BlueBook.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>

@@ -7,6 +7,7 @@
     <ApplicationIcon>BlueBook.ico</ApplicationIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>arsmagna-icon.png</PackageIcon>
+    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

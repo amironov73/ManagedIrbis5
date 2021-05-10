@@ -15,6 +15,7 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
+    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
