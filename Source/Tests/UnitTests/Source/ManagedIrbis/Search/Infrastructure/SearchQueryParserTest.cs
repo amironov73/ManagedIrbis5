@@ -1,12 +1,18 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable IdentifierTypo
+// ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable StringLiteralTypo
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Search.Infrastructure
 {
-    [Ignore]
     [TestClass]
     public class SearchQueryParserTest
     {
@@ -16,7 +22,7 @@ namespace UnitTests.ManagedIrbis.Search.Infrastructure
                 int expected
             )
         {
-            SearchTokenList tokens = SearchQueryLexer.Tokenize(text);
+            var tokens = SearchQueryLexer.Tokenize(text);
 
             Assert.AreEqual(expected, tokens.Length);
         }
@@ -108,10 +114,10 @@ namespace UnitTests.ManagedIrbis.Search.Infrastructure
                 string expected
             )
         {
-            SearchTokenList tokens = SearchQueryLexer.Tokenize(text);
-            SearchQueryParser parser = new SearchQueryParser(tokens);
-            SearchProgram program = parser.Parse();
-            string actual = program.ToString();
+            var tokens = SearchQueryLexer.Tokenize(text);
+            var parser = new SearchQueryParser(tokens);
+            var program = parser.Parse();
+            var actual = program.ToString();
 
             Assert.AreEqual(expected, actual);
         }
@@ -121,10 +127,10 @@ namespace UnitTests.ManagedIrbis.Search.Infrastructure
                 string text
             )
         {
-            SearchTokenList tokens = SearchQueryLexer.Tokenize(text);
-            SearchQueryParser parser = new SearchQueryParser(tokens);
-            SearchProgram program = parser.Parse();
-            string actual = program.ToString();
+            var tokens = SearchQueryLexer.Tokenize(text);
+            var parser = new SearchQueryParser(tokens);
+            var program = parser.Parse();
+            var actual = program.ToString();
             Assert.IsNotNull(actual);
         }
 
@@ -229,10 +235,10 @@ namespace UnitTests.ManagedIrbis.Search.Infrastructure
                 int expected
             )
         {
-            SearchTokenList tokens = SearchQueryLexer.Tokenize(text);
-            SearchQueryParser parser = new SearchQueryParser(tokens);
-            SearchProgram program = parser.Parse();
-            SearchTerm[] terms = SearchQueryUtility.ExtractTerms(program);
+            var tokens = SearchQueryLexer.Tokenize(text);
+            var parser = new SearchQueryParser(tokens);
+            var program = parser.Parse();
+            var terms = SearchQueryUtility.ExtractTerms(program);
 
             Assert.AreEqual(expected, terms.Length);
         }

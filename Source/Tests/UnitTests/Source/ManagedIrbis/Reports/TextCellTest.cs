@@ -1,7 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
-using ManagedIrbis.Client;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using ManagedIrbis.Reports;
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Reports
 {
@@ -12,7 +17,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void TextCell_Construction_1()
         {
-            TextCell cell = new TextCell();
+            var cell = new TextCell();
             Assert.IsNotNull(cell.Attributes);
             Assert.IsNull(cell.Band);
             Assert.IsNull(cell.Report);
@@ -23,8 +28,8 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void TextCell_Construction_2()
         {
-            string text = "Text";
-            TextCell cell = new TextCell(text);
+            var text = "Text";
+            var cell = new TextCell(text);
             Assert.IsNotNull(cell.Attributes);
             Assert.IsNull(cell.Band);
             Assert.IsNull(cell.Report);
@@ -32,58 +37,52 @@ namespace UnitTests.ManagedIrbis.Reports
             Assert.AreSame(text, cell.Text);
         }
 
-        /*
+
         [TestMethod]
         public void TextCell_Compute_1()
         {
-            string text = "Text";
-            TextCell cell = new TextCell(text);
-            using (IrbisProvider provider = GetProvider())
-            {
-                ReportContext context = new ReportContext(provider);
-                string output = cell.Compute(context);
-                Assert.AreEqual(text, output);
-            }
+            var text = "Text";
+            var cell = new TextCell(text);
+            using var provider = GetProvider();
+            var context = new ReportContext(provider);
+            var output = cell.Compute(context);
+            Assert.AreEqual(text, output);
         }
 
         [TestMethod]
         public void TextCell_Render_1()
         {
-            string text = "Text";
-            TextCell cell = new TextCell(text);
-            using (IrbisProvider provider = GetProvider())
-            {
-                ReportContext context = new ReportContext(provider);
-                cell.Render(context);
-                string output = context.Output.Text;
-                Assert.AreEqual("Text\t", output);
-            }
+            var text = "Text";
+            var cell = new TextCell(text);
+            using var provider = GetProvider();
+            var context = new ReportContext(provider);
+            cell.Render(context);
+            var output = context.Output.Text;
+            Assert.AreEqual("Text\t", output);
         }
-
-        */
 
         [TestMethod]
         public void TextCell_Verify_1()
         {
-            TextCell cell = new TextCell();
+            var cell = new TextCell();
             Assert.IsTrue(cell.Verify(false));
         }
 
         [TestMethod]
         public void TextCell_Dispose_1()
         {
-            TextCell cell = new TextCell();
+            var cell = new TextCell();
             cell.Dispose();
         }
 
         [TestMethod]
         public void TextCell_Clone_1()
         {
-            TextCell first = new TextCell("text")
+            var first = new TextCell("text")
             {
                 UserData = "user data"
             };
-            TextCell second = (TextCell) first.Clone();
+            var second = (TextCell) first.Clone();
             Assert.AreEqual(first.Attributes.Count, second.Attributes.Count);
             Assert.AreSame(first.Band, second.Band);
             Assert.AreSame(first.Report, second.Report);

@@ -79,6 +79,7 @@ namespace UnitTests.ManagedIrbis.Fst
         }
 
         [TestMethod]
+        [Description("Объединение строк в единый формат (для отработки форматтером)")]
         public void FstFile_ConcatenateFormat_1()
         {
             var fst = _GetFile();
@@ -96,7 +97,7 @@ namespace UnitTests.ManagedIrbis.Fst
             var bytes = first.SaveToMemory();
 
             var second = bytes.RestoreObjectFromMemory<FstFile>();
-            Assert.IsNull(second);
+            Assert.IsNotNull(second);
             Assert.AreEqual(first.FileName, second!.FileName);
             Assert.AreEqual(first.Lines.Count, second.Lines.Count);
             for (var i = 0; i < first.Lines.Count; i++)
@@ -108,7 +109,6 @@ namespace UnitTests.ManagedIrbis.Fst
             }
         }
 
-        [Ignore]
         [TestMethod]
         [Description("Ручная сериализация")]
         public void FstFile_Serialization_1()
@@ -120,7 +120,6 @@ namespace UnitTests.ManagedIrbis.Fst
             _TestSerialization(fst);
         }
 
-        [Ignore]
         [TestMethod]
         [Description("Парсинг файла с диска")]
         public void FstFile_ParseLocalFile_1()
@@ -128,7 +127,7 @@ namespace UnitTests.ManagedIrbis.Fst
             var fileName = Path.Combine
                 (
                     TestDataPath,
-                    "QueryToRec.fst"
+                    "querytorec.fst"
                 );
             var fst = FstFile.ParseLocalFile(fileName, IrbisEncoding.Ansi);
             Assert.AreEqual(5, fst.Lines.Count);
@@ -155,15 +154,14 @@ namespace UnitTests.ManagedIrbis.Fst
             Assert.AreEqual("<fst fileName=\"FST file\"><line tag=\"610\" method=\"Method0\"><format>(v2 /)</format></line><line tag=\"700\" method=\"Method0\"><format>\"^A\"v1^A</format></line><line tag=\"200\" method=\"Method0\"><format>\"^A\"v1^T</format></line><line tag=\"210\" method=\"Method0\"><format>\"^D\"v1^B</format></line><line tag=\"10\" method=\"Method0\"><format>\"^A\"v1^D</format></line></fst>", XmlUtility.SerializeShort(fst));
         }
 
-        [Ignore]
         [TestMethod]
         public void FstFile_ToJson_1()
         {
             var fst = new FstFile();
-            Assert.AreEqual("{}", JsonUtility.SerializeShort(fst));
+            Assert.AreEqual("{\"lines\":[]}", JsonUtility.SerializeShort(fst));
 
             fst = _GetFile();
-            Assert.AreEqual("{\'fileName\':\'FST file\',\'lines\':[{\'tag\':610,\'method\':0,\'format\':\'(v2 /)\'},{\'tag\':700,\'method\':0,\'format\':\'\"^A\"v1^A\'},{\'tag\':200,\'method\':0,\'format\':\'\"^A\"v1^T\'},{\'tag\':210,\'method\':0,\'format\':\'\"^D\"v1^B\'},{\'tag\':10,\'method\':0,\'format\':\'\"^A\"v1^D\'}]}", JsonUtility.SerializeShort(fst));
+            Assert.AreEqual("{\"fileName\":\"FST file\",\"lines\":[{\"tag\":610,\"method\":0,\"format\":\"(v2 /)\"},{\"tag\":700,\"method\":0,\"format\":\"\\u0022^A\\u0022v1^A\"},{\"tag\":200,\"method\":0,\"format\":\"\\u0022^A\\u0022v1^T\"},{\"tag\":210,\"method\":0,\"format\":\"\\u0022^D\\u0022v1^B\"},{\"tag\":10,\"method\":0,\"format\":\"\\u0022^A\\u0022v1^D\"}]}", JsonUtility.SerializeShort(fst));
         }
 
         [TestMethod]

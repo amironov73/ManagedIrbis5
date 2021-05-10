@@ -1,4 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable IdentifierTypo
+// ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable StringLiteralTypo
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Json;
 using AM.Runtime;
@@ -7,17 +13,10 @@ using AM.Xml;
 using ManagedIrbis;
 using ManagedIrbis.Magazines;
 
-// ReSharper disable CheckNamespace
-// ReSharper disable ForCanBeConvertedToForeach
-// ReSharper disable IdentifierTypo
-// ReSharper disable InvokeAsExtensionMethod
-// ReSharper disable StringLiteralTypo
-
 #nullable enable
 
 namespace UnitTests.ManagedIrbis.Magazines
 {
-    [Ignore]
     [TestClass]
     public class MagazineArticleInfoTest
         : CommonMagazineTest
@@ -209,7 +208,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             Assert.AreEqual("<article />", XmlUtility.SerializeShort(article));
 
             article = MagazineArticleInfo.ParseAsp(_GetAspRecord());
-            Assert.AreEqual("<article><author familyName=\"Королева\" initials=\"О.\" fullName=\"Ольга\" cantBeInverted=\"false\" /><title title=\"Четыре новых руководителя в администрации города\" first=\"О. Королева\" /><source><title>Усольская городская газета</title><year>2017</year><position>1, 4</position><illustrations>a-фот.</illustrations><secondLevelNumber>№ 42 (19 окт.)</secondLevelNumber><index>У761/2017/42</index></source></article>", XmlUtility.SerializeShort(article));
+            Assert.AreEqual("<article><author familyName=\"Королева\" initials=\"О.\" fullName=\"Ольга\" cantBeInverted=\"false\" postfix=\"\" appendix=\"\" number=\"\" dates=\"\" variant=\"\" workplace=\"\" /><title volume=\"\" title=\"Четыре новых руководителя в администрации города\" specific=\"\" general=\"\" subtitle=\"\" first=\"О. Королева\" other=\"\" /><source><title>Усольская городская газета</title><year>2017</year><publisher /><city /><unit /><position>1, 4</position><articleNumber /><illustrations>a-фот.</illustrations><comments /><volumeNumber /><volumeTitle /><parallelVolumeTitle /><secondLevelNumber>№ 42 (19 окт.)</secondLevelNumber><secondLevelTitle /><thirdLevelNumber /><thirdLevelTitle /><abbreviation /><parallelTitle1 /><parallelTitle2 /><parallelTitle3 /><index>У761/2017/42</index></source></article>", XmlUtility.SerializeShort(article));
         }
 
         [TestMethod]
@@ -219,7 +218,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             Assert.AreEqual("{}", JsonUtility.SerializeShort(article));
 
             article = MagazineArticleInfo.ParseAsp(_GetAspRecord());
-            Assert.AreEqual("{'authors':[{'familyName':'Королева','initials':'О.','fullName':'Ольга','cantBeInverted':false}],'title':{'title':'Четыре новых руководителя в администрации города','first':'О. Королева'},'sources':[{'title':'Усольская городская газета','year':'2017','position':'1, 4','illustrations':'a-фот.','secondLevelNumber':'№ 42 (19 окт.)','index':'У761/2017/42'}]}", JsonUtility.SerializeShort(article));
+            Assert.AreEqual("{\"authors\":[{\"familyName\":\"\\u041A\\u043E\\u0440\\u043E\\u043B\\u0435\\u0432\\u0430\",\"initials\":\"\\u041E.\",\"fullName\":\"\\u041E\\u043B\\u044C\\u0433\\u0430\",\"cantBeInverted\":false,\"postfix\":\"\",\"appendix\":\"\",\"number\":\"\",\"dates\":\"\",\"variant\":\"\",\"workplace\":\"\"}],\"title\":{\"volume\":\"\",\"title\":\"\\u0427\\u0435\\u0442\\u044B\\u0440\\u0435 \\u043D\\u043E\\u0432\\u044B\\u0445 \\u0440\\u0443\\u043A\\u043E\\u0432\\u043E\\u0434\\u0438\\u0442\\u0435\\u043B\\u044F \\u0432 \\u0430\\u0434\\u043C\\u0438\\u043D\\u0438\\u0441\\u0442\\u0440\\u0430\\u0446\\u0438\\u0438 \\u0433\\u043E\\u0440\\u043E\\u0434\\u0430\",\"specific\":\"\",\"general\":\"\",\"subtitle\":\"\",\"first\":\"\\u041E. \\u041A\\u043E\\u0440\\u043E\\u043B\\u0435\\u0432\\u0430\",\"other\":\"\"},\"sources\":[{\"title\":\"\\u0423\\u0441\\u043E\\u043B\\u044C\\u0441\\u043A\\u0430\\u044F \\u0433\\u043E\\u0440\\u043E\\u0434\\u0441\\u043A\\u0430\\u044F \\u0433\\u0430\\u0437\\u0435\\u0442\\u0430\",\"year\":\"2017\",\"publisher\":\"\",\"city\":\"\",\"unit\":\"\",\"position\":\"1, 4\",\"articleNumber\":\"\",\"illustrations\":\"a-\\u0444\\u043E\\u0442.\",\"comments\":\"\",\"volumeNumber\":\"\",\"volumeTitle\":\"\",\"parallelVolumeTitle\":\"\",\"secondLevelNumber\":\"\\u2116 42 (19 \\u043E\\u043A\\u0442.)\",\"secondLevelTitle\":\"\",\"thirdLevelNumber\":\"\",\"thirdLevelTitle\":\"\",\"abbreviation\":\"\",\"parallelTitle1\":\"\",\"parllelTitle2\":\"\",\"parallelTitle3\":\"\",\"index\":\"\\u0423761/2017/42\"}]}", JsonUtility.SerializeShort(article));
         }
 
         [TestMethod]

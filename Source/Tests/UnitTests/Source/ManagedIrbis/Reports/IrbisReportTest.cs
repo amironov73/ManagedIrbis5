@@ -11,9 +11,10 @@ using ManagedIrbis;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Reports;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Reports
 {
-    [Ignore]
     [TestClass]
     public class IrbisReportTest
         : Common.CommonUnitTest

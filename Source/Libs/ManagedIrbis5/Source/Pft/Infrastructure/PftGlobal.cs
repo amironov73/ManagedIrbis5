@@ -195,12 +195,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 BinaryWriter writer
             )
         {
-            /*
-
             writer.WritePackedInt32(Number);
             writer.WriteCollection(Fields);
-
-            */
         }
 
         #endregion

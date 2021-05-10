@@ -115,16 +115,10 @@ namespace ManagedIrbis.Marc.Schema
                 BinaryWriter writer
             )
         {
-            /*
-
             writer
                 .WriteNullable(Name)
                 .WriteNullable(Description)
                 .WriteCollection(Options);
-
-                */
-
-            throw new NotImplementedException();
         }
 
         #endregion

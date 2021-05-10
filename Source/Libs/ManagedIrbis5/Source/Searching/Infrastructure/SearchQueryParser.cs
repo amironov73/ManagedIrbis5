@@ -154,8 +154,8 @@ namespace ManagedIrbis.Infrastructure
                 ISearchTree parent
             )
         {
-            ISearchTree[] children = parent.Children;
-            foreach (ISearchTree child in children)
+            var children = parent.Children;
+            foreach (var child in children)
             {
                 child.Parent = parent;
                 _AssignParentToChildren(child);
@@ -167,9 +167,9 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         private SearchTerm ParseTerm()
         {
-            SearchTerm result = new SearchTerm();
+            var result = new SearchTerm();
 
-            SearchToken token = Tokens.Current;
+            var token = Tokens.Current;
             if (token.Kind != SearchTokenKind.Term)
             {
                 Magna.Error
@@ -182,7 +182,7 @@ namespace ManagedIrbis.Infrastructure
                 throw new SearchSyntaxException();
             }
 
-            string text = token.Text.RequireSyntax("token");
+            var text = token.Text.RequireSyntax("token");
             if (text.EndsWith("$") || text.EndsWith("@"))
             {
                 result.Tail = text.Substring(text.Length - 1, 1);
@@ -203,7 +203,7 @@ namespace ManagedIrbis.Infrastructure
             Tokens.RequireNext(SearchTokenKind.LeftParenthesis);
             Tokens.RequireNext();
 
-            List<string> context = new List<string>();
+            var context = new List<string>();
             while (true)
             {
                 token = Tokens.Current;
@@ -248,8 +248,8 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         SearchLevel0 ParseLevel0()
         {
-            SearchLevel0 result = new SearchLevel0();
-            SearchToken token = Tokens.Current;
+            var result = new SearchLevel0();
+            var token = Tokens.Current;
 
             switch (token.Kind)
             {
@@ -283,9 +283,9 @@ namespace ManagedIrbis.Infrastructure
             where TLevel: ComplexLevel<TItem>, new()
             where TItem: class, ISearchTree
         {
-            TLevel result = new TLevel();
+            var result = new TLevel();
 
-            TItem item = parse();
+            var item = parse();
             result.AddItem(item);
 
             while (!Tokens.IsEof
@@ -304,9 +304,9 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         private SearchLevel1 ParseLevel1()
         {
-            SearchLevel1 result = new SearchLevel1();
+            var result = new SearchLevel1();
 
-            SearchLevel0 item = ParseLevel0();
+            var item = ParseLevel0();
             result.AddItem(item);
 
             while (!Tokens.IsEof
@@ -325,7 +325,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         private SearchLevel2 ParseLevel2()
         {
-            SearchLevel2 result = ParseLevel<SearchLevel2, SearchLevel1>
+            var result = ParseLevel<SearchLevel2, SearchLevel1>
                 (
                     ParseLevel1,
                     SearchTokenKind.F
@@ -339,7 +339,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         private SearchLevel3 ParseLevel3()
         {
-            SearchLevel3 result = ParseLevel<SearchLevel3, SearchLevel2>
+            var result = ParseLevel<SearchLevel3, SearchLevel2>
                 (
                     ParseLevel2,
                     SearchTokenKind.G
@@ -353,7 +353,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         private SearchLevel4 ParseLevel4()
         {
-            SearchLevel4 result = ParseLevel<SearchLevel4, SearchLevel3>
+            var result = ParseLevel<SearchLevel4, SearchLevel3>
                 (
                     ParseLevel3,
                     SearchTokenKind.Star
@@ -367,7 +367,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         private SearchLevel5 ParseLevel5()
         {
-            SearchLevel5 result = ParseLevel<SearchLevel5, SearchLevel4>
+            var result = ParseLevel<SearchLevel5, SearchLevel4>
                 (
                     ParseLevel4,
                     SearchTokenKind.Hat
@@ -381,7 +381,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         private SearchLevel6 ParseLevel6()
         {
-            SearchLevel6 result = ParseLevel<SearchLevel6, SearchLevel5>
+            var result = ParseLevel<SearchLevel6, SearchLevel5>
                 (
                     ParseLevel5,
                     SearchTokenKind.Plus
@@ -395,7 +395,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         private SearchLevel7 ParseLevel7()
         {
-            SearchLevel7 result = new SearchLevel7();
+            var result = new SearchLevel7();
             SearchLevel6 item;
 
             if (Tokens.Current.Kind == SearchTokenKind.LeftParenthesis)
@@ -447,11 +447,11 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public SearchProgram Parse()
         {
-            SearchProgram result = new SearchProgram();
+            var result = new SearchProgram();
 
             if (Tokens.Length != 0)
             {
-                SearchLevel6 entryPoint = ParseLevel6();
+                var entryPoint = ParseLevel6();
                 result.EntryPoint = entryPoint;
             }
 

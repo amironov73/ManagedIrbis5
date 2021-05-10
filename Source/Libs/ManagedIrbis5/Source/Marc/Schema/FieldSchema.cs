@@ -205,8 +205,6 @@ namespace ManagedIrbis.Marc.Schema
                 BinaryWriter writer
             )
         {
-            /*
-
             writer.WriteNullable(Description);
             writer.Write(Display);
             writer.WriteCollection(Examples);
@@ -220,10 +218,6 @@ namespace ManagedIrbis.Marc.Schema
             writer.WriteNullable(RepeatableText);
             writer.WriteCollection(SubFields);
             writer.WriteNullable(Tag);
-
-            */
-
-            throw new NotImplementedException();
         }
 
         #endregion

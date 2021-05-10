@@ -21,7 +21,7 @@ using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
-
+using AM.Json;
 
 #endregion
 
@@ -206,7 +206,7 @@ namespace ManagedIrbis.Reports
 
             */
 
-            throw new NotImplementedException();
+            return JsonUtility.ReadObjectFromFile<IrbisReport>(fileName);
         }
 
         /// <summary>
@@ -255,7 +255,7 @@ namespace ManagedIrbis.Reports
 
             */
 
-            throw new NotImplementedException();
+            return JsonUtility.ReadObjectFromFile<IrbisReport>(fileName);
         }
 
         /// <summary>
@@ -267,7 +267,6 @@ namespace ManagedIrbis.Reports
             )
         {
             /*
-
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 NullValueHandling = NullValueHandling.Ignore,
@@ -287,10 +286,9 @@ namespace ManagedIrbis.Reports
                     contents,
                     IrbisEncoding.Utf8
                 );
-
             */
 
-            throw new NotImplementedException();
+            JsonUtility.SaveObjectToFile(this, fileName);
         }
 
         /// <summary>
@@ -370,7 +368,7 @@ namespace ManagedIrbis.Reports
 
             */
 
-            throw new NotImplementedException();
+            JsonUtility.SaveObjectToFile(this, fileName);
         }
 
         #endregion

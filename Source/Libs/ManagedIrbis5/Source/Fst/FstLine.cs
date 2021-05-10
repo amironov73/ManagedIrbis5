@@ -15,6 +15,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -55,6 +56,7 @@ namespace ManagedIrbis.Fst
         /// Line number.
         /// </summary>
         [XmlIgnore]
+        [JsonIgnore]
         [Browsable(false)]
         public int LineNumber { get; set; }
 
@@ -91,6 +93,7 @@ namespace ManagedIrbis.Fst
         [XmlIgnore]
         [JsonIgnore]
         [Browsable(false)]
+        [ExcludeFromCodeCoverage]
         public object? UserData { get; set; }
 
         #endregion
@@ -105,8 +108,6 @@ namespace ManagedIrbis.Fst
                 TextReader reader
             )
         {
-            Sure.NotNull(reader, nameof(reader));
-
             string? line;
             while (true)
             {

@@ -53,7 +53,7 @@ namespace ManagedIrbis.Fst
         /// </summary>
         [XmlElement("line")]
         [JsonPropertyName("lines")]
-        public NonNullCollection<FstLine> Lines { get; private set; } = new();
+        public NonNullCollection<FstLine> Lines { get; } = new();
 
         #endregion
 
@@ -144,12 +144,9 @@ namespace ManagedIrbis.Fst
                 BinaryWriter writer
             )
         {
-            /*
-
             writer.WriteNullable(FileName);
             writer.WriteCollection(Lines);
 
-            */
         } // method SaveToStream
 
         #endregion

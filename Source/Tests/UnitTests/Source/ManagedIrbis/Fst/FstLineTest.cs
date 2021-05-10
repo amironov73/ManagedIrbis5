@@ -95,15 +95,14 @@ namespace UnitTests.ManagedIrbis.Fst
             Assert.AreEqual("<line tag=\"12252\" method=\"Method8\"><format>MHL,\'/K=/\'(v225^i,|%|d225/)</format></line>", XmlUtility.SerializeShort(line));
         }
 
-        [Ignore]
         [TestMethod]
         public void FstLine_ToJson_1()
         {
             var line = new FstLine();
-            Assert.AreEqual("{'method':0}", JsonUtility.SerializeShort(line));
+            Assert.AreEqual("{\"tag\":0,\"method\":0}", JsonUtility.SerializeShort(line));
 
             line = _GetLine();
-            Assert.AreEqual("{'tag':12252,'method':8,'format':'MHL,\\'/K=/\\'(v225^i,|%|d225/)'}", JsonUtility.SerializeShort(line));
+            Assert.AreEqual("{\"tag\":12252,\"method\":8,\"format\":\"MHL,\\u0027/K=/\\u0027(v225^i,|%|d225/)\"}", JsonUtility.SerializeShort(line));
         }
 
         [TestMethod]

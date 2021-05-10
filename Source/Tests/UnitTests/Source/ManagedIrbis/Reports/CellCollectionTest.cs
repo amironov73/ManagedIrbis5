@@ -1,13 +1,18 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+
+using System;
 using System.IO;
 
 using AM;
 using AM.Runtime;
 
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis.Reports;
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Reports
 {
@@ -28,7 +33,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Construction_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             Assert.IsNull(collection.Band);
             Assert.IsNull(collection.Report);
             Assert.IsFalse(collection.ReadOnly);
@@ -38,7 +43,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Add_1()
         {
-            ReportBand band = new ReportBand();
+            var band = new ReportBand();
             ReportCell cell = new TextCell();
             band.Cells.Add(cell);
             Assert.AreSame(band, cell.Band);
@@ -47,8 +52,8 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Add_2()
         {
-            IrbisReport report = new IrbisReport();
-            ReportBand band = new ReportBand();
+            var report = new IrbisReport();
+            var band = new ReportBand();
             report.Body.Add(band);
             ReportCell cell = new TextCell();
             band.Cells.Add(cell);
@@ -58,11 +63,11 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_AddRange_1()
         {
-            CellCollection collection = new CellCollection();
-            ReportCell[] cells = _GetCells();
+            var collection = new CellCollection();
+            var cells = _GetCells();
             collection.AddRange(cells);
             Assert.AreEqual(cells.Length, collection.Count);
-            for (int i = 0; i < cells.Length; i++)
+            for (var i = 0; i < cells.Length; i++)
             {
                 Assert.AreSame(cells[i], collection[i]);
             }
@@ -71,15 +76,15 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_AsReadOnly_1()
         {
-            CellCollection first = new CellCollection();
+            var first = new CellCollection();
             first.AddRange(_GetCells());
-            CellCollection second = first.AsReadOnly();
+            var second = first.AsReadOnly();
             Assert.IsTrue(second.ReadOnly);
             Assert.AreEqual(first.Count, second.Count);
-            for (int i = 0; i < first.Count; i++)
+            for (var i = 0; i < first.Count; i++)
             {
-                TextCell cell1 = (TextCell) first[i];
-                TextCell cell2 = (TextCell) second[i];
+                var cell1 = (TextCell) first[i];
+                var cell2 = (TextCell) second[i];
                 Assert.AreEqual(cell1.Text, cell2.Text);
             }
         }
@@ -88,9 +93,9 @@ namespace UnitTests.ManagedIrbis.Reports
         [ExpectedException(typeof(ReadOnlyException))]
         public void CellCollection_AsReadOnly_2()
         {
-            CellCollection first = new CellCollection();
+            var first = new CellCollection();
             first.AddRange(_GetCells());
-            CellCollection second = first.AsReadOnly();
+            var second = first.AsReadOnly();
             ReportCell cell = new TextCell();
             second.Add(cell);
         }
@@ -98,7 +103,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Clear_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             collection.AddRange(_GetCells());
             collection.Clear();
             Assert.AreEqual(0, collection.Count);
@@ -107,14 +112,14 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Clone_1()
         {
-            CellCollection first = new CellCollection();
+            var first = new CellCollection();
             first.AddRange(_GetCells());
-            CellCollection second = first.Clone();
+            var second = first.Clone();
             Assert.AreEqual(first.Count, second.Count);
-            for (int i = 0; i < first.Count; i++)
+            for (var i = 0; i < first.Count; i++)
             {
-                TextCell cell1 = (TextCell)first[i];
-                TextCell cell2 = (TextCell)second[i];
+                var cell1 = (TextCell)first[i];
+                var cell2 = (TextCell)second[i];
                 Assert.AreEqual(cell1.Text, cell2.Text);
             }
         }
@@ -122,7 +127,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Dispose_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             collection.AddRange(_GetCells());
             collection.Dispose();
         }
@@ -130,12 +135,12 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Find_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             collection.AddRange(_GetCells());
-            ReportCell found = collection
+            var found = collection
                 .Find(cell => ((TextCell)cell).Text == "Cell2");
             Assert.IsNotNull(found);
-            Assert.AreEqual("Cell2", ((TextCell)found).Text);
+            Assert.AreEqual("Cell2", ((TextCell)found!).Text);
 
             found = collection
                 .Find(cell => ((TextCell)cell).Text == "nosuchcell");
@@ -145,9 +150,9 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_FindAll_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             collection.AddRange(_GetCells());
-            ReportCell[] found = collection
+            var found = collection
                 .FindAll(cell => string.CompareOrdinal
                     (
                         ((TextCell)cell).Text,
@@ -168,7 +173,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Insert_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             collection.AddRange(_GetCells());
             ReportCell cell = new TextCell();
             collection.Insert(0, cell);
@@ -179,9 +184,9 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Remove_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             collection.AddRange(_GetCells());
-            ReportCell cell = collection[1];
+            var cell = collection[1];
             collection.Remove(cell);
             Assert.AreEqual(2, collection.Count);
         }
@@ -189,7 +194,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_RemoveAt_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             collection.AddRange(_GetCells());
             collection.RemoveAt(1);
             Assert.AreEqual(2, collection.Count);
@@ -200,13 +205,14 @@ namespace UnitTests.ManagedIrbis.Reports
                 CellCollection first
             )
         {
-            byte[] bytes = first.SaveToMemory();
-            CellCollection second = bytes.RestoreObjectFromMemory<CellCollection>();
-            Assert.AreEqual(first.Count, second.Count);
-            for (int i = 0; i < first.Count; i++)
+            var bytes = first.SaveToMemory();
+            var second = bytes.RestoreObjectFromMemory<CellCollection>();
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Count, second!.Count);
+            for (var i = 0; i < first.Count; i++)
             {
-                TextCell cell1 = (TextCell) first[i];
-                TextCell cell2 = (TextCell) second[i];
+                var cell1 = (TextCell) first[i];
+                var cell2 = (TextCell) second[i];
                 Assert.AreEqual(cell1.Text, cell2.Text);
             }
         }
@@ -215,7 +221,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [ExpectedException(typeof(NotImplementedException))]
         public void CellCollection_Serialization_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             _TestSerialization(collection);
 
             //collection.AddRange(_GetCells());
@@ -226,18 +232,18 @@ namespace UnitTests.ManagedIrbis.Reports
         [ExpectedException(typeof(NotImplementedException))]
         public void CellCollection_Serialization_2()
         {
-            CellCollection collection = new CellCollection();
-            MemoryStream stream = new MemoryStream();
-            BinaryReader reader = new BinaryReader(stream);
+            var collection = new CellCollection();
+            var stream = new MemoryStream();
+            var reader = new BinaryReader(stream);
             collection.RestoreFromStream(reader);
         }
 
         [TestMethod]
         public void CellCollection_SetItem_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             collection.AddRange(_GetCells());
-            TextCell cell = new TextCell();
+            var cell = new TextCell();
             collection[2] = cell;
             Assert.AreSame(cell, collection[2]);
         }
@@ -245,7 +251,7 @@ namespace UnitTests.ManagedIrbis.Reports
         [TestMethod]
         public void CellCollection_Verify_1()
         {
-            CellCollection collection = new CellCollection();
+            var collection = new CellCollection();
             Assert.IsTrue(collection.Verify(false));
 
             collection.AddRange(_GetCells());

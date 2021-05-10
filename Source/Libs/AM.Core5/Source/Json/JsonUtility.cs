@@ -335,9 +335,9 @@ namespace AM.Json
                 string fileName
             )
         {
-            // TODO implement
-            throw new System.NotImplementedException();
-        }
+            var content = JsonSerializer.Serialize(obj);
+            File.WriteAllText(fileName, content);
+        } // method SaveObjectToFile
 
         #endregion
 

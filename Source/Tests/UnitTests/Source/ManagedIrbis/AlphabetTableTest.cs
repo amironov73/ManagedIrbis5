@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+
+using System.IO;
 
 using AM.Runtime;
 using AM.Text;
@@ -11,10 +15,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
 #nullable enable
-
-// ReSharper disable CheckNamespace
-// ReSharper disable IdentifierTypo
-// ReSharper disable StringLiteralTypo
 
 namespace UnitTests.ManagedIrbis
 {

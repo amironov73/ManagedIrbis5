@@ -1,14 +1,12 @@
-﻿using System;
-using System.IO;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
-using AM;
-using AM.Runtime;
-
-
-using ManagedIrbis.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis.Reports;
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Reports
 {

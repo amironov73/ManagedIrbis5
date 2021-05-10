@@ -344,6 +344,26 @@ namespace AM.IO
         }
 
         /// <summary>
+        /// Writes the collection to the stream.
+        /// </summary>
+        public static BinaryWriter WriteCollection<T>
+        (
+            this BinaryWriter writer,
+            NonNullCollection<T> collection
+        )
+            where T : class, IHandmadeSerializable, new()
+        {
+            writer.WritePackedInt32(collection.Count);
+            for (var i = 0; i < collection.Count; i++)
+            {
+                T item = collection[i];
+                item.SaveToStream(writer);
+            }
+
+            return writer;
+        }
+
+        /// <summary>
         /// Write the list to the stream.
         /// </summary>
         public static BinaryWriter WriteList<T>

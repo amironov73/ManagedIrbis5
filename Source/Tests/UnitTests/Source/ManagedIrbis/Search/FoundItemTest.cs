@@ -1,17 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable ForCanBeConvertedToForeach
+// ReSharper disable IdentifierTypo
+// ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable StringLiteralTypo
 
 using AM.Json;
-using AM.Runtime;
 using AM.Xml;
 
 using ManagedIrbis;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Search
 {
-    [Ignore]
     [TestClass]
     public class FoundItemTest
         : Common.CommonUnitTest
@@ -37,7 +41,7 @@ namespace UnitTests.ManagedIrbis.Search
             item.Text = string.Empty;
             Assert.AreEqual
                 (
-                    "[0] (empty)",
+                    "[0] ",
                     item.ToString()
                 );
 
@@ -50,6 +54,7 @@ namespace UnitTests.ManagedIrbis.Search
         }
 
         /*
+
         [TestMethod]
         public void FoundItem_ParseLine_1()
         {
@@ -58,6 +63,8 @@ namespace UnitTests.ManagedIrbis.Search
             Assert.AreEqual(123, item.Mfn);
             Assert.AreEqual("Hello", item.Text);
         }
+
+        /*
 
         [TestMethod]
         public void FoundItem_ConvertToMfn_1()
@@ -156,13 +163,13 @@ namespace UnitTests.ManagedIrbis.Search
         public void FoundItem_ToJson_1()
         {
             FoundItem item = new FoundItem();
-            Assert.AreEqual("{'mfn':0}", JsonUtility.SerializeShort(item));
+            Assert.AreEqual("{\"mfn\":0}", JsonUtility.SerializeShort(item));
 
             item.Mfn = 1;
-            Assert.AreEqual("{'mfn':1}", JsonUtility.SerializeShort(item));
+            Assert.AreEqual("{\"mfn\":1}", JsonUtility.SerializeShort(item));
 
             item.Text = "Hello";
-            Assert.AreEqual("{'text':'Hello','mfn':1}", JsonUtility.SerializeShort(item));
+            Assert.AreEqual("{\"text\":\"Hello\",\"mfn\":1}", JsonUtility.SerializeShort(item));
         }
 
         /*

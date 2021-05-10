@@ -29,7 +29,7 @@ namespace ManagedIrbis.Infrastructure
     {
         #region Private members
 
-        static readonly char[] StopChars =
+        static readonly char[] _stopChars =
         {
             '(', '/', '\t', ' ', ',', ')', '+', '*'
         };
@@ -39,17 +39,17 @@ namespace ManagedIrbis.Infrastructure
                 TextNavigator navigator
             )
         {
-            string result = navigator.ReadUntil(StopChars).ToString();
+            var result = navigator.ReadUntil(_stopChars).ToString();
             while (navigator.PeekChar() == '/')
             {
-                char c2 = navigator.LookAhead(1);
+                var c2 = navigator.LookAhead(1);
                 if (c2 == '(' || c2 == '\0')
                 {
                     break;
                 }
                 result = result
                     + navigator.ReadChar()
-                    + navigator.ReadUntil(StopChars);
+                    + navigator.ReadUntil(_stopChars);
             }
 
             return result;
@@ -71,10 +71,8 @@ namespace ManagedIrbis.Infrastructure
         {
             Sure.NotNull(text, nameof(text));
 
-            List<SearchToken> result = new List<SearchToken>();
-            TextNavigator navigator = new TextNavigator(text);
-
-            /*
+            var result = new List<SearchToken>();
+            var navigator = new TextNavigator(text);
 
             while (!navigator.IsEOF)
             {
@@ -84,14 +82,14 @@ namespace ManagedIrbis.Infrastructure
                     break;
                 }
 
-                char c = navigator.ReadChar();
+                var c = navigator.ReadChar();
                 string value;
-                int position = navigator.Position;
+                var position = navigator.Position;
                 SearchTokenKind kind;
                 switch (c)
                 {
                     case '"':
-                        value = navigator.ReadUntil('"');
+                        value = navigator.ReadUntil('"').ToString();
                         kind = SearchTokenKind.Term;
                         if (navigator.ReadChar() != '"')
                         {
@@ -104,9 +102,9 @@ namespace ManagedIrbis.Infrastructure
                             throw new SearchSyntaxException();
                         }
 
-                        TextPosition saved = navigator.SavePosition();
-                        string tail = navigator.ReadUntil('"').ToString();
-                        while (!ReferenceEquals(tail, null))
+                        var saved = navigator.SavePosition();
+                        var tail = navigator.ReadUntil('"').ToString();
+                        while (!string.IsNullOrEmpty(tail))
                         {
                             if (navigator.ReadChar() != '"')
                             {
@@ -114,23 +112,29 @@ namespace ManagedIrbis.Infrastructure
                                 break;
                             }
 
-                            string trimmed = tail.TrimStart();
-                            char c2 = trimmed.FirstChar();
+                            var trimmed = tail.TrimStart();
+                            var c2 = trimmed.FirstChar();
                             if (tail.StartsWith("(F)")
                                 || tail.StartsWith("(G)")
-                                || c2.OneOf('+', '*', '^', '.', ',', ')', '/'))
+                                || c2.IsOneOf('+', '*', '^', '.', ',', ')', '/'))
                             {
                                 navigator.RestorePosition(saved);
                                 break;
                             }
                             value = value + '"' + tail;
                             saved = navigator.SavePosition();
-                            tail = navigator.ReadUntil('"');
+                            while (navigator.PeekChar() == '"')
+                            {
+                                value += navigator.ReadChar();
+                                saved = navigator.SavePosition();
+                            }
+
+                            tail = navigator.ReadUntil('"').ToString();
                         }
                         break;
 
                     case '<':
-                        if (navigator.PeekString(2) != ".>")
+                        if (navigator.PeekString(2).ToString() != ".>")
                         {
                             throw new SearchSyntaxException();
                         }
@@ -138,9 +142,9 @@ namespace ManagedIrbis.Infrastructure
                         navigator.ReadChar();
                         navigator.ReadChar();
 
-                        value = navigator.ReadUntil("<.>");
+                        value = navigator.ReadUntil("<.>").ToString();
                         kind = SearchTokenKind.Term;
-                        if (navigator.ReadString(3) != "<.>")
+                        if (navigator.ReadString(3).ToString() != "<.>")
                         {
                             Magna.Error
                                 (
@@ -153,8 +157,7 @@ namespace ManagedIrbis.Infrastructure
                         break;
 
                     case '#':
-                        value = navigator.ReadWhile('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
-                            .ThrowIfNull();
+                        value = navigator.ReadWhile('0', '1', '2', '3', '4', '5', '6', '7', '8', '9').ToString();
                         kind = SearchTokenKind.Hash;
                         break;
 
@@ -179,7 +182,7 @@ namespace ManagedIrbis.Infrastructure
                         break;
 
                     case '/':
-                        if (navigator.PeekChar().OneOf('(', '\0'))
+                        if (navigator.PeekChar().IsOneOf('(', '\0'))
                         {
                             value = c.ToString();
                             kind = SearchTokenKind.Slash;
@@ -197,7 +200,7 @@ namespace ManagedIrbis.Infrastructure
                         break;
 
                     case '(':
-                        string preview = c + navigator.PeekString(2);
+                        string preview = c + navigator.PeekString(2).ToString();
                         if (preview == "(G)" || preview == "(g)")
                         {
                             value = preview;
@@ -230,12 +233,10 @@ namespace ManagedIrbis.Infrastructure
                         break;
                 }
 
-                SearchToken token = new SearchToken(kind, position, value);
+                var token = new SearchToken(kind, position, value);
 
                 result.Add(token);
             }
-
-            */
 
             return new SearchTokenList(result);
         }

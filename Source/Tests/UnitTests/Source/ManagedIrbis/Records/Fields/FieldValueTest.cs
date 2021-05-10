@@ -9,6 +9,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Records.Fields
 {
     [TestClass]
@@ -47,7 +49,7 @@ namespace UnitTests.ManagedIrbis.Records.Fields
 
         [TestMethod]
         [ExpectedException(typeof(VerificationException))]
-        public void FieldValue_Verify_Exception_1()
+        public void FieldValue_Verify_2()
         {
             FieldValue.Verify("У попа ^была собака", true);
         }

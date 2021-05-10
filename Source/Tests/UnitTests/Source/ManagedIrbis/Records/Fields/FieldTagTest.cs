@@ -9,6 +9,8 @@ using ManagedIrbis;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Records.Fields
 {
     [TestClass]
@@ -32,11 +34,11 @@ namespace UnitTests.ManagedIrbis.Records.Fields
 
         private void _TestNormalize
             (
-                string source,
-                string expected
+                string? source,
+                string? expected
             )
         {
-            string actual = FieldTag.Normalize(source);
+            var actual = FieldTag.Normalize(source);
 
             Assert.AreEqual(expected, actual);
         }

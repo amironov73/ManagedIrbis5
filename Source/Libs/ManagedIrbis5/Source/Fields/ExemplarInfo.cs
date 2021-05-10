@@ -290,8 +290,8 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Прочие подполя, не попавшие в вышеперечисленные.
         /// </summary>
-        [XmlElement("other-subfields")]
-        [JsonPropertyName("other-subfields")]
+        [XmlIgnore]
+        [JsonIgnore]
         public SubField[]? OtherSubFields { get; set; }
 
         /// <summary>

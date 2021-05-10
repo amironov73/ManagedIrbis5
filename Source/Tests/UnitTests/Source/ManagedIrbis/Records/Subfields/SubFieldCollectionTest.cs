@@ -12,6 +12,8 @@ using AM.Runtime;
 
 using ManagedIrbis;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Records.Subfields
 {
     [TestClass]
@@ -55,7 +57,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
                     .RestoreObjectFromMemory <SubFieldCollection>();
 
             Assert.IsNotNull(collection2);
-            Assert.AreEqual(collection1.Count, collection2.Count);
+            Assert.AreEqual(collection1.Count, collection2!.Count);
 
             for (var i = 0; i < collection1.Count; i++)
             {
@@ -92,7 +94,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             var collection = new SubFieldCollection
                 {
                     new SubField(),
-                    null,
+                    null!,
                     new SubField('a')
                 };
             Assert.AreEqual(2, collection.Count);
@@ -320,7 +322,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         public void SubFieldCollection_InsertItem_2()
         {
             var collection = _GetCollection();
-            collection.Insert(1, null);
+            collection.Insert(1, null!);
         }
 
         [TestMethod]
@@ -348,7 +350,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         public void SubFieldCollection_SetItem_2()
         {
             var collection = _GetCollection();
-            collection[1] = null;
+            collection[1] = null!;
         }
     }
 }

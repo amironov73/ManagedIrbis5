@@ -8,6 +8,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Records.Fields
 {
     [TestClass]

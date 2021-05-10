@@ -9,6 +9,8 @@ using AM;
 
 using ManagedIrbis;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Records.Subfields
 {
     [TestClass]
@@ -34,10 +36,10 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
 
         private void _TestNormalize
             (
-                string expected
+                string? expected
             )
         {
-            string actual = SubFieldValue.Normalize(expected);
+            var actual = SubFieldValue.Normalize(expected);
 
             Assert.AreEqual(expected, actual);
         }
@@ -75,7 +77,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         [Description("Исключения при верификации значения подполя")]
         public void SubFieldValue_ThrowOnVerify_1()
         {
-            bool save = SubFieldValue.ThrowOnVerify;
+            var save = SubFieldValue.ThrowOnVerify;
             SubFieldValue.ThrowOnVerify = true;
             try
             {

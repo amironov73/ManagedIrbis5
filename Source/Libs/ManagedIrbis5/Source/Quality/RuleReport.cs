@@ -121,10 +121,8 @@ namespace ManagedIrbis.Quality
                 BinaryWriter writer
             )
         {
-            // TODO: implement WriteCollection
-
             writer
-                // .WriteCollection(Defects)
+                .WriteCollection(Defects)
                 .WritePackedInt32(Damage)
                 .WritePackedInt32(Bonus);
         }

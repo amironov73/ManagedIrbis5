@@ -1471,7 +1471,8 @@ namespace ManagedIrbis
             List<SubField>? result = null;
             foreach (var subField in subFields)
             {
-                if (!subField.Code.SameChar(knownCodes))
+                if (subField.Code != '\0'
+                    && !subField.Code.SameChar(knownCodes))
                 {
                     result ??= new List<SubField>();
                     result.Add(subField);

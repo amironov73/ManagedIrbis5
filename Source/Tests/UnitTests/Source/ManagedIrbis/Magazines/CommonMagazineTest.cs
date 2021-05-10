@@ -15,7 +15,7 @@ namespace UnitTests.ManagedIrbis.Magazines
         protected static Field Parse(int tag, string text)
         {
             var result = new Field { Tag = tag };
-            result.Decode(text);
+            result.DecodeBody(text);
 
             return result;
         }

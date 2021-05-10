@@ -17,7 +17,6 @@ using ManagedIrbis.Magazines;
 
 namespace UnitTests.ManagedIrbis.Magazines
 {
-    [Ignore]
     [TestClass]
     public class MagazineCumulationTest
         : Common.CommonUnitTest
@@ -25,7 +24,7 @@ namespace UnitTests.ManagedIrbis.Magazines
         private static Field Parse(int tag, string text)
         {
             var result = new Field { Tag = tag };
-            result.Decode(text);
+            result.DecodeBody(text);
 
             return result;
         }
@@ -147,11 +146,11 @@ namespace UnitTests.ManagedIrbis.Magazines
         {
             var field = _GetField();
             var cumulation = MagazineCumulation.Parse(field);
-            Assert.AreEqual(field.GetFirstSubFieldValue('q'), cumulation.Year);
-            Assert.AreEqual(field.GetFirstSubFieldValue('f'), cumulation.Volume);
-            Assert.AreEqual(field.GetFirstSubFieldValue('d'), cumulation.Place);
-            Assert.AreEqual(field.GetFirstSubFieldValue('h'), cumulation.Numbers);
-            Assert.AreEqual(field.GetFirstSubFieldValue('k'), cumulation.Set);
+            Assert.AreEqual(field.GetFirstSubFieldValue('q').ToString(), cumulation.Year);
+            Assert.AreEqual(field.GetFirstSubFieldValue('f').ToString(), cumulation.Volume);
+            Assert.AreEqual(field.GetFirstSubFieldValue('d').ToString(), cumulation.Place);
+            Assert.AreEqual(field.GetFirstSubFieldValue('h').ToString(), cumulation.Numbers);
+            Assert.AreEqual(field.GetFirstSubFieldValue('k').ToString(), cumulation.Set);
             Assert.IsNotNull(cumulation.UnknownSubFields);
             Assert.AreEqual(0, cumulation.UnknownSubFields!.Length);
         }
@@ -172,8 +171,8 @@ namespace UnitTests.ManagedIrbis.Magazines
                 .Add('h', "1,2,3");
             var cumulation = _GetCumulation();
             cumulation.ApplyTo(field);
-            Assert.AreEqual(cumulation.Year, field.GetFirstSubFieldValue('q'));
-            Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h'));
+            Assert.AreEqual(cumulation.Year, field.GetFirstSubFieldValue('q').ToString());
+            Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h').ToString());
         }
 
         [TestMethod]
@@ -181,11 +180,11 @@ namespace UnitTests.ManagedIrbis.Magazines
         {
             var cumulation = _GetCumulation();
             var field = cumulation.ToField();
-            Assert.AreEqual(cumulation.Year, field.GetFirstSubFieldValue('q'));
-            Assert.AreEqual(cumulation.Volume, field.GetFirstSubFieldValue('f'));
-            Assert.AreEqual(cumulation.Place, field.GetFirstSubFieldValue('d'));
-            Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h'));
-            Assert.AreEqual(cumulation.Set, field.GetFirstSubFieldValue('k'));
+            Assert.AreEqual(cumulation.Year, field.GetFirstSubFieldValue('q').ToString());
+            Assert.AreEqual(string.Empty, field.GetFirstSubFieldValue('f').ToString());
+            Assert.AreEqual(cumulation.Place, field.GetFirstSubFieldValue('d').ToString());
+            Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h').ToString());
+            Assert.AreEqual(cumulation.Set, field.GetFirstSubFieldValue('k').ToString());
         }
 
         private void _TestSerialization
@@ -247,7 +246,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             Assert.AreEqual("{}", JsonUtility.SerializeShort(cumulation));
 
             cumulation = _GetCumulation();
-            Assert.AreEqual("{'year':'2016','place':'Ф403','numbers':'1,3,4,6,7,9,10,12,13,15,16,18,20,21,23,25,26,28,29,31,32,34,35,37,38,40,41,43,44,46,48,49,51,52,54,55,57,58,60,61,64,66,67,69,70,72,73,75,76,78,79,81,82,84,85,87,88,90,91,93,94,96,97,99,100,102,103,105,106,108,109,111,114,115,2/ч,5/ч,8/ч,11/ч,14/ч,17/ч,19/ч,22/ч,24/ч,27/ч,30/ч,33/ч,36/ч,39/ч,42/ч,45/ч,47/ч,50/ч,53/ч,56/ч,59/ч,62/ч,65/ч,68/ч,71/ч,74/ч,77/ч,80/ч,83/ч,86/ч,89/ч,92/ч,95/ч,98/ч,101/ч,104/ч,107/ч,4/п,7/п,10/п,13/п,16/п,21/п,26/п,29/п,32/п,35/п,38/п,41/п,44/п,52/п,55/п,58/п,61/п,67/п,70/п,72/п,73/п,79/п,82/п,85/п,88/п,91/п,94/п,97/п,100/п,103/п,106/п,109/п,63/д,110/ч,112/п,113/ч,115/п,117,118,120,121,123,124,116/ч,118/п,119/ч,121/п,122/ч,124/п,126,128,129,131,127/ч,129/п,130/ч,132/п,132,134,135,137,138,135/п,138/п,133/ч,136/ч,139/ч,140,141/п,141,142/ч,145/ч,143,144/п,144,146,147,147/п,148/ч,149,125/ч-126,1/т-52/т','set':'1'}", JsonUtility.SerializeShort(cumulation));
+            Assert.AreEqual("{\"year\":\"2016\",\"place\":\"\\u0424403\",\"numbers\":\"1,3,4,6,7,9,10,12,13,15,16,18,20,21,23,25,26,28,29,31,32,34,35,37,38,40,41,43,44,46,48,49,51,52,54,55,57,58,60,61,64,66,67,69,70,72,73,75,76,78,79,81,82,84,85,87,88,90,91,93,94,96,97,99,100,102,103,105,106,108,109,111,114,115,2/\\u0447,5/\\u0447,8/\\u0447,11/\\u0447,14/\\u0447,17/\\u0447,19/\\u0447,22/\\u0447,24/\\u0447,27/\\u0447,30/\\u0447,33/\\u0447,36/\\u0447,39/\\u0447,42/\\u0447,45/\\u0447,47/\\u0447,50/\\u0447,53/\\u0447,56/\\u0447,59/\\u0447,62/\\u0447,65/\\u0447,68/\\u0447,71/\\u0447,74/\\u0447,77/\\u0447,80/\\u0447,83/\\u0447,86/\\u0447,89/\\u0447,92/\\u0447,95/\\u0447,98/\\u0447,101/\\u0447,104/\\u0447,107/\\u0447,4/\\u043F,7/\\u043F,10/\\u043F,13/\\u043F,16/\\u043F,21/\\u043F,26/\\u043F,29/\\u043F,32/\\u043F,35/\\u043F,38/\\u043F,41/\\u043F,44/\\u043F,52/\\u043F,55/\\u043F,58/\\u043F,61/\\u043F,67/\\u043F,70/\\u043F,72/\\u043F,73/\\u043F,79/\\u043F,82/\\u043F,85/\\u043F,88/\\u043F,91/\\u043F,94/\\u043F,97/\\u043F,100/\\u043F,103/\\u043F,106/\\u043F,109/\\u043F,63/\\u0434,110/\\u0447,112/\\u043F,113/\\u0447,115/\\u043F,117,118,120,121,123,124,116/\\u0447,118/\\u043F,119/\\u0447,121/\\u043F,122/\\u0447,124/\\u043F,126,128,129,131,127/\\u0447,129/\\u043F,130/\\u0447,132/\\u043F,132,134,135,137,138,135/\\u043F,138/\\u043F,133/\\u0447,136/\\u0447,139/\\u0447,140,141/\\u043F,141,142/\\u0447,145/\\u0447,143,144/\\u043F,144,146,147,147/\\u043F,148/\\u0447,149,125/\\u0447-126,1/\\u0442-52/\\u0442\",\"set\":\"1\"}", JsonUtility.SerializeShort(cumulation));
         }
 
         [TestMethod]
@@ -264,10 +263,10 @@ namespace UnitTests.ManagedIrbis.Magazines
         public void MagazineCumulation_ToString_1()
         {
             var cumulation = new MagazineCumulation();
-            Assert.AreEqual("(null):(null)", cumulation.ToString());
+            Assert.AreEqual("(null): (null)", cumulation.ToString());
 
             cumulation = _GetCumulation();
-            Assert.AreEqual("2016:1,3,4,6,7,9,10,12,13,15,16,18,20,21,23,25,26,28,29,31,32,34,35,37,38,40,41,43,44,46,48,49,51,52,54,55,57,58,60,61,64,66,67,69,70,72,73,75,76,78,79,81,82,84,85,87,88,90,91,93,94,96,97,99,100,102,103,105,106,108,109,111,114,115,2/ч,5/ч,8/ч,11/ч,14/ч,17/ч,19/ч,22/ч,24/ч,27/ч,30/ч,33/ч,36/ч,39/ч,42/ч,45/ч,47/ч,50/ч,53/ч,56/ч,59/ч,62/ч,65/ч,68/ч,71/ч,74/ч,77/ч,80/ч,83/ч,86/ч,89/ч,92/ч,95/ч,98/ч,101/ч,104/ч,107/ч,4/п,7/п,10/п,13/п,16/п,21/п,26/п,29/п,32/п,35/п,38/п,41/п,44/п,52/п,55/п,58/п,61/п,67/п,70/п,72/п,73/п,79/п,82/п,85/п,88/п,91/п,94/п,97/п,100/п,103/п,106/п,109/п,63/д,110/ч,112/п,113/ч,115/п,117,118,120,121,123,124,116/ч,118/п,119/ч,121/п,122/ч,124/п,126,128,129,131,127/ч,129/п,130/ч,132/п,132,134,135,137,138,135/п,138/п,133/ч,136/ч,139/ч,140,141/п,141,142/ч,145/ч,143,144/п,144,146,147,147/п,148/ч,149,125/ч-126,1/т-52/т", cumulation.ToString());
+            Assert.AreEqual("2016: 1,3,4,6,7,9,10,12,13,15,16,18,20,21,23,25,26,28,29,31,32,34,35,37,38,40,41,43,44,46,48,49,51,52,54,55,57,58,60,61,64,66,67,69,70,72,73,75,76,78,79,81,82,84,85,87,88,90,91,93,94,96,97,99,100,102,103,105,106,108,109,111,114,115,2/ч,5/ч,8/ч,11/ч,14/ч,17/ч,19/ч,22/ч,24/ч,27/ч,30/ч,33/ч,36/ч,39/ч,42/ч,45/ч,47/ч,50/ч,53/ч,56/ч,59/ч,62/ч,65/ч,68/ч,71/ч,74/ч,77/ч,80/ч,83/ч,86/ч,89/ч,92/ч,95/ч,98/ч,101/ч,104/ч,107/ч,4/п,7/п,10/п,13/п,16/п,21/п,26/п,29/п,32/п,35/п,38/п,41/п,44/п,52/п,55/п,58/п,61/п,67/п,70/п,72/п,73/п,79/п,82/п,85/п,88/п,91/п,94/п,97/п,100/п,103/п,106/п,109/п,63/д,110/ч,112/п,113/ч,115/п,117,118,120,121,123,124,116/ч,118/п,119/ч,121/п,122/ч,124/п,126,128,129,131,127/ч,129/п,130/ч,132/п,132,134,135,137,138,135/п,138/п,133/ч,136/ч,139/ч,140,141/п,141,142/ч,145/ч,143,144/п,144,146,147,147/п,148/ч,149,125/ч-126,1/т-52/т", cumulation.ToString());
         }
     }
 }
