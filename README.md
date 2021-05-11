@@ -85,6 +85,7 @@ internal class Program
 
 ### Build status
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7a2fc9c9cff946c89f7f4f6adcb567c3)](https://app.codacy.com/gh/amironov73/ManagedIrbis5?utm_source=github.com&utm_medium=referral&utm_content=amironov73/ManagedIrbis5&utm_campaign=Badge_Grade_Settings)
 [![Build status](https://img.shields.io/appveyor/ci/AlexeyMironov/managedirbis5.svg)](https://ci.appveyor.com/project/AlexeyMironov/managedirbis5/)
 [![Build status](https://api.travis-ci.org/amironov73/ManagedIrbis5.svg)](https://travis-ci.org/amironov73/ManagedIrbis5/)
 [![GitHub Action](https://github.com/amironov73/ManagedIrbis5/workflows/CI/badge.svg)](https://github.com/amironov73/ManagedIrbis5/actions)
