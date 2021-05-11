@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* Unifor.cs --
+/* Unifor.cs -- форматный выход "&unifor"
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +29,7 @@ using ManagedIrbis.Pft.Infrastructure.Unifors;
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// Unifor.
+    /// Форматный выход "@unifor".
     /// </summary>
     public sealed class Unifor
         : IFormatExit
@@ -37,17 +37,19 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Properties
 
         /// <summary>
-        /// Registry.
+        /// Реестр префиксов.
         /// </summary>
-        public static CaseInsensitiveDictionary<Action<PftContext, PftNode?, string>> Registry { get; } = new();
+        public static CaseInsensitiveDictionary<Action<PftContext, PftNode?, string>> Registry { get; } = new ();
 
         /// <summary>
-        /// Throw an exception on empty UNIFOR?
+        /// Бросать исключения при пустом содержимом UNIFOR?
+        /// По умолчанию - нет.
         /// </summary>
         public static bool ThrowOnEmpty { get; set; } = false;
 
         /// <summary>
-        /// Throw an exception on unknown key?
+        /// Бросать исключения при неизвестных префиксах?
+        /// По умолчанию - нет.
         /// </summary>
         public static bool ThrowOnUnknown { get; set; } = false;
 
@@ -206,7 +208,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             Registry.Add("[", UniforSquareBracket.CleanContextMarkup);
             Registry.Add("&", UniforAmpersand.Unknown);
             Registry.Add(":", UniforColon.CheckRights);
-        }
+
+        } // method RegisterActions
 
         #endregion
 
@@ -264,8 +267,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 Magna.Error
                     (
-                        "Unifor::Execute: "
-                        + "empty expression: "
+                        nameof(Unifor) + "::" + nameof(Execute)
+                        + ": empty expression: "
                         + this
                     );
 
@@ -273,8 +276,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 {
                     throw new PftSemanticException
                         (
-                            "Unifor::Execute: "
-                            + "empty expression: "
+                            nameof(Unifor) + "::" + nameof(Execute)
+                            + ": empty expression: "
                             + this
                         );
                 }
@@ -288,8 +291,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             {
                 Magna.Error
                     (
-                        "Unifor::Execute: "
-                        + "unknown action="
+                        nameof(Unifor) + "::" + nameof(Execute)
+                        + ": unknown action="
                         + expression.ToVisibleString()
                     );
 
@@ -311,8 +314,11 @@ namespace ManagedIrbis.Pft.Infrastructure
                         expression
                     );
             }
-        }
+
+        } // method Execute
 
         #endregion
-    }
-}
+
+    } // class Unifor
+
+} // namespace ManagedIrbis.Pft.Infrastructure
