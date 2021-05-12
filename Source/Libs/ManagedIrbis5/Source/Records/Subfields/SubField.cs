@@ -16,6 +16,8 @@
 using System;
 using System.IO;
 using System.Text.Json.Serialization;
+using System.Xml;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 using AM;
@@ -31,8 +33,10 @@ namespace ManagedIrbis
     /// <summary>
     /// Подполе библиографической записи.
     /// </summary>
+    [XmlRoot("subfield")]
     public sealed class SubField
         : IVerifiable,
+        IXmlSerializable,
         IHandmadeSerializable,
         IReadOnly<SubField>,
         IDisposable
@@ -64,19 +68,16 @@ namespace ManagedIrbis
         /// <summary>
         /// Значение подполя.
         /// </summary>
-        public ReadOnlyMemory<char> Value { get; set; }
+        public ReadOnlyMemory<char> Value
+        {
+            get => _value;
+            set => SetValue(value);
+        }
 
         /// <summary>
         /// Подполе хранит значение поля до первого разделителя.
         /// </summary>
         public bool RepresentsValue => Code == NoCode;
-
-        /// <summary>
-        /// Подполе модифицировано?
-        /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        public bool Modified { get; internal set; }
 
         /// <summary>
         /// Ссылка на поле.
@@ -128,16 +129,14 @@ namespace ManagedIrbis
             )
         {
             Code = code;
-            if (value is not null)
-            {
-                if (value.Contains(Delimiter))
-                {
-                    throw new ArgumentException(nameof(value));
-                }
-            }
-
             Value = value.AsMemory();
         } // constructor
+
+        #endregion
+
+        #region Private members
+
+        private ReadOnlyMemory<char> _value;
 
         #endregion
 
@@ -146,8 +145,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Клонирование подполя.
         /// </summary>
-        public SubField Clone() =>
-            (SubField) MemberwiseClone();
+        public SubField Clone() => (SubField) MemberwiseClone();
 
         /// <summary>
         /// Сравнение двух подполей.
@@ -187,10 +185,7 @@ namespace ManagedIrbis
             {
                 Code = char.ToLowerInvariant(text.Span[0]);
                 var value = text[1..];
-                if (value.Span.Contains(Delimiter))
-                {
-                    throw new ArgumentException("Illegal subfield value");
-                }
+                SubFieldValue.Verify(value, true);
                 Value = value;
             }
         } // method Decode
@@ -205,6 +200,19 @@ namespace ManagedIrbis
         /// Возврат объекта в пул.
         /// </summary>
         public void ToPool() => SubFieldPool.Default.Return(this);
+
+        /// <summary>
+        /// Установка нового значения подполя.
+        /// </summary>
+        public void SetValue
+            (
+                ReadOnlyMemory<char> value
+            )
+        {
+            ThrowIfReadOnly();
+            SubFieldValue.Verify(value, true);
+            _value = value;
+        } // method SetValue
 
         #endregion
 
@@ -232,6 +240,35 @@ namespace ManagedIrbis
 
         #endregion
 
+        #region IXmlSerializable members
+
+        /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
+        XmlSchema? IXmlSerializable.GetSchema() => null;
+
+        /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
+        void IXmlSerializable.ReadXml
+            (
+                XmlReader reader
+            )
+        {
+            Code = reader.GetAttribute("code").FirstChar();
+            Value = reader.GetAttribute("value").AsMemory();
+
+        } // method ReadXml
+
+        /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
+        void IXmlSerializable.WriteXml
+            (
+                XmlWriter writer
+            )
+        {
+            writer.WriteAttributeString("code", Code.ToString());
+            writer.WriteAttributeString("value", Value.ToString());
+
+        } // method WriteXml
+
+        #endregion
+
         #region IVerifiable members
 
         /// <inheritdoc cref="IVerifiable.Verify"/>
@@ -247,10 +284,11 @@ namespace ManagedIrbis
                     Code is NoCode or > ' ',
                     $"Wrong subfield code {Code}"
                 );
-            if (!Value.IsEmpty)
-            {
-                verifier.Assert(!Value.Span.Contains(Delimiter));
-            }
+
+            verifier.Assert
+                (
+                    SubFieldValue.Verify(Value, throwOnError)
+                );
 
             return verifier.Result;
         } // method Verify

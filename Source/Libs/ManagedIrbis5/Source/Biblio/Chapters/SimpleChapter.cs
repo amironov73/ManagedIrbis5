@@ -10,7 +10,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SimpleChapter.cs --
+/* SimpleChapter.cs -- простая глава
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,6 +18,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -32,7 +33,7 @@ using ManagedIrbis.Reports;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    ///
+    /// Простая глава.
     /// </summary>
     public class SimpleChapter
         : ChapterWithRecords
@@ -95,10 +96,13 @@ namespace ManagedIrbis.Biblio
             return result;
         }
 
-        static string Propis(int number)
+        static string Propis
+            (
+                int number
+            )
         {
             var integers = new int[4];
-            var strings = new string[4, 3]
+            var strings = new [,]
             {
                 {" миллиард", " миллиарда", " миллиардов"},
                 {" миллион", " миллиона", " миллионов"},
@@ -106,94 +110,100 @@ namespace ManagedIrbis.Biblio
                 {"", "", ""}
 
             };
-            integers[0] = (number - (number % 1000000000)) / 1000000000;
-            integers[1] = ((number % 1000000000) - (number % 1000000)) / 1000000;
-            integers[2] = ((number % 1000000) - (number % 1000)) / 1000;
+
+            integers[0] = (number - number % 1000000000) / 1000000000;
+            integers[1] = (number % 1000000000 - number % 1000000) / 1000000;
+            integers[2] = (number % 1000000 - number % 1000) / 1000;
             integers[3] = number % 1000;
-            var result = "";
+
+            var result = new StringBuilder();
             for (var i = 0; i < 4; i++)
             {
                 if (integers[i] != 0)
                 {
-                    if (((integers[i] - (integers[i] % 100)) / 100) != 0)
-                        switch (((integers[i] - (integers[i] % 100)) / 100))
-                        {
-                            case 1: result += " сто"; break;
-                            case 2: result += " двести"; break;
-                            case 3: result += " триста"; break;
-                            case 4: result += " четыреста"; break;
-                            case 5: result += " пятьсот"; break;
-                            case 6: result += " шестьсот"; break;
-                            case 7: result += " семьсот"; break;
-                            case 8: result += " восемьсот"; break;
-                            case 9: result += " девятьсот"; break;
-                        }
-                    if (((integers[i] % 100) - ((integers[i] % 100) % 10)) / 10 != 1)
+                    if ((integers[i] - integers[i] % 100) / 100 != 0)
                     {
-                        switch (((integers[i] % 100) - ((integers[i] % 100) % 10)) / 10)
+                        switch ((integers[i] - integers[i] % 100) / 100)
                         {
-                            case 2: result += " двадцать"; break;
-                            case 3: result += " тридцать"; break;
-                            case 4: result += " сорок"; break;
-                            case 5: result += " пятьдесят"; break;
-                            case 6: result += " шестьдесят"; break;
-                            case 7: result += " семьдесят"; break;
-                            case 8: result += " восемьдесят"; break;
-                            case 9: result += " девяносто"; break;
+                            case 1: result.Append(" сто"); break;
+                            case 2: result.Append(" двести"); break;
+                            case 3: result.Append(" триста"); break;
+                            case 4: result.Append(" четыреста"); break;
+                            case 5: result.Append(" пятьсот"); break;
+                            case 6: result.Append(" шестьсот"); break;
+                            case 7: result.Append(" семьсот"); break;
+                            case 8: result.Append(" восемьсот"); break;
+                            case 9: result.Append(" девятьсот"); break;
                         }
                     }
+
+                    if ((integers[i] % 100 - integers[i] % 100 % 10) / 10 != 1)
+                    {
+                        switch ((integers[i] % 100 - integers[i] % 100 % 10) / 10)
+                        {
+                            case 2: result.Append(" двадцать"); break;
+                            case 3: result.Append(" тридцать"); break;
+                            case 4: result.Append(" сорок"); break;
+                            case 5: result.Append(" пятьдесят"); break;
+                            case 6: result.Append(" шестьдесят"); break;
+                            case 7: result.Append(" семьдесят"); break;
+                            case 8: result.Append(" восемьдесят"); break;
+                            case 9: result.Append(" девяносто"); break;
+                        }
+                    }
+
                     switch (integers[i] % 100)
                     {
-                        case 1: if (i == 2) result += " одна"; else result += " один"; break;
-                        case 2: if (i == 2) result += " две"; else result += " два"; break;
-                        case 3: result += " три"; break;
-                        case 4: result += " четыре"; break;
-                        case 5: result += " пять"; break;
-                        case 6: result += " шесть"; break;
-                        case 7: result += " семь"; break;
-                        case 8: result += " восемь"; break;
-                        case 9: result += " девять"; break;
-                        case 10: result += " десять"; break;
-                        case 11: result += " одиннадцать"; break;
-                        case 12: result += " двенадцать"; break;
-                        case 13: result += " тринадцать"; break;
-                        case 14: result += " четырнадцать"; break;
-                        case 15: result += " пятнадцать"; break;
-                        case 16: result += " шестнадцать"; break;
-                        case 17: result += " семнадцать"; break;
-                        case 18: result += " восемнадцать"; break;
-                        case 19: result += " девятнадцать"; break;
+                        case 1:  result.Append(i == 2 ? " одна" : " один"); break;
+                        case 2:  result.Append(i == 2 ? " две" : " два"); break;
+                        case 3:  result.Append(" три"); break;
+                        case 4:  result.Append(" четыре"); break;
+                        case 5:  result.Append(" пять"); break;
+                        case 6:  result.Append(" шесть"); break;
+                        case 7:  result.Append(" семь"); break;
+                        case 8:  result.Append(" восемь"); break;
+                        case 9:  result.Append(" девять"); break;
+                        case 10: result.Append(" десять"); break;
+                        case 11: result.Append(" одиннадцать"); break;
+                        case 12: result.Append(" двенадцать"); break;
+                        case 13: result.Append(" тринадцать"); break;
+                        case 14: result.Append(" четырнадцать"); break;
+                        case 15: result.Append(" пятнадцать"); break;
+                        case 16: result.Append(" шестнадцать"); break;
+                        case 17: result.Append(" семнадцать"); break;
+                        case 18: result.Append(" восемнадцать"); break;
+                        case 19: result.Append(" девятнадцать"); break;
                     }
 
                     if (integers[i] % 100 >= 10 && integers[i] % 100 <= 19)
                     {
-                        result += " " + strings[i, 2] + " ";
+                        result.Append($" ");
+                        result.Append(strings[i, 2]);
+                        result.Append(' ');
                     }
                     else
                     {
                         switch (integers[i] % 100)
                         {
-                            case 1: result += " " + strings[i, 0] + " "; break;
+                            case 1: result.Append(' '); result.Append(strings[i, 0]); result.Append(' '); break;
                             case 2:
                             case 3:
-                            case 4: result += " " + strings[i, 1] + " "; break;
+                            case 4: result.Append(' '); result.Append(strings[i, 1]); result.Append(' '); break;
                             case 5:
                             case 6:
                             case 7:
                             case 8:
-                            case 9: result += " " + strings[i, 2] + " "; break;
+                            case 9: result.Append(' '); result.Append(strings[i, 2]); result.Append(' '); break;
 
                         }
                     }
                 }
 
             }
-            return result;
-        }
 
-        #endregion
+            return result.ToString();
 
-        #region Public methods
+        } // method Propis
 
         #endregion
 
@@ -226,10 +236,7 @@ namespace ManagedIrbis.Biblio
                 var mfns = Records.Select(r => r.Mfn).ToArray();
                 var formatted = formatter.FormatRecords(mfns);
 
-                if (ReferenceEquals(Items, null))
-                {
-                    Items = new ItemCollection();
-                }
+                Items ??= new ItemCollection();
 
                 for (var i = 0; i < Records.Count; i++)
                 {
@@ -334,7 +341,8 @@ namespace ManagedIrbis.Biblio
             }
 
             log.WriteLine("End build items {0}", this);
-        }
+
+        } // method BuildItems
 
         /// <inheritdoc cref="BiblioChapter.GatherRecords" />
         public override void GatherRecords
@@ -344,14 +352,12 @@ namespace ManagedIrbis.Biblio
         {
             var log = context.Log;
             log.WriteLine("Begin gather records {0}", this);
-            Record? record;
 
             try
             {
                 var processor = context.Processor
                     .ThrowIfNull("context.Processor");
-                using (var formatter
-                    = processor.AcquireFormatter(context))
+                using (var formatter = processor.AcquireFormatter(context))
                 {
                     var provider = context.Provider;
                     var records = Records
@@ -360,7 +366,7 @@ namespace ManagedIrbis.Biblio
                     var searchExpression = SearchExpression
                         .ThrowIfNull("SearchExpression");
                     formatter.ParseProgram(searchExpression);
-                    record = new Record();
+                    var record = new Record();
                     searchExpression = formatter.FormatRecord(record);
 
                     var parameters = new SearchParameters
@@ -378,12 +384,12 @@ namespace ManagedIrbis.Biblio
                         // Пробуем не загружать записи,
                         // а предоставить заглушки
 
-                        for (var i = 0; i < found.Length; i++)
+                        foreach (var item in found)
                         {
                             log.Write(".");
                             record = new Record
                             {
-                                Mfn = found[i].Mfn
+                                Mfn = item.Mfn
                             };
                             records.Add(record);
                             context.Records.Add(record);
@@ -401,18 +407,13 @@ namespace ManagedIrbis.Biblio
             }
             catch (Exception exception)
             {
-                var message = string.Format
-                    (
-                        "Exception: {0}",
-                        exception
-                    );
-
-                log.WriteLine(message);
+                log.WriteLine($"Exception: {exception}");
                 throw;
             }
 
             log.WriteLine("End gather records {0}", this);
-        }
+
+        } // method GatherRecords
 
         /// <inheritdoc cref="BiblioChapter.Render" />
         public override void Render
@@ -482,12 +483,11 @@ namespace ManagedIrbis.Biblio
 
             log.WriteLine(string.Empty);
             log.WriteLine("End render {0}", this);
-        }
+
+        } // method Render
 
         #endregion
 
-        #region Object members
+    } // class SimpleChapter
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Biblio

@@ -45,7 +45,7 @@ namespace UnitTests.ManagedIrbis.Records.Fields
         private Field _GetField_3()
         {
             var result = new Field(461)
-                .Add('1', null)
+                .Add('1', (object?) null)
                 .Add('a', "Златая цепь")
                 .Add('e', "Записки. Повести. Рассказы")
                 .Add('f', "Бондарин С. А.")

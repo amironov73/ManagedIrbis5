@@ -91,5 +91,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         }
 
         #endregion
-    }
-}
+
+    } // class FormatExit
+
+} // namespace ManagedIrbis.Pft.Infrastructure

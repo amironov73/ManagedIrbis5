@@ -56,5 +56,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         public override string ToString() => Name.ToVisibleString();
 
         #endregion
-    }
-}
+
+    } // class FunctionDescriptor
+
+} // namespace ManagedIrbis.Pft.Infrastructure

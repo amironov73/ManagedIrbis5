@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using AM;
 
 #endregion
@@ -44,17 +45,14 @@ namespace ManagedIrbis
         /// </summary>
         public static bool IsValidValue
             (
-                string? value
+                ReadOnlyMemory<char> value
             )
         {
-            if (!ReferenceEquals(value, null))
+            foreach (char c in value.Span)
             {
-                foreach (char c in value)
+                if (c == SubField.Delimiter)
                 {
-                    if (c == SubField.Delimiter)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
@@ -82,20 +80,15 @@ namespace ManagedIrbis
         /// <summary>
         /// Verify subfield value.
         /// </summary>
-        public static bool Verify
-            (
-                string? value
-            )
-        {
-            return Verify(value, ThrowOnVerify);
-        } // method Verify
+        public static bool Verify (ReadOnlyMemory<char> value) =>
+            Verify(value, ThrowOnVerify);
 
         /// <summary>
         /// Verify subfield value.
         /// </summary>
         public static bool Verify
             (
-                string? value,
+                ReadOnlyMemory<char> value,
                 bool throwOnError
             )
         {

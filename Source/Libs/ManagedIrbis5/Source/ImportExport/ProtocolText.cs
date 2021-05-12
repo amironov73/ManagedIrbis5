@@ -179,8 +179,6 @@ namespace ManagedIrbis.ImportExport
                 string line
             )
         {
-            Sure.NotNullNorEmpty(line, nameof(line));
-
             var reader = new StringReader(line);
             var result = new Field
             {

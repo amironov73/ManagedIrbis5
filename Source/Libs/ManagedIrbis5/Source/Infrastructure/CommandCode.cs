@@ -4,8 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
 /* CommandCode.cs -- коды команд для сервера ИРБИС64
  * Ars Magna project, http://arsmagna.ru
@@ -18,7 +17,7 @@ namespace ManagedIrbis.Infrastructure
     /// <summary>
     /// Коды команд для сервера ИРБИС64.
     /// </summary>
-    public class CommandCode
+    public static class CommandCode
     {
         /// <summary>
         /// Получение признака монопольной блокировки базы данных.
@@ -292,5 +291,7 @@ namespace ManagedIrbis.Infrastructure
         /// Получение списка файлов на сервере.
         /// </summary>
         public const string ListFiles = "!";
-    }
-}
+
+    } // class CommandCode
+
+} // namespace ManagedIrbis.Infrastructure

@@ -4,11 +4,15 @@
 // ReSharper disable StringLiteralTypo
 
 using System;
+using System.Text.Json;
+using AM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Runtime;
+using AM.Xml;
 
 using ManagedIrbis;
+using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
@@ -26,7 +30,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.IsTrue(subField.Value.IsEmpty);
             Assert.AreEqual(string.Empty, subField.ToString());
             Assert.IsTrue(subField.RepresentsValue);
-            Assert.IsFalse(subField.Modified);
             Assert.IsNull(subField.Field);
             Assert.IsFalse(subField.ReadOnly);
             Assert.IsTrue(subField.Verify(false));
@@ -42,7 +45,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.AreEqual(value, subField.Value.ToString());
             Assert.AreEqual("^aThe value", subField.ToString());
             Assert.IsFalse(subField.RepresentsValue);
-            Assert.IsFalse(subField.Modified);
             Assert.IsNull(subField.Field);
             Assert.IsFalse(subField.ReadOnly);
             Assert.IsTrue(subField.Verify(false));
@@ -59,7 +61,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
 
         [TestMethod]
         [Description("Неверное значение подполя (String)")]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(VerificationException))]
         public void SubField_Constructor_4()
         {
             var subField = new SubField('a', "Wrong^Value");
@@ -67,7 +69,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         }
 
         [TestMethod]
-        [Description("Конструктор с String")]
+        [Description("Конструктор со string")]
         public void SubField_Constructor_5()
         {
             const string value = "The value";
@@ -76,7 +78,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.AreEqual(value, subField.Value.ToString());
             Assert.AreEqual("^aThe value", subField.ToString());
             Assert.IsFalse(subField.RepresentsValue);
-            Assert.IsFalse(subField.Modified);
             Assert.IsNull(subField.Field);
             Assert.IsFalse(subField.ReadOnly);
             Assert.IsTrue(subField.Verify(false));
@@ -92,7 +93,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.AreEqual(subField.Value, clone.Value);
             Assert.AreEqual(string.Empty, clone.ToString());
             Assert.IsTrue(clone.RepresentsValue);
-            Assert.IsFalse(clone.Modified);
             Assert.IsNull(clone.Field);
             Assert.AreEqual(subField.ReadOnly, clone.ReadOnly);
         }
@@ -108,7 +108,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.AreEqual(subField.Value, clone.Value);
             Assert.AreEqual("^aThe value", clone.ToString());
             Assert.IsFalse(clone.RepresentsValue);
-            Assert.IsFalse(clone.Modified);
             Assert.IsNull(clone.Field);
             Assert.AreEqual(subField.ReadOnly, clone.ReadOnly);
         }
@@ -179,7 +178,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(VerificationException))]
         [Description("Декодирование строки, содержащей недопустимый символ")]
         public void SubField_Decode_4()
         {
@@ -208,7 +207,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.IsTrue(subField.Value.IsEmpty);
             Assert.AreEqual(string.Empty, subField.ToString());
             Assert.IsTrue(subField.RepresentsValue);
-            Assert.IsFalse(subField.Modified);
             Assert.IsNull(subField.Field);
             Assert.IsFalse(subField.ReadOnly);
             Assert.IsTrue(subField.Verify(false));
@@ -220,7 +218,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.IsTrue(subField.Value.IsEmpty);
             Assert.AreEqual(string.Empty, subField.ToString());
             Assert.IsTrue(subField.RepresentsValue);
-            Assert.IsFalse(subField.Modified);
             Assert.IsNull(subField.Field);
             Assert.IsFalse(subField.ReadOnly);
             Assert.IsTrue(subField.Verify(false));
@@ -336,15 +333,22 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.AreEqual("Value", jObject["value"].ToString());
         }
 
+        */
+
         [TestMethod]
         public void SubField_ToJson_1()
         {
-            SubField subField = new SubField('a', "Value");
-
-            string actual = subField.ToJson();
-            const string expected = @"{'code':'a','value':'Value'}";
+            var subField = new SubField('a', "Value");
+            var options = new JsonSerializerOptions()
+            {
+                Converters = { new SubFieldJsonConverter() }
+            };
+            var actual = JsonSerializer.Serialize(subField, options);
+            const string expected = "{\"code\":\"a\",\"value\":\"Value\"}";
             Assert.AreEqual(expected, actual);
         }
+
+        /*
 
         [TestMethod]
         public void SubField_FromJObject_1()
@@ -360,33 +364,46 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.AreEqual("Value", subField.Value);
         }
 
+        */
+
         [TestMethod]
         public void SubField_FromJson_1()
         {
-            const string text = @"{"
-+@"  ""code"": ""a"","
-+@"  ""value"": ""Value"""
-+@"}";
+            const string text = "{\"code\":\"a\",\"value\":\"Value\"}";
+            var options = new JsonSerializerOptions()
+            {
+                Converters = { new SubFieldJsonConverter() }
+            };
 
-            SubField subField = SubFieldUtility.FromJson(text);
-
-            Assert.AreEqual('a', subField.Code);
-            Assert.AreEqual("Value", subField.Value);
+            var subField = JsonSerializer.Deserialize<SubField>(text, options);
+            Assert.IsNotNull(subField);
+            Assert.AreEqual('a', subField!.Code);
+            Assert.AreEqual("Value", subField.Value.ToString());
         }
 
         [TestMethod]
+        [Description("Проверяем наш метод WriteXml")]
         public void SubField_ToXml_1()
         {
-            SubField subField = new SubField('a', "Value");
-            string actual = XmlUtility.SerializeShort(subField);
+            var subField = new SubField('a', "Value");
+            var actual = XmlUtility.SerializeShort(subField);
             const string expected = "<subfield code=\"a\" value=\"Value\" />";
             Assert.AreEqual(expected, actual);
         }
 
-
-        */
+        [TestMethod]
+        [Description("Проверяем наш метод ReadXml")]
+        public void SubField_FromXml_1()
+        {
+            const string text = "<subfield code=\"a\" value=\"Value\" />";
+            var subField = XmlUtility.DeserializeString<SubField>(text);
+            Assert.IsNotNull(subField);
+            Assert.AreEqual('a', subField!.Code);
+            Assert.AreEqual("Value", subField.Value.ToString());
+        }
 
         [TestMethod]
+        [Description("Верификация подполя")]
         public void SubField_Verify_1()
         {
             var subField = new SubField();
@@ -398,7 +415,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             subField = new SubField ('a', "Title");
             Assert.IsTrue(subField.Verify(false));
         }
-
 
         /*
 
@@ -441,6 +457,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         */
 
         [TestMethod]
+        [Description("Преобразование в строку")]
         public void SubField_ToString_1()
         {
             var subField = new SubField();

@@ -1564,11 +1564,83 @@ namespace AM
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
+        /// Сравнение двух кусков памяти.
+        /// </summary>
+        public static int CompareOrdinal
+            (
+                ReadOnlyMemory<char> first,
+                ReadOnlyMemory<char> second
+            )
+        {
+            for (var i = 0; ; i++)
+            {
+                if (i == first.Length)
+                {
+                    return i == second.Length ? 0 : -1;
+                }
+
+                if (i == second.Length)
+                {
+                    return 1;
+                }
+
+                var result = first.Span[i] - second.Span[i];
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
+        } // method CompareOrdinal
+
+        /// <summary>
+        /// Посимвольное сравнение двух кусков памяти.
+        /// </summary>
+        public static int CompareOrdinal
+            (
+                ReadOnlySpan<char> first,
+                ReadOnlySpan<char> second
+            )
+        {
+            for (var i = 0; ; i++)
+            {
+                if (i == first.Length)
+                {
+                    return i == second.Length ? 0 : -1;
+                }
+
+                if (i == second.Length)
+                {
+                    return 1;
+                }
+
+                var result = first[i] - second[i];
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
+        } // method CompareOrdinal
+
+        /// <summary>
         /// Превращает объект в видимую строку.
         /// </summary>
         [Pure]
         public static string ToVisibleString<T> (this T? value) where T: class
             => value?.ToString() ?? "(null)";
+
+        /// <summary>
+        /// Превращает фрагмент памяти в видимую строку.
+        /// </summary>
+        [Pure]
+        public static string ToVisibleString (this ReadOnlyMemory<char> value)
+            => value.IsEmpty ? "(empty)" : value.ToString();
+
+        /// <summary>
+        /// Превращает фрагмент памяти в видимую строку.
+        /// </summary>
+        [Pure]
+        public static string ToVisibleString (this ReadOnlySpan<char> value)
+            => value.IsEmpty ? "(empty)" : value.ToString();
 
         /// <summary>
         /// Сравнивает две строки независимо от текущей культуры.

@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable ReplaceSliceWithRangeIndexer
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
@@ -25,6 +26,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
@@ -41,6 +43,7 @@ namespace ManagedIrbis
     /// <summary>
     /// Поле библиографической записи.
     /// </summary>
+    [XmlRoot("field")]
     public class Field
         : IHandmadeSerializable,
         IReadOnly<Field>,
@@ -77,6 +80,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Метка поля.
         /// </summary>
+        [XmlAttribute("tag")]
+        [JsonPropertyName("tag")]
         public int Tag { get; set; }
 
         /// <summary>
@@ -91,17 +96,19 @@ namespace ManagedIrbis
             get => GetValueSubField()?.Value ?? default;
             set
             {
-                if (value.IsEmpty)
+                // TODO: реализовать корректное отслеживание изменений
+
+                Clear();
+                if (value.Span.Contains(Delimiter))
                 {
-                    var valueSubfield = GetValueSubField();
-                    if (valueSubfield is not null)
-                    {
-                        Subfields.Remove(valueSubfield);
-                    }
+                    DecodeBody(value.Span);
                 }
                 else
                 {
-                    CreateValueSubField().Value = value;
+                    if (!value.IsEmpty)
+                    {
+                        CreateValueSubField().Value = value;
+                    }
                 }
             } // set
         } // property Value
@@ -109,6 +116,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Список подполей.
         /// </summary>
+        [XmlArrayItem("subfield")]
+        [JsonPropertyName("subfields")]
         public SubFieldCollection Subfields { get; } = new ();
 
         /// <summary>
@@ -117,16 +126,21 @@ namespace ManagedIrbis
         /// <remarks>
         /// Формируется автоматически.
         /// </remarks>
+        [XmlIgnore]
+        [JsonIgnore]
         public int Repeat { get; internal set; }
 
         /// <summary>
         /// Запись, которой принадлежит поле.
         /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
         public Record? Record { get; internal set; }
 
         /// <summary>
         /// Пустое ли поле?
         /// </summary>
+        [XmlIgnore]
         [JsonIgnore]
         public bool IsEmpty => Subfields.Count == 0;
 
@@ -355,13 +369,28 @@ namespace ManagedIrbis
         public Field Add
             (
                 char code,
-                string? value = default
+                ReadOnlyMemory<char> value
             )
         {
             Subfields.Add(new SubField(code, value));
             return this;
         } // method Add
 
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
+        /// <param name="code">Код подполя.</param>
+        /// <param name="value">Значение подполя (опционально).</param>
+        /// <returns>this</returns>
+        public Field Add
+            (
+                char code,
+                string? value = default
+            )
+        {
+            Subfields.Add(new SubField(code, value));
+            return this;
+        } // method Add
 
         /// <summary>
         /// Assign the field from another.
@@ -380,6 +409,58 @@ namespace ManagedIrbis
 
             return this;
         } // method AssignFrom
+
+        /// <summary>
+        /// Compares the specified fields.
+        /// </summary>
+        public static int Compare
+            (
+                Field field1,
+                Field field2
+            )
+        {
+            var result = field1.Tag - field2.Tag;
+            if (result != 0)
+            {
+                return result;
+            }
+
+            result = Utility.CompareOrdinal
+                (
+                    field1.Value,
+                    field2.Value
+                );
+            if (result != 0)
+            {
+                return result;
+            }
+
+            result = field1.Subfields.Count
+                     - field2.Subfields.Count;
+            if (result != 0)
+            {
+                return result;
+            }
+
+            for (int i = 0; i < field1.Subfields.Count; i++)
+            {
+                var subField1 = field1.Subfields[i];
+                var subField2 = field2.Subfields[i];
+
+                result = SubField.Compare
+                    (
+                        subField1,
+                        subField2
+                    );
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
+
+            return result;
+
+        } // method Compare
 
         /// <summary>
         /// Если нет подполя, выделенного для хранения
@@ -890,10 +971,7 @@ namespace ManagedIrbis
             )
         {
             Tag = reader.ReadPackedInt32();
-            // отдельно Value сохранять не надо, оно входит в Subfields!
-            // Value = reader.ReadNullableString().AsMemory();
-            // TODO: реализовать
-            //Subfields.RestoreFromStream(reader);
+            Subfields.RestoreFromStream(reader);
         }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -905,10 +983,7 @@ namespace ManagedIrbis
             Sure.NotNull(writer, nameof(writer));
 
             writer.WritePackedInt32(Tag);
-            // отдельно Value восстанавливать не надо, оно входит в Subfields!
-            // Value.SaveToStream(writer);
-            // TODO: реализовать
-            //Subfields.SaveToStream(writer);
+            Subfields.SaveToStream(writer);
         }
 
         #endregion
@@ -969,7 +1044,7 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            // TODO: удостовериться, что подполе-значение единственное
+            // TODO: удостовериться, что подполе-значение единственное и первое!
 
             var verifier = new Verifier<Field>(this, throwOnError);
 
