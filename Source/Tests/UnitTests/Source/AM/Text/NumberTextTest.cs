@@ -2,6 +2,7 @@
 // ReSharper disable ReturnValueOfPureMethodIsNotUsed
 // ReSharper disable ExpressionIsAlwaysNull
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -309,7 +310,7 @@ namespace UnitTests.AM.Text
         {
             NumberText number = "Hello2";
             var prefix = number.GetPrefix(0);
-            Assert.AreEqual("Hello", prefix);
+            Assert.AreEqual("Hello", prefix.ToString());
         }
 
         [TestMethod]
@@ -317,7 +318,7 @@ namespace UnitTests.AM.Text
         {
             NumberText number = "Hello2";
             var prefix = number.GetPrefix(10);
-            Assert.IsNull(prefix);
+            Assert.IsTrue(prefix.IsEmpty);
         }
 
         [TestMethod]
@@ -585,14 +586,29 @@ namespace UnitTests.AM.Text
         }
 
         [TestMethod]
+        [Description("Разбор обычных случаев")]
         public void NumberText_Parse_1()
         {
             var number = new NumberText();
-            number.Parse("hello1");
+
+            number.Parse("hello1".AsMemory());
             Assert.AreEqual("hello1", number.ToString());
+
+            number.Parse("hello123".AsMemory());
+            Assert.AreEqual("hello123", number.ToString());
+
+            number.Parse("123".AsMemory());
+            Assert.AreEqual("123", number.ToString());
+
+            number.Parse("123hello".AsMemory());
+            Assert.AreEqual("123hello", number.ToString());
+
+            number.Parse("123hello456".AsMemory());
+            Assert.AreEqual("123hello456", number.ToString());
         }
 
         [TestMethod]
+        [Description("Разбор пустого текста")]
         public void NumberText_Parse_2()
         {
             var number = new NumberText();

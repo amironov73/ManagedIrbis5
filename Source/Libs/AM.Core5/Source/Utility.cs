@@ -3484,6 +3484,41 @@ namespace AM
         } // method CompareSpans
 
         /// <summary>
+        /// Сравнение двух фрагментов.
+        /// </summary>
+        [Pure]
+        public static int CompareSpans
+            (
+                ReadOnlySpan<char> first,
+                ReadOnlySpan<char> second
+            )
+        {
+            for (var i = 0; ; i++)
+            {
+                if (i == first.Length)
+                {
+                    if (i == second.Length)
+                    {
+                        return 0;
+                    }
+
+                    return -1;
+                }
+
+                if (i == second.Length)
+                {
+                    return 1;
+                }
+
+                var result = first[i] - second[i];
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
+        } // method CompareSpans
+
+        /// <summary>
         /// Разбивка текста на отдельные строки.
         /// </summary>
         /// <remarks>Пустые строки не удаляются.</remarks>

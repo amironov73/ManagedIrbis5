@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* FieldSpecification -- field/subfield specification.cs --
+/* FieldSpecification -- спецификация поля/подполя
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,7 +31,7 @@ using ManagedIrbis.Pft.Infrastructure.Serialization;
 namespace ManagedIrbis.Pft.Infrastructure
 {
     /// <summary>
-    /// Field/subfield specification.
+    /// Спецификация поля/подполя.
     /// </summary>
 
     public sealed class FieldSpecification
@@ -107,26 +107,21 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         ///
         /// </summary>
-        public static bool ParseSubFieldSpecification { get; set; }
+        public static bool ParseSubFieldSpecification { get; set; } = true;
 
         #endregion
 
         #region Construction
 
-        static FieldSpecification()
-        {
-            ParseSubFieldSpecification = true;
-        }
-
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public FieldSpecification()
         {
-        }
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public FieldSpecification
             (
@@ -1083,15 +1078,13 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <inheritdoc cref="ICloneable.Clone" />
         public object Clone()
         {
-            var result
-                = (FieldSpecification) MemberwiseClone();
+            var result = (FieldSpecification) MemberwiseClone();
 
             result.FieldRepeat = (IndexSpecification) FieldRepeat.Clone();
-            result.SubFieldRepeat
-                = (IndexSpecification) SubFieldRepeat.Clone();
+            result.SubFieldRepeat = (IndexSpecification) SubFieldRepeat.Clone();
 
             return result;
-        }
+        } // method Clone
 
         #endregion
 
@@ -1109,21 +1102,25 @@ namespace ManagedIrbis.Pft.Infrastructure
                 result.Append('@');
                 result.Append(Embedded);
             }
+
             if (SubField != '\0')
             {
                 result.Append('^');
                 result.Append(SubField);
             }
+
             if (Offset != 0)
             {
                 result.Append('*');
                 result.Append(Offset);
             }
+
             if (Length != 0)
             {
                 result.Append('.');
                 result.Append(Length);
             }
+
             if (ParagraphIndent != 0)
             {
                 result.Append('(');
@@ -1132,8 +1129,10 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
 
             return result.ToString();
-        }
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class FieldSpecification
+
+} // namespace ManagedIrbis.Pft.Infrastructure
