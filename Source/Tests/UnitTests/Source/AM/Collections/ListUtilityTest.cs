@@ -1,14 +1,14 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable ExpressionIsAlwaysNull
+// ReSharper disable InvokeAsExtensionMethod
+// ReSharper disable ReturnValueOfPureMethodIsNotUsed
+
+using System;
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Collections;
-
-// ReSharper disable CheckNamespace
-// ReSharper disable ExpressionIsAlwaysNull
-// ReSharper disable InvokeAsExtensionMethod
-// ReSharper disable ReturnValueOfPureMethodIsNotUsed
 
 #nullable enable
 
