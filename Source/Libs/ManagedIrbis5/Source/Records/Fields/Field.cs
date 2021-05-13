@@ -96,8 +96,6 @@ namespace ManagedIrbis
             get => GetValueSubField()?.Value ?? default;
             set
             {
-                // TODO: реализовать корректное отслеживание изменений
-
                 Clear();
                 if (value.Span.Contains(Delimiter))
                 {

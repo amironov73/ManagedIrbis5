@@ -13,10 +13,9 @@
 
 #region Using directives
 
-using System.Text;
-
 using AM;
 using AM.Text;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -70,7 +69,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var record = context.Record;
             if (!ReferenceEquals(record, null))
             {
-                var builder = new StringBuilder();
+                var builder = StringBuilderPool.Shared.Get();
                 var fieldCount = 0;
                 var dataSize = 0;
                 var recordSize = 32; // Размер заголовка записи
@@ -121,7 +120,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                         recordSize
                     );
 
-                context.WriteAndSetFlag(node, builder.ToString());
+                var result = builder.ToString();
+                StringBuilderPool.Shared.Return(builder);
+                context.WriteAndSetFlag(node, result);
             }
         }
 
