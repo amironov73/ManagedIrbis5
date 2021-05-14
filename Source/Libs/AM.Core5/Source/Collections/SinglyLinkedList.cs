@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* SinglyLinkedList.cs -- простой односвязный список
  * Ars Magna project, http://arsmagna.ru
@@ -15,6 +14,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
@@ -144,13 +144,11 @@ namespace AM.Collections
 
         #region ICollection<T> members
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        [ExcludeFromCodeCoverage]
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        public IEnumerator<T> GetEnumerator() => new Enumerator(this);
+        public IEnumerator<T> GetEnumerator() => new Enumerator (this);
 
         /// <inheritdoc cref="ICollection{T}.Add"/>
         public void Add
@@ -205,42 +203,64 @@ namespace AM.Collections
                 T? item
             )
         {
-            // умеем удалять только первый элемент в списке
-            // остальное -- как-нибудь потом
+            if (First is null)
+            {
+                return false;
+            }
 
-            if (First is not null)
+            var node = First;
+            SinglyLinkedListNode<T>? previous = null;
+            var comparer = EqualityComparer<T>.Default;
+            while (node is not null)
             {
                 if (item is null)
                 {
-                    if (First.Value is null)
+                    if (node.Value is null)
                     {
-                        if (First == Last)
-                        {
-                            Last = null;
-                        }
-                        First = First.Next;
+                        break;
                     }
-                    else
+                }
+                else
+                {
+                    var nodeValue = node.Value;
+                    if (nodeValue is not null)
                     {
-                        var nodeValue = First.Value;
-                        if (nodeValue is not null)
+                        if (comparer.Equals(item, nodeValue))
                         {
-                            var comparer = EqualityComparer<T>.Default;
-                            if (comparer.Equals(item, nodeValue))
-                            {
-                                if (First == Last)
-                                {
-                                    Last = null;
-                                }
-
-                                First = First.Next;
-                            }
+                            break;
                         }
                     }
                 }
+
+                previous = node;
+                node = node.Next;
             }
 
-            throw new NotImplementedException();
+            if (node is null)
+            {
+                // не нашли
+                return false;
+            }
+
+            if (previous is null)
+            {
+                // это первый элемент
+                RemoveFirst();
+
+                return true;
+            }
+
+            // это не первый элемент
+            previous.Next = node.Next;
+            --_count;
+
+            if (ReferenceEquals(node, Last))
+            {
+                // это последний элемент
+                Last = previous;
+            }
+
+            return true;
         }
 
         /// <inheritdoc cref="ICollection{T}.Count"/>
@@ -285,17 +305,14 @@ namespace AM.Collections
             #region IEnumerator members
 
             /// <inheritdoc cref="IEnumerator.MoveNext"/>
-            public bool MoveNext()
-            {
-                return _current is null
-                    ? (_current = _list.First) is not null
-                    : (_current = _current!.Next) is not null;
-            }
+            public bool MoveNext() =>
+                (_current is null ? _current = _list.First : _current = _current!.Next) is not null;
 
             /// <inheritdoc cref="IEnumerator.Reset" />
             public void Reset() => _current = null;
 
             /// <inheritdoc cref="IEnumerator.Current"/>
+            [ExcludeFromCodeCoverage]
             object? IEnumerator.Current => Current;
 
             /// <inheritdoc cref="IDisposable.Dispose"/>
@@ -306,7 +323,7 @@ namespace AM.Collections
 
             #endregion
 
-        } // class Enumerator
+        } // struct Enumerator
 
         #endregion
 

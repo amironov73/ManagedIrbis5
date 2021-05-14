@@ -1,4 +1,8 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable ExpressionIsAlwaysNull
+// ReSharper disable InvokeAsExtensionMethod
+
+using System;
 using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -6,10 +10,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AM.Collections;
 using AM.IO;
 using AM.Runtime;
-
-// ReSharper disable CheckNamespace
-// ReSharper disable ExpressionIsAlwaysNull
-// ReSharper disable InvokeAsExtensionMethod
 
 namespace UnitTests.AM.IO
 {
