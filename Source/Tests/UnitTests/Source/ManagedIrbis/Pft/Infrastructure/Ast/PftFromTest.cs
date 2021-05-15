@@ -17,6 +17,8 @@ using ManagedIrbis.Providers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
 {
     [TestClass]
