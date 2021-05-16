@@ -34,9 +34,12 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Unifors
             Execute("+9F", "");
         }
 
+        [Ignore]
         [TestMethod]
         public void UniforPlus9_GetDirectoryName_1()
         {
+            // TODO: Придумать что-нибудь насчет Linux и OSX
+
             // Нормальное выполнение
             Execute(@"+92C:\Windows\System32\esent.dll", @"C:\Windows\System32\");
 
@@ -45,9 +48,12 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Unifors
             Execute("+92C:", "");
         }
 
+        [Ignore]
         [TestMethod]
         public void UniforPlus9_GetDrive_1()
         {
+            // TODO: Придумать что-нибудь насчет Linux и OSX
+
             // Нормальное выполнение
             Execute(@"+94C:\Windows\System32\esent.dll", "C:");
 
@@ -102,9 +108,12 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Unifors
             Execute("+9L2,IBIS,", "");
         }
 
+        [Ignore]
         [TestMethod]
         public void UniforPlus9_GetFileName_1()
         {
+            // TODO: Придумать что-нибудь насчет Linux и OSX
+
             // Нормальное выполнение
             Execute(@"+91C:\Windows\System32\esent.dll", "esent.dll");
             Execute(@"+91Windows.exe.dll", "Windows.exe.dll");
