@@ -496,10 +496,84 @@ namespace AM
                 return value;
             }
 
-            byte[] bytes = fromEncoding.GetBytes(value);
-            string result = toEncoding.GetString (bytes);
+            var bytes = fromEncoding.GetBytes(value);
+            var result = toEncoding.GetString (bytes);
 
             return result;
+        }
+
+        /// <summary>
+        /// Is URL-safe char?
+        /// </summary>
+        /// <remarks>Set of safe chars, from RFC 1738.4 minus '+'</remarks>
+        public static bool IsUrlSafeChar
+            (
+                char ch
+            )
+        {
+            if (ch >= 'a' && ch <= 'z'
+                || ch >= 'A' && ch <= 'Z'
+                || ch >= '0' && ch <= '9'
+            )
+            {
+                return true;
+            }
+
+            switch (ch)
+            {
+                case '-':
+                case '_':
+                case '.':
+                case '!':
+                case '*':
+                case '(':
+                case ')':
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Encode string.
+        /// </summary>
+        public static string? UrlEncode
+            (
+                string? text,
+                Encoding encoding
+            )
+        {
+            char _IntToHex (int n) => n <= 9 ? (char) (n + '0') : (char) (n - 10 + 'A');
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
+            var bytes = encoding.GetBytes(text);
+            var result = new StringBuilder();
+            foreach (var b in bytes)
+            {
+                var c = (char)b;
+                if (IsUrlSafeChar(c))
+                {
+                    result.Append(c);
+                }
+                else if (c == ' ')
+                {
+                    result.Append('+');
+                }
+                else
+                {
+                    result.Append('%');
+                    result.Append(_IntToHex((b >> 4) & 0x0F));
+                    result.Append(_IntToHex(b & 0x0F));
+                }
+            }
+
+            return result.ToString();
         }
 
         /// <summary>
