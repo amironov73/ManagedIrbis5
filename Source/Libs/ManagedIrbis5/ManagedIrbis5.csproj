@@ -65,5 +65,9 @@
     <ItemGroup>
         <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Source\Requests" />
+    </ItemGroup>
     
 </Project>
