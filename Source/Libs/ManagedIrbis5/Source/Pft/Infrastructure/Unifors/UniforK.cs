@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforK.cs --
+/* UniforK.cs -- раскодировка через справочник
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +17,7 @@ using AM;
 using AM.Text;
 
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Menus;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -61,8 +61,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
-            /*
-
             if (!string.IsNullOrEmpty(expression))
             {
                 var navigator = new TextNavigator(expression);
@@ -122,10 +120,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     context.WriteAndSetFlag(node, output);
                 }
             }
-
-            */
-        }
+        } // method GetMenuEntry
 
         #endregion
-    }
-}
+
+    } // class UniforK
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Unifors

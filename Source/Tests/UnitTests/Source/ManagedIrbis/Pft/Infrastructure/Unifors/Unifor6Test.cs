@@ -13,7 +13,6 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Unifors
     public class Unifor6Test
         : CommonUniforTest
     {
-        [Ignore]
         [TestMethod]
         public void Unifor6_ExecuteNestedFormat_1()
         {

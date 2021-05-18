@@ -365,6 +365,8 @@ namespace ManagedIrbis.Direct
         }
 
         #endregion
-    }
-}
+
+    } // class MstFile64
+
+} // namespace ManagedIrbis.Direct
 

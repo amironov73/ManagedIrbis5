@@ -13,7 +13,6 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Unifors
     public class UniforDTest
         : CommonUniforTest
     {
-        [Ignore]
         [TestMethod]
         public void UniforD_FormatDocumentDB_1()
         {

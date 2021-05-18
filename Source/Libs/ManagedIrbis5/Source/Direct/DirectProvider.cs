@@ -23,11 +23,14 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
+using AM.Parameters;
 using AM.PlatformAbstraction;
 using AM.Threading;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Pft;
+using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
 
@@ -52,9 +55,14 @@ namespace ManagedIrbis.Direct
         #region Properties
 
         /// <summary>
+        /// Режим доступа.
+        /// </summary>
+        public DirectAccessMode Mode { get; private set; }
+
+        /// <summary>
         /// Корневой путь для текущейго экземпляра провайдера.
         /// </summary>
-        public string RootPath { get; }
+        public string RootPath { get; private set; }
 
         /// <summary>
         /// Data path.
@@ -79,22 +87,35 @@ namespace ManagedIrbis.Direct
         /// Конструктор.
         /// </summary>
         /// <param name="rootPath">Корневой путь.</param>
+        /// <param name="mode">Режим доступа.</param>
+        /// <param name="strategy">Стратегия создания акцессора.</param>
         public DirectProvider
             (
-                string rootPath
+                string rootPath,
+                DirectAccessMode mode = DirectAccessMode.ReadOnly,
+                IDirectAccess64Strategy? strategy = default
             )
         {
+            _strategy = strategy ?? new TransientDirectAccess64();
+
             var fullPath = Path.GetFullPath(rootPath);
             if (!Directory.Exists(fullPath))
             {
                 throw new FileNotFoundException(fullPath);
             }
 
+            Mode = mode;
             RootPath = fullPath;
             DataPath = Path.Combine(RootPath, "DataI");
             Busy = new BusyState();
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
+
+        #endregion
+
+        #region Private members
+
+        private readonly IDirectAccess64Strategy _strategy;
 
         #endregion
 
@@ -124,7 +145,56 @@ namespace ManagedIrbis.Direct
             }
 
             return result;
-        }
+
+        } // method DatabaseOrDeposit
+
+        /// <summary>
+        /// Получение акцессора для доступа к файлам базы.
+        /// </summary>
+        public DirectAccessProxy64 GetAccessor (string? databaseName = null)
+            => _strategy.CreateAccessor(this, databaseName);
+
+        /// <summary>
+        /// Форматирование записи.
+        /// </summary>
+        public string FormatRecord
+            (
+                PftProgram program,
+                Record? record
+            )
+        {
+            var context = new PftContext(null)
+            {
+                Record = record
+            };
+            context.SetProvider(this);
+            program.Execute(context);
+
+            return context.GetProcessedOutput();
+
+        } // method FormatRecord
+
+        /// <summary>
+        /// Получение таблицы символов.
+        /// </summary>
+        public AlphabetTable GetAlphabetTable()
+        {
+            var specification = new FileSpecification
+                {
+                    Path = IrbisPath.System,
+                    FileName = AlphabetTable.DefaultFileName
+                };
+            var path = MapPath(specification);
+            if (path is null)
+            {
+                return new AlphabetTable();
+            }
+
+            return File.Exists(path)
+                ? AlphabetTable.ParseLocalFile(path)
+                : new AlphabetTable();
+
+        } // method GetAlphabetTable
 
         /// <summary>
         /// Поиск файла по его спецификации.
@@ -220,10 +290,7 @@ namespace ManagedIrbis.Direct
         }
 
         /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
-        public string GetGeneration()
-        {
-            throw new NotImplementedException();
-        }
+        public string GetGeneration() => "64";
 
         /// <inheritdoc cref="IIrbisProvider.PlatformAbstraction"/>
         public PlatformAbstractionLayer PlatformAbstraction
@@ -238,8 +305,40 @@ namespace ManagedIrbis.Direct
                 string configurationString
             )
         {
-            throw new NotImplementedException();
-        }
+            var parameters = ParameterUtility.ParseString
+            (
+                configurationString
+            );
+
+            foreach (var parameter in parameters)
+            {
+                var name = parameter.Name
+                    .ThrowIfNull("parameter.Name")
+                    .ToLower();
+                var value = parameter.Value
+                    .ThrowIfNull("parameter.Value");
+
+                switch (name)
+                {
+                    case "path":
+                    case "root":
+                        RootPath = value;
+                        DataPath = value + "/DataI";
+                        break;
+
+                    case "db":
+                    case "database":
+                        Database = value;
+                        break;
+
+                    case "provider": // pass through
+                        break;
+
+                    default:
+                        throw new IrbisException();
+                }
+            }
+        } // method Configure
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
@@ -331,25 +430,69 @@ namespace ManagedIrbis.Direct
             throw new NotImplementedException();
         }
 
-        public bool FormatRecords(FormatRecordParameters parameters)
+        /// <inheritdoc cref="ISyncProvider.FormatRecords"/>
+        public bool FormatRecords
+            (
+                FormatRecordParameters parameters
+            )
         {
-            throw new NotImplementedException();
-        }
+            var program = PftUtility.CompileProgram
+                (
+                    parameters.Format ?? string.Empty
+                );
 
-        public FullTextResult? FullTextSearch(SearchParameters searchParameters, TextParameters textParameters)
-        {
-            throw new NotImplementedException();
-        }
+            if (parameters.Records is { } records)
+            {
+                var result = new List<string>(records.Length);
+                foreach (var record in records)
+                {
+                    result.Add(FormatRecord(program, record));
+                }
 
-        public DatabaseInfo? GetDatabaseInfo(string? databaseName = default)
-        {
-            throw new NotImplementedException();
-        }
+                parameters.Result = result.ToArray();
+            }
+            else if (parameters.Record is { } record)
+            {
+                parameters.Result = FormatRecord(program, record);
+            }
 
-        public int GetMaxMfn(string? databaseName = default)
+            return true;
+
+        } // method FormatRecords
+
+        /// <inheritdoc cref="ISyncProvider.FullTextSearch"/>
+        public FullTextResult? FullTextSearch
+            (
+                SearchParameters searchParameters,
+                TextParameters textParameters
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method FullTextSearch
+
+        /// <inheritdoc cref="ISyncProvider.GetDatabaseInfo"/>
+        public DatabaseInfo? GetDatabaseInfo
+            (
+                string? databaseName = default
+            )
+        {
+            using var accessProxy = GetAccessor(databaseName);
+
+            return accessProxy.Accessor.GetDatabaseInfo();
+
+        } // method GetDatabaseInfo
+
+        /// <inheritdoc cref="ISyncProvider.GetMaxMfn"/>
+        public int GetMaxMfn
+            (
+                string? databaseName = default
+            )
+        {
+            using var accessProxy = GetAccessor(databaseName);
+
+            return accessProxy.Accessor.GetMaxMfn();
+
+        } // method GetMaxMfn
 
         public ServerStat? GetServerStat()
         {
@@ -403,50 +546,91 @@ namespace ManagedIrbis.Direct
 
         } // method ListFiles
 
+        /// <inheritdoc cref="ISyncProvider.ListProcesses"/>
         public ProcessInfo[]? ListProcesses()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc cref="ISyncProvider.ListUsers"/>
         public UserInfo[]? ListUsers()
         {
             throw new NotImplementedException();
         }
 
-        public bool NoOperation()
+        /// <inheritdoc cref="ISyncProvider.NoOperation"/>
+        public bool NoOperation() => true;
+
+        /// <inheritdoc cref="ISyncProvider.PrintTable"/>
+        public string? PrintTable
+            (
+                TableDefinition definition
+            )
         {
             throw new NotImplementedException();
         }
 
-        public string? PrintTable(TableDefinition definition)
+        /// <inheritdoc cref="ISyncProvider.ReadBinaryFile"/>
+        public byte[]? ReadBinaryFile
+            (
+                FileSpecification specification
+            )
         {
-            throw new NotImplementedException();
+            var fullPath = MapPath(specification);
+            if (!string.IsNullOrEmpty(fullPath))
+            {
+                return File.ReadAllBytes(fullPath);
+            }
+
+            return default;
         }
 
-        public byte[]? ReadBinaryFile(FileSpecification specification)
+        /// <inheritdoc cref="ISyncProvider.ReadPostings"/>
+        public TermPosting[]? ReadPostings
+            (
+                PostingParameters parameters
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method ReadPostings
 
-        public TermPosting[]? ReadPostings(PostingParameters parameters)
+        /// <inheritdoc cref="ISyncProvider.ReadRecord"/>
+        public Record? ReadRecord
+            (
+                ReadRecordParameters parameters
+            )
         {
-            throw new NotImplementedException();
-        }
+            // TODO: поддержка версий записи
 
-        public Record? ReadRecord(ReadRecordParameters parameters)
-        {
-            throw new NotImplementedException();
-        }
+            if (parameters.Mfn <= 0)
+            {
+                return default;
+            }
 
-        public TermPosting[]? ReadRecordPostings(ReadRecordParameters parameters, string prefix)
-        {
-            throw new NotImplementedException();
-        }
+            using var accessProxy = GetAccessor(parameters.Database);
+            var result = accessProxy.Accessor.ReadRecord(parameters.Mfn);
 
-        public Term[]? ReadTerms(TermParameters parameters)
+            return result;
+        } // method ReadRecord
+
+        /// <inheritdoc cref="ISyncProvider.ReadRecordPostings"/>
+        public TermPosting[]? ReadRecordPostings
+            (
+                ReadRecordParameters parameters,
+                string prefix
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method ReadRecordPostings
+
+        /// <inheritdoc cref="ISyncProvider.ReadTerms"/>
+        public Term[]? ReadTerms
+            (
+                TermParameters parameters
+            )
+        {
+            throw new NotImplementedException();
+        } // method ReadTerms
 
         /// <inheritdoc cref="ISyncProvider.ReadTextFile"/>
         public string? ReadTextFile
@@ -480,35 +664,93 @@ namespace ManagedIrbis.Direct
             return true;
         }
 
-        public FoundItem[]? Search(SearchParameters parameters)
+        /// <inheritdoc cref="ISyncProvider.Search"/>
+        public FoundItem[]? Search
+            (
+                SearchParameters parameters
+            )
+        {
+            var expression = parameters.Expression;
+            if (string.IsNullOrEmpty(expression))
+            {
+                return Array.Empty<FoundItem>();
+            }
+
+            var manager = new SearchManager(this);
+            var context = new SearchContext(manager, this);
+            var tokenList = SearchQueryLexer.Tokenize(expression);
+            var parser = new SearchQueryParser(tokenList);
+            var program = parser.Parse();
+            var found = program.Find(context);
+            var result = new List<FoundItem>(found.Length);
+            foreach (var termLink in found)
+            {
+                var item = new FoundItem()
+                {
+                    Mfn = termLink.Mfn,
+                    Text = null // TODO: возвращать текст
+                };
+            }
+
+            return result.ToArray();
+
+        } // method Search
+
+        /// <inheritdoc cref="ISyncProvider.TruncateDatabase"/>
+        public bool TruncateDatabase
+            (
+                string? databaseName = default
+            )
         {
             throw new NotImplementedException();
         }
 
-        public bool TruncateDatabase(string? databaseName = default)
+        /// <inheritdoc cref="ISyncProvider.UnlockDatabase"/>
+        public bool UnlockDatabase
+            (
+                string? databaseName = default
+            )
         {
-            throw new NotImplementedException();
-        }
+            using var accessProxy = GetAccessor(databaseName);
+            accessProxy.Accessor.Mst.LockDatabase(false);
 
-        public bool UnlockDatabase(string? databaseName = default)
-        {
-            throw new NotImplementedException();
-        }
+            return true;
 
-        public bool UnlockRecords(IEnumerable<int> mfnList, string? databaseName = default)
-        {
-            throw new NotImplementedException();
-        }
+        } // method UnlockDatabase
 
-        public bool UpdateIniFile(IEnumerable<string> lines)
+        public bool UnlockRecords
+            (
+                IEnumerable<int> mfnList,
+                string? databaseName = default
+            )
         {
-            throw new NotImplementedException();
-        }
+            using var accessProxy = GetAccessor(databaseName);
+            foreach (var mfn in mfnList)
+            {
+                accessProxy.Accessor.Xrf.LockRecord(mfn, false);
+            }
 
-        public bool UpdateUserList(IEnumerable<UserInfo> users)
+            return true;
+
+        } // method UnlockRecords
+
+        /// <inheritdoc cref="ISyncProvider.UpdateIniFile"/>
+        public bool UpdateIniFile
+            (
+                IEnumerable<string> lines
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method UpdateIniFile
+
+        /// <inheritdoc cref="ISyncProvider.UpdateUserList"/>
+        public bool UpdateUserList
+            (
+                IEnumerable<UserInfo> users
+            )
+        {
+            throw new NotImplementedException();
+        } // method UpdateUserList
 
         /// <inheritdoc cref="ISyncProvider.WriteTextFile"/>
         public bool WriteTextFile
@@ -542,10 +784,24 @@ namespace ManagedIrbis.Direct
 
         } // method WriteTextFile
 
-        public bool WriteRecord(WriteRecordParameters parameters)
+        /// <inheritdoc cref="ISyncProvider.WriteRecord"/>
+        public bool WriteRecord
+            (
+                WriteRecordParameters parameters
+            )
         {
-            throw new NotImplementedException();
-        }
+            var record = parameters.Record;
+            if (record is null)
+            {
+                return false;
+            }
+
+            using var accessProxy = GetAccessor();
+            accessProxy.Accessor.WriteRecord((Record) record);
+
+            return true;
+
+        } // method WriteRecord
 
         #endregion
 

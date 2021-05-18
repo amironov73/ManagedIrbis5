@@ -140,7 +140,6 @@ namespace UnitTests.ManagedIrbis.Pft
             formatter.FormatRecord(record);
         }
 
-        [Ignore]
         [TestMethod]
         public void PftFormatter_FormatRecord_2()
         {
@@ -156,7 +155,6 @@ namespace UnitTests.ManagedIrbis.Pft
             Assert.AreEqual(expected, actual);
         }
 
-        [Ignore]
         [TestMethod]
         public void PftFormatter_FormatRecords_1()
         {

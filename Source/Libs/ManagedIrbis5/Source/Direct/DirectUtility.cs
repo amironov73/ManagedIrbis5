@@ -57,6 +57,40 @@ namespace ManagedIrbis.Direct
         #region Public methods
 
         /// <summary>
+        /// Создание акцессора.
+        /// </summary>
+        public static DirectAccess64 CreateAccessor
+            (
+                DirectProvider provider,
+                string? databaseName
+            )
+        {
+            databaseName ??= provider.Database;
+            if (string.IsNullOrEmpty(databaseName))
+            {
+                // TODO: выставлять код ошибки
+                throw new IrbisException();
+            }
+
+            // TODO: сделать через PAR-файл
+            var fileName = Path.Combine
+                (
+                    provider.DataPath,
+                    databaseName,
+                    databaseName + ".mst"
+                );
+
+            if (!File.Exists(fileName))
+            {
+                // TODO: выставлять код ошибки
+                throw new IrbisException();
+            }
+
+            return new DirectAccess64(fileName, provider.Mode);
+
+        } // method CreateAccessor
+
+        /// <summary>
         /// Create 8 database files for IRBIS32.
         /// </summary>
         public static void CreateDatabase32

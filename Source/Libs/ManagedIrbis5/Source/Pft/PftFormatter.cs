@@ -15,6 +15,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using AM;
@@ -101,6 +102,9 @@ namespace ManagedIrbis.Pft
         public bool HaveWarning => Context.Output.HaveWarning;
 
 
+        /// <summary>
+        /// Форматирование указанной записи.
+        /// </summary>
         public virtual string FormatRecord
             (
                 Record? record
@@ -110,8 +114,8 @@ namespace ManagedIrbis.Pft
             {
                 Magna.Error
                     (
-                        "PftFormatter::Format: "
-                        + "program was not set"
+                        nameof(PftFormatter) + "::" + nameof(FormatRecord)
+                        + ": program was not set"
                     );
 
                 throw new PftException("Program was not set");
@@ -131,31 +135,54 @@ namespace ManagedIrbis.Pft
             Elapsed = stopwatch.Elapsed;
 
             return result;
-        }
 
-        public virtual string FormatRecord(int mfn) =>
-            throw new NotImplementedException();
+        } // method FormatRecord
 
-        public virtual string[] FormatRecords(int[] mfns) =>
-            throw new NotImplementedException();
+        /// <summary>
+        /// Форматирование записи с указанным MFN.
+        /// </summary>
+        public virtual string FormatRecord ( int mfn ) =>
+            FormatRecord(Context.Provider.ReadRecord(mfn));
 
-        public virtual void ParseProgram(string source)
-        {
-            Program = PftUtility.CompileProgram(source);
-        }
-
-        public virtual void SetProvider
+        /// <summary>
+        /// Форматирование записей с указанными MFN.
+        /// </summary>
+        public virtual string[] FormatRecords
             (
-                ISyncProvider provider
+                IEnumerable<int> mfns
             )
         {
+            var result = new List<string>();
+
+            // TODO: сделать форматирование пачками
+
+            foreach (var mfn in mfns)
+            {
+                var text = FormatRecord(mfn);
+                result.Add(text);
+            }
+
+            return result.ToArray();
+
+        } // method FormatRecords
+
+        /// <summary>
+        /// Разбор программы.
+        /// </summary>
+        public virtual void ParseProgram (string source) =>
+            Program = PftUtility.CompileProgram(source);
+
+        /// <summary>
+        /// Установка провайдера.
+        /// </summary>
+        public virtual void SetProvider (ISyncProvider provider) =>
             Context.SetProvider(provider);
-        }
 
         #endregion
 
         #region IDisposable members
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public virtual void Dispose()
         {
             // TODO: implement

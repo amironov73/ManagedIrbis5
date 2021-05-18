@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* Unifor6.cs --
+/* Unifor6.cs -- вложенный формат
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -181,8 +181,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var output = nestedContext.Text;
             context.Write(node, output);
-        }
+
+        } // method ExecuteNestedFormat
 
         #endregion
-    }
-}
+
+    } // class Unifor6
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Unifors

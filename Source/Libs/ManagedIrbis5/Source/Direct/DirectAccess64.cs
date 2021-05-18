@@ -119,7 +119,7 @@ namespace ManagedIrbis.Direct
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DirectAccess64
             (
@@ -127,10 +127,10 @@ namespace ManagedIrbis.Direct
             )
             : this(masterFile, DirectAccessMode.Exclusive)
         {
-        }
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DirectAccess64
             (
@@ -138,18 +138,32 @@ namespace ManagedIrbis.Direct
                 DirectAccessMode mode
             )
         {
-            Database = Path.GetFileNameWithoutExtension(masterFile);
-            Mst = new MstFile64(Path.ChangeExtension(masterFile, ".mst"), mode);
-            Xrf = new XrfFile64(Path.ChangeExtension(masterFile, ".xrf"), mode);
-            InvertedFile = new InvertedFile64(Path.ChangeExtension(masterFile, ".ifp"), mode);
-        }
+            Database = Path.GetFileNameWithoutExtension (masterFile)
+                .ThrowIfNullOrEmpty();
+            Mst = new MstFile64
+                (
+                    Path.ChangeExtension (masterFile, ".mst"),
+                    mode
+                );
+            Xrf = new XrfFile64
+                (
+                    Path.ChangeExtension(masterFile, ".xrf"),
+                    mode
+                );
+            InvertedFile = new InvertedFile64
+                (
+                    Path.ChangeExtension (masterFile, ".ifp"),
+                    mode
+                );
+
+        } // constructor
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Get database info.
+        /// Получение стандартной информации о базе данных.
         /// </summary>
         public DatabaseInfo GetDatabaseInfo()
         {
@@ -191,15 +205,14 @@ namespace ManagedIrbis.Direct
             };
 
             return result;
-        }
+
+        } // method GetDatabaseInfo
 
         /// <summary>
-        /// Get max MFN for database. Not next MFN!
+        /// Получает реальный максимальный MFN в базе данных.
+        /// НЕ СЛЕДУЮЩИЙ MFN, а именно максимальный!
         /// </summary>
-        public int GetMaxMfn()
-        {
-            return Mst.ControlRecord.NextMfn - 1;
-        }
+        public int GetMaxMfn() => Mst.ControlRecord.NextMfn - 1;
 
         /// <summary>
         /// Read raw record.
@@ -464,9 +477,12 @@ namespace ManagedIrbis.Direct
             Mst.Dispose();
             Xrf.Dispose();
             InvertedFile.Dispose();
-        }
+
+        } // method Dispose
 
         #endregion
-    }
-}
+
+    } // class DirectAccess64
+
+} // namespace ManagedIrbis.Directe
 

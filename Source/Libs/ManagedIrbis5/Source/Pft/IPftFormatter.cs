@@ -16,7 +16,8 @@
 #region Using directives
 
 using System;
-using ManagedIrbis.Client;
+using System.Collections.Generic;
+
 using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
@@ -62,7 +63,7 @@ namespace ManagedIrbis.Pft
         /// </summary>
         string[] FormatRecords
             (
-                int[] mfns
+                IEnumerable<int> mfns
             );
 
         /// <summary>

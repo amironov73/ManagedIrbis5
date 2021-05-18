@@ -7,14 +7,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforD.cs --
+/* UniforD.cs -- форматирование документа из другой базы данных
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-
 using AM;
 using AM.Text;
 
@@ -60,8 +59,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
-            /*
-
             if (string.IsNullOrEmpty(expression))
             {
                 return;
@@ -69,9 +66,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var navigator = new TextNavigator(expression);
 
-            TermLink[] links = null;
+            TermLink[]? links = null;
 
-            string database = navigator.ReadUntil(',').ToString();
+            var database = navigator.ReadUntil(',').ToString();
             if (string.IsNullOrEmpty(database))
             {
                 database = context.Provider.Database;
@@ -88,9 +85,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 // явное указание MFN
 
                 navigator.ReadChar();
-                int mfn;
-                string mfnText = navigator.ReadInteger().ToString();
-                if (!Utility.TryParseInt32(mfnText, out mfn))
+                var mfnText = navigator.ReadInteger().ToString();
+                if (!Utility.TryParseInt32(mfnText, out var mfn))
                 {
                     return;
                 }
@@ -99,7 +95,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             else
             {
                 var delimiter = navigator.ReadChar();
-                string query = navigator.ReadUntil(delimiter).ToString();
+                var query = navigator.ReadUntil(delimiter).ToString();
                 if (string.IsNullOrEmpty(query))
                 {
                     return;
@@ -111,7 +107,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 {
                     context.Provider.Database = database;
 
-                    links = context.Provider.ExactSearchLinks(query);
+                    // links = context.Provider.ExactSearchLinks(query);
+                    links = Array.Empty<TermLink>();
                     found = TermLink.ToMfn(links);
                 }
                 finally
@@ -130,7 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return;
             }
 
-            string format = navigator.GetRemainingText().ToString();
+            var format = navigator.GetRemainingText().ToString();
             if (string.IsNullOrEmpty(format))
             {
                 return;
@@ -160,35 +157,31 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                 var program = PftUtility.CompileProgram(format);
 
-                using (var guard = new PftContextGuard(context))
+                using var guard = new PftContextGuard(context);
+                var nestedContext = guard.ChildContext;
+
+                // ibatrak
+                // формат вызывается в контексте без повторений
+                nestedContext.Reset();
+
+                var saveDatabase = nestedContext.Provider.Database;
+                try
                 {
-                    var nestedContext = guard.ChildContext;
-
-                    // ibatrak
-                    // формат вызывается в контексте без повторений
-                    nestedContext.Reset();
-
-                    var saveDatabase = nestedContext.Provider.Database;
-                    try
+                    nestedContext.Provider.Database = database;
+                    nestedContext.Output = context.Output;
+                    var mfn = found[0];
+                    var record = nestedContext.Provider.ReadRecord(mfn);
+                    if (!ReferenceEquals(record, null))
                     {
-                        nestedContext.Provider.Database = database;
-                        nestedContext.Output = context.Output;
-                        var mfn = found[0];
-                        var record = nestedContext.Provider.ReadRecord(mfn);
-                        if (!ReferenceEquals(record, null))
-                        {
-                            nestedContext.Record = record;
-                            program.Execute(nestedContext);
-                        }
-                    }
-                    finally
-                    {
-                        nestedContext.Provider.Database = saveDatabase;
+                        nestedContext.Record = record;
+                        program.Execute(nestedContext);
                     }
                 }
+                finally
+                {
+                    nestedContext.Provider.Database = saveDatabase;
+                }
             }
-
-            */
         }
 
         #endregion

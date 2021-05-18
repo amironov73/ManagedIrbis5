@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* Unifor2.cs --
+/* Unifor2.cs -- вернуть последний номер MFN в базе + 1
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -80,8 +80,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             context.WriteAndSetFlag(node, output);
-        }
+
+        } // method GetMaxMfn
 
         #endregion
-    }
-}
+
+    } // class Unifor2
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Unifors

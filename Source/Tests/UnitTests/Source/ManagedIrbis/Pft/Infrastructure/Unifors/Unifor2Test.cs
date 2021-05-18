@@ -13,7 +13,6 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Unifors
     public class Unifor2Test
         : CommonUniforTest
     {
-        [Ignore]
         [TestMethod]
         public void Unifor2_GetMaxMfn_1()
         {
