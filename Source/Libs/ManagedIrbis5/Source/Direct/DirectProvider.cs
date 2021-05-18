@@ -23,14 +23,11 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
-using AM.IO;
 using AM.PlatformAbstraction;
 using AM.Threading;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Menus;
-using ManagedIrbis.Pft;
 
 #endregion
 
@@ -59,6 +56,21 @@ namespace ManagedIrbis.Direct
         /// </summary>
         public string RootPath { get; }
 
+        /// <summary>
+        /// Data path.
+        /// </summary>
+        public string DataPath { get; set; }
+
+        /// <summary>
+        /// Fallback path.
+        /// </summary>
+        public string? FallBackPath { get; set; }
+
+        /// <summary>
+        /// Fall-forward path.
+        /// </summary>
+        public string? FallForwardPath { get; set;}
+
         #endregion
 
         #region Construction
@@ -79,9 +91,118 @@ namespace ManagedIrbis.Direct
             }
 
             RootPath = fullPath;
+            DataPath = Path.Combine(RootPath, "DataI");
             Busy = new BusyState();
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Ищем файл сначала в указанной базе данных, а затем,
+        /// если он не найден, то в Deposit.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="database"></param>
+        /// <returns></returns>
+        public string? DatabaseOrDeposit
+            (
+                string fileName,
+                string database
+            )
+        {
+            var result = Path.Combine(DataPath, database, fileName);
+            if (!File.Exists(result))
+            {
+                result = Path.Combine ( DataPath, "Deposit" , fileName );
+                if (!File.Exists(result))
+                {
+                    result = null;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Поиск файла по его спецификации.
+        /// </summary>
+        /// <param name="specification"></param>
+        /// <param name="forReading">Файл должен существовать?
+        /// Если <paramref name="forReading"/> равен <c>false</c>,
+        /// то путь мапится чисто формально.</param>
+        /// <returns></returns>
+        /// <summary>При <paramref name="forReading"/>
+        /// рассматриваются также папки <see cref="FallBackPath"/>
+        /// и <see cref="FallForwardPath"/>.
+        /// </summary>
+        public string? MapPath
+            (
+                FileSpecification specification,
+                bool forReading = true
+            )
+        {
+            var fileName = specification.FileName;
+            if (string.IsNullOrEmpty(fileName))
+            {
+                throw new IrbisException(nameof(fileName));
+            }
+
+            if (forReading
+                && !string.IsNullOrEmpty(FallForwardPath))
+            {
+                var probe = Path.Combine(FallForwardPath, fileName);
+                if (File.Exists(fileName))
+                {
+                    return probe;
+                }
+            }
+
+            var database = specification.Database
+                ?? Database
+                ?? throw new IrbisException(nameof(Database));
+
+            var result = specification.Path switch
+            {
+                IrbisPath.System => Path.Combine (RootPath, fileName),
+
+                IrbisPath.Data => Path.Combine (DataPath, fileName),
+
+                IrbisPath.MasterFile or IrbisPath.InternalResource =>
+                    DatabaseOrDeposit(fileName, database),
+
+                (IrbisPath) 11 => fileName,
+
+                _ => throw new IrbisException()
+            };
+
+            if (forReading
+                && string.IsNullOrEmpty(result)
+                && !string.IsNullOrEmpty(FallBackPath))
+            {
+                var probe = Path.Combine(FallBackPath, fileName);
+                if (File.Exists(fileName))
+                {
+                    result = probe;
+                }
+            }
+
+            if (string.IsNullOrEmpty(result))
+            {
+                Magna.Warning($"File not found: {specification}");
+                // throw new IrbisException(nameof(fileName));
+            }
+            else
+            {
+                result = Path.GetFullPath(result);
+                // var fileInfo = new FileInfo(result);
+            }
+
+            return result;
+
+        } // method MapPath
 
         #endregion
 
@@ -93,7 +214,9 @@ namespace ManagedIrbis.Direct
                 FileSpecification specification
             )
         {
-            throw new NotImplementedException();
+            var fullPath = MapPath(specification);
+
+            return fullPath is not null;
         }
 
         /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
@@ -243,10 +366,42 @@ namespace ManagedIrbis.Direct
             throw new NotImplementedException();
         }
 
-        public string[]? ListFiles(params FileSpecification[] specifications)
+        /// <inheritdoc cref="ISyncProvider.ListFiles"/>
+        public string[]? ListFiles
+            (
+                params FileSpecification[] specifications
+            )
         {
-            throw new NotImplementedException();
-        }
+            var result = new List<string>();
+
+            foreach (var specification in specifications)
+            {
+                var filePath = MapPath(specification, false);
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    if (Directory.Exists(directory))
+                    {
+                        var pattern = Path.GetFileName(filePath);
+                        if (!string.IsNullOrEmpty(pattern))
+                        {
+                            var found = Directory.GetFiles(directory, pattern);
+                            foreach (var one in found)
+                            {
+                                var fileName = Path.GetFileName(one);
+                                if (!string.IsNullOrEmpty(fileName))
+                                {
+                                    result.Add(one);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result.ToArray();
+
+        } // method ListFiles
 
         public ProcessInfo[]? ListProcesses()
         {
@@ -293,10 +448,19 @@ namespace ManagedIrbis.Direct
             throw new NotImplementedException();
         }
 
-        public string? ReadTextFile(FileSpecification specification)
+        /// <inheritdoc cref="ISyncProvider.ReadTextFile"/>
+        public string? ReadTextFile
+            (
+                FileSpecification specification
+            )
         {
-            throw new NotImplementedException();
-        }
+            var fullPath = MapPath(specification);
+
+            return fullPath is null
+                ? null
+                : File.ReadAllText(fullPath, IrbisEncoding.Ansi);
+
+        } // method ReadTextFile
 
         public bool ReloadDictionary(string? databaseName = default)
         {
@@ -308,9 +472,12 @@ namespace ManagedIrbis.Direct
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc cref="ISyncProvider.RestartServer"/>
         public bool RestartServer()
         {
-            throw new NotImplementedException();
+            Magna.Trace(nameof(DirectProvider) + "::" + nameof(RestartServer));
+
+            return true;
         }
 
         public FoundItem[]? Search(SearchParameters parameters)
@@ -343,10 +510,37 @@ namespace ManagedIrbis.Direct
             throw new NotImplementedException();
         }
 
-        public bool WriteTextFile(FileSpecification specification)
+        /// <inheritdoc cref="ISyncProvider.WriteTextFile"/>
+        public bool WriteTextFile
+            (
+                FileSpecification specification
+            )
         {
-            throw new NotImplementedException();
-        }
+            var fullPath = MapPath(specification);
+
+            if (fullPath is null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var content = specification.Content ?? string.Empty;
+                File.WriteAllText(fullPath, content, IrbisEncoding.Ansi);
+            }
+            catch (Exception exception)
+            {
+                Magna.TraceException
+                    (
+                        nameof(DirectProvider) + "::" + nameof(WriteTextFile),
+                        exception
+                    );
+                return false;
+            }
+
+            return true;
+
+        } // method WriteTextFile
 
         public bool WriteRecord(WriteRecordParameters parameters)
         {

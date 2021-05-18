@@ -284,7 +284,6 @@ namespace ManagedIrbis.Direct
             return result;
         }
 
-
         #endregion
 
     } // class DirectUtility
