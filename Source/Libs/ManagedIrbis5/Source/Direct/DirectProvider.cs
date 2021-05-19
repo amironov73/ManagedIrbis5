@@ -31,6 +31,7 @@ using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Pft.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -93,10 +94,12 @@ namespace ManagedIrbis.Direct
             (
                 string rootPath,
                 DirectAccessMode mode = DirectAccessMode.ReadOnly,
-                IDirectAccess64Strategy? strategy = default
+                IDirectAccess64Strategy? strategy = default,
+                IServiceProvider? provider = default
             )
         {
             _strategy = strategy ?? new TransientDirectAccess64();
+            _provider = provider;
 
             var fullPath = Path.GetFullPath(rootPath);
             if (!Directory.Exists(fullPath))
@@ -116,31 +119,55 @@ namespace ManagedIrbis.Direct
         #region Private members
 
         private readonly IDirectAccess64Strategy _strategy;
+        private readonly IServiceProvider? _provider;
 
         #endregion
 
         #region Public methods
 
         /// <summary>
+        /// Ищет файл в папке Deposit
+        /// </summary>
+        public string? Deposit
+            (
+                string fileName
+            )
+        {
+            // TODO: искать в Deposit_User
+
+            var result = Path.Combine(DataPath, "Deposit", fileName);
+            if (!File.Exists(result))
+            {
+                result = null;
+            }
+
+            return result;
+
+        } // method Deposit
+
+        /// <summary>
         /// Ищем файл сначала в указанной базе данных, а затем,
         /// если он не найден, то в Deposit.
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="database"></param>
-        /// <returns></returns>
         public string? DatabaseOrDeposit
             (
                 string fileName,
                 string database
             )
         {
-            var result = Path.Combine(DataPath, database, fileName);
-            if (!File.Exists(result))
+            string? result;
+
+            var databasePath = MapDatabase(database);
+            if (string.IsNullOrEmpty(databasePath))
             {
-                result = Path.Combine ( DataPath, "Deposit" , fileName );
+                result = Deposit(fileName);
+            }
+            else
+            {
+                result = Path.Combine(databasePath, fileName);
                 if (!File.Exists(result))
                 {
-                    result = null;
+                    result = Deposit(fileName);
                 }
             }
 
@@ -195,6 +222,48 @@ namespace ManagedIrbis.Direct
                 : new AlphabetTable();
 
         } // method GetAlphabetTable
+
+        /// <summary>
+        /// Получение пути к базе данных.
+        /// </summary>
+        public string? MapDatabase
+            (
+                string? databaseName = default,
+                bool mustExist = true
+            )
+        {
+            databaseName ??= Database.ThrowIfNull(nameof(Database));
+            var specification = new FileSpecification
+            {
+                Path = IrbisPath.Data,
+                FileName = databaseName + ".par"
+            };
+
+            var parFile = this.ReadParFile(specification);
+            if (parFile is null)
+            {
+                return default;
+            }
+
+            var mstPath = parFile.MstPath.SafeTrim();
+            if (string.IsNullOrEmpty(mstPath))
+            {
+                return default;
+            }
+
+            mstPath = mstPath.ConvertSlashes();
+            var result = Path.IsPathFullyQualified(mstPath)
+                ? mstPath
+                : Path.Combine(DataPath, mstPath);
+
+            if (mustExist)
+            {
+                return Directory.Exists(result) ? result : default;
+            }
+
+            return result;
+
+        } // method MapDatabase
 
         /// <summary>
         /// Поиск файла по его спецификации.
@@ -274,6 +343,18 @@ namespace ManagedIrbis.Direct
 
         } // method MapPath
 
+        /// <summary>
+        /// Чтение текстового файла по указанному пути.
+        /// </summary>
+        public string? ReadTextFile ( IrbisPath path, string fileName ) =>
+            ReadTextFile(new FileSpecification { Path = path, FileName = fileName });
+
+        /// <summary>
+        /// Чтение текстового файла по указанному пути.
+        /// </summary>
+        public string? ReadTextFile ( IrbisPath path, string? databaseName, string fileName ) =>
+            ReadTextFile(new FileSpecification { Path = path, Database = databaseName ?? Database, FileName = fileName });
+
         #endregion
 
         #region ISyncProvider members
@@ -344,6 +425,7 @@ namespace ManagedIrbis.Direct
         public void Dispose()
         {
             Disposing.Raise(this);
+            _strategy.Dispose();
         }
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
@@ -354,13 +436,7 @@ namespace ManagedIrbis.Direct
         }
 
         /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService
-            (
-                Type serviceType
-            )
-        {
-            throw new NotImplementedException();
-        }
+        public object? GetService ( Type serviceType ) => _provider?.GetService(serviceType);
 
         private void SetBusy(bool busy)
         {
@@ -400,35 +476,83 @@ namespace ManagedIrbis.Direct
             throw new NotImplementedException();
         }
 
-        public bool ActualizeRecord(ActualizeRecordParameters parameters)
+        /// <inheritdoc cref="ISyncProvider.ActualizeRecord"/>
+        public bool ActualizeRecord
+            (
+                ActualizeRecordParameters parameters
+            )
         {
             throw new NotImplementedException();
-        }
 
+        } // method ActualizeRecord
+
+        /// <inheritdoc cref="ISyncProvider.Connect"/>
         public bool Connect()
         {
-            throw new NotImplementedException();
-        }
+            // TODO: что делать?
 
-        public bool CreateDatabase(CreateDatabaseParameters parameters)
+            return true;
+
+        } // method Connect
+
+        /// <inheritdoc cref="ISyncProvider.CreateDatabase"/>
+        public bool CreateDatabase
+            (
+                CreateDatabaseParameters parameters
+            )
+        {
+            var databaseName = parameters.Database;
+            if (string.IsNullOrEmpty(databaseName))
+            {
+                return false;
+            }
+
+            var databasePath = MapDatabase(databaseName, false);
+            if (Directory.Exists(databasePath))
+            {
+                // база уже существует
+                return false;
+            }
+
+            throw new NotImplementedException();
+
+        } // method CreateDatabase
+
+        /// <inheritdoc cref="ISyncProvider.CreateDictionary"/>
+        public bool CreateDictionary
+            (
+                string? databaseName = default
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method CreateDictionary
 
-        public bool CreateDictionary(string? databaseName = default)
+        /// <inheritdoc cref="ISyncProvider.DeleteDatabase"/>
+        public bool DeleteDatabase
+            (
+                string? databaseName = default
+            )
         {
-            throw new NotImplementedException();
-        }
+            var databasePath = MapDatabase(databaseName);
+            if (string.IsNullOrEmpty(databasePath))
+            {
+                return false;
+            }
 
-        public bool DeleteDatabase(string? databaseName = default)
-        {
-            throw new NotImplementedException();
-        }
+            Directory.Delete(databasePath);
 
+            return true;
+
+        } // method DeleteDatabase
+
+        /// <inheritdoc cref="ISyncProvider.Disconnect"/>
         public bool Disconnect()
         {
-            throw new NotImplementedException();
-        }
+            // TODO: что делать?
+
+            return true;
+
+        } // method Disconnect
 
         /// <inheritdoc cref="ISyncProvider.FormatRecords"/>
         public bool FormatRecords
@@ -476,9 +600,9 @@ namespace ManagedIrbis.Direct
                 string? databaseName = default
             )
         {
-            using var accessProxy = GetAccessor(databaseName);
+            using var proxy = GetAccessor(databaseName);
 
-            return accessProxy.Accessor.GetDatabaseInfo();
+            return proxy.Accessor.GetDatabaseInfo();
 
         } // method GetDatabaseInfo
 
@@ -488,26 +612,44 @@ namespace ManagedIrbis.Direct
                 string? databaseName = default
             )
         {
-            using var accessProxy = GetAccessor(databaseName);
+            using var proxy = GetAccessor(databaseName);
 
-            return accessProxy.Accessor.GetMaxMfn();
+            return proxy.Accessor.GetMaxMfn();
 
         } // method GetMaxMfn
 
+        /// <inheritdoc cref="ISyncProvider.GetServerStat"/>
         public ServerStat? GetServerStat()
         {
-            throw new NotImplementedException();
-        }
+            var result = new ServerStat();
 
+            return result;
+
+        } // method GetServerStat
+
+        /// <inheritdoc cref="ISyncProvider.GetServerVersion"/>
         public ServerVersion? GetServerVersion()
         {
-            throw new NotImplementedException();
-        }
+            var result = new ServerVersion
+            {
+                ConnectedClients = 1,
+                MaxClients = int.MaxValue,
+                Organization = "Сообщество пользователей АБИС ИРБИС64",
+                Version = "64.2014.1"
+            };
 
-        public GblResult? GlobalCorrection(GblSettings settings)
+            return result;
+
+        } // method GetServerVersion
+
+        /// <inheritdoc cref="ISyncProvider.GlobalCorrection"/>
+        public GblResult? GlobalCorrection
+            (
+                GblSettings settings
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method GlobalCorrection
 
         /// <inheritdoc cref="ISyncProvider.ListFiles"/>
         public string[]? ListFiles
@@ -547,16 +689,16 @@ namespace ManagedIrbis.Direct
         } // method ListFiles
 
         /// <inheritdoc cref="ISyncProvider.ListProcesses"/>
-        public ProcessInfo[]? ListProcesses()
-        {
-            throw new NotImplementedException();
-        }
+        public ProcessInfo[]? ListProcesses() => Array.Empty<ProcessInfo>();
 
         /// <inheritdoc cref="ISyncProvider.ListUsers"/>
         public UserInfo[]? ListUsers()
         {
-            throw new NotImplementedException();
-        }
+            var text = ReadTextFile(IrbisPath.Data, "client_m.mnu");
+
+            return string.IsNullOrEmpty(text) ? default : UserInfo.Parse(text);
+
+        } // method ListUsers
 
         /// <inheritdoc cref="ISyncProvider.NoOperation"/>
         public bool NoOperation() => true;
@@ -568,7 +710,7 @@ namespace ManagedIrbis.Direct
             )
         {
             throw new NotImplementedException();
-        }
+        } // method PrintTable
 
         /// <inheritdoc cref="ISyncProvider.ReadBinaryFile"/>
         public byte[]? ReadBinaryFile
@@ -583,7 +725,8 @@ namespace ManagedIrbis.Direct
             }
 
             return default;
-        }
+
+        } // method ReadBinaryFile
 
         /// <inheritdoc cref="ISyncProvider.ReadPostings"/>
         public TermPosting[]? ReadPostings

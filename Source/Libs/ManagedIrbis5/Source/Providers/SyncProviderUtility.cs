@@ -55,6 +55,27 @@ namespace ManagedIrbis.Providers
 
         } // method ReadMenuFile
 
+        /// <summary>
+        /// Чтение параметрического файла как текстового.
+        /// </summary>
+        public static ParFile? ReadParFile
+            (
+                this ISyncProvider provider,
+                FileSpecification specification
+            )
+        {
+            var text = provider.ReadTextFile(specification);
+            if (text is null)
+            {
+                return default;
+            }
+
+            using var reader = new StringReader(text);
+
+            return ParFile.ParseText(reader);
+
+        } // method ReadMenuFile
+
         #endregion
 
     } // class SyncProviderUtility

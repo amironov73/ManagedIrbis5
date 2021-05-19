@@ -13,6 +13,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Unifors
     public class UniforKTest
         : CommonUniforTest
     {
+        [Ignore]
         [TestMethod]
         public void UniforK_GetMenuEntry_1()
         {

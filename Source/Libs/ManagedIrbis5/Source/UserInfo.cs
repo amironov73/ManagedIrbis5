@@ -2,14 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* UserInfo.cs -- информация зарегистрированном пользователе системы
+/* UserInfo.cs -- информация о зарегистрированном пользователе системы
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -124,20 +121,8 @@ namespace ManagedIrbis
 
         #region Private members
 
-        private string _FormatPair
-            (
-                string prefix,
-                string? value,
-                string defaultValue
-            )
-        {
-            if (value.SameString(defaultValue))
-            {
-                return string.Empty;
-            }
-            return $"{prefix}={value};";
-
-        }
+        private string _FormatPair ( string prefix, string? value, string defaultValue ) =>
+            value.SameString(defaultValue) ? string.Empty : $"{prefix}={value};";
 
         #endregion
 
@@ -161,7 +146,8 @@ namespace ManagedIrbis
                     _FormatPair("K", Provision, "irbisk.ini"),
                     _FormatPair("A", Administrator, "irbisa.ini")
                 );
-        }
+        } // method Encode
+
         // ReSharper restore UseStringInterpolation
 
         /// <summary>
@@ -200,7 +186,8 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Разбор ответа сервера.
@@ -236,67 +223,50 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Should serialize the <see cref="Cataloger"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeCataloger()
-        {
-            return !string.IsNullOrEmpty(Cataloger);
-        }
+        public bool ShouldSerializeCataloger() => !string.IsNullOrEmpty(Cataloger);
 
         /// <summary>
         /// Should serialize the <see cref="Reader"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeReader()
-        {
-            return !string.IsNullOrEmpty(Reader);
-        }
+        public bool ShouldSerializeReader() => !string.IsNullOrEmpty(Reader);
 
         /// <summary>
         /// Should serialize the <see cref="Circulation"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeCirculation()
-        {
-            return !string.IsNullOrEmpty(Circulation);
-        }
+        public bool ShouldSerializeCirculation() => !string.IsNullOrEmpty(Circulation);
 
         /// <summary>
         /// Should serialize the <see cref="Acquisitions"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeAcquisitions()
-        {
-            return !string.IsNullOrEmpty(Acquisitions);
-        }
+        public bool ShouldSerializeAcquisitions() => !string.IsNullOrEmpty(Acquisitions);
 
         /// <summary>
         /// Should serialize the <see cref="Provision"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeProvision()
-        {
-            return !string.IsNullOrEmpty(Provision);
-        }
+        public bool ShouldSerializeProvision() => !string.IsNullOrEmpty(Provision);
 
         /// <summary>
         /// Should serialize the <see cref="Administrator"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeAdministrator()
-        {
-            return !string.IsNullOrEmpty(Administrator);
-        }
+        public bool ShouldSerializeAdministrator() => !string.IsNullOrEmpty(Administrator);
 
         #endregion
 
@@ -316,7 +286,8 @@ namespace ManagedIrbis
             Acquisitions = reader.ReadNullableString();
             Provision = reader.ReadNullableString();
             Administrator = reader.ReadNullableString();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -334,7 +305,8 @@ namespace ManagedIrbis
                 .WriteNullable(Acquisitions)
                 .WriteNullable(Provision)
                 .WriteNullable(Administrator);
-        }
+
+        } // method SaveToStream
 
         #endregion
 
@@ -356,7 +328,8 @@ namespace ManagedIrbis
                 .NotNullNorEmpty(Name, "Name");
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
@@ -364,27 +337,27 @@ namespace ManagedIrbis
 
         /// <inheritdoc cref="object.ToString" />
         // ReSharper disable UseStringInterpolation
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "Number: {0}, Name: {1}, Password: {2}, "
-                    + "Cataloger: {3}, Reader: {4}, Circulation: {5}, "
-                    + "Acquisitions: {6}, Provision: {7}, "
-                    + "Administrator: {8}",
-                    Number.ToVisibleString(),
-                    Name.ToVisibleString(),
-                    Password.ToVisibleString(),
-                    Cataloger.ToVisibleString(),
-                    Reader.ToVisibleString(),
-                    Circulation.ToVisibleString(),
-                    Acquisitions.ToVisibleString(),
-                    Provision.ToVisibleString(),
-                    Administrator.ToVisibleString()
-                );
-        }
+        public override string ToString() => string.Format
+            (
+                "Number: {0}, Name: {1}, Password: {2}, "
+                + "Cataloger: {3}, Reader: {4}, Circulation: {5}, "
+                + "Acquisitions: {6}, Provision: {7}, "
+                + "Administrator: {8}",
+                Number.ToVisibleString(),
+                Name.ToVisibleString(),
+                Password.ToVisibleString(),
+                Cataloger.ToVisibleString(),
+                Reader.ToVisibleString(),
+                Circulation.ToVisibleString(),
+                Acquisitions.ToVisibleString(),
+                Provision.ToVisibleString(),
+                Administrator.ToVisibleString()
+            );
+
         // ReSharper restore UseStringInterpolation
 
         #endregion
-    }
-}
+
+    } // class UserInfo
+
+} // namespace ManagedIrbis
