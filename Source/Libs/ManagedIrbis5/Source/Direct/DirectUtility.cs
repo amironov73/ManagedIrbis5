@@ -57,6 +57,49 @@ namespace ManagedIrbis.Direct
         #region Public methods
 
         /// <summary>
+        /// Сборка пути к файлу из компонентов.
+        /// </summary>
+        public static string CombinePath
+            (
+                string first,
+                string second
+            )
+        {
+            second = second.ConvertSlashes();
+            if (Path.IsPathRooted(second) || Path.IsPathFullyQualified(second))
+            {
+                return second;
+            }
+
+            return Path.Combine(first.ConvertSlashes(), second);
+        }
+
+        /// <summary>
+        /// Сборка пути к файлу из компонентов.
+        /// </summary>
+        public static string CombinePath
+            (
+                string first,
+                string second,
+                string third
+            )
+        {
+            third = third.ConvertSlashes();
+            if (Path.IsPathRooted(third) || Path.IsPathFullyQualified(third))
+            {
+                return third;
+            }
+
+            second = second.ConvertSlashes();
+            if (Path.IsPathRooted(second) || Path.IsPathFullyQualified(second))
+            {
+                return Path.Combine(second, third);
+            }
+
+            return Path.Combine(first.ConvertSlashes(), second, third);
+        }
+
+        /// <summary>
         /// Создание акцессора.
         /// </summary>
         public static DirectAccess64 CreateAccessor
@@ -73,14 +116,14 @@ namespace ManagedIrbis.Direct
             }
 
             // TODO: сделать через PAR-файл
-            var fileName = Path.Combine
+            var fileName = CombinePath
                 (
                     provider.DataPath,
                     databaseName,
                     databaseName + ".mst"
                 );
 
-            if (!File.Exists(fileName))
+            if (!Unix.FileExists(fileName))
             {
                 // TODO: выставлять код ошибки
                 throw new IrbisException();

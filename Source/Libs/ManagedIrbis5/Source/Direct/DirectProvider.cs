@@ -206,18 +206,13 @@ namespace ManagedIrbis.Direct
         /// </summary>
         public AlphabetTable GetAlphabetTable()
         {
-            var specification = new FileSpecification
-                {
-                    Path = IrbisPath.System,
-                    FileName = AlphabetTable.DefaultFileName
-                };
-            var path = MapPath(specification);
+            var path = MapPath(IrbisPath.System, AlphabetTable.DefaultFileName);
             if (path is null)
             {
                 return new AlphabetTable();
             }
 
-            return File.Exists(path)
+            return Unix.FileExists(path)
                 ? AlphabetTable.ParseLocalFile(path)
                 : new AlphabetTable();
 
@@ -251,24 +246,26 @@ namespace ManagedIrbis.Direct
                 return default;
             }
 
-            mstPath = mstPath.ConvertSlashes();
-            var result = Path.IsPathFullyQualified(mstPath)
-                ? mstPath
-                : Path.Combine(DataPath, mstPath);
-
+            var result = DirectUtility.CombinePath(DataPath, mstPath);
             if (mustExist)
             {
-                return Directory.Exists(result) ? result : default;
+                return Unix.DirectoryExists(result) ? result : default;
             }
 
             return result;
 
         } // method MapDatabase
 
+        public string? MapPath(IrbisPath path, string fileName) =>
+            MapPath(new FileSpecification {Path = path, FileName = fileName});
+
+        public string? MapPath(IrbisPath path, string database, string fileName) =>
+            MapPath(new FileSpecification {Path = path, Database = database, FileName = fileName});
+
         /// <summary>
         /// Поиск файла по его спецификации.
         /// </summary>
-        /// <param name="specification"></param>
+        /// <param name="specification">Спецификация.</param>
         /// <param name="forReading">Файл должен существовать?
         /// Если <paramref name="forReading"/> равен <c>false</c>,
         /// то путь мапится чисто формально.</param>
@@ -292,8 +289,8 @@ namespace ManagedIrbis.Direct
             if (forReading
                 && !string.IsNullOrEmpty(FallForwardPath))
             {
-                var probe = Path.Combine(FallForwardPath, fileName);
-                if (File.Exists(fileName))
+                var probe = DirectUtility.CombinePath(FallForwardPath, fileName);
+                if (Unix.FileExists(fileName))
                 {
                     return probe;
                 }
@@ -305,9 +302,9 @@ namespace ManagedIrbis.Direct
 
             var result = specification.Path switch
             {
-                IrbisPath.System => Path.Combine (RootPath, fileName),
+                IrbisPath.System => DirectUtility.CombinePath (RootPath, fileName),
 
-                IrbisPath.Data => Path.Combine (DataPath, fileName),
+                IrbisPath.Data => DirectUtility.CombinePath (DataPath, fileName),
 
                 IrbisPath.MasterFile or IrbisPath.InternalResource =>
                     DatabaseOrDeposit(fileName, database),
@@ -321,8 +318,8 @@ namespace ManagedIrbis.Direct
                 && string.IsNullOrEmpty(result)
                 && !string.IsNullOrEmpty(FallBackPath))
             {
-                var probe = Path.Combine(FallBackPath, fileName);
-                if (File.Exists(fileName))
+                var probe = DirectUtility.CombinePath(FallBackPath, fileName);
+                if (Unix.FileExists(fileName))
                 {
                     result = probe;
                 }
@@ -789,10 +786,14 @@ namespace ManagedIrbis.Direct
 
         } // method ReadTextFile
 
-        public bool ReloadDictionary(string? databaseName = default)
+        /// <inheritdoc cref="ISyncProvider.ReloadDictionary"/>
+        public bool ReloadDictionary
+            (
+                string? databaseName = default
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method ReloadDictionary
 
         public bool ReloadMasterFile(string? databaseName = default)
         {
@@ -846,7 +847,7 @@ namespace ManagedIrbis.Direct
             )
         {
             throw new NotImplementedException();
-        }
+        } // method TruncateDatabase
 
         /// <inheritdoc cref="ISyncProvider.UnlockDatabase"/>
         public bool UnlockDatabase

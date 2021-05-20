@@ -83,7 +83,7 @@ namespace ManagedIrbis.Direct
         {
             Sure.NotNullNorEmpty(fileName, nameof(fileName));
 
-            FileName = fileName;
+            FileName = Unix.FindDirectoryOrThrow(fileName);
             Mode = mode;
 
             _stream = DirectUtility.OpenFile(fileName, mode);
@@ -129,7 +129,8 @@ namespace ManagedIrbis.Direct
                 record.Locked = flag;
                 WriteRecord(mfn, record);
             }
-        }
+
+        } // method LockRecord
 
         /// <summary>
         /// Read the record.
@@ -150,10 +151,7 @@ namespace ManagedIrbis.Direct
                     throw new ArgumentOutOfRangeException(nameof(mfn));
                 }
 
-                if (_stream.Seek(offset, SeekOrigin.Begin) != offset)
-                {
-                    throw new IOException();
-                }
+                _stream.Seek(offset, SeekOrigin.Begin);
 
                 _stream.Flush();
                 var span = MemoryMarshal.CreateSpan(ref result, 1);
@@ -219,7 +217,7 @@ namespace ManagedIrbis.Direct
             {
                 _stream.Dispose();
             }
-        }
+        } // method Dispose
 
         #endregion
 

@@ -132,13 +132,17 @@ namespace ManagedIrbis.Direct
             _lockObject = new object();
             _encoding = new UTF8Encoding(false, true);
 
-            FileName = fileName;
+            FileName = Unix.FindFileOrThrow(fileName);
             Mode = mode;
 
             Ifp = DirectUtility.OpenFile(fileName, mode);
             IfpControlRecord = IfpControlRecord64.Read(Ifp);
-            L01 = DirectUtility.OpenFile(Path.ChangeExtension(fileName, ".l01"), mode);
-            N01 = DirectUtility.OpenFile(Path.ChangeExtension(fileName, ".n01"), mode);
+
+            var l01Name = Unix.FindFileOrThrow(Path.ChangeExtension(fileName, ".l01"));
+            L01 = DirectUtility.OpenFile(l01Name, mode);
+
+            var n01Name = Unix.FindFileOrThrow(Path.ChangeExtension(fileName, ".n01"));
+            N01 = DirectUtility.OpenFile(n01Name, mode);
         }
 
         #endregion

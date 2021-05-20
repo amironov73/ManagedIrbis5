@@ -58,14 +58,7 @@ namespace UnitTests.ManagedIrbis.Direct
             return result;
         }
 
-        private string _GetFileName()
-        {
-            return Path.Combine
-                (
-                    Irbis64RootPath,
-                    "Datai/IBIS/ibis.mst"
-                );
-        }
+        private string _GetFileName() => Unix.FindFileOrThrow (DirectUtility.CombinePath ( Irbis64RootPath, "Datai/IBIS/ibis.mst" ));
 
         private string _CreateDatabase()
         {
@@ -87,15 +80,13 @@ namespace UnitTests.ManagedIrbis.Direct
         public void MstFile64_ReadRecord_1()
         {
             var fileName = _GetFileName();
-            using (var file = new MstFile64(fileName, DirectAccessMode.ReadOnly))
-            {
-                Assert.AreSame(fileName, file.FileName);
-                Assert.AreEqual(333, file.ControlRecord.NextMfn);
-                var record = file.ReadRecord(22951100L);
-                Assert.AreEqual(100, record.Dictionary.Count);
-                var expected = "Tag: 200, Position: 2652, Length: 173, Text: ^AКуда пойти учиться?^EИнформ. - реклам. справ^FЗ. М. Акулова, А. М. Бабич ; ред. А. С. Павловский [и др.]";
-                Assert.AreEqual(expected, record.Dictionary[87].ToString());
-            }
+            using var file = new MstFile64(fileName, DirectAccessMode.ReadOnly);
+            Assert.AreSame(fileName, file.FileName);
+            Assert.AreEqual(333, file.ControlRecord.NextMfn);
+            var record = file.ReadRecord(22951100L);
+            Assert.AreEqual(100, record.Dictionary.Count);
+            var expected = "Tag: 200, Position: 2652, Length: 173, Text: ^AКуда пойти учиться?^EИнформ. - реклам. справ^FЗ. М. Акулова, А. М. Бабич ; ред. А. С. Павловский [и др.]";
+            Assert.AreEqual(expected, record.Dictionary[87].ToString());
         }
 
         [Ignore]
@@ -103,13 +94,11 @@ namespace UnitTests.ManagedIrbis.Direct
         public void MstFile64_LockDatabase_1()
         {
             var fileName = _CreateDatabase();
-            using (var file = new MstFile64(fileName, DirectAccessMode.Exclusive))
-            {
-                file.LockDatabase(true);
-                Assert.IsTrue(file.ReadDatabaseLockedFlag());
-                file.LockDatabase(false);
-                Assert.IsFalse(file.ReadDatabaseLockedFlag());
-            }
+            using var file = new MstFile64(fileName, DirectAccessMode.Exclusive);
+            file.LockDatabase(true);
+            Assert.IsTrue(file.ReadDatabaseLockedFlag());
+            file.LockDatabase(false);
+            Assert.IsFalse(file.ReadDatabaseLockedFlag());
         }
 
         [Ignore]
@@ -117,12 +106,10 @@ namespace UnitTests.ManagedIrbis.Direct
         public void MstFile64_ReopenFile_1()
         {
             var fileName = _CreateDatabase();
-            using (var file = new MstFile64(fileName, DirectAccessMode.ReadOnly))
-            {
-                Assert.AreEqual(DirectAccessMode.ReadOnly, file.Mode);
-                file.ReopenFile(DirectAccessMode.Exclusive);
-                Assert.AreEqual(DirectAccessMode.Exclusive, file.Mode);
-            }
+            using var file = new MstFile64(fileName, DirectAccessMode.ReadOnly);
+            Assert.AreEqual(DirectAccessMode.ReadOnly, file.Mode);
+            file.ReopenFile(DirectAccessMode.Exclusive);
+            Assert.AreEqual(DirectAccessMode.Exclusive, file.Mode);
         }
 
         [Ignore]
@@ -130,22 +117,20 @@ namespace UnitTests.ManagedIrbis.Direct
         public void MstFile64_WriteRecord_1()
         {
             var fileName = _CreateDatabase();
-            using (var file = new MstFile64(fileName, DirectAccessMode.Exclusive))
-            {
-                var record = _GetRecord();
-                var leader1 = record.Leader;
-                leader1.Mfn = 1;
-                leader1.Version = 1;
-                record.Leader = leader1;
-                record.Prepare();
-                var offset = file.WriteRecord(record);
-                file.UpdateLeader(leader1, offset);
-                Assert.AreNotEqual(0L, offset);
-                file.UpdateControlRecord(true);
-                var leader2 = file.ReadLeader(offset);
-                Assert.AreEqual(leader1.Mfn, leader2.Mfn);
-                Assert.AreEqual(leader1.Length, leader2.Length);
-            }
+            using var file = new MstFile64(fileName, DirectAccessMode.Exclusive);
+            var record = _GetRecord();
+            var leader1 = record.Leader;
+            leader1.Mfn = 1;
+            leader1.Version = 1;
+            record.Leader = leader1;
+            record.Prepare();
+            var offset = file.WriteRecord(record);
+            file.UpdateLeader(leader1, offset);
+            Assert.AreNotEqual(0L, offset);
+            file.UpdateControlRecord(true);
+            var leader2 = file.ReadLeader(offset);
+            Assert.AreEqual(leader1.Mfn, leader2.Mfn);
+            Assert.AreEqual(leader1.Length, leader2.Length);
         }
     }
 }

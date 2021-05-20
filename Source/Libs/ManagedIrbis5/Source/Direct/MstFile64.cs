@@ -18,8 +18,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
+using AM;
 using AM.IO;
 
 using ManagedIrbis.Infrastructure;
@@ -96,7 +96,7 @@ namespace ManagedIrbis.Direct
                 DirectAccessMode mode
             )
         {
-            FileName = fileName;
+            FileName = Unix.FindDirectoryOrThrow(fileName);
             Mode = mode;
 
             _lockObject = new object();
