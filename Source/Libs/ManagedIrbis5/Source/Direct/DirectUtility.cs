@@ -123,11 +123,11 @@ namespace ManagedIrbis.Direct
                     databaseName + ".mst"
                 );
 
-            if (!Unix.FileExists(fileName))
-            {
-                // TODO: выставлять код ошибки
-                throw new IrbisException();
-            }
+            // if (!Unix.FileExists(fileName))
+            // {
+            //     // TODO: выставлять код ошибки
+            //     throw new FileNotFoundException(fileName);
+            // }
 
             return new DirectAccess64(fileName, provider.Mode);
 
