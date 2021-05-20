@@ -96,7 +96,7 @@ namespace ManagedIrbis.Direct
                 DirectAccessMode mode
             )
         {
-            FileName = Unix.FindDirectoryOrThrow(fileName);
+            FileName = Unix.FindFileOrThrow(fileName);
             Mode = mode;
 
             _lockObject = new object();

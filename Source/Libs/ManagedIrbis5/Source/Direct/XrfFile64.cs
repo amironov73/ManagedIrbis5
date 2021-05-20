@@ -83,7 +83,7 @@ namespace ManagedIrbis.Direct
         {
             Sure.NotNullNorEmpty(fileName, nameof(fileName));
 
-            FileName = Unix.FindDirectoryOrThrow(fileName);
+            FileName = Unix.FindFileOrThrow(fileName);
             Mode = mode;
 
             _stream = DirectUtility.OpenFile(fileName, mode);
