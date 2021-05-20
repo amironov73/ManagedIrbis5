@@ -56,10 +56,7 @@ namespace AM
             foreach (var candidate in
                 Directory.EnumerateDirectories(parent, child, options))
             {
-                if (candidate.SameString(child))
-                {
-                    return candidate;
-                }
+                return Path.GetFileName(candidate);
             }
 
             return null;

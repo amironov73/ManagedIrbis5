@@ -108,26 +108,12 @@ namespace ManagedIrbis.Direct
                 string? databaseName
             )
         {
-            databaseName ??= provider.Database;
-            if (string.IsNullOrEmpty(databaseName))
+            var fileName = provider.MapDatabase(databaseName);
+            if (fileName is null)
             {
                 // TODO: выставлять код ошибки
-                throw new IrbisException();
+                throw new FileNotFoundException(databaseName);
             }
-
-            // TODO: сделать через PAR-файл
-            var fileName = CombinePath
-                (
-                    provider.DataPath,
-                    databaseName,
-                    databaseName + ".mst"
-                );
-
-            // if (!Unix.FileExists(fileName))
-            // {
-            //     // TODO: выставлять код ошибки
-            //     throw new FileNotFoundException(fileName);
-            // }
 
             return new DirectAccess64(fileName, provider.Mode);
 

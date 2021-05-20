@@ -782,7 +782,7 @@ namespace ManagedIrbis.Direct
 
             return fullPath is null
                 ? null
-                : File.ReadAllText(fullPath, IrbisEncoding.Ansi);
+                : Unix.ReadAllText(fullPath, IrbisEncoding.Ansi);
 
         } // method ReadTextFile
 

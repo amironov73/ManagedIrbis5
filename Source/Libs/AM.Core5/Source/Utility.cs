@@ -3707,10 +3707,10 @@ namespace AM
         /// Конвертирует слеши в принятые в текущей операционной системе.
         /// </summary>
         public static string ConvertSlashes (this string path) => path.Replace
-                (
-                    Path.AltDirectorySeparatorChar,
-                    Path.DirectorySeparatorChar
-                );
+            (
+                Path.AltDirectorySeparatorChar,
+                Path.DirectorySeparatorChar
+            );
 
         /// <summary>
         /// Усекает строку до указанной длины, добавляя при необходимости
