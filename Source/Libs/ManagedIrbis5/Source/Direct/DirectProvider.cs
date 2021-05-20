@@ -27,6 +27,7 @@ using AM.Parameters;
 using AM.PlatformAbstraction;
 using AM.Threading;
 
+using ManagedIrbis;
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
@@ -135,7 +136,7 @@ namespace ManagedIrbis.Direct
         {
             // TODO: искать в Deposit_User
 
-            var result = Path.Combine(DataPath, "Deposit", fileName);
+            var result = Unix.FindFile(DirectUtility.CombinePath(DataPath, "Deposit", fileName));
             if (!File.Exists(result))
             {
                 result = null;
@@ -164,8 +165,8 @@ namespace ManagedIrbis.Direct
             }
             else
             {
-                result = Path.Combine(databasePath, fileName);
-                if (!File.Exists(result))
+                result = Unix.FindFile(DirectUtility.CombinePath(databasePath, fileName));
+                if (result is null)
                 {
                     result = Deposit(fileName);
                 }
@@ -206,7 +207,7 @@ namespace ManagedIrbis.Direct
         /// </summary>
         public AlphabetTable GetAlphabetTable()
         {
-            var path = MapPath(IrbisPath.System, AlphabetTable.DefaultFileName);
+            var path = MapFile(IrbisPath.System, AlphabetTable.DefaultFileName);
             if (path is null)
             {
                 return new AlphabetTable();
@@ -246,21 +247,39 @@ namespace ManagedIrbis.Direct
                 return default;
             }
 
-            var result = DirectUtility.CombinePath(DataPath, mstPath);
+            var result = Path.GetFullPath(DirectUtility.CombinePath(RootPath, mstPath));
+            if (result.EndsWith(Path.DirectorySeparatorChar))
+            {
+                result = result.Substring(0, result.Length - 1);
+            }
+            var parent = Unix.FindDirectory(Path.GetDirectoryName(result) ?? ".");
+            if (parent is null)
+            {
+                return null;
+            }
+
+            var child = Path.GetFileName(result);
+            result = Path.Combine(parent, child);
             if (mustExist)
             {
-                return Unix.DirectoryExists(result) ? result : default;
+                return Unix.FindDirectory(result);
             }
 
             return result;
 
         } // method MapDatabase
 
-        public string? MapPath(IrbisPath path, string fileName) =>
-            MapPath(new FileSpecification {Path = path, FileName = fileName});
+        /// <summary>
+        /// Поиск файла по его спецификации.
+        /// </summary>
+        public string? MapFile(IrbisPath path, string fileName) =>
+            MapFile(new FileSpecification {Path = path, FileName = fileName});
 
-        public string? MapPath(IrbisPath path, string database, string fileName) =>
-            MapPath(new FileSpecification {Path = path, Database = database, FileName = fileName});
+        /// <summary>
+        /// Поиск файла по его спецификации.
+        /// </summary>
+        public string? MapFile(IrbisPath path, string database, string fileName) =>
+            MapFile(new FileSpecification {Path = path, Database = database, FileName = fileName});
 
         /// <summary>
         /// Поиск файла по его спецификации.
@@ -269,17 +288,20 @@ namespace ManagedIrbis.Direct
         /// <param name="forReading">Файл должен существовать?
         /// Если <paramref name="forReading"/> равен <c>false</c>,
         /// то путь мапится чисто формально.</param>
-        /// <returns></returns>
+        /// <returns>Метод должен выдавать либо полный путь к файлу
+        /// (с учетом регистрозависимости Unix) либо <c>null</c></returns>
         /// <summary>При <paramref name="forReading"/>
         /// рассматриваются также папки <see cref="FallBackPath"/>
         /// и <see cref="FallForwardPath"/>.
         /// </summary>
-        public string? MapPath
+        public string? MapFile
             (
                 FileSpecification specification,
                 bool forReading = true
             )
         {
+            string? result;
+
             var fileName = specification.FileName;
             if (string.IsNullOrEmpty(fileName))
             {
@@ -289,10 +311,10 @@ namespace ManagedIrbis.Direct
             if (forReading
                 && !string.IsNullOrEmpty(FallForwardPath))
             {
-                var probe = DirectUtility.CombinePath(FallForwardPath, fileName);
-                if (Unix.FileExists(fileName))
+                result = Unix.FindFile(DirectUtility.CombinePath(FallForwardPath, fileName));
+                if (result is not null)
                 {
-                    return probe;
+                    return Path.GetFullPath(result);
                 }
             }
 
@@ -300,7 +322,7 @@ namespace ManagedIrbis.Direct
                 ?? Database
                 ?? throw new IrbisException(nameof(Database));
 
-            var result = specification.Path switch
+            result = specification.Path switch
             {
                 IrbisPath.System => DirectUtility.CombinePath (RootPath, fileName),
 
@@ -309,31 +331,32 @@ namespace ManagedIrbis.Direct
                 IrbisPath.MasterFile or IrbisPath.InternalResource =>
                     DatabaseOrDeposit(fileName, database),
 
+                // TODO: мапить согласно PAR-файлу
                 (IrbisPath) 11 => fileName,
 
                 _ => throw new IrbisException()
             };
 
+            if (result is not null)
+            {
+                result = Unix.FindFile(result);
+            }
+
             if (forReading
                 && string.IsNullOrEmpty(result)
                 && !string.IsNullOrEmpty(FallBackPath))
             {
-                var probe = DirectUtility.CombinePath(FallBackPath, fileName);
-                if (Unix.FileExists(fileName))
-                {
-                    result = probe;
-                }
+                result = Unix.FindFile(DirectUtility.CombinePath(FallBackPath, fileName));
             }
 
             if (string.IsNullOrEmpty(result))
             {
+                result = null;
                 Magna.Warning($"File not found: {specification}");
-                // throw new IrbisException(nameof(fileName));
             }
             else
             {
                 result = Path.GetFullPath(result);
-                // var fileInfo = new FileInfo(result);
             }
 
             return result;
@@ -362,7 +385,7 @@ namespace ManagedIrbis.Direct
                 FileSpecification specification
             )
         {
-            var fullPath = MapPath(specification);
+            var fullPath = MapFile(specification);
 
             return fullPath is not null;
         }
@@ -658,7 +681,7 @@ namespace ManagedIrbis.Direct
 
             foreach (var specification in specifications)
             {
-                var filePath = MapPath(specification, false);
+                var filePath = MapFile(specification, false);
                 var directory = Path.GetDirectoryName(filePath);
                 if (!string.IsNullOrEmpty(directory))
                 {
@@ -715,7 +738,7 @@ namespace ManagedIrbis.Direct
                 FileSpecification specification
             )
         {
-            var fullPath = MapPath(specification);
+            var fullPath = MapFile(specification);
             if (!string.IsNullOrEmpty(fullPath))
             {
                 return File.ReadAllBytes(fullPath);
@@ -778,11 +801,11 @@ namespace ManagedIrbis.Direct
                 FileSpecification specification
             )
         {
-            var fullPath = MapPath(specification);
+            var fullPath = MapFile(specification);
 
             return fullPath is null
                 ? null
-                : Unix.ReadAllText(fullPath, IrbisEncoding.Ansi);
+                : File.ReadAllText(fullPath, IrbisEncoding.Ansi);
 
         } // method ReadTextFile
 
@@ -902,7 +925,7 @@ namespace ManagedIrbis.Direct
                 FileSpecification specification
             )
         {
-            var fullPath = MapPath(specification);
+            var fullPath = MapFile(specification);
 
             if (fullPath is null)
             {

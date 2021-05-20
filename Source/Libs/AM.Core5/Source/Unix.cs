@@ -219,7 +219,7 @@ namespace AM
 
             if (OperatingSystem.IsWindows())
             {
-                return directoryName;
+                return null;
             }
 
             var parent = Path.GetDirectoryName(directoryName) ?? ".";
@@ -237,7 +237,7 @@ namespace AM
             foreach (var candidate in
                 Directory.EnumerateDirectories(parent, child, options))
             {
-                if (candidate.SameString(child))
+                if (candidate.SameString(directoryName))
                 {
                     return candidate;
                 }
@@ -281,7 +281,7 @@ namespace AM
 
             if (OperatingSystem.IsWindows())
             {
-                return fileName;
+                return null;
             }
 
             var parent = Path.GetDirectoryName(fileName) ?? ".";

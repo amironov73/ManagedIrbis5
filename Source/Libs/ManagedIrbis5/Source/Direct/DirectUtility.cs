@@ -108,12 +108,17 @@ namespace ManagedIrbis.Direct
                 string? databaseName
             )
         {
+            databaseName ??= provider.Database;
+
             var fileName = provider.MapDatabase(databaseName);
             if (fileName is null)
             {
                 // TODO: выставлять код ошибки
                 throw new FileNotFoundException(databaseName);
             }
+
+            fileName = Path.Combine(fileName, (databaseName ?? provider.Database) + ".mst");
+            fileName = Unix.FindFileOrThrow(fileName);
 
             return new DirectAccess64(fileName, provider.Mode);
 
