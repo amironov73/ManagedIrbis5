@@ -91,15 +91,19 @@ namespace ManagedIrbis.Direct
         /// <param name="rootPath">Корневой путь.</param>
         /// <param name="mode">Режим доступа.</param>
         /// <param name="strategy">Стратегия создания акцессора.</param>
+        /// <param name="caching">Стратегия кеширования.</param>
+        /// <param name="provider">Провайдер сервисов.</param>
         public DirectProvider
             (
                 string rootPath,
                 DirectAccessMode mode = DirectAccessMode.ReadOnly,
                 IDirectAccess64Strategy? strategy = default,
+                IContextCachingStrategy? caching = default,
                 IServiceProvider? provider = default
             )
         {
-            _strategy = strategy ?? new TransientDirectAccess64();
+            _access = strategy ?? new TransientDirectAccess64();
+            _caching = caching ?? new TransientCaching();
             _provider = provider;
 
             var fullPath = Path.GetFullPath(rootPath);
@@ -119,7 +123,8 @@ namespace ManagedIrbis.Direct
 
         #region Private members
 
-        private readonly IDirectAccess64Strategy _strategy;
+        private readonly IDirectAccess64Strategy _access;
+        private readonly IContextCachingStrategy _caching;
         private readonly IServiceProvider? _provider;
 
         #endregion
@@ -180,7 +185,7 @@ namespace ManagedIrbis.Direct
         /// Получение акцессора для доступа к файлам базы.
         /// </summary>
         public DirectAccessProxy64 GetAccessor (string? databaseName = null)
-            => _strategy.CreateAccessor(this, databaseName);
+            => _access.CreateAccessor(this, databaseName);
 
         /// <summary>
         /// Форматирование записи.
@@ -218,6 +223,12 @@ namespace ManagedIrbis.Direct
                 : new AlphabetTable();
 
         } // method GetAlphabetTable
+
+        /// <summary>
+        /// Получение кешированного файла (если есть).
+        /// </summary>
+        public string? GetCachedFile(string fileName) =>
+            _caching.GetCachedFile(this, fileName);
 
         /// <summary>
         /// Получение пути к базе данных.
@@ -375,6 +386,12 @@ namespace ManagedIrbis.Direct
         public string? ReadTextFile ( IrbisPath path, string? databaseName, string fileName ) =>
             ReadTextFile(new FileSpecification { Path = path, Database = databaseName ?? Database, FileName = fileName });
 
+        /// <summary>
+        /// Сохранение файла в кеше.
+        /// </summary>
+        public void StoreFileInCache(string fileName, string content) =>
+            _caching.StoreFile(fileName, content);
+
         #endregion
 
         #region ISyncProvider members
@@ -445,7 +462,7 @@ namespace ManagedIrbis.Direct
         public void Dispose()
         {
             Disposing.Raise(this);
-            _strategy.Dispose();
+            _access.Dispose();
         }
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
@@ -801,11 +818,23 @@ namespace ManagedIrbis.Direct
                 FileSpecification specification
             )
         {
-            var fullPath = MapFile(specification);
+            var fileName = specification.ToString();
+            var result = GetCachedFile(fileName);
+            if (result is not null)
+            {
+                return result;
+            }
 
-            return fullPath is null
-                ? null
-                : File.ReadAllText(fullPath, IrbisEncoding.Ansi);
+            var fullPath = MapFile(specification);
+            if (fullPath is null)
+            {
+                return null;
+            }
+
+            result = File.ReadAllText(fullPath, IrbisEncoding.Ansi);
+            StoreFileInCache(fileName, result);
+
+            return result;
 
         } // method ReadTextFile
 
