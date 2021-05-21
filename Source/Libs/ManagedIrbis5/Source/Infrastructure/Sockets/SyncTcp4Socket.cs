@@ -27,11 +27,17 @@ using AM;
 
 namespace ManagedIrbis.Infrastructure.Sockets
 {
+    /// <summary>
+    /// Сокет, реализующий синхронный режим для TCPv4-подключения.
+    /// </summary>
     public sealed class SyncTcp4Socket
         : ISyncClientSocket
     {
         #region Properties
 
+        /// <summary>
+        /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
+        /// </summary>
         public ISyncConnection? Connection { get; set; }
 
         #endregion

@@ -527,8 +527,12 @@ namespace ManagedIrbis
             Subfields.Add(subfield);
 
             return this;
+
         } // method Add
 
+        /// <summary>
+        /// Добавление поля, если переданное значение не равно 0.
+        /// </summary>
         public Field AddNonEmpty
             (
                 char code,
@@ -541,8 +545,12 @@ namespace ManagedIrbis
             }
 
             return this;
-        }
 
+        } // method AddNonEmpty
+
+        /// <summary>
+        /// Добавление поля, если переданное значение не равно 0.
+        /// </summary>
         public Field AddNonEmpty
             (
                 char code,
@@ -555,8 +563,13 @@ namespace ManagedIrbis
             }
 
             return this;
-        }
 
+        } // method AddNonEmpty
+
+        /// <summary>
+        /// Добавление поля, если переданная дата имеет смысл
+        /// (не равна <see cref="DateTime.MinValue"/>).
+        /// </summary>
         public Field AddNonEmpty
             (
                 char code,
@@ -572,7 +585,8 @@ namespace ManagedIrbis
             }
 
             return this;
-        }
+
+        } // method AddNonEmpty
 
         /// <summary>
         /// Добавление подполя в конец списка подполей

@@ -50,9 +50,19 @@ namespace AM.Windows.Forms
             _parent = parent;
         }
 
-        public TreeGridNode Add ( string text, params object [] data )
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public TreeGridNode Add
+            (
+                string text,
+                params object [] data
+            )
         {
-            TreeGridNode result = new TreeGridNode
+            var result = new TreeGridNode
                                       {
                                           Title = text,
                                       };

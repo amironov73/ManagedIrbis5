@@ -100,7 +100,7 @@ namespace ManagedIrbis.Providers
         /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; private set; }
 
-        /// <inheritdoc cref="IIrbisProvider.LastError"/>
+        /// <inheritdoc cref="IGetLastError.LastError"/>
         public int LastError { get; private set; }
 
         /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>

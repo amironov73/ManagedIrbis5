@@ -88,6 +88,9 @@ namespace ManagedIrbis
             return result;
         } // method FormatRecord
 
+        /// <summary>
+        /// Форматирование записи по ее MFN.
+        /// </summary>
         public static string? FormatRecord
             (
                 this ISyncProvider conneciton,
@@ -98,6 +101,9 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method FormatRecord
 
+        /// <summary>
+        /// Форматирование записи в клиентском представлении.
+        /// </summary>
         public static string? FormatRecord
             (
                 this ISyncProvider conneciton,
@@ -108,6 +114,9 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method FormatRecord
 
+        /// <summary>
+        /// Форматирование записей по их MFN.
+        /// </summary>
         public static string[] FormatRecords
             (
                 this ISyncProvider conneciton,
@@ -152,6 +161,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Чтение терминов словаря.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="startTerm">Параметры терминов.</param>
         /// <param name="numberOfTerms">Максимальное число терминов.</param>
         /// <returns>Массив прочитанных терминов.</returns>
@@ -175,6 +185,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Упрощенный поиск.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Массив MFN найденных записей.</returns>
         public static int[] Search
@@ -229,6 +240,7 @@ namespace ManagedIrbis
         /// Определение количества записей, удовлетворяющих
         /// заданному запросу.
         /// </summary>
+        /// <param name="connection">Подключение.</param>
         /// <param name="expression">Выражение для поиска по словарю.</param>
         /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
         public static int SearchCount

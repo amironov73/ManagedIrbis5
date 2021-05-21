@@ -258,6 +258,11 @@ namespace AM.Drawing.Barcodes
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string Encode
             (
                 string text

@@ -38,20 +38,28 @@ namespace ManagedIrbis
 
         #region Public methods
 
+        /// <summary>
+        /// Создание синхронного подключения с настройками по умолчанию.
+        /// </summary>
         public virtual SyncConnection CreateSyncConnection()
         {
             var socket = new SyncTcp4Socket();
             var result = new SyncConnection(socket, Magna.Host.Services);
 
             return result;
+
         } // method CreateSyncConnection
 
+        /// <summary>
+        /// Создание асинхронного подключения с настройками по умолчанию.
+        /// </summary>
         public virtual AsyncConnection CreateAsyncConnection()
         {
             var socket = new AsyncTcp4Socket();
             var result = new AsyncConnection(socket, Magna.Host.Services);
 
             return result;
+
         } // method CreateAsyncConnection
 
         /// <summary>

@@ -20,6 +20,9 @@ using System.Drawing;
 
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    ///
+    /// </summary>
     public class TreeGridTreeColumn
         : TreeGridColumn
     {
@@ -37,6 +40,7 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <inheritdoc cref="TreeGridColumn.OnMouseClick"/>
         protected internal override void OnMouseClick
             (
                 TreeGridMouseEventArgs args
@@ -76,6 +80,12 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="bounds"></param>
+        /// <returns></returns>
         public virtual TreeGridDrawLayout MakeLayout
             (
                 TreeGridNode node,
@@ -165,5 +175,7 @@ namespace AM.Windows.Forms
         }
 
         #endregion
-    }
-}
+
+    } // class TreeGridTreeColumn
+
+} // namespace AM.Windows.Forms

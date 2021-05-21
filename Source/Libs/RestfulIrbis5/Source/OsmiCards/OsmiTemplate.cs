@@ -51,7 +51,7 @@ namespace RestfulIrbis.OsmiCards
         #region Public methods
 
         /// <summary>
-        /// Convert <see cref="JObject"/> to
+        /// Convert Newtonsoft JObject to
         /// <see cref="OsmiTemplate"/>.
         /// </summary>
         public static OsmiTemplate FromJObject

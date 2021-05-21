@@ -78,6 +78,11 @@ namespace AM.Drawing.Barcodes
             "1011001"  // start/stop
         };
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string Encode
             (
                 string text

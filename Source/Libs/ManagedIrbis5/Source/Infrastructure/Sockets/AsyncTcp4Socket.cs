@@ -29,13 +29,16 @@ using AM;
 namespace ManagedIrbis.Infrastructure.Sockets
 {
     /// <summary>
-    ///
+    /// Сокет, реализующий асинхронный режим для TCPv4-подключения.
     /// </summary>
     public sealed class AsyncTcp4Socket
         : IAsyncClientSocket
     {
         #region IAsyncClientSocket members
 
+        /// <summary>
+        /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
+        /// </summary>
         public IAsyncConnection? Connection { get; set; }
 
         /// <inheritdoc cref="IAsyncClientSocket.TransactAsync"/>

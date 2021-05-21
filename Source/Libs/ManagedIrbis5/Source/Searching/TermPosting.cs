@@ -129,7 +129,7 @@ namespace ManagedIrbis
 
         #region IEquatable members
 
-        /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
         public bool Equals(TermPosting? other)
         {
             if (other is not null)

@@ -86,6 +86,9 @@ namespace ManagedIrbis.Providers
             get; private set;
         }
 
+        /// <summary>
+        /// Провайдер сервисов.
+        /// </summary>
         public static IServiceProvider ServiceProvider { get; private set; }
 
         #endregion
@@ -103,14 +106,14 @@ namespace ManagedIrbis.Providers
                 { InMemory, typeof(InMemoryProvider) },
                 { Connected, typeof(SyncConnection) },
                 //{SemiConnected, typeof(SemiConnectedClient)},
-                //{Default, typeof(ConnectedClient)}
+                {Default, typeof(SyncConnection)}
             };
-
 
             serviceCollection.RegisterIrbisProviders();
 
             ServiceProvider = serviceCollection.BuildServiceProvider();
-        }
+
+        } // static constructor
 
         #endregion
 

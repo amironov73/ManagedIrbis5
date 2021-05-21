@@ -21,19 +21,46 @@ using System.ComponentModel;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///   Represents a scroll bar with own settings
+    /// Represents a scroll bar with own settings
     /// </summary>
     [TypeConverter(typeof (ExpandableObjectConverter))]
     public sealed class ScrollSettings
     {
         #region Constants
 
+        /// <summary>
+        ///
+        /// </summary>
         public const bool DefaultEnabled = true;
+
+        /// <summary>
+        ///
+        /// </summary>
         public const int DefaultLargeChange = 10;
+
+        /// <summary>
+        ///
+        /// </summary>
         public const int DefaultMaximum = 100;
+
+        /// <summary>
+        ///
+        /// </summary>
         public const int DefaultMinimum = 0;
+
+        /// <summary>
+        ///
+        /// </summary>
         public const int DefaultPosition = 0;
+
+        /// <summary>
+        ///
+        /// </summary>
         public const int DefaultSmallChange = 1;
+
+        /// <summary>
+        ///
+        /// </summary>
         public const bool DefaultVisible = true;
 
         #endregion

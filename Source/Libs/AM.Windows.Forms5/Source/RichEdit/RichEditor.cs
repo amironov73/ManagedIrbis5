@@ -29,11 +29,17 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    ///
+    /// </summary>
     public partial class RichEditor
         : UserControl
     {
         #region Events
 
+        /// <summary>
+        ///
+        /// </summary>
         public event EventHandler? FileNameChanged;
 
         #endregion
@@ -42,6 +48,9 @@ namespace AM.Windows.Forms
 
         private string? _fileName;
 
+        /// <summary>
+        ///
+        /// </summary>
         [DefaultValue(null)]
         public string? FileName
         {
@@ -68,6 +77,9 @@ namespace AM.Windows.Forms
         /// </summary>
         public RichTextBox RichTextBox => rtfBox;
 
+        /// <summary>
+        ///
+        /// </summary>
         public bool Modified
         {
             get => rtfBox.Modified;

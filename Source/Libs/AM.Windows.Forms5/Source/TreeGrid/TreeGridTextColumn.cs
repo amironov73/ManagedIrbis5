@@ -29,21 +29,15 @@ namespace AM.Windows.Forms
     public class TreeGridTextColumn
         : TreeGridColumn
     {
-        #region Construction
-
-        //public TreeGridTextColumn()
-        //{
-        //}
-
-        #endregion
-
         #region TreeGridColumn members
 
-        public override bool Editable
-        {
-            get { return true; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public override bool Editable => true;
 
         #endregion
-    }
-}
+
+    } // class TreeGridTextColumn
+
+} // namespace AM.Windows.Forms

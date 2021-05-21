@@ -612,6 +612,9 @@ namespace ManagedIrbis.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Чтение нескольких строк в кодировке ANSI.
+        /// </summary>
         public string[]? GetAnsiStrings(int lineCount)
         {
             throw new NotImplementedException();
@@ -661,10 +664,13 @@ namespace ManagedIrbis.Infrastructure
         public string ReadRemainingUtfText() => RemainingText(IrbisEncoding.Utf8);
 
         /// <summary>
-        ///
+        /// Чтение строки в кодировке UTF-8.
         /// </summary>
         public string ReadUtf() => ReadLine(IrbisEncoding.Utf8);
 
+        /// <summary>
+        /// Чтение целого числа.
+        /// </summary>
         public int RequireInt32()
         {
             throw new NotImplementedException();

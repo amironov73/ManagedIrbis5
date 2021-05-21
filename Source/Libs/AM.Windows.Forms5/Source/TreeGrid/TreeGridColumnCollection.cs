@@ -48,6 +48,9 @@ namespace AM.Windows.Forms
 
         private readonly TreeGrid _grid;
 
+        /// <summary>
+        ///
+        /// </summary>
         protected internal void Update()
         {
             _grid.UpdateState();

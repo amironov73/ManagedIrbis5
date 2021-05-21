@@ -41,6 +41,11 @@ namespace ManagedIrbis.Pft
 
         #region Public methods
 
+        /// <summary>
+        /// Получение текста сообщения по коду ошибки.
+        /// </summary>
+        /// <param name="code">Код ошибки.</param>
+        /// <returns>Текст сообщения об ошибке (или об ее отсутствии).</returns>
         public static string GetMessageForCode
             (
                 int code

@@ -89,7 +89,7 @@ namespace ManagedIrbis
         /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; protected internal set; }
 
-        /// <inheritdoc cref="IIrbisProvider.LastError"/>
+        /// <inheritdoc cref="IGetLastError.LastError"/>
         public int LastError { get; private set; }
 
         /// <summary>
@@ -149,15 +149,24 @@ namespace ManagedIrbis
 
         #region Private members
 
+        /// <summary>
+        /// Логгер.
+        /// </summary>
         protected internal readonly ILogger _logger;
 
+        /// <summary>
+        /// Провайдер сервисов.
+        /// </summary>
         protected internal readonly IServiceProvider _provider;
 
+        /// <summary>
+        /// Отмена выполнения операций.
+        /// </summary>
         protected internal CancellationTokenSource _cancellation;
 
-        private static readonly int[] _goodCodesForReadRecord = { -201, -600, -602, -603 };
-        private static readonly int[] _goodCodesForReadTerms = { -202, -203, -204 };
-
+        /// <summary>
+        /// Установка состояния занятости.
+        /// </summary>
         protected internal void SetBusy
             (
                 bool busy
@@ -293,6 +302,9 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method GetWaitHandle
 
+        /// <summary>
+        /// Абстракция от платформы.
+        /// </summary>
         public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
         #endregion

@@ -32,6 +32,9 @@ namespace AM.Windows.Forms
     {
         #region Construction
 
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public TreeGridDateBox()
         {
             _control = new DateTimePicker();
@@ -47,19 +50,19 @@ namespace AM.Windows.Forms
 
         #region Properties
 
-        public DateTimePicker DateTimePicker
-        {
-            get { return _control;  }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public DateTimePicker DateTimePicker => _control;
 
         #endregion
 
         #region TreeGridEditor members
 
-        public override Control Control
-        {
-            get { return _control; }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public override Control Control => _control;
 
         /// <summary>
         /// Sets the value.

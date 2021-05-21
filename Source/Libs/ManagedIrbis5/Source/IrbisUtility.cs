@@ -220,6 +220,9 @@ namespace ManagedIrbis
             return result;
         } // method UrlDecode
 
+        /// <summary>
+        /// Проверка, безопасен ли символ для включения его в URL "как есть".
+        /// </summary>
         public static bool IsUrlSafeChar
             (
                 char ch

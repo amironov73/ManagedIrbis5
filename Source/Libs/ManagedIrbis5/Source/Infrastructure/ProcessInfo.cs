@@ -135,7 +135,7 @@ namespace ManagedIrbis.Infrastructure
 
         #region IEquatable members
 
-        /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
         public bool Equals(ProcessInfo? other)
         {
             return Number?.Equals(other?.Number) ?? false;

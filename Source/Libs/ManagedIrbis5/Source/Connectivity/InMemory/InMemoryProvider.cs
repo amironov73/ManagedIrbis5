@@ -191,6 +191,7 @@ namespace ManagedIrbis.InMemory
 
         #region IIrbisProvider members
 
+        /// <inheritdoc cref="IIrbisProvider.Disposing"/>
         public event EventHandler? Disposing;
 
         /// <inheritdoc cref="IIrbisProvider.Database"/>
@@ -199,9 +200,10 @@ namespace ManagedIrbis.InMemory
         /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; private set; }
 
-        /// <inheritdoc cref="IIrbisProvider.LastError"/>
+        /// <inheritdoc cref="IGetLastError.LastError"/>
         public int LastError { get; private set; }
 
+        /// <inheritdoc cref="IIrbisProvider.PlatformAbstraction"/>
         public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
         /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>

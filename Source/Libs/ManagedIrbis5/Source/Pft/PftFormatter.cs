@@ -72,8 +72,12 @@ namespace ManagedIrbis.Pft
         /// <inheritdoc cref="IPftFormatter.Program"/>
         public PftProgram? Program { get; set; }
 
+        /// <inheritdoc cref="IPftFormatter.SupportsExtendedSyntax"/>
         public virtual bool SupportsExtendedSyntax { get; }
 
+        /// <summary>
+        /// Контекст, в котором работает форматтер.
+        /// </summary>
         public PftContext Context { get; set; }
 
         /// <summary>
@@ -100,7 +104,6 @@ namespace ManagedIrbis.Pft
         /// Have warning.
         /// </summary>
         public bool HaveWarning => Context.Output.HaveWarning;
-
 
         /// <summary>
         /// Форматирование указанной записи.

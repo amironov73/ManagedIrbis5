@@ -28,6 +28,9 @@ namespace AM.Windows.Forms
     {
         #region Construction
 
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public TreeGridTextBox()
         {
             _textBox = new TextBox();

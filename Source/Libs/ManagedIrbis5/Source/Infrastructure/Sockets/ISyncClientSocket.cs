@@ -28,6 +28,9 @@ namespace ManagedIrbis.Infrastructure.Sockets
     /// </summary>
     public interface ISyncClientSocket
     {
+        /// <summary>
+        /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
+        /// </summary>
         ISyncConnection? Connection { get; set; }
 
         /// <summary>

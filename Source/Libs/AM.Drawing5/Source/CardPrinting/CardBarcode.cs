@@ -65,6 +65,10 @@ namespace AM.Drawing.CardPrinting
 
         #region CardItem members
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="context"></param>
         public override void Draw
             (
                 DrawingContext context

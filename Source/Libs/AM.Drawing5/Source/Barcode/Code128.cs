@@ -118,12 +118,24 @@ namespace AM.Drawing.Barcodes
     {
         #region Constants
 
+        /// <summary>
+        ///
+        /// </summary>
         public const char FNC1 = (char) 200;
 
+        /// <summary>
+        ///
+        /// </summary>
         public const char FNC2 = (char) 200;
 
+        /// <summary>
+        ///
+        /// </summary>
         public const char FNC3 = (char) 200;
 
+        /// <summary>
+        ///
+        /// </summary>
         public const char FNC4 = (char) 200;
 
         #endregion
@@ -445,6 +457,11 @@ namespace AM.Drawing.Barcodes
             ["99"] = "10111011110",
         };
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
         public static string Encode
             (
                 string text

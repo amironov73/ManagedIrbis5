@@ -24,6 +24,9 @@ using System.Windows.Forms;
 
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    ///
+    /// </summary>
     // ReSharper disable RedundantNameQualifier
     [System.ComponentModel.DesignerCategory("Code")]
     // ReSharper restore RedundantNameQualifier
@@ -42,6 +45,9 @@ namespace AM.Windows.Forms
 
         #region Construction
 
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public SimpleScrollableControl()
         {
             HorizontalScroll = new ScrollSettings(this, NativeMethods.ScrollBarKind.SB_HORZ);

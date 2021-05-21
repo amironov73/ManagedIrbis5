@@ -35,10 +35,16 @@ namespace AM.Drawing.CardPrinting
 
         //public PrinterInfo Printer { get; set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public CardInfo? Card { get; set; }
 
         // public HumanInfo Human { get; set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public Graphics? Graphics { get; set; }
 
         #endregion
@@ -86,6 +92,11 @@ namespace AM.Drawing.CardPrinting
 
         #region Public methods
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public string ExpandText
             (
                 string input

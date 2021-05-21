@@ -181,12 +181,14 @@ namespace AM.Windows.Forms
 
         internal TreeGridNode? Node;
 
+        /// <inheritdoc cref="Collection{T}.ClearItems"/>
         protected override void ClearItems()
         {
             base.ClearItems();
             Update();
         }
 
+        /// <inheritdoc cref="Collection{T}.InsertItem"/>
         protected override void InsertItem
             (
                 int index,
@@ -197,12 +199,14 @@ namespace AM.Windows.Forms
             Update();
         }
 
+        /// <inheritdoc cref="Collection{T}.RemoveItem"/>
         protected override void RemoveItem(int index)
         {
             base.RemoveItem(index);
             Update();
         }
 
+        /// <inheritdoc cref="Collection{T}.SetItem"/>
         protected override void SetItem
             (
                 int index,
@@ -213,6 +217,9 @@ namespace AM.Windows.Forms
             Update();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         internal void Update ()
         {
             OnDataChanged();

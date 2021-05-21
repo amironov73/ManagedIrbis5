@@ -26,6 +26,9 @@ using System;
 
 namespace ManagedIrbis.Workspace
 {
+    /// <summary>
+    /// Вызов внешнего редактора.
+    /// </summary>
     public sealed class ExternalProgramMarcEditor
         : IMarcEditor
     {
@@ -60,6 +63,7 @@ namespace ManagedIrbis.Workspace
             )
         {
             throw new NotImplementedException();
+
         } // method PerformEdit
 
         #endregion

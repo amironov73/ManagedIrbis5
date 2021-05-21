@@ -32,10 +32,16 @@ namespace AM.Drawing.CardPrinting
     {
         #region Properties
 
+        /// <summary>
+        ///
+        /// </summary>
         [XmlElement("left")]
         [DisplayName("X")]
         public int Left { get; set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         [XmlElement("top")] [DisplayName("Y")] public int Top { get; set; }
 
         #endregion

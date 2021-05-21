@@ -20,8 +20,6 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-using AM.Windows.Forms;
-
 #endregion
 
 namespace AM.Windows.Forms
@@ -30,9 +28,9 @@ namespace AM.Windows.Forms
     ///
     /// </summary>
     // ReSharper disable RedundantNameQualifier
-// ReSharper disable LocalizableElement
+    // ReSharper disable LocalizableElement
     [System.ComponentModel.DesignerCategory("Code")]
-// ReSharper restore LocalizableElement
+    // ReSharper restore LocalizableElement
     // ReSharper restore RedundantNameQualifier
     public class TreeGrid
         : SimpleScrollableControl
@@ -107,9 +105,11 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         [Browsable(false)]
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Hidden)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public TreeGridNode CurrentNode
         {
             get
@@ -129,8 +129,8 @@ namespace AM.Windows.Forms
             {
                 try
                 {
-                    TreeGridNode[] flatten = FlattenedNodes;
-                    int index = Array.IndexOf(flatten, value);
+                    var flatten = FlattenedNodes;
+                    var index = Array.IndexOf(flatten, value);
                     if (index >= 0)
                     {
                         GotoLine(index);
@@ -176,6 +176,9 @@ namespace AM.Windows.Forms
             get { return typeof(TreeGridNode); }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         public TreeGridNode[] FlattenedNodes
         {
             get { return _flattenedNodes ?? (_flattenedNodes = GetFlattenedNodes()); }
@@ -214,45 +217,29 @@ namespace AM.Windows.Forms
         /// Gets the nodes.
         /// </summary>
         /// <value>The nodes.</value>
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Content)]
-        public TreeGridNodeCollection Nodes
-        {
-            get
-            {
-                return _nodes;
-            }
-        }
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Content)]
+        public TreeGridNodeCollection Nodes => _nodes;
 
-        [DesignerSerializationVisibility
-            (DesignerSerializationVisibility.Content)]
-        public TreeGridPalette Palette
-        {
-            get
-            {
-                return _palette;
-            }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public TreeGridPalette Palette => _palette;
 
-        public TreeGridColumn[] VisibleColumns
-        {
-            get { return _visibleColumns ?? (_visibleColumns = GetVisibleColumns()); }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public TreeGridColumn[] VisibleColumns => _visibleColumns ?? (_visibleColumns = GetVisibleColumns());
 
-        public TreeGridNode[] VisibleNodes
-        {
-            get { return _visibleNodes ?? (_visibleNodes = GetVisibleNodes()); }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public TreeGridNode[] VisibleNodes => _visibleNodes ?? (_visibleNodes = GetVisibleNodes());
 
-        public int VisibleNodeCount
-        {
-            get
-            {
-                return (VisibleNodes == null)
-                    ? 0
-                    : VisibleNodes.Length;
-            }
-        }
+        /// <summary>
+        ///
+        /// </summary>
+        public int VisibleNodeCount => VisibleNodes == null ? 0 : VisibleNodes.Length;
 
         #endregion
 
@@ -288,19 +275,19 @@ namespace AM.Windows.Forms
             (
             )
         {
-            for (int i = 0; i < Columns.Count; i++)
+            for (var i = 0; i < Columns.Count; i++)
             {
                 Columns[i]._index = i;
             }
 
-            int totalFill = Columns.Sum(_ => _.FillFactor);
+            var totalFill = Columns.Sum(_ => _.FillFactor);
             if (totalFill != 0)
             {
-                int totalNotFill = Columns
+                var totalNotFill = Columns
                     .Where(_ => _.FillFactor == 0)
                     .Sum(_ => _.Width);
-                int totalFree = ClientSize.Width - totalNotFill - 2;
-                foreach (TreeGridColumn column in
+                var totalFree = ClientSize.Width - totalNotFill - 2;
+                foreach (var column in
                     Columns.Where(_ => _.FillFactor != 0))
                 {
                     column.Width = (totalFree > 0)
@@ -309,13 +296,13 @@ namespace AM.Windows.Forms
                 }
             }
 
-            List<TreeGridColumn> result = new List<TreeGridColumn>();
-            int runningWidth = 0;
-            int totalWidth = ClientSize.Width;
+            var result = new List<TreeGridColumn>();
+            var runningWidth = 0;
+            var totalWidth = ClientSize.Width;
 
-            for (int i = _leftColumnIndex; i < Columns.Count; i++)
+            for (var i = _leftColumnIndex; i < Columns.Count; i++)
             {
-                TreeGridColumn currentColumn = Columns[i];
+                var currentColumn = Columns[i];
                 if (runningWidth < totalWidth)
                 {
                     result.Add(currentColumn);
@@ -338,16 +325,16 @@ namespace AM.Windows.Forms
         /// <returns></returns>
         protected internal virtual TreeGridNode[] GetVisibleNodes()
         {
-            TreeGridNode[] flattenedNodes = FlattenedNodes;
+            var flattenedNodes = FlattenedNodes;
 
-            List<TreeGridNode> result = new List<TreeGridNode>();
-            int runningHeight = 0;
-            int totalHeight = ClientSize.Height - LineHeight;
+            var result = new List<TreeGridNode>();
+            var runningHeight = 0;
+            var totalHeight = ClientSize.Height - LineHeight;
 
-            int top = LineHeight;
-            for (int i = _topNodeIndex; i < flattenedNodes.Length; i++)
+            var top = LineHeight;
+            for (var i = _topNodeIndex; i < flattenedNodes.Length; i++)
             {
-                TreeGridNode currentNode = flattenedNodes[i];
+                var currentNode = flattenedNodes[i];
                 currentNode.Top = top;
                 top += currentNode.Height;
                 runningHeight += currentNode.Height;
@@ -367,12 +354,12 @@ namespace AM.Windows.Forms
         /// <returns></returns>
         protected internal TreeGridNode[] GetFlattenedNodes()
         {
-            List<TreeGridNode> result = new List<TreeGridNode>();
-            foreach (TreeGridNode node in Nodes)
+            var result = new List<TreeGridNode>();
+            foreach (var node in Nodes)
             {
                 result.AddRange(node.Flatten());
             }
-            for (int i = 0; i < result.Count; i++)
+            for (var i = 0; i < result.Count; i++)
             {
                 result[i].FlatIndex = i;
             }
@@ -387,15 +374,22 @@ namespace AM.Windows.Forms
             _flattenedNodes = GetFlattenedNodes();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         protected internal void ResetVisibleColumns()
         {
             _visibleColumns = GetVisibleColumns();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         protected internal void ResetVisibleNodes()
         {
             _visibleNodes = GetVisibleNodes();
         }
+
         /// <summary>
         /// Raises the <see cref="E:System.Windows.Forms.Control.Paint"/> event.
         /// </summary>
@@ -404,15 +398,15 @@ namespace AM.Windows.Forms
         {
             //base.OnPaint(e);
 
-            TreeGridColumn[] visibleColumns = VisibleColumns;
+            var visibleColumns = VisibleColumns;
 
-            Graphics graphics = e.Graphics;
+            var graphics = e.Graphics;
             graphics.Clear(BackColor);
-            int height = ClientSize.Height;
+            var height = ClientSize.Height;
 
-            foreach (TreeGridColumn column in visibleColumns)
+            foreach (var column in visibleColumns)
             {
-                Rectangle r = new Rectangle
+                var r = new Rectangle
                     (
                         column.Left,
                         0,
@@ -420,7 +414,7 @@ namespace AM.Windows.Forms
                         LineHeight
                     );
 
-                TreeGridDrawColumnHeaderEventArgs dha
+                var dha
                     = new TreeGridDrawColumnHeaderEventArgs
                     {
                         Column = column,
@@ -440,18 +434,18 @@ namespace AM.Windows.Forms
                     );
             }
 
-            TreeGridNode[] visibleNodes = VisibleNodes;
+            var visibleNodes = VisibleNodes;
 
-            foreach (TreeGridNode node in visibleNodes)
+            foreach (var node in visibleNodes)
             {
                 if (visibleColumns.Length != 0)
                 {
-                    int left = visibleColumns.First().Left;
-                    int right = visibleColumns.Last().Right;
-                    int top = node.Top;
-                    int nodeHeight = node.Height;
+                    var left = visibleColumns.First().Left;
+                    var right = visibleColumns.Last().Right;
+                    var top = node.Top;
+                    var nodeHeight = node.Height;
 
-                    Rectangle r = new Rectangle
+                    var r = new Rectangle
                         (
                         left,
                         top,
@@ -459,7 +453,7 @@ namespace AM.Windows.Forms
                         nodeHeight
                         );
 
-                    TreeGridDrawNodeEventArgs args
+                    var args
                         = new TreeGridDrawNodeEventArgs
                               {
                                   Graphics = graphics,
@@ -470,7 +464,7 @@ namespace AM.Windows.Forms
                               };
                     node.OnDrawRow(args);
 
-                    int bottom = top - 1;
+                    var bottom = top - 1;
 
                     graphics.DrawLine
                         (
@@ -504,6 +498,7 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <inheritdoc cref="Control.OnResize"/>
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
@@ -523,12 +518,16 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="line"></param>
         protected internal void GotoLine(int line)
         {
-            TreeGridNode[] flattenNodes = FlattenedNodes;
-            TreeGridNode[] visibleNodes = VisibleNodes;
-            int flattenCount = flattenNodes.Length;
-            int visibleCount = visibleNodes.Length;
+            var flattenNodes = FlattenedNodes;
+            var visibleNodes = VisibleNodes;
+            var flattenCount = flattenNodes.Length;
+            var visibleCount = visibleNodes.Length;
             if (line >= flattenCount)
             {
                 line = flattenCount - 1;
@@ -574,24 +573,33 @@ namespace AM.Windows.Forms
             Invalidate();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
         protected internal TreeGridColumn FindEditableColumn ()
         {
             if (DefaultColumn > 0)
             {
                 return Columns[DefaultColumn];
             }
-            TreeGridColumn result = Columns
+            var result = Columns
                 .Where(_ => _.Editable)
                 .FirstOrDefault();
             return result;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
         protected override bool ProcessKeyEventArgs(ref Message m)
         {
-            char? letter = KeyboardUtility.ProcessKeyEventArgs(ref m);
+            var letter = KeyboardUtility.ProcessKeyEventArgs(ref m);
             if (letter != null)
             {
-                TreeGridColumn column = FindEditableColumn();
+                var column = FindEditableColumn();
                 if (column != null)
                 {
                     BeginEdit(column.Index, letter.ToString());
@@ -632,10 +640,10 @@ namespace AM.Windows.Forms
                     return true;
                 case Keys.Enter:
                     {
-                        TreeGridColumn column = FindEditableColumn();
+                        var column = FindEditableColumn();
                         if (column != null)
                         {
-                            string initialValue = GetInitialValue
+                            var initialValue = GetInitialValue
                                 (
                                     CurrentNode,
                                     column
@@ -653,6 +661,12 @@ namespace AM.Windows.Forms
             return base.ProcessDialogKey(keyData);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="column"></param>
+        /// <returns></returns>
         public virtual string GetInitialValue
             (
                 TreeGridNode node,
@@ -664,7 +678,7 @@ namespace AM.Windows.Forms
             if ((column != null)
                 && (node != null))
             {
-                object data = node.Data.SafeGet(column.Index - 1);
+                var data = node.Data.SafeGet(column.Index - 1);
                 if (data != null)
                 {
                     result = data.ToString();
@@ -674,6 +688,7 @@ namespace AM.Windows.Forms
             return result;
         }
 
+        /// <inheritdoc cref="Control.OnKeyDown"/>
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
@@ -708,7 +723,7 @@ namespace AM.Windows.Forms
         /// <param name="expand">if set to <c>true</c> [expand].</param>
         public void ExpandAll(bool expand)
         {
-            foreach (TreeGridNode node in Nodes)
+            foreach (var node in Nodes)
             {
                 node.ExpandAll(expand);
             }
@@ -721,7 +736,7 @@ namespace AM.Windows.Forms
         /// <param name="expand">if set to <c>true</c> [expand].</param>
         public void ExpandCurrentNode(bool expand)
         {
-            TreeGridNode currentNode = CurrentNode;
+            var currentNode = CurrentNode;
             if (currentNode == null)
             {
                 return;
@@ -730,7 +745,7 @@ namespace AM.Windows.Forms
             {
                 currentNode.Expanded = true;
                 ResetFlattenedNodes();
-                TreeGridNode first = currentNode.Nodes.FirstOrDefault();
+                var first = currentNode.Nodes.FirstOrDefault();
                 if (first != null)
                 {
                     GotoLine(first.FlatIndex);
@@ -776,16 +791,21 @@ namespace AM.Windows.Forms
         /// <returns></returns>
         public virtual TreeGridNode CreateNode()
         {
-            Type nodeType = DefaultNodeType;
-            TreeGridNode result = (TreeGridNode)
+            var nodeType = DefaultNodeType;
+            var result = (TreeGridNode)
                 Activator.CreateInstance(nodeType);
             result._SetTreeGrid(this);
             return result;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
         public TreeGridNodeState GetNodeState(TreeGridNode node)
         {
-            TreeGridNodeState result = TreeGridNodeState.Normal;
+            var result = TreeGridNodeState.Normal;
 
             if (node.FlatIndex == CurrentLine)
             {
@@ -809,7 +829,7 @@ namespace AM.Windows.Forms
         /// <returns></returns>
         public List<TreeGridNode> GetAllNodesAndSubnodes ()
         {
-            List<TreeGridNode> result = new List<TreeGridNode>(Nodes);
+            var result = new List<TreeGridNode>(Nodes);
 
             result.AddRange(Nodes.SelectMany(_=>_.GetAllSubnodes()));
 
@@ -818,6 +838,11 @@ namespace AM.Windows.Forms
 
         #endregion
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="columnIndex"></param>
+        /// <returns></returns>
         public bool EnsureColumnVisible ( int columnIndex )
         {
             if ((columnIndex < 0)
@@ -846,10 +871,16 @@ namespace AM.Windows.Forms
             return true;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="columnIndex"></param>
+        /// <param name="initialValue"></param>
+        /// <returns></returns>
         public virtual bool BeginEdit(int columnIndex, string initialValue)
         {
             EndEdit(false);
-            TreeGridNode currentNode = CurrentNode;
+            var currentNode = CurrentNode;
             if (currentNode == null)
             {
                 return false;
@@ -862,9 +893,9 @@ namespace AM.Windows.Forms
             {
                 return false;
             }
-            TreeGridColumn column = Columns[columnIndex];
-            int top = currentNode.Top;
-            Rectangle bounds = new Rectangle
+            var column = Columns[columnIndex];
+            var top = currentNode.Top;
+            var bounds = new Rectangle
                 (
                     column.Left,
                     top,
@@ -882,14 +913,17 @@ namespace AM.Windows.Forms
             return false;
         }
 
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="accept"></param>
         public virtual void EndEdit(bool accept)
         {
             if (_editor != null)
             {
                 if (accept)
                 {
-                    TreeGridNode currentNode = CurrentNode;
+                    var currentNode = CurrentNode;
                     if (currentNode != null)
                     {
                         currentNode.AcceptData(_editor,_editingColumn.Index-1);
@@ -902,30 +936,35 @@ namespace AM.Windows.Forms
             UpdateState();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public virtual TreeGridMouseEventArgs TranslateMouseClick
             (
                 MouseEventArgs args
             )
         {
-            TreeGridMouseEventArgs result
+            var result
                 = new TreeGridMouseEventArgs(args);
 
-            TreeGridNode [] nodes = VisibleNodes;
-            TreeGridNode node = nodes
-                                    .Where(_ => (args.Y >= _.Top) && (args.Y < _.Bottom))
-                                    .FirstOrDefault()
-                                    ?? nodes.LastOrDefault();
+            var nodes = VisibleNodes;
+            var node = nodes
+                           .Where(_ => (args.Y >= _.Top) && (args.Y < _.Bottom))
+                           .FirstOrDefault()
+                       ?? nodes.LastOrDefault();
 
             if (node == null)
             {
                 return null;
             }
 
-            TreeGridColumn[] columns = VisibleColumns;
-            TreeGridColumn column = columns
-                .Where(_ => (args.X >= _.Left) && (args.X < _.Right))
-                .FirstOrDefault()
-                ?? columns.LastOrDefault();
+            var columns = VisibleColumns;
+            var column = columns
+                             .Where(_ => (args.X >= _.Left) && (args.X < _.Right))
+                             .FirstOrDefault()
+                         ?? columns.LastOrDefault();
 
             if (column == null)
             {
@@ -939,6 +978,7 @@ namespace AM.Windows.Forms
             return result;
         }
 
+        /// <inheritdoc cref="Control.OnMouseClick"/>
         protected override void OnMouseClick(MouseEventArgs e)
         {
             base.OnMouseClick(e);
@@ -950,34 +990,35 @@ namespace AM.Windows.Forms
 
             EndEdit(false);
 
-            TreeGridMouseEventArgs args = TranslateMouseClick(e);
+            var args = TranslateMouseClick(e);
             if (args == null)
             {
                 return;
             }
 
             GotoLine(args.Node.FlatIndex);
-            TreeGridNode currentNode = CurrentNode;
+            var currentNode = CurrentNode;
             if (currentNode != null)
             {
                 currentNode.OnMouseClick(args);
             }
         }
 
+        /// <inheritdoc cref="Control.OnMouseDoubleClick"/>
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
             base.OnMouseDoubleClick(e);
 
             EndEdit(false);
 
-            TreeGridNode currentNode = CurrentNode;
-            TreeGridColumn column = Columns
+            var currentNode = CurrentNode;
+            var column = Columns
                 .Skip(_leftColumnIndex)
                 .Where(_ => (_._left < e.X) && (_._right > e.X))
                 .FirstOrDefault();
             if (currentNode != null)
             {
-                TreeGridMouseEventArgs mea
+                var mea
                     = new TreeGridMouseEventArgs(e)
                     {
                         TreeGrid = this,
@@ -988,15 +1029,17 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <inheritdoc cref="System.Windows.Forms.Control.OnMouseWheel"/>
         protected override void OnMouseWheel(MouseEventArgs e)
         {
             GotoLine(CurrentLine - e.Delta / 120);
         }
 
+        /// <inheritdoc cref="Control.OnMouseDown"/>
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            TreeGridColumn column = FindColumnToResize(e);
+            var column = FindColumnToResize(e);
             if (column != null)
             {
                 _sizingColumn = column;
@@ -1004,6 +1047,11 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
         protected TreeGridColumn FindColumnToResize(MouseEventArgs e)
         {
             return VisibleColumns
@@ -1012,17 +1060,17 @@ namespace AM.Windows.Forms
                 .FirstOrDefault();
         }
 
-
+        /// <inheritdoc cref="Control.OnMouseMove"/>
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (Capture && (_sizingColumn != null))
             {
-                int width = e.X - _sizingColumn._left;
+                var width = e.X - _sizingColumn._left;
                 if (width < 3)
                 {
                     width = 3;
                 }
-                int maxWidth = ClientSize.Width - _sizingColumn._left;
+                var maxWidth = ClientSize.Width - _sizingColumn._left;
                 if (width >= maxWidth)
                 {
                     width = maxWidth;
@@ -1037,7 +1085,7 @@ namespace AM.Windows.Forms
             else
             {
                 //_CalculateColumnWidths();
-                TreeGridColumn column = Columns
+                var column = Columns
                     .Skip(_leftColumnIndex)
                     .Where(_ => _.Resizeable
                                 && (Math.Abs(_._right - e.X) < 2))
@@ -1056,6 +1104,10 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         public virtual void OnDrawHeader
             (
                 TreeGridDrawColumnHeaderEventArgs args
@@ -1064,6 +1116,7 @@ namespace AM.Windows.Forms
             args.Column.OnDrawHeader(args);
         }
 
+        /// <inheritdoc cref="Control.OnMouseUp"/>
         protected override void OnMouseUp(MouseEventArgs e)
         {
             if (Capture)
@@ -1074,5 +1127,6 @@ namespace AM.Windows.Forms
             }
         }
 
-    }
-}
+    } // class TreeGrid
+
+} // namespace AM.Windows.Forms

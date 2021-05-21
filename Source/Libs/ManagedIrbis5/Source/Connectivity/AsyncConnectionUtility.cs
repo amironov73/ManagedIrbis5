@@ -102,6 +102,9 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method FormatRecordAsync
 
+        /// <summary>
+        /// Асинхронное перечисление файлов.
+        /// </summary>
         public static async Task<string[]?> ListFilesAsync
             (
                 this AsyncConnection connection,
@@ -377,6 +380,9 @@ namespace ManagedIrbis
         } // method SearchSingleRecordAsync
 
 
+        /// <summary>
+        /// Асинхронное сохранение записей.
+        /// </summary>
         public static Task<Record[]> WriteRecordsAsync
             (
                 this AsyncConnection connection,

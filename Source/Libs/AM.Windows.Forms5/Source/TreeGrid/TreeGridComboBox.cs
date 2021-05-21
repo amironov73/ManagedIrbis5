@@ -32,6 +32,9 @@ namespace AM.Windows.Forms
     {
         #region Construction
 
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public TreeGridComboBox()
         {
             _control = new ComboBox();

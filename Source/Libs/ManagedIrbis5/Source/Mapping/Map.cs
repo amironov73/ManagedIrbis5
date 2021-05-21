@@ -1006,6 +1006,9 @@ namespace ManagedIrbis.Mapping
             return result;
         } // method ToByte
 
+        /// <summary>
+        /// Преобразование в байт со знаком.
+        /// </summary>
         public static sbyte ToSByte(ReadOnlyMemory<char> value)
         {
             sbyte.TryParse
@@ -1582,6 +1585,9 @@ namespace ManagedIrbis.Mapping
 
         #region Object
 
+        /// <summary>
+        /// Преобразование из объекта произвольного типа.
+        /// </summary>
         public static void FromObject
             (
                 Field field,
@@ -1593,10 +1599,16 @@ namespace ManagedIrbis.Mapping
             mapper.ToField(field, source);
         } // method FromObject
 
+        /// <summary>
+        /// Преобразование из объекта произвольного типа.
+        /// </summary>
         public static void FromObject<T>(Field field, object source)
             where T : class
             => FromObject(field, typeof(T), source);
 
+        /// <summary>
+        /// Преобразование из объекта произвольного типа.
+        /// </summary>
         public static void FromObject
             (
                 Record record,
@@ -1617,10 +1629,16 @@ namespace ManagedIrbis.Mapping
             }
         } // method FromObject
 
+        /// <summary>
+        /// Преобразование из объекта произвольного типа.
+        /// </summary>
         public static void FromObject<T>(Record record, int tag, IEnumerable source)
             where T : class
             => FromObject(record, tag, typeof(T), source);
 
+        /// <summary>
+        /// Преобразование в объект произвольного типа.
+        /// </summary>
         public static void ToObject
             (
                 Field field,
@@ -1632,10 +1650,16 @@ namespace ManagedIrbis.Mapping
             mapper.FromField(field, target);
         } // method ToObject
 
+        /// <summary>
+        /// Преобразование в объект произвольного типа.
+        /// </summary>
         public static void ToObject<T>(Field field, object target)
             where T : class
             => ToObject(field, typeof(T), target);
 
+        /// <summary>
+        /// Преобразование в объект произвольного типа.
+        /// </summary>
         public static void ToObject
             (
                 Record record,
@@ -1651,6 +1675,9 @@ namespace ManagedIrbis.Mapping
             }
         } // method ToObject
 
+        /// <summary>
+        /// Преобразование в объект произвольного типа.
+        /// </summary>
         public static void ToObject
             (
                 Record record,
@@ -1672,6 +1699,9 @@ namespace ManagedIrbis.Mapping
             }
         } // method ToObject
 
+        /// <summary>
+        /// Преобразование в объект произвольного типа.
+        /// </summary>
         public static void ToObject<T>(Record record, int tag, IList target)
             where T : class, new()
             => ToObject(record, tag, typeof(T), target);

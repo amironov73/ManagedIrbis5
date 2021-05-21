@@ -318,19 +318,18 @@ namespace ManagedIrbis
 
         #region Object members
 
-        /// <inheritdoc cref="ArsMagnaException.ToString" />
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "ErrorCode: {2}{1}Description: {3}{1}{0}",
-                    base.ToString(),
-                    Environment.NewLine,
-                    ErrorCode,
-                    Message
-                );
-        }
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString() => string.Format
+            (
+                "ErrorCode: {2}{1}Description: {3}{1}{0}",
+                base.ToString(),
+                Environment.NewLine,
+                ErrorCode,
+                Message
+            );
 
         #endregion
-    }
-}
+
+    } // class IrbisException
+
+} // namespace ManagedIrbis

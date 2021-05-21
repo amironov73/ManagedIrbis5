@@ -30,10 +30,19 @@ namespace AM.Windows.Forms
     {
         #region Events
 
+        /// <summary>
+        ///
+        /// </summary>
         public event EventHandler<EventArgs>? Click;
 
+        /// <summary>
+        ///
+        /// </summary>
         public event EventHandler<TreeGridMouseEventArgs>? MouseClick;
 
+        /// <summary>
+        ///
+        /// </summary>
         public event EventHandler<TreeGridMouseEventArgs>? MouseDoubleClick;
 
         #endregion
@@ -48,6 +57,7 @@ namespace AM.Windows.Forms
 
         #region TreeGridColumn members
 
+        /// <inheritdoc cref="TreeGridColumn.OnDrawCell"/>
         protected internal override void OnDrawCell
             (
                 TreeGridDrawCellEventArgs args
@@ -96,6 +106,7 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <inheritdoc cref="TreeGridColumn.OnMouseClick"/>
         protected internal override void OnMouseClick
             (
                 TreeGridMouseEventArgs args
@@ -106,6 +117,7 @@ namespace AM.Windows.Forms
             MouseClick?.Invoke(this, args);
         }
 
+        /// <inheritdoc cref="TreeGridColumn.OnMouseDoubleClick"/>
         protected internal override void OnMouseDoubleClick
             (
                 TreeGridMouseEventArgs args
@@ -114,8 +126,11 @@ namespace AM.Windows.Forms
             MouseDoubleClick?.Invoke(this, args);
         }
 
+        /// <inheritdoc cref="TreeGridColumn.Editable"/>
         public override bool Editable => false;
 
         #endregion
-    }
-}
+
+    } // class TreeGridButtomColumn
+
+} // namespace AM.Windows.Forms

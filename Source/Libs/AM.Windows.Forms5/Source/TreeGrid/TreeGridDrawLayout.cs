@@ -21,10 +21,16 @@ using System.Drawing;
 
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    ///
+    /// </summary>
     public sealed class TreeGridDrawLayout
     {
         #region Construction
 
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public TreeGridDrawLayout()
         {
             Expand = Rectangle.Empty;
@@ -37,20 +43,40 @@ namespace AM.Windows.Forms
 
         #region Properties
 
+        /// <summary>
+        ///
+        /// </summary>
         public Rectangle Expand { get; set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public Rectangle Check { get; set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public Rectangle Icon { get; set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public Rectangle Text { get; set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public string? TextOverride { get; set; }
 
         #endregion
 
         #region Public methods
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         public TreeGridClickKind DetermineClickKind ( Point point )
         {
             TreeGridClickKind result = TreeGridClickKind.Unknown;

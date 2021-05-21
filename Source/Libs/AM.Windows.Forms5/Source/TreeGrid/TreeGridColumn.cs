@@ -193,6 +193,9 @@ namespace AM.Windows.Forms
         [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public int Index => _index;
 
+        /// <summary>
+        ///
+        /// </summary>
         public const int DefaultDataIndex = -1;
 
         /// <summary>
@@ -250,7 +253,10 @@ namespace AM.Windows.Forms
         internal int _index;
         internal TreeGrid? _grid;
 
-
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         protected internal virtual void OnDrawHeader
             (
                 TreeGridDrawColumnHeaderEventArgs args
@@ -284,6 +290,10 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         protected internal virtual void OnMouseClick
             (
                 TreeGridMouseEventArgs args
@@ -291,6 +301,10 @@ namespace AM.Windows.Forms
         {
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         protected internal virtual void OnMouseDoubleClick
             (
                 TreeGridMouseEventArgs args

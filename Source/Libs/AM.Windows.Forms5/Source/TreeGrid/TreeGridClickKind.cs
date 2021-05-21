@@ -12,12 +12,36 @@
 
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    ///
+    /// </summary>
     public enum TreeGridClickKind
     {
+        /// <summary>
+        ///
+        /// </summary>
         Unknown,
+
+        /// <summary>
+        ///
+        /// </summary>
         Text,
+
+        /// <summary>
+        ///
+        /// </summary>
         Expand,
+
+        /// <summary>
+        ///
+        /// </summary>
         Check,
-        Icon,
-    }
-}
+
+        /// <summary>
+        ///
+        /// </summary>
+        Icon
+
+    } // enum TreeGridClickKind
+
+} // namespace AM.Windows.Forms

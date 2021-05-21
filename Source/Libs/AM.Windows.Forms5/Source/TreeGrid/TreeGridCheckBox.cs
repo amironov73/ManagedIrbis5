@@ -27,6 +27,9 @@ namespace AM.Windows.Forms
     {
         #region Construction
 
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
         public TreeGridCheckBox()
         {
             _control = new CheckBox();

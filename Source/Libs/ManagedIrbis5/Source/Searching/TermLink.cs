@@ -232,7 +232,7 @@ namespace ManagedIrbis
             return $"[{Mfn}] {Tag}/{Occurrence} {Index}";
         }
 
-        /// <inheritdoc cref="IEquatable{T}.Equals(T?)"/>
+        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
         public bool Equals
             (
                 TermLink? other

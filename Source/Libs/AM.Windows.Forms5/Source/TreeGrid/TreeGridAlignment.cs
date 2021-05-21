@@ -12,10 +12,26 @@
 
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    ///
+    /// </summary>
     public enum TreeGridAlignment
     {
+        /// <summary>
+        ///
+        /// </summary>
         Near,
+
+        /// <summary>
+        ///
+        /// </summary>
         Center,
+
+        /// <summary>
+        ///
+        /// </summary>
         Far
-    }
-}
+
+    } // enum TreeGridAlignment
+
+} // namespace AM.Windows.Forms

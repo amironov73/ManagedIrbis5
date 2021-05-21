@@ -46,6 +46,9 @@ namespace AM.Drawing.Barcodes
         /// </summary>
         public BarcodeData? Data { get; set; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public IServiceProvider? ServiceProvider { get; set; }
 
         #endregion

@@ -92,6 +92,7 @@ namespace ManagedIrbis.Direct
         /// <param name="mode">Режим доступа.</param>
         /// <param name="strategy">Стратегия создания акцессора.</param>
         /// <param name="caching">Стратегия кеширования.</param>
+        /// <param name="locking">Стратегия блокировки базы данных.</param>
         /// <param name="provider">Провайдер сервисов.</param>
         public DirectProvider
             (
@@ -99,11 +100,13 @@ namespace ManagedIrbis.Direct
                 DirectAccessMode mode = DirectAccessMode.ReadOnly,
                 IDirectAccess64Strategy? strategy = default,
                 IContextCachingStrategy? caching = default,
+                IDirectLockingStrategy? locking = default,
                 IServiceProvider? provider = default
             )
         {
             _access = strategy ?? new TransientDirectAccess64();
             _caching = caching ?? new TransientCaching();
+            _locking = locking ?? new NullLocking();
             _provider = provider;
 
             var fullPath = Path.GetFullPath(rootPath);
@@ -125,11 +128,27 @@ namespace ManagedIrbis.Direct
 
         private readonly IDirectAccess64Strategy _access;
         private readonly IContextCachingStrategy _caching;
+        private readonly IDirectLockingStrategy _locking;
         private readonly IServiceProvider? _provider;
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Блокировка базы данных для выполнения операции (например, чтение записи).
+        /// </summary>
+        public LockMark LockUp
+            (
+                string databaseName
+            )
+        {
+            var success = _locking.LockDatabase(this, databaseName);
+            var result = new LockMark(this, _locking, databaseName, success);
+
+            return result;
+
+        } // method LockUp
 
         /// <summary>
         /// Ищет файл в папке Deposit
@@ -480,15 +499,26 @@ namespace ManagedIrbis.Direct
             Busy.SetState(busy);
         }
 
+        /// <summary>
+        /// Установка состояния подключения.
+        /// </summary>
         private void SetConnected(bool state) => Connected = state;
 
+        /// <summary>
+        /// Установка кода ошибки.
+        /// </summary>
         private void SetLastError(int code) => LastError = code;
 
+        /// <inheritdoc cref="IIrbisProvider.Database"/>
         public string? Database { get; set; } = "IBIS";
+
+        /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; private set; }
+
+        /// <inheritdoc cref="ICancellable.Busy"/>
         public BusyState Busy { get; private set; }
 
-        /// <inheritdoc cref="IIrbisProvider.LastError"/>
+        /// <inheritdoc cref="IGetLastError.LastError"/>
         public int LastError { get; set; }
 
         /// <inheritdoc cref="ICancellable.CancelOperation"/>
@@ -503,11 +533,13 @@ namespace ManagedIrbis.Direct
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>
         public bool CheckProviderState()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc cref="IIrbisProvider.GetWaitHandle"/>
         public WaitHandle GetWaitHandle()
         {
             throw new NotImplementedException();
@@ -780,6 +812,9 @@ namespace ManagedIrbis.Direct
                 ReadRecordParameters parameters
             )
         {
+            var databaseName = parameters.Database
+                ?? Database.ThrowIfNullOrEmpty(nameof(Database));
+
             // TODO: поддержка версий записи
 
             if (parameters.Mfn <= 0)
@@ -787,8 +822,12 @@ namespace ManagedIrbis.Direct
                 return default;
             }
 
-            using var accessProxy = GetAccessor(parameters.Database);
-            var result = accessProxy.Accessor.ReadRecord(parameters.Mfn);
+            // TODO: выставлять код ошибки
+            using var accessProxy = GetAccessor(databaseName);
+            using var mark = LockUp(databaseName);
+            var result = mark.Success
+                ? accessProxy.Accessor.ReadRecord(parameters.Mfn)
+                : default;
 
             return result;
         } // method ReadRecord
@@ -847,10 +886,14 @@ namespace ManagedIrbis.Direct
             throw new NotImplementedException();
         } // method ReloadDictionary
 
-        public bool ReloadMasterFile(string? databaseName = default)
+        /// <inheritdoc cref="ISyncProvider.ReloadMasterFile"/>
+        public bool ReloadMasterFile
+            (
+                string? databaseName = default
+            )
         {
             throw new NotImplementedException();
-        }
+        } // method ReloadMasterFile
 
         /// <inheritdoc cref="ISyncProvider.RestartServer"/>
         public bool RestartServer()
@@ -858,7 +901,7 @@ namespace ManagedIrbis.Direct
             Magna.Trace(nameof(DirectProvider) + "::" + nameof(RestartServer));
 
             return true;
-        }
+        } // method RestardServer
 
         /// <inheritdoc cref="ISyncProvider.Search"/>
         public FoundItem[]? Search
@@ -914,6 +957,9 @@ namespace ManagedIrbis.Direct
 
         } // method UnlockDatabase
 
+        /// <summary>
+        /// Разблокировка записей.
+        /// </summary>
         public bool UnlockRecords
             (
                 IEnumerable<int> mfnList,

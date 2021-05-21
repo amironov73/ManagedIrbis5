@@ -103,7 +103,14 @@ namespace AM.Drawing.CardPrinting
 
         #region CardItem members
 
-        public override void Draw(DrawingContext context)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="context"></param>
+        public override void Draw
+            (
+                DrawingContext context
+            )
         {
             Graphics graphics = context.Graphics.ThrowIfNull("context.Graphics");
 

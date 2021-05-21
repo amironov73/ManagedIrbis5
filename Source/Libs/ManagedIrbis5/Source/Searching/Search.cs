@@ -364,10 +364,16 @@ namespace ManagedIrbis
 
         #region Operators
 
+        /// <summary>
+        /// Неявное преобразование в строку.
+        /// </summary>
         public static implicit operator string(Search search) => search._buffer;
 
+        /// <summary>
+        /// Неявное преобразование строки в построитель запроса.
+        /// </summary>
         public static implicit operator Search(string value)
-            => new Search { _buffer = value };
+            => new () { _buffer = value };
 
         #endregion
 

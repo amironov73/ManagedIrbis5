@@ -10,19 +10,14 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-#endregion
-
 namespace AM.Windows.Forms
 {
+    /// <summary>
+    ///
+    /// </summary>
     public class TreeGridNullColumn
         : TreeGridColumn
     {
-    }
-}
+    } // class TreeGridNullColumn
+
+} // namespace AM.Windows.Forms

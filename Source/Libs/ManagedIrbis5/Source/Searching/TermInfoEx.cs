@@ -21,6 +21,7 @@ using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
+using AM.Runtime;
 
 #endregion
 
@@ -185,7 +186,7 @@ namespace ManagedIrbis.Infrastructure
 
         #region IHandmadeSerializable members
 
-        /// <inheritdoc cref="I.RestoreFromStream" />
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
         public override void RestoreFromStream
             (
                 BinaryReader reader
@@ -197,9 +198,10 @@ namespace ManagedIrbis.Infrastructure
             Occurrence = reader.ReadPackedInt32();
             Index = reader.ReadPackedInt32();
             Formatted = reader.ReadNullableString();
-        }
 
-        /// <inheritdoc cref="IVerifiable.SaveToStream" />
+        } // method RestoreFromStream
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public override void SaveToStream
             (
                 BinaryWriter writer
@@ -213,7 +215,8 @@ namespace ManagedIrbis.Infrastructure
                 .WritePackedInt32(Occurrence)
                 .WritePackedInt32(Index)
                 .WriteNullable(Formatted);
-        }
+
+        } // method SaveToStream
 
         #endregion
 
@@ -234,7 +237,8 @@ namespace ManagedIrbis.Infrastructure
                 .Assert(Occurrence > 0, "Occurrence > 0");
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 

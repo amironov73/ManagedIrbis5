@@ -25,10 +25,16 @@ namespace ManagedIrbis.Providers
     {
         #region ConnectionFactory members
 
-        /// <inheritdoc cref="ConnectionFactory.CreateSyncConnection"/>
+        /// <summary>
+        /// Создание нулевого подключения, работающего в синхронном режиме.
+        /// </summary>
         public ISyncProvider CreateSyncConnection() =>
             new NullProvider();
 
+        /// <summary>
+        /// Создание нулевого подключения, работающего в асинхронном режиме.
+        /// </summary>
+        /// <returns></returns>
         public IAsyncProvider CreateAsyncConnection() =>
             new NullProvider();
 

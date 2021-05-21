@@ -161,7 +161,7 @@ namespace ManagedIrbis
 
         #region IEquatable<T> members
 
-        /// <inheritdoc cref="IEquatable{T}.Equals(T?)" />
+        /// <inheritdoc cref="IEquatable{T}.Equals(T)" />
         public bool Equals(Term? other)
             => Text?.Equals(other?.Text) ?? false;
 

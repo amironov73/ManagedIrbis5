@@ -130,6 +130,10 @@ namespace AM.Windows.Forms
         protected virtual void OnAfterEdit () =>
             AfterEdit?.Invoke(this, EventArgs.Empty);
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         protected internal virtual void OnDrawRow
             (
                 TreeGridDrawNodeEventArgs args
@@ -159,6 +163,10 @@ namespace AM.Windows.Forms
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         protected internal virtual void OnDrawCell
             (
                 TreeGridDrawCellEventArgs args
@@ -183,6 +191,10 @@ namespace AM.Windows.Forms
             _UpdateGrid();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         protected internal virtual void OnKeyDown
             (
                 KeyEventArgs args
@@ -191,6 +203,10 @@ namespace AM.Windows.Forms
             // TODO: нужно ли тут что-нибудь делать?
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         protected internal virtual void OnMouseClick
             (
                 TreeGridMouseEventArgs args
@@ -199,6 +215,10 @@ namespace AM.Windows.Forms
             args.Column?.OnMouseClick(args);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
         protected internal virtual void OnMouseDoubleClick
             (
                 TreeGridMouseEventArgs args
@@ -207,6 +227,13 @@ namespace AM.Windows.Forms
             args.Column?.OnMouseDoubleClick(args);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="bounds"></param>
+        /// <param name="initialValue"></param>
+        /// <returns></returns>
         protected internal virtual TreeGridEditor? CreateEditor
             (
                 TreeGridColumn column,
@@ -241,6 +268,11 @@ namespace AM.Windows.Forms
             return result;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="editor"></param>
+        /// <param name="index"></param>
         protected internal virtual void AcceptData
             (
                 TreeGridEditor? editor,
@@ -254,7 +286,7 @@ namespace AM.Windows.Forms
             }
         }
 
-        void _editor_PreviewKeyDown
+        private void _editor_PreviewKeyDown
             (
                 object? sender,
                 PreviewKeyDownEventArgs e

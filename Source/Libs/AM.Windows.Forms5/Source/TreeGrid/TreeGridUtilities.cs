@@ -53,6 +53,13 @@ namespace AM.Windows.Forms
             return result;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="grid"></param>
+        /// <param name="node"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public static Brush GetForegroundBrush
             (
                 TreeGrid grid,
@@ -80,6 +87,13 @@ namespace AM.Windows.Forms
             return result;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="grid"></param>
+        /// <param name="node"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public static Brush GetBackgroundBrush
             (
                 TreeGrid grid,
@@ -99,6 +113,11 @@ namespace AM.Windows.Forms
             return result;
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="layout"></param>
         public static void DrawTreeCell
             (
                 TreeGridDrawCellEventArgs args,

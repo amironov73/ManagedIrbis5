@@ -7,10 +7,19 @@
     {
         #region Properties
 
+        /// <summary>
+        ///
+        /// </summary>
         public INode Subject { get; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public INode Predicate { get; }
 
+        /// <summary>
+        ///
+        /// </summary>
         public INode Object { get; }
 
         #endregion

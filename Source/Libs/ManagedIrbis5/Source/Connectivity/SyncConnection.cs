@@ -85,7 +85,7 @@ namespace ManagedIrbis
         /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; protected internal set; }
 
-        /// <inheritdoc cref="IIrbisProvider.LastError"/>
+        /// <inheritdoc cref="IGetLastError.LastError"/>
         public int LastError { get; private set; }
 
         /// <summary>
@@ -145,12 +145,24 @@ namespace ManagedIrbis
 
         #region Private members
 
+        /// <summary>
+        /// Логгер.
+        /// </summary>
         protected internal ILogger _logger;
 
+        /// <summary>
+        /// Провайдер сервисов.
+        /// </summary>
         protected internal readonly IServiceProvider _serviceProvider;
 
+        /// <summary>
+        /// Отмена выполняемых операций.
+        /// </summary>
         protected internal CancellationTokenSource _cancellation;
 
+        /// <summary>
+        /// Установка состояния занятости.
+        /// </summary>
         protected internal void SetBusy
             (
                 bool busy
@@ -288,6 +300,7 @@ namespace ManagedIrbis
             throw new NotImplementedException();
         } // method GetWaitHandle
 
+        /// <inheritdoc cref="IIrbisProvider.PlatformAbstraction"/>
         public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
         #endregion
@@ -378,7 +391,7 @@ namespace ManagedIrbis
             return response is not null;
         } // method ActualizeRecord
 
-        /// <inheritdoc cref="ISyncConnection.Connect"/>
+        /// <inheritdoc cref="ISyncProvider.Connect"/>
         public bool Connect()
         {
             if (Connected)

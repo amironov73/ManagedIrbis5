@@ -786,7 +786,10 @@ namespace AM
         /// Бросает исключение, если переданная строка пустая
         /// или равна <c>null</c>.
         /// </summary>
-        public static string ThrowIfNullOrEmpty(this string? value)
+        public static string ThrowIfNullOrEmpty
+            (
+                this string? value
+            )
         {
             if (string.IsNullOrEmpty(value))
             {
@@ -800,7 +803,28 @@ namespace AM
         /// Бросает исключение, если переданная строка пустая
         /// или равна <c>null</c>.
         /// </summary>
-        public static ReadOnlySpan<char> ThrowIfNullOrEmpty(this ReadOnlySpan<char> value)
+        public static string ThrowIfNullOrEmpty
+            (
+                this string? value,
+                string argumentName
+            )
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentException(argumentName);
+            }
+
+            return value!;
+        }
+
+        /// <summary>
+        /// Бросает исключение, если переданная строка пустая
+        /// или равна <c>null</c>.
+        /// </summary>
+        public static ReadOnlySpan<char> ThrowIfNullOrEmpty
+            (
+                this ReadOnlySpan<char> value
+            )
         {
             if (value.IsEmpty)
             {

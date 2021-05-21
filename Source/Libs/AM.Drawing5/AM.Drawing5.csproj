@@ -25,6 +25,18 @@
     <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>bin\Debug\AM.Drawing5.xml</DocumentationFile>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>bin\Release\AM.Drawing5.xml</DocumentationFile>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL</DefineConstants>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
