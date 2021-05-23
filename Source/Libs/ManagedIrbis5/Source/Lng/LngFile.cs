@@ -255,7 +255,7 @@ namespace ManagedIrbis.Lng
                 writer.WriteNullable(pair.Key);
                 writer.WriteNullable(pair.Value);
             }
-            writer.WriteNullable(null);
+            writer.WriteNullable((string?)null);
         }
 
         #endregion

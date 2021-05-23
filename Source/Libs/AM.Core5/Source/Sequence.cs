@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
@@ -17,6 +18,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -50,7 +52,7 @@ namespace AM
             }
 
             return defaultValue;
-        }
+        } // method FirstOr
 
         /// <summary>
         /// Первый элемент из последовательности либо значение по умолчанию.
@@ -68,7 +70,7 @@ namespace AM
             }
 
             return defaultValue;
-        }
+        } // method FirstOr
 
         /// <summary>
         /// Порождает последовательность из одного элемента.
@@ -80,7 +82,8 @@ namespace AM
             )
         {
             yield return item;
-        }
+
+        } // method FromItem
 
         /// <summary>
         /// Порождает последовательность из двух элементов.
@@ -94,7 +97,8 @@ namespace AM
         {
             yield return item1;
             yield return item2;
-        }
+
+        } // method FromItems
 
         /// <summary>
         /// Порождает последовательность из трех элементов.
@@ -110,7 +114,8 @@ namespace AM
             yield return item1;
             yield return item2;
             yield return item3;
-        }
+
+        } // method FromItems
 
         /// <summary>
         /// Порождает последовательность из перечисленных элементов.
@@ -125,7 +130,8 @@ namespace AM
             {
                 yield return item;
             }
-        }
+
+        } // method FromItems
 
         /// <summary>
         /// Вычисление максимального значения в последовательности.
@@ -137,6 +143,8 @@ namespace AM
             )
             where T: class
         {
+            // TODO: сделать без массива
+
             var array = sequence.ToArray();
             if (array.Length == 0)
             {
@@ -146,7 +154,8 @@ namespace AM
             var result = array.Max();
 
             return result;
-        }
+
+        } // method MaxOrDefault
 
         /// <summary>
         /// Вычисление максимального значения в последовательности.
@@ -158,6 +167,8 @@ namespace AM
             )
             where T: struct
         {
+            // TODO: сделать без массива
+
             var array = sequence.ToArray();
             if (array.Length == 0)
             {
@@ -167,7 +178,8 @@ namespace AM
             var result = array.Max();
 
             return result;
-        }
+
+        } // method MaxOrDefault
 
         /// <summary>
         /// Вычисление максимального значения в последовательности.
@@ -187,8 +199,10 @@ namespace AM
             }
 
             var result = array.Max(selector);
+
             return result;
-        }
+
+        } // method MaxOrDefault
 
         /// <summary>
         /// Вычисление максимального значения в последовательности.
@@ -208,8 +222,10 @@ namespace AM
             }
 
             var result = array.Max(selector);
+
             return result;
-        }
+
+        } // method MaxOrDefault
 
         /// <summary>
         /// Отбирает из последовательности только
@@ -228,7 +244,8 @@ namespace AM
                     yield return item;
                 }
             }
-        }
+
+        } // method NonNullItems
 
         /// <summary>
         /// Отбирает из последовательности только непустые строки.
@@ -245,7 +262,8 @@ namespace AM
                     yield return line;
                 }
             }
-        }
+
+        } // method NonEmptyLines
 
         /// <summary>
         /// Отбирает из последовательности только непустые строки.
@@ -262,7 +280,7 @@ namespace AM
                     yield return line;
                 }
             }
-        }
+        } // method NonEmptyLines
 
         /// <summary>
         /// Повторяет указанное значение.
@@ -278,7 +296,7 @@ namespace AM
             {
                 yield return value;
             }
-        }
+        } // method Repeat
 
         /// <summary>
         /// Repeats the specified list.
@@ -298,7 +316,7 @@ namespace AM
                     yield return value;
                 }
             }
-        }
+        } // method Repeat
 
         /// <summary>
         /// Заменяет в последовательности одно значение на другое.
@@ -322,7 +340,7 @@ namespace AM
                     yield return item;
                 }
             }
-        }
+        } // method Replace
 
         /// <summary>
         /// Добавляет некоторое действие к каждому
@@ -340,7 +358,7 @@ namespace AM
 
                 yield return item;
             }
-        }
+        } // method Tee
 
         /// <summary>
         /// Добавляет некоторое действие к каждому
@@ -360,7 +378,7 @@ namespace AM
 
                 yield return item;
             }
-        }
+        } // method Tee
 
         /// <summary>
         /// Перемежаем значения некоторым разделителем.
@@ -384,7 +402,7 @@ namespace AM
                 }
                 yield return obj;
             }
-        }
+        } // method Separate
 
         /// <summary>
         /// Нарезает последовательность на куски (массивы)
@@ -423,8 +441,22 @@ namespace AM
             {
                 yield return piece.ToArray();
             }
-        }
+        } // method Slice
+
+        /// <summary>
+        /// Get next item from the sequence.
+        /// </summary>
+        public static T? NetOrDefault<T> (this IEnumerator<T> sequence, T? defaultValue = default) =>
+            sequence.MoveNext() ? sequence.Current : defaultValue;
+
+        /// <summary>
+        /// Get next item from the sequence.
+        /// </summary>
+        public static T? NetOrDefault<T> (this IEnumerator sequence, T? defaultValue = default) =>
+            sequence.MoveNext() ? (T) sequence.Current : defaultValue;
 
         #endregion
-    }
-}
+
+    } // class Sequence
+
+} // namespace AM

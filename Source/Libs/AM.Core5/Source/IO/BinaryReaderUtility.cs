@@ -381,7 +381,31 @@ namespace AM.IO
             }
 
             return result;
-        }
+
+        } // method ReadNullableStringArray
+
+        /// <summary>
+        /// Read nullable array of strings.
+        /// </summary>
+        public static ReadOnlyMemory<char>[]? ReadNullableReadOnlyMemoryArray
+            (
+                this BinaryReader reader
+            )
+        {
+            ReadOnlyMemory<char>[]? result = null;
+            if (reader.ReadBoolean())
+            {
+                var count = reader.ReadPackedInt32();
+                result = new ReadOnlyMemory<char>[count];
+                for (var i = 0; i < count; i++)
+                {
+                    result[i] = reader.ReadOnlyMemory();
+                }
+            }
+
+            return result;
+
+        } // method ReadNullableReadOnlyMemoryArray
 
         /// <summary>
         /// Read nullable array of objects.

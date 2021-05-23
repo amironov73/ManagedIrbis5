@@ -218,7 +218,8 @@ namespace AM.IO
             }
 
             return writer;
-        }
+
+        } // method Write
 
         /// <summary>
         /// Запись строки в виде ReadOnlyMemory.
@@ -234,7 +235,8 @@ namespace AM.IO
             writer.Write(memory.Span);
 
             return writer;
-        }
+
+        } // method Write
 
         /// <summary>
         /// Write array of bytes.
@@ -249,7 +251,8 @@ namespace AM.IO
             writer.Write(array);
 
             return writer;
-        }
+
+        } // method Write
 
         /// <summary>
         /// Write array of 16-bit integers.
@@ -438,6 +441,32 @@ namespace AM.IO
             (
                 this BinaryWriter writer,
                 string[]? array
+            )
+        {
+            if (ReferenceEquals(array, null))
+            {
+                writer.Write(false);
+            }
+            else
+            {
+                writer.Write(true);
+                writer.WritePackedInt32(array.Length);
+                for (var i = 0; i < array.Length; i++)
+                {
+                    writer.Write(array[i]);
+                }
+            }
+
+            return writer;
+        }
+
+        /// <summary>
+        /// Write array of objects.
+        /// </summary>
+        public static BinaryWriter WriteNullable
+            (
+                this BinaryWriter writer,
+                ReadOnlyMemory<char>[]? array
             )
         {
             if (ReferenceEquals(array, null))
