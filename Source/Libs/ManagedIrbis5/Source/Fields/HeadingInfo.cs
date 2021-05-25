@@ -1,0 +1,386 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable CommentTypo
+// ReSharper disable ConvertClosureToMethodGroup
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
+// ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedParameter.Local
+
+/* HeadingInfo.cs -- предметная рубрика
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+
+using AM;
+using AM.IO;
+using AM.Runtime;
+
+using ManagedIrbis.Mapping;
+
+#endregion
+
+#nullable enable
+
+namespace ManagedIrbis.Fields
+{
+    /// <summary>
+    /// Предметная рубрика, поле 606.
+    /// </summary>
+    [XmlRoot("heading")]
+    public sealed class HeadingInfo
+        : IHandmadeSerializable,
+        IVerifiable
+    {
+        #region Constants
+
+        /// <summary>
+        /// Tag.
+        /// </summary>
+        public const int Tag = 606;
+
+        /// <summary>
+        /// Known subfield codes.
+        /// </summary>
+        public const string KnownCodes = "abcdegho9";
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Предметный заголовок. Подполе a.
+        /// </summary>
+        [SubField('a')]
+        [XmlElement("title")]
+        [JsonPropertyName("title")]
+        [Description("Предметный заголовок")]
+        [DisplayName("Предметный заголовок")]
+        public string? Title { get; set; }
+
+        /// <summary>
+        /// Первый подзаголовок. Подполе b.
+        /// </summary>
+        [SubField('b')]
+        [XmlElement("subtitle1")]
+        [JsonPropertyName("subtitle1")]
+        [Description("Первый подзаголовок")]
+        [DisplayName("Первый подзаголовок")]
+        public string? Subtitle1 { get; set; }
+
+        /// <summary>
+        /// Второй подзаголовок. Подполе c.
+        /// </summary>
+        [SubField('c')]
+        [XmlElement("subtitle2")]
+        [JsonPropertyName("subtitle2")]
+        [Description("Второй подзаголовок")]
+        [DisplayName("Второй подзаголовок")]
+        public string? Subtitle2 { get; set; }
+
+        /// <summary>
+        /// Третий подзаголовок. Подполе d.
+        /// </summary>
+        [SubField('d')]
+        [XmlElement("subtitle3")]
+        [JsonPropertyName("subtitle3")]
+        [Description("Третий подзаголовок")]
+        [DisplayName("Третий подзаголовок")]
+        public string? Subtitle3 { get; set; }
+
+        /// <summary>
+        /// Географический подзаголовок. Подполе g.
+        /// </summary>
+        [SubField('g')]
+        [XmlElement("geoSubtitle1")]
+        [JsonPropertyName("geoSubtitle1")]
+        [Description("Первый географический подзаголовок")]
+        [DisplayName("Первый географический подзаголовок")]
+        public string? GeographicalSubtitle1 { get; set; }
+
+        /// <summary>
+        /// Географический подзаголовок. Подполе e.
+        /// </summary>
+        [SubField('e')]
+        [XmlElement("geoSubtitle2")]
+        [JsonPropertyName("geoSubtitle2")]
+        [Description("Второй географический подзаголовок")]
+        [DisplayName("Второй географический подзаголовок")]
+        public string? GeographicalSubtitle2 { get; set; }
+
+        /// <summary>
+        /// Географический подзаголовок. Подполе o.
+        /// </summary>
+        [SubField('o')]
+        [XmlElement("geoSubtitle3")]
+        [JsonPropertyName("geoSubtitle3")]
+        [Description("Третий географический подзаголовок")]
+        [DisplayName("Третий географический подзаголовок")]
+        public string? GeographicalSubtitle3 { get; set; }
+
+        /// <summary>
+        /// Хронологический подзаголовок. Подполе h.
+        /// </summary>
+        [SubField('h')]
+        [XmlElement("chronoSubtitle")]
+        [JsonPropertyName("chronoSubtitle")]
+        [Description("Хронологический подзаголовок")]
+        [DisplayName("Хронологический подзаголовок")]
+        public string? ChronologicalSubtitle { get; set; }
+
+        /// <summary>
+        /// Формальный подзаголовок (аспект). Подполе 9.
+        /// </summary>
+        [SubField('9')]
+        [XmlElement("aspect")]
+        [JsonPropertyName("aspect")]
+        [Description("Формальный подзаголовок (аспект)")]
+        [DisplayName("Формальный подзаголовок (аспект)")]
+        public string? Aspect { get; set; }
+
+        /// <summary>
+        /// Unknown subfields.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable(false)]
+        public SubField[]? UnknownSubFields { get; set; }
+
+        /// <summary>
+        /// Associated field.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable(false)]
+        public Field? Field { get; set; }
+
+        /// <summary>
+        /// Arbitrary user data.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable(false)]
+        public object? UserData { get; set; }
+
+        #endregion
+
+        #region Construction
+
+        #endregion
+
+        #region Private members
+
+        private void _AppendSubTitle
+            (
+                StringBuilder builder,
+                string? subtitle
+            )
+        {
+            if (!string.IsNullOrEmpty(subtitle))
+            {
+                builder.AppendFormat(" -- {0}", subtitle);
+            }
+        }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Apply the <see cref="HeadingInfo"/>
+        /// to the <see cref="Field"/>.
+        /// </summary>
+        public void ApplyToField
+            (
+                Field field
+            )
+        {
+            field
+                .ApplySubField('a', Title)
+                .ApplySubField('b', Subtitle1)
+                .ApplySubField('c', Subtitle2)
+                .ApplySubField('d', Subtitle3)
+                .ApplySubField('g', GeographicalSubtitle1)
+                .ApplySubField('e', GeographicalSubtitle2)
+                .ApplySubField('o', GeographicalSubtitle3)
+                .ApplySubField('h', ChronologicalSubtitle)
+                .ApplySubField('9', Aspect);
+        }
+
+        /// <summary>
+        /// Parse the field.
+        /// </summary>
+        public static HeadingInfo ParseField
+            (
+                Field field
+            )
+        {
+            var result = new HeadingInfo
+            {
+                Title = field.GetFirstSubFieldValue('a').ToString(),
+                Subtitle1 = field.GetFirstSubFieldValue('b').ToString(),
+                Subtitle2 = field.GetFirstSubFieldValue('c').ToString(),
+                Subtitle3 = field.GetFirstSubFieldValue('d').ToString(),
+                GeographicalSubtitle1 = field.GetFirstSubFieldValue('g').ToString(),
+                GeographicalSubtitle2 = field.GetFirstSubFieldValue('e').ToString(),
+                GeographicalSubtitle3 = field.GetFirstSubFieldValue('o').ToString(),
+                ChronologicalSubtitle = field.GetFirstSubFieldValue('h').ToString(),
+                Aspect = field.GetFirstSubFieldValue('9').ToString(),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
+                Field = field
+            };
+
+            return result;
+        }
+
+        /// <summary>
+        /// Parse the <see cref="Record"/>.
+        /// </summary>
+        public static HeadingInfo[] ParseRecord
+            (
+                Record record
+            )
+        {
+            var result = new List<HeadingInfo>();
+            foreach (var field in record.Fields)
+            {
+                if (field.Tag == Tag)
+                {
+                    var heading = ParseField(field);
+                    result.Add(heading);
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Convert <see cref="HeadingInfo"/>
+        /// to <see cref="Field"/>.
+        /// </summary>
+        public Field ToField()
+        {
+            var result = new Field(Tag)
+                .AddNonEmptySubField('a', Title)
+                .AddNonEmptySubField('b', Subtitle1)
+                .AddNonEmptySubField('c', Subtitle2)
+                .AddNonEmptySubField('d', Subtitle3)
+                .AddNonEmptySubField('g', GeographicalSubtitle1)
+                .AddNonEmptySubField('e', GeographicalSubtitle2)
+                .AddNonEmptySubField('o', GeographicalSubtitle3)
+                .AddNonEmptySubField('h', ChronologicalSubtitle)
+                .AddNonEmptySubField('9', Aspect)
+                .AddSubFields(UnknownSubFields);
+
+            return result;
+        }
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Title = reader.ReadNullableString();
+            Subtitle1 = reader.ReadNullableString();
+            Subtitle2 = reader.ReadNullableString();
+            Subtitle3 = reader.ReadNullableString();
+            GeographicalSubtitle1 = reader.ReadNullableString();
+            GeographicalSubtitle2 = reader.ReadNullableString();
+            GeographicalSubtitle3 = reader.ReadNullableString();
+            ChronologicalSubtitle = reader.ReadNullableString();
+            Aspect = reader.ReadNullableString();
+            UnknownSubFields = reader.ReadNullableArray<SubField>();
+
+        } // method RestoreFromStream
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            writer
+                .WriteNullable(Title)
+                .WriteNullable(Subtitle1)
+                .WriteNullable(Subtitle2)
+                .WriteNullable(Subtitle3)
+                .WriteNullable(GeographicalSubtitle1)
+                .WriteNullable(GeographicalSubtitle2)
+                .WriteNullable(GeographicalSubtitle3)
+                .WriteNullable(ChronologicalSubtitle)
+                .WriteNullable(Aspect)
+                .WriteNullableArray(UnknownSubFields);
+
+        } // method SaveToStream
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify" />
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier
+                = new Verifier<HeadingInfo>(this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty(Title, nameof(Title));
+
+            return verifier.Result;
+
+        } // method Verify
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(Title))
+            {
+                return Title.ToVisibleString();
+            }
+
+            var result = new StringBuilder();
+            result.Append(Title);
+            _AppendSubTitle(result, Subtitle1);
+            _AppendSubTitle(result, Subtitle2);
+            _AppendSubTitle(result, Subtitle3);
+            _AppendSubTitle(result, GeographicalSubtitle1);
+            _AppendSubTitle(result, GeographicalSubtitle2);
+            _AppendSubTitle(result, GeographicalSubtitle3);
+            _AppendSubTitle(result, ChronologicalSubtitle);
+            _AppendSubTitle(result, Aspect);
+
+            return result.ToString();
+
+        } // method ToString
+
+        #endregion
+
+    } // class HeadingInfo
+
+} // namespace ManagedIrbis.Fields
+
