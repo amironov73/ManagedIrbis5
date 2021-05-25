@@ -353,7 +353,7 @@ namespace ManagedIrbis
                     targetField = new Field { Tag = tag };
                     fields.Add(targetField);
                 }
-                targetField.Decode(value);
+                targetField.DecodeBody(value);
             }
 
             return fields;

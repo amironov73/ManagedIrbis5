@@ -16,6 +16,7 @@
 
 #region Using directives
 
+using System;
 using System.IO;
 
 using ManagedIrbis.Infrastructure;
@@ -75,6 +76,18 @@ namespace ManagedIrbis.Providers
             return ParFile.ParseText(reader);
 
         } // method ReadMenuFile
+
+        /// <summary>
+        /// Поиск с последующим чтением одной записи.
+        /// </summary>
+        public static Record? SearchReadOneRecord
+            (
+                this ISyncProvider provider,
+                string expression
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 
