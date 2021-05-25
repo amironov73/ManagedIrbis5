@@ -6,6 +6,7 @@ using System.IO;
 
 using ManagedIrbis;
 using ManagedIrbis.Fst;
+using ManagedIrbis.Providers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

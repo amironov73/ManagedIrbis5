@@ -24,6 +24,7 @@ using AM.Text;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Ast;
+using ManagedIrbis.Providers;
 
 #endregion
 

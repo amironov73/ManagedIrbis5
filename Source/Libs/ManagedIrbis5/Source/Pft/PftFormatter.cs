@@ -21,6 +21,7 @@ using System.Diagnostics;
 using AM;
 
 using ManagedIrbis.Pft.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 

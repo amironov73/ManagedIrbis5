@@ -7,15 +7,18 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* Unifor7.cs --
+/* Unifor7.cs -- расформатирование группы связанных документов из другой БД
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+
 using AM;
 using AM.Text;
+
+using ManagedIrbis.Providers;
 
 #endregion
 

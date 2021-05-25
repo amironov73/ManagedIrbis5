@@ -15,7 +15,7 @@
 
 #region Using directives
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Providers;
 
 #endregion
 

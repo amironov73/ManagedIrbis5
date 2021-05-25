@@ -23,6 +23,7 @@ using AM;
 using AM.Text;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
