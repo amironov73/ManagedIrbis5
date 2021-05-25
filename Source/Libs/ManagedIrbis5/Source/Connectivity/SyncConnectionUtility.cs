@@ -19,8 +19,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-
+using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -141,24 +142,6 @@ namespace ManagedIrbis
         } // method FormatRecord
 
         /// <summary>
-        /// Чтение записи с сервера.
-        /// </summary>
-        public static Record? ReadRecord
-            (
-                this ISyncProvider connection,
-                int mfn
-            )
-        {
-            var parameters = new ReadRecordParameters
-            {
-                Database = connection.Database,
-                Mfn = mfn
-            };
-
-            return connection.ReadRecord(parameters);
-        } // method ReadRecord
-
-        /// <summary>
         /// Чтение терминов словаря.
         /// </summary>
         /// <param name="connection">Подключение.</param>
@@ -245,7 +228,7 @@ namespace ManagedIrbis
         /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
         public static int SearchCount
             (
-                this SyncConnection connection,
+                this ISyncConnection connection,
                 string expression
             )
         {
@@ -270,7 +253,34 @@ namespace ManagedIrbis
             }
 
             return response.ReadInteger();
+
         } // method SearchCount
+
+        /// <summary>
+        /// Поиск с последующим чтением записей.
+        /// </summary>
+        public static Record[] SearchRead
+            (
+                this ISyncConnection connection,
+                string expression
+            )
+        {
+            // TODO: сделать оптимально
+
+            var found = connection.Search(expression);
+            var result = new List<Record>(found.Length);
+            foreach (var mfn in found)
+            {
+                var record = connection.ReadRecord(mfn);
+                if (record is not null)
+                {
+                    result.Add(record);
+                }
+            }
+
+            return result.ToArray();
+
+        } // method SearchRead
 
         /// <summary>
         /// Сохранение/обновление записи в базе данных.

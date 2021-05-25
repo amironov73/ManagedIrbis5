@@ -8,8 +8,8 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
-using ManagedIrbis.Client;
 using ManagedIrbis.Flc;
+using ManagedIrbis.Providers;
 
 using Moq;
 

@@ -17,7 +17,7 @@
 #region Using directives
 
 using System.IO;
-
+using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
@@ -35,6 +35,27 @@ namespace ManagedIrbis.Providers
         #region Public methods
 
         /// <summary>
+        /// Чтение FST-файла как текстового.
+        /// </summary>
+        public static FstFile? ReadFstFile
+            (
+                this ISyncProvider connection,
+                FileSpecification specification
+            )
+        {
+            var content = connection.ReadTextFile(specification);
+            if (content is null)
+            {
+                return default;
+            }
+
+            using var reader = new StringReader(content);
+
+            return FstFile.ParseStream(reader);
+
+        } // method ReadFstFile
+
+        /// <summary>
         /// Чтение меню как текстового файла.
         /// </summary>
         public static MenuFile? ReadMenuFile
@@ -43,13 +64,13 @@ namespace ManagedIrbis.Providers
                 FileSpecification specification
             )
         {
-            var text = provider.ReadTextFile(specification);
-            if (text is null)
+            var content = provider.ReadTextFile(specification);
+            if (content is null)
             {
                 return default;
             }
 
-            using var reader = new StringReader(text);
+            using var reader = new StringReader(content);
 
             return MenuFile.ParseStream(reader);
 
@@ -74,7 +95,26 @@ namespace ManagedIrbis.Providers
 
             return ParFile.ParseText(reader);
 
-        } // method ReadMenuFile
+        } // method ReadParFile
+
+        /// <summary>
+        /// Чтение записи с сервера.
+        /// </summary>
+        public static Record? ReadRecord
+            (
+                this ISyncProvider connection,
+                int mfn
+            )
+        {
+            var parameters = new ReadRecordParameters
+            {
+                Database = connection.Database,
+                Mfn = mfn
+            };
+
+            return connection.ReadRecord(parameters);
+
+        } // method ReadRecord
 
         #endregion
 

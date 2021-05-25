@@ -18,6 +18,7 @@
 using AM.IO;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 

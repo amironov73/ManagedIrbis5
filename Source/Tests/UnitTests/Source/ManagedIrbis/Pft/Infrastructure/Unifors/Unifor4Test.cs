@@ -5,8 +5,8 @@
 
 using AM.Text;
 
-using ManagedIrbis;
 using ManagedIrbis.Pft.Infrastructure;
+using ManagedIrbis.Providers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

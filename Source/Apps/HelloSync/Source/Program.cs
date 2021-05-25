@@ -20,6 +20,7 @@ using System;
 
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 using static System.Console;
 

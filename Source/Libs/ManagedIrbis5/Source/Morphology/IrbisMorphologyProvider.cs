@@ -19,7 +19,7 @@ using System.Linq;
 
 using AM;
 
-using ManagedIrbis.Client;
+using ManagedIrbis.Providers;
 using ManagedIrbis.Infrastructure;
 
 #endregion

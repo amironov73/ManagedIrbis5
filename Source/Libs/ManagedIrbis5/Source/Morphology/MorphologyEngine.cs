@@ -19,6 +19,8 @@ using System.Collections.Generic;
 
 using AM;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable

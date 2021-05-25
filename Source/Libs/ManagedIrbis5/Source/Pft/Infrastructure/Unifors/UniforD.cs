@@ -14,8 +14,11 @@
 #region Using directives
 
 using System;
+
 using AM;
 using AM.Text;
+
+using ManagedIrbis.Providers;
 
 #endregion
 

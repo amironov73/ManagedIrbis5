@@ -5,6 +5,7 @@
 using ManagedIrbis;
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

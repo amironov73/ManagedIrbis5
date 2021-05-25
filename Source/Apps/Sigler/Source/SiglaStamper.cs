@@ -26,7 +26,9 @@ using System.Text;
 
 using AM;
 using AM.Text.Output;
+
 using ManagedIrbis;
+using ManagedIrbis.Providers;
 
 #endregion
 
