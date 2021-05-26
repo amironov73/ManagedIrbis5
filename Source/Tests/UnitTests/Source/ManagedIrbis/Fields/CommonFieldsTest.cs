@@ -1,10 +1,10 @@
-﻿using ManagedIrbis;
-
-// ReSharper disable CheckNamespace
+﻿// ReSharper disable CheckNamespace
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable IdentifierTypo
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable StringLiteralTypo
+
+using ManagedIrbis;
 
 #nullable enable
 

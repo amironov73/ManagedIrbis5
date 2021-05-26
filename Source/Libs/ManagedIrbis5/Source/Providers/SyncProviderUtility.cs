@@ -16,6 +16,7 @@
 
 #region Using directives
 
+using System;
 using System.IO;
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
@@ -115,6 +116,18 @@ namespace ManagedIrbis.Providers
             return connection.ReadRecord(parameters);
 
         } // method ReadRecord
+
+        /// <summary>
+        /// Поиск с последующим чтением одной записи.
+        /// </summary>
+        public static Record? SearchReadOneRecord
+            (
+                this ISyncProvider provider,
+                string expression
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 

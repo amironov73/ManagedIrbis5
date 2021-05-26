@@ -27,6 +27,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 using AM;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -54,6 +55,79 @@ namespace ManagedIrbis
             if (!string.IsNullOrEmpty(value))
             {
                 field.Add(code, value);
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Добавление подполя.
+        /// </summary>
+        public static Field AddNonEmptySubField
+            (
+                this Field field,
+                char code,
+                bool flag,
+                string? value
+            )
+        {
+            if (flag && !string.IsNullOrEmpty(value))
+            {
+                field.Add(code, value);
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Добавление подполя.
+        /// </summary>
+        public static Field AddNonEmptySubField
+            (
+                this Field field,
+                char code,
+                int? value
+            )
+        {
+            if (value.HasValue)
+            {
+                field.Add(code, value.Value);
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Добавление подполя.
+        /// </summary>
+        public static Field AddNonEmptySubField
+            (
+                this Field field,
+                char code,
+                long? value
+            )
+        {
+            if (value.HasValue)
+            {
+                field.Add(code, value.Value);
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Добавление подполя.
+        /// </summary>
+        public static Field AddNonEmptySubField
+            (
+                this Field field,
+                char code,
+                DateTime? value
+            )
+        {
+            if (value.HasValue)
+            {
+                field.Add(code, IrbisDate.ConvertDateToString(value.Value));
             }
 
             return field;
