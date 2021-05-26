@@ -112,8 +112,8 @@ namespace ManagedIrbis.Fields
 
             var result = new AthraWorkPlace
             {
-                WorksHere = field.GetFirstSubFieldValue('y').ToString(),
-                WorkPlace = field.GetFirstSubFieldValue('p').ToString(),
+                WorksHere = field.GetFirstSubFieldValue('y'),
+                WorkPlace = field.GetFirstSubFieldValue('p'),
                 Field = field
             };
 

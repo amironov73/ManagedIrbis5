@@ -18,7 +18,8 @@ using System;
 using System.IO;
 using System.Linq;
 
-using ManagedIrbis.Client;
+using AM;
+
 using ManagedIrbis.Direct;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
@@ -150,17 +151,15 @@ namespace ManagedIrbis.Fst
 
                     var field = FieldUtility.Parse(tag.AsMemory(), body.AsMemory());
 
-                    var badSubFields
-                        = field.Subfields
-                        .Where(sf => sf.Value.IsEmpty)
+                    var badSubFields= field.Subfields
+                        .Where(sf => sf.Value.IsEmpty())
                         .ToArray();
                     foreach (var subField in badSubFields)
                     {
                         field.Subfields.Remove(subField);
                     }
 
-                    if (!field.Value.IsEmpty
-                        || field.Subfields.Count != 0)
+                    if (field.Subfields.Count != 0)
                     {
                         result.Fields.Add(field);
                     }

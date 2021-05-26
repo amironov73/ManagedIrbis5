@@ -255,13 +255,13 @@ namespace ManagedIrbis.Fields
 
             var result = new TitleInfo
             {
-                VolumeNumber = field.GetFirstSubFieldValue('v').ToString(),
-                Title = field.GetFirstSubFieldValue('a').ToString(),
-                Specific = field.GetFirstSubFieldValue('u').ToString(),
-                General = field.GetFirstSubFieldValue('b').ToString(),
-                Subtitle = field.GetFirstSubFieldValue('e').ToString(),
-                FirstResponsibility = field.GetFirstSubFieldValue('f').ToString(),
-                OtherResponsibility = field.GetFirstSubFieldValue('g').ToString(),
+                VolumeNumber = field.GetFirstSubFieldValue('v'),
+                Title = field.GetFirstSubFieldValue('a'),
+                Specific = field.GetFirstSubFieldValue('u'),
+                General = field.GetFirstSubFieldValue('b'),
+                Subtitle = field.GetFirstSubFieldValue('e'),
+                FirstResponsibility = field.GetFirstSubFieldValue('f'),
+                OtherResponsibility = field.GetFirstSubFieldValue('g'),
                 Field = field
             };
 
@@ -281,9 +281,9 @@ namespace ManagedIrbis.Fields
 
             var result = new TitleInfo
             {
-                Title = field.GetFirstSubFieldValue('c').ToString(),
-                Subtitle = field.GetFirstSubFieldValue('e').ToString(),
-                FirstResponsibility = field.GetFirstSubFieldValue('g').ToString(),
+                Title = field.GetFirstSubFieldValue('c'),
+                Subtitle = field.GetFirstSubFieldValue('e'),
+                FirstResponsibility = field.GetFirstSubFieldValue('g'),
                 Field = field
             };
 

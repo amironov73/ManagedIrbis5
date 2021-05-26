@@ -13,7 +13,6 @@
 
 #region Using directives
 
-using System;
 using System.Linq;
 
 using AM;
@@ -103,22 +102,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 Field field
             )
         {
-            field.SetSubFieldValue('a', "0".AsMemory());
+            field.SetSubFieldValue('a', "0");
             var specification = field.GetFirstSubFieldValue('B');
-            if (specification.IsEmpty)
+            if (specification.IsEmpty())
             {
                 return;
             }
-            var navigator = new TextNavigator(specification);
+
+            var navigator = new TextNavigator(specification!);
             var countText = navigator.ReadUntil('/').ToString();
             if (string.IsNullOrEmpty(countText))
             {
                 navigator.ReadChar();
-                field.SetSubFieldValue('b', navigator.GetRemainingText());
+                field.SetSubFieldValue('b', navigator.GetRemainingText().EmptyToNull());
                 return;
             }
-            var count = countText.SafeToInt32();
 
+            var count = countText.SafeToInt32();
             if (count <= 0)
             {
                 record.Fields.Remove(field);
@@ -135,12 +135,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 inventoryText = "1";
             }
-            NumberText inventory = inventoryText;
 
+            NumberText inventory = inventoryText;
             var barcodeText = field.GetFirstSubFieldValue('H');
-            var barcode = barcodeText.IsEmpty
+            var barcode = barcodeText.IsEmpty()
                 ? null
-                : new NumberText(barcodeText.ToString());
+                : new NumberText(barcodeText);
 
             var first = true;
             while (count > 0)
@@ -152,10 +152,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     record.Fields.Add(current);
                 }
 
-                current.SetSubFieldValue('b', inventory.ToString().AsMemory());
+                current.SetSubFieldValue('b', inventory.ToString());
                 if (!ReferenceEquals(barcode, null))
                 {
-                    current.SetSubFieldValue('h', barcode.ToString().AsMemory());
+                    current.SetSubFieldValue('h', barcode.ToString());
                     barcode = barcode.Increment();
                 }
 

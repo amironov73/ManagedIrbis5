@@ -72,8 +72,8 @@ namespace ManagedIrbis.Systematization
         {
             var result = new BbkReference
             {
-                Condition = field.GetFirstSubFieldValue('a').ToString(),
-                Content = field.GetFirstSubFieldValue('b').ToString()
+                Condition = field.GetFirstSubFieldValue('a'),
+                Content = field.GetFirstSubFieldValue('b')
             };
 
             return result;

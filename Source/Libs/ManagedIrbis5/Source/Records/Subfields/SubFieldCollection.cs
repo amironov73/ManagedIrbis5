@@ -47,8 +47,7 @@ namespace ManagedIrbis
     public sealed class SubFieldCollection
         : Collection<SubField>,
         IHandmadeSerializable,
-        IReadOnly<SubFieldCollection>,
-        IDisposable
+        IReadOnly<SubFieldCollection>
     {
         #region Properties
 
@@ -237,18 +236,6 @@ namespace ManagedIrbis
 
         */
 
-        /// <summary>
-        /// Получение коллекции из пула.
-        /// </summary>
-        /// <returns>Объект из пула.</returns>
-        public static SubFieldCollection FromPool()
-            => SubFieldCollectionPool.Default.Get();
-
-        /// <summary>
-        /// Возврат коллекции в пул.
-        /// </summary>
-        public void ToPool() => SubFieldCollectionPool.Default.Return(this);
-
         #endregion
 
         #region Collection<T> members
@@ -299,7 +286,7 @@ namespace ManagedIrbis
 
             if (index >= 0 && index < Count)
             {
-                SubField subField = this[index];
+                SubField? subField = this[index];
                 if (subField != null)
                 {
                     subField.Field = null;
@@ -401,27 +388,6 @@ namespace ManagedIrbis
             {
                 subField.SetReadOnly();
             }
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <summary>
-        /// Очистка коллекции перед помещением ее в пул.
-        /// </summary>
-        /// <remarks>
-        /// <para>Начиная с ManagedIrbis5, коллекция подполей
-        /// поддерживает пулинг, см. класс
-        /// <see cref="SubFieldCollectionPool"/>.</para>
-        /// <para>Очистка перед помещением в пул выполняется с помощью
-        /// вызова <see cref="Dispose"/>.</para>
-        /// <para>При обычном использовании вызывать метод
-        /// <see cref="Dispose"/> не нужно.</para>
-        /// </remarks>
-        public void Dispose()
-        {
-            ClearItems();
         }
 
         #endregion

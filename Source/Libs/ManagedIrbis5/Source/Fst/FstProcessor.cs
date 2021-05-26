@@ -682,9 +682,8 @@ namespace ManagedIrbis.Fst
                     }
                     var field = FieldUtility.Parse(tag.AsMemory(), body.AsMemory());
 
-                    var badSubFields
-                        = field.Subfields
-                        .Where(sf => sf.Value.IsEmpty)
+                    var badSubFields = field.Subfields
+                        .Where(sf => sf.Value.IsEmpty())
                         .ToArray();
                     foreach (var subField in badSubFields)
                     {

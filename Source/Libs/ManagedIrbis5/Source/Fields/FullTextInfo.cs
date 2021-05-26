@@ -207,10 +207,10 @@ namespace ManagedIrbis.Fields
         {
             FullTextInfo result = new FullTextInfo
             {
-                DisplayText = field.GetFirstSubFieldValue('t').ToString(),
-                FileName = field.GetFirstSubFieldValue('a').ToString(),
+                DisplayText = field.GetFirstSubFieldValue('t'),
+                FileName = field.GetFirstSubFieldValue('a'),
                 PageCount = Map.ToInt32(field, 'n'),
-                AccessRights = field.GetFirstSubFieldValue('b').ToString(),
+                AccessRights = field.GetFirstSubFieldValue('b'),
                 Field = field
             };
 

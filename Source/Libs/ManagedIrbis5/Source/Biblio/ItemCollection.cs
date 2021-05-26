@@ -13,18 +13,11 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 using AM.Text;
 
 #endregion
@@ -104,9 +97,9 @@ namespace ManagedIrbis.Biblio
                 record.FM(900, '6')
             };
 
-            return character.Contains("n".AsMemory())
-                   || character.Contains("N".AsMemory())
-                   || character.Contains("67".AsMemory());
+            return character.Contains("n")
+                   || character.Contains("N")
+                   || character.Contains("67");
         }
 
         private static bool _IsForeign
@@ -118,9 +111,9 @@ namespace ManagedIrbis.Biblio
             // Если язык не указан, считаем, что rus
 
             var language = record.FM(101);
-            if (language.IsEmpty)
+            if (language.IsEmpty())
             {
-                language = "rus".AsMemory();
+                language = "rus";
             }
 
             return !language.SameString("rus");

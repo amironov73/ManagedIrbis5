@@ -15,7 +15,6 @@
 
 #region Using directives
 
-using System;
 using AM;
 
 #endregion
@@ -40,7 +39,7 @@ namespace ManagedIrbis.Quality.Rules
             MustNotContainSubfields(field);
 
             var text = field.Value;
-            if (text.Span.Contains('.'))
+            if (text.SafeContains('.'))
             {
                 AddDefect
                     (
@@ -56,10 +55,7 @@ namespace ManagedIrbis.Quality.Rules
         #region QualityRule members
 
         /// <inheritdoc cref="QualityRule.FieldSpec" />
-        public override string FieldSpec
-        {
-            get { return "610"; }
-        }
+        public override string FieldSpec => "610";
 
         /// <inheritdoc cref="QualityRule.CheckRecord" />
         public override RuleReport CheckRecord

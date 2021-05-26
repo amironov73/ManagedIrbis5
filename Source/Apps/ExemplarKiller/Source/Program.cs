@@ -159,7 +159,7 @@ namespace ExemplarKiller
                 Console.Write(" <written off>");
                 connection.WriteRecord(bookRecord);
 
-                var barcode = found.GetFirstSubFieldValue('h').ToString();
+                var barcode = found.GetFirstSubFieldValue('h');
                 var searcher = new BatchSearcher
                     (
                         connection,

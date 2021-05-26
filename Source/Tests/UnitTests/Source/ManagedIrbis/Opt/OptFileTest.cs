@@ -138,7 +138,7 @@ namespace UnitTests.ManagedIrbis
             opt.SetWorksheetTag(920);
             var record = _GetRecord();
             const string expected = "PAZK";
-            var actual = opt.GetWorksheet(record).ToString();
+            var actual = opt.GetWorksheet(record);
             Assert.AreEqual(expected, actual);
         }
 

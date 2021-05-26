@@ -55,8 +55,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromBoolean(bool value) =>
-            value ? "1".AsMemory() : default;
+        public static string? FromBoolean(bool value) =>
+            value ? "1" : default;
 
         /// <summary>
         /// Преобразование в строку.
@@ -147,8 +147,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromByte(byte value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string? FromByte(byte value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -244,8 +244,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromChar(char value) =>
-            new string(value, 1).AsMemory();
+        public static string FromChar(char value) =>
+            new string(value, 1);
 
         /// <summary>
         /// Преобразование в строку.
@@ -329,8 +329,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromDateTime(DateTime value)
-            => IrbisDate.ConvertDateToString(value).AsMemory();
+        public static string FromDateTime(DateTime value)
+            => IrbisDate.ConvertDateToString(value);
 
         /// <summary>
         /// Преобразование в строку.
@@ -423,8 +423,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromDecimal(decimal value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromDecimal(decimal value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -538,8 +538,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromDouble(double value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromDouble(double value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -654,8 +654,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromInt16(short value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromInt16(short value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -770,8 +770,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromInt32(int value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromInt32(int value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -864,8 +864,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromInt64(long value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromInt64(long value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -958,8 +958,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromSByte(sbyte value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromSByte(sbyte value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -1055,8 +1055,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromSingle(float value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string? FromSingle(float value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -1170,7 +1170,7 @@ namespace ManagedIrbis.Mapping
         /// Преобразование в строку.
         /// </summary>
         public static void FromString(SubField subfield, string? value)
-            => subfield.Value = value.AsMemory();
+            => subfield.Value = value;
 
         /// <summary>
         /// Преобразование в строку.
@@ -1181,7 +1181,7 @@ namespace ManagedIrbis.Mapping
                 char code,
                 string? value
             )
-            => field.SetSubFieldValue(code, value.AsMemory());
+            => field.SetSubFieldValue(code, value);
 
         /// <summary>
         /// Преобразование в строку.
@@ -1198,7 +1198,7 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static string? ToString(SubField subfield) => subfield.Value.ToString();
+        public static string? ToString(SubField subfield) => subfield.Value;
 
         /// <summary>
         /// Преобразование в строку.
@@ -1211,7 +1211,7 @@ namespace ManagedIrbis.Mapping
         {
             if (code == NoCode)
             {
-                return field.Value.ToString();
+                return field.Value;
             }
 
             var subField = field.GetFirstSubField(code);
@@ -1219,6 +1219,7 @@ namespace ManagedIrbis.Mapping
             return subField is null
                 ? null
                 : ToString(subField);
+
         } // method ToString
 
         /// <summary>
@@ -1236,6 +1237,7 @@ namespace ManagedIrbis.Mapping
             return field is null
                 ? null
                 : ToString(field, code);
+
         } // method ToString
 
         #endregion
@@ -1245,8 +1247,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromUInt16(ushort value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromUInt16(ushort value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -1359,8 +1361,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromUInt32(uint value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromUInt32(uint value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.
@@ -1473,8 +1475,8 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в строку.
         /// </summary>
-        public static ReadOnlyMemory<char> FromUInt64(ulong value)
-            => value.ToString(CultureInfo.InvariantCulture).AsMemory();
+        public static string FromUInt64(ulong value)
+            => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование в строку.

@@ -72,7 +72,7 @@ namespace ManagedIrbis.Infrastructure
                         break;
 
                     case "value":
-                        result.Value = propertyValue.AsMemory();
+                        result.Value = propertyValue;
                         break;
 
                     default:
@@ -94,7 +94,7 @@ namespace ManagedIrbis.Infrastructure
         {
             writer.WriteStartObject();
             writer.WriteString("code", value.Code.ToString());
-            writer.WriteString("value", value.Value.ToString());
+            writer.WriteString("value", value.Value);
             writer.WriteEndObject();
 
         } // method Write

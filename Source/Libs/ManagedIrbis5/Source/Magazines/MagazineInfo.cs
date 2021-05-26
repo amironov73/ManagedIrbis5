@@ -222,16 +222,16 @@ namespace ManagedIrbis.Magazines
 
             var result = new MagazineInfo
             {
-                Index = record.FM(903).ToString(),
-                Title = record.FM(200, 'a').ToString(),
-                SubTitle = record.FM(200, 'e').ToString(),
+                Index = record.FM(903),
+                Title = record.FM(200, 'a'),
+                SubTitle = record.FM(200, 'e'),
                 Cumulation = MagazineCumulation.Parse(record),
                 QuarterlyOrders = QuarterlyOrderInfo.Parse(record),
-                SeriesNumber = record.FM(923,'h').ToString(),
-                SeriesTitle = record.FM(923, 'i').ToString(),
-                MagazineType = record.FM(110, 't').ToString(),
-                MagazineKind = record.FM(110, 'b').ToString(),
-                Periodicity = record.FM(110, 'x').ToString(),
+                SeriesNumber = record.FM(923,'h'),
+                SeriesTitle = record.FM(923, 'i'),
+                MagazineType = record.FM(110, 't'),
+                MagazineKind = record.FM(110, 'b'),
+                Periodicity = record.FM(110, 'x'),
                 Record = record,
                 Mfn = record.Mfn
             };

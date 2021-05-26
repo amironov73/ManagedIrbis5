@@ -42,7 +42,7 @@ namespace ManagedIrbis.Quality.Rules
                 (
                     field
                 );
-            if (!CheckForMenu(_menu, field.Value.ToString()))
+            if (!CheckForMenu(_menu, field.Value))
             {
                 AddDefect
                     (

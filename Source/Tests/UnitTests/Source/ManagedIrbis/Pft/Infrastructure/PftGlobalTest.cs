@@ -60,8 +60,8 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
             var node = new PftGlobal();
             Assert.AreSame(node, node.Parse("\n"));
             Assert.AreEqual(2, node.Fields.Count);
-            Assert.AreEqual(string.Empty, node.Fields[0].Value.ToString());
-            Assert.AreEqual(string.Empty, node.Fields[1].Value.ToString());
+            Assert.IsNull(node.Fields[0].Value);
+            Assert.IsNull(node.Fields[1].Value);
         }
 
         [TestMethod]
@@ -71,7 +71,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
             var node = new PftGlobal();
             Assert.AreSame(node, node.Parse(text));
             Assert.AreEqual(1, node.Fields.Count);
-            Assert.AreEqual(text, node.Fields[0].Value.ToString());
+            Assert.AreEqual(text, node.Fields[0].Value);
         }
 
         [TestMethod]
@@ -81,8 +81,8 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
             var node = new PftGlobal();
             Assert.AreSame(node, node.Parse(text1 + '\n' + text2));
             Assert.AreEqual(2, node.Fields.Count);
-            Assert.AreEqual(text1, node.Fields[0].Value.ToString());
-            Assert.AreEqual(text2, node.Fields[1].Value.ToString());
+            Assert.AreEqual(text1, node.Fields[0].Value);
+            Assert.AreEqual(text2, node.Fields[1].Value);
         }
 
         [TestMethod]
@@ -91,7 +91,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
             var node = new PftGlobal();
             Assert.AreSame(node, node.Parse("^atext"));
             Assert.AreEqual(1, node.Fields.Count);
-            Assert.AreEqual("text", node.Fields[0].GetFirstSubFieldValue('a').ToString());
+            Assert.AreEqual("text", node.Fields[0].GetFirstSubFieldValue('a'));
         }
 
         [TestMethod]
@@ -100,8 +100,8 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
             var node = new PftGlobal();
             Assert.AreSame(node, node.Parse("^atext1^btext2"));
             Assert.AreEqual(1, node.Fields.Count);
-            Assert.AreEqual("text1", node.Fields[0].GetFirstSubFieldValue('a').ToString());
-            Assert.AreEqual("text2", node.Fields[0].GetFirstSubFieldValue('b').ToString());
+            Assert.AreEqual("text1", node.Fields[0].GetFirstSubFieldValue('a'));
+            Assert.AreEqual("text2", node.Fields[0].GetFirstSubFieldValue('b'));
         }
 
         [TestMethod]
@@ -110,10 +110,10 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
             var node = new PftGlobal();
             Assert.AreSame(node, node.Parse("^atext1^btext2\n^ctext3^dtext4"));
             Assert.AreEqual(2, node.Fields.Count);
-            Assert.AreEqual("text1", node.Fields[0].GetFirstSubFieldValue('a').ToString());
-            Assert.AreEqual("text2", node.Fields[0].GetFirstSubFieldValue('b').ToString());
-            Assert.AreEqual("text3", node.Fields[1].GetFirstSubFieldValue('c').ToString());
-            Assert.AreEqual("text4", node.Fields[1].GetFirstSubFieldValue('d').ToString());
+            Assert.AreEqual("text1", node.Fields[0].GetFirstSubFieldValue('a'));
+            Assert.AreEqual("text2", node.Fields[0].GetFirstSubFieldValue('b'));
+            Assert.AreEqual("text3", node.Fields[1].GetFirstSubFieldValue('c'));
+            Assert.AreEqual("text4", node.Fields[1].GetFirstSubFieldValue('d'));
         }
 
         [TestMethod]
@@ -121,12 +121,12 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure
         {
             var node = new PftGlobal();
             Assert.AreSame(node, node.Parse("^atext1^btext2"));
-            Assert.AreEqual("text1", node.Fields[0].GetFirstSubFieldValue('a').ToString());
-            Assert.AreEqual("text2", node.Fields[0].GetFirstSubFieldValue('b').ToString());
+            Assert.AreEqual("text1", node.Fields[0].GetFirstSubFieldValue('a'));
+            Assert.AreEqual("text2", node.Fields[0].GetFirstSubFieldValue('b'));
             Assert.AreEqual(1, node.Fields.Count);
             Assert.AreSame(node, node.Parse("^ctext3^dtext4"));
-            Assert.AreEqual("text3", node.Fields[1].GetFirstSubFieldValue('c').ToString());
-            Assert.AreEqual("text4", node.Fields[1].GetFirstSubFieldValue('d').ToString());
+            Assert.AreEqual("text3", node.Fields[1].GetFirstSubFieldValue('c'));
+            Assert.AreEqual("text4", node.Fields[1].GetFirstSubFieldValue('d'));
         }
 
         private void _TestSerialization

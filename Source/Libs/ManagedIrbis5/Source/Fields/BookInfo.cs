@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -48,10 +50,7 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Количество экземпляров.
         /// </summary>
-        public int Amount
-        {
-            get { return _ExecuteScript(_amountScript).SafeToInt32(); }
-        }
+        public int Amount => _ExecuteScript(_amountScript).SafeToInt32();
 
         /// <summary>
         /// Первый автор.
@@ -74,10 +73,7 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Авторы.
         /// </summary>
-        public AuthorInfo[] Authors
-        {
-            get { return AuthorInfo.ParseRecord(Record, AuthorInfo.AllKnownTags); }
-        }
+        public AuthorInfo[] Authors => AuthorInfo.ParseRecord(Record, AuthorInfo.AllKnownTags);
 
         /// <summary>
         /// Библиографическое описание.
@@ -97,14 +93,12 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Характер документа (первый из).
         /// </summary>
-        public ReadOnlyMemory<char> DocumentCharacter =>
-            Record.FM(900, 'c');
+        public string? DocumentCharacter => Record.FM(900, 'c');
 
         /// <summary>
         /// Тип документа.
         /// </summary>
-        public ReadOnlyMemory<char> DocumentType =>
-            Record.FM(900, 't');
+        public string? DocumentType => Record.FM(900, 't');
 
         /// <summary>
         /// Электронный ресурс?
@@ -147,10 +141,7 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Экземпляры.
         /// </summary>
-        public ExemplarInfo[] Exemplars
-        {
-            get { return ExemplarInfo.Parse(Record); }
-        }
+        public ExemplarInfo[] Exemplars => ExemplarInfo.Parse(Record);
 
         /// <summary>
         /// Число экземпляров.
@@ -204,14 +195,14 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Языки документа
         /// </summary>
-        public ReadOnlyMemory<char>[] Languages =>
+        public string[] Languages =>
             Record.FMA(101);
 
         /// <summary>
         /// Первая ссылка на внешний ресурс.
         /// </summary>
-        public ReadOnlyMemory<char> Link =>
-            _ExecuteScript(_linkScript).AsMemory();
+        public string Link =>
+            _ExecuteScript(_linkScript);
 
         /// <summary>
         /// Количество страниц.
@@ -221,19 +212,16 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Цена, общая для всех экземпляров.
         /// </summary>
-        public decimal Price
-        {
-            get { return Record.FM(10, 'd').SafeToDecimal(); }
-        }
+        public decimal Price => Record.FM(10, 'd').SafeToDecimal();
 
         /// <summary>
         /// Издательства.
         /// </summary>
-        public ReadOnlyMemory<char>[] Publishers
+        public string[] Publishers
         {
             get
             {
-                var result = new List<ReadOnlyMemory<char>>();
+                var result = new List<string>();
                 result.AddRange(Record.FMA(210, 'c'));
                 result.AddRange(Record.FMA(461, 'g'));
                 return result.ToArray();
@@ -256,28 +244,22 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Заголовок.
         /// </summary>
-        public string TitleText
-        {
-            get { return _ExecuteScript(_titleScript); }
-        }
+        public string TitleText => _ExecuteScript(_titleScript);
 
         /// <summary>
         /// Счётчик выдач.
         /// </summary>
-        public int UsageCount
-        {
-            get { return Record.FM(999).SafeToInt32(); }
-        }
+        public int UsageCount => Record.FM(999).SafeToInt32();
 
         /// <summary>
         /// Объем издания (цифры).
         /// </summary>
-        public ReadOnlyMemory<char> Volume => Record.FM(215, 'a');
+        public string? Volume => Record.FM(215, 'a');
 
         /// <summary>
         /// Рабочий лист.
         /// </summary>
-        public ReadOnlyMemory<char> Worksheet => Record.FM(920);
+        public string? Worksheet => Record.FM(920);
 
         /// <summary>
         /// Год издания.
@@ -288,38 +270,44 @@ namespace ManagedIrbis.Fields
             {
                 var record = Record;
                 var result = record.FM(210, 'd');
-                if (result.IsEmpty)
+                if (result.IsEmpty())
                 {
                     result = record.FM(461, 'h');
                 }
-                if (result.IsEmpty)
+
+                if (result.IsEmpty())
                 {
                     result = record.FM(461, 'z');
                 }
-                if (result.IsEmpty)
+
+                if (result.IsEmpty())
                 {
                     result = record.FM(463, 'j');
                 }
-                if (result.IsEmpty)
+
+                if (result.IsEmpty())
                 {
                     result = record.FM(934);
                 }
-                if (result.IsEmpty)
+
+                if (result.IsEmpty())
                 {
                     return 0;
                 }
 
                 // TODO: реализовать оптимально
 
-                var match = Regex.Match(result.ToString(), @"\d{4}");
+                var match = Regex.Match(result, @"\d{4}");
                 if (match.Success)
                 {
-                    result = match.Value.AsMemory();
+                    result = match.Value;
                 }
 
                 return result.SafeToInt32();
-            }
-        }
+
+            } // get
+
+        } // property Year
 
         #endregion
 
@@ -372,7 +360,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public static int CountPages
             (
-                ReadOnlyMemory<char> text
+                ReadOnlySpan<char> text
             )
         {
             if (text.IsEmpty)

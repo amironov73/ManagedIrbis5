@@ -152,7 +152,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             var reader = new StringReader(line);
             var field = new Field { Tag = Number };
             Fields.Add(field);
-            field.Value = _ReadTo(reader, '^');
+            field.Value = _ReadTo(reader, '^').EmptyToNull();
 
             while (true)
             {
@@ -163,8 +163,8 @@ namespace ManagedIrbis.Pft.Infrastructure
                 }
 
                 var code = char.ToLower((char)next);
-                var text = _ReadTo(reader, '^');
-                SubField subField = new SubField
+                var text = _ReadTo(reader, '^').EmptyToNull();
+                var subField = new SubField
                 {
                     Code = code,
                     Value = text

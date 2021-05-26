@@ -86,7 +86,7 @@ namespace ManagedIrbis.Quality
         [XmlIgnore]
         [JsonIgnore]
         [Browsable(false)]
-        public string? Worksheet => Record?.FM(920).ToString();
+        public string? Worksheet => Record?.FM(920);
 
         /// <summary>
         /// Arbitrary user data.
@@ -159,7 +159,7 @@ namespace ManagedIrbis.Quality
                 Field = field.Tag,
                 Repeat = field.Repeat,
                 Subfield = subfield.Code.ToString(),
-                Value = subfield.Value.ToString(),
+                Value = subfield.Value,
                 Damage = damage,
                 Message = string.Format(format, args)
             };
@@ -231,7 +231,7 @@ namespace ManagedIrbis.Quality
         /// </summary>
         protected static ReadOnlyMemory<char> GetTextAtPosition
             (
-                ReadOnlyMemory<char> text,
+                string text,
                 int position
             )
         {
@@ -239,31 +239,31 @@ namespace ManagedIrbis.Quality
             var start = Math.Max(0, position - 1);
             var stop = Math.Min(length - 1, position + 2);
 
-            while (start >= 0 && text.Span[start] == ' ')
+            while (start >= 0 && text[start] == ' ')
             {
                 start--;
             }
 
-            while (start >= 0 && text.Span[start] != ' ')
+            while (start >= 0 && text[start] != ' ')
             {
                 start--;
             }
 
             start = Math.Max(0, start);
 
-            while (stop < length && text.Span[stop] == ' ')
+            while (stop < length && text[stop] == ' ')
             {
                 stop++;
             }
 
-            while (stop < length && text.Span[stop] != ' ')
+            while (stop < length && text[stop] != ' ')
             {
                 stop++;
             }
 
             stop = Math.Min(length - 1, stop);
 
-            return text.Slice
+            return text.AsMemory().Slice
                 (
                     start,
                     stop - start + 1
@@ -287,7 +287,7 @@ namespace ManagedIrbis.Quality
 
             return GetTextAtPosition
                 (
-                    text,
+                    text.ToString(),
                     position
                 );
         }
@@ -303,7 +303,7 @@ namespace ManagedIrbis.Quality
         {
             var text = subfield.Value;
 
-            if (text.IsEmpty)
+            if (text.IsEmpty())
             {
                 AddDefect
                     (
@@ -317,7 +317,7 @@ namespace ManagedIrbis.Quality
                 return;
             }
 
-            if (text.Span.StartsWith(" "))
+            if (text.StartsWith(" "))
             {
                 AddDefect
                     (
@@ -330,7 +330,7 @@ namespace ManagedIrbis.Quality
                     );
             }
 
-            if (text.Span.EndsWith(" "))
+            if (text.EndsWith(" "))
             {
                 AddDefect
                     (
@@ -345,7 +345,7 @@ namespace ManagedIrbis.Quality
 
             // TODO: реализовать эффективно
 
-            if (text.ToString().Contains("  "))
+            if (text.Contains("  "))
             {
                 AddDefect
                     (
@@ -355,7 +355,7 @@ namespace ManagedIrbis.Quality
                         "Подполе {0}^{1} содержит двойной пробел: {2}",
                         field.Tag,
                         subfield.Code,
-                        ShowDoubleWhiteSpace(text)
+                        ShowDoubleWhiteSpace(text.AsMemory())
                     );
             }
         }
@@ -369,9 +369,9 @@ namespace ManagedIrbis.Quality
             )
         {
             var text = field.Value;
-            if (!text.IsEmpty)
+            if (!text.IsEmpty())
             {
-                if (text.Span.StartsWith(" "))
+                if (text.StartsWith(" "))
                 {
                     AddDefect
                         (
@@ -381,7 +381,7 @@ namespace ManagedIrbis.Quality
                             field.Tag
                         );
                 }
-                if (text.Span.EndsWith(" "))
+                if (text.EndsWith(" "))
                 {
                     AddDefect
                         (
@@ -508,7 +508,7 @@ namespace ManagedIrbis.Quality
                 Field field
             )
         {
-            if (!field.Value.IsEmpty)
+            if (!field.Value.IsEmpty())
             {
                 AddDefect
                     (
@@ -559,11 +559,10 @@ namespace ManagedIrbis.Quality
                 Field[] fields
             )
         {
-            var grouped = fields
-                .GroupBy
+            var grouped = fields.GroupBy
                 (
                     f => f.Value
-                        .ThrowIfEmpty("field.Value")
+                        .ThrowIfNullOrEmpty("field.Value")
                         .ToString()
                         .ToLowerInvariant()
                 )
@@ -595,7 +594,7 @@ namespace ManagedIrbis.Quality
         {
             var selected = field.Subfields
                 .GetSubField(new[] {code})
-                .Where(sf => sf.Value.IsEmpty);
+                .Where(sf => sf.Value.IsEmpty());
             foreach (var subField in selected)
             {
                 AddDefect
@@ -625,7 +624,7 @@ namespace ManagedIrbis.Quality
                 .GroupBy
                 (
                     sf => sf.Value
-                        .ThrowIfEmpty("field.Value")
+                        .ThrowIfNullOrEmpty("field.Value")
                         .ToString()
                         .ToLowerInvariant()
                 );
@@ -757,9 +756,9 @@ namespace ManagedIrbis.Quality
             )
         {
             var text = field.Value;
-            if (!text.IsEmpty)
+            if (!text.IsEmpty())
             {
-                var position = RuleUtility.BadCharacterPosition(text.ToString());
+                var position = RuleUtility.BadCharacterPosition(text);
                 if (position >= 0)
                 {
                     AddDefect
@@ -783,7 +782,7 @@ namespace ManagedIrbis.Quality
             )
         {
             var text = subField.Value;
-            if (!text.IsEmpty)
+            if (!text.IsEmpty())
             {
                 var position = RuleUtility.BadCharacterPosition(text.ToString());
                 if (position >= 0)

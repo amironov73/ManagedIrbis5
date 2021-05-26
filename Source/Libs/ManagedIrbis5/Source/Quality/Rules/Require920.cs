@@ -78,6 +78,7 @@ namespace ManagedIrbis.Quality.Rules
                         "Повторяется поле 920: Рабочий лист"
                     );
             }
+
             foreach (var field in fields)
             {
                 MustNotContainSubfields
@@ -85,7 +86,7 @@ namespace ManagedIrbis.Quality.Rules
                         field
                     );
 
-                worksheet = field.Value.ToString();
+                worksheet = field.Value;
                 if (!worksheet.IsOneOf(_goodWorksheets))
                 {
                     AddDefect

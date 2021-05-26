@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using AM;
 using AM.Text;
 
 #endregion
@@ -74,7 +75,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             var maskSpecifiaction = navigator.ReadUntil(delimiter).ToString();
-            if (ReferenceEquals(maskSpecifiaction, null)
+            if (navigator.IsEOF
                 || navigator.ReadChar() == TextNavigator.EOF)
             {
                 return;

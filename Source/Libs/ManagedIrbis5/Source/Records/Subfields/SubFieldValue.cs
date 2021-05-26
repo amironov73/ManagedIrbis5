@@ -45,10 +45,10 @@ namespace ManagedIrbis
         /// </summary>
         public static bool IsValidValue
             (
-                ReadOnlyMemory<char> value
+                ReadOnlySpan<char> value
             )
         {
-            foreach (char c in value.Span)
+            foreach (var c in value)
             {
                 if (c == SubField.Delimiter)
                 {
@@ -80,7 +80,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Verify subfield value.
         /// </summary>
-        public static bool Verify (ReadOnlyMemory<char> value) =>
+        public static bool Verify (ReadOnlySpan<char> value) =>
             Verify(value, ThrowOnVerify);
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace ManagedIrbis
         /// </summary>
         public static bool Verify
             (
-                ReadOnlyMemory<char> value,
+                ReadOnlySpan<char> value,
                 bool throwOnError
             )
         {

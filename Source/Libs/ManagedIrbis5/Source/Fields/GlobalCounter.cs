@@ -219,9 +219,9 @@ namespace ManagedIrbis.Fields
 
             var result = new GlobalCounter
             {
-                Index = record.FM(1).ToString(),
-                Value = record.FM(2).ToString(),
-                Template = record.FM(3).ToString(),
+                Index = record.FM(1),
+                Value = record.FM(2),
+                Template = record.FM(3),
                 Record = record
             };
 

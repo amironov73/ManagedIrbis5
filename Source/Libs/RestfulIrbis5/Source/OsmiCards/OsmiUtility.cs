@@ -13,7 +13,6 @@
 #region Using directives
 
 using System;
-using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -203,9 +202,9 @@ namespace RestfulIrbis.OsmiCards
             )
         {
             var idTag = config.ReaderId.SafeToInt32(30);
-            var result = record.FM(idTag).ThrowIfEmpty("reader.Ticket");
+            var result = record.FM(idTag).ThrowIfNullOrEmpty("reader.Ticket");
 
-            return result.ToString();
+            return result;
         }
 
         /// <summary>

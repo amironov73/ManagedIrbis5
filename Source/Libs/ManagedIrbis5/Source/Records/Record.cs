@@ -18,7 +18,6 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -27,6 +26,7 @@ using System.Xml.Serialization;
 
 using AM;
 using AM.Collections;
+
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 
@@ -339,12 +339,12 @@ namespace ManagedIrbis
         public Record Add
             (
                 int tag,
-                string?[] subfields
+                string[] subfields
             )
         {
             Sure.Positive(tag, nameof(tag));
 
-            var field = new Field(tag, subfields);
+            var field = Field.WithSubFields(tag, subfields);
             Fields.Add(field);
 
             return this;
@@ -459,6 +459,7 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
+
         } // method Encode
 
         /// <summary>
@@ -467,18 +468,12 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="tag">Метка поля.</param>
         /// <returns>Значение поля или <c>null</c>.</returns>
-        public ReadOnlyMemory<char> FM
-            (
-                int tag
-            )
-        {
-            return GetField(tag)?.Value ?? default;
-        } // method FM
+        public string? FM ( int tag ) => GetField(tag)?.Value;
 
         /// <summary>
         /// Текст первого подполя с указанным тегом и кодом.
         /// </summary>
-        public ReadOnlyMemory<char> FM
+        public string? FM
             (
                 int tag,
                 char code
@@ -494,22 +489,23 @@ namespace ManagedIrbis
             }
 
             return default;
+
         } // method FM
 
         /// <summary>
         /// Текст всех полей с указанным тегом.
         /// </summary>
-        public ReadOnlyMemory<char>[] FMA
+        public string[] FMA
             (
                 int tag
             )
         {
-            var result = new LocalList<ReadOnlyMemory<char>>();
+            var result = new LocalList<string>();
 
             foreach (var field in Fields)
             {
                 if (field.Tag == tag
-                    && !field.Value.IsEmpty)
+                    && !field.Value.IsEmpty())
                 {
                     result.Add(field.Value);
                 }
@@ -521,13 +517,13 @@ namespace ManagedIrbis
         /// <summary>
         /// Текст всех подполей с указанным тегом и кодом.
         /// </summary>
-        public ReadOnlyMemory<char>[] FMA
+        public string[] FMA
             (
                 int tag,
                 char code
             )
         {
-            var result = new LocalList<ReadOnlyMemory<char>>();
+            var result = new LocalList<string>();
 
             foreach (var field in Fields)
             {
@@ -537,7 +533,7 @@ namespace ManagedIrbis
                     var value = code == '*'
                         ? field.GetValueOrFirstSubField()
                         : field.GetSubFieldValue(code);
-                    if (!value.IsEmpty)
+                    if (!value.IsEmpty())
                     {
                         result.Add(value);
                     }
@@ -545,6 +541,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
+
         } // method FMA
 
         /// <summary>

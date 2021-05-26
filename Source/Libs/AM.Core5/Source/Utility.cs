@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
@@ -2962,10 +2963,32 @@ namespace AM
         /// любому из перечисленных.
         /// </summary>
         [Pure]
+        public static bool IsOneOf(this string? value, string? first, string? second) =>
+            !string.IsNullOrEmpty(value)
+            && (string.CompareOrdinal(value, first) == 0
+                || string.CompareOrdinal(value, second) == 0);
+
+        /// <summary>
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
         public static bool IsOneOf<T>(this T value, T first, T second)
             where T : IComparable<T> =>
             value.CompareTo(first) == 0
             || value.CompareTo(second) == 0;
+
+        /// <summary>
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf(this string? value, string? first,
+            string? second, string? third) =>
+            !string.IsNullOrEmpty(value)
+            && (string.CompareOrdinal(value, first) == 0
+            || string.CompareOrdinal(value, second) == 0
+            || string.CompareOrdinal(value, third) == 0);
 
         /// <summary>
         /// Определяет, равен ли ли данный объект
@@ -2984,6 +3007,19 @@ namespace AM
         /// любому из перечисленных.
         /// </summary>
         [Pure]
+        public static bool IsOneOf(this string? value, string? first,
+            string? second, string? third, string? fourth) =>
+            !string.IsNullOrEmpty(value)
+            && (string.CompareOrdinal(value, first) == 0
+            || string.CompareOrdinal(value, second) == 0
+            || string.CompareOrdinal(value, third) == 0
+            || string.CompareOrdinal(value, fourth) == 0);
+
+        /// <summary>
+        /// Определяет, равен ли ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
         public static bool IsOneOf<T>(this T value, T first, T second,
             T third, T fourth)
             where T : IComparable<T> =>
@@ -2991,6 +3027,34 @@ namespace AM
             || value.CompareTo(second) == 0
             || value.CompareTo(third) == 0
             || value.CompareTo(fourth) == 0;
+
+        /// <summary>
+        /// Определяет, равен ли данный объект
+        /// любому из перечисленных.
+        /// </summary>
+        [Pure]
+        public static bool IsOneOf
+            (
+                this string? value,
+                params string?[] array
+            )
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            foreach (var one in array)
+            {
+                if (string.CompareOrdinal(value, one) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+
+        } // method IsOneOf
 
         /// <summary>
         /// Определяет, равен ли данный объект
@@ -3013,6 +3077,7 @@ namespace AM
             }
 
             return false;
+
         } // method IsOneOf
 
         /// <summary>
@@ -3132,6 +3197,20 @@ namespace AM
         [Pure]
         public static string? EmptyToNull (this string? value) =>
             string.IsNullOrEmpty(value) ? null : value;
+
+        /// <summary>
+        /// Converts empty string to <c>null</c>.
+        /// </summary>
+        [Pure]
+        public static string? EmptyToNull(this ReadOnlySpan<char> value) =>
+            value.IsEmpty ? null : value.ToString();
+
+        /// <summary>
+        /// Converts empty string to <c>null</c>.
+        /// </summary>
+        [Pure]
+        public static string? EmptyToNull(this ReadOnlyMemory<char> value) =>
+            value.IsEmpty ? null : value.ToString();
 
         /// <summary>
         /// Determines whether given value can be converted to
@@ -3645,6 +3724,13 @@ namespace AM
             && text.Contains(subtext);
 
         /// <summary>
+        /// Содержит ли строка указанный символ?
+        /// </summary>
+        public static bool SafeContains (this string? text, char symbol) =>
+            !string.IsNullOrEmpty(text)
+            && text.Contains(symbol);
+
+        /// <summary>
         /// Содержит ли данная строка одну из перечисленных подстрок?
         /// </summary>
         public static bool SafeContains
@@ -4095,6 +4181,13 @@ namespace AM
 
             return result.ToArray();
         }
+
+        /// <summary>
+        /// Сокращение для <see cref="string.IsNullOrEmpty"/>
+        /// </summary>
+        [Pure]
+        public static bool IsEmpty([NotNullWhen(false)] this string? text)
+            => string.IsNullOrEmpty(text);
 
         /// <summary>
         /// Универсальное длинное представление даты/времени.

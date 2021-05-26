@@ -121,10 +121,10 @@ namespace ManagedIrbis.Readers
 
             var result = new ReaderRegistration
             {
-                DateString = field.Value.ToString(),
-                Chair = field.GetFirstSubFieldValue('c').ToString(),
-                OrderNumber = field.GetFirstSubFieldValue('a').ToString(),
-                Reason = field.GetFirstSubFieldValue('b').ToString()
+                DateString = field.Value,
+                Chair = field.GetFirstSubFieldValue('c'),
+                OrderNumber = field.GetFirstSubFieldValue('a'),
+                Reason = field.GetFirstSubFieldValue('b')
             };
 
             return result;
@@ -155,7 +155,7 @@ namespace ManagedIrbis.Readers
         {
             var result = new Field
                 {
-                    Value = DateString.AsMemory()
+                    Value = DateString
                 }
                 .AddNonEmptySubField('c', Chair)
                 .AddNonEmptySubField('a', OrderNumber)

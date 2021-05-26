@@ -89,12 +89,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var title = navigator.GetRemainingText().ToString();
 
-            var output = string.Format
-                (
-                    "</>{{\v {0}}}{1}{{\v}}",
-                    firstPart,
-                    title
-                );
+            var output = $"</>{{\v {firstPart}}}{title}{{\v}}";
             context.WriteAndSetFlag(node, output);
         }
 

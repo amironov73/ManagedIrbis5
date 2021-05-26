@@ -94,12 +94,12 @@ namespace ManagedIrbis.Systematization
 
             var result = new AthrbHeading
             {
-                Heading = field.GetFirstSubFieldValue('a').ToString(),
-                Code1 = field.GetFirstSubFieldValue('b').ToString(),
-                Code2 = field.GetFirstSubFieldValue('c').ToString(),
-                Code3 = field.GetFirstSubFieldValue('d').ToString(),
-                Code4 = field.GetFirstSubFieldValue('e').ToString(),
-                Code5 = field.GetFirstSubFieldValue('f').ToString(),
+                Heading = field.GetFirstSubFieldValue('a'),
+                Code1 = field.GetFirstSubFieldValue('b'),
+                Code2 = field.GetFirstSubFieldValue('c'),
+                Code3 = field.GetFirstSubFieldValue('d'),
+                Code4 = field.GetFirstSubFieldValue('e'),
+                Code5 = field.GetFirstSubFieldValue('f'),
             };
 
             return result;

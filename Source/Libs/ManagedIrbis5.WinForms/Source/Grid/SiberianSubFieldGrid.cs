@@ -87,7 +87,7 @@ namespace ManagedIrbis.WinForms.Grid
                 var line = SiberianSubField.FromWorksheetItem ( item );
                 if (!ReferenceEquals(subField, null))
                 {
-                    line.Value = subField.Value.ToString();
+                    line.Value = subField.Value;
                 }
 
                 CreateRow(line);

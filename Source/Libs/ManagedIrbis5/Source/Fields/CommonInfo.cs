@@ -334,34 +334,34 @@ namespace ManagedIrbis.Fields
 
                 if (!ReferenceEquals(field461, null))
                 {
-                    info.Title = field461.GetFirstSubFieldValue('c').ToString();
-                    info.Specific = field461.GetFirstSubFieldValue('u').ToString();
-                    info.General = field461.GetFirstSubFieldValue('2').ToString();
-                    info.Subtitle = field461.GetFirstSubFieldValue('e').ToString();
-                    info.Responsibility = field461.GetFirstSubFieldValue('f').ToString();
-                    info.Publisher = field461.GetFirstSubFieldValue('g').ToString();
-                    info.City = field461.GetFirstSubFieldValue('d').ToString();
-                    info.BeginningYear = field461.GetFirstSubFieldValue('h').ToString();
-                    info.EndingYear = field461.GetFirstSubFieldValue('z').ToString();
-                    info.Isbn = field461.GetFirstSubFieldValue('i').ToString();
-                    info.Issn = field461.GetFirstSubFieldValue('j').ToString();
-                    info.Reprint = field461.GetFirstSubFieldValue('p').ToString();
-                    info.Translation = field461.GetFirstSubFieldValue('a').ToString();
-                    info.FirstAuthor = field461.GetFirstSubFieldValue('x').ToString();
-                    info.Collective = field461.GetFirstSubFieldValue('b').ToString();
+                    info.Title = field461.GetFirstSubFieldValue('c');
+                    info.Specific = field461.GetFirstSubFieldValue('u');
+                    info.General = field461.GetFirstSubFieldValue('2');
+                    info.Subtitle = field461.GetFirstSubFieldValue('e');
+                    info.Responsibility = field461.GetFirstSubFieldValue('f');
+                    info.Publisher = field461.GetFirstSubFieldValue('g');
+                    info.City = field461.GetFirstSubFieldValue('d');
+                    info.BeginningYear = field461.GetFirstSubFieldValue('h');
+                    info.EndingYear = field461.GetFirstSubFieldValue('z');
+                    info.Isbn = field461.GetFirstSubFieldValue('i');
+                    info.Issn = field461.GetFirstSubFieldValue('j');
+                    info.Reprint = field461.GetFirstSubFieldValue('p');
+                    info.Translation = field461.GetFirstSubFieldValue('a');
+                    info.FirstAuthor = field461.GetFirstSubFieldValue('x');
+                    info.Collective = field461.GetFirstSubFieldValue('b');
                     info.Field461 = field461;
                 }
 
                 if (!ReferenceEquals(field46, null))
                 {
-                    info.TitleVariant = field46.GetFirstSubFieldValue('r').ToString();
-                    info.SecondLevelNumber = field46.GetFirstSubFieldValue('h').ToString();
-                    info.SecondLevelTitle = field46.GetFirstSubFieldValue('i').ToString();
-                    info.ThirdLevelNumber = field46.GetFirstSubFieldValue('k').ToString();
-                    info.ThirdLevelTitle = field46.GetFirstSubFieldValue('m').ToString();
-                    info.ParallelTitle = field46.GetFirstSubFieldValue('l').ToString();
-                    info.SeriesTitle = field46.GetFirstSubFieldValue('a').ToString();
-                    info.PreviousTitle = field46.GetFirstSubFieldValue('c').ToString();
+                    info.TitleVariant = field46.GetFirstSubFieldValue('r');
+                    info.SecondLevelNumber = field46.GetFirstSubFieldValue('h');
+                    info.SecondLevelTitle = field46.GetFirstSubFieldValue('i');
+                    info.ThirdLevelNumber = field46.GetFirstSubFieldValue('k');
+                    info.ThirdLevelTitle = field46.GetFirstSubFieldValue('m');
+                    info.ParallelTitle = field46.GetFirstSubFieldValue('l');
+                    info.SeriesTitle = field46.GetFirstSubFieldValue('a');
+                    info.PreviousTitle = field46.GetFirstSubFieldValue('c');
                     info.Field46 = field46;
                 }
             }

@@ -281,7 +281,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
 
             collection.SetReadOnly();
 
-            subFieldA.Value = "New value".AsMemory();
+            subFieldA.Value = "New value";
         }
 
         [TestMethod]

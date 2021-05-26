@@ -82,7 +82,7 @@ namespace ManagedIrbis.Fields
 
             var result = new ZaprRecord
             {
-                Ticket = record.FM(1).ToString(),
+                Ticket = record.FM(1),
                 // Requests = record.Fields
                 //     .GetField(2)
                 //     .Select(f => ZaprInfo.Parse(f))

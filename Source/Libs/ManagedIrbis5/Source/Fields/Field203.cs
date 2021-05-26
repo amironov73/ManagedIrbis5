@@ -57,18 +57,18 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Вид содержания. Подполя A, B, D, E, F, G, I, K, L.
         /// </summary>
-        public ReadOnlyMemory<char>[]? ContentType { get; set; }
+        public string[]? ContentType { get; set; }
 
         /// <summary>
         /// Средства доступа. Подполя C, 1, 2, 3, 4, 5, 6, 7, 8
         /// </summary>
-        public ReadOnlyMemory<char>[]? Access { get; set; }
+        public string[]? Access { get; set; }
 
         /// <summary>
         /// Характеристика содержания.
         /// Подполя O, P, U, Y, T, R, W, Q, X, V, Z
         /// </summary>
-        public ReadOnlyMemory<char>[]? ContentDescription { get; set; }
+        public string[]? ContentDescription { get; set; }
 
         #endregion
 
@@ -147,9 +147,9 @@ namespace ManagedIrbis.Fields
             )
         {
             // TODO: check whether this code actually works
-            ContentType = reader.ReadNullableReadOnlyMemoryArray();
-            Access = reader.ReadNullableReadOnlyMemoryArray();
-            ContentDescription = reader.ReadNullableReadOnlyMemoryArray();
+            ContentType = reader.ReadNullableStringArray();
+            Access = reader.ReadNullableStringArray();
+            ContentDescription = reader.ReadNullableStringArray();
 
         } // method RestoreFromStream
 
@@ -160,9 +160,9 @@ namespace ManagedIrbis.Fields
             )
         {
             writer
-                .WriteNullable(ContentType)
-                .WriteNullable(Access)
-                .WriteNullable(ContentDescription);
+                .WriteNullableArray(ContentType)
+                .WriteNullableArray(Access)
+                .WriteNullableArray(ContentDescription);
 
         } // method SaveToStream
 

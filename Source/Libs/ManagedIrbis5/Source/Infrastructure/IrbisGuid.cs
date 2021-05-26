@@ -19,6 +19,8 @@
 
 using System;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -71,7 +73,7 @@ namespace ManagedIrbis.Infrastructure
             }
 
             var text = record.FM(Tag);
-            if (text.IsEmpty)
+            if (text.IsEmpty())
             {
                 return null;
             }
@@ -81,6 +83,7 @@ namespace ManagedIrbis.Infrastructure
             // TODO почему тут "D" ?
 
             return guid.ToString("D").ToUpperInvariant();
+
         } // method Get
 
         /// <summary>
@@ -93,7 +96,7 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Parse the text.
         /// </summary>
-        public static Guid Parse (ReadOnlyMemory<char> text) => Guid.Parse(text.Span);
+        public static Guid Parse (ReadOnlySpan<char> text) => Guid.Parse(text);
 
         /// <summary>
         /// Parse the record.
@@ -104,7 +107,7 @@ namespace ManagedIrbis.Infrastructure
             )
         {
             var text = record.FM(Tag);
-            if (text.IsEmpty)
+            if (text.IsEmpty())
             {
                 return null;
             }

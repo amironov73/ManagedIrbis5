@@ -7,13 +7,12 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* MorphologyEntry.cs -- entry of the morphology database.
+/* MorphologyEntry.cs -- entry of the morphology database
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -89,10 +88,10 @@ namespace ManagedIrbis.Morphology
             (
                 Record record,
                 int tag,
-                ReadOnlyMemory<char> text
+                string? text
             )
         {
-            if (!text.IsEmpty)
+            if (!text.IsEmpty())
             {
                 record.Fields.Add(new Field { Tag = tag, Value = text });
             }
@@ -112,16 +111,16 @@ namespace ManagedIrbis.Morphology
                 Mfn = Mfn
             };
 
-            _AddField(result, 10, MainTerm.AsMemory());
-            _AddField(result, 11, Dictionary.AsMemory());
+            _AddField(result, 10, MainTerm);
+            _AddField(result, 11, Dictionary);
             if (!ReferenceEquals(Forms, null))
             {
                 foreach (string synonym in Forms)
                 {
-                    _AddField(result, 20, synonym.AsMemory());
+                    _AddField(result, 20, synonym);
                 }
             }
-            _AddField(result, 12, Language.AsMemory());
+            _AddField(result, 12, Language);
 
             return result;
         }
@@ -139,10 +138,10 @@ namespace ManagedIrbis.Morphology
             var result = new MorphologyEntry
             {
                 Mfn = record.Mfn,
-                MainTerm = record.FM(10).ToString(),
-                Dictionary = record.FM(11).ToString(),
-                Language = record.FM(12).ToString(),
-                Forms = record.FMA(20).ToStringArray()
+                MainTerm = record.FM(10),
+                Dictionary = record.FM(11),
+                Language = record.FM(12),
+                Forms = record.FMA(20)
             };
 
             return result;

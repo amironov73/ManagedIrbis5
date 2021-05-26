@@ -110,10 +110,10 @@ namespace UnitTests.ManagedIrbis.Fields
             };
 
             var actual = title.ToField200();
-            Assert.AreEqual("Пикассо сегодня", actual.GetFirstSubFieldValue('a').ToString().EmptyToNull());
-            Assert.AreEqual("[сборник статей]", actual.GetFirstSubFieldValue('e').ToString().EmptyToNull());
-            Assert.AreEqual("А. А. Бабин, Т. В. Балашова ; отв. ред. М. А. Бусев", actual.GetFirstSubFieldValue('f').ToString().EmptyToNull());
-            Assert.AreEqual("Рос. акад. художеств, Гос. музей изобр. искусств им. А. С. Пушкина", actual.GetFirstSubFieldValue('g').ToString().EmptyToNull());
+            Assert.AreEqual("Пикассо сегодня", actual.GetFirstSubFieldValue('a'));
+            Assert.AreEqual("[сборник статей]", actual.GetFirstSubFieldValue('e'));
+            Assert.AreEqual("А. А. Бабин, Т. В. Балашова ; отв. ред. М. А. Бусев", actual.GetFirstSubFieldValue('f'));
+            Assert.AreEqual("Рос. акад. художеств, Гос. музей изобр. искусств им. А. С. Пушкина", actual.GetFirstSubFieldValue('g'));
         }
 
         [TestMethod]

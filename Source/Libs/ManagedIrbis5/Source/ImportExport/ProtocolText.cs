@@ -183,7 +183,7 @@ namespace ManagedIrbis.ImportExport
             var result = new Field
             {
                 Tag = FastNumber.ParseInt32(_ReadTo(reader, '#')),
-                Value = _ReadTo(reader, '^')
+                Value = _ReadTo(reader, '^').EmptyToNull()
             };
 
             while (true)
@@ -198,7 +198,7 @@ namespace ManagedIrbis.ImportExport
                 var subField = new SubField
                 {
                     Code = code,
-                    Value = text
+                    Value = text.ToString()
                 };
                 result.Subfields.Add(subField);
             }

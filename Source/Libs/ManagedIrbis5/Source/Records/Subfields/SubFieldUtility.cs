@@ -241,10 +241,10 @@ namespace ManagedIrbis
             foreach (var subField in subFields.NonNullItems())
             {
                 var value = subField.Value;
-                if (!value.IsEmpty)
+                if (!value.IsEmpty())
                 {
                     result ??= new List<string>();
-                    result.Add(value.ToString());
+                    result.Add(value);
                 }
             }
 

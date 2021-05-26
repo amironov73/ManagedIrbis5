@@ -239,7 +239,7 @@ namespace ManagedIrbis.Fields
             {
                 if (field.Tag.IsOneOf(tags))
                 {
-                    var collective = ParseField(field);
+                    var collective = Parse(field);
                     result.Add(collective);
                 }
             }
@@ -250,31 +250,29 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Parse the specified field.
         /// </summary>
-        public static CollectiveInfo ParseField
+        public static CollectiveInfo Parse
             (
                 Field field
             )
         {
             var result = new CollectiveInfo
             {
-                Title = field.GetFirstSubFieldValue('a').ToString(),
-                Country = field.GetFirstSubFieldValue('s').ToString(),
-                Abbreviation = field.GetFirstSubFieldValue('r').ToString(),
-                Number = field.GetFirstSubFieldValue('n').ToString(),
-                Date = field.GetFirstSubFieldValue('f').ToString(),
-                City1 = field.GetFirstSubFieldValue('c').ToString(),
-                Department = field.GetFirstSubFieldValue('b').ToString(),
-                Characteristic = !string.IsNullOrEmpty
-                    (
-                        field.GetFirstSubFieldValue('x').ToString()
-                    ),
-                Gost = field.GetFirstSubFieldValue('7').ToString(),
+                Title = field.GetFirstSubFieldValue('a'),
+                Country = field.GetFirstSubFieldValue('s'),
+                Abbreviation = field.GetFirstSubFieldValue('r'),
+                Number = field.GetFirstSubFieldValue('n'),
+                Date = field.GetFirstSubFieldValue('f'),
+                City1 = field.GetFirstSubFieldValue('c'),
+                Department = field.GetFirstSubFieldValue('b'),
+                Characteristic = field.GetFirstSubFieldValue('x').IsEmpty(),
+                Gost = field.GetFirstSubFieldValue('7'),
                 UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
                 Field = field
             };
 
             return result;
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Should serialize the <see cref="Characteristic"/> field?

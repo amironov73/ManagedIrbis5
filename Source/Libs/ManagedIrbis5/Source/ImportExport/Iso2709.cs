@@ -179,8 +179,7 @@ namespace ManagedIrbis.ImportExport
                             record,
                             fieldOffset,
                             fieldLength - 1
-                        )
-                        .AsMemory();
+                        );
                 }
                 else
                 {
@@ -212,8 +211,7 @@ namespace ManagedIrbis.ImportExport
                                 record,
                                 start,
                                 position - start
-                            )
-                            .AsMemory();
+                            );
                     }
 
                     // Просматриваем подполя
@@ -238,7 +236,6 @@ namespace ManagedIrbis.ImportExport
                                         start + 2,
                                         position - start - 2
                                     )
-                                    .AsMemory()
                             };
                         field.Subfields.Add(subField);
                         start = position;
@@ -280,12 +277,12 @@ namespace ManagedIrbis.ImportExport
                 if (field.Tag < 10)
                 {
                     // В фиксированном поле не бывает подполей.
-                    fldlen += encoding.GetByteCount(field.Value.Span);
+                    fldlen += encoding.GetByteCount(field.Value ?? string.Empty);
                 }
                 else
                 {
                     fldlen += 2; // RecordField.IndicatorCount; // Индикаторы
-                    fldlen += encoding.GetByteCount(field.Value.Span);
+                    fldlen += encoding.GetByteCount(field.Value ?? string.Empty);
                     for (var j = 0; j < field.Subfields.Count; j++)
                     {
                         SubField subField = field.Subfields[j];
@@ -301,7 +298,7 @@ namespace ManagedIrbis.ImportExport
 //                        }
 
                             fldlen += 2; // Признак подполя и его код
-                            fldlen += encoding.GetByteCount(subField.Value.Span);
+                            fldlen += encoding.GetByteCount(subField.Value ?? string.Empty);
                         }
                     }
                 }
@@ -371,7 +368,7 @@ namespace ManagedIrbis.ImportExport
                         (
                             bytes,
                             currentAddress,
-                            field.Value.Span,
+                            field.Value,
                             encoding
                         );
                 }
@@ -385,7 +382,7 @@ namespace ManagedIrbis.ImportExport
                         (
                             bytes,
                             currentAddress,
-                            field.Value.Span,
+                            field.Value,
                             encoding
                         );
 
@@ -400,7 +397,7 @@ namespace ManagedIrbis.ImportExport
                                 (
                                     bytes,
                                     currentAddress,
-                                    subfield.Value.Span,
+                                    subfield.Value,
                                     encoding
                                 );
                         }

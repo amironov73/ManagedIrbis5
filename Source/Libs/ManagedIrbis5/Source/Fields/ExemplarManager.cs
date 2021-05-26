@@ -101,34 +101,34 @@ namespace ManagedIrbis.Fields
 
         private readonly AbstractOutput? _output;
 
-        private static string _GetYear
+        private static string GetYear
             (
                 Record record
             )
         {
-            var result = record.FM(210, 'd').ToString();
-            if (string.IsNullOrEmpty(result))
+            var result = record.FM(210, 'd');
+            if (result.IsEmpty())
             {
-                result = record.FM(461, 'h').ToString();
+                result = record.FM(461, 'h');
             }
 
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty())
             {
-                result = record.FM(461, 'z').ToString();
+                result = record.FM(461, 'z');
             }
 
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty())
             {
-                var workList = record.FM(920).ToString();
+                var workList = record.FM(920);
                 if (workList.SameString("NJ"))
                 {
-                    result = record.FM(934).ToString();
+                    result = record.FM(934);
                 }
             }
 
-            if (string.IsNullOrEmpty(result))
+            if (result.IsEmpty())
             {
-                return result;
+                return result ?? string.Empty;
             }
 
             var match = Regex.Match(result, @"\d{4}");
@@ -138,27 +138,25 @@ namespace ManagedIrbis.Fields
             }
 
             return result;
-        }
 
-        private static string _GetPrice
+        } // method GetYear
+
+        private static string GetPrice
             (
                 Record record,
                 ExemplarInfo exemplar
             )
         {
-            if (!string.IsNullOrEmpty(exemplar.Price))
+            if (!exemplar.Price.IsEmpty())
             {
                 return exemplar.Price;
             }
 
-            var price = record.FM(10, 'd').ToString();
-            if (!string.IsNullOrEmpty(price))
-            {
-                return price;
-            }
+            var price = record.FM(10, 'd');
 
-            return string.Empty;
-        }
+            return !price.IsEmpty() ? price : string.Empty;
+
+        } // method GetPrice
 
         #endregion
 
@@ -284,8 +282,8 @@ namespace ManagedIrbis.Fields
             {
                 Magna.Error
                     (
-                        "ExemplarManager::Extend: "
-                        + "MFN="
+                        nameof(ExemplarManager) + "::" + nameof(Extend)
+                        + ": MFN="
                         + exemplar.Mfn
                     );
 
@@ -300,7 +298,7 @@ namespace ManagedIrbis.Fields
 
             if (!ReferenceEquals(record, null))
             {
-                string workList = record.FM(920).ToString();
+                var workList = record.FM(920);
 
                 if (string.IsNullOrEmpty(exemplar.ShelfIndex))
                 {
@@ -309,42 +307,38 @@ namespace ManagedIrbis.Fields
                             record.FM(906),
                             record.FM(621),
                             record.FM(686)
-                        )
-                        .ToString();
+                        );
                 }
 
-                if (string.IsNullOrEmpty(exemplar.ShelfIndex)
+                if (exemplar.ShelfIndex.IsEmpty()
                     && workList.SameString("NJ"))
                 {
-                    string consolidatedIndex = record.FM(933).ToString();
+                    var consolidatedIndex = record.FM(933);
                     if (!string.IsNullOrEmpty(consolidatedIndex))
                     {
                         var expression = $"\"I={consolidatedIndex}\"";
-                        //MarcRecord consolidatedRecord
-                        //    = Connection.SearchReadOneRecord(expression);
-                        var found = Connection.Search(expression);
-                        if (found.Length == 1)
+                        var consolidatedRecord = Connection.SearchReadOneRecord(expression);
+                        if (consolidatedRecord is not null)
                         {
-                            var consolidatedRecord = Connection.ReadRecord(found[0])
-                                .ThrowIfNull("consolidatedRecord");
                             exemplar.ShelfIndex = Utility.NonEmpty
                                 (
                                     consolidatedRecord.FM(906),
                                     consolidatedRecord.FM(621),
                                     consolidatedRecord.FM(686)
-                                )
-                                .ToString();
+                                );
                         }
                     }
+
                 }
 
-                exemplar.Year = _GetYear(record);
-                exemplar.Price = _GetPrice(record, exemplar);
-                exemplar.Issue = record.FM(936).ToString();
+                exemplar.Year = GetYear(record);
+                exemplar.Price = GetPrice(record, exemplar);
+                exemplar.Issue = record.FM(936);
             }
 
             return exemplar;
-        }
+
+        } // method Extend
 
         /// <summary>
         ///
@@ -393,17 +387,18 @@ namespace ManagedIrbis.Fields
                 Record record
             )
         {
-            string worklist = record.FM(920).ToString();
-            if (string.IsNullOrEmpty(worklist))
+            var worklist = record.FM(920);
+            if (worklist.IsEmpty())
             {
                 return false;
             }
+
             if (!worklist.SameString("NJ"))
             {
                 return false;
             }
 
-            string index = record.FM(933).ToString();
+            var index = record.FM(933);
             if (string.IsNullOrEmpty(index))
             {
                 return false;
@@ -420,7 +415,7 @@ namespace ManagedIrbis.Fields
                 return false;
             }
 
-            var kind = main.FM(110, 'b').ToString();
+            var kind = main.FM(110, 'b');
             result = kind.SameString("c");
             _newspapers[index] = result;
             return result;

@@ -228,10 +228,10 @@ namespace ManagedIrbis.Fields
 
             var result = new BinaryResource
             {
-                Kind = field.GetFirstSubFieldValue('a').ToString(),
-                Resource = field.GetFirstSubFieldValue('b').ToString(),
-                Title = field.GetFirstSubFieldValue('t').ToString(),
-                View = field.GetFirstSubFieldValue('p').ToString(),
+                Kind = field.GetFirstSubFieldValue('a'),
+                Resource = field.GetFirstSubFieldValue('b'),
+                Title = field.GetFirstSubFieldValue('t'),
+                View = field.GetFirstSubFieldValue('p'),
                 Field = field
             };
 

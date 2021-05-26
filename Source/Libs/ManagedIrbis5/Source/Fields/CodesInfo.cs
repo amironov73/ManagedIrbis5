@@ -233,23 +233,24 @@ namespace ManagedIrbis.Fields
         {
             CodesInfo result = new CodesInfo
                 {
-                    DocumentType = field.GetFirstSubFieldValue('t').ToString(),
-                    DocumentKind = field.GetFirstSubFieldValue('b').ToString(),
-                    DocumentCharacter1 = field.GetFirstSubFieldValue('c').ToString(),
-                    DocumentCharacter2 = field.GetFirstSubFieldValue('2').ToString(),
-                    DocumentCharacter3 = field.GetFirstSubFieldValue('3').ToString(),
-                    DocumentCharacter4 = field.GetFirstSubFieldValue('4').ToString(),
-                    DocumentCharacter5 = field.GetFirstSubFieldValue('5').ToString(),
-                    DocumentCharacter6 = field.GetFirstSubFieldValue('6').ToString(),
-                    PurposeCode1 = field.GetFirstSubFieldValue('x').ToString(),
-                    PurposeCode2 = field.GetFirstSubFieldValue('y').ToString(),
-                    PurposeCode3 = field.GetFirstSubFieldValue('9').ToString(),
-                    AgeRestrictions = field.GetFirstSubFieldValue('z').ToString(),
+                    DocumentType = field.GetFirstSubFieldValue('t'),
+                    DocumentKind = field.GetFirstSubFieldValue('b'),
+                    DocumentCharacter1 = field.GetFirstSubFieldValue('c'),
+                    DocumentCharacter2 = field.GetFirstSubFieldValue('2'),
+                    DocumentCharacter3 = field.GetFirstSubFieldValue('3'),
+                    DocumentCharacter4 = field.GetFirstSubFieldValue('4'),
+                    DocumentCharacter5 = field.GetFirstSubFieldValue('5'),
+                    DocumentCharacter6 = field.GetFirstSubFieldValue('6'),
+                    PurposeCode1 = field.GetFirstSubFieldValue('x'),
+                    PurposeCode2 = field.GetFirstSubFieldValue('y'),
+                    PurposeCode3 = field.GetFirstSubFieldValue('9'),
+                    AgeRestrictions = field.GetFirstSubFieldValue('z'),
                     Field = field
                 };
 
             return result;
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Transform back to field.

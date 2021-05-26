@@ -185,19 +185,19 @@ namespace ManagedIrbis.Fulltext
 
             var result = new FulltextRecord
             {
-                Guid = record.FM(IrbisGuid.Tag).ToString(),
-                WordCount = record.FM(20).ToString(),
-                Subject = record.FM(21).ToString(),
-                BriefText = record.FM(22).ToString(),
-                Remarks = record.FM(23).ToString(),
-                EntryDate = record.FM(24).ToString(),
-                FileSize = record.FM(25).ToString(),
-                FileDate = record.FM(26).ToString(),
-                Lines = record.FMA(27).Select(o=>o.ToString()).ToArray(),
-                Transfer = record.FM(66).ToString(),
-                InitialData = record.FM(951).ToString(),
+                Guid = record.FM(IrbisGuid.Tag),
+                WordCount = record.FM(20),
+                Subject = record.FM(21),
+                BriefText = record.FM(22),
+                Remarks = record.FM(23),
+                EntryDate = record.FM(24),
+                FileSize = record.FM(25),
+                FileDate = record.FM(26),
+                Lines = record.FMA(27),
+                Transfer = record.FM(66),
+                InitialData = record.FM(951),
                 TextReference = FullTextReference.Parse(record.GetField(952)),
-                ReferenceGuid = record.FM(999).ToString(),
+                ReferenceGuid = record.FM(999),
                 Record = record
             };
 

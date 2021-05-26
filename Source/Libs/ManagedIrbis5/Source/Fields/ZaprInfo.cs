@@ -77,9 +77,9 @@ namespace ManagedIrbis.Fields
 
             var result = new ZaprInfo
             {
-                NaturalLanguage = field.GetSubFieldValue('a').ToString(),
-                FullTextQuery = field.GetSubFieldValue('b').ToString(),
-                SearchQuery = field.GetSubFieldValue('c').ToString(),
+                NaturalLanguage = field.GetSubFieldValue('a'),
+                FullTextQuery = field.GetSubFieldValue('b'),
+                SearchQuery = field.GetSubFieldValue('c'),
                 Date = IrbisDate.ConvertStringToDate(field.GetSubFieldValue('d'))
             };
 

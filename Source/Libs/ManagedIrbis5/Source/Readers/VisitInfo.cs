@@ -321,32 +321,26 @@ namespace ManagedIrbis.Readers
         #region Private members
 
         // ReSharper disable once InconsistentNaming
-        private ReadOnlyMemory<char> FM
-            (
-                char code
-            )
-        {
-            return Field?.GetFirstSubFieldValue(code) ?? default;
-        }
+        private string? FM ( char code ) => Field?.GetFirstSubFieldValue(code);
 
         private void _Parse()
         {
-            Database = FM('g').ToString();
-            Index = FM('a').ToString();
-            Inventory = FM('b').ToString();
-            Barcode = FM('h').ToString();
-            Sigla = FM('k').ToString();
-            DateGivenString = FM('d').ToString();
-            Department = FM('v').ToString();
-            DateExpectedString = FM('e').ToString();
-            DateReturnedString = FM('f').ToString();
-            DateProlongString = FM('l').ToString();
-            Lost = FM('u').ToString();
-            Description = FM('c').ToString();
-            Responsible = FM('i').ToString();
-            TimeIn = FM('1').ToString();
-            TimeOut = FM('2').ToString();
-            Comment = FM('9').ToString();
+            Database = FM('g');
+            Index = FM('a');
+            Inventory = FM('b');
+            Barcode = FM('h');
+            Sigla = FM('k');
+            DateGivenString = FM('d');
+            Department = FM('v');
+            DateExpectedString = FM('e');
+            DateReturnedString = FM('f');
+            DateProlongString = FM('l');
+            Lost = FM('u');
+            Description = FM('c');
+            Responsible = FM('i');
+            TimeIn = FM('1');
+            TimeOut = FM('2');
+            Comment = FM('9');
         }
 
         #endregion
@@ -390,7 +384,7 @@ namespace ManagedIrbis.Readers
 
             if (string.IsNullOrEmpty(result))
             {
-                result = bookRecord.FM(10, 'd').ToString();
+                result = bookRecord.FM(10, 'd');
             }
 
             return result;

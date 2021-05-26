@@ -68,9 +68,9 @@ namespace UnitTests.ManagedIrbis.Fields
             var record = _GetRecord();
             var counter = GlobalCounter.Parse(record);
             Assert.AreSame(record, counter.Record);
-            Assert.AreEqual(record.FM(1).ToString(), counter.Index);
-            Assert.AreEqual(record.FM(2).ToString(), counter.Value);
-            Assert.AreEqual(record.FM(3).ToString(), counter.Template);
+            Assert.AreEqual(record.FM(1), counter.Index);
+            Assert.AreEqual(record.FM(2), counter.Value);
+            Assert.AreEqual(record.FM(3), counter.Template);
             Assert.IsNull(counter.UserData);
         }
 
@@ -79,9 +79,9 @@ namespace UnitTests.ManagedIrbis.Fields
         {
             var counter = _GetCounter();
             var record = counter.ToRecord();
-            Assert.AreEqual(counter.Index, record.FM(1).ToString());
-            Assert.AreEqual(counter.Value, record.FM(2).ToString());
-            Assert.AreEqual(counter.Template, record.FM(3).ToString());
+            Assert.AreEqual(counter.Index, record.FM(1));
+            Assert.AreEqual(counter.Value, record.FM(2));
+            Assert.AreEqual(counter.Template, record.FM(3));
         }
 
         [TestMethod]
@@ -93,9 +93,9 @@ namespace UnitTests.ManagedIrbis.Fields
             record.Fields.Add(new Field(2, "333"));
             record.Fields.Add(new Field(3, "???"));
             counter.ApplyTo(record);
-            Assert.AreEqual(counter.Index, record.FM(1).ToString());
-            Assert.AreEqual(counter.Value, record.FM(2).ToString());
-            Assert.AreEqual(counter.Template, record.FM(3).ToString());
+            Assert.AreEqual(counter.Index, record.FM(1));
+            Assert.AreEqual(counter.Value, record.FM(2));
+            Assert.AreEqual(counter.Template, record.FM(3));
         }
 
         [TestMethod]

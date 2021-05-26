@@ -230,15 +230,15 @@ namespace ManagedIrbis.Fields
         {
             var result = new HeadingInfo
             {
-                Title = field.GetFirstSubFieldValue('a').ToString(),
-                Subtitle1 = field.GetFirstSubFieldValue('b').ToString(),
-                Subtitle2 = field.GetFirstSubFieldValue('c').ToString(),
-                Subtitle3 = field.GetFirstSubFieldValue('d').ToString(),
-                GeographicalSubtitle1 = field.GetFirstSubFieldValue('g').ToString(),
-                GeographicalSubtitle2 = field.GetFirstSubFieldValue('e').ToString(),
-                GeographicalSubtitle3 = field.GetFirstSubFieldValue('o').ToString(),
-                ChronologicalSubtitle = field.GetFirstSubFieldValue('h').ToString(),
-                Aspect = field.GetFirstSubFieldValue('9').ToString(),
+                Title = field.GetFirstSubFieldValue('a'),
+                Subtitle1 = field.GetFirstSubFieldValue('b'),
+                Subtitle2 = field.GetFirstSubFieldValue('c'),
+                Subtitle3 = field.GetFirstSubFieldValue('d'),
+                GeographicalSubtitle1 = field.GetFirstSubFieldValue('g'),
+                GeographicalSubtitle2 = field.GetFirstSubFieldValue('e'),
+                GeographicalSubtitle3 = field.GetFirstSubFieldValue('o'),
+                ChronologicalSubtitle = field.GetFirstSubFieldValue('h'),
+                Aspect = field.GetFirstSubFieldValue('9'),
                 UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
                 Field = field
             };

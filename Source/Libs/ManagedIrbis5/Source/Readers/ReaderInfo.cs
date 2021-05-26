@@ -410,24 +410,24 @@ namespace ManagedIrbis.Readers
 
             var result = new ReaderInfo
                 {
-                    FamilyName = record.FM(10).ToString(),
-                    FirstName = record.FM(11).ToString(),
-                    Patronymic = record.FM(12).ToString(),
-                    DateOfBirth = record.FM(21).ToString(),
-                    PassCard = record.FM(22).ToString(),
-                    Ticket = record.FM(30).ToString(),
-                    Gender = record.FM(23).ToString(),
-                    Category = record.FM(50).ToString(),
+                    FamilyName = record.FM(10),
+                    FirstName = record.FM(11),
+                    Patronymic = record.FM(12),
+                    DateOfBirth = record.FM(21),
+                    PassCard = record.FM(22),
+                    Ticket = record.FM(30),
+                    Gender = record.FM(23),
+                    Category = record.FM(50),
                     Address = ReaderAddress.Parse
                         (
                             record.Fields
                             .GetFirstField(13)
                         ),
-                    WorkPlace = record.FM(15).ToString(),
-                    Education = record.FM(20).ToString(),
-                    Email = record.FM(32).ToString(),
-                    HomePhone = record.FM(17).ToString(),
-                    RegistrationDateString = record.FM(51).ToString(),
+                    WorkPlace = record.FM(15),
+                    Education = record.FM(20),
+                    Email = record.FM(32),
+                    HomePhone = record.FM(17),
+                    RegistrationDateString = record.FM(51),
 
                     Enrollment = record.Fields
                         .GetField(51)
@@ -439,11 +439,11 @@ namespace ManagedIrbis.Readers
                         .Select(field => ReaderRegistration.Parse(field))
                         .ToArray(),
 
-                    EnabledPlaces = record.FM(56).ToString(),
-                    DisabledPlaces = record.FM(57).ToString(),
-                    Rights = record.FM(29).ToString(),
-                    Remarks = record.FM(33).ToString(),
-                    PhotoFile = record.FM(950).ToString(),
+                    EnabledPlaces = record.FM(56),
+                    DisabledPlaces = record.FM(57),
+                    Rights = record.FM(29),
+                    Remarks = record.FM(33),
+                    PhotoFile = record.FM(950),
 
                     Visits = record.Fields
                         .GetField(40)
@@ -451,8 +451,8 @@ namespace ManagedIrbis.Readers
                         .ToArray(),
 
                     Profiles = IriProfile.ParseRecord(record),
-                    Password = record.FM(130).ToString(),
-                    Status = Utility.NonEmpty(record.FM(2015), "0".AsMemory()).ToString(),
+                    Password = record.FM(130),
+                    Status = Utility.NonEmpty(record.FM(2015), "0"),
                     Record = record
                 };
 

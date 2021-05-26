@@ -147,11 +147,11 @@ namespace ManagedIrbis.Magazines
 
             var result = new MagazineCumulation
             {
-                Year = field.GetFirstSubFieldValue('q').ToString(),
-                Volume = field.GetFirstSubFieldValue('f').ToString(),
-                Place = field.GetFirstSubFieldValue('d').ToString(),
-                Numbers = field.GetFirstSubFieldValue('h').ToString(),
-                Set = field.GetFirstSubFieldValue('k').ToString(),
+                Year = field.GetFirstSubFieldValue('q'),
+                Volume = field.GetFirstSubFieldValue('f'),
+                Place = field.GetFirstSubFieldValue('d'),
+                Numbers = field.GetFirstSubFieldValue('h'),
+                Set = field.GetFirstSubFieldValue('k'),
                 UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
                 Field = field
             };

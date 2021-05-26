@@ -191,15 +191,15 @@ namespace ManagedIrbis.Fields
 
             var result = new QuarterlyOrderInfo
             {
-                Period = field.GetFirstSubFieldValue('q').ToString(),
-                NumberOfIssues = field.GetFirstSubFieldValue('n').ToString(),
-                FirstIssue = field.GetFirstSubFieldValue('a').ToString(),
-                LastIssue = field.GetFirstSubFieldValue('b').ToString(),
-                TotalPrice = field.GetFirstSubFieldValue('y').ToString(),
-                IssuePrice = field.GetFirstSubFieldValue('e').ToString(),
-                Currency = field.GetFirstSubFieldValue('v').ToString(),
-                PeriodicityCode = field.GetFirstSubFieldValue('d').ToString(),
-                PeriodicityNumber = field.GetFirstSubFieldValue('x').ToString(),
+                Period = field.GetFirstSubFieldValue('q'),
+                NumberOfIssues = field.GetFirstSubFieldValue('n'),
+                FirstIssue = field.GetFirstSubFieldValue('a'),
+                LastIssue = field.GetFirstSubFieldValue('b'),
+                TotalPrice = field.GetFirstSubFieldValue('y'),
+                IssuePrice = field.GetFirstSubFieldValue('e'),
+                Currency = field.GetFirstSubFieldValue('v'),
+                PeriodicityCode = field.GetFirstSubFieldValue('d'),
+                PeriodicityNumber = field.GetFirstSubFieldValue('x'),
                 UnknownSubfields = field.Subfields.GetUnknownSubFields(KnownCodes),
                 Field = field
             };

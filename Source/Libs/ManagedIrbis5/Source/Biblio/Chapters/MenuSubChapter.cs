@@ -133,11 +133,16 @@ namespace ManagedIrbis.Biblio
                 .ThrowIfNull("MainChapter.Format");
         }
 
-        internal static string Enhance
+        internal static string? Enhance
             (
-                string text
+                string? text
             )
         {
+            if (string.IsNullOrEmpty(text))
+            {
+                return text;
+            }
+
             var result = text
                 .Replace(". - ", ". – ")
                 .Replace("№", "\\'B9");

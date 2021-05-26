@@ -136,12 +136,12 @@ namespace ManagedIrbis.Fields
         {
             ContentType result = new ContentType
             {
-                ContentKind = field.GetFirstSubFieldValue('a').ToString(),
-                DegreeOfApplicability = field.GetFirstSubFieldValue('b').ToString(),
-                TypeSpecification = field.GetFirstSubFieldValue('c').ToString(),
-                MovementSpecification = field.GetFirstSubFieldValue('d').ToString(),
-                DimensionSpecification = field.GetFirstSubFieldValue('e').ToString(),
-                SensorySpecification = field.GetFirstSubFieldValue('f').ToString()
+                ContentKind = field.GetFirstSubFieldValue('a'),
+                DegreeOfApplicability = field.GetFirstSubFieldValue('b'),
+                TypeSpecification = field.GetFirstSubFieldValue('c'),
+                MovementSpecification = field.GetFirstSubFieldValue('d'),
+                DimensionSpecification = field.GetFirstSubFieldValue('e'),
+                SensorySpecification = field.GetFirstSubFieldValue('f')
             };
 
             return result;

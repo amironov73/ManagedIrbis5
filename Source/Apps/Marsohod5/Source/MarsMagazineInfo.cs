@@ -74,17 +74,18 @@ namespace Marsohod5
         {
             MarsMagazineInfo result = new MarsMagazineInfo
             {
-                Title = record.FM(200, 'a').ToString(),
-                Index = record.FM(903).ToString(),
-                MarsCode = record.FM(options.MarsCode).ToString(),
-                Flag = record.FM(options.MarsFlag).ToString(),
+                Title = record.FM(200, 'a'),
+                Index = record.FM(903),
+                MarsCode = record.FM(options.MarsCode),
+                Flag = record.FM(options.MarsFlag),
                 Mfn = record.Mfn
             };
 
             return result;
-        }
+
+        } // method FromRecord
 
         #endregion
 
-    }
+    } // class MarsMagazineInfo
 }

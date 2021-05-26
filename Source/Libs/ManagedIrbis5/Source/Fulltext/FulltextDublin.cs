@@ -201,21 +201,21 @@ namespace ManagedIrbis.Fulltext
 
             var result = new FulltextDublin
             {
-                Title = record.FM(1).ToString(),
-                Creator = record.FM(2).ToString(),
-                Subject = record.FM(3).ToString(),
-                Description = record.FM(4).ToString(),
-                Publisher = record.FM(5).ToString(),
-                Contributor = record.FM(6).ToString(),
-                Date = record.FM(7).ToString(),
-                Type = record.FM(8).ToString(),
-                Format = record.FM(9).ToString(),
-                Identifier = record.FM(10).ToString(),
-                Source = record.FM(11).ToString(),
-                Language = record.FM(12).ToString(),
-                Relation = record.FM(13).ToString(),
-                Coverage = record.FM(14).ToString(),
-                Rights = record.FM(15).ToString(),
+                Title = record.FM(1),
+                Creator = record.FM(2),
+                Subject = record.FM(3),
+                Description = record.FM(4),
+                Publisher = record.FM(5),
+                Contributor = record.FM(6),
+                Date = record.FM(7),
+                Type = record.FM(8),
+                Format = record.FM(9),
+                Identifier = record.FM(10),
+                Source = record.FM(11),
+                Language = record.FM(12),
+                Relation = record.FM(13),
+                Coverage = record.FM(14),
+                Rights = record.FM(15),
                 Record = record
             };
 

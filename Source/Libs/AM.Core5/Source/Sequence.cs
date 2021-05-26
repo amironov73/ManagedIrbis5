@@ -121,12 +121,12 @@ namespace AM
         /// Порождает последовательность из перечисленных элементов.
         /// </summary>
         [Pure]
-        public static IEnumerable<T> FromItems<T>
+        public static IEnumerable<T?> FromItems<T>
             (
-                params T[] items
+                params T?[] items
             )
         {
-            foreach (T item in items)
+            foreach (T? item in items)
             {
                 yield return item;
             }
@@ -252,7 +252,7 @@ namespace AM
         /// </summary>
         public static IEnumerable<string> NonEmptyLines
             (
-                this IEnumerable<string> sequence
+                this IEnumerable<string?> sequence
             )
         {
             foreach (var line in sequence)

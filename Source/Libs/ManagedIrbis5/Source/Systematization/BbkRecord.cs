@@ -224,15 +224,15 @@ namespace ManagedIrbis.Systematization
 
             var result = new BbkRecord
             {
-                RecordKind = record.FM(1).ToString(),
-                SuperHeading = record.FM(2).ToString(),
-                MainIndex = record.FM(3).ToString(),
-                MainHeading = record.FM(4).ToString(),
-                MainExtension = record.FM(5).ToString(),
-                SearchQuery = record.FM(6).ToString(),
-                ExclusionDate = record.FM(7).ToString(),
-                MethodicalInstructions = record.FMA(8).ToStringArray(),
-                FacetedInstructions = record.FMA(9).ToStringArray(),
+                RecordKind = record.FM(1),
+                SuperHeading = record.FM(2),
+                MainIndex = record.FM(3),
+                MainHeading = record.FM(4),
+                MainExtension = record.FM(5),
+                SearchQuery = record.FM(6),
+                ExclusionDate = record.FM(7),
+                MethodicalInstructions = record.FMA(8),
+                FacetedInstructions = record.FMA(9),
                 SeeReferences = record.Fields
                     .GetField(10)
                     .Select(field => BbkReference.Parse(field))
@@ -241,23 +241,23 @@ namespace ManagedIrbis.Systematization
                     .GetField(11)
                     .Select(field => BbkReference.Parse(field))
                     .ToArray(),
-                Expansion = record.FMA(12).ToStringArray(),
-                AdjacentAreas = record.FMA(13).ToStringArray(),
-                ApplicationAreas = record.FMA(14).ToStringArray(),
-                SubstituteIndex = record.FMA(15).ToStringArray(),
-                ContinuingRecordNumber = record.FM(16).ToString(),
-                Grnti = record.FMA(17).ToStringArray(),
-                Dewey = record.FMA(18).ToStringArray(),
-                Udc = record.FMA(19).ToStringArray(),
-                MT = record.FMA(20).ToStringArray(),
-                Composition = record.FM(21).ToString(),
-                Correcture = record.FMA(22).ToStringArray(),
-                WorkingScheme = record.FMA(23).ToStringArray(),
+                Expansion = record.FMA(12),
+                AdjacentAreas = record.FMA(13),
+                ApplicationAreas = record.FMA(14),
+                SubstituteIndex = record.FMA(15),
+                ContinuingRecordNumber = record.FM(16),
+                Grnti = record.FMA(17),
+                Dewey = record.FMA(18),
+                Udc = record.FMA(19),
+                MT = record.FMA(20),
+                Composition = record.FM(21),
+                Correcture = record.FMA(22),
+                WorkingScheme = record.FMA(23),
                 BackReferences = record.Fields
                     .GetField(24)
                     .Select(field => BbkReference.Parse(field))
                     .ToArray(),
-                Hyphens = record.FM(505).ToString()
+                Hyphens = record.FM(505)
             };
 
             return result;

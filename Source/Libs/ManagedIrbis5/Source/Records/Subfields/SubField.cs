@@ -38,8 +38,7 @@ namespace ManagedIrbis
         : IVerifiable,
         IXmlSerializable,
         IHandmadeSerializable,
-        IReadOnly<SubField>,
-        IDisposable
+        IReadOnly<SubField>
     {
         #region Constants
 
@@ -68,7 +67,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Значение подполя.
         /// </summary>
-        public ReadOnlyMemory<char> Value
+        public string? Value
         {
             get => _value;
             set => SetValue(value);
@@ -114,7 +113,7 @@ namespace ManagedIrbis
                 throw new ArgumentException(nameof(value));
             }
 
-            Value = value;
+            Value = value.ToString();
         } // constructor
 
         /// <summary>
@@ -129,14 +128,14 @@ namespace ManagedIrbis
             )
         {
             Code = code;
-            Value = value.AsMemory();
+            Value = value;
         } // constructor
 
         #endregion
 
         #region Private members
 
-        private ReadOnlyMemory<char> _value;
+        private string? _value;
 
         #endregion
 
@@ -164,11 +163,7 @@ namespace ManagedIrbis
                 return result;
             }
 
-            result = subField1.Value.Span.CompareTo
-                (
-                    subField2.Value.Span,
-                    StringComparison.Ordinal
-                );
+            result = string.CompareOrdinal(subField1.Value, subField2.Value);
 
             return result;
         } // method Compare
@@ -178,40 +173,44 @@ namespace ManagedIrbis
         /// </summary>
         public void Decode
             (
-                ReadOnlyMemory<char> text
+                ReadOnlySpan<char> text
             )
         {
             if (!text.IsEmpty)
             {
-                Code = char.ToLowerInvariant(text.Span[0]);
+                Code = char.ToLowerInvariant(text[0]);
                 var value = text[1..];
                 SubFieldValue.Verify(value, true);
-                Value = value;
+                Value = value.ToString();
             }
         } // method Decode
-
-        /// <summary>
-        /// Получение подполя из пула.
-        /// </summary>
-        /// <returns>Объект из пула.</returns>
-        public static SubField FromPool() => SubFieldPool.Default.Get();
-
-        /// <summary>
-        /// Возврат объекта в пул.
-        /// </summary>
-        public void ToPool() => SubFieldPool.Default.Return(this);
 
         /// <summary>
         /// Установка нового значения подполя.
         /// </summary>
         public void SetValue
             (
-                ReadOnlyMemory<char> value
+                ReadOnlySpan<char> value
+            )
+        {
+            ThrowIfReadOnly();
+            SubFieldValue.Verify(value, true);
+            _value = value.ToString();
+
+        } // method SetValue
+
+        /// <summary>
+        /// Установка нового значения подполя.
+        /// </summary>
+        public void SetValue
+            (
+                string? value
             )
         {
             ThrowIfReadOnly();
             SubFieldValue.Verify(value, true);
             _value = value;
+
         } // method SetValue
 
         #endregion
@@ -225,7 +224,8 @@ namespace ManagedIrbis
             )
         {
             Code = reader.ReadChar();
-            Value = reader.ReadOnlyMemory();
+            Value = reader.ReadNullableString();
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -235,7 +235,8 @@ namespace ManagedIrbis
             )
         {
             writer.Write(Code);
-            writer.Write(Value);
+            writer.WriteNullable(Value);
+
         } // method SaveToStream
 
         #endregion
@@ -252,7 +253,7 @@ namespace ManagedIrbis
             )
         {
             Code = reader.GetAttribute("code").FirstChar();
-            Value = reader.GetAttribute("value").AsMemory();
+            Value = reader.GetAttribute("value");
 
         } // method ReadXml
 
@@ -263,7 +264,7 @@ namespace ManagedIrbis
             )
         {
             writer.WriteAttributeString("code", Code.ToString());
-            writer.WriteAttributeString("value", Value.ToString());
+            writer.WriteAttributeString("value", Value);
 
         } // method WriteXml
 
@@ -325,34 +326,12 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IDisposable members
-
-        /// <summary>
-        /// Очистка поля перед помещением его в пул.
-        /// </summary>
-        /// <remarks>
-        /// <para>Начиная с ManagedIrbis5, подполе поддерживает пулинг,
-        /// см. класс <see cref="SubFieldPool"/>.</para>
-        /// <para>Очистка перед помещением в пул выполняется с помощью
-        /// вызова <see cref="Dispose"/>.</para>
-        /// <para>При обычном использовании вызывать метод
-        /// <see cref="Dispose"/> не нужно.</para>
-        /// </remarks>
-        public void Dispose()
-        {
-            Code = NoCode;
-            Value = null;
-            Field = null;
-        } // method Dispose
-
-        #endregion
-
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
         public override string ToString() =>
             Code == NoCode
-                ? Value.ToString()
+                ? Value ?? string.Empty
                 : "^" + char.ToLowerInvariant(Code) + Value;
 
         #endregion

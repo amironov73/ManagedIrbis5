@@ -38,17 +38,17 @@ namespace ManagedIrbis.Quality.Rules
 
         private List<string> CheckText
             (
-                string text
+                string? text
             )
         {
-            List<string> result = new List<string>();
+            var result = new List<string>();
 
             if (!string.IsNullOrEmpty(text))
             {
-                Match match = _mixRegex.Match(text);
+                var match = _mixRegex.Match(text);
                 while (match.Success)
                 {
-                    CharacterClass classes = CharacterClassifier
+                    var classes = CharacterClassifier
                         .DetectCharacterClasses
                         (
                             match.Value
@@ -68,7 +68,7 @@ namespace ManagedIrbis.Quality.Rules
                 List<string> list
             )
         {
-            string word = list.Count == 1
+            var word = list.Count == 1
                 ? "слове"
                 : "словах";
             return string.Format
@@ -84,7 +84,7 @@ namespace ManagedIrbis.Quality.Rules
                 Field field
             )
         {
-            List<string> result = CheckText(field.Value.ToString());
+            var result = CheckText(field.Value);
             if (result.Count != 0)
             {
                 AddDefect
@@ -102,7 +102,7 @@ namespace ManagedIrbis.Quality.Rules
                 SubField subField
             )
         {
-            List<string> result = CheckText(subField.Value.ToString());
+            var result = CheckText(subField.Value);
             if (result.Count != 0)
             {
                 AddDefect
@@ -133,14 +133,14 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
-            foreach (Field field in fields)
+            var fields = GetFields();
+            foreach (var field in fields)
             {
                 CheckField
                     (
                         field
                     );
-                foreach (SubField subField in field.Subfields)
+                foreach (var subField in field.Subfields)
                 {
                     CheckSubField
                         (

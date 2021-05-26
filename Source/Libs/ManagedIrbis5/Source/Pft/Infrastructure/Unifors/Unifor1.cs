@@ -176,7 +176,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
             var text = code == SubField.NoCode
                 ? field.ToText()
-                : field.GetFirstSubFieldValue(code).ToString();
+                : field.GetFirstSubFieldValue(code);
             if (string.IsNullOrEmpty(text))
             {
                 return;

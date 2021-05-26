@@ -201,11 +201,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 }
                 else if (code == '*')
                 {
-                    result = field.GetValueOrFirstSubField().ToString();
+                    result = field.GetValueOrFirstSubField();
                 }
                 else
                 {
-                    result = field.GetFirstSubFieldValue(code).ToString();
+                    result = field.GetFirstSubFieldValue(code);
                 }
 
                 result = LimitText(specification, result);

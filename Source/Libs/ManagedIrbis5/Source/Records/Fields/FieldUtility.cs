@@ -202,7 +202,7 @@ namespace ManagedIrbis
                     subField = new SubField { Code = code };
                     field.Subfields.Add(subField);
                 }
-                subField.Value = value.ToString().AsMemory();
+                subField.Value = value.ToString();
             }
 
             return field;
@@ -236,7 +236,7 @@ namespace ManagedIrbis
                     subField = new SubField { Code = code };
                     field.Subfields.Add(subField);
                 }
-                subField.Value = text.AsMemory();
+                subField.Value = text;
             }
 
             return field;
@@ -269,7 +269,7 @@ namespace ManagedIrbis
                     subField = new SubField { Code = code };
                     field.Subfields.Add(subField);
                 }
-                subField.Value = value.AsMemory();
+                subField.Value = value;
             }
 
             return field;
@@ -714,8 +714,8 @@ namespace ManagedIrbis
                         field =>
                         {
                             var value = field.Value;
-                            return !value.IsEmpty
-                                   && Regex.IsMatch(value.ToString(), textRegex);
+                            return !value.IsEmpty()
+                                   && Regex.IsMatch(value, textRegex);
                         })
                 .ToArray();
         }
@@ -757,8 +757,8 @@ namespace ManagedIrbis
                     {
                         var value = sub.Value;
 
-                        return !value.IsEmpty
-                            && regex.IsMatch(value.ToString());
+                        return !value.IsEmpty()
+                            && regex.IsMatch(value);
                     }))
                 .ToArray();
         }
@@ -785,7 +785,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Получение значения поля.
         /// </summary>
-        public static ReadOnlyMemory<char>[] GetFieldValue
+        public static string[] GetFieldValue
             (
                 this IEnumerable<Field> fields
             )
@@ -795,24 +795,24 @@ namespace ManagedIrbis
                     (
                         field => field.Value!
                     )
-                .Where(line => !line.IsEmpty)
+                .Where(line => !line.IsEmpty())
                 .ToArray();
         }
 
         /// <summary>
         /// Непустые значения полей с указанным тегом.
         /// </summary>
-        public static ReadOnlyMemory<char>[] GetFieldValue
+        public static string[] GetFieldValue
             (
                 this IEnumerable<Field> fields,
                 int tag
             )
         {
-            var result = new List<ReadOnlyMemory<char>>();
+            var result = new List<string>();
             foreach (var field in fields.NonNullItems())
             {
                 if (field.Tag == tag
-                    && !field.Value.IsEmpty)
+                    && !field.Value.IsEmpty())
                 {
                     result.Add(field.Value);
                 }
@@ -992,7 +992,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Получение текста указанного подполя
         /// </summary>
-        public static ReadOnlyMemory<char> GetFirstSubFieldValue
+        public static string? GetFirstSubFieldValue
             (
                 this Field field,
                 char code
@@ -1015,7 +1015,7 @@ namespace ManagedIrbis
         /// Значение первого подполя с указанными тегом и кодом
         /// или <c>null</c>.
         /// </summary>
-        public static ReadOnlyMemory<char> GetFirstSubFieldValue
+        public static string? GetFirstSubFieldValue
             (
                 this IEnumerable<Field> fields,
                 int tag,
@@ -1262,7 +1262,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Получение текста указанного подполя.
         /// </summary>
-        public static ReadOnlyMemory<char> GetSubFieldValue
+        public static string? GetSubFieldValue
             (
                 this Field field,
                 char code,
@@ -1291,14 +1291,14 @@ namespace ManagedIrbis
         /// <summary>
         /// Непустые значения подполей с указанными тегом и кодом.
         /// </summary>
-        public static ReadOnlyMemory<char>[] GetSubFieldValue
+        public static string[] GetSubFieldValue
             (
                 this IEnumerable<Field> fields,
                 int tag,
                 char code
             )
         {
-            var result = new List<ReadOnlyMemory<char>>();
+            var result = new List<string>();
             foreach (var field in fields)
             {
                 if (field.Tag == tag)
@@ -1306,7 +1306,7 @@ namespace ManagedIrbis
                     foreach (var subField in field.Subfields)
                     {
                         if (subField.Code.SameChar(code)
-                            && !subField.Value.IsEmpty)
+                            && !subField.Value.IsEmpty())
                         {
                             result.Add(subField.Value);
                         }
@@ -1437,7 +1437,7 @@ namespace ManagedIrbis
                 this IEnumerable<Field> fields
             )
         {
-            return fields .Where(field => !field.Value.IsEmpty)
+            return fields .Where(field => !field.Value.IsEmpty())
                 .ToArray();
         }
 
@@ -1477,8 +1477,8 @@ namespace ManagedIrbis
             (
                 this Field field,
                 char code,
-                ReadOnlyMemory<char> oldValue,
-                ReadOnlyMemory<char> newValue
+                string oldValue,
+                string newValue
             )
         {
             var subFields = field.Subfields;
@@ -1508,7 +1508,7 @@ namespace ManagedIrbis
             (
                 this Field field,
                 char code,
-                ReadOnlyMemory<char> newValue,
+                string newValue,
                 bool ignoreCase
             )
         {
@@ -1516,11 +1516,7 @@ namespace ManagedIrbis
                 (
                     code
                 );
-            var changed = oldValue.Span.CompareTo
-                (
-                    newValue.Span,
-                    StringComparison.Ordinal
-                );
+            var changed = string.CompareOrdinal(oldValue, newValue);
 
             if (changed != 0)
             {
@@ -1637,7 +1633,7 @@ namespace ManagedIrbis
             {
                 if (first < 0)
                 {
-                    result.Value = body;
+                    result.Value = body.ToString();
                     body = default;
                 }
                 else
@@ -1646,7 +1642,8 @@ namespace ManagedIrbis
                         (
                             0,
                             first
-                        );
+                        )
+                        .ToString();
                     body = body.Slice(first);
                 }
             }
@@ -1791,7 +1788,7 @@ namespace ManagedIrbis
                 this IEnumerable<Field> fields
             )
         {
-            return fields .Where(field => field.Value.IsEmpty)
+            return fields .Where(field => field.Value.IsEmpty())
                 .ToArray();
         }
 

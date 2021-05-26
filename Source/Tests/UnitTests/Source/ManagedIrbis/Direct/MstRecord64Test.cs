@@ -58,7 +58,7 @@ namespace UnitTests.ManagedIrbis.Direct
             Assert.AreEqual(123, decoded.Mfn);
             Assert.AreEqual(1, decoded.Fields.Count);
             Assert.AreEqual(100, decoded.Fields[0].Tag);
-            Assert.AreEqual("Hello", decoded.Fields[0].Value.ToString());
+            Assert.AreEqual("Hello", decoded.Fields[0].Value);
             Assert.AreEqual(1, decoded.Fields[0].Subfields.Count);
         }
 

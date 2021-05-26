@@ -143,7 +143,6 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            Sure.NotNull(fields, "fields");
 
             foreach (var field in fields)
             {
@@ -183,7 +182,7 @@ namespace ManagedIrbis
                     Add(field);
                 }
 
-                field.Value = value.AsMemory();
+                field.Value = value;
             }
 
             return this;
@@ -221,7 +220,7 @@ namespace ManagedIrbis
                     Add(field);
                 }
 
-                field.Value = value;
+                field.Value = value.ToString();
             }
 
             return this;

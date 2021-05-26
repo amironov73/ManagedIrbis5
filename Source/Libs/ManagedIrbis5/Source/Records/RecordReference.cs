@@ -97,8 +97,9 @@ namespace ManagedIrbis
         {
             Database = record.Database;
             Mfn = record.Mfn;
-            Index = record.FM(903).ThrowIfEmpty("record.FM(903)").ToString();
+            Index = record.FM(903).ThrowIfNullOrEmpty("record.FM(903)");
             Record = record;
+
         } // constructor
 
         #endregion

@@ -17,6 +17,8 @@
 
 using System.Text.RegularExpressions;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -39,7 +41,7 @@ namespace ManagedIrbis.Quality.Rules
             MustNotContainSubfields(field);
 
             var text = field.Value;
-            if (text.IsEmpty)
+            if (text.IsEmpty())
             {
                 AddDefect
                     (
@@ -50,9 +52,8 @@ namespace ManagedIrbis.Quality.Rules
             }
             else
             {
-                char firstLetter = text.Span[0];
-                bool isGood = ((firstLetter >= 'A') && (firstLetter <= 'Z'))
-                              || ((firstLetter >= 'А') && (firstLetter <= 'Я'));
+                var firstLetter = text![0];
+                var isGood = firstLetter is >= 'A' and <= 'Z' or >= 'А' and <= 'Я';
                 if (!isGood)
                 {
                     AddDefect
@@ -66,17 +67,16 @@ namespace ManagedIrbis.Quality.Rules
                 {
                     string regex = @"[А-Я]\s\d{2}";
 
-                    if ((firstLetter >= 'A') && (firstLetter <= 'Z'))
+                    if (firstLetter is >= 'A' and <= 'Z')
                     {
                         regex = @"[A-Z]\d{2}";
                     }
-                    if ((firstLetter == 'З') || (firstLetter == 'О')
-                        || (firstLetter == 'Ч'))
+                    if (firstLetter is 'З' or 'О' or 'Ч')
                     {
                         regex = @"[ЗОЧ]-\d{2}";
                     }
 
-                    if (!Regex.IsMatch(text.ToString(), regex))
+                    if (!Regex.IsMatch(text, regex))
                     {
                         AddDefect
                             (

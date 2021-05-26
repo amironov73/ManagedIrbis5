@@ -90,22 +90,22 @@ namespace UnitTests.ManagedIrbis.ImportExport
         {
             var field = ProtocolText.ParseLine("692#^B2008/2009^CO^X!NOZO^D42^E3^Z14.00^G20081218");
             Assert.AreEqual(692, field.Tag);
-            Assert.IsTrue(field.Value.IsEmpty);
+            Assert.IsTrue(field.Value.IsEmpty());
             Assert.AreEqual(7, field.Subfields.Count);
             Assert.AreEqual('b', field.Subfields[0].Code);
-            Assert.AreEqual("2008/2009", field.Subfields[0].Value.ToString().EmptyToNull());
+            Assert.AreEqual("2008/2009", field.Subfields[0].Value);
             Assert.AreEqual('c', field.Subfields[1].Code);
-            Assert.AreEqual("O", field.Subfields[1].Value.ToString().EmptyToNull());
+            Assert.AreEqual("O", field.Subfields[1].Value);
             Assert.AreEqual('x', field.Subfields[2].Code);
-            Assert.AreEqual("!NOZO", field.Subfields[2].Value.ToString().EmptyToNull());
+            Assert.AreEqual("!NOZO", field.Subfields[2].Value);
             Assert.AreEqual('d', field.Subfields[3].Code);
-            Assert.AreEqual("42", field.Subfields[3].Value.ToString().EmptyToNull());
+            Assert.AreEqual("42", field.Subfields[3].Value);
             Assert.AreEqual('e', field.Subfields[4].Code);
-            Assert.AreEqual("3", field.Subfields[4].Value.ToString().EmptyToNull());
+            Assert.AreEqual("3", field.Subfields[4].Value);
             Assert.AreEqual('z', field.Subfields[5].Code);
-            Assert.AreEqual("14.00", field.Subfields[5].Value.ToString().EmptyToNull());
+            Assert.AreEqual("14.00", field.Subfields[5].Value);
             Assert.AreEqual('g', field.Subfields[6].Code);
-            Assert.AreEqual("20081218", field.Subfields[6].Value.ToString().EmptyToNull());
+            Assert.AreEqual("20081218", field.Subfields[6].Value);
         }
 
         [TestMethod]
@@ -312,10 +312,10 @@ namespace UnitTests.ManagedIrbis.ImportExport
             Assert.AreSame(record1, record2);
             Assert.AreEqual(2, record1.Fields.Count);
             Assert.AreEqual(692, record1.Fields[0].Tag);
-            Assert.IsTrue(record1.Fields[0].Value.IsEmpty);
+            Assert.IsTrue(record1.Fields[0].Value.IsEmpty());
             Assert.AreEqual(7, record1.Fields[0].Subfields.Count);
             Assert.AreEqual(200, record1.Fields[1].Tag);
-            Assert.IsTrue(record1.Fields[1].Value.IsEmpty);
+            Assert.IsTrue(record1.Fields[1].Value.IsEmpty());
         }
 
         [TestMethod]
@@ -336,10 +336,10 @@ namespace UnitTests.ManagedIrbis.ImportExport
             Assert.AreSame(record1, record2);
             Assert.AreEqual(2, record1.Fields.Count);
             Assert.AreEqual(692, record1.Fields[0].Tag);
-            Assert.IsTrue(record1.Fields[0].Value.IsEmpty);
+            Assert.IsTrue(record1.Fields[0].Value.IsEmpty());
             Assert.AreEqual(7, record1.Fields[0].Subfields.Count);
             Assert.AreEqual(200, record1.Fields[1].Tag);
-            Assert.IsTrue(record1.Fields[1].Value.IsEmpty);
+            Assert.IsTrue(record1.Fields[1].Value.IsEmpty());
         }
 
         [TestMethod]

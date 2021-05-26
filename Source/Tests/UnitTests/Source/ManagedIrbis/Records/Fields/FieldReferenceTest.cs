@@ -137,7 +137,7 @@ namespace UnitTests.ManagedIrbis.Records.Fields
                         (
                             reference.Tag,
                             reference.SubField
-                        ).ToString(),
+                        ),
                     actual
                 );
         }

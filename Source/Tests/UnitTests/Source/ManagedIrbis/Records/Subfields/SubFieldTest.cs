@@ -27,7 +27,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         {
             var subField = new SubField();
             Assert.AreEqual(SubField.NoCode, subField.Code);
-            Assert.IsTrue(subField.Value.IsEmpty);
+            Assert.IsTrue(subField.Value.IsEmpty());
             Assert.AreEqual(string.Empty, subField.ToString());
             Assert.IsTrue(subField.RepresentsValue);
             Assert.IsNull(subField.Field);
@@ -42,7 +42,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             const string value = "The value";
             var subField = new SubField ('A', value.AsMemory());
             Assert.AreEqual('A', subField.Code);
-            Assert.AreEqual(value, subField.Value.ToString());
+            Assert.AreEqual(value, subField.Value);
             Assert.AreEqual("^aThe value", subField.ToString());
             Assert.IsFalse(subField.RepresentsValue);
             Assert.IsNull(subField.Field);
@@ -75,7 +75,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             const string value = "The value";
             var subField = new SubField ('A', value);
             Assert.AreEqual('A', subField.Code);
-            Assert.AreEqual(value, subField.Value.ToString());
+            Assert.AreEqual(value, subField.Value);
             Assert.AreEqual("^aThe value", subField.ToString());
             Assert.IsFalse(subField.RepresentsValue);
             Assert.IsNull(subField.Field);
@@ -152,9 +152,9 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         public void SubField_Decode_1()
         {
             var subField = new SubField();
-            subField.Decode(string.Empty.AsMemory());
+            subField.Decode(string.Empty);
             Assert.AreEqual(SubField.NoCode, subField.Code);
-            Assert.IsTrue(subField.Value.IsEmpty);
+            Assert.IsTrue(subField.Value.IsEmpty());
         }
 
         [TestMethod]
@@ -162,7 +162,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         public void SubField_Decode_2()
         {
             var subField = new SubField();
-            subField.Decode("A".AsMemory());
+            subField.Decode("A");
             Assert.AreEqual('a', subField.Code);
             Assert.AreEqual(0, subField.Value.Length);
         }
@@ -172,9 +172,9 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         public void SubField_Decode_3()
         {
             var subField = new SubField();
-            subField.Decode("AValue".AsMemory());
+            subField.Decode("AValue");
             Assert.AreEqual('a', subField.Code);
-            Assert.AreEqual("Value", subField.Value.ToString());
+            Assert.AreEqual("Value", subField.Value);
         }
 
         [TestMethod]
@@ -183,7 +183,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         public void SubField_Decode_4()
         {
             var subField = new SubField();
-            subField.Decode("Wrong^value".AsMemory());
+            subField.Decode("Wrong^value");
         }
 
         [Ignore]
@@ -197,30 +197,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             var field = new Field(200);
             field.Subfields.Add(subField);
             Assert.AreEqual(field, subField.Field);
-        }
-
-        [TestMethod]
-        [Description("Работа с пулом подполей")]
-        public void SubField_FromPool_1()
-        {
-            var subField = SubField.FromPool();
-            Assert.IsTrue(subField.Value.IsEmpty);
-            Assert.AreEqual(string.Empty, subField.ToString());
-            Assert.IsTrue(subField.RepresentsValue);
-            Assert.IsNull(subField.Field);
-            Assert.IsFalse(subField.ReadOnly);
-            Assert.IsTrue(subField.Verify(false));
-
-            subField.Code = 'a';
-            subField.Value = "The Value".AsMemory();
-
-            subField.ToPool();
-            Assert.IsTrue(subField.Value.IsEmpty);
-            Assert.AreEqual(string.Empty, subField.ToString());
-            Assert.IsTrue(subField.RepresentsValue);
-            Assert.IsNull(subField.Field);
-            Assert.IsFalse(subField.ReadOnly);
-            Assert.IsTrue(subField.Verify(false));
         }
 
         private void _TestSerialization
@@ -378,7 +354,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             var subField = JsonSerializer.Deserialize<SubField>(text, options);
             Assert.IsNotNull(subField);
             Assert.AreEqual('a', subField!.Code);
-            Assert.AreEqual("Value", subField.Value.ToString());
+            Assert.AreEqual("Value", subField.Value);
         }
 
         [TestMethod]
@@ -399,7 +375,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             var subField = XmlUtility.DeserializeString<SubField>(text);
             Assert.IsNotNull(subField);
             Assert.AreEqual('a', subField!.Code);
-            Assert.AreEqual("Value", subField.Value.ToString());
+            Assert.AreEqual("Value", subField.Value);
         }
 
         [TestMethod]

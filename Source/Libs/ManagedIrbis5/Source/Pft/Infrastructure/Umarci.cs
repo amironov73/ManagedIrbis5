@@ -192,9 +192,9 @@ namespace ManagedIrbis.Pft.Infrastructure
             }
 
             var text = field.GetSubFieldValue(code[0], repeat);
-            if (!text.IsEmpty)
+            if (!text.IsEmpty())
             {
-                context.Write(node, text.ToString());
+                context.Write(node, text);
             }
         }
 
@@ -443,8 +443,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             var text = code == '\0'
                 ? field.ToText()
                 : code == '*'
-                    ? field.Value.ToString()
-                    : field.GetValueOrFirstSubField().ToString();
+                    ? field.Value
+                    : field.GetValueOrFirstSubField();
 
             context.Write(node, text);
         }

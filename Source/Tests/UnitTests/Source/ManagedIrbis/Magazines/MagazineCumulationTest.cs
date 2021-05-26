@@ -146,11 +146,11 @@ namespace UnitTests.ManagedIrbis.Magazines
         {
             var field = _GetField();
             var cumulation = MagazineCumulation.Parse(field);
-            Assert.AreEqual(field.GetFirstSubFieldValue('q').ToString(), cumulation.Year);
-            Assert.AreEqual(field.GetFirstSubFieldValue('f').ToString(), cumulation.Volume);
-            Assert.AreEqual(field.GetFirstSubFieldValue('d').ToString(), cumulation.Place);
-            Assert.AreEqual(field.GetFirstSubFieldValue('h').ToString(), cumulation.Numbers);
-            Assert.AreEqual(field.GetFirstSubFieldValue('k').ToString(), cumulation.Set);
+            Assert.AreEqual(field.GetFirstSubFieldValue('q'), cumulation.Year);
+            Assert.AreEqual(field.GetFirstSubFieldValue('f'), cumulation.Volume);
+            Assert.AreEqual(field.GetFirstSubFieldValue('d'), cumulation.Place);
+            Assert.AreEqual(field.GetFirstSubFieldValue('h'), cumulation.Numbers);
+            Assert.AreEqual(field.GetFirstSubFieldValue('k'), cumulation.Set);
             Assert.IsNotNull(cumulation.UnknownSubFields);
             Assert.AreEqual(0, cumulation.UnknownSubFields!.Length);
         }
@@ -171,8 +171,8 @@ namespace UnitTests.ManagedIrbis.Magazines
                 .Add('h', "1,2,3");
             var cumulation = _GetCumulation();
             cumulation.ApplyTo(field);
-            Assert.AreEqual(cumulation.Year, field.GetFirstSubFieldValue('q').ToString());
-            Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h').ToString());
+            Assert.AreEqual(cumulation.Year, field.GetFirstSubFieldValue('q'));
+            Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h'));
         }
 
         [TestMethod]
@@ -180,11 +180,11 @@ namespace UnitTests.ManagedIrbis.Magazines
         {
             var cumulation = _GetCumulation();
             var field = cumulation.ToField();
-            Assert.AreEqual(cumulation.Year, field.GetFirstSubFieldValue('q').ToString());
-            Assert.AreEqual(string.Empty, field.GetFirstSubFieldValue('f').ToString());
-            Assert.AreEqual(cumulation.Place, field.GetFirstSubFieldValue('d').ToString());
-            Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h').ToString());
-            Assert.AreEqual(cumulation.Set, field.GetFirstSubFieldValue('k').ToString());
+            Assert.AreEqual(cumulation.Year, field.GetFirstSubFieldValue('q'));
+            Assert.AreEqual(cumulation.Volume, field.GetFirstSubFieldValue('f'));
+            Assert.AreEqual(cumulation.Place, field.GetFirstSubFieldValue('d'));
+            Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h'));
+            Assert.AreEqual(cumulation.Set, field.GetFirstSubFieldValue('k'));
         }
 
         private void _TestSerialization

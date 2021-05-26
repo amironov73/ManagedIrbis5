@@ -34,7 +34,7 @@ namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Ast
             };
             node.Execute(context);
             var actual = record.FM(int.Parse(node.Field!.Tag!));
-            Assert.AreEqual(expected, actual.ToString());
+            Assert.AreEqual(expected, actual);
         }
 
         private static Field Parse

@@ -64,7 +64,7 @@ namespace ManagedIrbis
                     }
 
                     var value = subField.Value;
-                    if (value.IsEmpty)
+                    if (value.IsEmpty())
                     {
                         Magna.Error
                             (
@@ -75,11 +75,11 @@ namespace ManagedIrbis
                         throw new FormatException();
                     }
 
-                    var tag = int.Parse(value.Slice(0, 3).Span);
+                    var tag = int.Parse(value.AsSpan().Slice(0, 3));
                     found = new Field { Tag = tag };
                     if (tag < 10 && value.Length > 3)
                     {
-                        found.Value = value.Slice(3);
+                        found.Value = value.Substring(0, 3);
                     }
                 }
                 else

@@ -15,10 +15,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using AM;
 
 #endregion
 
@@ -41,7 +38,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             foreach (SubField subField in field.Subfields)
             {
-                if (subField.Value.IsEmpty)
+                if (subField.Value.IsEmpty())
                 {
                     AddDefect
                         (
@@ -61,10 +58,7 @@ namespace ManagedIrbis.Quality.Rules
         #region QualityRule members
 
         /// <inheritdoc />
-        public override string FieldSpec
-        {
-            get { return "!100,330,905,907,919,920,3005"; }
-        }
+        public override string FieldSpec => "!100,330,905,907,919,920,3005";
 
         /// <inheritdoc />
         public override RuleReport CheckRecord

@@ -2,7 +2,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable StringLiteralTypo
 
-using AM;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Json;
@@ -137,13 +136,13 @@ namespace UnitTests.ManagedIrbis.Readers
             var address = _GetAddress();
             var field = address.ToField();
             Assert.AreEqual(7, field.Subfields.Count);
-            Assert.AreEqual(address.Postcode, field.GetFirstSubFieldValue('a').ToString().EmptyToNull());
-            Assert.AreEqual(address.Country, field.GetFirstSubFieldValue('b').ToString().EmptyToNull());
-            Assert.AreEqual(address.City, field.GetFirstSubFieldValue('c').ToString().EmptyToNull());
-            Assert.AreEqual(address.Street, field.GetFirstSubFieldValue('d').ToString().EmptyToNull());
-            Assert.AreEqual(address.Building, field.GetFirstSubFieldValue('e').ToString().EmptyToNull());
-            Assert.AreEqual(address.Entrance, field.GetFirstSubFieldValue('g').ToString());
-            Assert.AreEqual(address.Apartment, field.GetFirstSubFieldValue('h').ToString().EmptyToNull());
+            Assert.AreEqual(address.Postcode, field.GetFirstSubFieldValue('a'));
+            Assert.AreEqual(address.Country, field.GetFirstSubFieldValue('b'));
+            Assert.AreEqual(address.City, field.GetFirstSubFieldValue('c'));
+            Assert.AreEqual(address.Street, field.GetFirstSubFieldValue('d'));
+            Assert.AreEqual(address.Building, field.GetFirstSubFieldValue('e'));
+            Assert.AreEqual(address.Entrance, field.GetFirstSubFieldValue('g'));
+            Assert.AreEqual(address.Apartment, field.GetFirstSubFieldValue('h'));
         }
 
         [TestMethod]
@@ -154,13 +153,13 @@ namespace UnitTests.ManagedIrbis.Readers
             var address = _GetAddress();
             address.ApplyToField(field);
             Assert.AreEqual(7, field.Subfields.Count);
-            Assert.AreEqual(address.Postcode, field.GetFirstSubFieldValue('a').ToString());
-            Assert.AreEqual(address.Country, field.GetFirstSubFieldValue('b').ToString());
-            Assert.AreEqual(address.City, field.GetFirstSubFieldValue('c').ToString());
-            Assert.AreEqual(address.Street, field.GetFirstSubFieldValue('d').ToString());
-            Assert.AreEqual(address.Building, field.GetFirstSubFieldValue('e').ToString());
-            Assert.AreEqual(address.Entrance, field.GetFirstSubFieldValue('g').ToString());
-            Assert.AreEqual(address.Apartment, field.GetFirstSubFieldValue('h').ToString());
+            Assert.AreEqual(address.Postcode, field.GetFirstSubFieldValue('a'));
+            Assert.AreEqual(address.Country, field.GetFirstSubFieldValue('b'));
+            Assert.AreEqual(address.City, field.GetFirstSubFieldValue('c'));
+            Assert.AreEqual(address.Street, field.GetFirstSubFieldValue('d'));
+            Assert.AreEqual(address.Building, field.GetFirstSubFieldValue('e'));
+            Assert.AreEqual(address.Entrance, field.GetFirstSubFieldValue('g'));
+            Assert.AreEqual(address.Apartment, field.GetFirstSubFieldValue('h'));
         }
 
         private void _TestSerialization

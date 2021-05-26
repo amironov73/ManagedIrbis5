@@ -135,8 +135,8 @@ namespace ManagedIrbis.Biblio
             var value = item.Suffix;
 
             var record = new Record();
-            record.Fields.Add(new Field { Tag = 1, Value = key.AsMemory() });
-            record.Fields.Add(new Field { Tag = 2, Value = value.AsMemory() });
+            record.Fields.Add(new Field { Tag = 1, Value = key });
+            record.Fields.Add(new Field { Tag = 2, Value = value });
             var title = formatter.FormatRecord(record);
 
             string? className = null;
@@ -208,9 +208,9 @@ namespace ManagedIrbis.Biblio
 
                 foreach (var subField in field.Subfields)
                 {
-                    if (!subField.Value.IsEmpty)
+                    if (!subField.Value.IsEmpty())
                     {
-                        subField.Value = MenuSubChapter.Enhance(subField.Value.ToString()).AsMemory();
+                        subField.Value = MenuSubChapter.Enhance(subField.Value);
                     }
                 }
             }
@@ -255,10 +255,10 @@ namespace ManagedIrbis.Biblio
             if (!ReferenceEquals(subField, null))
             {
                 var value = subField.Value;
-                if (!value.IsEmpty)
+                if (!value.IsEmpty())
                 {
 
-                    var match = _regex463.Match(value.ToString());
+                    var match = _regex463.Match(value);
                     if (match.Success)
                     {
 
@@ -266,7 +266,7 @@ namespace ManagedIrbis.Biblio
                         if (!string.IsNullOrEmpty(date)
                             && date.Contains(" "))
                         {
-                            subField.Value = date.Replace(" ", "\\~").AsMemory();
+                            subField.Value = date.Replace(" ", "\\~");
                         }
                     }
                 }
@@ -303,33 +303,38 @@ namespace ManagedIrbis.Biblio
             )
         {
             var result = record.FM(210, 'd');
-            if (result.IsEmpty)
+            if (result.IsEmpty())
             {
                 result = record.FM(461, 'h');
             }
-            if (result.IsEmpty)
+
+            if (result.IsEmpty())
             {
                 result = record.FM(461, 'z');
             }
-            if (result.IsEmpty)
+
+            if (result.IsEmpty())
             {
                 result = record.FM(463, 'j');
             }
-            if (result.IsEmpty)
+
+            if (result.IsEmpty())
             {
                 result = record.FM(934);
             }
-            if (result.IsEmpty)
+
+            if (result.IsEmpty())
             {
                 return 0;
             }
 
             // TODO: реализовать оптимально
-            var match = Regex.Match(result.ToString(), @"\d{4}");
+            var match = Regex.Match(result, @"\d{4}");
             if (match.Success)
             {
-                result = match.Value.AsMemory();
+                result = match.Value;
             }
+
             return result.SafeToInt32();
         }
 

@@ -141,7 +141,7 @@ namespace ManagedIrbis.ImportExport
                     );
                 throw new IrbisException();
             }
-            result.Value = _ReadTo(reader, '^');
+            result.Value = _ReadTo(reader, '^').EmptyToNull();
 
             while (true)
             {
@@ -156,7 +156,7 @@ namespace ManagedIrbis.ImportExport
                 var subField = new SubField
                 {
                     Code = code,
-                    Value = text
+                    Value = text.ToString()
                 };
                 result.Subfields.Add(subField);
             }
@@ -340,7 +340,7 @@ namespace ManagedIrbis.ImportExport
                 writer.Write('#');
                 writer.Write(field.Tag.ToString(culture));
                 writer.Write(": ");
-                if (!field.Value.IsEmpty)
+                if (!field.Value.IsEmpty())
                 {
                     writer.Write(field.Value);
                 }

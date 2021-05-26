@@ -91,19 +91,19 @@ namespace ManagedIrbis
         /// Значение имитируется с помощью первого подполя,
         /// код которого должен быть равен '\0'.
         /// </remarks>
-        public ReadOnlyMemory<char> Value
+        public string? Value
         {
             get => GetValueSubField()?.Value ?? default;
             set
             {
                 Clear();
-                if (value.Span.Contains(Delimiter))
+                if (value.SafeContains(Delimiter))
                 {
-                    DecodeBody(value.Span);
+                    DecodeBody(value);
                 }
                 else
                 {
-                    if (!value.IsEmpty)
+                    if (!value.IsEmpty())
                     {
                         CreateValueSubField().Value = value;
                     }
@@ -162,27 +162,11 @@ namespace ManagedIrbis
         public Field
             (
                 int tag,
-                ReadOnlyMemory<char> value = default
-            )
-        {
-            Tag = tag;
-            Value = value;
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <param name="value">Значение поля до первого разделителя
-        /// (опционально).</param>
-        public Field
-            (
-                int tag,
                 string? value
             )
         {
             Tag = tag;
-            Value = value.AsMemory();
+            Value = value;
         } // constructor
 
         /// <summary>
@@ -320,29 +304,49 @@ namespace ManagedIrbis
             Subfields.Add(new SubField(code3, value3));
         } // constructor
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="tag">Метка поля.</param>
-        /// <param name="subfields">Коды и значения подполей.</param>
-        public Field
-            (
-                int tag,
-                params string?[] subfields
-            )
-        {
-            Tag = tag;
-            for (var i = 0; i < subfields.Length; i += 2)
-            {
-                var code = subfields[i]![0];
-                var value = subfields[i + 1];
-                Subfields.Add(new SubField(code, value));
-            }
-        } // constructor
+        // /// <summary>
+        // /// Конструктор.
+        // /// </summary>
+        // /// <param name="tag">Метка поля.</param>
+        // /// <param name="subfields">Коды и значения подполей.</param>
+        // public Field
+        //     (
+        //         int tag,
+        //         params string?[] subfields
+        //     )
+        // {
+        //     Tag = tag;
+        //     for (var i = 0; i < subfields.Length; i += 2)
+        //     {
+        //         var code = subfields[i]![0];
+        //         var value = subfields[i + 1];
+        //         Subfields.Add(new SubField(code, value));
+        //     }
+        // } // constructor
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Поле с подполями.
+        /// </summary>
+        public static Field WithSubFields
+            (
+                int tag,
+                params string[] subfields
+            )
+        {
+            var result = new Field(tag);
+            for (var i = 0; i < subfields.Length; i += 2)
+            {
+                var code = subfields[i][0];
+                var value = subfields[i + 1];
+                result.Subfields.Add(new SubField(code, value));
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Добавление подполя в конец списка подполей.
@@ -518,12 +522,12 @@ namespace ManagedIrbis
         {
             if (code == ValueCode)
             {
-                Value = (value?.ToString()).AsMemory();
+                Value = value?.ToString();
                 return this;
             }
 
             var text = value?.ToString();
-            var subfield = new SubField { Code = code, Value = text.AsMemory() };
+            var subfield = new SubField { Code = code, Value = text };
             Subfields.Add(subfield);
 
             return this;
@@ -602,14 +606,14 @@ namespace ManagedIrbis
             {
                 if (code == ValueCode)
                 {
-                    Value = value.ToString().AsMemory();
+                    Value = value.ToString();
                     return this;
                 }
 
                 var text = value.ToString();
                 if (!string.IsNullOrEmpty(text))
                 {
-                    var subfield = new SubField { Code = code, Value = text.AsMemory() };
+                    var subfield = new SubField { Code = code, Value = text };
                     Subfields.Add(subfield);
                 }
             }
@@ -668,14 +672,14 @@ namespace ManagedIrbis
             if (index < 0)
             {
                 // TODO: реализовать оптимально
-                Value = line.ToString().AsMemory();
+                Value = line.ToString();
                 return;
             }
 
             if (index != 0)
             {
                 // TODO: реализовать оптимально
-                Value = line.Slice(0, index).ToString().AsMemory();
+                Value = line.Slice(0, index).ToString();
             }
 
             line = line.Slice(index + 1);
@@ -850,7 +854,7 @@ namespace ManagedIrbis
         /// Нумерация начинается с нуля.
         /// Отрицательные индексы отсчитываются с конца массива.</param>
         /// <returns>Текст найденного подполя или <c>null</c>.</returns>
-        public ReadOnlyMemory<char> GetSubFieldValue
+        public string? GetSubFieldValue
             (
                 char code,
                 int occurrence = 0
@@ -860,39 +864,8 @@ namespace ManagedIrbis
         /// <summary>
         /// For * specification.
         /// </summary>
-        public ReadOnlyMemory<char> GetValueOrFirstSubField()
+        public string? GetValueOrFirstSubField()
             => Subfields.FirstOrDefault()?.Value ?? default;
-
-        /// <summary>
-        /// Установка значения подполя.
-        /// </summary>
-        /// <param name="code">Искомый код подполя.</param>
-        /// <param name="value">Новое значение подполя.</param>
-        /// <returns>this</returns>
-        public Field SetSubFieldValue
-            (
-                char code,
-                ReadOnlyMemory<char> value
-            )
-        {
-            if (code == ValueCode)
-            {
-                Value = value;
-            }
-            else
-            {
-                if (value.IsEmpty)
-                {
-                    RemoveSubField(code);
-                }
-                else
-                {
-                    GetOrAddSubField(code).Value = value;
-                }
-            }
-
-            return this;
-        } // method SetSubFieldValue
 
         /// <summary>
         /// Установка значения подполя.
@@ -908,7 +881,7 @@ namespace ManagedIrbis
         {
             if (code == ValueCode)
             {
-                Value = value.AsMemory();
+                Value = value;
             }
             else
             {
@@ -918,7 +891,7 @@ namespace ManagedIrbis
                 }
                 else
                 {
-                    GetOrAddSubField(code).Value = value.AsMemory();
+                    GetOrAddSubField(code).Value = value;
                 }
             }
 
@@ -953,7 +926,7 @@ namespace ManagedIrbis
         {
             var length = Subfields.Sum
                 (
-                    sf => (sf.Value.Length)
+                    sf => (sf.Value!.Length)
                           + (sf.Code == ValueCode ? 1 : 2)
                 );
             var result = new StringBuilder (length);
@@ -1079,7 +1052,7 @@ namespace ManagedIrbis
         {
             var length = 4 + Subfields.Sum
                 (
-                    sf => (sf.Value.Length)
+                    sf => (sf.Value!.Length)
                     + (sf.Code == ValueCode ? 1 : 2)
                 );
             var result = new StringBuilder (length);

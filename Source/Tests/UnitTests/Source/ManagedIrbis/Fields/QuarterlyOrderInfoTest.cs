@@ -250,8 +250,8 @@ namespace UnitTests.ManagedIrbis.Fields
             var actual = order.ToField();
             foreach (var code in QuarterlyOrderInfo.KnownCodes)
             {
-                Assert.AreEqual(expected.GetFirstSubFieldValue(code).ToString(),
-                    actual.GetFirstSubFieldValue(code).ToString());
+                Assert.AreEqual(expected.GetFirstSubFieldValue(code),
+                    actual.GetFirstSubFieldValue(code));
             }
         }
 
@@ -266,7 +266,7 @@ namespace UnitTests.ManagedIrbis.Fields
             order.ApplyTo(actual);
             foreach (var code in "ab")
             {
-                Assert.AreEqual(expected.GetFirstSubFieldValue(code).ToString(), actual.GetFirstSubFieldValue(code).ToString());
+                Assert.AreEqual(expected.GetFirstSubFieldValue(code), actual.GetFirstSubFieldValue(code));
             }
         }
 

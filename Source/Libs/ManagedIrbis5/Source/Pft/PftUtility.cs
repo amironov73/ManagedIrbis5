@@ -7,6 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
 /* PftUtility.cs --
@@ -124,7 +125,7 @@ namespace ManagedIrbis.Pft
             var reader = new StringReader(line);
             var result = new Field
             {
-                Value = _ReadTo(reader, '^')
+                Value = _ReadTo(reader, '^').EmptyToNull()
             };
 
             while (true)
@@ -136,7 +137,7 @@ namespace ManagedIrbis.Pft
                 }
 
                 var code = char.ToLower((char)next);
-                var text = _ReadTo(reader, '^');
+                var text = _ReadTo(reader, '^').EmptyToNull();
                 var subField = new SubField
                 {
                     Code = code,
@@ -312,7 +313,7 @@ namespace ManagedIrbis.Pft
                 var subField = new SubField
                 {
                     Code = code,
-                    Value = line.AsMemory()
+                    Value = line
                 };
                 newSubFields.Add(subField);
             }
@@ -745,14 +746,12 @@ namespace ManagedIrbis.Pft
                 }
 
                 var value = subField.Value;
-                if (!value.IsEmpty)
+                if (!value.IsEmpty())
                 {
                     value = value
-                        .ToString()
                         .Replace("><", "; ")
                         .Replace("<", string.Empty)
-                        .Replace(">", string.Empty)
-                        .AsMemory();
+                        .Replace(">", string.Empty);
                 }
 
                 result.Append(value);
@@ -1120,7 +1119,7 @@ namespace ManagedIrbis.Pft
             }
             else if (subFieldCode == '*')
             {
-                result = field.GetValueOrFirstSubField().ToString();
+                result = field.GetValueOrFirstSubField();
             }
             else
             {
@@ -1134,7 +1133,7 @@ namespace ManagedIrbis.Pft
                 var subField = subFields.FirstOrDefault();
                 if (!ReferenceEquals(subField, null))
                 {
-                    result = subField.Value.ToString();
+                    result = subField.Value;
                 }
             }
 
@@ -1256,7 +1255,7 @@ namespace ManagedIrbis.Pft
 
             var result = fields.Select
                 (
-                    subField => subField.GetFirstSubFieldValue(code).ToString()
+                    subField => subField.GetFirstSubFieldValue(code) ?? string.Empty
                 )
                 .ToArray();
 
@@ -1268,7 +1267,8 @@ namespace ManagedIrbis.Pft
                 );
 
             return result;
-        }
+
+        } // method GetSubFieldValue
 
         //=================================================
 

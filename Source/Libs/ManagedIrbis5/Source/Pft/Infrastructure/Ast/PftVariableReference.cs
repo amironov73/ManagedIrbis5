@@ -164,7 +164,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             var reader = new StringReader(line);
             var result = new Field
             {
-                Value = _ReadTo(reader, '^')
+                Value = _ReadTo(reader, '^').ToString()
             };
 
             while (true)
@@ -176,7 +176,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 }
 
                 var code = char.ToLower((char)next);
-                var text = _ReadTo(reader, '^');
+                var text = _ReadTo(reader, '^').ToString();
                 var subField = new SubField
                 {
                     Code = code,
@@ -257,9 +257,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                                 (
                                     subField
                                 );
-                            if (!text.IsEmpty)
+                            if (!text.IsEmpty())
                             {
-                                list.Add(text.ToString());
+                                list.Add(text);
                             }
                         }
 
@@ -287,9 +287,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                                 (
                                     subField
                                 );
-                            if (!text.IsEmpty)
+                            if (!text.IsEmpty())
                             {
-                                list.Add(text.ToString());
+                                list.Add(text);
                             }
                         }
 

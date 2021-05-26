@@ -160,13 +160,13 @@ namespace ManagedIrbis.Readers
         {
             var result = new IriProfile
             {
-                Active = field.GetFirstSubFieldValue('a').ToString() == "1",
-                ID = field.GetFirstSubFieldValue('b').ToString(),
-                Title = field.GetFirstSubFieldValue('c').ToString(),
-                Query = field.GetFirstSubFieldValue('d').ToString(),
+                Active = field.GetFirstSubFieldValue('a') == "1",
+                ID = field.GetFirstSubFieldValue('b'),
+                Title = field.GetFirstSubFieldValue('c'),
+                Query = field.GetFirstSubFieldValue('d'),
                 Periodicity = field.GetFirstSubFieldValue('e').SafeToInt32(),
-                LastServed = field.GetFirstSubFieldValue('f').ToString(),
-                Database = field.GetFirstSubFieldValue('i').ToString(),
+                LastServed = field.GetFirstSubFieldValue('f'),
+                Database = field.GetFirstSubFieldValue('i'),
                 UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
                 Field = field
             };

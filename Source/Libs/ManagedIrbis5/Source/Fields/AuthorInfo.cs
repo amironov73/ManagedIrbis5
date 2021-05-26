@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedParameter.Local
 
 /* AuthorInfo.cs -- информация об индивидуальном авторе
@@ -45,39 +46,38 @@ namespace ManagedIrbis.Fields
         #region Properties
 
         /// <summary>
-        /// Empty array of the <see cref="AuthorInfo"/>.
+        /// Known tags.
         /// </summary>
-        public static readonly AuthorInfo[] EmptyArray = new AuthorInfo[0];
+        public static int[] AllKnownTags { get; } =
+        {
+            330, 391, 454, 470, 481, 488, 600,
+            700, 701, 702, 922, 925, 926, 961, 970
+        };
 
         /// <summary>
         /// Known tags.
         /// </summary>
-        public static int[] AllKnownTags { get { return _allKnownTags; } }
+        public static int[] KnownTags1 { get; } = { 391, 470, 700, 701, 702, 926, 961, 970 };
 
         /// <summary>
         /// Known tags.
         /// </summary>
-        public static int[] KnownTags1 { get { return _knownTags1; } }
+        public static int[] KnownTags2 { get; } = { 330, 922, 925 };
 
         /// <summary>
         /// Known tags.
         /// </summary>
-        public static int[] KnownTags2 { get { return _knownTags2; } }
+        public static int[] KnownTags3 { get; } = { 481, 488 };
 
         /// <summary>
         /// Known tags.
         /// </summary>
-        public static int[] KnownTags3 { get { return _knownTags3; } }
+        public static int[] KnownTags4 { get; } = { 600 };
 
         /// <summary>
         /// Known tags.
         /// </summary>
-        public static int[] KnownTags4 { get { return _knownTags4; } }
-
-        /// <summary>
-        /// Known tags.
-        /// </summary>
-        public static int[] KnownTags5 { get { return _knownTags5; } }
+        public static int[] KnownTags5 { get; } = { 454 };
 
         /// <summary>
         /// Фамилия. Подполе a.
@@ -208,27 +208,6 @@ namespace ManagedIrbis.Fields
         #endregion
 
         #region Private members
-
-        private static readonly int[] _allKnownTags =
-        {
-            330, 391, 454, 470, 481, 488, 600,
-            700, 701, 702, 922, 925, 926, 961, 970
-        };
-
-        private static readonly int[] _knownTags1 =
-            { 391, 470, 700, 701, 702, 926, 961, 970 };
-
-        private static readonly int[] _knownTags2 =
-            { 330, 922, 925 };
-
-        private static readonly int[] _knownTags3 =
-            { 481, 488 };
-
-        private static readonly int[] _knownTags4 =
-            { 600 };
-
-        private static readonly int[] _knownTags5 =
-            { 454 };
 
         private static readonly char[] _first330 =
             { 'f', '?', 'x', '=' };
@@ -413,22 +392,22 @@ namespace ManagedIrbis.Fields
             }
 
             var withInitials = field.GetFirstSubFieldValue(subFields[0]);
-            if (withInitials.IsEmpty)
+            if (withInitials.IsEmpty())
             {
                 return false;
             }
 
-            var navigator = new TextNavigator(withInitials);
+            var navigator = new TextNavigator(withInitials!);
             var familyName = navigator.ReadUntil(_delimiters).ToString();
             if (!familyName.SameString(FamilyName))
             {
                 return false;
             }
 
-            withInitials = FamilyName.AsMemory();
+            withInitials = FamilyName;
             if (!string.IsNullOrEmpty(Initials))
             {
-                withInitials = (withInitials + " " + Initials).AsMemory();
+                withInitials = withInitials + " " + Initials;
             }
 
             field
@@ -499,7 +478,7 @@ namespace ManagedIrbis.Fields
                     return new[] { one };
                 }
 
-                return EmptyArray;
+                return Array.Empty<AuthorInfo>();
             }
 
             if (tag.IsOneOf(KnownTags2))
@@ -517,10 +496,10 @@ namespace ManagedIrbis.Fields
                 one = ParseField600(field);
                 if (!ReferenceEquals(one, null))
                 {
-                    return new[] {one};
+                    return new[] { one };
                 }
 
-                return EmptyArray;
+                return Array.Empty<AuthorInfo>();
             }
 
             if (tag.IsOneOf(KnownTags5))
@@ -540,7 +519,7 @@ namespace ManagedIrbis.Fields
             )
         {
             var familyName = field.GetFirstSubFieldValue('a');
-            if (familyName.IsEmpty)
+            if (familyName.IsEmpty())
             {
                 return null;
             }
@@ -549,16 +528,16 @@ namespace ManagedIrbis.Fields
 
             var result = new AuthorInfo
             {
-                FamilyName = familyName.ToString(),
-                Initials = field.GetFirstSubFieldValue('b').ToString(),
-                FullName = field.GetFirstSubFieldValue('g').ToString(),
-                CantBeInverted = !field.GetFirstSubFieldValue('9').IsEmpty,
-                Postfix = field.GetFirstSubFieldValue('1').ToString(),
-                Appendix = field.GetFirstSubFieldValue('c').ToString(),
-                Number = field.GetFirstSubFieldValue('d').ToString(),
-                Dates = field.GetFirstSubFieldValue('f').ToString(),
-                Variant = field.GetFirstSubFieldValue('r').ToString(),
-                WorkPlace = field.GetFirstSubFieldValue('p').ToString(),
+                FamilyName = familyName,
+                Initials = field.GetFirstSubFieldValue('b'),
+                FullName = field.GetFirstSubFieldValue('g'),
+                CantBeInverted = !field.GetFirstSubFieldValue('9').IsEmpty(),
+                Postfix = field.GetFirstSubFieldValue('1'),
+                Appendix = field.GetFirstSubFieldValue('c'),
+                Number = field.GetFirstSubFieldValue('d'),
+                Dates = field.GetFirstSubFieldValue('f'),
+                Variant = field.GetFirstSubFieldValue('r'),
+                WorkPlace = field.GetFirstSubFieldValue('p'),
                 Field = field
             };
 
@@ -574,12 +553,12 @@ namespace ManagedIrbis.Fields
             )
         {
             var withInitials = field.GetFirstSubFieldValue('a');
-            if (withInitials.IsEmpty)
+            if (withInitials.IsEmpty())
             {
                 return null;
             }
 
-            var navigator = new TextNavigator(withInitials);
+            var navigator = new TextNavigator(withInitials!);
             var familyName = navigator.ReadUntil(_delimiters);
             navigator.SkipChar(_delimiters);
             var initials = navigator.GetRemainingText();
@@ -588,14 +567,14 @@ namespace ManagedIrbis.Fields
             {
                 FamilyName = familyName.ToString(),
                 Initials = initials.ToString(),
-                FullName = field.GetFirstSubFieldValue('g').ToString(),
-                CantBeInverted = !field.GetFirstSubFieldValue('9').IsEmpty,
-                Postfix = field.GetFirstSubFieldValue('1').ToString(),
-                Appendix = field.GetFirstSubFieldValue('c').ToString(),
-                Number = field.GetFirstSubFieldValue('d').ToString(),
-                Dates = field.GetFirstSubFieldValue('f').ToString(),
-                Variant = field.GetFirstSubFieldValue('r').ToString(),
-                WorkPlace = field.GetFirstSubFieldValue('p').ToString(),
+                FullName = field.GetFirstSubFieldValue('g'),
+                CantBeInverted = !field.GetFirstSubFieldValue('9').IsEmpty(),
+                Postfix = field.GetFirstSubFieldValue('1'),
+                Appendix = field.GetFirstSubFieldValue('c'),
+                Number = field.GetFirstSubFieldValue('d'),
+                Dates = field.GetFirstSubFieldValue('f'),
+                Variant = field.GetFirstSubFieldValue('r'),
+                WorkPlace = field.GetFirstSubFieldValue('p'),
                 Field = field
             };
 
@@ -721,19 +700,19 @@ namespace ManagedIrbis.Fields
             }
 
             var withInitials = field.GetFirstSubFieldValue(subFields[0]);
-            if (withInitials.IsEmpty)
+            if (withInitials.IsEmpty())
             {
                 return null;
             }
 
             var result = new AuthorInfo();
-            var navigator = new TextNavigator(withInitials);
-            result.CantBeInverted = !field.GetFirstSubFieldValue(subFields[2]).IsEmpty;
+            var navigator = new TextNavigator(withInitials!);
+            result.CantBeInverted = !field.GetFirstSubFieldValue(subFields[2]).IsEmpty();
             result.FamilyName = navigator.ReadUntil(_delimiters).ToString();
             navigator.SkipChar(_delimiters);
             result.Initials = navigator.GetRemainingText().ToString();
-            result.FullName = field.GetFirstSubFieldValue(subFields[1]).ToString();
-            result.WorkPlace = field.GetFirstSubFieldValue(subFields[3]).ToString();
+            result.FullName = field.GetFirstSubFieldValue(subFields[1]);
+            result.WorkPlace = field.GetFirstSubFieldValue(subFields[3]);
             result.Field = field;
 
             return result;
