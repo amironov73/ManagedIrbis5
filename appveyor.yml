@@ -27,7 +27,7 @@ before_build:
 - pygount -f summary Source/Apps -s cs -N "*.Designer.cs" -F "obj"
 - pwsh: |
     Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
-    ./dotnet-install.ps1 -JSonFile global.json -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-preview.4.21255.9"
+    ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-preview.4.21255.9"
 - dotnet --info
 - dotnet tool install -g JetBrains.ReSharper.GlobalTools
 
