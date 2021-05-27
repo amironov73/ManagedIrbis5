@@ -164,7 +164,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             var subField = new SubField();
             subField.Decode("A");
             Assert.AreEqual('a', subField.Code);
-            Assert.AreEqual(0, subField.Value.Length);
+            Assert.IsNull(subField.Value);
         }
 
         [TestMethod]

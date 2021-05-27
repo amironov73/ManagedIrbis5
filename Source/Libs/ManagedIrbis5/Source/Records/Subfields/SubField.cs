@@ -181,7 +181,7 @@ namespace ManagedIrbis
                 Code = char.ToLowerInvariant(text[0]);
                 var value = text[1..];
                 SubFieldValue.Verify(value, true);
-                Value = value.ToString();
+                Value = value.EmptyToNull();
             }
         } // method Decode
 

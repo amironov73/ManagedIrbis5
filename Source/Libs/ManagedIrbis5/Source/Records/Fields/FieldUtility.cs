@@ -9,9 +9,10 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* FieldUtility.cs --
+/* FieldUtility.cs -- методы расширения для Field
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,6 +28,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 using AM;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -36,14 +38,14 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis
 {
     /// <summary>
-    ///
+    /// Методы расширения для <see cref="Field"/>.
     /// </summary>
     public static class FieldUtility
     {
         #region Public methods
 
         /// <summary>
-        /// Добавление подполя.
+        /// Добавление подполя, при условии, что оно не пустое.
         /// </summary>
         public static Field AddNonEmptySubField
             (
@@ -58,7 +60,8 @@ namespace ManagedIrbis
             }
 
             return field;
-        }
+
+        } // method AddNonEmptySubField
 
         /// <summary>
         /// Добавление подполя.
@@ -1340,6 +1343,30 @@ namespace ManagedIrbis
         }
 
         /// <summary>
+        /// Есть хотя бы одно подполе с указанным кодом?
+        /// </summary>
+        public static bool HaveSubField
+            (
+                this Field field,
+                char code,
+                string value
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code)
+                    && subFields[i].Value.SameString(value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Есть хотя бы одно поле с любым из указанных кодов?
         /// </summary>
         public static bool HaveSubField
@@ -1535,7 +1562,7 @@ namespace ManagedIrbis
         public static SubField[] GetUnknownSubFields
             (
                 this IEnumerable<SubField> subFields,
-                string knownCodes
+                ReadOnlySpan<char> knownCodes
             )
         {
             List<SubField>? result = null;
@@ -1827,6 +1854,99 @@ namespace ManagedIrbis
                     )
                 .ToArray();
         }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Поиск поля, которое обязательно должно быть.
+        /// </summary>
+        public static Field RequireField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                int occurrence = default
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (occurrence == 0)
+                    {
+                        return field;
+                    }
+                    occurrence--;
+                }
+            }
+
+            throw new KeyNotFoundException($"Tag={tag}");
+
+        } // method RequireField
+
+        // ==========================================================
+
+        /// <summary>
+        /// Перечисление полей с указанной меткой.
+        /// </summary>
+        public static IEnumerable<Field> EnumerateField
+            (
+                this IEnumerable<Field> fields,
+                int tag
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    yield return field;
+                }
+            }
+        } // method EnumerateField
+
+        /// <summary>
+        /// Перечисление полей с указанной меткой.
+        /// </summary>
+        public static IEnumerable<Field> EnumerateField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (field.HaveSubField(code))
+                    {
+                        yield return field;
+                    }
+                }
+            }
+        } // method EnumerateField
+
+        /// <summary>
+        /// Перечисление полей с указанной меткой.
+        /// </summary>
+        public static IEnumerable<Field> EnumerateField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code,
+                string value
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (field.HaveSubField(code, value))
+                    {
+                        yield return field;
+                    }
+                }
+            }
+        } // method EnumerateField
 
         #endregion
 

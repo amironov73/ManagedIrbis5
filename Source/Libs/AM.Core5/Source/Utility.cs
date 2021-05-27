@@ -1891,6 +1891,34 @@ namespace AM
             }
 
             return false;
+
+        } // method SameChar
+
+        /// <summary>
+        /// Сравнивает символы с точностью до регистра
+        /// без учета текущей культуры.
+        /// </summary>
+        /// <param name="one">Левая часть.</param>
+        /// <param name="text">Правая часть.</param>
+        /// <returns>Результат поиска <paramref name="one"/> среди
+        /// элементов <paramref name="text"/>.</returns>
+        [Pure]
+        public static bool SameChar
+            (
+                this char one,
+                ReadOnlySpan<char> text
+            )
+        {
+            foreach (var two in text)
+            {
+                if (char.ToUpperInvariant(one) == char.ToUpperInvariant(two))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+
         } // method SameChar
 
         /// <summary>

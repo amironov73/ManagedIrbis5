@@ -168,7 +168,7 @@ namespace ExemplarKiller
                     );
                 var readerRecords = searcher.SearchRead
                     (
-                        new [] { number, barcode }
+                        new [] { number, barcode }.NonEmptyLines()
                     );
                 foreach (var readerRecord in readerRecords)
                 {

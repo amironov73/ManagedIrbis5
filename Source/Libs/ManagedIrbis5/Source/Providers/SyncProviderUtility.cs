@@ -8,6 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* SyncProviderUtility.cs -- вспомогательные методы для синхронного провайдера
@@ -18,6 +19,8 @@
 
 using System;
 using System.IO;
+
+using AM;
 
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
@@ -119,16 +122,74 @@ namespace ManagedIrbis.Providers
         } // method ReadRecord
 
         /// <summary>
+        /// Чтение с сервера записи, которая обязательно должна быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
+        public static Record RequireRecord ( this ISyncProvider connection, int mfn ) =>
+            connection.ReadRecord(mfn)
+            ?? throw new IrbisException($"Record not found: MFN={mfn}");
+
+        /// <summary>
+        /// Чтение с сервера записи, которая обязательно должна быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
+        public static Record RequireRecord ( this ISyncProvider connection, string expression ) =>
+            connection.SearchReadOneRecord(expression)
+            ?? throw new IrbisException($"Record not found: expression={expression}");
+
+        /// <summary>
+        /// Чтение с сервера текстового файла, который обязательно должен быть.
+        /// </summary>
+        /// <exception cref="FileNotFoundException">Файл отсутствует или другая ошибка при чтении.</exception>
+        public static string RequireTextFile ( this ISyncProvider connection, FileSpecification specification ) =>
+            connection.ReadTextFile(specification)
+            ?? throw new IrbisException($"File not found: {specification}");
+
+        /// <summary>
+        /// Чтение с сервера FST-файла, который обязательно должен быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
+        public static FstFile RequireFstFile (this ISyncProvider connection, FileSpecification specification) =>
+            connection.ReadFstFile(specification)
+            ?? throw new IrbisException($"FST not found: {specification}");
+
+        /// <summary>
+        /// Чтение с сервера файла меню, которое обязательно должно быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
+        public static MenuFile RequireMenuFile (this ISyncProvider connection, FileSpecification specification) =>
+            connection.ReadMenuFile(specification)
+            ?? throw new IrbisException($"Menu not found: {specification}");
+
+        /// <summary>
+        /// Чтение с сервера PAR-файла, который обязательно должен быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
+        public static ParFile RequireParFile (this ISyncProvider connection, FileSpecification specification) =>
+            connection.ReadParFile(specification)
+            ?? throw new IrbisException($"PAR not found: {specification}");
+
+        /// <summary>
         /// Поиск с последующим чтением одной записи.
         /// </summary>
         public static Record? SearchReadOneRecord
             (
-                this ISyncProvider provider,
+                this ISyncProvider connection,
                 string expression
             )
         {
-            throw new NotImplementedException();
-        }
+            var parameters = new SearchParameters
+            {
+                Expression = expression,
+                NumberOfRecords = 1
+            };
+            var found = connection.Search(parameters);
+
+            return found is { Length: 1 }
+                ? connection.ReadRecord(found[0].Mfn)
+                : default;
+
+        } // method SearchReadOneRecord
 
         #endregion
 
