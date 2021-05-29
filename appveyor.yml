@@ -3,6 +3,7 @@ configuration: Debug
 image: Visual Studio 2019
 
 environment:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   PATH: C:\Python36-x64;C:\Python36-x64\Scripts;%PATH%
 
 init:
