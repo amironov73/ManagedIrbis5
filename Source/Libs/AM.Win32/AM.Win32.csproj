@@ -31,10 +31,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Source" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
@@ -43,7 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
+        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>
