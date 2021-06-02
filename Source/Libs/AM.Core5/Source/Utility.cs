@@ -772,7 +772,29 @@ namespace AM
             }
 
             return value;
+
         } // method ThrowIfNull
+
+        /// <summary>
+        /// Подстановка значения по умолчанию вместо <c>null</c>.
+        /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
+        public static T IfNull<T>(this T? value, T defaultValue)
+            where T: class
+            => value ?? defaultValue;
+
+        /// <summary>
+        /// Подстановка значения по умолчания вместо пустой строки.
+        /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
+        public static string IfEmpty(this string? value, string defaultValue)
+            => string.IsNullOrEmpty(value)
+                ? string.IsNullOrEmpty(defaultValue)
+                    ? throw new ArgumentNullException(nameof(defaultValue))
+                    : defaultValue
+                : value;
 
         /// <summary>
         /// Бросает исключение, если переданное значение равно <c>null</c>,

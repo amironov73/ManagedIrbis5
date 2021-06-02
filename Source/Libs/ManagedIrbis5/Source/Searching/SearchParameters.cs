@@ -138,6 +138,7 @@ namespace ManagedIrbis
             query.Add(MinMfn);
             query.Add(MaxMfn);
             query.AddAnsi(Sequential);
+
         } // method Encode
 
         #endregion

@@ -16,12 +16,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
 
 using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Runtime;
+
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -36,6 +39,15 @@ namespace ManagedIrbis.Gbl
         : IVerifiable,
         IHandmadeSerializable
     {
+        #region Constants
+
+        /// <summary>
+        /// Разделитель элементов в строке.
+        /// </summary>
+        private const string Delimiter = IrbisText.IrbisDelimiter;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -147,6 +159,77 @@ namespace ManagedIrbis.Gbl
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Кодирование пользовательского запроса.
+        /// </summary>
+        public void Encode<T>
+            (
+                T query
+            )
+            where T: IQuery
+        {
+            query.Add(Actualize ? 1 : 0);
+            if (!string.IsNullOrEmpty(FileName))
+            {
+                query.AddAnsi("@" + FileName);
+            }
+            else
+            {
+                var builder = new StringBuilder();
+                // "!" здесь означает, что передавать будем в UTF-8
+                builder.Append('!');
+                // не знаю, что тут означает "0"
+                builder.Append('0');
+                builder.Append(Delimiter);
+                foreach (var statement in Statements)
+                {
+                    // TODO: сделать подстановку параметров
+                    // $encoded .=  $settings->substituteParameters(strval($statement));
+                    builder.Append(statement.EncodeForProtocol());
+                    builder.Append(Delimiter);
+                }
+
+                builder.Append(Delimiter);
+                query.AddUtf(builder.ToString());
+            }
+
+            // отбор записей на основе поиска
+            query.AddUtf(SearchExpression); // поиск по словарю
+            query.Add(MinMfn); // нижняя граница MFN
+            query.Add(MaxMfn); // верхняя граница MFN
+            //query.AddUtf(SequentialExpression); // последовательный поиск
+
+            // TODO поддержка режима "кроме отмеченных"
+            if (MfnList is { Length: not 0 })
+            {
+                query.Add(MfnList.Length);
+                foreach (var mfn in MfnList)
+                {
+                    query.Add(mfn);
+                }
+            }
+            else
+            {
+                var count = MaxMfn - MinMfn + 1;
+                query.Add(count);
+                for (var mfn = 0; mfn <= MaxMfn; mfn++)
+                {
+                    query.Add(mfn);
+                }
+            }
+
+            if (!FormalControl)
+            {
+                query.AddAnsi("*");
+            }
+
+            if (!Autoin)
+            {
+                query.AddAnsi("&");
+            }
+
+        } // method Encode
 
         /*
 

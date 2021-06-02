@@ -120,6 +120,22 @@ namespace ManagedIrbis
 
         #region Private members
 
+        private static void _Write
+            (
+                TextWriter writer,
+                string name,
+                int[]? mfns
+            )
+        {
+            writer.Write($"{name}: ");
+            writer.WriteLine
+                (
+                    mfns is null or { Length: 0 }
+                    ? "None"
+                    : string.Join(", ", mfns)
+                );
+        }
+
         private static int[] _ParseLine
             (
                 string? text
@@ -136,10 +152,12 @@ namespace ManagedIrbis
             {
                 result[i] = int.Parse(items[i]);
             }
+
             Array.Sort(result);
 
             return result;
-        }
+
+        } // method ParseLine
 
         #endregion
 
@@ -148,13 +166,15 @@ namespace ManagedIrbis
         /// <summary>
         /// Разбор ответа сервера.
         /// </summary>
-        public static DatabaseInfo ParseServerResponse
+        public static DatabaseInfo Parse
             (
+                string? name,
                 Response response
             )
         {
-            DatabaseInfo result = new DatabaseInfo
+            var result = new DatabaseInfo
             {
+                Name = name,
                 LogicallyDeletedRecords = _ParseLine(response.ReadAnsi()),
                 PhysicallyDeletedRecords = _ParseLine(response.ReadAnsi()),
                 NonActualizedRecords = _ParseLine(response.ReadAnsi()),
@@ -164,7 +184,26 @@ namespace ManagedIrbis
             };
 
             return result;
-        }
+
+        } // method Parse
+
+        /// <summary>
+        /// Вывод сведений о базе данных.
+        /// </summary>
+        public void Write
+            (
+                TextWriter writer
+            )
+        {
+            writer.WriteLine($"Database: {Name}");
+            writer.WriteLine($"Max MFN={MaxMfn}");
+            writer.WriteLine($"Locked={DatabaseLocked}");
+            _Write(writer, "Logically deleted records", LogicallyDeletedRecords);
+            _Write(writer, "Physically deleted records", PhysicallyDeletedRecords);
+            _Write(writer, "Non-actualized records", NonActualizedRecords);
+            _Write(writer, "Locked records", LockedRecords);
+
+        } // method Write
 
         #endregion
 

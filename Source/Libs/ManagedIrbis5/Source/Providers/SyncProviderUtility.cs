@@ -40,6 +40,34 @@ namespace ManagedIrbis.Providers
         #region Public methods
 
         /// <summary>
+        /// Форматирование записи по ее MFN.
+        /// </summary>
+        public static string? FormatRecord
+            (
+                this ISyncProvider conneciton,
+                string format,
+                int mfn
+            )
+        {
+            throw new NotImplementedException();
+
+        } // method FormatRecord
+
+        /// <summary>
+        /// Форматирование записи в клиентском представлении.
+        /// </summary>
+        public static string? FormatRecord
+            (
+                this ISyncProvider connection,
+                string format,
+                Record record
+            )
+        {
+            throw new NotImplementedException();
+
+        } // method FormatRecord
+
+        /// <summary>
         /// Чтение FST-файла как текстового.
         /// </summary>
         public static FstFile? ReadFstFile

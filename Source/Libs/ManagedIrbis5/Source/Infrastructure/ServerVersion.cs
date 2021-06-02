@@ -58,12 +58,12 @@ namespace ManagedIrbis
         /// <summary>
         /// Разбор ответа сервера.
         /// </summary>
-        public void Parse
+        public ServerVersion Parse
             (
                 Response response
             )
         {
-            string[] lines = response.ReadRemainingAnsiLines();
+            var lines = response.ReadRemainingAnsiLines();
 
             if (lines.Length >= 4)
             {
@@ -78,7 +78,10 @@ namespace ManagedIrbis
                 ConnectedClients = lines[1].SafeToInt32();
                 MaxClients = lines[2].SafeToInt32();
             }
-        }
+
+            return this;
+
+        } // method Parse
 
         #endregion
 

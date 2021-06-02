@@ -24,9 +24,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-using AM;
 using AM.Collections;
-using AM.Configuration;
 
 using ManagedIrbis;
 using ManagedIrbis.ImportExport;
@@ -111,6 +109,12 @@ namespace Marsohod5
         private void LoadMagazines()
         {
             var records = _connection!.SearchRead("MARS=$");
+            if (records is null)
+            {
+                _logger.LogError("Can't read magazines");
+                return;
+            }
+
             _logger.LogInformation($"{records.Length} records found");
             foreach (var record in records)
             {

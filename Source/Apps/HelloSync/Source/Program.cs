@@ -55,15 +55,30 @@ class Program
 
             WriteLine("Successfully connected");
 
-            //var version = connection.GetServerVersion();
-            //WriteLine(version);
+            var version = connection.GetServerVersion();
+            WriteLine(version);
 
-            //var processes = connection.ListProcesses();
-            //WriteLine("Processes: "
-            //          + string.Join<ProcessInfo>(" | ", processes));
+            var processes = connection.ListProcesses();
+            if (processes is not null)
+            {
+                WriteLine("Processes: "
+                    + string.Join<ProcessInfo>(" | ", processes));
+            }
+
+            var stat = connection.GetServerStat();
+            if (stat is not null)
+            {
+                WriteLine(stat);
+            }
 
             var maxMfn = connection.GetMaxMfn();
             WriteLine($"Max MFN={maxMfn}");
+
+            var dbInfo = connection.GetDatabaseInfo();
+            if (dbInfo is not null)
+            {
+                dbInfo.Write(Out);
+            }
 
             connection.NoOperation();
             WriteLine("NOP");
@@ -89,8 +104,17 @@ class Program
             var formatted = connection.FormatRecord("@brief", 1);
             WriteLine($"Formatted={formatted}");
 
-            //var files = connection.ListFiles("2.IBIS.*.mnu");
-            //WriteLine("Files: " + string.Join(",", files));
+            var files = connection.ListFiles("2.IBIS.*.mnu");
+            if (files is not null)
+            {
+                WriteLine("Files: " + string.Join(",", files));
+            }
+
+            var users = connection.ListUsers();
+            if (users is not null)
+            {
+                WriteLine("Users: " + string.Join<UserInfo>(", ", users));
+            }
 
             var specification = new FileSpecification
             {
@@ -112,6 +136,7 @@ class Program
         }
 
         return 0;
+
     } // method Main
 
 } // class Program

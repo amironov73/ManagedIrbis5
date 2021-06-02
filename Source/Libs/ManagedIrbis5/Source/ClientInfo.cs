@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* ClientInfo.cs -- информация о клиенте, подключенном к серверу ИРБИС
  * Ars Magna project, http://arsmagna.ru
@@ -85,5 +82,15 @@ namespace ManagedIrbis
         public string? CommandNumber { get; set; }
 
         #endregion
-    }
-}
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() =>
+            $"IP: {IPAddress}, ID: {ID}, {Workstation}";
+
+        #endregion
+
+    } // class ClientInfo
+
+} // namespace ManagedIrbis

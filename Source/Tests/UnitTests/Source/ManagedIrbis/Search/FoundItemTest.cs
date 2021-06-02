@@ -207,7 +207,7 @@ namespace UnitTests.ManagedIrbis.Search
             byte[] rawAnswer = builder.Encode();
             IrbisConnection connection = new IrbisConnection();
             ServerResponse response = new ServerResponse(connection, rawAnswer, rawRequest, true);
-            List<FoundItem> found = FoundItem.ParseServerResponse(response, 0);
+            List<FoundItem> found = FoundItem.Parse(response, 0);
             Assert.AreEqual(10, found.Count);
             Assert.AreEqual(47, found[0].Mfn);
             Assert.AreEqual("Еремеева, Т. В. Освоение генофонда некоторых видов Armeniaca Scop. в Предбайкалье : Автореф. дисс. ... канд. наук / Т. В. Еремеева, 2000. - 19 с.", found[0].Text);

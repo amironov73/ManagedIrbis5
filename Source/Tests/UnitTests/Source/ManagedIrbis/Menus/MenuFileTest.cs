@@ -185,7 +185,7 @@ namespace UnitTests.ManagedIrbis.Menus
 //                    query,
 //                    true
 //                );
-//            MenuFile menu = MenuFile.ParseServerResponse(response);
+//            MenuFile menu = MenuFile.Parse(response);
 //            Assert.AreEqual(3, menu.Entries.Count);
 //            Assert.AreEqual("Comment for a", menu.GetString("a"));
 //            Assert.AreEqual("Comment for b", menu.GetString("b"));
@@ -197,7 +197,7 @@ namespace UnitTests.ManagedIrbis.Menus
 //        public void MenuFile_ParseServerResponse_2()
 //        {
 //            string response = "a\nComment for a\nb\nComment for b\nc\nComment for c\n*****";
-//            MenuFile menu = MenuFile.ParseServerResponse(response);
+//            MenuFile menu = MenuFile.Parse(response);
 //            Assert.AreEqual(3, menu.Entries.Count);
 //            Assert.AreEqual("Comment for a", menu.GetString("a"));
 //            Assert.AreEqual("Comment for b", menu.GetString("b"));
@@ -209,7 +209,7 @@ namespace UnitTests.ManagedIrbis.Menus
 //        public void MenuFile_ParseServerResponse_3()
 //        {
 //            string response = "a\nComment for a\nb\nComment for b\nc\nComment for c\n";
-//            MenuFile menu = MenuFile.ParseServerResponse(response);
+//            MenuFile menu = MenuFile.Parse(response);
 //            Assert.AreEqual(3, menu.Entries.Count);
 //            Assert.AreEqual("Comment for a", menu.GetString("a"));
 //            Assert.AreEqual("Comment for b", menu.GetString("b"));
@@ -221,7 +221,7 @@ namespace UnitTests.ManagedIrbis.Menus
 //        public void MenuFile_ParseServerResponse_4()
 //        {
 //            string response = "a\nComment for a\nb\nComment for b\nc\nComment for c";
-//            MenuFile menu = MenuFile.ParseServerResponse(response);
+//            MenuFile menu = MenuFile.Parse(response);
 //            Assert.AreEqual(3, menu.Entries.Count);
 //            Assert.AreEqual("Comment for a", menu.GetString("a"));
 //            Assert.AreEqual("Comment for b", menu.GetString("b"));

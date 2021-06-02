@@ -105,6 +105,7 @@ namespace ManagedIrbis.Infrastructure
             var length = FastNumber.Int32ToBytes(value, span);
             _writer.Write((ReadOnlySpan<byte>) span.Slice(0, length));
             NewLine();
+
         } // method Add
 
         /// <summary>
@@ -126,6 +127,7 @@ namespace ManagedIrbis.Infrastructure
             }
 
             NewLine();
+
         } // method AddAnsi
 
         /// <summary>
@@ -143,10 +145,12 @@ namespace ManagedIrbis.Infrastructure
                 Span<byte> span = length < 2048
                     ? stackalloc byte[length]
                     : new byte[length];
-                length = IrbisEncoding.Ansi.GetBytes(value, span);
+                length = utf.GetBytes(value, span);
                 _writer.Write((ReadOnlySpan<byte>) span.Slice(0, length));
             }
+
             NewLine();
+
         } // method AddUtf
 
         /// <summary>
@@ -163,7 +167,23 @@ namespace ManagedIrbis.Infrastructure
             }
             else
             {
-                AddAnsi(format);
+                format = format.Trim();
+                if (string.IsNullOrEmpty(format))
+                {
+                    NewLine();
+                }
+                else
+                {
+                    if (format.StartsWith('@'))
+                    {
+                        AddAnsi(format);
+                    }
+                    else
+                    {
+                        var prepared = IrbisFormat.PrepareFormat(format);
+                        AddUtf("!" + prepared);
+                    }
+                }
             }
 
         } // method AddFormat
@@ -173,25 +193,45 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public void Debug
             (
-                TextWriter writer
+                TextWriter? writer = null
             )
         {
+            writer ??= Console.Out;
+
             var span = GetBody().Span;
             foreach (var b in span)
             {
                 writer.Write($" {b:X2}");
             }
+
         } // method Debug
+
+        /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void DebugAnsi
+            (
+                TextWriter? writer = null
+            )
+        {
+            writer ??= Console.Out;
+
+            writer.WriteLine (IrbisEncoding.Ansi.GetString (_writer.WrittenSpan));
+
+        } // method DebugUtf
 
         /// <summary>
         /// Отладочная печать.
         /// </summary>
         public void DebugUtf
             (
-                TextWriter writer
+                TextWriter? writer = null
             )
         {
+            writer ??= Console.Out;
+
             writer.WriteLine (IrbisEncoding.Utf8.GetString (_writer.WrittenSpan));
+
         } // method DebugUtf
 
         /// <summary>

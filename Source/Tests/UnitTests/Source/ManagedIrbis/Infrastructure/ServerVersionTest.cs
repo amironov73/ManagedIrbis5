@@ -64,7 +64,7 @@ namespace UnitTests.ManagedIrbis
 //                    true
 //                );
 //
-//            IrbisVersion version = IrbisVersion.ParseServerResponse(response);
+//            IrbisVersion version = IrbisVersion.Parse(response);
 //            Assert.AreEqual("Иркутский государственный технический университет", version.Organization);
 //            Assert.AreEqual("64.2015.1", version.Version);
 //            Assert.AreEqual(10, version.ConnectedClients);
@@ -92,7 +92,7 @@ namespace UnitTests.ManagedIrbis
 //                    true
 //                );
 //
-//            IrbisVersion version = IrbisVersion.ParseServerResponse(response);
+//            IrbisVersion version = IrbisVersion.Parse(response);
 //            Assert.IsNull(version.Organization);
 //            Assert.AreEqual("64.2015.1", version.Version);
 //            Assert.AreEqual(10, version.ConnectedClients);
@@ -111,7 +111,7 @@ namespace UnitTests.ManagedIrbis
 //                "100000"
 //            };
 //
-//            IrbisVersion version = IrbisVersion.ParseServerResponse(response);
+//            IrbisVersion version = IrbisVersion.Parse(response);
 //            Assert.AreEqual("Иркутский государственный технический университет", version.Organization);
 //            Assert.AreEqual("64.2015.1", version.Version);
 //            Assert.AreEqual(10, version.ConnectedClients);
@@ -129,7 +129,7 @@ namespace UnitTests.ManagedIrbis
 //                "100000"
 //            };
 //
-//            IrbisVersion version = IrbisVersion.ParseServerResponse(response);
+//            IrbisVersion version = IrbisVersion.Parse(response);
 //            Assert.IsNull(version.Organization);
 //            Assert.AreEqual("64.2015.1", version.Version);
 //            Assert.AreEqual(10, version.ConnectedClients);

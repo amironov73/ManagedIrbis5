@@ -303,7 +303,7 @@ namespace ManagedIrbis.Menus
         // /// <summary>
         // /// Parse server response.
         // /// </summary>
-        // public static MenuFile ParseServerResponse
+        // public static MenuFile Parse
         //     (
         //         Response response
         //     )
@@ -326,7 +326,7 @@ namespace ManagedIrbis.Menus
             var result = ParseStream(reader);
 
             return result;
-        } // method ParseServerResponse
+        } // method Parse
 
         /// <summary>
         /// Read <see cref="MenuFile"/> from server.

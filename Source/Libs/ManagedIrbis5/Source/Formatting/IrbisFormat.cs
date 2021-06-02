@@ -192,6 +192,7 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result.ToString();
+            
         } // method PrepareFormat
 
         /// <summary>

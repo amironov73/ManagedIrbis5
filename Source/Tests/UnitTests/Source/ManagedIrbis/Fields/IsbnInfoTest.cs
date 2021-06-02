@@ -97,7 +97,7 @@ namespace UnitTests.ManagedIrbis.Fields
             Assert.AreEqual(field.GetFirstSubFieldValue('d'), isbn.PriceString);
             Assert.AreEqual(field.GetFirstSubFieldValue('c'), isbn.Currency);
             Assert.IsNotNull(isbn.UnknownSubFields);
-            Assert.AreEqual(0, isbn.UnknownSubFields.Length);
+            Assert.AreEqual(0, isbn.UnknownSubFields!.Length);
         }
 
         [TestMethod]
@@ -115,7 +115,7 @@ namespace UnitTests.ManagedIrbis.Fields
             Assert.AreEqual(field.GetFirstSubFieldValue('d'), isbn[0].PriceString);
             Assert.AreEqual(field.GetFirstSubFieldValue('c'), isbn[0].Currency);
             Assert.IsNotNull(isbn[0].UnknownSubFields);
-            Assert.AreEqual(0, isbn[0].UnknownSubFields.Length);
+            Assert.AreEqual(0, isbn[0].UnknownSubFields!.Length);
         }
 
         [TestMethod]

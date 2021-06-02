@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -320,7 +321,10 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         ///
         /// </summary>
-        public string RemainingText(Encoding encoding)
+        public string RemainingText
+            (
+                Encoding encoding
+            )
         {
             var bytes = RemainingBytes();
             if (bytes.Length == 0)
@@ -336,54 +340,54 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public void Debug
             (
-                TextWriter? writer
+                TextWriter? writer = null
             )
         {
-            if (!ReferenceEquals(writer, null))
+            writer ??= Console.Out;
+
+            foreach (var memory in _memory)
             {
-                foreach (var memory in _memory)
+                foreach (var b in memory)
                 {
-                    foreach (var b in memory)
-                    {
-                        writer.Write($" {b:X2}");
-                    }
+                    writer.Write($" {b:X2}");
                 }
             }
-        }
+
+        } // method Debug
 
         /// <summary>
         /// Debug dump.
         /// </summary>
         public void DebugUtf
             (
-                TextWriter? writer
+                TextWriter? writer = null
             )
         {
-            if (!ReferenceEquals(writer, null))
+            writer ??= Console.Out;
+
+            foreach (var memory in _memory)
             {
-                foreach (var memory in _memory)
-                {
-                    writer.Write(IrbisEncoding.Utf8.GetString(memory));
-                }
+                writer.Write(IrbisEncoding.Utf8.GetString(memory));
             }
-        }
+
+        } // method DebugUtf
 
         /// <summary>
         /// Debug dump.
         /// </summary>
         public void DebugAnsi
             (
-                TextWriter? writer
+                TextWriter? writer = null
             )
         {
-            if (!ReferenceEquals(writer, null))
+            writer ??= Console.Out;
+
+            foreach (var memory in _memory)
             {
-                foreach (var memory in _memory)
-                {
-                    writer.Write(IrbisEncoding.Ansi.GetString(memory));
-                }
+                writer.Write(IrbisEncoding.Ansi.GetString(memory));
             }
-        }
+
+        } // method DebugAnsi
 
         /// <summary>
         ///
@@ -393,7 +397,8 @@ namespace ManagedIrbis.Infrastructure
             ReturnCode = ReadInteger();
 
             return ReturnCode;
-        }
+
+        } // method GetReturnCode
 
         /// <summary>
         ///
@@ -615,10 +620,27 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Чтение нескольких строк в кодировке ANSI.
         /// </summary>
-        public string[]? GetAnsiStrings(int lineCount)
+        public string[]? GetAnsiStrings
+            (
+                int lineCount
+            )
         {
-            throw new NotImplementedException();
-        }
+            var result = new LocalList<string>();
+
+            for (var i = 0; i < lineCount; i++)
+            {
+                if (EOT)
+                {
+                    return null;
+                }
+
+                var line = ReadAnsi();
+                result.Add(line);
+            }
+
+            return result.ToArray();
+
+        } // method GetAnsiStrings
 
         /// <summary>
         ///
@@ -626,7 +648,7 @@ namespace ManagedIrbis.Infrastructure
         /// <returns></returns>
         public string[] ReadRemainingAnsiLines()
         {
-            LocalList<string> result = new LocalList<string>();
+            var result = new LocalList<string>();
 
             while (!EOT)
             {
@@ -635,7 +657,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result.ToArray();
-        }
+
+        } // method ReadRemainingAnsiLines
 
         /// <summary>
         ///
@@ -673,8 +696,16 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public int RequireInt32()
         {
-            throw new NotImplementedException();
-        }
+            if (EOT)
+            {
+                throw new IrbisException("Unexpected end of response");
+            }
+
+            var line = ReadLine(IrbisEncoding.Ansi);
+
+            return int.Parse(line, CultureInfo.InvariantCulture);
+
+        } // method RequireInt32
 
         #endregion
 

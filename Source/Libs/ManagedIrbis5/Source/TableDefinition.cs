@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -103,6 +104,28 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
+        /// Кодирование запроса.
+        /// </summary>
+        public void Encode<T>
+            (
+                T query
+            )
+            where T: IQuery
+        {
+            // TODO: реализовать заголовки и список MFN
+
+            query.AddAnsi(Table);
+            query.NewLine(); // вместо заголовков
+            query.AddAnsi(Mode);
+            query.AddUtf(SearchQuery);
+            query.Add(MinMfn);
+            query.Add(MaxMfn);
+            query.AddUtf(SequentialQuery);
+            query.NewLine(); // вместо списка MFN
+
+        } // method Encode
+
+        /// <summary>
         /// Should serialize the <see cref="Headers"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
@@ -143,5 +166,7 @@ namespace ManagedIrbis
         }
 
         #endregion
-    }
-}
+
+    } // class TableDefinition
+
+} // namespace ManagedIrbis

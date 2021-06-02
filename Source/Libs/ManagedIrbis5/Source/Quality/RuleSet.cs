@@ -24,6 +24,8 @@ using System.Text.Json.Serialization;
 
 using AM;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable

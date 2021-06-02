@@ -5,7 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ServerStat.cs -- IRBIS server stat
  * Ars Magna project, http://arsmagna.ru
@@ -70,11 +69,11 @@ namespace ManagedIrbis
                 TotalCommandCount = response.RequireInt32(),
                 ClientCount = response.RequireInt32(),
             };
-            int linesPerClient = response.RequireInt32();
 
+            var linesPerClient = response.RequireInt32();
             var clients = new List<ClientInfo>();
 
-            for(int i = 0; i < result.ClientCount; i++)
+            for(var i = 0; i < result.ClientCount; i++)
             {
                 var lines = response.GetAnsiStrings(linesPerClient + 1);
                 if (ReferenceEquals(lines, null))
@@ -137,7 +136,7 @@ namespace ManagedIrbis
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
 
             result.AppendFormat("Command executed: {0}", TotalCommandCount);
             result.AppendLine();

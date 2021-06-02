@@ -46,7 +46,7 @@ namespace ManagedIrbis
         /// <returns>Признак успешности завершения операции.</returns>
         public static bool ActualizeDatabase
             (
-                this ISyncProvider connection,
+                this SyncConnection connection,
                 string? database = default
             )
         {
@@ -54,6 +54,7 @@ namespace ManagedIrbis
                 (
                     new() { Database = database, Mfn = 0 }
                 );
+
         } // method ActualizeDatabase
 
         /// <summary>
@@ -73,33 +74,19 @@ namespace ManagedIrbis
 
             using var query = new SyncQuery(connection, CommandCode.FormatRecord);
             query.AddAnsi(connection.Database);
-            var prepared = IrbisFormat.PrepareFormat(format);
-            query.AddAnsi(prepared);
+            query.AddFormat(format);
             query.Add(1);
             query.Add(mfn);
             var response = connection.ExecuteSync(query);
-            if (response is null)
+            if (!response.IsGood())
             {
                 return null;
             }
 
-            response.CheckReturnCode();
             var result = response.ReadRemainingUtfText().TrimEnd();
 
             return result;
-        } // method FormatRecord
 
-        /// <summary>
-        /// Форматирование записи по ее MFN.
-        /// </summary>
-        public static string? FormatRecord
-            (
-                this ISyncProvider conneciton,
-                string format,
-                int mfn
-            )
-        {
-            throw new NotImplementedException();
         } // method FormatRecord
 
         /// <summary>
@@ -107,12 +94,31 @@ namespace ManagedIrbis
         /// </summary>
         public static string? FormatRecord
             (
-                this ISyncProvider conneciton,
+                this SyncConnection connection,
                 string format,
                 Record record
             )
         {
-            throw new NotImplementedException();
+            if (!connection.CheckProviderState())
+            {
+                return null;
+            }
+
+            using var query = new SyncQuery(connection, CommandCode.FormatRecord);
+            query.AddAnsi(connection.Database);
+            query.AddFormat(format);
+            query.Add(-2);
+            query.AddUtf(record.Encode());
+            var response = connection.ExecuteSync(query);
+            if (!response.IsGood())
+            {
+                return null;
+            }
+
+            var result = response.ReadRemainingUtfText().TrimEnd();
+
+            return result;
+
         } // method FormatRecord
 
         /// <summary>
@@ -126,20 +132,70 @@ namespace ManagedIrbis
             )
         {
             throw new NotImplementedException();
-        }
+
+        } // method FormatRecords
 
         /// <summary>
-        /// Форматирование указанной записи.
+        /// Получение списка файлов, соответствующих спецификации.
         /// </summary>
-        public static Task<string?> FormatRecordAsync
+        public static string[]? ListFiles
             (
                 this SyncConnection connection,
-                string format,
-                Record record
+                string specification
             )
         {
-            throw new NotImplementedException();
-        } // method FormatRecord
+            if (!connection.CheckProviderState())
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(specification))
+            {
+                return Array.Empty<string>();
+            }
+
+            var response = connection.ExecuteSync(CommandCode.ListFiles, specification);
+
+            return ListFiles(response);
+
+        } // method ListFiles
+
+        /// <summary>
+        /// Получение списка файлов из ответа сервера.
+        /// </summary>
+        public static string[]? ListFiles
+            (
+                Response? response
+            )
+        {
+            if (response is null)
+            {
+                return null;
+            }
+
+            var lines = response.ReadRemainingAnsiLines();
+            var result = new List<string>();
+            foreach (var line in lines)
+            {
+                var files = IrbisText.SplitIrbisToLines(line);
+                foreach (var file1 in files)
+                {
+                    if (!string.IsNullOrEmpty(file1))
+                    {
+                        foreach (var file2 in file1.Split(IrbisText.WindowsDelimiter))
+                        {
+                            if (!string.IsNullOrEmpty(file2))
+                            {
+                                result.Add(file2);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result.ToArray();
+
+        } // method ListFiles
 
         /// <summary>
         /// Чтение терминов словаря.
@@ -163,6 +219,7 @@ namespace ManagedIrbis
             };
 
             return connection.ReadTerms(parameters);
+
         } // method ReadTerms
 
         /// <summary>
@@ -190,13 +247,13 @@ namespace ManagedIrbis
             };
             parameters.Encode(connection, query);
             var response = connection.ExecuteSync(query);
-            if (response is null
-                || !response.CheckReturnCode())
+            if (!response.IsGood())
             {
                 return Array.Empty<int>();
             }
 
             return FoundItem.ParseMfn(response);
+
         } // method Search
 
         /// <summary>
@@ -217,6 +274,7 @@ namespace ManagedIrbis
             var result = FoundItem.ToMfn(lines);
 
             return result;
+
         } // method Search
 
         /// <summary>
@@ -259,12 +317,17 @@ namespace ManagedIrbis
         /// <summary>
         /// Поиск с последующим чтением записей.
         /// </summary>
-        public static Record[] SearchRead
+        public static Record[]? SearchRead
             (
                 this ISyncConnection connection,
                 string expression
             )
         {
+            if (!connection.CheckProviderState())
+            {
+                return null;
+            }
+
             // TODO: сделать оптимально
 
             var found = connection.Search(expression);
@@ -303,7 +366,8 @@ namespace ManagedIrbis
                 };
 
             return connection.WriteRecord(parameters);
-        }
+
+        } // method WriteRecord
 
         #endregion
 
