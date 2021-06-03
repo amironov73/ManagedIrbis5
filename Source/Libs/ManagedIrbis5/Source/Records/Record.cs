@@ -18,6 +18,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -407,31 +408,45 @@ namespace ManagedIrbis
                 Response response
             )
         {
-            var line = response.ReadUtf();
-
-            var first = line.Split('#');
-            Mfn = int.Parse(first[0]);
-            Status = first.Length == 1
-                ? None
-                : (RecordStatus) first[1].SafeToInt32();
-
-            line = response.ReadUtf();
-            var second = line.Split('#');
-            Version = second.Length == 1
-                ? 0
-                : int.Parse(second[1]);
-
-            while (!response.EOT)
+            try
             {
-                line = response.ReadUtf();
-                if (string.IsNullOrEmpty(line))
-                {
-                    break;
-                }
+                var line = response.ReadUtf();
 
-                var field = new Field();
-                field.Decode(line);
-                Fields.Add(field);
+                var first = line.Split('#');
+                Mfn = int.Parse(first[0]);
+                Status = first.Length == 1
+                    ? None
+                    : (RecordStatus) first[1].SafeToInt32();
+
+                line = response.ReadUtf();
+                var second = line.Split('#');
+                Version = second.Length == 1
+                    ? 0
+                    : int.Parse(second[1]);
+
+                while (!response.EOT)
+                {
+                    line = response.ReadUtf();
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        break;
+                    }
+
+                    var field = new Field();
+                    field.Decode(line);
+                    Fields.Add(field);
+                }
+            }
+            catch (Exception exception)
+            {
+                // response.DebugUtf(Console.Error);
+                Magna.Error(nameof(Record) + "::" + nameof(Decode));
+
+                throw new IrbisException
+                    (
+                        nameof(Record) + "::" + nameof(Decode),
+                        exception
+                    );
             }
         } // method Decode
 

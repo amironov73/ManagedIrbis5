@@ -26,6 +26,8 @@ using System.Linq;
 
 using AM;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable
@@ -523,7 +525,6 @@ namespace ManagedIrbis.Batch
         {
             Magna.Trace("BatchRecordReader::GetEnumerator: start");
 
-            /*
             foreach (int[] package in _packages)
             {
                 Record[]? records = null;
@@ -534,7 +535,7 @@ namespace ManagedIrbis.Batch
                             Database,
                             package
                         );
-                    RecordsRead += records.Length;
+                    RecordsRead += records?.Length ?? 0;
                     BatchRead.Raise(this);
                 }
                 catch (Exception exception)
@@ -564,7 +565,7 @@ namespace ManagedIrbis.Batch
                         yield return record;
                     }
                 }
-                */
+            }
 
             Magna.Trace("BatchRecordReader::GetEnumerator: end");
 
@@ -574,10 +575,7 @@ namespace ManagedIrbis.Batch
             {
                 Connection.Dispose();
             }
-
-            yield break;
         }
-
 
         [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -57,6 +57,13 @@ namespace ManagedIrbis.Infrastructure
 
         #endregion
 
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"MFN={Mfn}";
+
+        #endregion
+
     } // class ReadRecordParameters
 
 } // namespace ManagedIrbis.Infrastructure

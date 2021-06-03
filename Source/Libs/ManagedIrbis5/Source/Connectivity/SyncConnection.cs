@@ -83,7 +83,11 @@ namespace ManagedIrbis
         public int ClientId { get; protected internal set; }
 
         /// <inheritdoc cref="IConnectionSettings.QueryId"/>
-        public int QueryId { get; protected internal set; }
+        public int QueryId
+        {
+            get => _queryId;
+            protected internal set => _queryId = value;
+        }
 
         /// <inheritdoc cref="IIrbisProvider.Connected"/>
         public bool Connected { get; protected internal set; }
@@ -162,6 +166,8 @@ namespace ManagedIrbis
         /// Отмена выполняемых операций.
         /// </summary>
         protected internal CancellationTokenSource _cancellation;
+
+        private int _queryId;
 
         /// <summary>
         /// Установка состояния занятости.
@@ -371,7 +377,7 @@ namespace ManagedIrbis
                 */
 
                 result.Parse();
-                QueryId++;
+                Interlocked.Increment(ref _queryId);
 
                 return result;
             }
@@ -823,24 +829,35 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var database = parameters.Database
-                           ?? Database
-                           ?? throw new IrbisException();
-            using var query = new SyncQuery(this, CommandCode.ReadRecord);
-            query.AddAnsi(database);
-            query.Add(parameters.Mfn);
-            // TODO: добавить обработку прочих параметров
-            var response = ExecuteSync(query);
-            if (!response.IsGood(ConnectionUtility.GoodCodesForReadRecord))
-            {
-                return null;
-            }
+            Record? result = null;
 
-            var result = new Record
+            try
             {
-                Database = Database
-            };
-            result.Decode(response);
+                var database = EnsureDatabase(parameters.Database);
+                using var query = new SyncQuery(this, CommandCode.ReadRecord);
+                query.AddAnsi(database);
+                query.Add(parameters.Mfn);
+                // TODO: добавить обработку прочих параметров
+                var response = ExecuteSync(query);
+                if (!response.IsGood(ConnectionUtility.GoodCodesForReadRecord))
+                {
+                    return null;
+                }
+
+                result = new Record
+                {
+                    Database = Database
+                };
+                result.Decode(response);
+            }
+            catch (Exception exception)
+            {
+                throw new IrbisException
+                    (
+                        nameof(ReadRecord) + " " + parameters,
+                        exception
+                    );
+            }
 
             return result;
 

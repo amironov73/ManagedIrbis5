@@ -18,10 +18,10 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using AM;
-
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
@@ -148,6 +148,44 @@ namespace ManagedIrbis.Providers
             return connection.ReadRecord(parameters);
 
         } // method ReadRecord
+
+        /// <summary>
+        /// Чтение указанных записей.
+        /// </summary>
+        public static Record[]? ReadRecords
+            (
+                this ISyncProvider connection,
+                string database,
+                IEnumerable<int> batch
+            )
+        {
+            if (!connection.CheckProviderState())
+            {
+                return null;
+            }
+
+            int[] mfns = batch is int[] array ? array : batch.ToArray();
+
+            switch (mfns.Length)
+            {
+                case 0:
+                    return Array.Empty<Record>();
+
+                case 1:
+                    // TODO: use database parameter
+
+                    return Sequence
+                        .FromItem(connection.ReadRecord(mfns[0]))
+                        .NonNullItems()
+                        .ToArray();
+            }
+
+            // TODO: implement
+
+            return Array.Empty<Record>();
+
+        } // method ReadRecords
+
 
         /// <summary>
         /// Чтение с сервера записи, которая обязательно должна быть.
