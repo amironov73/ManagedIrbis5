@@ -105,7 +105,7 @@ namespace ClearInventarization
                 var found = _connection.Search(_searchExpression);
                 Console.WriteLine($"Found: {found.Length}");
 
-                var batch = new BatchRecordReader(_connection, _connection.Database!, 500, found);
+                var batch = new BatchRecordReader(_connection, found);
 
                 foreach (var record in batch)
                 {

@@ -58,28 +58,29 @@ namespace ManagedIrbis
         /// <summary>
         /// Разбор ответа сервера.
         /// </summary>
-        public ServerVersion Parse
+        public static ServerVersion Parse
             (
                 Response response
             )
         {
             var lines = response.ReadRemainingAnsiLines();
+            var result = new ServerVersion();
 
             if (lines.Length >= 4)
             {
-                Organization = lines[0];
-                Version = lines[1];
-                ConnectedClients = lines[2].SafeToInt32();
-                MaxClients = lines[3].SafeToInt32();
+                result.Organization = lines[0];
+                result.Version = lines[1];
+                result.ConnectedClients = lines[2].SafeToInt32();
+                result.MaxClients = lines[3].SafeToInt32();
             }
             else
             {
-                Version = lines[0];
-                ConnectedClients = lines[1].SafeToInt32();
-                MaxClients = lines[2].SafeToInt32();
+                result.Version = lines[0];
+                result.ConnectedClients = lines[1].SafeToInt32();
+                result.MaxClients = lines[2].SafeToInt32();
             }
 
-            return this;
+            return result;
 
         } // method Parse
 

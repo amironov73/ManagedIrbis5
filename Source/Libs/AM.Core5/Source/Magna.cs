@@ -20,6 +20,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+
+using AM.AppServices;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -80,7 +83,7 @@ namespace AM
         /// <summary>
         /// Хост приложения.
         /// </summary>
-        public static IHost Host { get; private set; } = new HostBuilder().Build();
+        public static IHost Host { get; internal set; } = new HostBuilder().Build();
 
         /// <summary>
         /// Фабрика логгеров.
@@ -96,6 +99,12 @@ namespace AM
         /// Глобальные опции программы.
         /// </summary>
         public static Dictionary<string, object?> GlobalOptions { get; } = new();
+
+        /// <summary>
+        /// Глобальный объект приложения.
+        /// </summary>
+        [AllowNull]
+        public static MagnaApplication Application { get; internal set; }
 
         #endregion
 

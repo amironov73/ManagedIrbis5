@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 
 #endregion
@@ -141,7 +142,7 @@ namespace AM.Collections
         /// </summary>
         public static bool IsNullOrEmpty<T>
             (
-                this IList<T>? list
+                [NotNullWhen((false))] this IList<T>? list
             )
         {
             if (!ReferenceEquals(list, null))

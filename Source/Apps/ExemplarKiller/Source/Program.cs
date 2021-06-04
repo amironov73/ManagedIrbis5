@@ -28,6 +28,7 @@ using AM.Configuration;
 using ManagedIrbis;
 using ManagedIrbis.Batch;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 using CM = System.Configuration.ConfigurationManager;
 

@@ -17,7 +17,7 @@
 #region Using directives
 
 using System;
-
+using System.IO;
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
@@ -71,8 +71,16 @@ class Program
                 WriteLine(stat);
             }
 
+            var databases = connection.ListDatabases();
+            foreach (var database in databases)
+            {
+                WriteLine($"{database.Name} => {database.Description}");
+            }
+
+            WriteLine();
+
             var maxMfn = connection.GetMaxMfn();
-            WriteLine($"Max MFN={maxMfn}");
+            WriteLine($"Database={connection.Database}, max MFN={maxMfn}");
 
             var dbInfo = connection.GetDatabaseInfo();
             if (dbInfo is not null)
@@ -125,6 +133,17 @@ class Program
             var fileText = connection.ReadTextFile(specification);
             WriteLine($"BRIEF: {fileText}");
             WriteLine();
+
+            specification = new FileSpecification
+            {
+                Path = IrbisPath.System,
+                FileName = "logo.gif"
+            };
+            var binary = connection.ReadBinaryFile(specification);
+            if (binary is not null)
+            {
+                File.WriteAllBytes("logo.gif", binary);
+            }
 
             connection.Dispose();
             WriteLine("Successfully disconnected");

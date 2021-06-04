@@ -393,7 +393,8 @@ namespace ManagedIrbis.ImportExport
             }
 
             return record;
-        }
+
+        } // method ParseResponseForWriteRecords
 
         /// <summary>
         /// Parse server response for ALL-formatted record.

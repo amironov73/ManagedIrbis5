@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable ReplaceSliceWithRangeIndexer
 
 /* ArrayPoolWriter.cs -- аналог MemoryStream на массивах из пула
@@ -87,7 +88,7 @@ namespace AM.IO
         {
             if (chunkSize < 16)
             {
-                throw new ArgumentException(nameof(chunkSize));
+                throw new ArgumentException("Value too small", nameof(chunkSize));
             }
 
             _pool = arrayPool;

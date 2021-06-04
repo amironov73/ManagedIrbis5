@@ -150,7 +150,7 @@ namespace ManagedIrbis.Batch
             }
 
             string[][] packages = terms
-                .Slice(batchSize)
+                .Chunk(batchSize)
                 .ToArray();
             int totalSize = packages.Sum(p => p.Length);
             if (totalSize == 0)
@@ -197,7 +197,7 @@ namespace ManagedIrbis.Batch
             }
 
             string[][] packages = terms
-                .Slice(batchSize)
+                .Chunk(batchSize)
                 .ToArray();
             int totalSize = packages.Sum(p => p.Length);
             if (totalSize == 0)

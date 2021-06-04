@@ -26,6 +26,8 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable
@@ -82,9 +84,12 @@ namespace ManagedIrbis.Mx.Commands
                             mfns,
                             executive.DescriptionFormat
                         );
-                    for (var i = 0; i < mfns.Length; i++)
+                    if (formatted is not null)
                     {
-                        executive.Records[i].Description = formatted[i];
+                        for (var i = 0; i < mfns.Length; i++)
+                        {
+                            executive.Records[i].Description = formatted[i];
+                        }
                     }
                 }
             }

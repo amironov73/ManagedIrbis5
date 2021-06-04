@@ -18,7 +18,8 @@
 using System;
 
 using AM.Text;
-using ManagedIrbis.Infrastructure;
+
+using ManagedIrbis.Providers;
 
 #endregion
 

@@ -24,6 +24,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -79,15 +80,18 @@ namespace ManagedIrbis.Batch
                     break;
 
                 default:
-                    result = new BatchRecordReader
-                        (
-                            connectionString,
-                            database,
-                            1000,
-                            true,
-                            range
-                        );
-                    break;
+                    // TODO: implement
+                    throw new NotImplementedException();
+
+                    // result = new BatchRecordReader
+                    //     (
+                    //         connectionString,
+                    //         database,
+                    //         1000,
+                    //         true,
+                    //         range
+                    //     );
+                    // break;
             }
 
             return result;

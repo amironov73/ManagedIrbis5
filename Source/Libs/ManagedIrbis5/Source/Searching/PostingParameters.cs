@@ -21,6 +21,7 @@ using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -92,7 +93,8 @@ namespace ManagedIrbis
             }
 
             return result;
-        }
+
+        } // method Clone
 
         /// <summary>
         /// Кодирование параметров постингов для клиентского запроса.
@@ -101,13 +103,12 @@ namespace ManagedIrbis
         /// <param name="query">Клиентский запрос.</param>
         public void Encode<TQuery>
             (
-                IConnectionSettings connection,
+                IIrbisProvider connection,
                 TQuery query
             )
             where TQuery: IQuery
         {
-            var database = Database.ThrowIfNull(nameof(Database));
-
+            var database = connection.EnsureDatabase(Database);
             query.AddAnsi(database);
             query.Add(NumberOfPostings);
             query.Add(FirstPosting);
@@ -117,6 +118,7 @@ namespace ManagedIrbis
             {
                 query.AddUtf(term);
             }
+
         } // method Encode
 
         #endregion
@@ -134,7 +136,8 @@ namespace ManagedIrbis
             Format = reader.ReadNullableString();
             NumberOfPostings = reader.ReadPackedInt32();
             Terms = reader.ReadNullableStringArray();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -148,7 +151,8 @@ namespace ManagedIrbis
                 .WriteNullable(Format)
                 .WritePackedInt32(NumberOfPostings)
                 .WriteNullableArray(Terms);
-        }
+
+        } // method SaveToStream
 
         #endregion
 
@@ -178,9 +182,11 @@ namespace ManagedIrbis
                 );
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
-    }
-}
+    } // namespace PostingParameters
+
+} // namespace ManagedIrbis

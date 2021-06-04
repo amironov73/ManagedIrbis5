@@ -21,7 +21,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using AM;
+
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
@@ -40,16 +42,83 @@ namespace ManagedIrbis.Providers
         #region Public methods
 
         /// <summary>
+        /// Актуализация всех неактуализированных записей
+        /// в указанной базе данных.
+        /// </summary>
+        /// <param name="connection">Подключение.</param>
+        /// <param name="database">Имя базы данных.
+        /// По умолчанию - текущая база данных.</param>
+        /// <returns>Признак успешности завершения операции.</returns>
+        public static bool ActualizeDatabase (this ISyncProvider connection, string? database = default) =>
+            connection.ActualizeRecord ( new() { Database = database, Mfn = 0 } );
+
+        /// <summary>
+        /// Удаление файла на сервере.
+        /// </summary>
+        public static void DeleteServerFile(this ISyncProvider connection, string fileName) =>
+            connection.FormatRecord($"&if('+9K{fileName}')", 1);
+
+        /// <summary>
+        /// Удаление записи с указанным MFN.
+        /// </summary>
+        public static bool DeleteRecord
+            (
+                this ISyncProvider connection,
+                int mfn
+            )
+        {
+            var record = connection.ReadRecord(mfn);
+            if (record is null)
+            {
+                return false;
+            }
+
+            if (record.Deleted)
+            {
+                return true;
+            }
+
+            record.Status |= RecordStatus.LogicallyDeleted;
+
+            return connection.WriteRecord(record, dontParse: true);
+
+        } // method DeleteRecord
+
+        /// <summary>
+        /// Подстановка имени текущей базы данных, если она не задана явно.
+        /// </summary>
+        public static string EnsureDatabase
+            (
+                this IIrbisProvider connection,
+                string? database
+            )
+            =>
+            string.IsNullOrEmpty(database)
+                ? string.IsNullOrEmpty(connection.Database)
+                    ? throw new ArgumentException(nameof(connection.Database))
+                    : connection.Database
+                : database;
+
+        /// <summary>
         /// Форматирование записи по ее MFN.
         /// </summary>
         public static string? FormatRecord
             (
-                this ISyncProvider conneciton,
+                this ISyncProvider connection,
                 string format,
                 int mfn
             )
         {
-            throw new NotImplementedException();
+            var parameters = new FormatRecordParameters
+            {
+                Database = connection.Database,
+                Format = format,
+                Mfn = mfn
+            };
+
+            return connection.FormatRecords(parameters)
+                ? parameters.Result.AsSingle()
+                : null;
 
         } // method FormatRecord
 
@@ -63,9 +132,80 @@ namespace ManagedIrbis.Providers
                 Record record
             )
         {
-            throw new NotImplementedException();
+            var parameters = new FormatRecordParameters
+            {
+                Database = connection.Database,
+                Format = format,
+                Record = record
+            };
+
+            return connection.FormatRecords(parameters)
+                ? parameters.Result.AsSingle()
+                : null;
 
         } // method FormatRecord
+
+        /// <summary>
+        /// Форматирование записей по их MFN.
+        /// </summary>
+        public static string[]? FormatRecords
+            (
+                this ISyncProvider conneciton,
+                int[] mfns,
+                string format
+            )
+        {
+            var parameters = new FormatRecordParameters
+            {
+                Database = conneciton.Database,
+                Mfns = mfns,
+                Format = format
+            };
+
+            return conneciton.FormatRecords(parameters)
+                ? parameters.Result.AsArray()
+                : null;
+
+        } // method FormatRecords
+
+        /// <summary>
+        /// Получение списка баз данных.
+        /// </summary>
+        public static DatabaseInfo[] ListDatabases
+            (
+                this ISyncProvider connection,
+                string listFile = "dbnam3.mnu"
+            )
+        {
+            var specification = new FileSpecification
+            {
+                Path = IrbisPath.Data,
+                FileName = listFile
+            };
+            var menu = connection.RequireMenuFile(specification);
+
+            return DatabaseInfo.ParseMenu(menu);
+
+        } // method ListDatabases
+
+        /// <summary>
+        /// Блокирование указанной записи.
+        /// </summary>
+        public static bool LockRecord
+            (
+                this ISyncProvider connection,
+                int mfn
+            )
+        {
+            var parameters = new ReadRecordParameters
+            {
+                Mfn = mfn,
+                Lock = true
+            };
+
+            return connection.ReadRecord(parameters) is not null;
+
+        } // method LockRecord
 
         /// <summary>
         /// Чтение FST-файла как текстового.
@@ -104,8 +244,10 @@ namespace ManagedIrbis.Providers
             }
 
             using var reader = new StringReader(content);
+            var result = MenuFile.ParseStream(reader);
+            result.FileName = specification.FileName;
 
-            return MenuFile.ParseStream(reader);
+            return result;
 
         } // method ReadMenuFile
 
@@ -180,9 +322,39 @@ namespace ManagedIrbis.Providers
                         .ToArray();
             }
 
-            // TODO: implement
+            var parameters = new FormatRecordParameters
+            {
+                Database = database,
+                Mfns = mfns,
+                Format = IrbisFormat.All
+            };
+            if (!connection.FormatRecords(parameters))
+            {
+                return null;
+            }
 
-            return Array.Empty<Record>();
+            var lines = parameters.Result.AsArray();
+            if (lines.Length == 0)
+            {
+                return null;
+            }
+
+            var result = new List<Record>(lines.Length);
+            foreach (var line in lines)
+            {
+                if (!string.IsNullOrEmpty(line))
+                {
+                    var converted = IrbisText.SplitIrbisToLines(line);
+                    if (converted.Length > 2)
+                    {
+                        var record = new Record();
+                        record.Decode(converted);
+                        result.Add(record);
+                    }
+                }
+            }
+
+            return result.ToArray();
 
         } // method ReadRecords
 
@@ -256,6 +428,31 @@ namespace ManagedIrbis.Providers
                 : default;
 
         } // method SearchReadOneRecord
+
+        /// <summary>
+        /// Сохранение/обновление записи в базе данных.
+        /// </summary>
+        public static bool WriteRecord
+            (
+                this ISyncProvider connection,
+                IRecord record,
+                bool actualize = true,
+                bool lockRecord = false,
+                bool dontParse = false
+            )
+        {
+            var parameters = new WriteRecordParameters
+            {
+                Record = record,
+                Actualize = actualize,
+                Lock = lockRecord,
+                DontParse = dontParse
+            };
+
+            return connection.WriteRecord(parameters);
+
+        } // method WriteRecord
+
 
         #endregion
 

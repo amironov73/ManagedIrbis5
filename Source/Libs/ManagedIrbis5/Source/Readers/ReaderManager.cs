@@ -152,9 +152,9 @@ namespace ManagedIrbis.Readers
             var batch = new BatchRecordReader
                 (
                     Connection,
-                    database,
+                    mfns,
                     500,
-                    mfns
+                    database
                 );
 
             batch.BatchRead += HandleBatchRead;

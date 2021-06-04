@@ -229,7 +229,7 @@ namespace ManagedIrbis.Batch
 
             using (_records = new BlockingCollection<Record>(array.Length))
             {
-                int[][] slices = array.Slice(1000).ToArray();
+                int[][] slices = array.Chunk(1000).ToArray();
 
                 foreach (int[] slice in slices)
                 {
@@ -325,7 +325,7 @@ namespace ManagedIrbis.Batch
                 = new BlockingCollection<T>(array.Length))
             {
 
-                int[][] slices = array.Slice(1000).ToArray();
+                int[][] slices = array.Chunk(1000).ToArray();
 
                 foreach (int[] slice in slices)
                 {

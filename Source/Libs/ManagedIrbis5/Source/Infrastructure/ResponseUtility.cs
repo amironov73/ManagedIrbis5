@@ -61,6 +61,17 @@ namespace ManagedIrbis.Infrastructure
             where T: class
             => response.IsGood() ? transformer(response) : null;
 
+        /// <summary>
+        /// Трансформация запроса во что-нибудь полезное.
+        /// </summary>
+        public static T? TransformNoCheck<T>
+            (
+                this Response? response,
+                Func<Response, T?> transformer
+            )
+            where T: class
+            => response is not null ? transformer(response) : null;
+
         #endregion
 
     } // class ResponseUtility

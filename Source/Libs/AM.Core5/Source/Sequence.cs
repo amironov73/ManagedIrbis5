@@ -408,7 +408,7 @@ namespace AM
         /// Нарезает последовательность на куски (массивы)
         /// не больше указанного размера.
         /// </summary>
-        public static IEnumerable<T[]> Slice<T>
+        public static IEnumerable<T[]> Chunk<T>
             (
                 this IEnumerable<T> sequence,
                 int pieceSize
@@ -418,7 +418,7 @@ namespace AM
             {
                 Magna.Error
                     (
-                        nameof(Sequence) + "::" + nameof(Slice)
+                        nameof(Sequence) + "::" + nameof(Chunk)
                         + "pieceSize="
                         + pieceSize
                     );
@@ -441,7 +441,8 @@ namespace AM
             {
                 yield return piece.ToArray();
             }
-        } // method Slice
+
+        } // method Chunk
 
         /// <summary>
         /// Get next item from the sequence.

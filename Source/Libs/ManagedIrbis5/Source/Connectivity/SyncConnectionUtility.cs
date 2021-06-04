@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AM;
-
+using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
@@ -37,27 +37,6 @@ namespace ManagedIrbis
     public static class SyncConnectionUtility
     {
         #region Public methods
-
-        /// <summary>
-        /// Актуализация всех неактуализированных записей
-        /// в указанной базе данных.
-        /// </summary>
-        /// <param name="connection">Подключение.</param>
-        /// <param name="database">Имя базы данных.
-        /// По умолчанию - текущая база данных.</param>
-        /// <returns>Признак успешности завершения операции.</returns>
-        public static bool ActualizeDatabase
-            (
-                this SyncConnection connection,
-                string? database = default
-            )
-        {
-            return connection.ActualizeRecord
-                (
-                    new() { Database = database, Mfn = 0 }
-                );
-
-        } // method ActualizeDatabase
 
         /// <summary>
         /// Форматирование указанной записи по ее MFN.
@@ -106,8 +85,13 @@ namespace ManagedIrbis
                 return null;
             }
 
+            if (string.IsNullOrEmpty(format))
+            {
+                return string.Empty;
+            }
+
             using var query = new SyncQuery(connection, CommandCode.FormatRecord);
-            query.AddAnsi(connection.Database);
+            query.AddAnsi(connection.EnsureDatabase(string.Empty));
             query.AddFormat(format);
             query.Add(-2);
             query.AddUtf(record.Encode());
@@ -122,20 +106,6 @@ namespace ManagedIrbis
             return result;
 
         } // method FormatRecord
-
-        /// <summary>
-        /// Форматирование записей по их MFN.
-        /// </summary>
-        public static string[] FormatRecords
-            (
-                this ISyncProvider conneciton,
-                int[] mfns,
-                string format
-            )
-        {
-            throw new NotImplementedException();
-
-        } // method FormatRecords
 
         /// <summary>
         /// Получение списка файлов, соответствующих спецификации.
@@ -263,6 +233,27 @@ namespace ManagedIrbis
         } // method ReadTerms
 
         /// <summary>
+        /// Чтение несколькних текстовых файлов с сервера.
+        /// </summary>
+        public static string[]? ReadTextFiles
+            (
+                this ISyncConnection connection,
+                FileSpecification[] specifications
+            )
+        {
+            using var query = new SyncQuery(connection, CommandCode.ReadDocument);
+            foreach (var specification in specifications)
+            {
+                query.AddAnsi(specification.ToString());
+            }
+
+            var response = connection.ExecuteSync(query);
+
+            return response.IsGood() ? response.ReadRemainingAnsiLines() : null;
+
+        } // method ReadTextFiles
+
+        /// <summary>
         /// Упрощенный поиск.
         /// </summary>
         /// <param name="connection">Подключение.</param>
@@ -386,28 +377,57 @@ namespace ManagedIrbis
         } // method SearchRead
 
         /// <summary>
-        /// Сохранение/обновление записи в базе данных.
+        /// Сохранение записей на сервере.
         /// </summary>
-        public static bool WriteRecord
+        public static bool WriteRecords
             (
-                this ISyncProvider connection,
-                IRecord record,
+                this ISyncConnection connection,
+                IEnumerable<Record> records,
+                bool lockFlag = false,
                 bool actualize = true,
-                bool lockRecord = false,
-                bool dontParse = false
+                bool dontParse = true
             )
         {
-            var parameters = new WriteRecordParameters
+            if (!connection.CheckProviderState())
+            {
+                return false;
+            }
+
+            var query = new SyncQuery(connection, CommandCode.SaveRecordGroup);
+            query.Add(lockFlag);
+            query.Add(actualize);
+            var recordList = new List<Record>();
+            foreach (var record in records)
+            {
+                var line = connection.EnsureDatabase(record.Database)
+                    + IrbisText.IrbisDelimiter
+                    + ProtocolText.EncodeRecord(record);
+                query.AddUtf(line);
+                recordList.Add(record);
+            }
+
+            if (recordList.Count == 0)
+            {
+                return true;
+            }
+
+            var response = connection.ExecuteSync(query);
+            if (!response.IsGood())
+            {
+                return false;
+            }
+
+            if (!dontParse)
+            {
+                foreach (var record in recordList)
                 {
-                    Record = record,
-                    Actualize = actualize,
-                    Lock = lockRecord,
-                    DontParse = dontParse
-                };
+                    ProtocolText.ParseResponseForWriteRecords(response, record);
+                }
+            }
 
-            return connection.WriteRecord(parameters);
+            return true;
 
-        } // method WriteRecord
+        } // method WriteRecords
 
         #endregion
 

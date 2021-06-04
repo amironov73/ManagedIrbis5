@@ -448,6 +448,57 @@ namespace ManagedIrbis
                         exception
                     );
             }
+
+        } // method Decode
+
+        /// <summary>
+        /// Декодирование ответа сервера.
+        /// </summary>
+        public void Decode
+            (
+                string[] lines
+            )
+        {
+            try
+            {
+                var line = lines[0];
+
+                var first = line.Split('#');
+                Mfn = int.Parse(first[0]);
+                Status = first.Length == 1
+                    ? None
+                    : (RecordStatus) first[1].SafeToInt32();
+
+                line = lines[1];
+                var second = line.Split('#');
+                Version = second.Length == 1
+                    ? 0
+                    : int.Parse(second[1]);
+
+                for (var i = 2; i < lines.Length; i++)
+                {
+                    line = lines[i];
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        break;
+                    }
+
+                    var field = new Field();
+                    field.Decode(line);
+                    Fields.Add(field);
+                }
+            }
+            catch (Exception exception)
+            {
+                Magna.Error(nameof(Record) + "::" + nameof(Decode));
+
+                throw new IrbisException
+                    (
+                        nameof(Record) + "::" + nameof(Decode),
+                        exception
+                    );
+            }
+
         } // method Decode
 
         /// <summary>

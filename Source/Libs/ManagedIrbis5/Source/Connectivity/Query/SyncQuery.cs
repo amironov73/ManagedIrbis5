@@ -109,6 +109,11 @@ namespace ManagedIrbis.Infrastructure
         } // method Add
 
         /// <summary>
+        /// Добавление строки с флагом "да-нет".
+        /// </summary>
+        public void Add(bool value) => Add(value ? 1 : 0);
+
+        /// <summary>
         /// Добавление строки в кодировке ANSI (плюс перевод строки).
         /// </summary>
         public unsafe void AddAnsi

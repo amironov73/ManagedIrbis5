@@ -10,9 +10,10 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
+// get rid of "event never used" warning
 #pragma warning disable 67
 
-/* BatchRecordReader.cs -- batch record reader
+/* BatchRecordReader.cs -- пакетное чтение записей для ускорения процесса
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -35,7 +36,7 @@ using ManagedIrbis.Providers;
 namespace ManagedIrbis.Batch
 {
     /// <summary>
-    /// Batch reader for <see cref="Record"/>.
+    /// Пакетное чтение записей для ускорения процесса.
     /// </summary>
     public sealed class BatchRecordReader
         : IEnumerable<Record>
@@ -43,17 +44,17 @@ namespace ManagedIrbis.Batch
         #region Events
 
         /// <summary>
-        /// Raised on batch reading.
+        /// Возбуждается при чтении очередной порции записей.
         /// </summary>
         public event EventHandler? BatchRead;
 
         /// <summary>
-        /// Raised when exception occurs.
+        /// Возбуждается при возникновении исключения.
         /// </summary>
         public event EventHandler<ExceptionEventArgs<Exception>>? Exception;
 
         /// <summary>
-        /// Raised when all data read.
+        /// Возбуждается по окончании чтения записей.
         /// </summary>
         public event EventHandler? ReadComplete;
 
@@ -62,56 +63,57 @@ namespace ManagedIrbis.Batch
         #region Properties
 
         /// <summary>
-        /// Batch size.
+        /// Размер порции записей.
         /// </summary>
         public int BatchSize { get; }
 
         /// <summary>
-        /// Connection.
+        /// Синхронный провайдер.
         /// </summary>
         public ISyncProvider Connection { get; }
 
         /// <summary>
-        /// Database name.
+        /// Имя базы данных.
         /// </summary>
-        public string Database { get; private set; }
+        public string Database { get; }
 
         /// <summary>
-        /// Omit deleted records?
+        /// Пропускать удаленные записи?
         /// </summary>
         public bool OmitDeletedRecords { get; set; }
 
         /// <summary>
-        /// Total number of records read.
+        /// Количество записей, выданных потребителю к данному моменту.
         /// </summary>
         public int RecordsRead { get; private set; }
 
         /// <summary>
-        /// Number of records to read.
+        /// Количество записей, подлежащих чтению.
         /// </summary>
-        public int TotalRecords { get; private set; }
+        public int TotalRecords { get; }
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public BatchRecordReader
             (
                 ISyncProvider connection,
-                string database,
-                int batchSize,
-                IEnumerable<int> range
+                IEnumerable<int> range,
+                int batchSize = 500,
+                string? database = null,
+                bool omitDeletedRecords = true
             )
         {
             if (batchSize < 1)
             {
                 Magna.Error
                     (
-                        "BatchRecordReader::Constructor: "
-                        + "batchSize="
+                        nameof(BatchRecordReader) + "::Constructor"
+                        + ": batchSize="
                         + batchSize
                     );
 
@@ -119,89 +121,20 @@ namespace ManagedIrbis.Batch
             }
 
             Connection = connection;
-            Database = database;
-            BatchSize = batchSize;
-
-            _packages = range.Slice(batchSize).ToArray();
-            TotalRecords = _packages.Sum(p => p.Length);
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BatchRecordReader
-            (
-                ISyncProvider connection,
-                string database,
-                int batchSize,
-                bool omitDeletedRecords,
-                IEnumerable<int> range
-            )
-        {
-            if (batchSize < 1)
-            {
-                Magna.Error
-                    (
-                        "BatchRecordReader::Constructor: "
-                        + "batchSize="
-                        + batchSize
-                    );
-
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
-            }
-
-            Connection = connection;
-            Database = database;
+            Database = connection.EnsureDatabase(database);
             BatchSize = batchSize;
             OmitDeletedRecords = omitDeletedRecords;
 
-            _packages = range.Slice(batchSize).ToArray();
-            TotalRecords = _packages.Sum(p => p.Length);
-        }
+            _chunks = range.Chunk(batchSize).ToArray();
+            TotalRecords = _chunks.Sum(p => p.Length);
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BatchRecordReader
-            (
-                string connectionString,
-                string database,
-                int batchSize,
-                bool omitDeletedRecords,
-                IEnumerable<int> range
-            )
-        {
-            if (batchSize < 1)
-            {
-                Magna.Error
-                    (
-                        "BatchRecordReader::Constructor: "
-                        + "batchSize="
-                        + batchSize
-                    );
-
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
-            }
-
-            Connection = ConnectionFactory.Shared.CreateSyncConnection();
-            Connection.Configure(connectionString);
-            _ownConnection = true;
-            Database = database;
-            BatchSize = batchSize;
-            OmitDeletedRecords = omitDeletedRecords;
-
-            _packages = range.Slice(batchSize).ToArray();
-            TotalRecords = _packages.Sum(p => p.Length);
-        }
-
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private readonly bool _ownConnection;
-
-        private readonly int[][] _packages;
+        private readonly int[][] _chunks;
 
         private bool _HandleException
             (
@@ -210,7 +143,7 @@ namespace ManagedIrbis.Batch
         {
             var handler = Exception;
 
-            if (ReferenceEquals(handler, null))
+            if (handler is null)
             {
                 return false;
             }
@@ -219,35 +152,40 @@ namespace ManagedIrbis.Batch
             handler(this, arguments);
 
             return arguments.Handled;
-        }
+
+        } // method _HandleException
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Read interval of records
+        /// Чтение интервала записей.
         /// </summary>
         public static IEnumerable<Record> Interval
             (
                 ISyncProvider connection,
-                string database,
-                int firstMfn,
-                int lastMfn,
-                int batchSize
+                int firstMfn = 1,
+                int lastMfn = 0,
+                string? database = null,
+                int batchSize = 500,
+                bool omitDeletedRecords = true,
+                Action<BatchRecordReader>? action = null
             )
         {
             if (batchSize < 1)
             {
                 Magna.Error
                     (
-                        "BatchRecordReader::Interval: "
-                        + "batchSize="
+                        nameof(BatchRecordReader) + "::" + nameof(Interval)
+                        + ": batchSize="
                         + batchSize
                     );
 
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
+
+            database = connection.EnsureDatabase(database);
 
             var maxMfn = connection.GetMaxMfn(database) - 1;
             if (maxMfn == 0)
@@ -264,71 +202,31 @@ namespace ManagedIrbis.Batch
             var result = new BatchRecordReader
                 (
                     connection,
-                    database,
+                    Enumerable.Range(firstMfn, lastMfn - firstMfn + 1),
                     batchSize,
-                    Enumerable.Range(firstMfn, lastMfn - firstMfn + 1)
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Read interval of records
-        /// </summary>
-        public static IEnumerable<Record> Interval
-            (
-                ISyncProvider connection,
-                string database,
-                int firstMfn,
-                int lastMfn,
-                int batchSize,
-                bool omitDeletedRecords,
-                Action<BatchRecordReader>? action
-            )
-        {
-            BatchRecordReader result = (BatchRecordReader)Interval
-                (
-                    connection,
                     database,
-                    firstMfn,
-                    lastMfn,
-                    batchSize
+                    omitDeletedRecords
                 );
-            result.OmitDeletedRecords = omitDeletedRecords;
 
-            if (!ReferenceEquals(action, null))
+            if (action is not null)
             {
-                EventHandler batchHandler = (_, _) => action(result);
-                result.BatchRead += batchHandler;
+                void BatchHandler(object? o, EventArgs eventArgs) => action(result);
+                result.BatchRead += BatchHandler;
 
-                EventHandler completeHandler = (_, _) => result.BatchRead -= batchHandler;
-                result.ReadComplete += completeHandler;
+                void CompleteHandler(object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
+                result.ReadComplete += CompleteHandler;
             }
 
             return result;
-        }
 
-        /// <summary>
-        /// Считывает все записи сразу.
-        /// </summary>
-        public List<Record> ReadAll()
-        {
-            var result = new List<Record>(TotalRecords);
-
-            foreach (var record in this)
-            {
-                result.Add(record);
-            }
-
-            return result;
-        }
+        } // method Interval
 
         /// <summary>
         /// Считывает все записи сразу.
         /// </summary>
         public List<Record> ReadAll
             (
-                bool omitDeletedRecords
+                bool omitDeletedRecords = true
             )
         {
             var result = new List<Record>(TotalRecords);
@@ -344,25 +242,27 @@ namespace ManagedIrbis.Batch
             }
 
             return result;
-        }
+
+        } // method ReadAll
 
         /// <summary>
-        /// Search and read records.
+        /// Чтение записей, соответствующих запросу.
         /// </summary>
         public static IEnumerable<Record> Search
             (
                 ISyncProvider connection,
-                string database,
                 string searchExpression,
-                int batchSize
+                string? database = null,
+                int batchSize = 500,
+                Action<BatchRecordReader>? action = null
             )
         {
             if (batchSize < 1)
             {
                 Magna.Error
                     (
-                        "BatchRecordReader::Search: "
-                        + "batchSize="
+                        nameof(BatchRecordReader) + "::" + nameof(Search)
+                        + ": batchSize="
                         + batchSize
                     );
 
@@ -381,68 +281,52 @@ namespace ManagedIrbis.Batch
             }
 
             var range = FoundItem.ToMfn(found);
-            var reader = new BatchRecordReader
+            var result = new BatchRecordReader
                 (
                     connection,
-                    database,
+                    range,
                     batchSize,
-                    range
+                    database
                 );
 
-            return reader;
-        }
-
-        /// <summary>
-        /// Search and read records.
-        /// </summary>
-        public static IEnumerable<Record> Search
-            (
-                ISyncProvider connection,
-                string database,
-                string searchExpression,
-                int batchSize,
-                Action<BatchRecordReader>? action
-            )
-        {
-            var result = (BatchRecordReader)Search
-                (
-                    connection,
-                    database,
-                    searchExpression,
-                    batchSize
-                );
-
-            if (!ReferenceEquals(action, null))
+            if (action is not null)
             {
-                EventHandler batchHandler = (_, _) => action(result);
-                result.BatchRead += batchHandler;
+                void BatchHandler(object? o, EventArgs eventArgs) => action(result);
+                result.BatchRead += BatchHandler;
+
+                void CompleteHandler(object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
+                result.ReadComplete += CompleteHandler;
             }
 
             return result;
-        }
+
+        } // method Search
 
         /// <summary>
-        /// Read whole database
+        /// Чтение всей базы данных.
         /// </summary>
         public static IEnumerable<Record> WholeDatabase
             (
                 ISyncProvider connection,
-                string database,
-                int batchSize
+                string? database = null,
+                int batchSize = 500,
+                bool omitDeletedRecords = true,
+                Action<BatchRecordReader>? action = null
             )
         {
             if (batchSize < 1)
             {
                 Magna.Error
                     (
-                        "BatchRecordReader::WholeDatabase: "
-                        + "batchSize="
+                        nameof(BatchRecordReader) + "::" + nameof(WholeDatabase)
+                        + ": batchSize="
                         + batchSize
                     );
 
                 throw new ArgumentOutOfRangeException(nameof(batchSize));
             }
 
+            database = connection.EnsureDatabase(database);
             var maxMfn = connection.GetMaxMfn(database) - 1;
             if (maxMfn == 0)
             {
@@ -452,40 +336,24 @@ namespace ManagedIrbis.Batch
             var result = new BatchRecordReader
                 (
                     connection,
-                    database,
+                    Enumerable.Range(1, maxMfn),
                     batchSize,
-                    Enumerable.Range(1, maxMfn)
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Read whole database
-        /// </summary>
-        public static IEnumerable<Record> WholeDatabase
-            (
-                ISyncProvider connection,
-                string database,
-                int batchSize,
-                Action<BatchRecordReader>? action
-            )
-        {
-            var result = (BatchRecordReader)WholeDatabase
-                (
-                    connection,
                     database,
-                    batchSize
+                    omitDeletedRecords
                 );
 
-            if (!ReferenceEquals(action, null))
+            if (action is not null)
             {
-                EventHandler batchHandler = (_, _) => action(result);
-                result.BatchRead += batchHandler;
+                void BatchHandler(object? o, EventArgs eventArgs) => action(result);
+                result.BatchRead += BatchHandler;
+
+                void CompleteHandler(object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
+                result.ReadComplete += CompleteHandler;
             }
 
             return result;
-        }
+
+        } // method WholeDatabase
 
         /// <summary>
         /// Read whole database
@@ -495,7 +363,6 @@ namespace ManagedIrbis.Batch
                 ISyncProvider connection,
                 string database,
                 int batchSize,
-                bool omitDeletedRecords,
                 Action<BatchRecordReader>? action
             )
         {
@@ -505,11 +372,10 @@ namespace ManagedIrbis.Batch
                     database,
                     batchSize
                 );
-            result.OmitDeletedRecords = omitDeletedRecords;
 
             if (!ReferenceEquals(action, null))
             {
-                EventHandler batchHandler = (_, _) => action(result);
+                EventHandler batchHandler = (object? _, EventArgs _) => action(result);
                 result.BatchRead += batchHandler;
             }
 
@@ -523,9 +389,9 @@ namespace ManagedIrbis.Batch
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
         public IEnumerator<Record> GetEnumerator()
         {
-            Magna.Trace("BatchRecordReader::GetEnumerator: start");
+            Magna.Trace(nameof(BatchRecordReader) + "::" + nameof(GetEnumerator) + ": start");
 
-            foreach (int[] package in _packages)
+            foreach (var package in _chunks)
             {
                 Record[]? records = null;
                 try
@@ -542,7 +408,7 @@ namespace ManagedIrbis.Batch
                 {
                     Magna.TraceException
                         (
-                            "BatchRecordReader::GetEnumerator",
+                            nameof(BatchRecordReader) + "::" + nameof(GetEnumerator),
                             exception
                         );
 
@@ -552,12 +418,11 @@ namespace ManagedIrbis.Batch
                     }
                 }
 
-                if (!ReferenceEquals(records, null))
+                if (records is not null)
                 {
                     foreach (var record in records)
                     {
-                        if (OmitDeletedRecords
-                            && record.Deleted)
+                        if (OmitDeletedRecords && record.Deleted)
                         {
                             continue;
                         }
@@ -565,17 +430,14 @@ namespace ManagedIrbis.Batch
                         yield return record;
                     }
                 }
-            }
 
-            Magna.Trace("BatchRecordReader::GetEnumerator: end");
+            } // foreach
 
             ReadComplete.Raise(this);
 
-            if (_ownConnection)
-            {
-                Connection.Dispose();
-            }
-        }
+            Magna.Trace(nameof(BatchRecordReader) + "::" + nameof(GetEnumerator) + ": end");
+
+        } // method GetEnumerator
 
         [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

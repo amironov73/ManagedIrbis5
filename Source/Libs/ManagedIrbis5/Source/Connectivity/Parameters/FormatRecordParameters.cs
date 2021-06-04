@@ -56,7 +56,7 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// MFN записей, подлежащих форматированию.
         /// </summary>
-        public int[]? Mnfs { get; set; }
+        public int[]? Mfns { get; set; }
 
         /// <summary>
         /// Запись, подлежащая форматированию.

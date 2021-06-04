@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable ReplaceSliceWithRangeIndexer
 
-/* MemoryReader.cs -- аналог MemoryStream на массивах из пула
+/* MemoryReader.cs -- позволяет как бы непрерывно считывать память, разбросанную по фрагментам
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,23 +15,20 @@
 using System;
 using System.Collections.Generic;
 
-using AM.Collections;
-
 #endregion
 
 #nullable enable
 
-namespace AM.IO
+namespace ChunkedExperiment
 {
     // Алиас для краткости
     using Chunk = ReadOnlyMemory<byte>;
 
     /// <summary>
-    /// Аналог <see cref="System.IO.MemoryStream"/>,
-    /// использующий массивы из системного пула.
-    /// Работает только на чтение.
+    /// Позволяет как бы непрерывно считывать память,
+    /// разбросанную по фрагментам.
     /// </summary>
-    public class MemoryReader
+    public sealed class MemoryReader
     {
         #region Properties
 
@@ -104,6 +101,7 @@ namespace AM.IO
             }
 
             _current = _chunks.First;
+
         } // constructor
 
         #endregion
@@ -166,6 +164,24 @@ namespace AM.IO
             _current ??= _chunks.First;
 
         } // method Add
+
+        /// <summary>
+        /// Подхватываем память от буфера записи.
+        /// </summary>
+        public static MemoryReader FromWriter
+            (
+                ArrayPoolWriter writer
+            )
+        {
+            var result = new MemoryReader();
+            foreach (var chunk in writer)
+            {
+                result.Add(chunk);
+            }
+
+            return result;
+
+        } // method FromWriter
 
         /// <summary>
         /// Считывание непрерывного блока памяти.
@@ -250,4 +266,4 @@ namespace AM.IO
 
     } // class MemoryReader
 
-} // namespace AM.IO
+} // namespace ChunkedExperiment

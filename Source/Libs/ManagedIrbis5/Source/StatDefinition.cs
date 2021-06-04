@@ -82,23 +82,8 @@ namespace ManagedIrbis
 
             #region Object members
 
-            /// <summary>
-            /// Returns a <see cref="System.String" />
-            /// that represents this instance.
-            /// </summary>
-            /// <returns>A <see cref="System.String" />
-            /// that represents this instance.</returns>
-            public override string ToString()
-            {
-                return string.Format
-                    (
-                        "{0},{1},{2},{3}",
-                        Field,
-                        Length,
-                        Count,
-                        (int) Sort
-                    );
-            }
+            /// <inheritdoc cref="object.ToString"/>
+            public override string ToString() => $"{Field},{Length},{Count},{(int)Sort}";
 
             #endregion
         }

@@ -618,10 +618,10 @@ namespace ManagedIrbis
             }
 
             response.CheckReturnCode();
-            var result = new ServerVersion();
-            result.Parse(response);
+            var result = ManagedIrbis.ServerVersion.Parse(response);
 
             return result;
+
         } // method GetServerVersionAsync
 
         /// <inheritdoc cref="IAsyncProvider.GlobalCorrectionAsync"/>

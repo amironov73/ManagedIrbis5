@@ -26,6 +26,8 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable
@@ -85,21 +87,27 @@ namespace ManagedIrbis.Mx.Commands
                 {
                     var mfns = records.Select(r => r.Mfn).ToArray();
                     var order = executive.Provider.FormatRecords(mfns, executive.OrderFormat);
-                    for (var i = 0; i < order.Length; i++)
+                    if (order is not null)
                     {
-                        records[i].Order = order[i];
-                    }
+                        for (var i = 0; i < order.Length; i++)
+                        {
+                            records[i].Order = order[i];
+                        }
 
-                    records = records.OrderBy(r => r.Order).ToArray();
+                        records = records.OrderBy(r => r.Order).ToArray();
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(executive.DescriptionFormat))
                 {
                     var mfns = records.Select(r => r.Mfn).ToArray();
                     var formatted = executive.Provider.FormatRecords(mfns, executive.DescriptionFormat);
-                    for (var i = 0; i < formatted.Length; i++)
+                    if (formatted is not null)
                     {
-                        records[i].Order = formatted[i];
+                        for (var i = 0; i < formatted.Length; i++)
+                        {
+                            records[i].Order = formatted[i];
+                        }
                     }
                 }
 

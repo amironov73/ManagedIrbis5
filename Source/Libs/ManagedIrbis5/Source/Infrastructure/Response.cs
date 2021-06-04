@@ -98,6 +98,11 @@ namespace ManagedIrbis.Infrastructure
         private ArraySegment<byte> _currentChunk;
         private int _currentIndex, _currentOffset;
 
+        /// <summary>
+        /// IRBIS_BINARY_DATA
+        /// </summary>
+        private static byte[] BinaryDataPreamble = { 73, 82, 66, 73, 83, 95, 66, 73, 78, 65, 82, 89, 95, 68, 65, 84, 65 };
+
         #endregion
 
         #region Public methods
@@ -114,9 +119,17 @@ namespace ManagedIrbis.Infrastructure
         }
 
         /// <summary>
-        ///
+        /// Проверка кода возврата.
         /// </summary>
-        public bool CheckReturnCode(params int[] goodCodes)
+        public bool CheckReturnCode() => GetReturnCode() >= 0;
+
+        /// <summary>
+        /// Проверка кода возврата.
+        /// </summary>
+        public bool CheckReturnCode
+            (
+                params int[] goodCodes
+            )
         {
             if (GetReturnCode() < 0)
             {
@@ -128,7 +141,38 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return true;
-        }
+
+        } // method CheckReturnCode
+
+        /// <summary>
+        /// Ищем преамбулу сырых бинарных данных.
+        /// </summary>
+        public bool FindPreamble()
+        {
+            var preambleLength = BinaryDataPreamble.Length;
+
+            while (!EOT)
+            {
+                var found = true;
+                for (var i = 0; i < preambleLength; i++)
+                {
+                    var b = ReadByte();
+                    if (b != BinaryDataPreamble[i])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+
+        } // method FindPreamble
 
         /// <summary>
         /// Начальный разбор ответа сервера.

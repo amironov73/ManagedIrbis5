@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -25,6 +26,7 @@ using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
 
 #endregion
 
@@ -186,6 +188,42 @@ namespace ManagedIrbis
             return result;
 
         } // method Parse
+
+        /// <summary>
+        /// Разбор меню со списком баз данных.
+        /// </summary>
+        public static DatabaseInfo[] ParseMenu
+            (
+                MenuFile menu
+            )
+        {
+            var result = new List<DatabaseInfo>();
+
+            foreach (var entry in menu.Entries)
+            {
+                var readOnly = false;
+                var name = entry.Code;
+                if (!string.IsNullOrEmpty(name))
+                {
+                    if (name.FirstChar() == '-')
+                    {
+                        readOnly = true;
+                        name = name.Substring(1);
+                    }
+
+                    var database = new DatabaseInfo
+                    {
+                        Name = name,
+                        Description = entry.Comment,
+                        ReadOnly = readOnly
+                    };
+                    result.Add(database);
+                }
+            }
+
+            return result.ToArray();
+
+        } // method ParseMenu
 
         /// <summary>
         /// Вывод сведений о базе данных.

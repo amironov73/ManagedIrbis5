@@ -125,7 +125,7 @@ namespace ManagedIrbis.Batch
             Format = format;
 
             range ??= Array.Empty<int>();
-            _packages = range.Slice(batchSize).ToArray();
+            _packages = range.Chunk(batchSize).ToArray();
             TotalRecords = _packages.Sum(p => p.Length);
         } // constructor
 
@@ -160,7 +160,7 @@ namespace ManagedIrbis.Batch
             BatchSize = batchSize;
             Format = format;
 
-            _packages = range.Slice(batchSize).ToArray();
+            _packages = range.Chunk(batchSize).ToArray();
             TotalRecords = _packages.Sum(p => p.Length);
         } // constructor
 
