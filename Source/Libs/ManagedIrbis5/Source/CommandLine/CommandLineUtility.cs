@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -61,7 +62,25 @@ namespace ManagedIrbis.CommandLine
     /// </summary>
     public static class CommandLineUtility
     {
+        #region Constants
+
+        /// <summary>
+        /// Имя по умолчанию для переменной окружения,
+        /// содержащей параметры подключения к серверу ИРБИС64.
+        /// </summary>
+        public const string DefaultIrbisEnvironment = "IRBIS64_CONNECTION";
+
+        #endregion
+
         #region Public methods
+
+        /// <summary>
+        /// Получение строки подключения из переменных окружения.
+        /// </summary>
+        /// <param name="environmentName">Имя переменной окружения.</param>
+        /// <returns>Строка подключения либо <c>null</c>.</returns>
+        public static string? GetConnectionStringFromEnvironment (string? environmentName = DefaultIrbisEnvironment) =>
+            environmentName is null ? null : Environment.GetEnvironmentVariable(environmentName);
 
         /// <summary>
         /// Настройки для подключения к серверу.
@@ -108,6 +127,7 @@ namespace ManagedIrbis.CommandLine
             };
 
             return result;
+
         } // method GetRootCommand
 
         /// <summary>
@@ -136,18 +156,18 @@ namespace ManagedIrbis.CommandLine
         /// <summary>
         /// Получение настроек подключения из строки окружения.
         /// </summary>
+        /// <param name="settings">Настройки подключения.</param>
         /// <param name="environmentValue">Значение строки окружения.</param>
         /// <returns>Настройки подключения.</returns>
-        public static ConnectionSettings ParseEnvironment
+        public static void ParseEnvironment
             (
+                IConnectionSettings settings,
                 string? environmentValue
             )
         {
-            var result = new ConnectionSettings();
-
             if (string.IsNullOrEmpty(environmentValue))
             {
-                return result;
+                return;
             }
 
             if (environmentValue.Contains('='))
@@ -159,21 +179,17 @@ namespace ManagedIrbis.CommandLine
 
                 // TODO: дешифровать строку подключения, если необходимо
 
-                result.ParseConnectionString(environmentValue);
+                settings.ParseConnectionString(environmentValue);
             }
 
             var rootCommand = GetRootCommand();
             rootCommand.Handler = CommandHandler.Create
                 (
-                    (ConnectionSettings settings) =>
-                    {
-                        result = settings;
-                    }
+                    (ConnectionSettings cs) => cs.Apply(settings)
                 );
             var parser = new CommandLineBuilder(rootCommand).Build();
             parser.Invoke(environmentValue);
 
-            return result;
         } // method ParseEnvironment
 
         /// <summary>
@@ -185,17 +201,19 @@ namespace ManagedIrbis.CommandLine
         public static void ConfigureConnectionFromEnvironment
             (
                 IConnectionSettings connection,
-                string? environmentName = default
+                string? environmentName = DefaultIrbisEnvironment
             )
         {
-            environmentName ??= "IRBIS64_CONNECTION";
+            var environmentValue = GetConnectionStringFromEnvironment(environmentName);
+            if (!string.IsNullOrEmpty(environmentValue))
+            {
+                ParseEnvironment(connection, environmentValue);
+            }
 
-            var environmentValue = Environment.GetEnvironmentVariable(environmentName);
-            var settings = ParseEnvironment(environmentValue);
-            settings.Apply(connection);
         } // method ConfigureConnectionFromEnvironment
 
         #endregion
+
     } // class CommandLineUtility
 
 } // namespace ManagedIrbis.CommandLine

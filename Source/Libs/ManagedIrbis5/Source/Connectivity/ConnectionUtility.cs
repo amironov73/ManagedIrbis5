@@ -35,6 +35,15 @@ namespace ManagedIrbis
     /// </summary>
     public static class ConnectionUtility
     {
+        #region Constants
+
+        /// <summary>
+        /// Имя по умолчанию для файла, содержащего настройки подключения.
+        /// </summary>
+        public const string DefaultConnectionFileName = "connection.irbis";
+
+        #endregion
+
         #region Public data
 
         /// <summary>
@@ -118,6 +127,7 @@ namespace ManagedIrbis
                 );
 
             return result;
+
         } // method GetStandardConnectionString
 
         /// <summary>
@@ -141,7 +151,38 @@ namespace ManagedIrbis
             result.ParseConnectionString(connectionString);
 
             return result;
+
         } // method GetConnectionFromConfig
+
+        /// <summary>
+        /// Получаем строку подключения из (возможно, несуществующего)
+        /// файла с настройками.
+        /// </summary>
+        /// <returns>Валидная строка подключения либо <c>null</c>.</returns>
+        public static string? GetConnectionStringFromFile
+            (
+                string fileName = DefaultConnectionFileName
+            )
+        {
+            if (!File.Exists(fileName))
+            {
+                return null;
+            }
+
+            var result = File.ReadLines(fileName, Encoding.UTF8).FirstOrDefault()?.Trim();
+
+            if (!string.IsNullOrEmpty(result))
+            {
+                result = IrbisUtility.DecryptConnectionString
+                (
+                    result,
+                    null
+                );
+            }
+
+            return result;
+
+        } // method GetConnectionStringFromFile
 
         /// <summary>
         /// Получаем подключение из файла.
@@ -150,21 +191,20 @@ namespace ManagedIrbis
         /// <returns>Настроенный клиент.</returns>
         public static ISyncProvider GetConnectionFromFile
             (
-                string fileName = "connection.irbis"
+                string fileName = DefaultConnectionFileName
             )
         {
-            var connectionString = File.ReadLines(fileName, Encoding.UTF8)
-                .First().Trim();
+            var connectionString = GetConnectionStringFromFile(fileName);
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new IrbisException($"Can't get connection string from file {fileName}");
+            }
 
             ISyncProvider result = ConnectionFactory.Shared.CreateSyncConnection();
-            connectionString = IrbisUtility.DecryptConnectionString
-                (
-                    connectionString,
-                    null
-                );
             result.ParseConnectionString(connectionString);
 
             return result;
+
         } // method GetConnectionFromFile
 
         /// <summary>
@@ -184,7 +224,8 @@ namespace ManagedIrbis
             var settings = new ConnectionSettings();
             settings.ParseConnectionString(connectionString);
             settings.Apply(connection);
-        }
+
+        } // method ParseConnectionString
 
         /// <summary>
         /// Разбор строки подключения.
@@ -203,7 +244,8 @@ namespace ManagedIrbis
             var settings = new ConnectionSettings();
             settings.ParseConnectionString(connectionString);
             settings.Apply(provider);
-        }
+
+        } // method ParseConnectionString
 
         /// <summary>
         /// Разбор строки подключения.

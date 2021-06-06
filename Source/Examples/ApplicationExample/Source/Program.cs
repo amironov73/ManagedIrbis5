@@ -23,24 +23,20 @@ namespace ApplicationExample
         /// <summary>
         /// Конструктор.
         /// </summary>
-        /// <param name="args"></param>
         public Program(string[] args)
             : base(args)
         {
         }
 
-        private static void CustomRun
-            (
-                MagnaApplication application
-            )
+        /// <inheritdoc cref="MagnaApplication.ActualRun"/>
+        protected override int ActualRun()
         {
-            application.Logger.LogInformation("Привет из приложения");
+            Logger.LogInformation("Привет из приложения!");
+
+            return 0;
         }
 
-        static int Main(string[] args)
-        {
-            return new Program(args).Run(CustomRun);
-        }
+        static int Main(string[] args) => new Program(args).Run();
 
     } // class Program
 

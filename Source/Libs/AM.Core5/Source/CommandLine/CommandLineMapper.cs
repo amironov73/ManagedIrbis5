@@ -62,7 +62,7 @@ namespace AM.CommandLine
                 }
             }
 
-        }
+        } // method MapValue
 
         #endregion
 
@@ -104,7 +104,8 @@ namespace AM.CommandLine
 
                 MapValue(type, target, name, value);
             }
-        }
+
+        } // method MapParseResult
 
         /// <summary>
         /// Разбор командной строки и отображение результатов на существующий объект.
@@ -123,7 +124,8 @@ namespace AM.CommandLine
                 .Build()
                 .Parse(arguments);
             MapParseResult(parserResult, target);
-        }
+
+        } // method MapCommandResult
 
         /// <summary>
         /// Разбор командной строки и отображение результатов на вновь созданный объект.
@@ -143,7 +145,8 @@ namespace AM.CommandLine
             MapCommandResult(command, arguments, result);
 
             return result;
-        }
+
+        } // method MapCommandResult
 
         #endregion
 

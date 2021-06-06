@@ -5,7 +5,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
 /* MagnaApplication.cs -- класс-приложение
@@ -90,9 +93,13 @@ namespace AM.AppServices
         /// <summary>
         /// Построение конфигурации.
         /// </summary>
-        public virtual ConfigurationBuilder BuildConfiguration ()
+        protected virtual IConfigurationBuilder BuildConfiguration ()
         {
-            var result = new ConfigurationBuilder();
+            var result = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", false)
+                .AddEnvironmentVariables()
+                .AddCommandLine(Args);
 
             return result;
 
@@ -101,22 +108,19 @@ namespace AM.AppServices
         /// <summary>
         /// Построение хоста.
         /// </summary>
-        public virtual IHostBuilder BuildHost()
-        {
-            return Host.CreateDefaultBuilder(Args);
-        }
+        protected virtual IHostBuilder BuildHost() => Host.CreateDefaultBuilder(Args);
 
         /// <summary>
         /// Корневая команда для разбора командной строки.
         /// </summary>
-        public virtual RootCommand? BuildRootCommand() => null;
+        protected virtual RootCommand? BuildRootCommand() => null;
 
         /// <summary>
         /// Конфигурирование сервисов.
         /// </summary>
         /// <param name="context">Контекст.</param>
         /// <param name="services">Коллекция сервисов.</param>
-        public virtual void ConfigureServices
+        protected virtual void ConfigureServices
             (
                 HostBuilderContext context,
                 IServiceCollection services
@@ -130,7 +134,7 @@ namespace AM.AppServices
         /// Конфигурирование логирования.
         /// </summary>
         /// <param name="logging">Билдер.</param>
-        public virtual void ConfigureLogging
+        protected virtual void ConfigureLogging
             (
                 ILoggingBuilder logging
             )
@@ -143,7 +147,7 @@ namespace AM.AppServices
         /// <summary>
         /// Разбор командной строки.
         /// </summary>
-        public virtual ParseResult? ParseCommandLine()
+        protected virtual ParseResult? ParseCommandLine()
         {
             var rootCommand = BuildRootCommand();
             if (rootCommand is null)
@@ -163,13 +167,14 @@ namespace AM.AppServices
         /// <summary>
         /// Конфигурирование перед запуском.
         /// </summary>
-        public virtual MagnaApplication PreRun()
+        protected virtual MagnaApplication PreRun()
         {
             if (_prerun)
             {
                 return this;
             }
 
+            Magna.Application = this;
             Configuration = BuildConfiguration().Build();
             ParseResult = ParseCommandLine();
 
@@ -189,30 +194,33 @@ namespace AM.AppServices
 
             _prerun = true;
 
+            Logger.LogInformation("Pre-run configuration done");
+
             return this;
 
         } // method PreRun
 
         /// <summary>
         /// Собственно работа приложения.
+        /// Метод должен быть переопределен в классе-потомке.
         /// </summary>
-        /// <param name="action">Выполняемые действия</param>
+        /// <returns>Код, возвращаемый операционной системе.</returns>
+        protected virtual int ActualRun() => 0;
+
+        /// <summary>
+        /// Собственно работа приложения.
+        /// </summary>
         /// <returns>Код, возвращаемый операционной системе.
         /// </returns>
-        public virtual int Run
-            (
-                Action<MagnaApplication> action
-            )
+        public virtual int Run ()
         {
             try
             {
                 PreRun();
-                Magna.Application = this;
 
-                using var host = Magna.Host;
-                host.Start();
+                Magna.Host.Start();
 
-                action(this);
+                return ActualRun();
 
             }
             catch (Exception exception)
@@ -223,10 +231,9 @@ namespace AM.AppServices
                         nameof(MagnaApplication) + "::" + nameof(Run)
                     );
 
-                return 1;
             }
 
-            return 0;
+            return 1;
 
         } // method Run
 

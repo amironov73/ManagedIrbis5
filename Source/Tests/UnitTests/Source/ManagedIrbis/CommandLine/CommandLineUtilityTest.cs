@@ -259,7 +259,8 @@ namespace UnitTests.ManagedIrbis.CommandLine
         {
             var environment = "--host:testHost --port:5555 --username:librarian "
                               + "--password:secret --database:PERIO --workstation:A";
-            var settings = CommandLineUtility.ParseEnvironment(environment);
+            var settings = new ConnectionSettings();
+            CommandLineUtility.ParseEnvironment(settings, environment);
 
             Assert.AreEqual("testHost", settings.Host);
             Assert.AreEqual((ushort)5555, settings.Port);
@@ -306,12 +307,12 @@ namespace UnitTests.ManagedIrbis.CommandLine
             // TODO: придумать, как замочить Busy
             // Assert.IsFalse(connection.Busy);
             Assert.IsFalse(connection.Connected);
-            Assert.AreEqual("127.0.0.1", connection.Host);
-            Assert.AreEqual((ushort)6666, connection.Port);
+            Assert.IsNull(connection.Host);
+            Assert.AreEqual(0, connection.Port);
             Assert.IsNull(connection.Username);
             Assert.IsNull(connection.Password);
-            Assert.AreEqual("IBIS", connection.Database);
-            Assert.AreEqual("C", connection.Workstation);
+            Assert.IsNull(connection.Database);
+            Assert.IsNull(connection.Workstation);
         }
     }
 }

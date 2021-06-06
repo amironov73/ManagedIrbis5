@@ -230,7 +230,7 @@ namespace ManagedIrbis
                 IConnectionSettings connection
             )
         {
-            if (connection is IIrbisProvider {Connected: true})
+            if (connection is IIrbisProvider { Connected: true })
             {
                 throw new IrbisException("Already connected");
             }
@@ -257,10 +257,18 @@ namespace ManagedIrbis
                 connection.Workstation = Workstation;
             }
 
-            if (!string.IsNullOrEmpty(Database)
-                && connection is IIrbisProvider provider)
+            if (!string.IsNullOrEmpty(Database))
             {
-                provider.Database = Database;
+                switch (connection)
+                {
+                    case IIrbisProvider provider:
+                        provider.Database = Database;
+                        break;
+
+                    case ConnectionSettings settings:
+                        settings.Database = Database;
+                        break;
+                }
             }
 
         } // method Apply
