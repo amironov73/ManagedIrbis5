@@ -78,7 +78,7 @@ namespace AM.Text
 
         #region Private members
 
-        private bool _ownReader;
+        private readonly bool _ownReader;
 
         private StringBuilder _ReadNumber()
         {
@@ -130,8 +130,7 @@ namespace AM.Text
         #region Public methods
 
         /// <summary>
-        /// Construct the <see cref="StreamParser"/>
-        /// from the local text file.
+        /// Конструирование <see cref="StreamParser"/> из указанного файла
         /// </summary>
         public static StreamParser FromFile
             (
@@ -153,11 +152,12 @@ namespace AM.Text
                 );
 
             return result;
-        }
+
+        } // method FromFile
 
         /// <summary>
-        /// Construct the <see cref="StreamParser"/>
-        /// from the given text.
+        /// Конструирование <see cref="StreamParser"/>
+        /// из заданного текста.
         /// </summary>
         public static StreamParser FromString
             (
@@ -172,7 +172,8 @@ namespace AM.Text
                 );
 
             return result;
-        }
+
+        } // method FromString
 
         /// <summary>
         /// Управляющий символ?
@@ -286,7 +287,7 @@ namespace AM.Text
         /// </summary>
         public decimal? ReadDecimal
             (
-                IFormatProvider provider
+                IFormatProvider? provider = null
             )
         {
             if (!SkipWhitespace())
@@ -299,16 +300,8 @@ namespace AM.Text
             return decimal.Parse
                 (
                     result.ToString(),
-                    provider
+                    provider ?? CultureInfo.InvariantCulture
                 );
-        }
-
-        /// <summary>
-        /// Read fixed point number from stream.
-        /// </summary>
-        public decimal? ReadDecimal()
-        {
-            return ReadDecimal(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -316,7 +309,7 @@ namespace AM.Text
         /// </summary>
         public double? ReadDouble
             (
-                IFormatProvider provider
+                IFormatProvider? provider = null
             )
         {
             if (!SkipWhitespace())
@@ -329,16 +322,8 @@ namespace AM.Text
             return double.Parse
                 (
                     result.ToString(),
-                    provider
+                    provider ?? CultureInfo.InvariantCulture
                 );
-        }
-
-        /// <summary>
-        /// Read floating point number from stream.
-        /// </summary>
-        public double? ReadDouble()
-        {
-            return ReadDouble(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -415,7 +400,7 @@ namespace AM.Text
         /// </summary>
         public float? ReadSingle
             (
-                IFormatProvider provider
+                IFormatProvider? provider = null
             )
         {
             if (!SkipWhitespace())
@@ -428,16 +413,8 @@ namespace AM.Text
             return float.Parse
                 (
                     result.ToString(),
-                    provider
+                    provider ?? CultureInfo.InvariantCulture
                 );
-        }
-
-        /// <summary>
-        /// Read floating point number from stream.
-        /// </summary>
-        public float? ReadSingle()
-        {
-            return ReadSingle(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -577,5 +554,7 @@ namespace AM.Text
         }
 
         #endregion
-    }
-}
+
+    } // class StreamParser
+
+} // namespace AM.Text

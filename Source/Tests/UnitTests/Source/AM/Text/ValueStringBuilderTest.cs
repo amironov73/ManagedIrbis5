@@ -1,14 +1,14 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable ObjectCreationAsStatement
+// ReSharper disable StringLiteralTypo
+
+using System;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Text;
 
 #nullable enable
-
-// ReSharper disable CheckNamespace
-// ReSharper disable ObjectCreationAsStatement
-// ReSharper disable StringLiteralTypo
 
 namespace UnitTests.AM.Text
 {

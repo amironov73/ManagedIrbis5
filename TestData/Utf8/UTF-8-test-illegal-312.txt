@@ -1,0 +1,10 @@
+ï»¿"¿" 3  Malformed sequences                                                        |
+                                                                              |
+3.1  Unexpected continuation bytes                                            |
+                                                                              |
+Each unexpected continuation byte should be separately signalled as a         |
+malformed sequence of its own.                                                |
+                                                                              |
+                                     |
+3.1.2  Last  continuation byte 0xbf:"ï¿½"                                      |
+                                                                              |
