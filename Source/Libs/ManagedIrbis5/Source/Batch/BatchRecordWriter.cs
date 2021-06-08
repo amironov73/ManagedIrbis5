@@ -16,9 +16,10 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
+// field is never assigned to, and will have its default value
 #pragma warning disable 649
 
-/* BatchRecordWriter.cs -- batch record writer
+/* BatchRecordWriter.cs -- накапливает записи для пакетного сохранения
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,6 +29,7 @@ using System;
 using System.Collections.Generic;
 
 using AM;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -36,7 +38,7 @@ using AM;
 namespace ManagedIrbis.Batch
 {
     /// <summary>
-    /// Batch writer for <see cref="Record"/>.
+    /// Накапливает записи для пакетного сохранения на сервере.
     /// </summary>
     public sealed class BatchRecordWriter
         : IDisposable
@@ -44,7 +46,7 @@ namespace ManagedIrbis.Batch
         #region Events
 
         /// <summary>
-        /// Raised on batch write.
+        /// Событие возникает в момент пакетного сохранения.
         /// </summary>
         public event EventHandler? BatchWrite;
 
@@ -53,27 +55,28 @@ namespace ManagedIrbis.Batch
         #region Properties
 
         /// <summary>
-        /// Actualize records when writing.
+        /// Актуализировать записи при сохранении?
         /// </summary>
         public bool Actualize { get; set; }
 
         /// <summary>
-        /// Capacity.
+        /// Емкость (количество записей, по достижении которого
+        /// происходит автоматическая отсылка на сервер).
         /// </summary>
-        public int Capacity { get; private set; }
+        public int Capacity { get; }
 
         /// <summary>
-        /// Connection.
+        /// Подключение к серверу.
         /// </summary>
-        public ISyncProvider Connection { get; private set; }
+        public ISyncProvider Connection { get; }
 
         /// <summary>
-        /// Database name.
+        /// Имя базы данных.
         /// </summary>
-        public string Database { get; private set; }
+        public string Database { get; }
 
         /// <summary>
-        /// Total number of records written.
+        /// Общее количество сохраненных записей.
         /// </summary>
         public int RecordsWritten { get; private set; }
 
@@ -82,7 +85,7 @@ namespace ManagedIrbis.Batch
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public BatchRecordWriter
             (
@@ -95,8 +98,8 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        "BatchRecordWriter::Constructor: "
-                        + "capacity="
+                        nameof(BatchRecordWriter) + "::Constructor"
+                        + ": capacity="
                         + capacity
                     );
 
@@ -124,7 +127,7 @@ namespace ManagedIrbis.Batch
         #region Public methods
 
         /// <summary>
-        /// Add many records.
+        /// Добавление многих записей одновременно.
         /// </summary>
         public BatchRecordWriter AddRange
             (
@@ -140,10 +143,11 @@ namespace ManagedIrbis.Batch
             }
 
             return this;
-        }
+
+        } // method AddRange
 
         /// <summary>
-        /// Append one record.
+        /// Добавление одной записи.
         /// </summary>
         public BatchRecordWriter Append
             (
@@ -160,10 +164,11 @@ namespace ManagedIrbis.Batch
             }
 
             return this;
-        }
+
+        } // method Append
 
         /// <summary>
-        /// Flush the buffer.
+        /// Принудительная отсылка записей на сервер.
         /// </summary>
         public BatchRecordWriter Flush()
         {
@@ -171,27 +176,25 @@ namespace ManagedIrbis.Batch
             {
                 if (_buffer.Count != 0)
                 {
+                    var savedDatabase = Connection.Database;
+
                     try
                     {
-                        /*
-
-                        Connection.PushDatabase(Database);
-                        Connection.WriteRecords
-                            (
-                                _buffer.ToArray(),
-                                false,
-                                Actualize
-                            );
-
-                        */
+                        var parameters = new WriteRecordParameters
+                        {
+                            Records = _buffer.ToArray(),
+                            Actualize = Actualize,
+                            Lock = false,
+                            DontParse = true
+                        };
+                        Connection.Database = Database;
+                        Connection.WriteRecord (parameters);
 
                         RecordsWritten += _buffer.Count;
                     }
                     finally
                     {
-                        /*
-                        Connection.PopDatabase();
-                        */
+                        Connection.Database = savedDatabase;
                     }
 
                     BatchWrite.Raise(this);
@@ -201,17 +204,15 @@ namespace ManagedIrbis.Batch
             }
 
             return this;
-        }
+
+        } // method Flush
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            Flush();
-        }
+        public void Dispose() => Flush();
 
         #endregion
 

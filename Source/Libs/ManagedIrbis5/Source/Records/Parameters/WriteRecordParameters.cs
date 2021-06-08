@@ -10,7 +10,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
-/* WriterRecordParameters.cs -- параметры сохранения записи на ИРБИС-сервере
+/* WriteRecordParameters.cs -- параметры сохранения записи на ИРБИС-сервере
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,16 +19,21 @@
 namespace ManagedIrbis.Infrastructure
 {
     /// <summary>
-    /// Параметры сохранения записи на ИРБИС-сервере.
+    /// Параметры сохранения записи/записей на ИРБИС-сервере.
     /// </summary>
     public sealed class WriteRecordParameters
     {
         #region Properties
 
         /// <summary>
-        /// Запись (обязательно).
+        /// Запись (обязательно, если записываем одну).
         /// </summary>
         public IRecord? Record { get; set; }
+
+        /// <summary>
+        /// Много записей (обязательно, если записываем несколько).
+        /// </summary>
+        public Record[]? Records { get; set; }
 
         /// <summary>
         /// Оставить запись заблокированной?

@@ -19,7 +19,6 @@ using System.Text.RegularExpressions;
 using ManagedIrbis;
 using ManagedIrbis.Batch;
 using ManagedIrbis.Fields;
-using ManagedIrbis.Providers;
 
 #endregion
 
@@ -35,7 +34,11 @@ namespace ClearInventarization
         private static readonly SyncConnection _connection
             = ConnectionFactory.Shared.CreateSyncConnection();
 
-        private static void _ProcessRecord(Record record)
+        private static void _ProcessRecord
+            (
+                BatchRecordWriter writer,
+                Record record
+            )
         {
             var exemplars = ExemplarInfo.Parse(record);
 
@@ -68,14 +71,15 @@ namespace ClearInventarization
 
             if (found)
             {
-                 _connection.WriteRecord(record);
+                writer.Append(record);
                 Console.Write('!');
             }
             else
             {
                 Console.Write('.');
             }
-        }
+
+        } // method _ProcessRecord
 
         static int Main(string[] args)
         {
@@ -106,11 +110,18 @@ namespace ClearInventarization
                 Console.WriteLine($"Found: {found.Length}");
 
                 var batch = new BatchRecordReader(_connection, found);
+                var database = _connection.EnsureDatabase();
+                using var writer = new BatchRecordWriter(_connection, database, 60);
+
+                writer.BatchWrite += (sender, _) =>
+                    Console.Write($"\n{((BatchRecordWriter)sender!).RecordsWritten}\n");
 
                 foreach (var record in batch)
                 {
-                    _ProcessRecord(record);
+                    _ProcessRecord(writer, record);
                 }
+
+                writer.Flush();
 
                 Console.WriteLine();
                 Console.WriteLine("ALL DONE");
@@ -126,6 +137,9 @@ namespace ClearInventarization
             }
 
             return 0;
-        }
-    }
-}
+
+        } // method Main
+
+    } // class Program
+
+} // namespace ClearInventarization

@@ -17,6 +17,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
@@ -144,6 +145,34 @@ class Program
             {
                 File.WriteAllBytes("logo.gif", binary);
             }
+
+            #pragma warning disable 162
+            // ReSharper disable HeuristicUnreachableCode
+
+            if (false)
+            {
+                // если нам не жалко каталог, можем проверить,
+                // как сохраняются записи
+
+                var records = new List<Record>(10);
+                for (var i = 1; i <= 10; i++)
+                {
+                    var newRecord = new Record
+                    {
+                        { 700, 'a', "Миронов", 'b', "А. В.", 'g', "Алексей Владимирович" },
+                        { 200, 'a', $"Новая запись N {i}"},
+                        { 920, "PAZK"},
+                        { 300, $"Примечание к новой записи {i}" }
+                    };
+
+                    records.Add(newRecord);
+                }
+
+                connection.WriteRecords(records);
+            }
+
+            // ReSharper restore HeuristicUnreachableCode
+            #pragma warning restore 162
 
             connection.Dispose();
             WriteLine("Successfully disconnected");

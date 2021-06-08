@@ -58,6 +58,7 @@ namespace ChunkedExperiment
                 Encoding encoding
             )
         {
+            Span<byte> smallBuffer = stackalloc byte[10];
             var encoder = encoding.GetEncoder();
             while (!text.IsEmpty)
             {
@@ -67,18 +68,31 @@ namespace ChunkedExperiment
                     throw new OutOfMemoryException();
                 }
 
-                var flushState = text.Length <= span.Length;
-                try
+                if (!encoding.IsSingleByte && span.Length < 4)
                 {
+                    // если у нас вдруг UTF-8 или другая "широкая" кодировка
+                    // и может оказаться мало байт для хотя бы одного символа
+                    // В тексте UTF-8 любой байт со значением меньше 128 изображает
+                    // символ ASCII с тем же кодом. Остальные символы Юникода
+                    // изображаются последовательностями длиной от 2 до 6 байт
+                    // (реально только до 4 байт, поскольку использование кодов
+                    // больше 221 не планируется), в которых первый байт всегда
+                    // имеет вид 11xxxxxx, а остальные — 10xxxxxx.
+
+                    encoder.Convert(text, smallBuffer, false, out var charsUsed, out var bytesUsed, out var _);
+                    writer.Write(smallBuffer[0..bytesUsed]);
+                    text = text[charsUsed..];
+                }
+                else
+                {
+                    // можно копировать напрямую в буфер
+                    // прикидываем, нужно ли делать flush
+
+                    var remaining = encoder.GetByteCount(text, false);
+                    var flushState = span.Length < remaining;
                     encoder.Convert(text, span, flushState, out var charsUsed, out var bytesUsed, out var _);
                     writer.Advance(bytesUsed);
                     text = text[charsUsed..];
-                }
-                catch (Exception)
-                {
-                    var bytes = encoding.GetBytes(text.ToString());
-                    writer.Write(bytes.AsSpan());
-                    break;
                 }
             }
 

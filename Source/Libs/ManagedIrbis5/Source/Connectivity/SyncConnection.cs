@@ -1122,31 +1122,59 @@ namespace ManagedIrbis
                 WriteRecordParameters parameters
             )
         {
-            var record = parameters.Record as Record
-                ?? throw new IrbisException(nameof(WriteRecord));
-            var database = EnsureDatabase(record.Database);
-            using var query = new SyncQuery(this, CommandCode.UpdateRecord);
-            query.AddAnsi(database);
-            query.Add(parameters.Lock);
-            query.Add(parameters.Actualize);
-            query.AddUtf(record.Encode());
-
-            var response = ExecuteSync(query);
-            if (!response.IsGood())
+            var record = parameters.Record as Record;
+            if (record is not null)
             {
-                return false;
+                var database = EnsureDatabase(record.Database);
+                using var query = new SyncQuery(this, CommandCode.UpdateRecord);
+                query.AddAnsi(database);
+                query.Add(parameters.Lock);
+                query.Add(parameters.Actualize);
+                query.AddUtf(record.Encode());
+
+                var response = ExecuteSync(query);
+                if (!response.IsGood())
+                {
+                    return false;
+                }
+
+                var result = response.ReturnCode;
+                if (!parameters.DontParse)
+                {
+                    record.Database ??= database;
+                    ProtocolText.ParseResponseForWriteRecord(response, record);
+                }
+
+                parameters.MaxMfn = result;
+
+                return true;
+
             }
 
-            var result = response.ReturnCode;
-            if (!parameters.DontParse)
+            var records = parameters.Records.ThrowIfNull(nameof(parameters.Records));
+            if (records.Length == 0)
             {
-                record.Database ??= database;
-                ProtocolText.ParseResponseForWriteRecord(response, record);
+                return true;
             }
 
-            parameters.MaxMfn = result;
+            if (records.Length == 1)
+            {
+                parameters.Record = records[0];
+                parameters.Records = null;
+                var result2 = WriteRecord(parameters);
+                parameters.Record = null;
+                parameters.Records = records;
 
-            return true;
+                return result2;
+            }
+
+            return this.WriteRecords
+                (
+                    records,
+                    parameters.Lock,
+                    parameters.Actualize,
+                    parameters.DontParse
+                );
 
         } // method WriteRecord
 

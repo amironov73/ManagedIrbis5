@@ -345,10 +345,10 @@ namespace ManagedIrbis.Providers
                 if (!string.IsNullOrEmpty(line))
                 {
                     var converted = IrbisText.SplitIrbisToLines(line);
-                    if (converted.Length > 2)
+                    if (converted.Length > 3)
                     {
                         var record = new Record();
-                        record.Decode(converted);
+                        record.Decode(converted[1..]);
                         result.Add(record);
                     }
                 }

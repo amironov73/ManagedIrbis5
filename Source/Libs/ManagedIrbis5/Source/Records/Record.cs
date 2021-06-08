@@ -19,6 +19,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -46,6 +47,7 @@ namespace ManagedIrbis
         "}] MFN={" + nameof(Mfn) + "} ({" + nameof(Version) + "})")]
     public sealed class Record
         : IRecord,
+        IEnumerable<Field>,
         IVerifiable
     {
         #region Constants
@@ -726,6 +728,18 @@ namespace ManagedIrbis
         /// Формирует плоское текстовое представление записи.
         /// </summary>
         public string ToPlainText() => PlainText.ToPlainText(this);
+
+        #endregion
+
+        #region IEnumerable<Field> members
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        public IEnumerator<Field> GetEnumerator() => Fields.GetEnumerator();
 
         #endregion
 
