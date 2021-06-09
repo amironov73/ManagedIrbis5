@@ -17,6 +17,7 @@ using AM;
 using AM.Text;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -125,23 +126,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     };
                     record = context.Provider.ReadRecord(parameters);
 
-                    using (var guard = new PftContextGuard(context))
-                    {
-                        var nestedContext = guard.ChildContext;
-                        nestedContext.Record = record;
+                    using var guard = new PftContextGuard(context);
+                    var nestedContext = guard.ChildContext;
+                    nestedContext.Record = record;
 
-                        // ibatrak
-                        // формат вызывается в контексте без повторений
-                        nestedContext.Reset();
+                    // ibatrak
+                    // формат вызывается в контексте без повторений
+                    nestedContext.Reset();
 
-                        // TODO some caching
+                    // TODO some caching
 
-                        var program = PftUtility.CompileProgram(format);
-                        program.Execute(nestedContext);
+                    var program = PftUtility.CompileProgram(format);
+                    program.Execute(nestedContext);
 
-                        var output = nestedContext.Text;
-                        context.Write(node, output);
-                    }
+                    var output = nestedContext.Text;
+                    context.Write(node, output);
                 }
             }
         }

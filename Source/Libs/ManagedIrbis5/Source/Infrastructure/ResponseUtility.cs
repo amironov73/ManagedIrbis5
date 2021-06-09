@@ -20,6 +20,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 
 #endregion
 
@@ -51,6 +52,35 @@ namespace ManagedIrbis.Infrastructure
             => response is not null && response.CheckReturnCode(goodCodes);
 
         /// <summary>
+        /// Проверяем, хороший ли пришел ответ от сервера.
+        /// </summary>
+        public static async Task<bool> IsGoodAsync
+            (
+                [NotNullWhen(true)] this Task<Response?> task
+            )
+        {
+            var response = await task;
+
+            return response is not null && response.CheckReturnCode();
+
+        } // method IsGoodAsync
+
+        /// <summary>
+        /// Проверяем, хороший ли пришел ответ от сервера.
+        /// </summary>
+        public static async Task<bool> IsGoodAsync
+            (
+                [NotNullWhen(true)] this Task<Response?> task,
+                params int[] goodCodes
+            )
+        {
+            var response = await task;
+
+            return response is not null && response.CheckReturnCode(goodCodes);
+
+        } // method IsGoodAsync
+
+        /// <summary>
         /// Трансформация запроса во что-нибудь полезное.
         /// </summary>
         public static T? Transform<T>
@@ -71,6 +101,38 @@ namespace ManagedIrbis.Infrastructure
             )
             where T: class
             => response is not null ? transformer(response) : null;
+
+        /// <summary>
+        /// Трансформация запроса во что-нибудь полезное.
+        /// </summary>
+        public static async Task<T?> TransformAsync<T>
+            (
+                this Task<Response?> response,
+                Func<Response, T?> transformer
+            )
+            where T : class
+        {
+            var waited = await response;
+
+            return waited.IsGood() ? transformer(waited) : null;
+
+        } // method TransformAsync
+
+        /// <summary>
+        /// Трансформация запроса во что-нибудь полезное.
+        /// </summary>
+        public static async Task<T?> TransformNoCheckAsync<T>
+            (
+                this Task<Response?> response,
+                Func<Response, T?> transformer
+            )
+            where T: class
+        {
+            var waited = await response;
+
+            return waited is not null ? transformer(waited) : null;
+
+        } // method TransformNoCheckAsync
 
         #endregion
 

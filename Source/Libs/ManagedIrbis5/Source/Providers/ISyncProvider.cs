@@ -20,6 +20,7 @@ using System.Collections.Generic;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -232,10 +233,11 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры операции.</param>
         /// <returns>Прочитанная запись.</returns>
-        Record? ReadRecord
+        T? ReadRecord<T>
             (
                 ReadRecordParameters parameters
-            );
+            )
+            where T : class, IRecord, new();
 
         /// <summary>
         /// Получение постингов для указанных записи и префикса.

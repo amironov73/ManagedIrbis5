@@ -22,17 +22,19 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
+using AM.Collections;
 using AM.IO;
-using AM.PlatformAbstraction;
-using AM.Threading;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
+using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Logging;
 
@@ -46,76 +48,10 @@ namespace ManagedIrbis
     /// Асинхронное подключение к серверу ИРБИС64.
     /// </summary>
     public class AsyncConnection
-        : IAsyncConnection
+        : ConnectionBase,
+          IAsyncConnection
     {
-        #region Events
-
-        /// <summary>
-        /// Fired when <see cref="Busy"/> changed.
-        /// </summary>
-        public event EventHandler? BusyChanged;
-
-        /// <inheritdoc cref="IIrbisProvider.Disposing"/>
-        public event EventHandler? Disposing;
-
-        #endregion
-
         #region Properties
-
-        /// <inheritdoc cref="IConnectionSettings.Host"/>
-        public string? Host { get; set; } = "127.0.0.1";
-
-        /// <inheritdoc cref="IConnectionSettings.Port"/>
-        public ushort Port { get; set; } = 6666;
-
-        /// <inheritdoc cref="IConnectionSettings.Username"/>
-        public string? Username { get; set; } = string.Empty;
-
-        /// <inheritdoc cref="IConnectionSettings.Password"/>
-        public string? Password { get; set; } = string.Empty;
-
-        /// <inheritdoc cref="IIrbisProvider.Database"/>
-        public string? Database { get; set; } = "IBIS";
-
-        /// <inheritdoc cref="IConnectionSettings.Workstation"/>
-        public string? Workstation { get; set; } = "C";
-
-        /// <inheritdoc cref="IConnectionSettings.ClientId"/>
-        public int ClientId { get; protected internal set; }
-
-        /// <inheritdoc cref="IConnectionSettings.QueryId"/>
-        public int QueryId { get; protected internal set; }
-
-        /// <inheritdoc cref="IIrbisProvider.Connected"/>
-        public bool Connected { get; protected internal set; }
-
-        /// <inheritdoc cref="IGetLastError.LastError"/>
-        public int LastError { get; private set; }
-
-        /// <summary>
-        /// Токен для отмены длительных операций.
-        /// </summary>
-        public CancellationToken Cancellation { get; }
-
-        /// <summary>
-        /// Версия сервера. Берется из ответа на регистрацию клиента.
-        /// Сервер может прислать и пустую строку, надо быть
-        /// к этому готовым.
-        /// </summary>
-        public string? ServerVersion { get; protected internal set; }
-
-        /// <summary>
-        /// INI-файл, присылвемый сервером в ответ на регистрацию клиента.
-        /// </summary>
-        public IniFile? IniFile { get; private set; }
-
-        /// <summary>
-        /// Интервал подтверждения на сервере, минуты.
-        /// Берется из ответа сервера при регистрации клиента.
-        /// Сервер может прислать и пустую строку, к этому надо
-        /// быть готовым.
-        /// </summary>
-        public int Interval { get; private set; }
 
         /// <summary>
         /// Сокет.
@@ -131,54 +67,15 @@ namespace ManagedIrbis
         /// </summary>
         public AsyncConnection
             (
-                IAsyncClientSocket socket,
-                IServiceProvider provider
+                IAsyncClientSocket? socket = null,
+                IServiceProvider? serviceProvider = null
             )
+            : base (serviceProvider ?? Magna.Host.Services)
         {
-            Busy = new BusyState();
-            Socket = socket;
-            socket.Connection = this;
-            _cancellation = new CancellationTokenSource();
-            Cancellation = _cancellation.Token;
-            _logger = Magna.Factory.CreateLogger<IIrbisProvider>();
-            _provider = provider;
-            PlatformAbstraction = PlatformAbstractionLayer.Current;
-        }
+            Socket = socket ?? new AsyncTcp4Socket();
+            Socket.Connection = this;
 
-        #endregion
-
-        #region Private members
-
-        /// <summary>
-        /// Логгер.
-        /// </summary>
-        protected internal readonly ILogger _logger;
-
-        /// <summary>
-        /// Провайдер сервисов.
-        /// </summary>
-        protected internal readonly IServiceProvider _provider;
-
-        /// <summary>
-        /// Отмена выполнения операций.
-        /// </summary>
-        protected internal CancellationTokenSource _cancellation;
-
-        /// <summary>
-        /// Установка состояния занятости.
-        /// </summary>
-        protected internal void SetBusy
-            (
-                bool busy
-            )
-        {
-            if (Busy.State != busy)
-            {
-                _logger.LogTrace($"SetBusy: {busy}");
-                Busy.SetState(busy);
-                BusyChanged?.Invoke(this, EventArgs.Empty);
-            }
-        } // method SetBusy
+        } // constructor
 
         #endregion
 
@@ -211,6 +108,7 @@ namespace ManagedIrbis
             var result = await ExecuteAsync(query);
 
             return result;
+
         } // method ExecuteAsync
 
         /// <summary>
@@ -232,6 +130,7 @@ namespace ManagedIrbis
             var result = await ExecuteAsync(query);
 
             return result;
+
         } // method ExecuteAsync
 
         /// <summary>
@@ -257,55 +156,8 @@ namespace ManagedIrbis
             var result = await ExecuteAsync(query);
 
             return result;
+
         } // method ExecuteAsync
-
-        #endregion
-
-        #region ICancellable members
-
-        /// <inheritdoc cref="ICancellable.Busy"/>
-        public BusyState Busy { get; protected internal set; }
-
-        /// <inheritdoc cref="ICancellable.CancelOperation"/>
-        public void CancelOperation() => _cancellation.Cancel();
-
-        /// <inheritdoc cref="ICancellable.ThrowIfCancelled"/>
-        public void ThrowIfCancelled() => Cancellation.ThrowIfCancellationRequested();
-
-        #endregion
-
-        #region IIrbisProvider members
-
-        /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>
-        public bool CheckProviderState()
-        {
-            if (!Connected)
-            {
-                LastError = -100_500;
-            }
-
-            return Connected;
-        } // method CheckConnection
-
-        /// <inheritdoc cref="IIrbisProvider.Configure"/>
-        public void Configure(string configurationString)
-        {
-            // ParseConnectionString
-        }
-
-        /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
-        public string GetGeneration() => "64";
-
-        /// <inheritdoc cref="IIrbisProvider.GetWaitHandle"/>
-        public WaitHandle GetWaitHandle()
-        {
-            throw new NotImplementedException();
-        } // method GetWaitHandle
-
-        /// <summary>
-        /// Абстракция от платформы.
-        /// </summary>
-        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
 
         #endregion
 
@@ -323,6 +175,7 @@ namespace ManagedIrbis
             )
         {
             SetBusy(true);
+
             try
             {
                 if (_cancellation.IsCancellationRequested)
@@ -348,19 +201,13 @@ namespace ManagedIrbis
                     return null;
                 }
 
-                if (result is not null)
+                if (result is null)
                 {
-                    /*
-                    if (_debug)
-                    {
-                        result.Debug(Console.Out);
-                    }
-                    */
-
-                    result.Parse();
+                    return null;
                 }
 
-                QueryId++;
+                result.Parse();
+                Interlocked.Increment(ref _queryId);
 
                 return result;
             }
@@ -368,31 +215,87 @@ namespace ManagedIrbis
             {
                 SetBusy(false);
             }
+
         } // method ExecuteAsync
+
+        /// <summary>
+        /// Получение статистики по базе данных.
+        /// </summary>
+        public async Task<string?> GetDatabaseStatAsync
+            (
+                StatDefinition definition
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var query = new AsyncQuery(this, CommandCode.DatabaseStat);
+            definition.Encode(this, query);
+
+            var response = await ExecuteAsync(query);
+            if (!response.IsGood())
+            {
+                return null;
+            }
+
+            var result = "{\\rtf1 "
+                + response.ReadRemainingUtfText()
+                + "}";
+
+            return result;
+
+        } // method GetDatabaseStatAsync
+
+        /// <summary>
+        /// Переподключение к серверу.
+        /// </summary>
+        public async Task<bool> ReconnectAsync()
+        {
+            if (Connected)
+            {
+                await DisconnectAsync();
+            }
+
+            IniFile?.Dispose();
+            IniFile = null;
+
+            return await ConnectAsync();
+
+        } // method ReconnectAsync
+
+        /// <summary>
+        /// Остановка сервера (расширенная команда).
+        /// </summary>
+        public async Task<bool> StopServerAsync()
+        {
+            var result = await ExecuteAsync("STOP") is not null;
+            Connected = false;
+
+            return result;
+
+        } // method StopServerAsync
+
+        /// <summary>
+        /// Разблокирование указанной записи (альтернативный вариант).
+        /// </summary>
+        public async Task<bool> UnlockRecordAltAsync(int mfn) =>
+            await ExecuteAsync("E", EnsureDatabase(), mfn).IsGoodAsync();
 
         #endregion
 
         #region IAsyncProvider members
 
         /// <inheritdoc cref="IAsyncProvider.ActualizeRecordAsync"/>
-        public async Task<bool> ActualizeRecordAsync
-            (
-                ActualizeRecordParameters parameters
-            )
-        {
-            var database = parameters.Database
-                           ?? Database
-                           ?? throw new IrbisException();
-
-            var response = await ExecuteAsync
-                (
-                    CommandCode.ActualizeRecord,
-                    database,
-                    parameters.Mfn
-                );
-
-            return response is not null;
-        } // method ActualizeRecordAsync
+        public async Task<bool> ActualizeRecordAsync(ActualizeRecordParameters parameters) =>
+            await ExecuteAsync
+                    (
+                        CommandCode.ActualizeRecord,
+                        EnsureDatabase(parameters.Database),
+                        parameters.Mfn
+                    )
+                .IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.ConnectAsync"/>
         public async Task<bool> ConnectAsync()
@@ -432,9 +335,14 @@ namespace ManagedIrbis
             Connected = true;
             ServerVersion = response.ServerVersion;
             Interval = response.ReadInteger();
-            // TODO Read INI-file
+
+            IniFile = new IniFile();
+            var remainingText = response.RemainingText(IrbisEncoding.Ansi);
+            var reader = new StringReader(remainingText);
+            IniFile.Read(reader);
 
             return true;
+
         } // method ConnectAsync
 
         /// <inheritdoc cref="IAsyncProvider.CreateDatabaseAsync"/>
@@ -448,100 +356,94 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var database = parameters.Database
-                           ?? Database
-                           ?? throw new IrbisException();
             var query = new AsyncQuery(this, CommandCode.CreateDatabase);
-            query.AddAnsi(database);
-            query.AddAnsi(parameters.Database);
-            query.Add(parameters.ReaderAccess ? 1 : 0);
+            query.AddAnsi(EnsureDatabase(parameters.Database));
+            query.AddAnsi(parameters.Description);
+            query.Add(parameters.ReaderAccess);
             var response = await ExecuteAsync(query);
 
-            return response?.CheckReturnCode() ?? false;
+            return response.IsGood();
+
         } // method CreateDatabaseAsync
 
         /// <inheritdoc cref="IAsyncProvider.CreateDictionaryAsync"/>
-        public async Task<bool> CreateDictionaryAsync
-            (
-                string? databaseName = default
-            )
-        {
-            if (!CheckProviderState())
-            {
-                return false;
-            }
-
-            var database = databaseName
-                           ?? Database
-                           ?? throw new IrbisException();
-            var query = new AsyncQuery(this, CommandCode.CreateDictionary);
-            query.AddAnsi(database);
-            var response = await ExecuteAsync(query);
-
-            return response?.CheckReturnCode() ?? false;
-        } // method CreateDictionaryAsync
+        public async Task<bool> CreateDictionaryAsync (string? databaseName = default) =>
+            await ExecuteAsync(CommandCode.CreateDictionary,
+                EnsureDatabase(databaseName)).IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.DeleteDatabaseAsync"/>
-        public async Task<bool> DeleteDatabaseAsync
-            (
-                string? databaseName = default
-            )
-        {
-            if (!CheckProviderState())
-            {
-                return false;
-            }
-
-            var database = databaseName
-                           ?? Database
-                           ?? throw new IrbisException();
-            var query = new AsyncQuery(this, CommandCode.DeleteDatabase);
-            query.AddAnsi(database);
-            var response = await ExecuteAsync(query);
-
-            return response?.CheckReturnCode() ?? false;
-        } // method DeleteDatabaseAsync
+        public async Task<bool> DeleteDatabaseAsync (string? databaseName = default) =>
+            await ExecuteAsync(CommandCode.DeleteDatabase,
+                EnsureDatabase(databaseName)).IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.DisconnectAsync"/>
         public async Task<bool> DisconnectAsync()
         {
             if (Connected)
             {
-                var query = new AsyncQuery(this, CommandCode.UnregisterClient);
-                query.AddAnsi(Username);
+                await OnDisposingAsync();
+
                 try
                 {
-                    await ExecuteAsync(query);
+                    await ExecuteAsync(CommandCode.UnregisterClient);
                 }
                 catch (Exception exception)
                 {
-                    Debug.WriteLine(exception.Message);
+                    _logger.LogError
+                        (
+                            exception,
+                            nameof(SyncConnection) + "::" + nameof(DisconnectAsync)
+                        );
                 }
 
                 Connected = false;
-
-                Disposing?.Invoke(this, EventArgs.Empty);
             }
 
             return true;
+
         } // method DisconnectAsync
 
         /// <inheritdoc cref="IAsyncProvider.FileExistAsync"/>
-        public Task<bool> FileExistAsync
-            (
-                FileSpecification specification
-            )
-        {
-            throw new NotImplementedException();
-        } // method FileExistAsync
+        public async Task<bool> FileExistAsync (FileSpecification specification) =>
+            !string.IsNullOrEmpty (await ReadTextFileAsync(specification));
 
         /// <inheritdoc cref="IAsyncProvider.FormatRecordsAsync"/>
-        public Task<bool> FormatRecordsAsync
+        public async Task<bool> FormatRecordsAsync
             (
                 FormatRecordParameters parameters
             )
         {
-            throw new NotImplementedException();
+            if (!CheckProviderState())
+            {
+                return false;
+            }
+
+            // TODO: обнаруживать Records
+
+            if (parameters.Mfns.IsNullOrEmpty())
+            {
+                return false;
+            }
+
+            var query = new AsyncQuery(this, CommandCode.FormatRecord);
+            query.AddAnsi(EnsureDatabase(parameters.Database));
+            query.AddFormat(parameters.Format);
+            query.Add(parameters.Mfns.Length);
+            foreach (var mfn in parameters.Mfns)
+            {
+                query.Add(mfn);
+            }
+
+            var response = await ExecuteAsync(query);
+            if (!response.IsGood())
+            {
+                return false;
+            }
+
+            parameters.Result = response.ReadRemainingUtfLines();
+
+            return true;
+
         } // method FormatRecordsAsync
 
         /// <inheritdoc cref="IAsyncProvider.FullTextSearchAsync"/>
@@ -569,6 +471,7 @@ namespace ManagedIrbis
             result.Decode(response);
 
             return result;
+
         } // method FullTextSearchAsync
 
         /// <inheritdoc cref="IAsyncProvider.GetDatabaseInfoAsync"/>
@@ -578,6 +481,7 @@ namespace ManagedIrbis
             )
         {
             throw new NotImplementedException();
+
         } // method GetDatabaseInfoAsync
 
         /// <inheritdoc cref="IAsyncProvider.GetMaxMfnAsync"/>
@@ -594,12 +498,14 @@ namespace ManagedIrbis
             return response?.CheckReturnCode() ?? false
                 ? response.ReturnCode
                 : 0;
+
         } // method GetMaxMfnAsync
 
         /// <inheritdoc cref="IAsyncProvider.GetServerStatAsync"/>
         public Task<ServerStat?> GetServerStatAsync()
         {
             throw new NotImplementedException();
+
         } // method GetServerStatAsync
 
         /// <inheritdoc cref="IAsyncProvider.GetServerVersionAsync"/>
@@ -703,12 +609,14 @@ namespace ManagedIrbis
             var result = ProcessInfo.Parse(response);
 
             return result;
+
         } // method ListProcessesAsync
 
         /// <inheritdoc cref="IAsyncProvider.ListUsersAsync"/>
         public Task<UserInfo[]?> ListUsersAsync()
         {
             throw new NotImplementedException();
+
         } // method ListUsersAsync
 
         /// <inheritdoc cref="IAsyncProvider.NoOperationAsync"/>
@@ -722,6 +630,7 @@ namespace ManagedIrbis
             var response = await ExecuteAsync(CommandCode.Nop);
 
             return response?.CheckReturnCode() ?? false;
+
         } // method NoOperationAsync
 
         /// <inheritdoc cref="IAsyncProvider.PrintTableAsync"/>
@@ -731,6 +640,7 @@ namespace ManagedIrbis
             )
         {
             throw new NotImplementedException();
+
         } // method PrintTableAsync
 
         /// <inheritdoc cref="IAsyncProvider.ReadBinaryFileAsync"/>
@@ -740,6 +650,7 @@ namespace ManagedIrbis
             )
         {
             throw new NotImplementedException();
+
         } // method ReadBinaryFileAsync
 
         /// <inheritdoc cref="IAsyncProvider.ReadPostingsAsync"/>
@@ -765,18 +676,20 @@ namespace ManagedIrbis
             return TermPosting.Parse(response);
         } // method ReadPostingsAsync
 
-        /// <inheritdoc cref="IAsyncProvider.ReadRecordAsync"/>
-        public async Task<Record?> ReadRecordAsync
+        /// <inheritdoc cref="IAsyncProvider.ReadRecordAsync{T}"/>
+        public async Task<T?> ReadRecordAsync<T>
             (
                 ReadRecordParameters parameters
             )
+            where T: class, IRecord, new()
         {
             if (!CheckProviderState())
             {
                 return null;
             }
 
-            var database = parameters.Database
+            var database =
+                parameters.Database
                            ?? Database
                            ?? throw new IrbisException();
             var query = new AsyncQuery(this, CommandCode.ReadRecord);
@@ -790,13 +703,14 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var result = new Record
+            var result = new T
             {
                 Database = Database
             };
             result.Decode(response);
 
             return result;
+
         } // method ReadRecordAsync
 
         /// <inheritdoc cref="IAsyncProvider.ReadRecordPostingsAsync"/>
@@ -1027,36 +941,63 @@ namespace ManagedIrbis
                 WriteRecordParameters parameters
             )
         {
-            if (!CheckProviderState())
+            var record = parameters.Record;
+            if (record is not null)
             {
-                return false;
+                var database = EnsureDatabase(record.Database);
+                var query = new AsyncQuery(this, CommandCode.UpdateRecord);
+                query.AddAnsi(database);
+                query.Add(parameters.Lock);
+                query.Add(parameters.Actualize);
+                query.AddUtf(record.Encode());
+
+                var response = await ExecuteAsync(query);
+                if (!response.IsGood())
+                {
+                    return false;
+                }
+
+                var result = response.ReturnCode;
+                if (!parameters.DontParse)
+                {
+                    record.Database ??= database;
+                    //ProtocolText.ParseResponseForWriteRecord(response, record);
+                    record.Decode(response);
+                }
+
+                parameters.MaxMfn = result;
+
+                return true;
+
             }
 
-            var record = parameters.Record as Record
-                         ?? throw new IrbisException();
-            var database = record.Database
-                           ?? Database
-                           ?? throw new IrbisException();
-            var query = new AsyncQuery(this, CommandCode.UpdateRecord);
-            query.AddAnsi(database);
-            query.Add(parameters.Lock ? 1 : 0);
-            query.Add(parameters.Actualize ? 1 : 0);
-            query.AddUtf(record.Encode());
-
-            var response = await ExecuteAsync(query);
-            if (response is null || !response.CheckReturnCode())
+            var records = parameters.Records.ThrowIfNull(nameof(parameters.Records));
+            if (records.Length == 0)
             {
-                return false;
+                return true;
             }
 
-            var result = response.ReturnCode;
-            if (!parameters.DontParse)
+            if (records.Length == 1)
             {
-                record.Database ??= database;
-                // TODO reparse the record
+                parameters.Record = records[0];
+                parameters.Records = null;
+                var result2 = await WriteRecordAsync(parameters);
+                parameters.Record = null;
+                parameters.Records = records;
+
+                return result2;
             }
 
-            return true;
+            // return await this.WriteRecordsAsync
+            //     (
+            //         records,
+            //         parameters.Lock,
+            //         parameters.Actualize,
+            //         parameters.DontParse
+            //     );
+
+            return false;
+
         } // method WriteRecordAsync
 
         /// <inheritdoc cref="IAsyncProvider.WriteTextFileAsync"/>
@@ -1083,37 +1024,18 @@ namespace ManagedIrbis
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public async ValueTask DisposeAsync()
+        public override async ValueTask DisposeAsync()
         {
-            if (Connected)
-            {
-                await Disposing.RaiseAsync(this);
-                await DisconnectAsync().ConfigureAwait(false);
-                Busy.Dispose();
-            }
+            await DisconnectAsync();
+
         } // method DisposeAsync
-
-        #endregion
-
-        #region IAsyncConnection members
-
-        /// <inheritdoc cref="ISetLastError.SetLastError"/>
-        public int SetLastError(int code) => LastError = code;
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => DisposeAsync().GetAwaiter().GetResult();
-
-        #endregion
-
-        #region IServiceProvider members
-
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) =>
-            _provider.GetService(serviceType);
+        public override void Dispose() => DisposeAsync().GetAwaiter().GetResult();
 
         #endregion
 

@@ -22,12 +22,13 @@ using System.Threading.Tasks;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Records;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis.Providers
 {
     /// <summary>
     /// Интерфейс асинхронного ИРБИС-провайдера.
@@ -234,10 +235,11 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="parameters">Параметры операции.</param>
         /// <returns>Прочитанная запись.</returns>
-        Task<Record?> ReadRecordAsync
+        Task<T?> ReadRecordAsync<T>
             (
                 ReadRecordParameters parameters
-            );
+            )
+            where T: class, IRecord, new();
 
         /// <summary>
         /// Получение постингов для указанных записи и префикса.
@@ -388,4 +390,4 @@ namespace ManagedIrbis
 
     } // interface IAsyncProvider
 
-} // namespace ManagedIrbis
+} // namespace ManagedIrbis.Providers

@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using AM;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 

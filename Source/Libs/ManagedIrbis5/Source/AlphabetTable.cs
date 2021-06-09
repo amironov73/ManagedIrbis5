@@ -26,6 +26,7 @@ using AM.Runtime;
 using AM.Text;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -405,8 +406,7 @@ namespace ManagedIrbis
             )
         {
             if (text.Length == 0
-                || IsAlpha(text[0])
-                    && IsAlpha(text[text.Length - 1])
+                || IsAlpha(text[0]) && IsAlpha(text[^1])
                )
             {
                 return text;

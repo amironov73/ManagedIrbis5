@@ -27,6 +27,7 @@ using AM.Collections;
 
 using ManagedIrbis.Trees;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -411,6 +412,7 @@ namespace ManagedIrbis.Menus
         {
             var result = await connection.ReadMenuAsync(specification);
             return result.ThrowIfNull("RequireMenuAsync");
+
         } // method RequireMenuAsync
 
         #endregion

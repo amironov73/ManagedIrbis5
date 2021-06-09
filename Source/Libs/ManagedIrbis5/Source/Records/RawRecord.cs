@@ -22,7 +22,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using AM;
+using AM.Text;
 
+using ManagedIrbis.Direct;
 using ManagedIrbis.Infrastructure;
 
 using static ManagedIrbis.RecordStatus;
@@ -31,7 +33,7 @@ using static ManagedIrbis.RecordStatus;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace ManagedIrbis.Records
 {
     /// <summary>
     /// Сырая (не разобранная) запись.
@@ -43,6 +45,7 @@ namespace ManagedIrbis
     [DebuggerDisplay("[{" + nameof(Database) + "}] MFN={"
         + nameof(Mfn) + "} ({" + nameof(Version) + "})")]
     public sealed class RawRecord
+        : IRecord
     {
         #region Properties
 
@@ -100,10 +103,65 @@ namespace ManagedIrbis
 
         #region Public methods
 
-        /// <summary>
-        /// Encode record to text.
-        /// </summary>
-        public string EncodeRecord
+        /// <inheritdoc cref="IRecord.Decode(Response)"/>
+        public void Decode
+            (
+                Response response
+            )
+        {
+            try
+            {
+                var line = response.ReadUtf();
+
+                var first = line.Split('#');
+                Mfn = int.Parse(first[0]);
+                Status = first.Length == 1
+                    ? None
+                    : (RecordStatus) first[1].SafeToInt32();
+
+                line = response.ReadUtf();
+                var second = line.Split('#');
+                Version = second.Length == 1
+                    ? 0
+                    : int.Parse(second[1]);
+
+                while (!response.EOT)
+                {
+                    line = response.ReadUtf();
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        break;
+                    }
+
+                    Fields.Add(line);
+                }
+            }
+            catch (Exception exception)
+            {
+                // response.DebugUtf(Console.Error);
+                Magna.Error(nameof(RawRecord) + "::" + nameof(Decode));
+
+                throw new IrbisException
+                (
+                    nameof(Record) + "::" + nameof(Decode),
+                    exception
+                );
+            }
+
+        } // method Decode
+
+        /// <inheritdoc cref="IRecord.Decode(MstRecord64)"/>
+        public void Decode
+            (
+                MstRecord64 record
+            )
+        {
+            throw new NotImplementedException();
+
+        } // method Decode
+
+        /// <inheritdoc cref="IRecord.Encode(string)"/>
+        public string Encode
             (
                 string? delimiter = IrbisText.IrbisDelimiter
             )
@@ -124,7 +182,41 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
-        }
+
+        } // method Encode
+
+        /// <inheritdoc cref="IRecord.Encode(MstRecord64)"/>
+        public void Encode
+            (
+                MstRecord64 record
+            )
+        {
+            throw new NotImplementedException();
+
+        } // method Encode
+
+        /// <summary>
+        /// Поиск поля с указанной меткой.
+        /// </summary>
+        /// <param name="tag">Искомая метка поля.</param>
+        /// <returns>Найденное поле либо <c>null</c>.</returns>
+        public string? FM(int tag)
+        {
+            Span<char> tagText = stackalloc char[10];
+            tagText = tagText[..FastNumber.Int32ToChars(tag, tagText)];
+            foreach (var field in Fields)
+            {
+                var navigator = new ValueTextNavigator(field);
+                var opening = navigator.ReadUntil('#');
+                if (Utility.CompareSpans(tagText, opening) == 0)
+                {
+                    return field;
+                }
+            }
+
+            return null;
+
+        } // method FM
 
         /// <summary>
         /// Parse MFN, status and version of the record
@@ -154,7 +246,8 @@ namespace ManagedIrbis
             }
 
             return record;
-        }
+
+        } // method ParseMfnStatusVersion
 
         /// <summary>
         /// Parse text.
@@ -211,6 +304,7 @@ namespace ManagedIrbis
                 );
 
             return result;
+
         } // method Parse
 
         #endregion
@@ -218,7 +312,7 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => EncodeRecord(Environment.NewLine);
+        public override string ToString() => Encode(Environment.NewLine);
 
         #endregion
 

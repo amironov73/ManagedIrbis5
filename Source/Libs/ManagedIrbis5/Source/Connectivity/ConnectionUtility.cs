@@ -24,6 +24,8 @@ using System.Text;
 
 using AM.Configuration;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable

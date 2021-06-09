@@ -32,6 +32,7 @@ using AM.Threading;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -481,12 +482,18 @@ namespace ManagedIrbis.InMemory
             throw new NotImplementedException();
         }
 
-        /// <inheritdoc cref="ISyncProvider.ReadRecord"/>
-        public Record? ReadRecord
+        /// <inheritdoc cref="ISyncProvider.ReadRecord{T}"/>
+        public T? ReadRecord<T>
             (
                 ReadRecordParameters parameters
             )
+            where T: class, IRecord, new()
         {
+            if (typeof(T) != typeof(Record))
+            {
+                throw new NotSupportedException();
+            }
+
             using var guard = new BusyGuard(Busy);
 
             var db = GetDatabase(parameters.Database);
@@ -498,8 +505,9 @@ namespace ManagedIrbis.InMemory
 
             LastError = SoFarSoGood;
 
-            return db.ReadRecord(parameters.Mfn);
-        }
+            return (T?) (object?) db.ReadRecord(parameters.Mfn);
+
+        } // method ReadRecord
 
         /// <inheritdoc cref="ISyncProvider.ReadRecordPostings"/>
         public TermPosting[]? ReadRecordPostings

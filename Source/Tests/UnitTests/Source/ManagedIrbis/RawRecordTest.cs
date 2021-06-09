@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Records;
 
 #nullable enable
 
@@ -101,7 +102,7 @@ namespace UnitTests.ManagedIrbis
         {
             var lines = _GetLines();
             var record = RawRecord.Parse(lines);
-            var encoded = record.EncodeRecord();
+            var encoded = record.Encode();
             Assert.IsNotNull(encoded);
         }
 

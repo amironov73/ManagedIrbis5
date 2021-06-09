@@ -110,6 +110,9 @@ class Program
             var record = connection.ReadRecord(1);
             WriteLine($"ReadRecord={record?.FM(200, 'a')}");
 
+            var rawRecord = connection.ReadRawRecord(1);
+            WriteLine($"ReadRawRecord={rawRecord?.FM(200)}");
+
             var formatted = connection.FormatRecord("@brief", 1);
             WriteLine($"Formatted={formatted}");
 

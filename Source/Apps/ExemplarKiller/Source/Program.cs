@@ -152,6 +152,8 @@ namespace ExemplarKiller
             }
             else
             {
+                connection = connection.ThrowIfNull(nameof(connection));
+
                 found.SetSubFieldValue('a', "6");
                 if (!string.IsNullOrEmpty(actNumber))
                 {

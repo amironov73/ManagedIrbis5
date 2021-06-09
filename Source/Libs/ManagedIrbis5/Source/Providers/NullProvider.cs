@@ -26,6 +26,7 @@ using AM.Threading;
 
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -182,8 +183,10 @@ namespace ManagedIrbis.Providers
         /// <inheritdoc cref="ISyncProvider.ReadPostings"/>
         public TermPosting[]? ReadPostings(PostingParameters parameters) => default;
 
-        /// <inheritdoc cref="ISyncProvider.ReadRecord"/>
-        public Record? ReadRecord(ReadRecordParameters parameters) => default;
+        /// <inheritdoc cref="ISyncProvider.ReadRecord{T}"/>
+        public T? ReadRecord<T> (ReadRecordParameters parameters)
+            where T: class, IRecord, new()
+            => default;
 
         /// <inheritdoc cref="ISyncProvider.ReadRecordPostings"/>
         public TermPosting[]? ReadRecordPostings(ReadRecordParameters parameters, string prefix) => default;
@@ -294,8 +297,10 @@ namespace ManagedIrbis.Providers
         /// <inheritdoc cref="IAsyncProvider.ReadPostingsAsync"/>
         public Task<TermPosting[]?> ReadPostingsAsync(PostingParameters parameters) => Task.FromResult<TermPosting[]?>(default);
 
-        /// <inheritdoc cref="IAsyncProvider.ReadRecordAsync"/>
-        public Task<Record?> ReadRecordAsync(ReadRecordParameters parameters) => Task.FromResult<Record?>(default);
+        /// <inheritdoc cref="IAsyncProvider.ReadRecordAsync{T}"/>
+        public Task<T?> ReadRecordAsync<T>(ReadRecordParameters parameters)
+            where T: class, IRecord, new()
+            => Task.FromResult<T?>(default);
 
         /// <inheritdoc cref="IAsyncProvider.ReadRecordPostingsAsync"/>
         public Task<TermPosting[]?> ReadRecordPostingsAsync(ReadRecordParameters parameters, string prefix) => Task.FromResult<TermPosting[]?>(default);

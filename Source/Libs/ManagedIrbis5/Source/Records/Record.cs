@@ -29,8 +29,10 @@ using System.Xml.Serialization;
 using AM;
 using AM.Collections;
 
+using ManagedIrbis.Direct;
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Records;
 
 using static ManagedIrbis.RecordStatus;
 
@@ -331,6 +333,7 @@ namespace ManagedIrbis
             Fields.Add(field);
 
             return this;
+
         } // method Add
 
         /// <summary>
@@ -351,6 +354,7 @@ namespace ManagedIrbis
             Fields.Add(field);
 
             return this;
+
         } // method Add
 
         /// <summary>
@@ -372,6 +376,7 @@ namespace ManagedIrbis
             }
 
             return this;
+
         } // method AddNonEmptyField
 
         /// <summary>
@@ -385,6 +390,7 @@ namespace ManagedIrbis
             Fields.Clear();
 
             return this;
+
         } // method Clear
 
         /// <summary>
@@ -400,11 +406,10 @@ namespace ManagedIrbis
             }
 
             return result;
+
         } // method Clone
 
-        /// <summary>
-        /// Декодирование ответа сервера.
-        /// </summary>
+        /// <inheritdoc cref="IRecord.Decode(Response)"/>
         public void Decode
             (
                 Response response
@@ -450,6 +455,29 @@ namespace ManagedIrbis
                         exception
                     );
             }
+
+        } // method Decode
+
+        /// <inheritdoc cref="IRecord.Decode(MstRecord64)"/>
+        public void Decode
+            (
+                MstRecord64 record
+            )
+        {
+            Mfn = record.Leader.Mfn;
+            Status = (RecordStatus) record.Leader.Status;
+            Version = record.Leader.Version;
+
+            // result.Fields.BeginUpdate();
+            // result.Fields.EnsureCapacity(Dictionary.Count);
+
+            foreach (var entry in record.Dictionary)
+            {
+                var field = record.DecodeField(entry);
+                Fields.Add(field);
+            }
+
+            // result.Fields.EndUpdate();
 
         } // method Decode
 
@@ -503,12 +531,10 @@ namespace ManagedIrbis
 
         } // method Decode
 
-        /// <summary>
-        /// Кодирование записи в текстовое представление.
-        /// </summary>
+        /// <inheritdoc cref="IRecord.Encode(string)"/>
         public string Encode
             (
-                string delimiter = IrbisText.IrbisDelimiter
+                string? delimiter = IrbisText.IrbisDelimiter
             )
         {
             var result = new StringBuilder(512);
@@ -530,6 +556,16 @@ namespace ManagedIrbis
 
         } // method Encode
 
+        /// <inheritdoc cref="IRecord.Encode(MstRecord64)"/>
+        public void Encode
+            (
+                MstRecord64 record
+            )
+        {
+            throw new NotImplementedException();
+
+        } // method Encode
+
         /// <summary>
         /// Получить текст поля до разделителей подполей
         /// первого повторения поля с указанной меткой.
@@ -547,6 +583,8 @@ namespace ManagedIrbis
                 char code
             )
         {
+            Sure.Positive(tag, nameof(tag));
+
             var field = GetField(tag);
 
             if (!ReferenceEquals(field, null))
@@ -568,6 +606,8 @@ namespace ManagedIrbis
                 int tag
             )
         {
+            Sure.Positive(tag, nameof(tag));
+
             var result = new LocalList<string>();
 
             foreach (var field in Fields)
@@ -591,6 +631,8 @@ namespace ManagedIrbis
                 char code
             )
         {
+            Sure.Positive(tag, nameof(tag));
+
             var result = new LocalList<string>();
 
             foreach (var field in Fields)
@@ -621,6 +663,8 @@ namespace ManagedIrbis
                 int occurrence = 0
             )
         {
+            Sure.Positive(tag, nameof(tag));
+
             foreach (var field in Fields)
             {
                 if (field.Tag == tag)
@@ -635,6 +679,7 @@ namespace ManagedIrbis
             }
 
             return null;
+
         } // method GetField
 
         /// <summary>
@@ -655,6 +700,7 @@ namespace ManagedIrbis
                     yield return field;
                 }
             }
+
         } // method EnumerateField
 
         /// <summary>
@@ -682,6 +728,7 @@ namespace ManagedIrbis
             Fields.Add(result);
 
             return result;
+
         } // method GetOrAddField
 
         /// <summary>
@@ -692,6 +739,8 @@ namespace ManagedIrbis
                 int tag
             )
         {
+            Sure.Positive(tag, nameof(tag));
+
             foreach (var field in Fields)
             {
                 if (field.Tag == tag)
@@ -701,6 +750,7 @@ namespace ManagedIrbis
             }
 
             return false;
+
         } // method HaveField
 
         /// <summary>
@@ -722,6 +772,7 @@ namespace ManagedIrbis
             }
 
             return this;
+
         } // method RemoveField
 
         /// <summary>
@@ -756,6 +807,7 @@ namespace ManagedIrbis
             // TODO: implement
 
             return verifier.Result;
+
         } // method Verify
 
         #endregion

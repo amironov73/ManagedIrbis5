@@ -25,6 +25,7 @@ using AM;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
+using ManagedIrbis.Providers;
 using ManagedIrbis.Reports;
 using ManagedIrbis.Trees;
 
@@ -97,10 +98,7 @@ namespace ManagedIrbis.Biblio
         public List<SpecialSettings> MenuSettings { get; private set; }
 
         /// <inheritdoc cref="BiblioChapter.IsServiceChapter" />
-        public override bool IsServiceChapter
-        {
-            get { return true; }
-        }
+        public override bool IsServiceChapter => true;
 
         #endregion
 
@@ -118,8 +116,7 @@ namespace ManagedIrbis.Biblio
 
         #region Private members
 
-        private static char[] _lineDelimiters
-            = { '\r', '\n', '\u001E', '\u001F' };
+        private static readonly char[] _lineDelimiters = { '\r', '\n', '\u001E', '\u001F' };
 
         private MenuSubChapter _CreateChapter
             (
@@ -496,8 +493,7 @@ namespace ManagedIrbis.Biblio
 
                     CleanRecords(context, records);
 
-                    var dictionary
-                        = new Dictionary<string, MenuSubChapter>();
+                    var dictionary = new Dictionary<string, MenuSubChapter>();
                     Action<BiblioChapter> action = chapter =>
                     {
                         var subChapter = chapter as MenuSubChapter;
@@ -590,21 +586,11 @@ namespace ManagedIrbis.Biblio
             }
             catch (Exception exception)
             {
-                var message = string.Format
-                    (
-                        "Exception: {0}",
-                        exception
-                    );
+                var message = $"Exception: {exception}";
 
-                if (!ReferenceEquals(record, null))
+                if (record is not null)
                 {
-                    message = string.Format
-                        (
-                            "MFN={0}{1}{2}",
-                            record.Mfn,
-                            Environment.NewLine,
-                            message
-                        );
+                    message = $"MFN={record.Mfn}{Environment.NewLine}{message}";
                 }
 
                 log.WriteLine(message);

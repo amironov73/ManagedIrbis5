@@ -18,8 +18,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 using AM;
 using AM.Collections;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -217,7 +219,7 @@ namespace ManagedIrbis.Direct
         /// <summary>
         /// Read raw record.
         /// </summary>
-        public MstRecord64? ReadRawRecord
+        public MstRecord64? ReadMstRecord
             (
                 int mfn
             )
@@ -245,10 +247,11 @@ namespace ManagedIrbis.Direct
         /// <summary>
         /// Read record with given MFN.
         /// </summary>
-        public Record? ReadRecord
+        public T? ReadRecord<T>
             (
                 int mfn
             )
+            where T: class, IRecord, new()
         {
             XrfRecord64 xrfRecord;
             try
@@ -267,22 +270,36 @@ namespace ManagedIrbis.Direct
             }
 
             var mstRecord = Mst.ReadRecord(xrfRecord.Offset);
-            var result = mstRecord.DecodeRecord();
+            var result = new T();
+            result.Decode(mstRecord);
             result.Database = Database;
 
             return result;
+
+        } // method ReadRecord
+
+        /// <summary>
+        /// Read record with given MFN.
+        /// </summary>
+        public RawRecord? ReadRawRecord
+            (
+                int mfn
+            )
+        {
+            return null;
         }
 
         /// <summary>
         /// Read all versions of the record.
         /// </summary>
-        public Record[] ReadAllRecordVersions
+        public T[] ReadAllRecordVersions<T>
             (
                 int mfn
             )
+            where T: class, IRecord, new()
         {
-            var result = new List<Record>();
-            var lastVersion = ReadRecord(mfn);
+            var result = new List<T>();
+            var lastVersion = ReadRecord<T>(mfn);
             if (lastVersion != null)
             {
                 result.Add(lastVersion);
@@ -307,7 +324,8 @@ namespace ManagedIrbis.Direct
             }
 
             return result.ToArray();
-        }
+
+        } // method ReadAllRecordVersions
 
         /// <summary>
         /// Read links for the term.

@@ -120,7 +120,7 @@ namespace ManagedIrbis.Direct
         /// </summary>
         public Record DecodeRecord()
         {
-            Record result = new Record
+            var result = new Record
             {
                 Mfn = Leader.Mfn,
                 Status = (RecordStatus)Leader.Status,

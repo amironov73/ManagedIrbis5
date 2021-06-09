@@ -32,13 +32,12 @@ using System.Threading.Tasks;
 using AM;
 using AM.Collections;
 using AM.IO;
-using AM.PlatformAbstraction;
-using AM.Threading;
 
 using ManagedIrbis.Gbl;
-using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
+using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Logging;
 
@@ -52,75 +51,10 @@ namespace ManagedIrbis
     /// Синхронное подключение к серверу ИРБИС64.
     /// </summary>
     public class SyncConnection
-        : ISyncConnection
+        : ConnectionBase,
+          ISyncConnection
     {
-        #region Events
-
-        /// <inheritdoc cref="IIrbisProvider.Disposing"/>
-        public event EventHandler? Disposing;
-
-        #endregion
-
         #region Properties
-
-        /// <inheritdoc cref="IConnectionSettings.Host"/>
-        public string? Host { get; set; } = "127.0.0.1";
-
-        /// <inheritdoc cref="IConnectionSettings.Port"/>
-        public ushort Port { get; set; } = 6666;
-
-        /// <inheritdoc cref="IConnectionSettings.Username"/>
-        public string? Username { get; set; } = string.Empty;
-
-        /// <inheritdoc cref="IConnectionSettings.Password"/>
-        public string? Password { get; set; } = string.Empty;
-
-        /// <inheritdoc cref="IIrbisProvider.Database"/>
-        public string? Database { get; set; } = "IBIS";
-
-        /// <inheritdoc cref="IConnectionSettings.Workstation"/>
-        public string? Workstation { get; set; } = "C";
-
-        /// <inheritdoc cref="IConnectionSettings.ClientId"/>
-        public int ClientId { get; protected internal set; }
-
-        /// <inheritdoc cref="IConnectionSettings.QueryId"/>
-        public int QueryId
-        {
-            get => _queryId;
-            protected internal set => _queryId = value;
-        }
-
-        /// <inheritdoc cref="IIrbisProvider.Connected"/>
-        public bool Connected { get; protected internal set; }
-
-        /// <inheritdoc cref="IGetLastError.LastError"/>
-        public int LastError { get; private set; }
-
-        /// <summary>
-        /// Токен для отмены длительных операций.
-        /// </summary>
-        public CancellationToken Cancellation { get; }
-
-        /// <summary>
-        /// Версия сервера. Берется из ответа на регистрацию клиента.
-        /// Сервер может прислать и пустую строку, надо быть
-        /// к этому готовым.
-        /// </summary>
-        public string? ServerVersion { get; protected internal set; }
-
-        /// <summary>
-        /// INI-файл, присылвемый сервером в ответ на регистрацию клиента.
-        /// </summary>
-        public IniFile? IniFile { get; private set; }
-
-        /// <summary>
-        /// Интервал подтверждения на сервере, минуты.
-        /// Берется из ответа сервера при регистрации клиента.
-        /// Сервер может прислать и пустую строку, к этому надо
-        /// быть готовым.
-        /// </summary>
-        public int Interval { get; private set; }
 
         /// <summary>
         /// Сокет.
@@ -139,55 +73,12 @@ namespace ManagedIrbis
                 ISyncClientSocket? socket = null,
                 IServiceProvider? serviceProvider = null
             )
+            : base (serviceProvider ?? Magna.Host.Services)
         {
-            Busy = new BusyState();
             Socket = socket ?? new SyncTcp4Socket();
             Socket.Connection = this;
-            _cancellation = new CancellationTokenSource();
-            Cancellation = _cancellation.Token;
-            _logger = Magna.Factory.CreateLogger<IIrbisProvider>();
-            _serviceProvider = serviceProvider ?? Magna.Host.Services;
-            PlatformAbstraction = PlatformAbstractionLayer.Current;
 
         } // constructor
-
-        #endregion
-
-        #region Private members
-
-        /// <summary>
-        /// Логгер.
-        /// </summary>
-        protected internal ILogger _logger;
-
-        /// <summary>
-        /// Провайдер сервисов.
-        /// </summary>
-        protected internal readonly IServiceProvider _serviceProvider;
-
-        /// <summary>
-        /// Отмена выполняемых операций.
-        /// </summary>
-        protected internal CancellationTokenSource _cancellation;
-
-        private int _queryId;
-
-        private Stack<string>? _databaseStack;
-
-        /// <summary>
-        /// Установка состояния занятости.
-        /// </summary>
-        protected internal void SetBusy
-            (
-                bool busy
-            )
-        {
-            if (Busy.State != busy)
-            {
-                _logger.LogTrace($"SetBusy: {busy}");
-                Busy.SetState(busy);
-            }
-        } // method SetBusy
 
         #endregion
 
@@ -271,111 +162,6 @@ namespace ManagedIrbis
 
         } // method ExecuteSync
 
-        /// <summary>
-        /// Подстановка имени текущей базы данных, если она не задана явно.
-        /// </summary>
-        public string EnsureDatabase(string? database = null) =>
-            string.IsNullOrEmpty(database)
-                ? string.IsNullOrEmpty(Database)
-                    ? throw new ArgumentException(nameof(Database))
-                    : Database
-                : database;
-
-        /// <summary>
-        /// Запоминание текущей базы данных.
-        /// </summary>
-        /// <param name="newDtabase">Новая база данных,
-        /// на которую надо переключиться.</param>
-        /// <returns>Старая база данных.</returns>
-        public string PushDatabase
-            (
-                string newDtabase
-            )
-        {
-            if (string.IsNullOrEmpty(newDtabase))
-            {
-                throw new IrbisException(nameof(PushDatabase));
-            }
-
-            _databaseStack ??= new Stack<string>();
-            var result = EnsureDatabase(newDtabase);
-
-            _databaseStack.Push(result);
-            Database = newDtabase;
-
-            return result;
-
-        } // method PushDatabase
-
-        /// <summary>
-        /// Восстановление ранее запомненной базы данных.
-        /// </summary>
-        public string PopDatabase()
-        {
-            var result = EnsureDatabase(string.Empty);
-            if (_databaseStack is not null)
-            {
-                if (_databaseStack.TryPop(out var temp))
-                {
-                    Database = temp;
-                }
-
-                if (_databaseStack.Count == 0)
-                {
-                    _databaseStack = null;
-                }
-            }
-
-            return result;
-
-        } // method PushDatabase
-
-        #endregion
-
-        #region ICancellable members
-
-        /// <inheritdoc cref="ICancellable.Busy"/>
-        public BusyState Busy { get; protected internal set; }
-
-        /// <inheritdoc cref="ICancellable.CancelOperation"/>
-        public void CancelOperation() => _cancellation.Cancel();
-
-        /// <inheritdoc cref="ICancellable.ThrowIfCancelled"/>
-        public void ThrowIfCancelled() => Cancellation.ThrowIfCancellationRequested();
-
-        #endregion
-
-        #region IIrbisProvider members
-
-        /// <inheritdoc cref="IIrbisProvider.CheckProviderState"/>
-        public bool CheckProviderState()
-        {
-            if (!Connected)
-            {
-                LastError = -100_500;
-            }
-
-            return Connected;
-        } // method CheckConnection
-
-        /// <inheritdoc cref="IIrbisProvider.Configure"/>
-        public void Configure
-            (
-                string configurationString
-            )
-        {
-            ((ISyncProvider)this).ParseConnectionString(configurationString);
-        }
-
-        /// <inheritdoc cref="IIrbisProvider.GetGeneration"/>
-        public string GetGeneration() => "64";
-
-        /// <inheritdoc cref="IIrbisProvider.GetWaitHandle"/>
-        public WaitHandle GetWaitHandle() => Busy.WaitHandle;
-
-        /// <inheritdoc cref="IIrbisProvider.PlatformAbstraction"/>
-        public PlatformAbstractionLayer PlatformAbstraction { get; set; }
-
         #endregion
 
         #region ISyncConnection members
@@ -418,7 +204,7 @@ namespace ManagedIrbis
                     return null;
                 }
 
-                if (ReferenceEquals(result, null))
+                if (result is null)
                 {
                     return null;
                 }
@@ -455,27 +241,8 @@ namespace ManagedIrbis
                 return null;
             }
 
-            // "2"               STAT
-            // "IBIS"            database
-            // "v200^a,10,100,1" field
-            // "T=A$"            search
-            // "0"               min
-            // "0"               max
-            // ""                sequential
-            // ""                mfn list
-
-            var items = string.Join(IrbisText.IrbisDelimiter, definition.Items);
-            var mfns = string.Join(",", definition.MfnList);
-            var query = new SyncQuery(this, CommandCode.DatabaseStat);
-            query.AddAnsi(EnsureDatabase(definition.DatabaseName));
-            query.AddAnsi(items);
-            query.AddUtf(definition.SearchQuery);
-            query.Add(definition.MinMfn);
-            query.Add(definition.MaxMfn);
-            query.AddUtf(definition.SequentialQuery);
-
-            // TODO: реализовать список MFN
-            query.AddAnsi(mfns);
+            using var query = new SyncQuery(this, CommandCode.DatabaseStat);
+            definition.Encode(this, query);
 
             var response = ExecuteSync(query);
             if (!response.IsGood())
@@ -507,7 +274,6 @@ namespace ManagedIrbis
             return Connect();
 
         } // method Reconnect
-
 
         /// <summary>
         /// Остановка сервера (расширенная команда).
@@ -618,7 +384,7 @@ namespace ManagedIrbis
                 EnsureDatabase(databaseName)).IsGood();
 
         /// <inheritdoc cref="ISyncProvider.DeleteDatabase"/>
-        public bool DeleteDatabase(string? databaseName = default) =>
+        public bool DeleteDatabase (string? databaseName = default) =>
             ExecuteSync(CommandCode.DeleteDatabase,
                 EnsureDatabase(databaseName)).IsGood();
 
@@ -629,6 +395,8 @@ namespace ManagedIrbis
             {
                 try
                 {
+                    OnDisposing();
+
                     ExecuteSync(CommandCode.UnregisterClient);
                 }
                 catch (Exception exception)
@@ -641,8 +409,6 @@ namespace ManagedIrbis
                 }
 
                 Connected = false;
-
-                Disposing?.Invoke(this, EventArgs.Empty);
             }
 
             return true;
@@ -871,13 +637,14 @@ namespace ManagedIrbis
 
         } // method ReadPosting
 
-        /// <inheritdoc cref="ISyncProvider.ReadRecord"/>
-        public Record? ReadRecord
+        /// <inheritdoc cref="ISyncProvider.ReadRecord{T}"/>
+        public T? ReadRecord<T>
             (
                 ReadRecordParameters parameters
             )
+            where T: class, IRecord, new()
         {
-            Record? result;
+            T? result;
 
             try
             {
@@ -902,7 +669,7 @@ namespace ManagedIrbis
                     return null;
                 }
 
-                result = new Record
+                result = new T
                 {
                     Database = Database
                 };
@@ -931,10 +698,10 @@ namespace ManagedIrbis
             catch (Exception exception)
             {
                 throw new IrbisException
-                    (
-                        nameof(ReadRecord) + " " + parameters,
-                        exception
-                    );
+                (
+                    nameof(ReadRecord) + " " + parameters,
+                    exception
+                );
             }
 
             return result;
@@ -1122,7 +889,7 @@ namespace ManagedIrbis
                 WriteRecordParameters parameters
             )
         {
-            var record = parameters.Record as Record;
+            var record = parameters.Record;
             if (record is not null)
             {
                 var database = EnsureDatabase(record.Database);
@@ -1142,7 +909,7 @@ namespace ManagedIrbis
                 if (!parameters.DontParse)
                 {
                     record.Database ??= database;
-                    ProtocolText.ParseResponseForWriteRecord(response, record);
+                    record.Decode(response);
                 }
 
                 parameters.MaxMfn = result;
@@ -1184,17 +951,10 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region ISetLastError members
-
-        /// <inheritdoc cref="ISetLastError.SetLastError"/>
-        public int SetLastError(int code) => LastError = code;
-
-        #endregion
-
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public ValueTask DisposeAsync()
+        public override ValueTask DisposeAsync()
         {
             Dispose();
 
@@ -1207,19 +967,11 @@ namespace ManagedIrbis
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
+        public override void Dispose()
         {
             Disconnect();
 
         } // method Dispose
-
-        #endregion
-
-        #region IServiceProvider members
-
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) =>
-            _serviceProvider.GetService(serviceType);
 
         #endregion
 

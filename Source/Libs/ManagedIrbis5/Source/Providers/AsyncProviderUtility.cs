@@ -9,9 +9,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMemberInSuper.Global
 
-/* SyncProviderUtility.cs -- вспомогательные методы для синхронного провайдера
+/* AsyncProviderUtility.cs -- методы расширения для IAsyncProvider
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using AM;
 
@@ -36,9 +37,9 @@ using ManagedIrbis.Records;
 namespace ManagedIrbis.Providers
 {
     /// <summary>
-    /// Вспомогательные методы для синхронного провайдера.
+    /// Методы расширения для <see cref="IAsyncProvider"/>.
     /// </summary>
-    public static class SyncProviderUtility
+    public static class AsyncProviderUtility
     {
         #region Public methods
 
@@ -50,25 +51,25 @@ namespace ManagedIrbis.Providers
         /// <param name="database">Имя базы данных.
         /// По умолчанию - текущая база данных.</param>
         /// <returns>Признак успешности завершения операции.</returns>
-        public static bool ActualizeDatabase (this ISyncProvider connection, string? database = default) =>
-            connection.ActualizeRecord ( new() { Database = database, Mfn = 0 } );
+        public static async Task<bool> ActualizeDatabaseAsync (this IAsyncProvider connection, string? database = default) =>
+            await connection.ActualizeRecordAsync ( new() { Database = database, Mfn = 0 } );
 
         /// <summary>
         /// Удаление файла на сервере.
         /// </summary>
-        public static void DeleteServerFile(this ISyncProvider connection, string fileName) =>
-            connection.FormatRecord($"&if('+9K{fileName}')", 1);
+        public static async Task DeleteServerFileAsync (this IAsyncProvider connection, string fileName) =>
+            await connection.FormatRecordAsync ($"&if('+9K{fileName}')", 1);
 
         /// <summary>
         /// Удаление записи с указанным MFN.
         /// </summary>
-        public static bool DeleteRecord
+        public static async Task<bool> DeleteRecordAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 int mfn
             )
         {
-            var record = connection.ReadRecord(mfn);
+            var record = await connection.ReadRecordAsync (mfn);
             if (record is null)
             {
                 return false;
@@ -81,54 +82,39 @@ namespace ManagedIrbis.Providers
 
             record.Status |= RecordStatus.LogicallyDeleted;
 
-            return connection.WriteRecord(record, dontParse: true);
+            return await connection.WriteRecordAsync (record, dontParse: true);
 
-        } // method DeleteRecord
-
-        /// <summary>
-        /// Подстановка имени текущей базы данных, если она не задана явно.
-        /// </summary>
-        public static string EnsureDatabase
-            (
-                this IIrbisProvider connection,
-                string? database = null
-            )
-            =>
-            string.IsNullOrEmpty(database)
-                ? string.IsNullOrEmpty(connection.Database)
-                    ? throw new ArgumentException(nameof(connection.Database))
-                    : connection.Database
-                : database;
+        } // method DeleteRecordAsync
 
         /// <summary>
         /// Форматирование записи по ее MFN.
         /// </summary>
-        public static string? FormatRecord
+        public static async Task<string?> FormatRecordAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 string format,
                 int mfn
             )
         {
             var parameters = new FormatRecordParameters
             {
-                Database = connection.Database,
+                Database = connection.EnsureDatabase(),
                 Format = format,
                 Mfn = mfn
             };
 
-            return connection.FormatRecords(parameters)
+            return await connection.FormatRecordsAsync(parameters)
                 ? parameters.Result.AsSingle()
                 : null;
 
-        } // method FormatRecord
+        } // method FormatRecordAsync
 
         /// <summary>
         /// Форматирование записи в клиентском представлении.
         /// </summary>
-        public static string? FormatRecord
+        public static async Task<string?> FormatRecordAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 string format,
                 Record record
             )
@@ -140,18 +126,18 @@ namespace ManagedIrbis.Providers
                 Record = record
             };
 
-            return connection.FormatRecords(parameters)
+            return await connection.FormatRecordsAsync(parameters)
                 ? parameters.Result.AsSingle()
                 : null;
 
-        } // method FormatRecord
+        } // method FormatRecordAsync
 
         /// <summary>
         /// Форматирование записей по их MFN.
         /// </summary>
-        public static string[]? FormatRecords
+        public static async Task<string[]?> FormatRecordsAsync
             (
-                this ISyncProvider conneciton,
+                this IAsyncProvider conneciton,
                 int[] mfns,
                 string format
             )
@@ -163,18 +149,18 @@ namespace ManagedIrbis.Providers
                 Format = format
             };
 
-            return conneciton.FormatRecords(parameters)
+            return await conneciton.FormatRecordsAsync(parameters)
                 ? parameters.Result.AsArray()
                 : null;
 
-        } // method FormatRecords
+        } // method FormatRecordsAsync
 
         /// <summary>
         /// Получение списка баз данных.
         /// </summary>
-        public static DatabaseInfo[] ListDatabases
+        public static async Task<DatabaseInfo[]> ListDatabasesAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 string listFile = "dbnam3.mnu"
             )
         {
@@ -183,18 +169,18 @@ namespace ManagedIrbis.Providers
                 Path = IrbisPath.Data,
                 FileName = listFile
             };
-            var menu = connection.RequireMenuFile(specification);
+            var menu = await connection.RequireMenuFileAsync(specification);
 
             return DatabaseInfo.ParseMenu(menu);
 
-        } // method ListDatabases
+        } // method ListDatabasesAsync
 
         /// <summary>
         /// Блокирование указанной записи.
         /// </summary>
-        public static bool LockRecord
+        public static async Task<bool> LockRecordAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 int mfn
             )
         {
@@ -204,20 +190,20 @@ namespace ManagedIrbis.Providers
                 Lock = true
             };
 
-            return connection.ReadRecord<NullRecord>(parameters) is not null;
+            return await connection.ReadRecordAsync<NullRecord>(parameters) is not null;
 
-        } // method LockRecord
+        } // method LockRecordAsync
 
         /// <summary>
         /// Чтение FST-файла как текстового.
         /// </summary>
-        public static FstFile? ReadFstFile
+        public static async Task<FstFile?> ReadFstFileAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 FileSpecification specification
             )
         {
-            var content = connection.ReadTextFile(specification);
+            var content = await connection.ReadTextFileAsync(specification);
             if (content is null)
             {
                 return default;
@@ -227,18 +213,18 @@ namespace ManagedIrbis.Providers
 
             return FstFile.ParseStream(reader);
 
-        } // method ReadFstFile
+        } // method ReadFstFileAsync
 
         /// <summary>
         /// Чтение меню как текстового файла.
         /// </summary>
-        public static MenuFile? ReadMenuFile
+        public static async Task<MenuFile?> ReadMenuFileAsync
             (
-                this ISyncProvider provider,
+                this IAsyncProvider provider,
                 FileSpecification specification
             )
         {
-            var content = provider.ReadTextFile(specification);
+            var content = await provider.ReadTextFileAsync(specification);
             if (content is null)
             {
                 return default;
@@ -250,18 +236,18 @@ namespace ManagedIrbis.Providers
 
             return result;
 
-        } // method ReadMenuFile
+        } // method ReadMenuFileAsync
 
         /// <summary>
         /// Чтение параметрического файла как текстового.
         /// </summary>
-        public static ParFile? ReadParFile
+        public static async Task<ParFile?> ReadParFileAsync
             (
-                this ISyncProvider provider,
+                this IAsyncProvider provider,
                 FileSpecification specification
             )
         {
-            var text = provider.ReadTextFile(specification);
+            var text = await provider.ReadTextFileAsync(specification);
             if (text is null)
             {
                 return default;
@@ -271,14 +257,14 @@ namespace ManagedIrbis.Providers
 
             return ParFile.ParseText(reader);
 
-        } // method ReadParFile
+        } // method ReadParFileAsync
 
         /// <summary>
         /// Чтение "сырой" записи с сервера.
         /// </summary>
-        public static RawRecord? ReadRawRecord
+        public static async Task<RawRecord?> ReadRawRecordAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 int mfn
             )
         {
@@ -288,22 +274,22 @@ namespace ManagedIrbis.Providers
                 Mfn = mfn
             };
 
-            return connection.ReadRecord<RawRecord>(parameters);
+            return await connection.ReadRecordAsync<RawRecord>(parameters);
 
-        } // method ReadRawRecord
-
-        /// <summary>
-        /// Чтение записи с сервера.
-        /// </summary>
-        public static Record? ReadRecord (this ISyncProvider connection, ReadRecordParameters parameters) =>
-            connection.ReadRecord<Record>(parameters);
+        } // method ReadRawRecordAsync
 
         /// <summary>
         /// Чтение записи с сервера.
         /// </summary>
-        public static Record? ReadRecord
+        public static async Task<Record?> ReadRecordAsync (this IAsyncProvider connection, ReadRecordParameters parameters) =>
+            await connection.ReadRecordAsync<Record>(parameters);
+
+        /// <summary>
+        /// Чтение записи с сервера.
+        /// </summary>
+        public static async Task<Record?> ReadRecordAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 int mfn
             )
         {
@@ -313,16 +299,36 @@ namespace ManagedIrbis.Providers
                 Mfn = mfn
             };
 
-            return connection.ReadRecord(parameters);
+            return await connection.ReadRecordAsync(parameters);
 
-        } // method ReadRecord
+        } // method ReadRecordAsync
+
+        /// <summary>
+        /// Чтение записи с сервера.
+        /// </summary>
+        public static async Task<T?> ReadRecordAsync<T>
+            (
+                this IAsyncProvider connection,
+                int mfn
+            )
+            where T: class, IRecord, new()
+        {
+            var parameters = new ReadRecordParameters
+            {
+                Database = connection.Database,
+                Mfn = mfn
+            };
+
+            return await connection.ReadRecordAsync<T>(parameters);
+
+        } // method ReadRecordAsync
 
         /// <summary>
         /// Чтение указанных записей.
         /// </summary>
-        public static Record[]? ReadRecords
+        public static async Task<Record[]?> ReadRecordsAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 string database,
                 IEnumerable<int> batch
             )
@@ -343,7 +349,7 @@ namespace ManagedIrbis.Providers
                     // TODO: use database parameter
 
                     return Sequence
-                        .FromItem(connection.ReadRecord(mfns[0]))
+                        .FromItem(await connection.ReadRecordAsync(mfns[0]))
                         .NonNullItems()
                         .ToArray();
             }
@@ -354,7 +360,7 @@ namespace ManagedIrbis.Providers
                 Mfns = mfns,
                 Format = IrbisFormat.All
             };
-            if (!connection.FormatRecords(parameters))
+            if (!await connection.FormatRecordsAsync(parameters))
             {
                 return null;
             }
@@ -382,62 +388,63 @@ namespace ManagedIrbis.Providers
 
             return result.ToArray();
 
-        } // method ReadRecords
+        } // method ReadRecordsAsync
 
         /// <summary>
         /// Чтение с сервера записи, которая обязательно должна быть.
         /// </summary>
         /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
-        public static Record RequireRecord ( this ISyncProvider connection, int mfn ) =>
-            connection.ReadRecord(mfn)
-            ?? throw new IrbisException($"Record not found: MFN={mfn}");
+        public static async Task<T> RequireRecordAsync<T> ( this IAsyncProvider connection, int mfn )
+            where T: class, IRecord, new()
+            => await connection.ReadRecordAsync<T>(mfn)
+               ?? throw new IrbisException($"Record not found: MFN={mfn}");
 
         /// <summary>
         /// Чтение с сервера записи, которая обязательно должна быть.
         /// </summary>
         /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
-        public static Record RequireRecord ( this ISyncProvider connection, string expression ) =>
-            connection.SearchReadOneRecord(expression)
+        public static async Task<Record> RequireRecordAsync ( this IAsyncProvider connection, string expression ) =>
+            await connection.SearchReadOneRecordAsync(expression)
             ?? throw new IrbisException($"Record not found: expression={expression}");
 
         /// <summary>
         /// Чтение с сервера текстового файла, который обязательно должен быть.
         /// </summary>
         /// <exception cref="FileNotFoundException">Файл отсутствует или другая ошибка при чтении.</exception>
-        public static string RequireTextFile ( this ISyncProvider connection, FileSpecification specification ) =>
-            connection.ReadTextFile(specification)
+        public static async Task<string> RequireTextFileAsync ( this IAsyncProvider connection, FileSpecification specification ) =>
+            await connection.ReadTextFileAsync(specification)
             ?? throw new IrbisException($"File not found: {specification}");
 
         /// <summary>
         /// Чтение с сервера FST-файла, который обязательно должен быть.
         /// </summary>
         /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
-        public static FstFile RequireFstFile (this ISyncProvider connection, FileSpecification specification) =>
-            connection.ReadFstFile(specification)
+        public static async Task<FstFile> RequireFstFileAsync (this IAsyncProvider connection, FileSpecification specification) =>
+            await connection.ReadFstFileAsync(specification)
             ?? throw new IrbisException($"FST not found: {specification}");
 
         /// <summary>
         /// Чтение с сервера файла меню, которое обязательно должно быть.
         /// </summary>
         /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
-        public static MenuFile RequireMenuFile (this ISyncProvider connection, FileSpecification specification) =>
-            connection.ReadMenuFile(specification)
+        public static async Task<MenuFile> RequireMenuFileAsync (this IAsyncProvider connection, FileSpecification specification) =>
+            await connection.ReadMenuFileAsync(specification)
             ?? throw new IrbisException($"Menu not found: {specification}");
 
         /// <summary>
         /// Чтение с сервера PAR-файла, который обязательно должен быть.
         /// </summary>
         /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
-        public static ParFile RequireParFile (this ISyncProvider connection, FileSpecification specification) =>
-            connection.ReadParFile(specification)
+        public static async Task<ParFile> RequireParFileAsync (this IAsyncProvider connection, FileSpecification specification) =>
+            await connection.ReadParFileAsync(specification)
             ?? throw new IrbisException($"PAR not found: {specification}");
 
         /// <summary>
         /// Поиск с последующим чтением одной записи.
         /// </summary>
-        public static Record? SearchReadOneRecord
+        public static async Task<Record?> SearchReadOneRecordAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 string expression
             )
         {
@@ -446,20 +453,20 @@ namespace ManagedIrbis.Providers
                 Expression = expression,
                 NumberOfRecords = 1
             };
-            var found = connection.Search(parameters);
+            var found = await connection.SearchAsync(parameters);
 
             return found is { Length: 1 }
-                ? connection.ReadRecord(found[0].Mfn)
+                ? await connection.ReadRecordAsync(found[0].Mfn)
                 : default;
 
-        } // method SearchReadOneRecord
+        } // method SearchReadOneRecordAsyn
 
         /// <summary>
         /// Сохранение/обновление записи в базе данных.
         /// </summary>
-        public static bool WriteRecord
+        public static async Task<bool> WriteRecordAsync
             (
-                this ISyncProvider connection,
+                this IAsyncProvider connection,
                 IRecord record,
                 bool actualize = true,
                 bool lockRecord = false,
@@ -474,12 +481,12 @@ namespace ManagedIrbis.Providers
                 DontParse = dontParse
             };
 
-            return connection.WriteRecord(parameters);
+            return await connection.WriteRecordAsync(parameters);
 
-        } // method WriteRecord
+        } // method WriteRecordAsync
 
         #endregion
 
-    } // class SyncProviderUtility
+    } // class AsyncProviderUtility
 
 } // namespace ManagedIrbis.Providers

@@ -63,6 +63,11 @@ namespace ManagedIrbis.Infrastructure
         public void Add (int value) => _stream.Add(value);
 
         /// <summary>
+        /// Добавление строки с флагом "да-нет".
+        /// </summary>
+        public void Add(bool value) => Add(value ? 1 : 0);
+
+        /// <summary>
         /// Добавление строки в кодировке ANSI (плюс перевод строки).
         /// </summary>
         public void AddAnsi (string? value) => _stream.AddAnsi(value);

@@ -14,6 +14,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using ManagedIrbis.Records;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.Infrastructure

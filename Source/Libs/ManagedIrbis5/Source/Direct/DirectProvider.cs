@@ -27,12 +27,12 @@ using AM.Parameters;
 using AM.PlatformAbstraction;
 using AM.Threading;
 
-using ManagedIrbis;
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -189,11 +189,8 @@ namespace ManagedIrbis.Direct
             }
             else
             {
-                result = Unix.FindFile(DirectUtility.CombinePath(databasePath, fileName));
-                if (result is null)
-                {
-                    result = Deposit(fileName);
-                }
+                result = Unix.FindFile(DirectUtility.CombinePath(databasePath, fileName))
+                         ?? Deposit(fileName);
             }
 
             return result;
@@ -661,6 +658,7 @@ namespace ManagedIrbis.Direct
             )
         {
             throw new NotImplementedException();
+
         } // method FullTextSearch
 
         /// <inheritdoc cref="ISyncProvider.GetDatabaseInfo"/>
@@ -718,6 +716,7 @@ namespace ManagedIrbis.Direct
             )
         {
             throw new NotImplementedException();
+
         } // method GlobalCorrection
 
         /// <inheritdoc cref="ISyncProvider.ListFiles"/>
@@ -779,6 +778,7 @@ namespace ManagedIrbis.Direct
             )
         {
             throw new NotImplementedException();
+
         } // method PrintTable
 
         /// <inheritdoc cref="ISyncProvider.ReadBinaryFile"/>
@@ -804,13 +804,15 @@ namespace ManagedIrbis.Direct
             )
         {
             throw new NotImplementedException();
+
         } // method ReadPostings
 
-        /// <inheritdoc cref="ISyncProvider.ReadRecord"/>
-        public Record? ReadRecord
+        /// <inheritdoc cref="ISyncProvider.ReadRecord{T}"/>
+        public T? ReadRecord<T>
             (
                 ReadRecordParameters parameters
             )
+            where T: class, IRecord, new()
         {
             var databaseName = parameters.Database
                 ?? Database.ThrowIfNullOrEmpty(nameof(Database));
@@ -826,10 +828,11 @@ namespace ManagedIrbis.Direct
             using var accessProxy = GetAccessor(databaseName);
             using var mark = LockUp(databaseName);
             var result = mark.Success
-                ? accessProxy.Accessor.ReadRecord(parameters.Mfn)
+                ? accessProxy.Accessor.ReadRecord<T>(parameters.Mfn)
                 : default;
 
             return result;
+
         } // method ReadRecord
 
         /// <inheritdoc cref="ISyncProvider.ReadRecordPostings"/>

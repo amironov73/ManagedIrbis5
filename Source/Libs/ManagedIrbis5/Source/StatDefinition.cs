@@ -17,6 +17,9 @@
 
 using System.Collections.Generic;
 
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable
@@ -126,6 +129,43 @@ namespace ManagedIrbis
         /// List of MFN.
         /// </summary>
         public List<int> MfnList { get; } = new();
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Кодирование в пользовательский запрос.
+        /// </summary>
+        public void Encode<T>
+            (
+                IIrbisProvider connection,
+                T query
+            )
+            where T: IQuery
+        {
+            // "2"               STAT
+            // "IBIS"            database
+            // "v200^a,10,100,1" field
+            // "T=A$"            search
+            // "0"               min
+            // "0"               max
+            // ""                sequential
+            // ""                mfn list
+
+            var items = string.Join(IrbisText.IrbisDelimiter, Items);
+            var mfns = string.Join(",", MfnList);
+            query.AddAnsi(connection.EnsureDatabase(DatabaseName));
+            query.AddAnsi(items);
+            query.AddUtf(SearchQuery);
+            query.Add(MinMfn);
+            query.Add(MaxMfn);
+            query.AddUtf(SequentialQuery);
+
+            // TODO: реализовать список MFN
+            query.AddAnsi(mfns);
+
+        } // method Encode
 
         #endregion
 

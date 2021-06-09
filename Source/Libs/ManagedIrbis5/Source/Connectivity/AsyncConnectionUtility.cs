@@ -22,6 +22,8 @@ using System.Threading.Tasks;
 using AM.Collections;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -147,7 +149,8 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        } // method ListFileasAsync
+
+        } // method ListFilesAsync
 
         /// <summary>
         /// Чтение библиографической записи с сервера.
@@ -158,7 +161,26 @@ namespace ManagedIrbis
                 int mfn
             )
             =>
-            await connection.ReadRecordAsync
+            await connection.ReadRecordAsync<Record>
+                (
+                    new ()
+                    {
+                        Database = connection.Database,
+                        Mfn = mfn
+                    }
+                );
+
+        /// <summary>
+        /// Чтение библиографической записи с сервера.
+        /// </summary>
+        public static async Task<T?> ReadRecordAsync<T>
+            (
+                this IAsyncProvider connection,
+                int mfn
+            )
+            where T: class, IRecord, new()
+            =>
+            await connection.ReadRecordAsync<T>
                 (
                     new ()
                     {
@@ -224,6 +246,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
+
         } // method ReadAllTermsAsync
 
 
@@ -249,6 +272,7 @@ namespace ManagedIrbis
             };
 
             return await connection.ReadPostingsAsync(parameters);
+
         }
 
         /// <summary>
@@ -273,6 +297,7 @@ namespace ManagedIrbis
             };
 
             return await connection.ReadTermsAsync(parameters);
+
         } // method ReadTermsAsync
 
 
@@ -308,6 +333,7 @@ namespace ManagedIrbis
             }
 
             return FoundItem.ParseMfn(response);
+
         } // method SearchAsync
 
         /// <summary>
@@ -344,6 +370,7 @@ namespace ManagedIrbis
             }
 
             return response.ReadInteger();
+
         } // method SearchCountAsync
 
         /// <summary>
@@ -362,6 +389,7 @@ namespace ManagedIrbis
             )
         {
             throw new NotImplementedException();
+
         } // method SearchReadAsync
 
         /// <summary>
@@ -377,8 +405,8 @@ namespace ManagedIrbis
             )
         {
             throw new NotImplementedException();
-        } // method SearchSingleRecordAsync
 
+        } // method SearchSingleRecordAsync
 
         /// <summary>
         /// Асинхронное сохранение записей.
@@ -392,6 +420,7 @@ namespace ManagedIrbis
             )
         {
             throw new NotImplementedException();
+
         } // method WriteRecordsAsync
 
         /// <summary>
@@ -417,6 +446,7 @@ namespace ManagedIrbis
             var response = await connection.ExecuteAsync(query);
 
             return response is not null;
+
         } // method WriteFileAsync
 
         #endregion
