@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 
 using AM.Collections;
 
+using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
@@ -37,26 +38,6 @@ namespace ManagedIrbis
     public static class AsyncConnectionUtility
     {
         #region Public methods
-
-        /// <summary>
-        /// Актуализация всех неактуализированных записей
-        /// в указанной базе данных.
-        /// </summary>
-        /// <param name="connection">Подключение.</param>
-        /// <param name="database">Имя базы данных.
-        /// По умолчанию - текущая база данных.</param>
-        /// <returns>Признак успешности завершения операции.</returns>
-        public static async Task<bool> ActualizeDatabaseAsync
-            (
-                this IAsyncProvider connection,
-                string? database = default
-            )
-        {
-            return await connection.ActualizeRecordAsync
-                (
-                    new() { Database = database, Mfn = 0 }
-                );
-        } // method ActualizeDatabaseAsync
 
         /// <summary>
         /// Форматирование указанной записи по ее MFN.
@@ -80,32 +61,81 @@ namespace ManagedIrbis
             query.Add(1);
             query.Add(mfn);
             var response = await connection.ExecuteAsync(query);
-            if (response is null)
+            if (!response.IsGood())
             {
                 return null;
             }
 
-            response.CheckReturnCode();
             var result = response.ReadRemainingUtfText().TrimEnd();
 
             return result;
+
         } // method FormatRecordAsync
 
         /// <summary>
-        /// Форматирование указанной записи.
+        /// Форматирование записи в клиентском представлении.
         /// </summary>
-        public static Task<string?> FormatRecordAsync
+        public static async Task<string?> FormatRecordAsync
             (
                 this AsyncConnection connection,
                 string format,
                 Record record
             )
         {
-            throw new NotImplementedException();
+            if (!connection.CheckProviderState())
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(format))
+            {
+                return string.Empty;
+            }
+
+            var query = new AsyncQuery(connection, CommandCode.FormatRecord);
+            query.AddAnsi(connection.EnsureDatabase(string.Empty));
+            query.AddFormat(format);
+            query.Add(-2);
+            query.AddUtf(record.Encode());
+            var response = await connection.ExecuteAsync(query);
+            if (!response.IsGood())
+            {
+                return null;
+            }
+
+            var result = response.ReadRemainingUtfText().TrimEnd();
+
+            return result;
+
         } // method FormatRecordAsync
 
         /// <summary>
-        /// Асинхронное перечисление файлов.
+        /// Получение списка файлов, соответствующих спецификации.
+        /// </summary>
+        public static async Task<string[]?> ListFiles
+            (
+                this AsyncConnection connection,
+                string specification
+            )
+        {
+            if (!connection.CheckProviderState())
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(specification))
+            {
+                return Array.Empty<string>();
+            }
+
+            var response = await connection.ExecuteAsync(CommandCode.ListFiles, specification);
+
+            return SyncConnectionUtility.ListFiles(response);
+
+        } // method ListFiles
+
+        /// <summary>
+        /// Получение списка файлов, соответствующих спецификации.
         /// </summary>
         public static async Task<string[]?> ListFilesAsync
             (
@@ -118,37 +148,9 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var query = new AsyncQuery(connection, CommandCode.ListFiles);
-            query.AddAnsi(specification.ToString());
+            var response = await connection.ExecuteAsync(CommandCode.ListFiles, specification);
 
-            var response = await connection.ExecuteAsync(query);
-            if (response is null)
-            {
-                return null;
-            }
-
-            // TODO: вынести повторяющийся код в отдельный метод
-            var lines = response.ReadRemainingAnsiLines();
-            var result = new List<string>();
-            foreach (var line in lines)
-            {
-                var files = IrbisText.SplitIrbisToLines(line);
-                foreach (var file1 in files)
-                {
-                    if (!string.IsNullOrEmpty(file1))
-                    {
-                        foreach (var file2 in file1.Split(IrbisText.WindowsDelimiter))
-                        {
-                            if (!string.IsNullOrEmpty(file2))
-                            {
-                                result.Add(file2);
-                            }
-                        }
-                    }
-                }
-            }
-
-            return result.ToArray();
+            return SyncConnectionUtility.ListFiles(response);
 
         } // method ListFilesAsync
 
@@ -411,15 +413,55 @@ namespace ManagedIrbis
         /// <summary>
         /// Асинхронное сохранение записей.
         /// </summary>
-        public static Task<Record[]> WriteRecordsAsync
+        public static async Task<bool> WriteRecordsAsync
             (
                 this AsyncConnection connection,
-                Record[] records,
+                IEnumerable<Record> records,
                 bool lockFlag = false,
-                bool actualize = true
+                bool actualize = true,
+                bool dontParse = true
             )
         {
-            throw new NotImplementedException();
+            // TODO: сделать IRecord
+
+            if (!connection.CheckProviderState())
+            {
+                return false;
+            }
+
+            var query = new AsyncQuery(connection, CommandCode.SaveRecordGroup);
+            query.Add(lockFlag);
+            query.Add(actualize);
+            var recordList = new List<Record>();
+            foreach (var record in records)
+            {
+                var line = connection.EnsureDatabase(record.Database)
+                           + IrbisText.IrbisDelimiter
+                           + ProtocolText.EncodeRecord(record);
+                query.AddUtf(line);
+                recordList.Add(record);
+            }
+
+            if (recordList.Count == 0)
+            {
+                return true;
+            }
+
+            var response = await connection.ExecuteAsync(query);
+            if (!response.IsGood())
+            {
+                return false;
+            }
+
+            if (!dontParse)
+            {
+                foreach (var record in recordList)
+                {
+                    ProtocolText.ParseResponseForWriteRecords(response, record);
+                }
+            }
+
+            return true;
 
         } // method WriteRecordsAsync
 
@@ -429,7 +471,7 @@ namespace ManagedIrbis
         public static async Task<bool> WriteTextFilesAsync
             (
                 this AsyncConnection connection,
-                FileSpecification[] specifications
+                IEnumerable<FileSpecification> specifications
             )
         {
             if (!connection.CheckProviderState())
@@ -438,9 +480,16 @@ namespace ManagedIrbis
             }
 
             var query = new AsyncQuery(connection, CommandCode.ReadDocument);
+            var count = 0;
             foreach (var specification in specifications)
             {
                 query.AddAnsi(specification.ToString());
+                ++count;
+            }
+
+            if (count is 0)
+            {
+                return true;
             }
 
             var response = await connection.ExecuteAsync(query);

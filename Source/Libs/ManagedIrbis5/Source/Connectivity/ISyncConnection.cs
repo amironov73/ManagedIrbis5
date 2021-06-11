@@ -40,7 +40,10 @@ namespace ManagedIrbis
         /// <returns>Возвращенный сервером ответ
         /// либо <c>null</c>, если произошла
         /// ошибка сетевого обмена.</returns>
-        Response? ExecuteSync(SyncQuery query);
+        Response? ExecuteSync
+            (
+                SyncQuery query
+            );
 
     } // interface ISyncConnection
 

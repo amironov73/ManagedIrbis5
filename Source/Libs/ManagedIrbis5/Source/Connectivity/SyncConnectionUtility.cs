@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AM;
+
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
@@ -388,6 +389,8 @@ namespace ManagedIrbis
                 bool dontParse = true
             )
         {
+            // TODO: сделать IRecord
+
             if (!connection.CheckProviderState())
             {
                 return false;
@@ -428,6 +431,39 @@ namespace ManagedIrbis
             return true;
 
         } // method WriteRecords
+
+        /// <summary>
+        /// Запись/обновление файлов на сервере.
+        /// </summary>
+        public static bool WriteTextFiles
+            (
+                this SyncConnection connection,
+                IEnumerable<FileSpecification> specifications
+            )
+        {
+            if (!connection.CheckProviderState())
+            {
+                return false;
+            }
+
+            var query = new SyncQuery(connection, CommandCode.ReadDocument);
+            var count = 0;
+            foreach (var specification in specifications)
+            {
+                query.AddAnsi(specification.ToString());
+                ++count;
+            }
+
+            if (count is 0)
+            {
+                return true;
+            }
+
+            var response = connection.ExecuteSync(query);
+
+            return response is not null;
+
+        } // method WriteFile
 
         #endregion
 

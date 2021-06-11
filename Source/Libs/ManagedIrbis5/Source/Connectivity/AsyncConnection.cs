@@ -490,53 +490,47 @@ namespace ManagedIrbis
                 string? databaseName = default
             )
         {
-            var database = databaseName
-                           ?? Database
-                           ?? throw new IrbisException();
-            var response = await ExecuteAsync(CommandCode.GetMaxMfn, database);
+            var response = await ExecuteAsync(CommandCode.GetMaxMfn, EnsureDatabase(databaseName));
 
-            return response?.CheckReturnCode() ?? false
-                ? response.ReturnCode
-                : 0;
+            return response.IsGood() ? response.ReturnCode : 0;
 
         } // method GetMaxMfnAsync
 
         /// <inheritdoc cref="IAsyncProvider.GetServerStatAsync"/>
-        public Task<ServerStat?> GetServerStatAsync()
-        {
-            throw new NotImplementedException();
-
-        } // method GetServerStatAsync
+        public async Task<ServerStat?> GetServerStatAsync() =>
+            await ExecuteAsync(CommandCode.GetServerStat).TransformAsync(ServerStat.Parse);
 
         /// <inheritdoc cref="IAsyncProvider.GetServerVersionAsync"/>
-        public async Task<ServerVersion?> GetServerVersionAsync()
+        public async Task<ServerVersion?> GetServerVersionAsync() =>
+            await ExecuteAsync(CommandCode.ServerInfo).TransformAsync(ManagedIrbis.ServerVersion.Parse);
+
+        /// <inheritdoc cref="IAsyncProvider.GlobalCorrectionAsync"/>
+        public async Task<GblResult?> GlobalCorrectionAsync
+            (
+                GblSettings settings
+            )
         {
             if (!CheckProviderState())
             {
                 return null;
             }
 
-            var query = new AsyncQuery(this, CommandCode.ServerInfo);
+            var database = EnsureDatabase(settings.Database);
+            var query = new AsyncQuery(this, CommandCode.GlobalCorrection);
+            query.AddAnsi(database);
+            settings.Encode(query);
+
             var response = await ExecuteAsync(query);
-            if (response is null)
+            if (!response.IsGood())
             {
                 return null;
             }
 
-            response.CheckReturnCode();
-            var result = ManagedIrbis.ServerVersion.Parse(response);
+            var result = new GblResult();
+            result.Parse(response);
 
             return result;
 
-        } // method GetServerVersionAsync
-
-        /// <inheritdoc cref="IAsyncProvider.GlobalCorrectionAsync"/>
-        public Task<GblResult?> GlobalCorrectionAsync
-            (
-                GblSettings settings
-            )
-        {
-            throw new NotImplementedException();
         } // method GlobalCorrectionAsync
 
         /// <inheritdoc cref="IAsyncProvider.ListFilesAsync"/>
@@ -567,89 +561,51 @@ namespace ManagedIrbis
                 return null;
             }
 
-            var lines = response.ReadRemainingAnsiLines();
-            var result = new List<string>();
-            foreach (var line in lines)
-            {
-                var files = IrbisText.SplitIrbisToLines(line);
-                foreach (var file1 in files)
-                {
-                    if (!string.IsNullOrEmpty(file1))
-                    {
-                        foreach (var file2 in file1.Split(IrbisText.WindowsDelimiter))
-                        {
-                            if (!string.IsNullOrEmpty(file2))
-                            {
-                                result.Add(file2);
-                            }
-                        }
-                    }
-                }
-            }
+            return SyncConnectionUtility.ListFiles(response);
 
-            return result.ToArray();
         } // method ListFilesAsync
 
         /// <inheritdoc cref="IAsyncProvider.ListProcessesAsync"/>
-        public async Task<ProcessInfo[]?> ListProcessesAsync()
-        {
-            if (!CheckProviderState())
-            {
-                return null;
-            }
-
-            var query = new AsyncQuery(this, CommandCode.GetProcessList);
-            var response = await ExecuteAsync(query);
-            if (response is null)
-            {
-                return null;
-            }
-
-            response.CheckReturnCode();
-            var result = ProcessInfo.Parse(response);
-
-            return result;
-
-        } // method ListProcessesAsync
+        public async Task<ProcessInfo[]?> ListProcessesAsync() =>
+            await ExecuteAsync(CommandCode.GetProcessList).TransformAsync(ProcessInfo.Parse);
 
         /// <inheritdoc cref="IAsyncProvider.ListUsersAsync"/>
-        public Task<UserInfo[]?> ListUsersAsync()
-        {
-            throw new NotImplementedException();
-
-        } // method ListUsersAsync
+        public async Task<UserInfo[]?> ListUsersAsync() =>
+            await ExecuteAsync(CommandCode.GetUserList).TransformAsync(UserInfo.Parse);
 
         /// <inheritdoc cref="IAsyncProvider.NoOperationAsync"/>
-        public async Task<bool> NoOperationAsync()
-        {
-            if (!CheckProviderState())
-            {
-                return false;
-            }
-
-            var response = await ExecuteAsync(CommandCode.Nop);
-
-            return response?.CheckReturnCode() ?? false;
-
-        } // method NoOperationAsync
+        public async Task<bool> NoOperationAsync() => await ExecuteAsync(CommandCode.Nop).IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.PrintTableAsync"/>
-        public Task<string?> PrintTableAsync
+        public async Task<string?> PrintTableAsync
             (
                 TableDefinition definition
             )
         {
-            throw new NotImplementedException();
+            var query = new AsyncQuery(this, CommandCode.Print);
+            query.AddAnsi(EnsureDatabase(definition.DatabaseName));
+            definition.Encode(query);
+
+            var response = await ExecuteAsync(query);
+
+            return response?.ReadRemainingUtfText();
 
         } // method PrintTableAsync
 
         /// <inheritdoc cref="IAsyncProvider.ReadBinaryFileAsync"/>
-        public Task<byte[]?> ReadBinaryFileAsync
+        public async Task<byte[]?> ReadBinaryFileAsync
             (
                 FileSpecification specification
             )
         {
-            throw new NotImplementedException();
+            specification.BinaryFile = true;
+            var response = await ExecuteAsync(CommandCode.ReadDocument, specification.ToString());
+            if (response is null || !response.FindPreamble())
+            {
+                return null;
+            }
+
+            return response.RemainingBytes();
 
         } // method ReadBinaryFileAsync
 
@@ -659,21 +615,17 @@ namespace ManagedIrbis
                 PostingParameters parameters
             )
         {
-            if (!CheckProviderState())
-            {
-                return null;
-            }
-
             var query = new AsyncQuery(this, CommandCode.ReadPostings);
             parameters.Encode(this, query);
+
             var response = await ExecuteAsync(query);
-            if (response is null
-                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadTerms))
+            if (!response.IsGood(ConnectionUtility.GoodCodesForReadTerms))
             {
                 return null;
             }
 
             return TermPosting.Parse(response);
+
         } // method ReadPostingsAsync
 
         /// <inheritdoc cref="IAsyncProvider.ReadRecordAsync{T}"/>
@@ -683,44 +635,89 @@ namespace ManagedIrbis
             )
             where T: class, IRecord, new()
         {
-            if (!CheckProviderState())
-            {
-                return null;
-            }
+            T? result;
 
-            var database =
-                parameters.Database
-                           ?? Database
-                           ?? throw new IrbisException();
-            var query = new AsyncQuery(this, CommandCode.ReadRecord);
-            query.AddAnsi(database);
-            query.Add(parameters.Mfn);
-            // TODO: добавить обработку прочих параметров
-            var response = await ExecuteAsync(query);
-            if (response is null
-                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadRecord) )
+            try
             {
-                return null;
-            }
+                var database = EnsureDatabase(parameters.Database);
+                var query = new AsyncQuery(this, CommandCode.ReadRecord);
+                query.AddAnsi(database);
+                query.Add(parameters.Mfn);
+                if (parameters.Version != 0)
+                {
+                    query.Add(parameters.Version);
+                }
+                else
+                {
+                    query.Add(parameters.Lock);
+                }
 
-            var result = new T
+                query.AddFormat(parameters.Format);
+
+                var response = await ExecuteAsync(query);
+                if (!response.IsGood(ConnectionUtility.GoodCodesForReadRecord))
+                {
+                    return null;
+                }
+
+                result = new T
+                {
+                    Database = Database
+                };
+
+                switch ((ReturnCode) response.ReturnCode)
+                {
+                    case ReturnCode.PreviousVersionNotExist:
+                        result.Status |= RecordStatus.Absent;
+                        break;
+
+                    case ReturnCode.PhysicallyDeleted:
+                    case ReturnCode.PhysicallyDeleted1:
+                        result.Status |= RecordStatus.PhysicallyDeleted;
+                        break;
+
+                    default:
+                        result.Decode(response);
+                        break;
+                }
+
+                if (parameters.Version != 0)
+                {
+                    await UnlockRecordsAsync(new [] { parameters.Mfn });
+                }
+            }
+            catch (Exception exception)
             {
-                Database = Database
-            };
-            result.Decode(response);
+                throw new IrbisException
+                (
+                    nameof(ReadRecordAsync) + " " + parameters,
+                    exception
+                );
+            }
 
             return result;
 
         } // method ReadRecordAsync
 
         /// <inheritdoc cref="IAsyncProvider.ReadRecordPostingsAsync"/>
-        public Task<TermPosting[]?> ReadRecordPostingsAsync
+        public async Task<TermPosting[]?> ReadRecordPostingsAsync
             (
                 ReadRecordParameters parameters,
                 string prefix
             )
         {
-            throw new NotImplementedException();
+            if (!CheckProviderState() || string.IsNullOrEmpty(prefix))
+            {
+                return null;
+            }
+
+            var query = new AsyncQuery(this, CommandCode.GetRecordPostings);
+            query.AddAnsi(EnsureDatabase(parameters.Database));
+            query.Add(parameters.Mfn);
+            query.AddUtf(prefix);
+
+            return await ExecuteAsync(query).TransformAsync(TermPosting.Parse);
+
         } // method ReadRecordPostingsAsync
 
         /// <inheritdoc cref="IAsyncProvider.ReadTermsAsync"/>
@@ -740,76 +737,30 @@ namespace ManagedIrbis
             var query = new AsyncQuery(this, command);
             parameters.Encode(this, query);
             var response = await ExecuteAsync(query);
-            if (response is null
-                || !response.CheckReturnCode(ConnectionUtility.GoodCodesForReadTerms))
-            {
-                return Array.Empty<Term>();
-            }
 
-            return Term.Parse(response);
+            return !response.IsGood(ConnectionUtility.GoodCodesForReadTerms) ? null : Term.Parse(response);
+
         } // method ReadTermsAsync
 
         /// <inheritdoc cref="IAsyncProvider.ReadTextFileAsync"/>
-        public async Task<string?> ReadTextFileAsync
-            (
-                FileSpecification specification
-            )
-        {
-            if (!CheckProviderState())
-            {
-                return null;
-            }
-
-            var query = new AsyncQuery(this, CommandCode.ReadDocument);
-            query.AddAnsi(specification.ToString());
-            var response = await ExecuteAsync(query);
-            if (response is null)
-            {
-                return null;
-            }
-
-            var result = IrbisText.IrbisToWindows(response.ReadAnsi());
-
-            return result;
-        } // method ReadTextFileAsync
+        public async Task<string?> ReadTextFileAsync (FileSpecification specification) =>
+            await ExecuteAsync(CommandCode.ReadDocument, specification.ToString())
+                .TransformNoCheckAsync
+                (
+                    resp => IrbisText.IrbisToWindows(resp.ReadAnsi())
+                );
 
         /// <inheritdoc cref="IAsyncProvider.ReloadDictionaryAsync"/>
-        public async Task<bool> ReloadDictionaryAsync
-            (
-                string? databaseName = default
-            )
-        {
-            var response = await ExecuteAsync
-                (
-                    CommandCode.ReloadDictionary,
-                    databaseName ?? Database.ThrowIfNull("Database")
-                );
-
-            return response?.CheckReturnCode() ?? false;
-        } // method ReloadDictionaryAsync
+        public async Task<bool> ReloadDictionaryAsync (string? databaseName = default) =>
+            await ExecuteAsync(CommandCode.ReloadDictionary, EnsureDatabase(databaseName)).IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.ReloadMasterFileAsync"/>
-        public async Task<bool> ReloadMasterFileAsync
-            (
-                string? databaseName = default
-            )
-        {
-            var response = await ExecuteAsync
-                (
-                    CommandCode.ReloadMasterFile,
-                    databaseName ?? Database.ThrowIfNull("Database")
-                );
-
-            return response?.CheckReturnCode() ?? false;
-        } // method ReloadMasterFileAsync
+        public async Task<bool> ReloadMasterFileAsync (string? databaseName = default) =>
+            await ExecuteAsync(CommandCode.ReloadMasterFile, EnsureDatabase(databaseName)).IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.RestartServerAsync"/>
-        public async Task<bool> RestartServerAsync()
-        {
-            var response = await ExecuteAsync(CommandCode.RestartServer);
-
-            return response is not null;
-        } // method RestartServerAsync
+        public async Task<bool> RestartServerAsync() =>
+            await ExecuteAsync(CommandCode.RestartServer).IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.SearchAsync"/>
         public async Task<FoundItem[]?> SearchAsync
@@ -824,45 +775,18 @@ namespace ManagedIrbis
 
             var query = new AsyncQuery(this, CommandCode.Search);
             parameters.Encode(this, query);
-            var response = await ExecuteAsync(query);
-            if (response is null
-                || !response.CheckReturnCode())
-            {
-                return Array.Empty<FoundItem>();
-            }
 
-            return FoundItem.Parse(response);
+            return await ExecuteAsync(query).TransformAsync(FoundItem.Parse);
+
         } // method SearchAsync
 
         /// <inheritdoc cref="IAsyncProvider.TruncateDatabaseAsync"/>
-        public async Task<bool> TruncateDatabaseAsync
-            (
-                string? databaseName = default
-            )
-        {
-            var response = await ExecuteAsync
-                (
-                    CommandCode.EmptyDatabase,
-                    databaseName ?? Database.ThrowIfNull("Database")
-                );
-
-            return response is not null && response.CheckReturnCode();
-        } // method TruncateDatabaseAsync
+        public async Task<bool> TruncateDatabaseAsync (string? databaseName = default) =>
+            await ExecuteAsync(CommandCode.EmptyDatabase, EnsureDatabase(databaseName)).IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.UnlockDatabaseAsync"/>
-        public async Task<bool> UnlockDatabaseAsync
-            (
-                string? databaseName = default
-            )
-        {
-            var response = await ExecuteAsync
-                (
-                    CommandCode.UnlockDatabase,
-                    databaseName ?? Database.ThrowIfNull("Database")
-                );
-
-            return response is not null && response.CheckReturnCode();
-        } // method UnlockDatabaseAsync
+        public async Task<bool> UnlockDatabaseAsync(string? databaseName = default) =>
+            await ExecuteAsync(CommandCode.UnlockDatabase, EnsureDatabase(databaseName)).IsGoodAsync();
 
         /// <inheritdoc cref="IAsyncProvider.UnlockRecordsAsync"/>
         public async Task<bool> UnlockRecordsAsync
@@ -871,21 +795,23 @@ namespace ManagedIrbis
                 string? databaseName = default
             )
         {
-            if (!CheckProviderState())
-            {
-                return false;
-            }
-
             var query = new AsyncQuery(this, CommandCode.UnlockRecords);
-            query.AddAnsi(databaseName ?? Database);
+            query.AddAnsi(EnsureDatabase(databaseName));
+            var counter = 0;
             foreach (var mfn in mfnList)
             {
                 query.Add(mfn);
+                ++counter;
             }
 
-            var response = await ExecuteAsync(query);
+            // Если список MFN пуст, считаем операцию успешной
+            if (counter == 0)
+            {
+                return true;
+            }
 
-            return response is not null && response.CheckReturnCode();
+            return await ExecuteAsync(query).IsGoodAsync();
+
         } // method UnlockRecordsAsync
 
         /// <inheritdoc cref="IAsyncProvider.UpdateIniFileAsync"/>
@@ -894,23 +820,25 @@ namespace ManagedIrbis
                 IEnumerable<string> lines
             )
         {
-            if (!CheckProviderState())
-            {
-                return false;
-            }
-
             var query = new AsyncQuery(this, CommandCode.UpdateIniFile);
+            var counter = 0;
             foreach (var line in lines)
             {
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     query.AddAnsi(line);
+                    ++counter;
                 }
             }
 
-            var response = await ExecuteAsync(query);
+            // Если список обновляемых строк пуст, считаем операцию успешной
+            if (counter == 0)
+            {
+                return true;
+            }
 
-            return response is not null;
+            return await ExecuteAsync(query).IsGoodAsync();
+
         } // method UpdateIniFileAsync
 
         /// <inheritdoc cref="IAsyncProvider.UpdateUserListAsync"/>
@@ -925,14 +853,21 @@ namespace ManagedIrbis
             }
 
             var query = new AsyncQuery(this, CommandCode.SetUserList);
+            var counter = 0;
             foreach (var user in users)
             {
                 query.AddAnsi(user.Encode());
+                ++counter;
             }
 
-            var response = await ExecuteAsync(query);
+            // Если список обновляемых пользователей пуст, считаем операцию неуспешной
+            if (counter == 0)
+            {
+                return false;
+            }
 
-            return response is not null;
+            return await ExecuteAsync(query).IsGoodAsync();
+
         } // method UpdateUserListAsync
 
         /// <inheritdoc cref="IAsyncProvider.WriteRecordAsync"/>
@@ -1001,23 +936,8 @@ namespace ManagedIrbis
         } // method WriteRecordAsync
 
         /// <inheritdoc cref="IAsyncProvider.WriteTextFileAsync"/>
-        public async Task<bool> WriteTextFileAsync
-            (
-                FileSpecification specification
-            )
-        {
-            if (!CheckProviderState())
-            {
-                return false;
-            }
-
-            var query = new AsyncQuery(this, CommandCode.ReadDocument);
-            query.AddAnsi(specification.ToString());
-
-            var response = await ExecuteAsync(query);
-
-            return response is not null;
-        } // method WriteTextFileAsync
+        public async Task<bool> WriteTextFileAsync (FileSpecification specification) =>
+            await ExecuteAsync(CommandCode.ReadRecord, specification.ToString()).IsGoodAsync();
 
         #endregion
 

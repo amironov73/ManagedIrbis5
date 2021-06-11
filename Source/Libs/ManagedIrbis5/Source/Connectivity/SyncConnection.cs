@@ -587,10 +587,7 @@ namespace ManagedIrbis
         public bool NoOperation() => ExecuteSync(CommandCode.Nop).IsGood();
 
         /// <inheritdoc cref="ISyncProvider.PrintTable"/>
-        public string? PrintTable
-            (
-                TableDefinition definition
-            )
+        public string? PrintTable (TableDefinition definition)
         {
             using var query = new SyncQuery(this, CommandCode.Print);
             query.AddAnsi(EnsureDatabase(definition.DatabaseName));
@@ -627,6 +624,7 @@ namespace ManagedIrbis
         {
             using var query = new SyncQuery(this, CommandCode.ReadPostings);
             parameters.Encode(this, query);
+
             var response = ExecuteSync(query);
             if (!response.IsGood(ConnectionUtility.GoodCodesForReadTerms))
             {
@@ -746,12 +744,8 @@ namespace ManagedIrbis
             using var query = new SyncQuery(this, command);
             parameters.Encode(this, query);
             var response = ExecuteSync(query);
-            if (!response.IsGood(ConnectionUtility.GoodCodesForReadTerms))
-            {
-                return null;
-            }
 
-            return Term.Parse(response);
+            return !response.IsGood(ConnectionUtility.GoodCodesForReadTerms) ? null : Term.Parse(response);
 
         } // method ReadTerms
 
