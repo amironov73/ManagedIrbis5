@@ -106,6 +106,7 @@ namespace ManagedIrbis
             }
 
             var result = await ExecuteAsync(query);
+            // не надо query.Dispose();
 
             return result;
 
@@ -128,6 +129,7 @@ namespace ManagedIrbis
 
             var query = new AsyncQuery(this, command);
             var result = await ExecuteAsync(query);
+            // не надо query.Dispose();
 
             return result;
 
@@ -154,6 +156,7 @@ namespace ManagedIrbis
             query.AddAnsi(arg1.ToString());
 
             var result = await ExecuteAsync(query);
+            // не надо query.Dispose();
 
             return result;
 
@@ -214,6 +217,7 @@ namespace ManagedIrbis
             finally
             {
                 SetBusy(false);
+                asyncQuery.Dispose();
             }
 
         } // method ExecuteAsync
@@ -234,7 +238,7 @@ namespace ManagedIrbis
             var query = new AsyncQuery(this, CommandCode.DatabaseStat);
             definition.Encode(this, query);
 
-            var response = await ExecuteAsync(query);
+            using var response = await ExecuteAsync(query);
             if (!response.IsGood())
             {
                 return null;
@@ -270,7 +274,8 @@ namespace ManagedIrbis
         /// </summary>
         public async Task<bool> StopServerAsync()
         {
-            var result = await ExecuteAsync("STOP") is not null;
+            using var response = await ExecuteAsync("STOP");
+            var result = response is not null;
             Connected = false;
 
             return result;
@@ -314,6 +319,7 @@ namespace ManagedIrbis
             query.AddAnsi(Username);
             query.AddAnsi(Password);
 
+            // нельзя использовать using из-за goto
             var response = await ExecuteAsync(query);
             if (response is null)
             {
@@ -323,23 +329,32 @@ namespace ManagedIrbis
 
             if (response.GetReturnCode() == -3337)
             {
+                response.Dispose();
                 goto AGAIN;
             }
 
             if (response.ReturnCode < 0)
             {
                 LastError = response.ReturnCode;
+                response.Dispose();
                 return false;
             }
 
-            Connected = true;
-            ServerVersion = response.ServerVersion;
-            Interval = response.ReadInteger();
+            try
+            {
+                ServerVersion = response.ServerVersion;
+                Interval = response.ReadInteger();
 
-            IniFile = new IniFile();
-            var remainingText = response.RemainingText(IrbisEncoding.Ansi);
-            var reader = new StringReader(remainingText);
-            IniFile.Read(reader);
+                IniFile = new IniFile();
+                var remainingText = response.RemainingText(IrbisEncoding.Ansi);
+                var reader = new StringReader(remainingText);
+                IniFile.Read(reader);
+                Connected = true;
+            }
+            finally
+            {
+                response.Dispose();
+            }
 
             return true;
 
@@ -360,7 +375,8 @@ namespace ManagedIrbis
             query.AddAnsi(EnsureDatabase(parameters.Database));
             query.AddAnsi(parameters.Description);
             query.Add(parameters.ReaderAccess);
-            var response = await ExecuteAsync(query);
+            using var response = await ExecuteAsync(query);
+            query.Dispose();
 
             return response.IsGood();
 
@@ -385,7 +401,7 @@ namespace ManagedIrbis
 
                 try
                 {
-                    await ExecuteAsync(CommandCode.UnregisterClient);
+                    using var _ = await ExecuteAsync(CommandCode.UnregisterClient);
                 }
                 catch (Exception exception)
                 {
@@ -434,7 +450,7 @@ namespace ManagedIrbis
                 query.Add(mfn);
             }
 
-            var response = await ExecuteAsync(query);
+            using var response = await ExecuteAsync(query);
             if (!response.IsGood())
             {
                 return false;
@@ -461,8 +477,8 @@ namespace ManagedIrbis
             var query = new AsyncQuery(this, CommandCode.NewFulltextSearch);
             searchParameters.Encode(this, query);
             textParameters.Encode(this, query);
-            var response = await ExecuteAsync(query);
-            if (!(response?.CheckReturnCode() ?? false))
+            using var response = await ExecuteAsync(query);
+            if (!response.IsGood(false))
             {
                 return null;
             }
@@ -475,14 +491,16 @@ namespace ManagedIrbis
         } // method FullTextSearchAsync
 
         /// <inheritdoc cref="IAsyncProvider.GetDatabaseInfoAsync"/>
-        public Task<DatabaseInfo?> GetDatabaseInfoAsync
-            (
-                string? databaseName = default
-            )
-        {
-            throw new NotImplementedException();
-
-        } // method GetDatabaseInfoAsync
+        public async Task<DatabaseInfo?> GetDatabaseInfoAsync (string? databaseName = default) =>
+            await ExecuteAsync(CommandCode.RecordList, EnsureDatabase(databaseName))
+                .TransformAsync
+                (
+                    resp => DatabaseInfo.Parse
+                    (
+                        EnsureDatabase(databaseName),
+                        resp
+                    )
+                );
 
         /// <inheritdoc cref="IAsyncProvider.GetMaxMfnAsync"/>
         public async Task<int> GetMaxMfnAsync
@@ -490,9 +508,9 @@ namespace ManagedIrbis
                 string? databaseName = default
             )
         {
-            var response = await ExecuteAsync(CommandCode.GetMaxMfn, EnsureDatabase(databaseName));
+            using var response = await ExecuteAsync(CommandCode.GetMaxMfn, EnsureDatabase(databaseName));
 
-            return response.IsGood() ? response.ReturnCode : 0;
+            return response.IsGood(false) ? response.ReturnCode : 0;
 
         } // method GetMaxMfnAsync
 
@@ -520,8 +538,8 @@ namespace ManagedIrbis
             query.AddAnsi(database);
             settings.Encode(query);
 
-            var response = await ExecuteAsync(query);
-            if (!response.IsGood())
+            using var response = await ExecuteAsync(query);
+            if (!response.IsGood(false))
             {
                 return null;
             }
@@ -555,7 +573,7 @@ namespace ManagedIrbis
                 query.AddAnsi(specification.ToString());
             }
 
-            var response = await ExecuteAsync(query);
+            using var response = await ExecuteAsync(query);
             if (response is null)
             {
                 return null;
@@ -586,7 +604,7 @@ namespace ManagedIrbis
             query.AddAnsi(EnsureDatabase(definition.DatabaseName));
             definition.Encode(query);
 
-            var response = await ExecuteAsync(query);
+            using var response = await ExecuteAsync(query);
 
             return response?.ReadRemainingUtfText();
 
@@ -599,7 +617,7 @@ namespace ManagedIrbis
             )
         {
             specification.BinaryFile = true;
-            var response = await ExecuteAsync(CommandCode.ReadDocument, specification.ToString());
+            using var response = await ExecuteAsync(CommandCode.ReadDocument, specification.ToString());
             if (response is null || !response.FindPreamble())
             {
                 return null;
@@ -618,8 +636,8 @@ namespace ManagedIrbis
             var query = new AsyncQuery(this, CommandCode.ReadPostings);
             parameters.Encode(this, query);
 
-            var response = await ExecuteAsync(query);
-            if (!response.IsGood(ConnectionUtility.GoodCodesForReadTerms))
+            using var response = await ExecuteAsync(query);
+            if (!response.IsGood(false, ConnectionUtility.GoodCodesForReadTerms))
             {
                 return null;
             }
@@ -654,8 +672,8 @@ namespace ManagedIrbis
 
                 query.AddFormat(parameters.Format);
 
-                var response = await ExecuteAsync(query);
-                if (!response.IsGood(ConnectionUtility.GoodCodesForReadRecord))
+                using var response = await ExecuteAsync(query);
+                if (!response.IsGood(false, ConnectionUtility.GoodCodesForReadRecord))
                 {
                     return null;
                 }
@@ -736,9 +754,11 @@ namespace ManagedIrbis
                 : CommandCode.ReadTerms;
             var query = new AsyncQuery(this, command);
             parameters.Encode(this, query);
-            var response = await ExecuteAsync(query);
+            using var response = await ExecuteAsync(query);
 
-            return !response.IsGood(ConnectionUtility.GoodCodesForReadTerms) ? null : Term.Parse(response);
+            return !response.IsGood(false, ConnectionUtility.GoodCodesForReadTerms)
+                ? null
+                : Term.Parse(response);
 
         } // method ReadTermsAsync
 
@@ -886,8 +906,8 @@ namespace ManagedIrbis
                 query.Add(parameters.Actualize);
                 query.AddUtf(record.Encode());
 
-                var response = await ExecuteAsync(query);
-                if (!response.IsGood())
+                using var response = await ExecuteAsync(query);
+                if (!response.IsGood(false))
                 {
                     return false;
                 }
@@ -923,15 +943,13 @@ namespace ManagedIrbis
                 return result2;
             }
 
-            // return await this.WriteRecordsAsync
-            //     (
-            //         records,
-            //         parameters.Lock,
-            //         parameters.Actualize,
-            //         parameters.DontParse
-            //     );
-
-            return false;
+            return await this.WriteRecordsAsync
+                (
+                    records,
+                    parameters.Lock,
+                    parameters.Actualize,
+                    parameters.DontParse
+                );
 
         } // method WriteRecordAsync
 
