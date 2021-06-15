@@ -38,6 +38,7 @@ namespace ManagedIrbis.Infrastructure
     /// Ответ сервера ИРБИС64.
     /// </summary>
     public sealed class Response
+        : IDisposable
     {
         #region Properties
 
@@ -101,7 +102,8 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// IRBIS_BINARY_DATA
         /// </summary>
-        private static byte[] BinaryDataPreamble = { 73, 82, 66, 73, 83, 95, 66, 73, 78, 65, 82, 89, 95, 68, 65, 84, 65 };
+        private static readonly byte[] BinaryDataPreamble =
+            { 73, 82, 66, 73, 83, 95, 66, 73, 78, 65, 82, 89, 95, 68, 65, 84, 65 };
 
         #endregion
 
@@ -201,7 +203,8 @@ namespace ManagedIrbis.Infrastructure
                 ReadAnsi();
                 ReadAnsi();
             }
-        }
+
+        } // method Parse
 
         /// <summary>
         ///
@@ -227,7 +230,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return _currentChunk[_currentOffset];
-        }
+
+        } // method Peek
 
         /// <summary>
         ///
@@ -270,7 +274,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result;
-        }
+
+        } // method ReadByte
 
         /// <summary>
         ///
@@ -305,7 +310,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result.ToArray();
-        }
+
+        } // method ReadLine
 
         /// <summary>
         ///
@@ -322,7 +328,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return encoding.GetString(bytes);
-        }
+
+        } // method ReadLine
 
         /// <summary>
         ///
@@ -360,7 +367,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result;
-        }
+
+        } // method RemainingBytes
 
         /// <summary>
         ///
@@ -377,7 +385,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return encoding.GetString(bytes);
-        }
+
+        } // method RemainingText
 
         /// <summary>
         /// Debug dump.
@@ -753,5 +762,17 @@ namespace ManagedIrbis.Infrastructure
 
         #endregion
 
-    }
-}
+        #region IDisposable members
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose()
+        {
+            // TODO: проверять на повторный вызов Dispose
+            // Nothing yet
+        }
+
+        #endregion
+
+    } // class Response
+
+} // namespace ManagedIrbis.Infrastructure

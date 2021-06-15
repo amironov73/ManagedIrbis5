@@ -38,8 +38,21 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Проверяем, хороший ли пришел ответ от сервера.
         /// </summary>
-        public static bool IsGood([NotNullWhen(true)] this Response? response) =>
-            response is not null && response.CheckReturnCode();
+        public static bool IsGood
+            (
+                [NotNullWhen(true)] this Response? response,
+                bool dispose = true
+            )
+        {
+            var result = response is not null && response.CheckReturnCode();
+            if (dispose)
+            {
+                response?.Dispose();
+            }
+
+            return result;
+
+        } // method IsGood
 
         /// <summary>
         /// Проверяем, хороший ли пришел ответ от сервера.
@@ -47,21 +60,37 @@ namespace ManagedIrbis.Infrastructure
         public static bool IsGood
             (
                 [NotNullWhen(true)] this Response? response,
+                bool dispose = true,
                 params int[] goodCodes
             )
-            => response is not null && response.CheckReturnCode(goodCodes);
+        {
+            var result = response is not null && response.CheckReturnCode(goodCodes);
+            if (dispose)
+            {
+                response?.Dispose();
+            }
+
+            return result;
+
+        } // method IsGood
 
         /// <summary>
         /// Проверяем, хороший ли пришел ответ от сервера.
         /// </summary>
         public static async Task<bool> IsGoodAsync
             (
-                [NotNullWhen(true)] this Task<Response?> task
+                [NotNullWhen(true)] this Task<Response?> task,
+                bool dispose = true
             )
         {
             var response = await task;
+            var result = response is not null && response.CheckReturnCode();
+            if (dispose)
+            {
+                response?.Dispose();
+            }
 
-            return response is not null && response.CheckReturnCode();
+            return result;
 
         } // method IsGoodAsync
 
@@ -71,12 +100,18 @@ namespace ManagedIrbis.Infrastructure
         public static async Task<bool> IsGoodAsync
             (
                 [NotNullWhen(true)] this Task<Response?> task,
+                bool dispose = true,
                 params int[] goodCodes
             )
         {
             var response = await task;
+            var result = response is not null && response.CheckReturnCode(goodCodes);
+            if (dispose)
+            {
+                response?.Dispose();
+            }
 
-            return response is not null && response.CheckReturnCode(goodCodes);
+            return result;
 
         } // method IsGoodAsync
 
@@ -88,8 +123,14 @@ namespace ManagedIrbis.Infrastructure
                 this Response? response,
                 Func<Response, T?> transformer
             )
-            where T: class
-            => response.IsGood() ? transformer(response) : null;
+            where T : class
+        {
+            var result = response.IsGood(false) ? transformer(response) : null;
+            response?.Dispose();
+
+            return result;
+
+        } // method Transform
 
         /// <summary>
         /// Трансформация запроса во что-нибудь полезное.
@@ -99,8 +140,14 @@ namespace ManagedIrbis.Infrastructure
                 this Response? response,
                 Func<Response, T?> transformer
             )
-            where T: class
-            => response is not null ? transformer(response) : null;
+            where T : class
+        {
+            var result = response is not null ? transformer(response) : null;
+            response?.Dispose();
+
+            return result;
+
+        } // method TransformNoCheck
 
         /// <summary>
         /// Трансформация запроса во что-нибудь полезное.
@@ -113,8 +160,10 @@ namespace ManagedIrbis.Infrastructure
             where T : class
         {
             var waited = await response;
+            var result = waited.IsGood(false) ? transformer(waited) : null;
+            waited?.Dispose();
 
-            return waited.IsGood() ? transformer(waited) : null;
+            return result;
 
         } // method TransformAsync
 
@@ -129,8 +178,10 @@ namespace ManagedIrbis.Infrastructure
             where T: class
         {
             var waited = await response;
+            var result = waited is not null ? transformer(waited) : null;
+            waited?.Dispose();
 
-            return waited is not null ? transformer(waited) : null;
+            return result;
 
         } // method TransformNoCheckAsync
 

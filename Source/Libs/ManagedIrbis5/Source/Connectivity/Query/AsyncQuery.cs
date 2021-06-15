@@ -30,7 +30,8 @@ namespace ManagedIrbis.Infrastructure
     /// Клиентский запрос к серверу ИРБИС64.
     /// </summary>
     public sealed class AsyncQuery
-        : IQuery
+        : IQuery,
+        IDisposable
     {
         #region Construction
 
@@ -107,6 +108,16 @@ namespace ManagedIrbis.Infrastructure
         /// Добавление одного перевода строки.
         /// </summary>
         public void NewLine() => _stream.NewLine();
+
+        #endregion
+
+        #region IDisposable members
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose()
+        {
+            // nothing yet
+        }
 
         #endregion
 

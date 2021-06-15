@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* MessageFile.cs --
+/* MessageFile.cs -- файл с сообщениями, выдаваемыми клиентами.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -66,7 +66,7 @@ namespace ManagedIrbis.Client
     //
 
     /// <summary>
-    ///
+    /// Файл с сообщениями, выдаваемыми клиентами.
     /// </summary>
     public sealed class MessageFile
         : IHandmadeSerializable
@@ -186,5 +186,7 @@ namespace ManagedIrbis.Client
         }
 
         #endregion
-    }
-}
+
+    } // class MessageFile
+
+} // namespace ManagedIrbis.Client

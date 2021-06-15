@@ -244,7 +244,7 @@ namespace ManagedIrbis
             using var query = new SyncQuery(this, CommandCode.DatabaseStat);
             definition.Encode(this, query);
 
-            var response = ExecuteSync(query);
+            using var response = ExecuteSync(query);
             if (!response.IsGood())
             {
                 return null;
@@ -280,7 +280,8 @@ namespace ManagedIrbis
         /// </summary>
         public bool StopServer()
         {
-            var result = ExecuteSync("STOP") is not null;
+            using var response = ExecuteSync("STOP");
+            var result = response is not null;
             Connected = false;
 
             return result;
@@ -319,6 +320,7 @@ namespace ManagedIrbis
             QueryId = 1;
             ClientId = new Random().Next(100000, 999999);
 
+            // нельзя использовать using response из-за goto
             Response? response;
             using (var query = new SyncQuery(this, CommandCode.RegisterClient))
             {
@@ -326,7 +328,7 @@ namespace ManagedIrbis
                 query.AddAnsi(Password);
 
                 response = ExecuteSync(query);
-                if (ReferenceEquals(response, null))
+                if (response is null)
                 {
                     LastError = -100_500;
                     return false;
@@ -335,23 +337,32 @@ namespace ManagedIrbis
 
             if (response.GetReturnCode() == -3337)
             {
+                response.Dispose();
                 goto AGAIN;
             }
 
             if (response.ReturnCode < 0)
             {
                 LastError = response.ReturnCode;
+                response.Dispose();
                 return false;
             }
 
-            Connected = true;
-            ServerVersion = response.ServerVersion;
-            Interval = response.ReadInteger();
+            try
+            {
+                ServerVersion = response.ServerVersion;
+                Interval = response.ReadInteger();
 
-            IniFile = new IniFile();
-            var remainingText = response.RemainingText(IrbisEncoding.Ansi);
-            var reader = new StringReader(remainingText);
-            IniFile.Read(reader);
+                IniFile = new IniFile();
+                var remainingText = response.RemainingText(IrbisEncoding.Ansi);
+                var reader = new StringReader(remainingText);
+                IniFile.Read(reader);
+                Connected = true;
+            }
+            finally
+            {
+                response.Dispose();
+            }
 
             return true;
 
@@ -372,7 +383,7 @@ namespace ManagedIrbis
             query.AddAnsi(EnsureDatabase(parameters.Database));
             query.AddAnsi(parameters.Description);
             query.Add(parameters.ReaderAccess);
-            var response = ExecuteSync(query);
+            using var response = ExecuteSync(query);
 
             return response.IsGood();
 
@@ -397,7 +408,7 @@ namespace ManagedIrbis
                 {
                     OnDisposing();
 
-                    ExecuteSync(CommandCode.UnregisterClient);
+                    using var _ = ExecuteSync(CommandCode.UnregisterClient);
                 }
                 catch (Exception exception)
                 {
@@ -446,8 +457,8 @@ namespace ManagedIrbis
                 query.Add(mfn);
             }
 
-            var response = ExecuteSync(query);
-            if (!response.IsGood())
+            using var response = ExecuteSync(query);
+            if (!response.IsGood(false))
             {
                 return false;
             }
@@ -473,8 +484,8 @@ namespace ManagedIrbis
             using var query = new SyncQuery(this, CommandCode.NewFulltextSearch);
             searchParameters.Encode(this, query);
             textParameters.Encode(this, query);
-            var response = ExecuteSync(query);
-            if (!response.IsGood())
+            using var response = ExecuteSync(query);
+            if (!response.IsGood(false))
             {
                 return null;
             }
@@ -504,7 +515,7 @@ namespace ManagedIrbis
                 string? databaseName = default
             )
         {
-            var response = ExecuteSync(CommandCode.GetMaxMfn, EnsureDatabase(databaseName));
+            using var response = ExecuteSync(CommandCode.GetMaxMfn, EnsureDatabase(databaseName));
 
             return response.IsGood() ? response.ReturnCode : 0;
 
@@ -534,7 +545,7 @@ namespace ManagedIrbis
             query.AddAnsi(database);
             settings.Encode(query);
 
-            var response = ExecuteSync(query);
+            using var response = ExecuteSync(query);
             if (!response.IsGood())
             {
                 return null;
@@ -569,7 +580,7 @@ namespace ManagedIrbis
                 query.AddAnsi(specification.ToString());
             }
 
-            var response = ExecuteSync(query);
+            using var response = ExecuteSync(query);
 
             return SyncConnectionUtility.ListFiles(response);
 
@@ -593,7 +604,7 @@ namespace ManagedIrbis
             query.AddAnsi(EnsureDatabase(definition.DatabaseName));
             definition.Encode(query);
 
-            var response = ExecuteSync(query);
+            using var response = ExecuteSync(query);
 
             return response?.ReadRemainingUtfText();
 
@@ -606,7 +617,7 @@ namespace ManagedIrbis
             )
         {
             specification.BinaryFile = true;
-            var response = ExecuteSync(CommandCode.ReadDocument, specification.ToString());
+            using var response = ExecuteSync(CommandCode.ReadDocument, specification.ToString());
             if (response is null || !response.FindPreamble())
             {
                 return null;
@@ -625,8 +636,8 @@ namespace ManagedIrbis
             using var query = new SyncQuery(this, CommandCode.ReadPostings);
             parameters.Encode(this, query);
 
-            var response = ExecuteSync(query);
-            if (!response.IsGood(ConnectionUtility.GoodCodesForReadTerms))
+            using var response = ExecuteSync(query);
+            if (!response.IsGood(false, ConnectionUtility.GoodCodesForReadTerms))
             {
                 return null;
             }
@@ -661,8 +672,8 @@ namespace ManagedIrbis
 
                 query.AddFormat(parameters.Format);
 
-                var response = ExecuteSync(query);
-                if (!response.IsGood(ConnectionUtility.GoodCodesForReadRecord))
+                using var response = ExecuteSync(query);
+                if (!response.IsGood(false, ConnectionUtility.GoodCodesForReadRecord))
                 {
                     return null;
                 }
@@ -743,9 +754,9 @@ namespace ManagedIrbis
                 : CommandCode.ReadTerms;
             using var query = new SyncQuery(this, command);
             parameters.Encode(this, query);
-            var response = ExecuteSync(query);
+            using var response = ExecuteSync(query);
 
-            return !response.IsGood(ConnectionUtility.GoodCodesForReadTerms) ? null : Term.Parse(response);
+            return !response.IsGood(false, ConnectionUtility.GoodCodesForReadTerms) ? null : Term.Parse(response);
 
         } // method ReadTerms
 
@@ -893,7 +904,7 @@ namespace ManagedIrbis
                 query.Add(parameters.Actualize);
                 query.AddUtf(record.Encode());
 
-                var response = ExecuteSync(query);
+                using var response = ExecuteSync(query);
                 if (!response.IsGood())
                 {
                     return false;
