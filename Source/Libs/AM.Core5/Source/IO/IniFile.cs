@@ -678,7 +678,7 @@ namespace AM.IO
 
         #region Private members
 
-        private NonNullCollection<Section> _sections;
+        private readonly NonNullCollection<Section> _sections;
 
         internal static void CheckKeyName
             (
@@ -866,7 +866,13 @@ namespace AM.IO
             }
 
             return null;
-        }
+
+        } // method GetSection
+
+        /// <summary>
+        /// Get all the sections.
+        /// </summary>
+        public Section[] GetSections() => _sections.ToArray();
 
         /// <summary>
         /// Get value from the given section and key.
@@ -902,7 +908,41 @@ namespace AM.IO
                 : section.GetValue(keyName, defaultValue);
 
             return result;
-        }
+
+        } // method GetValue
+
+        /// <summary>
+        /// Merge the section.
+        /// </summary>
+        public void MergeSection
+            (
+                Section section
+            )
+        {
+            var sectionName = section.Name;
+            if (sectionName is null)
+            {
+                // TODO: слить с безымянной секцией
+                return;
+            }
+
+            var found = GetSection(sectionName);
+            if (ReferenceEquals(found, null))
+            {
+                _sections.Add(section);
+            }
+            else
+            {
+                foreach (string key in section.Keys)
+                {
+                    if (!found.ContainsKey(key))
+                    {
+                        found[key] = section[key];
+                    }
+                }
+            }
+
+        } // method MergeSection
 
         /// <summary>
         /// Remove specified section.

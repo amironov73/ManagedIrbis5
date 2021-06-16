@@ -22,6 +22,7 @@
 using System;
 using System.Threading.Tasks;
 
+using ManagedIrbis.Server.Commands;
 using ManagedIrbis.Server.Sockets;
 
 #endregion
@@ -38,25 +39,25 @@ namespace ManagedIrbis.Server
     {
         #region Properties
 
-        // /// <summary>
-        // /// Command.
-        // /// </summary>
-        // public ServerCommand Command { get; set; }
-        //
-        // /// <summary>
-        // /// Context.
-        // /// </summary>
-        // public ServerContext Context { get; set; }
-        //
-        // /// <summary>
-        // /// Engine
-        // /// </summary>
-        // public IrbisServerEngine Engine { get; set; }
-        //
-        // /// <summary>
-        // /// Response.
-        // /// </summary>
-        // public ServerResponse Response { get; set; }
+        /// <summary>
+        /// Команда, выполняемая в настоящее время по запросу клиента.
+        /// </summary>
+        public ServerCommand? Command { get; set; }
+
+        /// <summary>
+        /// Контекст для выполнения запроса.
+        /// </summary>
+        public ServerContext? Context { get; set; }
+
+        /// <summary>
+        /// Серверный движок.
+        /// </summary>
+        public ServerEngine? Engine { get; set; }
+
+        /// <summary>
+        /// Ответ сервера.
+        /// </summary>
+        public ServerResponse? Response { get; set; }
 
         /// <summary>
         /// Разобранный пользовательский запрос.
@@ -73,18 +74,18 @@ namespace ManagedIrbis.Server
         /// </summary>
         public Task? Task { get; set; }
 
-        // /// <summary>
-        // /// User info.
-        // /// </summary>
-        // public UserInfo User { get; set; }
-        //
-        // /// <summary>
-        // /// Worker.
-        // /// </summary>
-        // public ServerWorker Worker { get; set; }
+        /// <summary>
+        /// Информация о пользователе системы.
+        /// </summary>
+        public UserInfo? User { get; set; }
 
         /// <summary>
-        /// Когда началась обработка клиентского запроса.
+        /// Рабочий поток.
+        /// </summary>
+        public ServerWorker? Worker { get; set; }
+
+        /// <summary>
+        /// Момент, когда началась обработка клиентского запроса.
         /// </summary>
         public DateTime Started { get; set; }
 

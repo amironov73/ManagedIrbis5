@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -24,8 +25,9 @@ using System.Xml.Serialization;
 using AM;
 using AM.IO;
 using AM.Runtime;
-
+using AM.Text;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
 
 #endregion
 
@@ -121,6 +123,79 @@ namespace ManagedIrbis
 
         #region Private members
 
+        private static void _DecodePair
+            (
+                UserInfo user,
+                MenuFile clientIni,
+                char code,
+                string? value
+            )
+        {
+            value ??= GetStandardIni(clientIni, code);
+
+            value = value.EmptyToNull();
+
+            switch (code)
+            {
+                case 'C':
+                    user.Cataloger = value;
+                    break;
+
+                case 'R':
+                    user.Reader = value;
+                    break;
+
+                case 'B':
+                    user.Circulation = value;
+                    break;
+
+                case 'M':
+                    user.Acquisitions = value;
+                    break;
+
+                case 'K':
+                    user.Provision = value;
+                    break;
+
+                case 'A':
+                    user.Administrator = value;
+                    break;
+
+                //default:
+                //    throw new ArgumentOutOfRangeException();
+            }
+
+        } // method _DecodePair
+
+        private static void _DecodeLine
+            (
+                UserInfo user,
+                MenuFile clientIni,
+                string line
+            )
+        {
+            var pairs = line.Split(CommonSeparators.Semicolon);
+            var dictionary = new Dictionary<char, string>();
+            foreach (var pair in pairs)
+            {
+                var parts = pair.Split(CommonSeparators.EqualSign, 2);
+                if (parts.Length != 2 || parts[0].Length != 1)
+                {
+                    continue;
+                }
+
+                dictionary[char.ToUpper(parts[0][0])] = parts[1];
+            }
+
+            char[] codes = { 'C', 'R', 'B', 'M', 'K', 'A' };
+            foreach (var code in codes)
+            {
+                dictionary.TryGetValue(code, out var value);
+                _DecodePair(user, clientIni, code, value);
+            }
+
+        } // method _DecodeLine
+
         private string _FormatPair ( string prefix, string? value, string defaultValue ) =>
             value.SameString(defaultValue) ? string.Empty : $"{prefix}={value};";
 
@@ -149,6 +224,33 @@ namespace ManagedIrbis
         } // method Encode
 
         // ReSharper restore UseStringInterpolation
+
+        /// <summary>
+        /// Get standard INI-file name from client_ini.mnu
+        /// for the workstation code.
+        /// </summary>
+        public static string GetStandardIni
+            (
+                MenuFile clientIni,
+                char workstation
+            )
+        {
+            var entries = (IList<MenuEntry?>) clientIni.Entries.ThrowIfNull(nameof(clientIni.Entries));
+            var code = (Workstation) char.ToUpper(workstation);
+            var result = code switch
+            {
+                Workstation.Cataloger => entries.SafeAt(0),
+                Workstation.Reader => entries.SafeAt(1),
+                Workstation.Circulation => entries.SafeAt(2),
+                Workstation.Acquisitions => entries.SafeAt(3),
+                Workstation.Provision => entries.SafeAt(4),
+                Workstation.Administrator => entries.SafeAt(5),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            return result.ThrowIfNull().Code.ThrowIfNull();
+
+        } // method GetStandardIni
 
         /// <summary>
         /// Парсинг текстового представления.
@@ -225,6 +327,61 @@ namespace ManagedIrbis
             return result.ToArray();
 
         } // method Parse
+
+        /// <summary>
+        /// Parse the MNU-file from the stream.
+        /// </summary>
+        public static UserInfo[] ParseStream
+            (
+                TextReader reader,
+                MenuFile clientIni
+            )
+        {
+            var result = new List<UserInfo>();
+            while (true)
+            {
+                var line1 = reader.ReadLine();
+                if (ReferenceEquals(line1, null) || line1.StartsWith("***"))
+                {
+                    break;
+                }
+
+                var line2 = reader.ReadLine();
+                var line3 = reader.ReadLine();
+                if (ReferenceEquals(line2, null) || ReferenceEquals(line3, null))
+                {
+                    break;
+                }
+
+                // TODO handle encrypted passwords
+
+                var user = new UserInfo
+                {
+                    Name = line1,
+                    Password = line2
+                };
+                _DecodeLine(user, clientIni, line3);
+                result.Add(user);
+            }
+
+            return result.ToArray();
+
+        } // method ParseStream
+
+        /// <summary>
+        /// Parse the MNU-file.
+        /// </summary>
+        public static UserInfo[] ParseFile
+            (
+                string fileName,
+                MenuFile clientIni
+            )
+        {
+            using var reader = TextReaderUtility.OpenRead(fileName, IrbisEncoding.Ansi);
+
+            return ParseStream(reader, clientIni);
+
+        } // method ParseFile
 
         /// <summary>
         /// Should serialize the <see cref="Cataloger"/> field?

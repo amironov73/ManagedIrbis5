@@ -4146,6 +4146,7 @@ namespace AM
 
                 return module?.FileName ?? throw new ApplicationException();
             }
+
         } // property ExecutableFileName
 
         private static readonly Random _random = new ();
