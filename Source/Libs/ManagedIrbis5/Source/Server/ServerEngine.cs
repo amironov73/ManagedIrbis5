@@ -185,6 +185,8 @@ namespace ManagedIrbis.Server
                 Debugger.Launch();
             }
 
+            Listeners = Array.Empty<IAsyncServerListener>();
+
             _cancellation = new CancellationTokenSource();
 
             SyncRoot = new object();
@@ -319,7 +321,7 @@ namespace ManagedIrbis.Server
             PortNumber = portNumber;
         }
 
-        private string _GetDepositFile
+        private string? _GetDepositFile
             (
                 string fileName
             )
@@ -538,10 +540,12 @@ namespace ManagedIrbis.Server
             )
         {
             var result = RequireContext(data);
+            var request = data.Request.ThrowIfNull(nameof(data.Request));
             if (string.IsNullOrEmpty(result.Workstation))
             {
-                result.Workstation = data.Request.Workstation;
+                result.Workstation = request.Workstation;
             }
+
             if (result.Workstation != "A")
             {
                 // Требуется вход администратора
@@ -549,7 +553,8 @@ namespace ManagedIrbis.Server
             }
 
             return result;
-        }
+
+        } // method RequireAdministratorContext
 
         /// <summary>
         /// Find the specified user.
@@ -571,7 +576,8 @@ namespace ManagedIrbis.Server
             }
 
             return null;
-        }
+
+        } // method FindUser
 
         /// <summary>
         /// Get name of the default INI file for specified client type.
@@ -655,7 +661,7 @@ namespace ManagedIrbis.Server
                 string workstation
             )
         {
-            string filename;
+            string? filename;
             switch (workstation)
             {
                 case "a":
@@ -873,7 +879,7 @@ namespace ManagedIrbis.Server
                         break;
                     }
 
-                    var socket = tasks[ready].Result;
+                    var socket = tasks[ready].Result.ThrowIfNull("socket");
 
                     // Do we really need this?
                     // https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.dispose?view=net-5.0
@@ -885,7 +891,13 @@ namespace ManagedIrbis.Server
                         }
                     }
 
+                    #pragma warning disable 4014
+
+                    // TODO: сделать элегантно
+                    // компилятор хочет, чтобы мы делали await
                     _HandleClient(socket);
+
+                    #pragma warning restore 4014
                 }
                 catch (AggregateException)
                 {
@@ -932,7 +944,7 @@ namespace ManagedIrbis.Server
                 return null;
             }
 
-            string result;
+            string? result;
             var database = specification.Database;
             var path = (int)specification.Path;
             if (path == 0)
@@ -1025,7 +1037,7 @@ namespace ManagedIrbis.Server
         public void WaitForWorkers()
         {
             var tasks = Workers
-                .Select(worker => worker.Data.Task)
+                .Select(worker => worker.Data.Task.ThrowIfNull(nameof(worker.Data.Task)))
                 .ToArray();
 
             if (tasks.Length != 0)

@@ -120,14 +120,15 @@ namespace ManagedIrbis.Server
                         workers = Engine.Workers.ToArray();
                     }
 
-                    DateTime threshold = DateTime.Now.AddSeconds(-Timeout);
-                    ServerWorker[] longRunning = workers
+                    var threshold = DateTime.Now.AddSeconds(-Timeout);
+                    var longRunning = workers
                         .Where(w => w.Data.Started < threshold)
                         .ToArray();
 
-                    foreach (ServerWorker worker in longRunning)
+                    foreach (var worker in longRunning)
                     {
-                        Magna.Warning("Long running worker: " + worker.Data.Task.Id);
+                        var task = worker.Data.Task.ThrowIfNull(nameof(worker.Data.Task));
+                        Magna.Warning($"Long running worker: {task.Id}");
 
                         // TODO kill long running task?
                     }

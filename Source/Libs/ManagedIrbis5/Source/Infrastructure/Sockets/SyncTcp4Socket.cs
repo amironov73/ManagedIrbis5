@@ -35,6 +35,12 @@ namespace ManagedIrbis.Infrastructure.Sockets
     {
         #region Properties
 
+        /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
+        public int RetryCount { get; set; }
+
+        /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
+        public int RetryDelay { get; set; }
+
         /// <summary>
         /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
         /// </summary>
@@ -50,13 +56,13 @@ namespace ManagedIrbis.Infrastructure.Sockets
                 SyncQuery query
             )
         {
-            var connection = Connection.ThrowIfNull();
+            var connection = Connection.ThrowIfNull(nameof(Connection));
             connection.ThrowIfCancelled();
 
-            using var client = new TcpClient();
+            using var client = new TcpClient(AddressFamily.InterNetwork);
             try
             {
-                var host = connection.Host.ThrowIfNull("connection.Host");
+                var host = connection.Host.ThrowIfNull(nameof(connection.Host));
                 client.Connect(host, connection.Port);
             }
             catch (Exception exception)

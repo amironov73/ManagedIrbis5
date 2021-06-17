@@ -6,10 +6,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable ReplaceSliceWithRangeIndexer
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* AsyncTcp4Socket.cs -- клиентский сокет на основе TCP/IP v4
+/* SyncTcp6Socket.cs -- клиентский сокет на основе TCP/IP v6
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,8 +18,6 @@
 
 using System;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 
@@ -29,12 +28,12 @@ using AM;
 namespace ManagedIrbis.Infrastructure.Sockets
 {
     /// <summary>
-    /// Сокет, реализующий асинхронный режим для TCPv4-подключения.
+    /// Сокет, реализующий синхронный режим для TCPv6-подключения.
     /// </summary>
-    public sealed class AsyncTcp4Socket
-        : IAsyncClientSocket
+    public sealed class SyncTcp6Socket
+        : ISyncClientSocket
     {
-        #region IAsyncClientSocket members
+        #region Properties
 
         /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
         public int RetryCount { get; set; }
@@ -45,26 +44,30 @@ namespace ManagedIrbis.Infrastructure.Sockets
         /// <summary>
         /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
         /// </summary>
-        public IAsyncConnection? Connection { get; set; }
+        public ISyncConnection? Connection { get; set; }
 
-        /// <inheritdoc cref="IAsyncClientSocket.TransactAsync"/>
-        public async Task<Response?> TransactAsync
+        #endregion
+
+        #region ISyncClientSocket members
+
+        /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
+        public unsafe Response? TransactSync
             (
-                AsyncQuery asyncQuery
+                SyncQuery query
             )
         {
             var connection = Connection.ThrowIfNull(nameof(Connection));
             connection.ThrowIfCancelled();
 
-            using var client = new TcpClient(AddressFamily.InterNetwork);
+            using var client = new TcpClient(AddressFamily.InterNetworkV6);
             try
             {
                 var host = connection.Host.ThrowIfNull(nameof(connection.Host));
-                await client.ConnectAsync(host, connection.Port);
+                client.Connect(host, connection.Port);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(SyncTcp4Socket), exception);
+                Magna.TraceException(nameof(SyncTcp6Socket), exception);
                 connection.SetLastError(-100_002);
 
                 return default;
@@ -73,22 +76,22 @@ namespace ManagedIrbis.Infrastructure.Sockets
             connection.ThrowIfCancelled();
 
             var socket = client.Client;
-            var length = asyncQuery.GetLength();
-            var prefix = Encoding.ASCII.GetBytes
-                (
-                    length.ToInvariantString() + "\n"
-                );
-            var body = asyncQuery.GetBody();
+            var length = query.GetLength();
+            Span<byte> prefix = stackalloc byte[12];
+            length = FastNumber.Int32ToBytes(length, prefix);
+            prefix[length] = 10; // перевод строки
+            prefix = prefix.Slice(0, length + 1);
+            var body = query.GetBody();
 
             try
             {
-                await socket.SendAsync(prefix, SocketFlags.None);
-                await socket.SendAsync(body, SocketFlags.None);
+                socket.Send(prefix, SocketFlags.None);
+                socket.Send(body.Span, SocketFlags.None);
                 socket.Shutdown(SocketShutdown.Send);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(SyncTcp4Socket), exception);
+                Magna.TraceException(nameof(SyncTcp6Socket), exception);
                 connection.SetLastError(-100_002);
 
                 return default;
@@ -103,7 +106,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
 
                     var buffer = new byte[2048];
                     var chunk = new ArraySegment<byte>(buffer, 0, buffer.Length);
-                    var read = await socket.ReceiveAsync(chunk, SocketFlags.None);
+                    var read = socket.Receive(chunk, SocketFlags.None);
                     if (read <= 0)
                     {
                         break;
@@ -115,17 +118,18 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(SyncTcp4Socket), exception);
+                Magna.TraceException(nameof(SyncTcp6Socket), exception);
                 connection.SetLastError(-100_002);
 
                 return default;
             }
 
             return result;
-        } // method TransactAsync
+
+        } // method TransactSync
 
         #endregion
 
-    } // class AsyncTcp4Socket
+    } // class SyncTcp6Socket
 
-} // namespace ManagedIrbis.Infrastructure.Sockets
+}

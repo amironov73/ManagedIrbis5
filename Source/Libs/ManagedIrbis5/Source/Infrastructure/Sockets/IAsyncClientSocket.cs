@@ -29,6 +29,16 @@ namespace ManagedIrbis.Infrastructure.Sockets
     public interface IAsyncClientSocket
     {
         /// <summary>
+        /// Количество повторов при сетевом сбое.
+        /// </summary>
+        int RetryCount { get; set; }
+
+        /// <summary>
+        /// Задержка при повторе, миллисекунды.
+        /// </summary>
+        int RetryDelay { get; set; }
+
+        /// <summary>
         /// Подключение.
         /// </summary>
         IAsyncConnection? Connection { get; set; }

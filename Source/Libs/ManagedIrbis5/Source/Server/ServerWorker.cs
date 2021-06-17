@@ -80,8 +80,8 @@ namespace ManagedIrbis.Server
         {
             // TODO async
 
-            var engine = Data.Engine;
-            var request = Data.Request;
+            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
+            var request = Data.Request.ThrowIfNull(nameof(Data.Request));
             var fileName = string.Format
                 (
                     "{0}_{1}_{2}.packet",
@@ -101,8 +101,8 @@ namespace ManagedIrbis.Server
 
         private void _LogRequest()
         {
-            var request = Data.Request;
-            var memory = request.Memory;
+            var request = Data.Request.ThrowIfNull(nameof(Data.Request));
+            var memory = request.Memory.ThrowIfNull(nameof(request.Memory));
             var savedPosition = memory.Position;
             memory.Position = 0;
             var packet = new ReadOnlyMemory<byte>[1];
@@ -113,7 +113,7 @@ namespace ManagedIrbis.Server
 
         private void _LogResponse()
         {
-            var response = Data.Response;
+            var response = Data.Response.ThrowIfNull(nameof(Data.Response));
             var memory = response.Memory;
             var savedPosition = memory.Position;
             memory.Position = 0;
@@ -138,20 +138,22 @@ namespace ManagedIrbis.Server
 
                 _LogRequest();
 
+                var socket = Data.Socket.ThrowIfNull(nameof(Data.Socket));
                 Magna.Trace("ServerWorker::DoWork: request: address="
-                          + Data.Socket.GetRemoteAddress()
+                          + socket.GetRemoteAddress()
                           + ", command=" + request.CommandCode1
                           + ", login=" + request.Login
                           + ", workstation=" + request.Workstation);
 
+                var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
                 Data.Response = new ServerResponse(Data.Request);
-                Data.Command = Data.Engine.Mapper.MapCommand(Data);
+                Data.Command = engine.Mapper.MapCommand(Data);
                 Data.Command.Execute();
 
                 _LogResponse();
 
                 Magna.Trace("ServerWorker::DoWork: success: address="
-                          + Data.Socket.GetRemoteAddress()
+                          + socket.GetRemoteAddress()
                           + ", command=" + request.CommandCode1
                           + ", login=" + request.Login
                           + ", workstation=" + request.Workstation);

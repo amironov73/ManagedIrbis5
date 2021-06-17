@@ -29,6 +29,16 @@ namespace ManagedIrbis.Infrastructure.Sockets
     public interface ISyncClientSocket
     {
         /// <summary>
+        /// Количество повторов при сетевом сбое.
+        /// </summary>
+        int RetryCount { get; set; }
+
+        /// <summary>
+        /// Задержка при повторе, миллисекунды.
+        /// </summary>
+        int RetryDelay { get; set; }
+
+        /// <summary>
         /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
         /// </summary>
         ISyncConnection? Connection { get; set; }
