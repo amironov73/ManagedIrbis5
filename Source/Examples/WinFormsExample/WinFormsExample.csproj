@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>WinFormsExample.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+    <ProjectReference Include="..\..\Libs\AM.Drawing5\AM.Drawing5.csproj" />
+    <ProjectReference Include="..\..\Libs\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
+    <ProjectReference Include="..\..\Libs\ManagedIrbis5.WinForms\ManagedIrbis5.WinForms.csproj" />
+    <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

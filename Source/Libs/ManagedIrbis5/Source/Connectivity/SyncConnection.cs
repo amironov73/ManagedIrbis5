@@ -445,7 +445,8 @@ namespace ManagedIrbis
 
             if (parameters.Mfns.IsNullOrEmpty())
             {
-                return false;
+                parameters.Result = this.FormatRecord(parameters.Format!, parameters.Mfn)!;
+                return true;
             }
 
             using var query = new SyncQuery(this, CommandCode.FormatRecord);
@@ -463,7 +464,30 @@ namespace ManagedIrbis
                 return false;
             }
 
-            parameters.Result = response.ReadRemainingUtfLines();
+            var lines = response.ReadRemainingUtfLines();
+            var result = new List<string>(lines.Length);
+            if (parameters.Mfns.Length == 1)
+            {
+                result.Add(lines[0]);
+            }
+            else
+            {
+                foreach (var line in lines)
+                {
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        continue;
+                    }
+
+                    var parts = line.Split('#', 2);
+                    if (parts.Length > 1)
+                    {
+                        result.Add(parts[1]);
+                    }
+                }
+            }
+
+            parameters.Result = result.ToArray();
 
             return true;
 

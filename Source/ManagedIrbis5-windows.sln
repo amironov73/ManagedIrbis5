@@ -45,61 +45,63 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IrbisExamples", "Examples\I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example1", "Examples\Example1\Example1.csproj", "{1481845C-5179-4CB9-B0A6-CF0094873D42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5.WinForms", "Libs\ManagedIrbis5.WinForms\ManagedIrbis5.WinForms.csproj", "{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedIrbis5.WinForms", "Libs\ManagedIrbis5.WinForms\ManagedIrbis5.WinForms.csproj", "{2F5739D6-6B34-470B-A8C0-95F0CF1DA752}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormsTests", "Tests\FormsTests\FormsTests.csproj", "{5F817967-11E0-4B1E-BECA-04C59DBCC5D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormsTests", "Tests\FormsTests\FormsTests.csproj", "{5F817967-11E0-4B1E-BECA-04C59DBCC5D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrbisFormsTests", "Tests\IrbisFormsTests\IrbisFormsTests.csproj", "{AECDBA13-FF9E-451C-B8AC-40D77765FE29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IrbisFormsTests", "Tests\IrbisFormsTests\IrbisFormsTests.csproj", "{AECDBA13-FF9E-451C-B8AC-40D77765FE29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiberianTests", "Tests\SiberianTests\SiberianTests.csproj", "{BDB2B3F8-16A6-420E-9416-20CE3E820D76}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SiberianTests", "Tests\SiberianTests\SiberianTests.csproj", "{BDB2B3F8-16A6-420E-9416-20CE3E820D76}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingTests", "Tests\DrawingTests\DrawingTests.csproj", "{9DBD2677-C83B-49E9-8DC2-F63615B1F599}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DrawingTests", "Tests\DrawingTests\DrawingTests.csproj", "{9DBD2677-C83B-49E9-8DC2-F63615B1F599}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Rdf", "Libs\AM.Rdf\AM.Rdf.csproj", "{D8741F5B-3C27-43CD-9A8E-B9A73F9A1E64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Rdf", "Libs\AM.Rdf\AM.Rdf.csproj", "{D8741F5B-3C27-43CD-9A8E-B9A73F9A1E64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Onto", "Libs\AM.Onto\AM.Onto.csproj", "{66921FCE-96FD-4349-BB88-1205B3BB2AD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Onto", "Libs\AM.Onto\AM.Onto.csproj", "{66921FCE-96FD-4349-BB88-1205B3BB2AD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Skia", "Libs\AM.Skia\AM.Skia.csproj", "{0A486EC3-4DE9-4E2A-A2A5-616969F1CE39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Skia", "Libs\AM.Skia\AM.Skia.csproj", "{0A486EC3-4DE9-4E2A-A2A5-616969F1CE39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Gtk", "Libs\AM.Gtk\AM.Gtk.csproj", "{8B82CF92-B8DC-4FAB-9F05-7101C31EA4B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Gtk", "Libs\AM.Gtk\AM.Gtk.csproj", "{8B82CF92-B8DC-4FAB-9F05-7101C31EA4B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Asn1", "Libs\AM.Asn1\AM.Asn1.csproj", "{88122ECA-F53A-4766-8D47-2BBFE65A1CB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AM.Asn1", "Libs\AM.Asn1\AM.Asn1.csproj", "{88122ECA-F53A-4766-8D47-2BBFE65A1CB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PftTests", "Tests\PftTests\PftTests.csproj", "{7FE61F9F-7C02-4C43-AE69-F23F471F849C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PftTests", "Tests\PftTests\PftTests.csproj", "{7FE61F9F-7C02-4C43-AE69-F23F471F849C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Protector", "Apps\Protector\Protector.csproj", "{EB717E84-0097-4E83-957C-ACC27C444912}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Protector", "Apps\Protector\Protector.csproj", "{EB717E84-0097-4E83-957C-ACC27C444912}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example2", "Examples\Example2\Example2.csproj", "{34E28C4C-84C9-488B-8446-C13248C6B73E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example2", "Examples\Example2\Example2.csproj", "{34E28C4C-84C9-488B-8446-C13248C6B73E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrbisPing", "Apps\IrbisPing\IrbisPing.csproj", "{EE30BE3E-590B-46BA-A9B0-3E12F13CA72E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IrbisPing", "Apps\IrbisPing\IrbisPing.csproj", "{EE30BE3E-590B-46BA-A9B0-3E12F13CA72E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckIniFile", "Apps\CheckIniFile\CheckIniFile.csproj", "{4A9D98D7-71B5-46D2-8EC5-58DE79ED9675}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckIniFile", "Apps\CheckIniFile\CheckIniFile.csproj", "{4A9D98D7-71B5-46D2-8EC5-58DE79ED9675}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fst2Ifs", "Apps\Fst2Ifs\Fst2Ifs.csproj", "{4C9FDF64-3CC8-4BB4-BB22-6453053B7D1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fst2Ifs", "Apps\Fst2Ifs\Fst2Ifs.csproj", "{4C9FDF64-3CC8-4BB4-BB22-6453053B7D1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sigler", "Apps\Sigler\Sigler.csproj", "{D7500A88-3E96-4017-B8F9-5191E339B2FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sigler", "Apps\Sigler\Sigler.csproj", "{D7500A88-3E96-4017-B8F9-5191E339B2FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExemplarKiller", "Apps\ExemplarKiller\ExemplarKiller.csproj", "{40E03F3E-42BA-4260-B0FE-8E7EFDB56A5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExemplarKiller", "Apps\ExemplarKiller\ExemplarKiller.csproj", "{40E03F3E-42BA-4260-B0FE-8E7EFDB56A5E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RqstShrink", "Apps\RqstShrink\RqstShrink.csproj", "{675BFA71-6E9C-4DD1-A281-575009C36E20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RqstShrink", "Apps\RqstShrink\RqstShrink.csproj", "{675BFA71-6E9C-4DD1-A281-575009C36E20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tre2Mnu", "Apps\Tre2Mnu\Tre2Mnu.csproj", "{6FDC01DB-10C3-4F64-908F-428572E84A09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tre2Mnu", "Apps\Tre2Mnu\Tre2Mnu.csproj", "{6FDC01DB-10C3-4F64-908F-428572E84A09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DirectTests", "Tests\DirectTests\DirectTests.csproj", "{3B96809A-3666-454E-9BE2-263CB8426CD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DirectTests", "Tests\DirectTests\DirectTests.csproj", "{3B96809A-3666-454E-9BE2-263CB8426CD8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marsohod5", "Apps\Marsohod5\Marsohod5.csproj", "{0124F78C-0793-4EF0-B547-124C55BB92D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marsohod5", "Apps\Marsohod5\Marsohod5.csproj", "{0124F78C-0793-4EF0-B547-124C55BB92D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InvList", "Apps\InvList\InvList.csproj", "{C8296CC1-6E0C-467E-A40C-466C29A77B3D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvList", "Apps\InvList\InvList.csproj", "{C8296CC1-6E0C-467E-A40C-466C29A77B3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClearInventarization", "Apps\ClearInventarization\ClearInventarization.csproj", "{4BC916F1-EF4D-4B32-9A66-1BB70F86C92A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClearInventarization", "Apps\ClearInventarization\ClearInventarization.csproj", "{4BC916F1-EF4D-4B32-9A66-1BB70F86C92A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationExample", "Examples\ApplicationExample\ApplicationExample.csproj", "{DD206D8C-764A-41F6-BE92-D51F0DC77841}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationExample", "Examples\ApplicationExample\ApplicationExample.csproj", "{DD206D8C-764A-41F6-BE92-D51F0DC77841}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatchTest", "Tests\BatchTest\BatchTest.csproj", "{6A24E745-EFDE-416E-BD9B-1B8E8DE56D9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BatchTest", "Tests\BatchTest\BatchTest.csproj", "{6A24E745-EFDE-416E-BD9B-1B8E8DE56D9E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Experiments", "Experiments", "{707BA757-27E8-4184-A89A-3B4572F4BCB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChunkedExperiment", "Experiments\ChunkedExperiment\ChunkedExperiment.csproj", "{396CEA10-5177-49B4-9F72-3AB059276D03}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChunkedExperiment", "Experiments\ChunkedExperiment\ChunkedExperiment.csproj", "{396CEA10-5177-49B4-9F72-3AB059276D03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsExample", "Examples\WinFormsExample\WinFormsExample.csproj", "{ED66A3AF-B33D-4070-A87E-C63CCA14F212}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -615,6 +617,18 @@ Global
 		{396CEA10-5177-49B4-9F72-3AB059276D03}.Release|x64.Build.0 = Release|Any CPU
 		{396CEA10-5177-49B4-9F72-3AB059276D03}.Release|x86.ActiveCfg = Release|Any CPU
 		{396CEA10-5177-49B4-9F72-3AB059276D03}.Release|x86.Build.0 = Release|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Debug|x64.Build.0 = Debug|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Debug|x86.Build.0 = Debug|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Release|x64.ActiveCfg = Release|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Release|x64.Build.0 = Release|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Release|x86.ActiveCfg = Release|Any CPU
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -662,6 +676,7 @@ Global
 		{DD206D8C-764A-41F6-BE92-D51F0DC77841} = {788F67EC-79CA-4941-B29F-7970FA721205}
 		{6A24E745-EFDE-416E-BD9B-1B8E8DE56D9E} = {F56FBD0E-5530-4F55-ABE1-9E106B93417F}
 		{396CEA10-5177-49B4-9F72-3AB059276D03} = {707BA757-27E8-4184-A89A-3B4572F4BCB0}
+		{ED66A3AF-B33D-4070-A87E-C63CCA14F212} = {788F67EC-79CA-4941-B29F-7970FA721205}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E077767-1AE0-47E0-AEFB-59E4D7464AD4}

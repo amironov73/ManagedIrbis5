@@ -214,5 +214,35 @@ namespace ManagedIrbis.WinForms
         }
 
         #endregion
-    }
-}
+
+        #region Public methods
+
+        /// <summary>
+        /// Очистка.
+        /// </summary>
+        public void Clear()
+        {
+            _grid.DataSource = Array.Empty<FoundItem>();
+        }
+
+        /// <summary>
+        /// Заполнение.
+        /// </summary>
+        public void Fill()
+        {
+            var adapter = Adapter;
+            if (adapter is null)
+            {
+                Clear();
+                return;
+            }
+
+            _grid.DataSource = adapter.Source;
+
+        } // method Fill
+
+        #endregion
+
+    } // class FoundPanel
+
+} // namespace ManagedIrbis.WinForms

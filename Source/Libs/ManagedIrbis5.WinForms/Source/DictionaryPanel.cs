@@ -175,7 +175,8 @@ namespace ManagedIrbis.WinForms
                     _RaiseChoosed();
                     break;
             }
-        }
+
+        } // method _grid_KeyDown
 
         private void _keyBox_TextChanged
             (
@@ -229,7 +230,8 @@ namespace ManagedIrbis.WinForms
                     _RaiseChoosed();
                     break;
             }
-        }
+
+        } // method _keyBox_KeyDown
 
         private void _RaiseChoosed()
         {
@@ -274,8 +276,44 @@ namespace ManagedIrbis.WinForms
                     Adapter.MoveNext(_VisibleRowCount());
                     break;
             }
-        }
+
+        } // method _scrollControl_Scroll
 
         #endregion
-    }
-}
+
+        #region Public methods
+
+        /// <summary>
+        /// Очистка.
+        /// </summary>
+        public void Clear()
+        {
+            var adapter = Adapter;
+            if (adapter is not null)
+            {
+                adapter.Clear();
+            }
+
+        } // method Clear
+
+        /// <summary>
+        /// Заполнение.
+        /// </summary>
+        public void Fill()
+        {
+            var adapter = Adapter;
+
+            if (adapter is not null)
+            {
+                adapter.Fill();
+                _grid.DataSource = adapter.Source;
+                _grid.Refresh();
+            }
+
+        } // method Fill
+
+        #endregion
+
+    } // class DictionaryPanel
+
+} // namespace ManagedIrbis.WinForms

@@ -8,25 +8,40 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
-/* FoundLine.cs -- line in list of found documents
+/* FoundLine.cs -- строчка в списке найденных документов
  * Ars Magna project, http://arsmagna.ru
  */
+
+#region Using directives
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using ManagedIrbis.Providers;
+
+#endregion
 
 #nullable enable
 
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Line in list of found documents.
+    /// Строчка в списке найденных документов.
     /// </summary>
     public sealed class FoundLine
     {
         #region Properties
 
         /// <summary>
-        /// Serial number.
+        /// Порядковый номер.
         /// </summary>
         public int SerialNumber { get; set; }
+
+        /// <summary>
+        /// Материализовано?
+        /// </summary>
+        public bool Materialized { get; set; }
 
         /// <summary>
         /// MFN.
@@ -34,29 +49,71 @@ namespace ManagedIrbis
         public int Mfn { get; set; }
 
         /// <summary>
-        /// Icon.
+        /// Запись.
+        /// </summary>
+        public Record? Record { get; set; }
+
+        /// <summary>
+        /// Иконка.
         /// </summary>
         public object? Icon { get; set; }
 
         /// <summary>
-        /// Selected by user.
+        /// Выбрано пользователем.
         /// </summary>
         public bool Selected { get; set; }
 
         /// <summary>
-        /// Description.
+        /// Краткое библиографическое описание.
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        /// For list sorting.
+        /// Для сортировки списка.
         /// </summary>
         public string? Sort { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         public object? UserData { get; set; }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Загружаем найденные записи с сервера.
+        /// </summary>
+        public static FoundLine[] Read
+            (
+                ISyncProvider connection,
+                string format,
+                IEnumerable<int> found
+            )
+        {
+            var array = found.ToArray();
+            var length = array.Length;
+            var result = new FoundLine[length];
+            var formatted = connection.FormatRecords(array, format);
+            if (formatted is null)
+            {
+                return Array.Empty<FoundLine>();
+            }
+
+            for (var i = 0; i < length; i++)
+            {
+                var item = new FoundLine
+                {
+                    Mfn = array[i],
+                    Description = formatted[i]
+                };
+                result[i] = item;
+            }
+
+            return result;
+
+        } // method Read
 
         #endregion
 

@@ -217,7 +217,7 @@ namespace AM.IO
             {
                 get
                 {
-                    foreach (Line line in _lines)
+                    foreach (var line in _lines)
                     {
                         yield return line.Key;
                     }
@@ -288,7 +288,7 @@ namespace AM.IO
                     string? value
                 )
             {
-                Line line = new Line(key, value);
+                var line = new Line(key, value);
                 Add(line);
             }
 
@@ -327,7 +327,7 @@ namespace AM.IO
             {
                 Sure.NotNull(section, nameof(section));
 
-                foreach (Line line in this)
+                foreach (var line in this)
                 {
                     section[line.Key] = line.Value;
                 }
@@ -353,7 +353,7 @@ namespace AM.IO
             {
                 Sure.NotNullNorEmpty(key, nameof(key));
 
-                foreach (Line line in _lines)
+                foreach (var line in _lines)
                 {
                     if (line.Key.SameString(key))
                     {
@@ -375,7 +375,7 @@ namespace AM.IO
             {
                 CheckKeyName(key);
 
-                foreach (Line line in _lines)
+                foreach (var line in _lines)
                 {
                     if (line.Key.SameString(key))
                     {
@@ -397,13 +397,13 @@ namespace AM.IO
             {
                 Sure.NotNullNorEmpty(key, nameof(key));
 
-                string? value = GetValue(key, null);
+                var value = GetValue(key, null);
                 if (string.IsNullOrEmpty(value))
                 {
                     return defaultValue;
                 }
 
-                T result = Utility.ConvertTo<T>(value);
+                var result = Utility.ConvertTo<T>(value);
 
                 return result;
             }
@@ -418,7 +418,7 @@ namespace AM.IO
             {
                 CheckKeyName(key);
 
-                foreach (Line line in _lines)
+                foreach (var line in _lines)
                 {
                     if (line.Key.SameString(key))
                     {
@@ -458,7 +458,7 @@ namespace AM.IO
                 CheckKeyName(key);
 
                 Line? target = null;
-                foreach (Line line in _lines)
+                foreach (var line in _lines)
                 {
                     if (line.Key.SameString(key))
                     {
@@ -513,7 +513,7 @@ namespace AM.IO
             {
                 CheckKeyName(key);
 
-                foreach (Line line in _lines)
+                foreach (var line in _lines)
                 {
                     if (line.Key.SameString(key))
                     {
@@ -574,12 +574,12 @@ namespace AM.IO
             /// <inheritdoc cref="object.ToString" />
             public override string ToString()
             {
-                StringBuilder result = new StringBuilder();
+                var result = new StringBuilder();
                 result
                     .AppendFormat("[{0}]", Name)
                     .AppendLine();
 
-                foreach (Line line in _lines)
+                foreach (var line in _lines)
                 {
                     result.AppendLine(line.ToString());
                 }
@@ -724,7 +724,7 @@ namespace AM.IO
                     );
             }
 
-            foreach (Line line in section)
+            foreach (var line in section)
             {
                 line.Write(writer);
             }
@@ -744,12 +744,12 @@ namespace AM.IO
         {
             Sure.NotNull(iniFile, nameof(iniFile));
 
-            foreach (Section thisSection in this)
+            foreach (var thisSection in this)
             {
                 var name = thisSection.Name;
                 if (!ReferenceEquals(name, null) && name.Length != 0)
                 {
-                    Section otherSection = iniFile.GetOrCreateSection(name);
+                    var otherSection = iniFile.GetOrCreateSection(name);
                     thisSection.ApplyTo(otherSection);
                 }
             }
@@ -772,10 +772,10 @@ namespace AM.IO
         {
             Modified = false;
 
-            foreach (Section section in _sections)
+            foreach (var section in _sections)
             {
                 section.Modified = false;
-                foreach (Line line in section)
+                foreach (var line in section)
                 {
                     line.Modified = false;
                 }
@@ -792,7 +792,7 @@ namespace AM.IO
         {
             CheckKeyName(name);
 
-            foreach (Section section in _sections)
+            foreach (var section in _sections)
             {
                 if (section.Name.SameString(name))
                 {
@@ -825,7 +825,7 @@ namespace AM.IO
                 throw new ArgumentException("duplicate name " + name);
             }
 
-            Section result = new Section(this, name);
+            var result = new Section(this, name);
             _sections.Add(result);
 
             return result;
@@ -841,8 +841,8 @@ namespace AM.IO
         {
             CheckKeyName(name);
 
-            Section result = GetSection(name)
-                ?? CreateSection(name);
+            var result = GetSection(name)
+                         ?? CreateSection(name);
 
             return result;
         }
@@ -857,7 +857,7 @@ namespace AM.IO
         {
             CheckKeyName(name);
 
-            foreach (Section section in _sections)
+            foreach (var section in _sections)
             {
                 if (section.Name.SameString(name))
                 {
@@ -933,7 +933,7 @@ namespace AM.IO
             }
             else
             {
-                foreach (string key in section.Keys)
+                foreach (var key in section.Keys)
                 {
                     if (!found.ContainsKey(key))
                     {
@@ -954,7 +954,7 @@ namespace AM.IO
         {
             CheckKeyName(name);
 
-            foreach (Section section in _sections)
+            foreach (var section in _sections)
             {
                 if (section.Name.SameString(name))
                 {
@@ -991,7 +991,7 @@ namespace AM.IO
                 return;
             }
 
-            Encoding encoding = Encoding ?? Encoding.Default;
+            var encoding = Encoding ?? Encoding.Default;
 
             Read(FileName.ThrowIfNull(nameof(FileName)), encoding);
         }
@@ -1008,7 +1008,7 @@ namespace AM.IO
             Sure.NotNullNorEmpty(fileName, nameof(fileName));
             Sure.NotNull(encoding, nameof(encoding));
 
-            using StreamReader reader = TextReaderUtility.OpenRead
+            using var reader = TextReaderUtility.OpenRead
                 (
                     fileName,
                     encoding
@@ -1053,7 +1053,7 @@ namespace AM.IO
                         throw new FormatException();
                     }
 
-                    string name = line.Substring(1, line.Length - 2);
+                    var name = line.Substring(1, line.Length - 2);
                     section = CreateSection(name);
                 }
                 else
@@ -1090,8 +1090,8 @@ namespace AM.IO
         {
             Sure.NotNull(writer, nameof(writer));
 
-            bool first = true;
-            foreach (Section section in _sections)
+            var first = true;
+            foreach (var section in _sections)
             {
                 if (!first)
                 {
@@ -1120,9 +1120,9 @@ namespace AM.IO
         {
             Sure.NotNullNorEmpty(fileName, nameof(fileName));
 
-            Encoding encoding = Encoding ?? Encoding.Default;
+            var encoding = Encoding ?? Encoding.Default;
 
-            using StreamWriter writer = TextWriterUtility.Create
+            using var writer = TextWriterUtility.Create
                 (
                     fileName,
                     encoding
@@ -1140,7 +1140,7 @@ namespace AM.IO
                 string? value
             )
         {
-            Section section = GetOrCreateSection(sectionName);
+            var section = GetOrCreateSection(sectionName);
             section.SetValue(keyName, value);
 
             return this;
@@ -1156,7 +1156,7 @@ namespace AM.IO
                 T value
             )
         {
-            Section section = GetOrCreateSection(sectionName);
+            var section = GetOrCreateSection(sectionName);
             section.SetValue(keyName, value);
 
             return this;
@@ -1172,10 +1172,10 @@ namespace AM.IO
         {
             Sure.NotNull(writer, nameof(writer));
 
-            bool first = true;
-            foreach (Section section in _sections)
+            var first = true;
+            foreach (var section in _sections)
             {
-                Line[] lines = section
+                var lines = section
                     .Where(line => line.Modified)
                     .ToArray();
 
@@ -1195,7 +1195,7 @@ namespace AM.IO
                             );
                     }
 
-                    foreach (Line line in lines)
+                    foreach (var line in lines)
                     {
                         line.Write(writer);
                     }
@@ -1233,10 +1233,10 @@ namespace AM.IO
                 : Encoding.GetEncoding(encodingName);
             Modified = reader.ReadBoolean();
             _sections.Clear();
-            int count = reader.ReadPackedInt32();
-            for (int i = 0; i < count; i++)
+            var count = reader.ReadPackedInt32();
+            for (var i = 0; i < count; i++)
             {
-                Section section = new Section(this, null);
+                var section = new Section(this, null);
                 section.RestoreFromStream(reader);
                 _sections.Add(section);
             }
@@ -1256,7 +1256,7 @@ namespace AM.IO
             writer.WriteNullable(encodingName);
             writer.Write(Modified);
             writer.WritePackedInt32(_sections.Count);
-            foreach (Section section in _sections)
+            foreach (var section in _sections)
             {
                 section.SaveToStream(writer);
             }

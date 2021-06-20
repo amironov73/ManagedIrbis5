@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* RecordAdapter.cs --
+/* RecordAdapter.cs -- адаптер для отображения записей в гриде
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 #endregion
@@ -24,7 +25,7 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms
 {
     /// <summary>
-    ///
+    /// Адаптер для отображения записей в гриде.
     /// </summary>
     public class RecordAdapter
     {
@@ -42,13 +43,13 @@ namespace ManagedIrbis.WinForms
         {
             get
             {
-                var record = (Record?)Source.Current;
-                if (ReferenceEquals(record, null))
+                var current = (FoundLine?) Source.Current;
+                if (ReferenceEquals(current, null))
                 {
                     return 0;
                 }
 
-                return record.Mfn;
+                return current.Mfn;
             }
         }
 
@@ -83,7 +84,14 @@ namespace ManagedIrbis.WinForms
             First = 1;
             Portion = 100;
             Connection = connection;
-        }
+
+        } // constructor
+
+        #endregion
+
+        #region Private members
+
+        private bool _restricted; // нельзя выходить за пределы загруженных записей?
 
         #endregion
 
@@ -94,18 +102,22 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public bool MoveNext()
         {
-            BindingSource termSource = Source;
-            CurrencyManager currencyManager = termSource.CurrencyManager;
+            var termSource = Source;
+            var currencyManager = termSource.CurrencyManager;
 
             termSource.MoveNext();
-            int count = currencyManager.Count;
+            var count = currencyManager.Count;
             if (currencyManager.Position >= count - 1)
             {
-                return Fill(First + count);
+                if (!_restricted)
+                {
+                    return Fill(First + count);
+                }
             }
 
             return true;
-        }
+            
+        } // method MoveNext
 
         /// <summary>
         /// Move to next term.
@@ -122,24 +134,29 @@ namespace ManagedIrbis.WinForms
             }
 
             return true;
-        }
+
+        } // method MoveNext
 
         /// <summary>
         /// Move to previous term.
         /// </summary>
         public bool MovePrevious()
         {
-            BindingSource termSource = Source;
-            CurrencyManager currencyManager = termSource.CurrencyManager;
+            var termSource = Source;
+            var currencyManager = termSource.CurrencyManager;
 
             termSource.MovePrevious();
             if (currencyManager.Position < 1)
             {
-                return Fill(First - Portion, true);
+                if (!_restricted)
+                {
+                    return Fill(First - Portion, true);
+                }
             }
 
             return true;
-        }
+
+        } // method MovePrevious
 
         /// <summary>
         /// Move to previous term.
@@ -159,15 +176,45 @@ namespace ManagedIrbis.WinForms
             }
 
             return true;
-        }
+
+        } // method MovePrevious
 
         /// <summary>
         /// Fill the adapter.
         /// </summary>
-        public bool Fill()
+        public bool Fill() => Fill(First);
+
+        /// <summary>
+        /// Заполнение адаптера найденными записями.
+        /// </summary>
+        public bool Fill
+            (
+                IEnumerable<int> found
+            )
         {
-            return Fill(First);
-        }
+            Source.DataSource = Array.Empty<FoundLine>();
+            _restricted = true;
+
+            var array = found.ToArray();
+            if (array.Length == 0)
+            {
+                return true;
+            }
+
+            var records = FoundLine.Read
+                (
+                    Connection,
+                    "@brief",
+                    array
+                );
+
+            First = array[0];
+            Source.DataSource = records;
+            Source.Position = 0;
+
+            return true;
+
+        } // method Fill
 
         /// <summary>
         /// Fill the adapter.
@@ -178,17 +225,18 @@ namespace ManagedIrbis.WinForms
                 bool backward = false
             )
         {
-            List<int> list = new List<int>(Portion);
-            int max = Connection.GetMaxMfn();
-            int first = startMfn;
+            _restricted = false;
+            var list = new List<int>(Portion);
+            var max = Connection.GetMaxMfn();
+            var first = startMfn;
 
             if (first <= 0)
             {
                 first = 1;
             }
 
-            int current = first;
-            for (int i = 0; i < Portion; i++)
+            var current = first;
+            for (var i = 0; i < Portion; i++)
             {
                 if (current >= max)
                 {
@@ -203,17 +251,12 @@ namespace ManagedIrbis.WinForms
                 return false;
             }
 
-            /*
-            FoundItem[] records = FoundItem.Read
+            var records = FoundLine.Read
                 (
                     Connection,
                     "@brief",
                     list
                 );
-
-                */
-
-            var records = Array.Empty<FoundItem>();
 
             if (records.Length < 1)
             {
@@ -232,8 +275,11 @@ namespace ManagedIrbis.WinForms
             }
 
             return true;
-        }
+
+        } // method Fill
 
         #endregion
-    }
-}
+
+    } // class RecordAdapter
+
+} // namespace ManagedIrbis.WinForms

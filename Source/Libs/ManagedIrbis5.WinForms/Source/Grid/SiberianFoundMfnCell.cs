@@ -65,10 +65,9 @@ namespace ManagedIrbis.WinForms.Grid
             var column = (SiberianFoundMfnColumn?) Column;
             if (!ReferenceEquals(found, null))
             {
-                var useSerial = column?.UseSerialNumber ?? false;
-                var number = useSerial
-                    ? found.SerialNumber
-                    : found.Mfn;
+                // TODO: вернуть использование порядковых номеров
+                // var useSerial = column?.UseSerialNumber ?? false;
+                var number = found.Mfn;
                 var text = number.ToInvariantString();
 
                 var flags = TextFormatFlags.TextBoxControl
@@ -86,7 +85,7 @@ namespace ManagedIrbis.WinForms.Grid
                         flags
                     );
             }
-        }
+        } // method Paint
 
         #endregion
 
@@ -106,7 +105,8 @@ namespace ManagedIrbis.WinForms.Grid
             }
 
             return $"FoundMfnCell [{column}, {row}]: {text}";
-        }
+
+        } // method ToString
 
         #endregion
 

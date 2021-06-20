@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 
 using AM;
+using AM.IO;
 
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
@@ -230,6 +231,29 @@ namespace ManagedIrbis.Providers
         } // method ReadFstFile
 
         /// <summary>
+        /// Чтение INI-файла как текстового.
+        /// </summary>
+        public static IniFile? ReadIniFile
+            (
+                this ISyncProvider provider,
+                FileSpecification specification
+            )
+        {
+            var content = provider.ReadTextFile(specification);
+            if (content is null)
+            {
+                return default;
+            }
+
+            using var reader = new StringReader(content);
+            var result = new IniFile { FileName = specification.FileName };
+            result.Read(reader);
+
+            return result;
+
+        } // method ReadIniFile
+
+        /// <summary>
         /// Чтение меню как текстового файла.
         /// </summary>
         public static MenuFile? ReadMenuFile
@@ -415,6 +439,14 @@ namespace ManagedIrbis.Providers
         public static FstFile RequireFstFile (this ISyncProvider connection, FileSpecification specification) =>
             connection.ReadFstFile(specification)
             ?? throw new IrbisException($"FST not found: {specification}");
+
+        /// <summary>
+        /// Чтение с сервера INI-файла, который обязательно должен быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
+        public static IniFile RequireIniFile (this ISyncProvider connection, FileSpecification specification) =>
+            connection.ReadIniFile(specification)
+            ?? throw new IrbisException($"INI not found: {specification}");
 
         /// <summary>
         /// Чтение с сервера файла меню, которое обязательно должно быть.

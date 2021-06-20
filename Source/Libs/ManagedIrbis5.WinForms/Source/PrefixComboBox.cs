@@ -3,17 +3,21 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PrefixComboBox.cs --
+/* PrefixComboBox.cs -- выпадающий список поисковых сценариев
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Windows.Forms;
+
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -22,7 +26,7 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms
 {
     /// <summary>
-    ///
+    /// Выпадающий список поисковых сценариев.
     /// </summary>
     [System.ComponentModel.DesignerCategory("Code")]
     public class PrefixComboBox
@@ -30,7 +34,10 @@ namespace ManagedIrbis.WinForms
     {
         #region Properties
 
-
+        /// <summary>
+        /// Выбранный пользователем поисковый сценарий.
+        /// </summary>
+        public SearchScenario? SelectedScenario => SelectedItem as SearchScenario;
 
         #endregion
 
@@ -53,29 +60,45 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public void FillWithScenarios
             (
-                ISyncProvider connection,
+                ISyncProvider provider,
                 string database
             )
         {
-            /*
+            Items.Clear();
 
-            SearchScenario[] scenarios = SearchScenario.LoadSearchScenarios
-                (
-                    connection,
-                    database
-                );
-            if (ReferenceEquals(scenarios, null))
+            // TODO: использовать более интеллектуальный поиск сценариев
+
+            var specification = new FileSpecification
             {
-                // TODO do something
-                throw new IrbisException();
+                Path = IrbisPath.MasterFile,
+                Database = database,
+                FileName = $"{database}.ini"
+            };
+            var iniFile = provider.ReadIniFile(specification);
+            if (iniFile is null)
+            {
+                if (provider is SyncConnection connection)
+                {
+                    iniFile = connection.IniFile;
+                }
             }
 
-            // ReSharper disable once CoVariantArrayConversion
-            Items.AddRange(scenarios);
+            if (iniFile is null)
+            {
+                return;
+            }
 
-            */
-        }
+            var scenarios = SearchScenario.ParseIniFile(iniFile);
+            Items.AddRange(scenarios);
+            if (scenarios.Length != 0)
+            {
+                SelectedIndex = 0;
+            }
+
+        } // method FillWithScenarios
 
         #endregion
-    }
-}
+
+    } // class PrefixComboBox
+
+} // namespace ManagedIrbis.WinForms

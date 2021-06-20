@@ -60,7 +60,7 @@ namespace ManagedIrbis.Reports
             {
                 object? obj = record.UserData switch
                 {
-                    object?[] array => array.SafeAt(Index),
+                    object[] array => array.SafeAt(Index),
                     IList<object?> list => list.SafeAt(Index),
                     _ => record.UserData
                 };

@@ -7,7 +7,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* TermAdapter.cs --
+/* TermAdapter.cs -- адаптер поисковых терминов для отображения в гриде
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms
 {
     /// <summary>
-    ///
+    /// Адаптер поисковых терминов для отображения в гриде.
     /// </summary>
     public class TermAdapter
     {
@@ -87,7 +87,7 @@ namespace ManagedIrbis.WinForms
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public TermAdapter
             (
@@ -99,11 +99,20 @@ namespace ManagedIrbis.WinForms
             Portion = 100;
             Connection = connection;
             Prefix = prefix;
-        }
+
+        } // constructor
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Очистка.
+        /// </summary>
+        public void Clear()
+        {
+            Source.DataSource = Array.Empty<Term>();
+        }
 
         /// <summary>
         /// Move to next term.
@@ -249,8 +258,11 @@ namespace ManagedIrbis.WinForms
             }
 
             return true;
-        }
+
+        } // method Fill
 
         #endregion
-    }
-}
+
+    } // class TermAdapter
+
+} // namespace ManagedIrbis.WinForms

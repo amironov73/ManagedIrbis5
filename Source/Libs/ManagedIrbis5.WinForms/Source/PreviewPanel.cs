@@ -7,21 +7,15 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PreviewPanel.cs --
+/* PreviewPanel.cs -- панель предварительного просмотра карточки
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using AM.Text;
 
 #endregion
 
@@ -30,15 +24,11 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms
 {
     /// <summary>
-    /// Preview documents.
+    /// Панель предварительного просмотра карточки.
     /// </summary>
     public partial class PreviewPanel
         : UserControl
     {
-        #region Properties
-
-        #endregion
-
         #region Construction
 
         /// <summary>
@@ -80,18 +70,26 @@ namespace ManagedIrbis.WinForms
         /// Set HTML text in the preview pane.
         /// </summary>
         public void SetHtmlText
-        (
-            string? text
-        )
+            (
+                string? text
+            )
         {
-            _DisposePreviousControl();
-
-            _previewHtmlTextBox = new WebBrowser
+            // TODO: реализовать по-человечески
+            if (!ReferenceEquals(_previewControl, _previewHtmlTextBox))
             {
-                DocumentText = text,
-                Dock = DockStyle.Fill
-            };
-            _viewPage.Controls.Add(_previewHtmlTextBox);
+                _DisposePreviousControl();
+            }
+
+            if (_previewHtmlTextBox == null)
+            {
+                _previewHtmlTextBox = new WebBrowser
+                {
+                    Dock = DockStyle.Fill
+                };
+                _viewPage.Controls.Add(_previewHtmlTextBox);
+            }
+
+            _previewHtmlTextBox.DocumentText = text;
             _previewControl = _previewHtmlTextBox;
         }
 
@@ -103,17 +101,25 @@ namespace ManagedIrbis.WinForms
                 string? text
             )
         {
-            _DisposePreviousControl();
-
-            _previewTextBox = new TextBox
+            // TODO: реализовать по-человечески
+            if (!ReferenceEquals(_previewControl, _previewTextBox))
             {
-                Text = text,
-                Dock = DockStyle.Fill,
-                Multiline = true,
-                WordWrap = true,
-                ScrollBars = ScrollBars.Vertical
-            };
-            _viewPage.Controls.Add(_previewTextBox);
+                _DisposePreviousControl();
+            }
+
+            if (_previewTextBox == null)
+            {
+                _previewTextBox = new TextBox
+                {
+                    Dock = DockStyle.Fill,
+                    Multiline = true,
+                    WordWrap = true,
+                    ScrollBars = ScrollBars.Vertical
+                };
+                _viewPage.Controls.Add(_previewTextBox);
+            }
+
+            _previewTextBox.Text = text;
             _previewControl = _previewTextBox;
         }
 
@@ -125,16 +131,24 @@ namespace ManagedIrbis.WinForms
                 string? text
             )
         {
-            _DisposePreviousControl();
-
-            _previewRichTextBox = new RichTextBox
+            // TODO: реализовать по-человечески
+            if (!ReferenceEquals(_previewControl, _previewRichTextBox))
             {
-                Rtf = text,
-                Dock = DockStyle.Fill,
-                Multiline = true,
-                WordWrap = true
-            };
-            _viewPage.Controls.Add(_previewRichTextBox);
+                _DisposePreviousControl();
+            }
+
+            if (_previewRichTextBox == null)
+            {
+                _previewRichTextBox = new RichTextBox
+                {
+                    Dock = DockStyle.Fill,
+                    Multiline = true,
+                    WordWrap = true
+                };
+                _viewPage.Controls.Add(_previewRichTextBox);
+            }
+
+            _previewRichTextBox.Rtf = text;
             _previewControl = _previewRichTextBox;
         }
 
@@ -146,9 +160,7 @@ namespace ManagedIrbis.WinForms
                 string? text
             )
         {
-            /*
-            TextKind textKind
-                = TextUtility.DetermineTextKind(text);
+            var textKind = TextUtility.DetermineTextKind(text);
 
             switch (textKind)
             {
@@ -165,9 +177,10 @@ namespace ManagedIrbis.WinForms
                     break;
             }
 
-            */
-        }
+        } // method SetText
 
         #endregion
-    }
-}
+
+    } // class PreviewPanel
+
+} // namespace ManagedIrbis.WinForms

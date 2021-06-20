@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SimplestMarcEditor.cs --
+/* SimplestMarcEditor.cs -- простейший редактор MARC-записей
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +23,7 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms.Editors
 {
     /// <summary>
-    ///
+    /// Простейший редактор MARC-записей.
     /// </summary>
     public partial class SimplestMarcEditor
         : UserControl
@@ -68,6 +68,17 @@ namespace ManagedIrbis.WinForms.Editors
         #region Public methods
 
         /// <summary>
+        /// Очистка.
+        /// </summary>
+        public void Clear()
+        {
+            _originalFields = new List<Field>();
+            _items = new List<FieldItem>();
+            _bindingSource.DataSource = _items;
+
+        } // method Clear
+
+        /// <summary>
         /// Get the fields.
         /// </summary>
         public void GetFields
@@ -96,7 +107,8 @@ namespace ManagedIrbis.WinForms.Editors
             }
 
             //collection.EndUpdate();
-        }
+
+        } // method GetFields
 
         /// <summary>
         /// Set the fields.
@@ -119,8 +131,11 @@ namespace ManagedIrbis.WinForms.Editors
             }
             _items = list;
             _bindingSource.DataSource = _items;
-        }
+
+        } // method SetFields
 
         #endregion
-    }
-}
+
+    } // class SimplestMarcEditor
+
+} // namespace ManagedIrbis.WinForms.Editors

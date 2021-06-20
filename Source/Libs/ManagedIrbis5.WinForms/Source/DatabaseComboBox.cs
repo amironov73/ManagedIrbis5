@@ -30,7 +30,7 @@ namespace ManagedIrbis.WinForms
         #region Properties
 
         /// <summary>
-        /// Selected chair.
+        /// Выбранная пользователем база данных.
         /// </summary>
         public DatabaseInfo? SelectedDatabase => SelectedItem as DatabaseInfo;
 

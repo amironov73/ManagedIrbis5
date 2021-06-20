@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -23,6 +24,9 @@ using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
+
+using SyncProviderUtility = ManagedIrbis.Providers.SyncProviderUtility;
 
 #endregion
 
@@ -111,6 +115,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
+
         } // method Parse
 
         /// <summary>
@@ -137,7 +142,41 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
+
         } // method ParseMfn
+
+        /// <summary>
+        /// Загружаем найденные записи с сервера.
+        /// </summary>
+        public static FoundItem[] Read
+            (
+                ISyncProvider connection,
+                string format,
+                IEnumerable<int> found
+            )
+        {
+            var array = found.ToArray();
+            var length = array.Length;
+            var result = new FoundItem[length];
+            var formatted = connection.FormatRecords(array, format);
+            if (formatted is null)
+            {
+                return Array.Empty<FoundItem>();
+            }
+
+            for (var i = 0; i < length; i++)
+            {
+                var item = new FoundItem
+                {
+                    Mfn = array[i],
+                    Text = formatted[i]
+                };
+                result[i] = item;
+            }
+
+            return result;
+
+        } // method Read
 
         #endregion
 
