@@ -62,6 +62,7 @@ namespace WinFormsExample
                 MessageBox.Show(errorMessage);
                 Environment.FailFast(errorMessage);
             }
+
         }
 
         #endregion
@@ -72,24 +73,24 @@ namespace WinFormsExample
         {
             var prefixBox = new ToolStripPrefixComboBox();
             PrefixBox = prefixBox.ComboBox;
-            PrefixBox.Width = 500;
+            PrefixBox.Width = 300;
             PrefixBox.DisplayMember = "Name";
             PrefixBox.SelectedIndexChanged += PrefixBox_SelectedIndexChanged;
             _databaseToolStrip.Items.Add(prefixBox);
 
             var databaseBox = new ToolStripDatabaseComboBox();
             DatabaseBox = databaseBox.ComboBox;
-            DatabaseBox.Width = 500;
+            DatabaseBox.Width = 300;
             DatabaseBox.SelectedIndexChanged += DatabaseBox_SelectedIndexChanged;
             _databaseToolStrip.Items.Add(databaseBox);
 
             SearchAdapter = new TermAdapter(Provider, string.Empty);
             FoundAdapter = new RecordAdapter(Provider);
-            _foundPanel.Adapter = FoundAdapter;
+            _foundPanel.SetAdapter (FoundAdapter);
 
             _dictionaryPanel.Choosed += DictionaryPanel_Chosen;
-            _foundPanel.Choosed += FoundPanel_Chosen;
- 
+            _foundPanel.ItemSelected += FoundPanel_Chosen;
+
             Engine.PopulateDatabases(DatabaseBox);
         }
 
@@ -159,7 +160,7 @@ namespace WinFormsExample
             var expression = $"\"{searchAdapter.Prefix}{searchAdapter.CurrentValue}\"";
             var found = Provider.Search(expression);
             recordAdapter.Fill(found);
-            _foundPanel.Adapter = recordAdapter;
+            _foundPanel.SetAdapter (recordAdapter);
             _foundPanel.Fill();
             foreach (FoundLine line in recordAdapter.Source)
             {

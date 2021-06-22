@@ -15,6 +15,7 @@
 
 using System;
 using System.Windows.Forms;
+using AM;
 
 #endregion
 
@@ -31,9 +32,9 @@ namespace ManagedIrbis.WinForms
         #region Events
 
         /// <summary>
-        /// Raised when the term is choosed.
+        /// Событие, возникающее, когда элемент выбран.
         /// </summary>
-        public event EventHandler? Choosed;
+        public event EventHandler? ItemSelected;
 
         #endregion
 
@@ -42,7 +43,7 @@ namespace ManagedIrbis.WinForms
         /// <summary>
         /// Adapter.
         /// </summary>
-        public RecordAdapter? Adapter { get; set; }
+        public RecordAdapter? Adapter { get; private set; }
 
         #endregion
 
@@ -83,7 +84,8 @@ namespace ManagedIrbis.WinForms
         {
             _grid.KeyDown += _grid_KeyDown;
             //_grid.KeyPress += _grid_KeyPress;
-            _grid.DoubleClick += _grid_DoubleClick;
+            _grid.CellClick += _grid_CellClick;
+            //_grid.DoubleClick += _grid_DoubleClick;
             _grid.MouseWheel += _grid_MouseWheel;
             //_keyBox.KeyDown += _keyBox_KeyDown;
             //_keyBox.DelayedTextChanged += _keyBox_TextChanged;
@@ -91,6 +93,24 @@ namespace ManagedIrbis.WinForms
             //_keyBox.MouseWheel += _grid_MouseWheel;
             //_scrollControl.Scroll += _scrollControl_Scroll;
             //_scrollControl.MouseWheel += _grid_MouseWheel;
+        }
+
+        private void _adapter_CurrentItemChanged
+            (
+                object? sender,
+                EventArgs e
+            )
+        {
+            _RaiseItemSelected();
+        }
+
+        private void _grid_CellClick
+            (
+                object? sender,
+                DataGridViewCellEventArgs e
+            )
+        {
+            _RaiseItemSelected();
         }
 
         private void _grid_MouseWheel
@@ -155,7 +175,7 @@ namespace ManagedIrbis.WinForms
                     break;
 
                 case Keys.Enter:
-                    _RaiseChoosed();
+                    _RaiseItemSelected();
                     break;
             }
         }
@@ -194,14 +214,14 @@ namespace ManagedIrbis.WinForms
                     break;
 
                 case Keys.Enter:
-                    _RaiseChoosed();
+                    _RaiseItemSelected();
                     break;
             }
         }
 
-        private void _RaiseChoosed()
+        private void _RaiseItemSelected()
         {
-            Choosed?.Invoke(this, EventArgs.Empty);
+            ItemSelected.Raise(this);
         }
 
         private void _grid_DoubleClick
@@ -210,7 +230,7 @@ namespace ManagedIrbis.WinForms
                 EventArgs e
             )
         {
-            _RaiseChoosed();
+            _RaiseItemSelected();
         }
 
         #endregion
@@ -240,6 +260,17 @@ namespace ManagedIrbis.WinForms
             _grid.DataSource = adapter.Source;
 
         } // method Fill
+
+        public void SetAdapter(RecordAdapter adapter)
+        {
+            if (Adapter is not null)
+            {
+                Adapter.Source.CurrentItemChanged -= _adapter_CurrentItemChanged;
+            }
+
+            Adapter = adapter;
+            Adapter.Source.CurrentItemChanged += _adapter_CurrentItemChanged;
+        }
 
         #endregion
 
