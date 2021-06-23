@@ -10,4 +10,10 @@
       <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

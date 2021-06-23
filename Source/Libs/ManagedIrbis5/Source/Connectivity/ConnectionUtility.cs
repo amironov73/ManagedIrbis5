@@ -26,6 +26,8 @@ using AM.Configuration;
 
 using ManagedIrbis.Providers;
 
+using Microsoft.Extensions.Configuration;
+
 #endregion
 
 #nullable enable
@@ -102,6 +104,39 @@ namespace ManagedIrbis
                     1
                 );
         }
+
+        /// <summary>
+        /// Получаем строку подключения из стандартного провайдера конфигурации.
+        /// (проще говоря, из <c>appsettings.json</c>)
+        /// </summary>
+        public static string? GetConfiguredConnectionString
+            (
+                IConfiguration configuration
+            )
+        {
+            string? result = null;
+
+            foreach (var key in StandardConnectionStrings)
+            {
+                result = configuration[key];
+                if (!string.IsNullOrEmpty(result))
+                {
+                    break;
+                }
+            }
+
+            if (result is not null)
+            {
+                result = IrbisUtility.DecryptConnectionString
+                    (
+                        result,
+                        null
+                    );
+            }
+
+            return result;
+
+        } // method GetConfiguredConnectionString
 
         /// <summary>
         /// Получаем строку подключения в AppSettings.

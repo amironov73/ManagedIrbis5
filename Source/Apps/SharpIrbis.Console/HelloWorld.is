@@ -1,0 +1,11 @@
+﻿using static System.Console;
+
+WriteLine($"Client version = {ManagedIrbis.ClientVersion.Version}");
+
+var greeting = "Привет из скрипта!";
+if (args.Length != 0)
+{
+    greeting = args[0];
+}
+
+WriteLine(greeting);

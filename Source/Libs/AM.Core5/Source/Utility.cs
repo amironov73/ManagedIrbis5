@@ -3487,6 +3487,7 @@ namespace AM
             }
 
             return Task.Factory.StartNew(() => { handler.Invoke(sender, args); });
+
         } // method RaiseAsync
 
         /// <summary>
@@ -3500,6 +3501,7 @@ namespace AM
             }
 
             return Task.Factory.StartNew(() => { handler.Invoke(sender, EventArgs.Empty); });
+
         } // method RaiseAsync
 
         /// <summary>
@@ -4362,6 +4364,39 @@ namespace AM
         /// </summary>
         [Pure]
         public static RefEnumerable<T> AsRefEnumerable<T>(this T[] data) => new (data.AsSpan());
+
+        /// <summary>
+        /// "Запустить и забыть".
+        /// </summary>
+        /// <remarks>
+        /// https://www.meziantou.net/fire-and-forget-a-task-in-dotnet.htm
+        /// </remarks>
+        public static void Forget
+            (
+                this Task task
+            )
+        {
+            // Only care about tasks that may fault or are faulted,
+            // so fast-path for SuccessfullyCompleted and Canceled tasks
+            if (!task.IsCompleted || task.IsFaulted)
+            {
+                _ = ForgetAwaited(task);
+            }
+
+            static async Task ForgetAwaited(Task task)
+            {
+                try
+                {
+                    // No need to resume on the original SynchronizationContext
+                    await task.ConfigureAwait(false);
+                }
+                catch
+                {
+                    // Nothing to do here
+                }
+            }
+
+        } // method Forget
 
         #endregion
 

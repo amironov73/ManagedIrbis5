@@ -1,0 +1,21 @@
+﻿using System;
+using System.Linq;
+using LinqToDB.DataProvider.SqlServer;
+using Istu.OldModel;
+
+const string ConnectionString = "Data Source=libertine;Initial Catalog=kladovka;User ID=rdr;Password=q;";
+using (var db = SqlServerTools.CreateDataConnection(ConnectionString))
+{
+    var query =
+    (
+        from t in db.GetTable<Translator>()
+        where t.Inventory < 600000
+        select t
+    )
+    .Take(100);
+
+    foreach (var one in query)
+    {
+        Console.WriteLine($"{one.Inventory}: {one.Barcode}");
+    }
+}

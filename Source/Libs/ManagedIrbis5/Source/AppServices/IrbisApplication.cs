@@ -23,12 +23,14 @@ using System.Diagnostics.CodeAnalysis;
 
 using AM;
 using AM.AppServices;
+
 using ManagedIrbis.CommandLine;
 using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 #endregion
 
@@ -91,7 +93,9 @@ namespace ManagedIrbis.AppServices
         protected virtual void BuildConnectionSettings()
         {
             // сначала берем настройки из стандартного JSON-файла конфигурации
-            var connectionString = ConnectionUtility.GetStandardConnectionString();
+            var connectionString = ConnectionUtility.GetConfiguredConnectionString(Configuration)
+                ?? ConnectionUtility.GetStandardConnectionString();
+
             Settings = new ConnectionSettings();
             if (!string.IsNullOrEmpty(connectionString))
             {
@@ -160,8 +164,11 @@ namespace ManagedIrbis.AppServices
         {
             try
             {
+                Logger = new NullLogger<IrbisApplication>();
+
                 PreRun();
 
+                using var host = Magna.Host;
                 using var connection = Connection.ThrowIfNull(nameof(Connection));
                 connection.Connect();
                 if (!connection.Connected)
@@ -172,7 +179,7 @@ namespace ManagedIrbis.AppServices
 
                 Logger.LogInformation("Successfully connected");
 
-                Magna.Host.Run();
+                Magna.Host.Start();
 
                 var result = ActualRun();
 

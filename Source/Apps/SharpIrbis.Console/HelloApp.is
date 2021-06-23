@@ -1,0 +1,4 @@
+﻿Logger.LogInformation("Привет из приложения!");
+
+var maxMfn = Connection.GetMaxMfn("IBIS_OLD");
+Logger.LogInformation($"Max MFN={maxMfn}");

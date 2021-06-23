@@ -1,0 +1,25 @@
+﻿using Microsoft.Extensions.Logging;
+using AM.AppServices;
+using ManagedIrbis.AppServices;
+
+new Program(args).Run();
+
+internal class Program : IrbisApplication
+{
+    public Program(string[] args) : base(args) {}
+
+    protected override int ActualRun()
+    {
+        Logger.LogInformation("Привет из приложения!");
+
+        var maxMfn = Connection.GetMaxMfn("IBIS_OLD");
+        Logger.LogInformation($"Max MFN={maxMfn}");
+
+        return 0;
+    }
+
+    static int Main(string[] args) => new Program(args).Run();
+
+} // class Program
+
+

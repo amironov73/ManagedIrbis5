@@ -27,6 +27,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 #endregion
 
@@ -97,7 +98,7 @@ namespace AM.AppServices
         {
             var result = new ConfigurationBuilder()
                 .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", false)
+                .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables()
                 .AddCommandLine(Args);
 
@@ -216,12 +217,15 @@ namespace AM.AppServices
         {
             try
             {
+                Logger = new NullLogger<MagnaApplication>();
+
                 PreRun();
+
+                using var host = Magna.Host;
 
                 Magna.Host.Start();
 
                 return ActualRun();
-
             }
             catch (Exception exception)
             {

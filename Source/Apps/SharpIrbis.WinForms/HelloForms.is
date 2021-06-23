@@ -1,0 +1,34 @@
+﻿using System;
+using System.Windows.Forms;
+
+Application.Run(new MainForm());
+
+//====================================================================
+
+internal class MainForm : Form
+{
+    private readonly Button _button;
+
+    public MainForm()
+    {
+        Text = "Привет от SharpIrbis";
+
+        _button = new Button
+        {
+            Top = 10, Width = 100,
+            Anchor = AnchorStyles.Right | AnchorStyles.Top,
+            Text = "Нажми меня"
+        };
+        Controls.Add (_button);
+        _button.Left = this.Width - _button.Width - 20;
+
+        _button.Click += _button_Click;
+    }
+
+    private void _button_Click (object? sender, EventArgs ea)
+    {
+        MessageBox.Show("Съешь ещё этих мягких французских булок", "ScriptIrbis",
+            MessageBoxButtons.OK, MessageBoxIcon.Information);
+        Close();
+    }
+}
