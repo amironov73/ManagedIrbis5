@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* ScriptCompiler.cs -- компилятор скриптов
@@ -26,6 +27,8 @@ using AM.Collections;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Emit;
 
 #endregion
 
@@ -67,7 +70,7 @@ namespace ManagedIrbis.Scripting
 
         #region Private members
 
-        private static readonly string _applicationBegin = @"using Microsoft.Extensions.Logging;
+        private static readonly string _applicationSourceCode = @"using Microsoft.Extensions.Logging;
 using AM.AppServices;
 using ManagedIrbis.AppServices;
 
@@ -78,9 +81,7 @@ internal class Program : IrbisApplication
     public Program(string[] args) : base(args) {}
 
     protected override int ActualRun()
-    {";
-
-        private static readonly string _applicationEnd = @"return 0;
+    {
     }
 
     static int Main(string[] args) => new Program(args).Run();
@@ -102,11 +103,66 @@ internal class Program : IrbisApplication
             var builder = new StringBuilder();
             foreach (var line in lines)
             {
-                builder.AppendLine($"{prefix}line");
+                builder.AppendLine($"{prefix}{line}");
             }
 
+            // пустая строка для красоты
+            builder.AppendLine();
+
             return builder.ToString();
-        }
+
+        } // method _AddLines
+
+        private static string _MergeCode
+            (
+                string outerCode,
+                string innerCode
+            )
+        {
+            // синтаксическое дерево
+            var outerTree = CSharpSyntaxTree.ParseText(outerCode);
+            var innerTree = CSharpSyntaxTree.ParseText(innerCode);
+
+            // корневой узел
+            var outerRoot = outerTree.GetRoot();
+            var innerRoot = innerTree.GetRoot();
+
+            // находим метод ActualRun
+            var actualRun =
+                (
+                    from method in outerRoot.DescendantNodes()
+                        .OfType<MethodDeclarationSyntax>()
+                    where method.Identifier.ValueText == "ActualRun"
+                    select method
+                )
+                .First();
+
+            var statements = innerRoot.ChildNodes();
+            var newActualRun = actualRun;
+            foreach (var node in statements)
+            {
+                newActualRun = newActualRun.AddBodyStatements(((GlobalStatementSyntax)node).Statement);
+            }
+
+            // return 0;
+            newActualRun = newActualRun.AddBodyStatements
+                (
+                    SyntaxFactory.ReturnStatement
+                        (
+                            SyntaxFactory.LiteralExpression
+                            (
+                                SyntaxKind.NumericLiteralExpression,
+                                SyntaxFactory.Literal(0)
+                            )
+                        )
+                );
+
+            var resultRoot = outerRoot.ReplaceNode(actualRun, newActualRun)
+                .NormalizeWhitespace();
+
+            return resultRoot.ToFullString();
+
+        } // method _MergeCode
 
         #endregion
 
@@ -122,7 +178,7 @@ internal class Program : IrbisApplication
             AddReference(typeof(Console));
             AddReference(typeof(System.Collections.IEnumerable));
             AddReference(typeof(List<>));
-            AddReference(typeof(System.Text.Encoding));
+            AddReference(typeof(Encoding));
             AddReference(typeof(File));
             AddReference(typeof(Enumerable));
             AddReference("System.ComponentModel");
@@ -176,11 +232,16 @@ internal class Program : IrbisApplication
                 var sourceCode = File.ReadAllText(inputFileName);
                 if (options.ApplicationMode)
                 {
-                    sourceCode = _applicationBegin + "\n" + sourceCode + "\n" + _applicationEnd;
+                    sourceCode = _MergeCode(_applicationSourceCode, sourceCode);
                 }
 
-                sourceCode = _AddLines(sourceCode, "#using ", options.Usings);
+                sourceCode = _AddLines(sourceCode, "using ", options.Usings);
                 sourceCode = _AddLines(sourceCode, "#define ", options.Defines);
+
+                if (options.ShowApplicationCode)
+                {
+                    Console.WriteLine(sourceCode);
+                }
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
                 forest.Add(syntaxTree);
@@ -226,14 +287,24 @@ internal class Program : IrbisApplication
         /// <summary>
         /// Получение сборки в указанный поток.
         /// </summary>
-        /// <returns></returns>
         public bool EmitAssemblyToStream
             (
                 Compilation compilation,
-                Stream stream
+                Stream exeStream,
+                Stream? pdbStream = null
             )
         {
-            var emitResult = compilation.Emit(stream);
+            EmitResult emitResult;
+            if (pdbStream is null)
+            {
+                emitResult = compilation.Emit(exeStream);
+            }
+            else
+            {
+                var emitOptions = new EmitOptions(debugInformationFormat: DebugInformationFormat.Pdb);
+                emitResult = compilation.Emit(exeStream, pdbStream, options: emitOptions);
+            }
+
             if (!emitResult.Success)
             {
                 var failures = emitResult.Diagnostics.Where
@@ -259,12 +330,14 @@ internal class Program : IrbisApplication
         public bool EmitAssemblyToFile
             (
                 Compilation compilation,
-                string fileName
+                string exeName,
+                string? pdbName = null
             )
         {
-            using var stream = File.Create(fileName);
+            using Stream? pdbStream = pdbName is null ? null : File.Create(pdbName);
+            using var exeStream = File.Create(exeName);
 
-            return EmitAssemblyToStream(compilation, stream);
+            return EmitAssemblyToStream(compilation, exeStream);
 
         } // method EmitAssemblyToFile
 
@@ -324,7 +397,11 @@ internal class Program : IrbisApplication
             };
             var usingOption = new Option<string[]>("u", arity: ArgumentArity.ZeroOrMore)
             {
-                Description = "#using"
+                Description = "using directive"
+            };
+            var showOption = new Option<bool>("s")
+            {
+                Description = "show resulting application code"
             };
             var inputArg = new Argument<string[]>("input")
             {
@@ -340,6 +417,7 @@ internal class Program : IrbisApplication
                 applicationOption,
                 defineOption,
                 usingOption,
+                showOption,
                 inputArg
             };
 
@@ -383,6 +461,7 @@ internal class Program : IrbisApplication
             result.ApplicationMode = parseResult.ValueForOption(applicationOption);
             result.CompileOnly = parseResult.ValueForOption(compileOption);
             result.ExecuteOnly = parseResult.ValueForOption(executeOption);
+            result.ShowApplicationCode = parseResult.ValueForOption(showOption);
 
             return result;
 

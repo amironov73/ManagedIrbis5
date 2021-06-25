@@ -175,9 +175,13 @@ namespace ManagedIrbis.AppServices
                 {
                     Logger.LogError("Can't connect");
                     Logger.LogInformation(IrbisException.GetErrorDescription(connection.LastError));
-                }
 
-                Logger.LogInformation("Successfully connected");
+                    return 1;
+                }
+                else
+                {
+                    Logger.LogInformation("Successfully connected");
+                }
 
                 Magna.Host.Start();
 

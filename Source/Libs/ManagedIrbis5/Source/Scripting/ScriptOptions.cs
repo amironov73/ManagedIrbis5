@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 /* ScriptOptions.cs -- опции скрипта
  * Ars Magna project, http://arsmagna.ru
@@ -78,6 +79,11 @@ namespace ManagedIrbis.Scripting
         /// Не надо ссылок по умолчанию.
         /// </summary>
         public bool NoDefaultReferences { get; set; }
+
+        /// <summary>
+        /// Показать получившийся исходный код.
+        /// </summary>
+        public bool ShowApplicationCode { get; set; }
 
         #endregion
 
