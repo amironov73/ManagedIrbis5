@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* NodeRecord64.cs -- L01/N01
+/* NodeRecord64.cs -- запись в файлах L01/N01
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -115,9 +115,9 @@ namespace ManagedIrbis.Direct
         public NodeLeader64 Leader { get; set; }
 
         /// <summary>
-        /// Ссылки
+        /// Ссылки.
         /// </summary>
-        public List<NodeItem64> Items { get { return _items; } }
+        public List<NodeItem64> Items => _items;
 
         #endregion
 
@@ -157,7 +157,7 @@ namespace ManagedIrbis.Direct
         #region Public methods
 
         /// <summary>
-        /// Dump the record.
+        /// Дамп записи.
         /// </summary>
         public void Dump
             (
@@ -184,6 +184,7 @@ namespace ManagedIrbis.Direct
         }
 
         #endregion
-    }
-}
 
+    } // class NodeRecord64
+
+} // namespace ManagedIrbis.Direct
