@@ -114,7 +114,7 @@ namespace ManagedIrbis
         /// </remarks>
         [XmlAttribute("database")]
         [JsonPropertyName("database")]
-        public string? Database { get; set; } = DefaultDatabase;
+        public string? Database { get; set; }
 
         /// <summary>
         /// Workstation application kind.
@@ -123,7 +123,7 @@ namespace ManagedIrbis
         /// </remarks>
         [XmlAttribute("workstation")]
         [JsonPropertyName("workstation")]
-        public string? Workstation { get; set; } = DefaultWorkstation;
+        public string? Workstation { get; set; }
 
         /// <summary>
         /// Turn on network logging.
@@ -315,6 +315,33 @@ namespace ManagedIrbis
             }
 
         } // method Apply
+
+        /// <summary>
+        /// Применение настроек по умолчанию, если они не заданы.
+        /// </summary>
+        public void ApplyDefaults()
+        {
+            // if (string.IsNullOrEmpty(Database))
+            // {
+            //     Database = DefaultDatabase;
+            // }
+
+            if (string.IsNullOrEmpty(Workstation))
+            {
+                Workstation = DefaultWorkstation;
+            }
+
+            if (string.IsNullOrEmpty(Host))
+            {
+                Host = DefaultHost;
+            }
+
+            if (Port == 0)
+            {
+                Port = DefaultPort;
+            }
+
+        } // method ApplyDefaults
 
         /// <summary>
         /// Clone.

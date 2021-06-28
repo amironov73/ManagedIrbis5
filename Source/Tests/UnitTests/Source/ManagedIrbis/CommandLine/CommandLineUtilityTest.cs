@@ -65,8 +65,8 @@ namespace UnitTests.ManagedIrbis.CommandLine
                         Assert.AreEqual((ushort)6666, settings.Port);
                         Assert.AreEqual(string.Empty, settings.Username);
                         Assert.AreEqual(string.Empty, settings.Password);
-                        Assert.AreEqual("IBIS", settings.Database);
-                        Assert.AreEqual("C", settings.Workstation);
+                        Assert.IsNull(settings.Database);
+                        Assert.IsNull(settings.Workstation);
                     }
                 );
 
@@ -198,8 +198,8 @@ namespace UnitTests.ManagedIrbis.CommandLine
             Assert.AreEqual((ushort)6666, connection.Port);
             Assert.IsNull(connection.Username);
             Assert.IsNull(connection.Password);
-            Assert.AreEqual("IBIS", connection.Database);
-            Assert.AreEqual("C", connection.Workstation);
+            Assert.IsNull(connection.Database);
+            Assert.IsNull(connection.Workstation);
         }
 
         [TestMethod]

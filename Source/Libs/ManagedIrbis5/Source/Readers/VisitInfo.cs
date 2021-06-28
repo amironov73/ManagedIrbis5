@@ -45,6 +45,11 @@ namespace ManagedIrbis.Readers
         #region Constants
 
         /// <summary>
+        /// Метка поля.
+        /// </summary>
+        public const int Tag = 40;
+
+        /// <summary>
         /// Known codes.
         /// </summary>
         public const string KnownCodes = "1249abcdefghikluv";
@@ -391,9 +396,9 @@ namespace ManagedIrbis.Readers
         }
 
         /// <summary>
-        /// Get year of the book.
+        /// Получение года издания для книги.
         /// </summary>
-        public static string? GetBookYear
+        public static string GetBookYear
             (
                 Record bookRecord
             )
@@ -401,7 +406,7 @@ namespace ManagedIrbis.Readers
             var result = Utility.NonEmpty(bookRecord.FM(210, 'd'),
                          bookRecord.FM(934));
 
-            return result.ToString();
+            return result;
         }
 
         /// <summary>

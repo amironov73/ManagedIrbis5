@@ -29,6 +29,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
+using NLog.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -140,8 +142,8 @@ namespace AM.AppServices
                 ILoggingBuilder logging
             )
         {
-            logging.AddConsole();
-            logging.AddConfiguration(Configuration);
+            logging.ClearProviders();
+            logging.AddNLog(Configuration);
 
         } // method ConfigureLogging
 
@@ -175,6 +177,19 @@ namespace AM.AppServices
                 return this;
             }
 
+            // Это временный хост, чтобы сделать возможным логирование
+            // до того, как всё проинициализируется окончательно
+            var preliminaryServices = new ServiceCollection()
+                .AddLogging(builder =>
+                    {
+                        builder.ClearProviders();
+                        builder.AddConsole();
+                    })
+                .BuildServiceProvider();
+
+            Logger = preliminaryServices.GetRequiredService<ILogger<MagnaApplication>>();
+            Logger.LogInformation("Preliminary logging enabled");
+
             Magna.Application = this;
             Configuration = BuildConfiguration().Build();
             ParseResult = ParseCommandLine();
@@ -183,7 +198,7 @@ namespace AM.AppServices
             hostBuilder.ConfigureServices(ConfigureServices);
             hostBuilder.ConfigureServices
                 (
-                    services => services.AddLogging(ConfigureLogging)
+                    serviceCollection => serviceCollection.AddLogging(ConfigureLogging)
                 );
 
             var host = hostBuilder.Build();

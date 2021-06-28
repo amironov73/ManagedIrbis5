@@ -30,7 +30,6 @@ using ManagedIrbis.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 #endregion
 
@@ -115,7 +114,10 @@ namespace ManagedIrbis.AppServices
             // наконец, из командной строки
             CommandLineUtility.ConfigureConnectionFromCommandLine(Settings, Args);
 
-            Logger.LogInformation($"Using connection string: {connectionString}");
+            // Применяем настройки по умолчанию, если соответствующие элементы не заданы
+            Settings.ApplyDefaults();
+
+            // Logger.LogInformation($"Using connection settings: {Settings}");
 
             if (!Settings.Verify(false))
             {
@@ -164,8 +166,6 @@ namespace ManagedIrbis.AppServices
         {
             try
             {
-                Logger = new NullLogger<IrbisApplication>();
-
                 PreRun();
 
                 using var host = Magna.Host;
@@ -178,10 +178,8 @@ namespace ManagedIrbis.AppServices
 
                     return 1;
                 }
-                else
-                {
-                    Logger.LogInformation("Successfully connected");
-                }
+
+                Logger.LogInformation("Successfully connected");
 
                 Magna.Host.Start();
 
