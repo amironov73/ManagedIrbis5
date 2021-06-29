@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 /* ArrayIterator.cs -- итератор по массиву
  * Ars Magna project, http://arsmagna.ru
@@ -24,7 +25,8 @@ namespace AM.Collections
     /// Итератор по массиву.
     /// </summary>
     public struct ArrayIterator<T>
-        : IIterator<T>
+        : IIterator<T>,
+        IEquatable<ArrayIterator<T>>
         where T: unmanaged
     {
         #region Construction
@@ -53,6 +55,71 @@ namespace AM.Collections
 
         #region Public methods
 
+        /// <summary>
+        /// Оператор инкремента.
+        /// </summary>
+        public static ArrayIterator<T> operator ++(ArrayIterator<T> iterator) =>
+            new (iterator._array, iterator._index + 1);
+
+        /// <summary>
+        /// Оператор декремента.
+        /// </summary>
+        public static ArrayIterator<T> operator --(ArrayIterator<T> iterator) =>
+            new (iterator._array, iterator._index - 1);
+
+        /// <summary>
+        /// Оператор сложения с целым числом.
+        /// </summary>
+        public static ArrayIterator<T> operator + (ArrayIterator<T> left, int right) =>
+            new (left._array, left._index + right);
+
+        /// <summary>
+        /// Оператор вычитания целого числа.
+        /// </summary>
+        public static ArrayIterator<T> operator - (ArrayIterator<T> left, int right) =>
+            new (left._array, left._index - right);
+
+        /// <summary>
+        /// Вычисление разности между двумя итераторами.
+        /// </summary>
+        public static int operator - (ArrayIterator<T> left, ArrayIterator<T> right) =>
+            left._index - right._index;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator < (ArrayIterator<T> left, ArrayIterator<T> right) =>
+            left._index < right._index;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator <= (ArrayIterator<T> left, ArrayIterator<T> right) =>
+            left._index <= right._index;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator > (ArrayIterator<T> left, ArrayIterator<T> right) =>
+            left._index > right._index;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator >= (ArrayIterator<T> left, ArrayIterator<T> right) =>
+            left._index >= right._index;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator == (ArrayIterator<T> left, ArrayIterator<T> right) =>
+            left._index == right._index;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator != (ArrayIterator<T> left, ArrayIterator<T> right) =>
+            left._index != right._index;
 
         #endregion
 
@@ -69,6 +136,28 @@ namespace AM.Collections
 
         /// <inheritdoc cref="IIterator{T}.Advance"/>
         public void Advance(int delta = 1) => _index += delta;
+
+        #endregion
+
+        #region IEquatable members
+
+        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
+        public bool Equals(ArrayIterator<T> other) =>
+            _array.Equals(other._array) && _index == other._index;
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.Equals(object)"/>
+        public override bool Equals(object? obj) =>
+            obj is ArrayIterator<T> other && Equals(other);
+
+        /// <inheritdoc cref="object.GetHashCode"/>
+        public override int GetHashCode() => HashCode.Combine(_array, _index);
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => _index.ToInvariantString();
 
         #endregion
 

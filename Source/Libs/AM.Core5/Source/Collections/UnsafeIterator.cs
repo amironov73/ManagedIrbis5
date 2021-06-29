@@ -5,6 +5,8 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
+// ReSharper disable UnusedType.Global
 
 /* UnsafeIterator.cs -- итератор по опасной памяти
  * Ars Magna project, http://arsmagna.ru
@@ -24,7 +26,8 @@ namespace AM.Collections
     /// Итератор по опасной памяти.
     /// </summary>
     public unsafe struct UnsafeIterator<T>
-        : IIterator<T>
+        : IIterator<T>,
+        IEquatable<UnsafeIterator<T>>
         where T: unmanaged
     {
         #region Construction
@@ -74,6 +77,76 @@ namespace AM.Collections
 
         #endregion
 
+        #region Public methods
+
+        /// <summary>
+        /// Оператор инкремента.
+        /// </summary>
+        public static UnsafeIterator<T> operator ++(UnsafeIterator<T> iterator) =>
+            new (iterator._pointer + 1);
+
+        /// <summary>
+        /// Оператор декремента.
+        /// </summary>
+        public static UnsafeIterator<T> operator --(UnsafeIterator<T> iterator) =>
+            new (iterator._pointer - 1);
+
+        /// <summary>
+        /// Оператор сложения с целым числом.
+        /// </summary>
+        public static UnsafeIterator<T> operator + (UnsafeIterator<T> left, int right) =>
+            new (left._pointer + right);
+
+        /// <summary>
+        /// Оператор вычитания целого числа.
+        /// </summary>
+        public static UnsafeIterator<T> operator - (UnsafeIterator<T> left, int right) =>
+            new (left._pointer - right);
+
+        /// <summary>
+        /// Вычисление разности между двумя итераторами.
+        /// </summary>
+        public static int operator - (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+            unchecked((int)(left._pointer - right._pointer));
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator < (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+            left._pointer < right._pointer;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator <= (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+            left._pointer <= right._pointer;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator > (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+            left._pointer > right._pointer;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator >= (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+            left._pointer >= right._pointer;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator == (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+            left._pointer == right._pointer;
+
+        /// <summary>
+        /// Сравнение двух итераторов.
+        /// </summary>
+        public static bool operator != (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+            left._pointer != right._pointer;
+
+        #endregion
+
         #region IIterator members
 
         /// <inheritdoc cref="IComparable{T}.CompareTo"/>
@@ -87,6 +160,28 @@ namespace AM.Collections
 
         /// <inheritdoc cref="IIterator{T}.Advance"/>
         public void Advance(int delta = 1) => _pointer += delta;
+
+        #endregion
+
+        #region IEquatable members
+
+        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
+        public bool Equals(UnsafeIterator<T> other) =>
+            _pointer == other._pointer;
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.Equals(object)"/>
+        public override bool Equals(object? obj) =>
+            obj is UnsafeIterator<T> other && Equals(other);
+
+        /// <inheritdoc cref="object.GetHashCode"/>
+        public override int GetHashCode() => (int)_pointer;
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => ((int)_pointer).ToString("x8");
 
         #endregion
 
