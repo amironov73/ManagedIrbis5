@@ -234,5 +234,9 @@
   {
     "class": "FormsTests.InputLanguageUtilityTest",
     "title": "InputLanguageUtilityTest"
+  },
+  {
+    "class": "FormsTests.VirtualGridTest1",
+    "title": "VirtualGridTest - 1"
   }
 ]

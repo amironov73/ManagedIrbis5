@@ -47,7 +47,7 @@ namespace AM.Windows.Forms
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PagingDataGridView()
         {
@@ -58,18 +58,21 @@ namespace AM.Windows.Forms
             AllowUserToAddRows = false;
             AllowUserToResizeRows = false;
             AllowUserToDeleteRows = false;
+            EnableHeadersVisualStyles = false;
+            ColumnHeadersDefaultCellStyle.SelectionBackColor = ColumnHeadersDefaultCellStyle.BackColor;
+            ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             ScrollBars = ScrollBars.None;
 
             var mainStyle = new DataGridViewCellStyle();
             DefaultCellStyle = mainStyle;
 
-            var alternateStyle
-                = new DataGridViewCellStyle(mainStyle)
+            var alternateStyle = new DataGridViewCellStyle(mainStyle)
                 {
                     BackColor = Color.LightGray
                 };
             AlternatingRowsDefaultCellStyle = alternateStyle;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -126,8 +129,7 @@ namespace AM.Windows.Forms
                 bool initialCall
             )
         {
-            var eventArgs
-                = new PagingDataGridViewEventArgs
+            var eventArgs = new PagingDataGridViewEventArgs
             {
                 InitialCall = initialCall,
                 ScrollDown = scrollDown,
@@ -153,9 +155,9 @@ namespace AM.Windows.Forms
 
         /// <inheritdoc />
         protected override void OnKeyDown
-        (
-            KeyEventArgs e
-        )
+            (
+                KeyEventArgs e
+            )
         {
             base.OnKeyDown(e);
 
@@ -193,5 +195,7 @@ namespace AM.Windows.Forms
         }
 
         #endregion
-    }
-}
+
+    } // class PagingDataGridView
+
+} // namespace AM.Windows.Forms

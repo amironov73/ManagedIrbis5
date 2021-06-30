@@ -3,13 +3,17 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable LocalizableElement
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 #region Using directives
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
+
+using AM;
 
 using ManagedIrbis;
 using ManagedIrbis.Providers;
@@ -63,11 +67,15 @@ namespace WinFormsExample
                 Environment.FailFast(errorMessage);
             }
 
+            _stopwatch = new Stopwatch();
+            _stopwatch.Start();
         }
 
         #endregion
 
         #region Private members
+
+        private readonly Stopwatch _stopwatch;
 
         private void _PopulateControls()
         {
@@ -86,12 +94,15 @@ namespace WinFormsExample
 
             SearchAdapter = new TermAdapter(Provider, string.Empty);
             FoundAdapter = new RecordAdapter(Provider);
-            _foundPanel.SetAdapter (FoundAdapter);
+            _foundPanel.Adapter = FoundAdapter;
 
             _dictionaryPanel.Choosed += DictionaryPanel_Chosen;
             _foundPanel.ItemSelected += FoundPanel_Chosen;
 
             Engine.PopulateDatabases(DatabaseBox);
+
+            _DrawTime();
+            _DrawContext();
         }
 
         private void _LoadFirstRecords()
@@ -102,13 +113,24 @@ namespace WinFormsExample
                 return;
             }
 
-            adapter.Fill(1);
+            _foundPanel.Clear();
+            _foundPanel.RecreateGrid();
+            _foundPanel.Adapter = adapter;
             _foundPanel.Fill();
-            foreach (FoundLine line in adapter.Source)
+            var records = _foundPanel.Records;
+            if (records is not null)
             {
-                line.Icon = R.SmallBook;
+                foreach (var line in records)
+                {
+                    if (line is not null)
+                    {
+                        line.Icon = R.SmallBook;
+                    }
+                }
             }
+
             FoundPanel_Chosen(this, EventArgs.Empty);
+            _DrawContext();
 
         } // method _LoadFirstRecords
 
@@ -126,7 +148,7 @@ namespace WinFormsExample
                 return;
             }
 
-            var mfn = adapter.CurrentMfn;
+            var mfn = _foundPanel.CurrentMfn;
             if (mfn <= 0)
             {
                 return;
@@ -140,6 +162,8 @@ namespace WinFormsExample
                 var text = Provider.FormatRecord("@", mfn);
                 _previewPanel.SetText(text);
             }
+
+            _DrawCurrentMfn();
 
         } // method FoundPanel_Chosen
 
@@ -159,13 +183,11 @@ namespace WinFormsExample
 
             var expression = $"\"{searchAdapter.Prefix}{searchAdapter.CurrentValue}\"";
             var found = Provider.Search(expression);
-            recordAdapter.Fill(found);
-            _foundPanel.SetAdapter (recordAdapter);
-            _foundPanel.Fill();
-            foreach (FoundLine line in recordAdapter.Source)
-            {
-                line.Icon = R.SmallBook;
-            }
+            _foundPanel.Fill (found);
+            // foreach (FoundLine line in recordAdapter.Source)
+            // {
+            //     line.Icon = R.SmallBook;
+            // }
 
             FoundPanel_Chosen(searchAdapter, e);
 
@@ -242,6 +264,39 @@ namespace WinFormsExample
             )
         {
             Close();
+        }
+
+        private void _DrawContext()
+        {
+            var mfn = Engine.Provider.GetMaxMfn();
+            _maxMfnLabel.Text = mfn > 0
+                ? mfn.ToInvariantString()
+                : "- нет -";
+            _DrawCurrentMfn();
+        }
+
+        private void _DrawCurrentMfn()
+        {
+            var mfn = _foundPanel.CurrentMfn;
+            _currentMfnLabel.Text = mfn > 0
+                ? mfn.ToInvariantString()
+                : "- нет -";
+        }
+
+        private void _DrawTime()
+        {
+            _watchLabel.Text = DateTime.Now.ToString("HH:mm tt");
+            var elapsed = _stopwatch.Elapsed;
+            _timeLabel.Text = elapsed.ToHourString();
+        }
+
+        private void _workingTimer_Tick
+            (
+                object sender,
+                EventArgs e
+            )
+        {
+            _DrawTime();
         }
 
         #endregion

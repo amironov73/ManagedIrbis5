@@ -53,7 +53,7 @@ namespace SiberianTests
             };
             form.Controls.Add(grid);
 
-            const string connectionString = "host=127.0.0.1;port=6666;user=librarian;password=secret;";
+            const string connectionString = "host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;";
             using var connection = ConnectionFactory.Shared.CreateSyncConnection();
             connection.ParseConnectionString(connectionString);
             connection.Connect();

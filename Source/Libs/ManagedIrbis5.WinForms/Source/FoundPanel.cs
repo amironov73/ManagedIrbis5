@@ -41,9 +41,40 @@ namespace ManagedIrbis.WinForms
         #region Properties
 
         /// <summary>
-        /// Adapter.
+        /// Адаптер, подтягивающий записи с сервера.
         /// </summary>
-        public RecordAdapter? Adapter { get; private set; }
+        public RecordAdapter? Adapter
+        {
+            get => (RecordAdapter?) _grid.Adapter;
+            set => _grid.Adapter = value;
+        }
+
+        /// <summary>
+        /// Текущий MFN.
+        /// </summary>
+        public int CurrentMfn
+        {
+            get
+            {
+                var cell = _grid.CurrentRow?.Cells[0];
+                if (cell is null)
+                {
+                    return 0;
+                }
+
+                if (cell.Value is int mfn)
+                {
+                    return mfn;
+                }
+
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Текущие строки.
+        /// </summary>
+        public FoundLine?[]? Records => (FoundLine?[]?) _grid.Lines;
 
         #endregion
 
@@ -56,7 +87,6 @@ namespace ManagedIrbis.WinForms
         {
             InitializeComponent();
 
-            _grid.AutoGenerateColumns = false;
             _SetupEvents();
         }
 
@@ -70,9 +100,7 @@ namespace ManagedIrbis.WinForms
         {
             InitializeComponent();
 
-            _grid.AutoGenerateColumns = false;
             Adapter = adapter;
-            _grid.DataSource = adapter.Source;
             _SetupEvents();
         }
 
@@ -82,11 +110,11 @@ namespace ManagedIrbis.WinForms
 
         private void _SetupEvents()
         {
-            _grid.KeyDown += _grid_KeyDown;
+            //_grid.KeyDown += _grid_KeyDown;
             //_grid.KeyPress += _grid_KeyPress;
             _grid.CellClick += _grid_CellClick;
             //_grid.DoubleClick += _grid_DoubleClick;
-            _grid.MouseWheel += _grid_MouseWheel;
+            //_grid.MouseWheel += _grid_MouseWheel;
             //_keyBox.KeyDown += _keyBox_KeyDown;
             //_keyBox.DelayedTextChanged += _keyBox_TextChanged;
             //_keyBox.EnterPressed += _keyBox_TextChanged;
@@ -113,111 +141,111 @@ namespace ManagedIrbis.WinForms
             _RaiseItemSelected();
         }
 
-        private void _grid_MouseWheel
-            (
-                object? sender,
-                MouseEventArgs e
-            )
-        {
-            if (ReferenceEquals(Adapter, null))
-            {
-                return;
-            }
-
-            int delta = e.Delta;
-
-            if (delta > 0)
-            {
-                Adapter.MovePrevious();
-            }
-            else if (delta < 0)
-            {
-                Adapter.MoveNext();
-            }
-        }
+        // private void _grid_MouseWheel
+        //     (
+        //         object? sender,
+        //         MouseEventArgs e
+        //     )
+        // {
+        //     if (ReferenceEquals(Adapter, null))
+        //     {
+        //         return;
+        //     }
+        //
+        //     int delta = e.Delta;
+        //
+        //     if (delta > 0)
+        //     {
+        //         Adapter.MovePrevious();
+        //     }
+        //     else if (delta < 0)
+        //     {
+        //         Adapter.MoveNext();
+        //     }
+        // }
 
         private int _VisibleRowCount()
         {
             return _grid.DisplayedRowCount(true);
         }
 
-        private void _grid_KeyDown
-            (
-                object? sender,
-                KeyEventArgs e
-            )
-        {
-            if (ReferenceEquals(Adapter, null))
-            {
-                return;
-            }
+        // private void _grid_KeyDown
+        //     (
+        //         object? sender,
+        //         KeyEventArgs e
+        //     )
+        // {
+        //     if (ReferenceEquals(Adapter, null))
+        //     {
+        //         return;
+        //     }
+        //
+        //     switch (e.KeyData)
+        //     {
+        //         case Keys.Down:
+        //             Adapter.MoveNext();
+        //             e.Handled = true;
+        //             break;
+        //
+        //         case Keys.Up:
+        //             Adapter.MovePrevious();
+        //             e.Handled = true;
+        //             break;
+        //
+        //         case Keys.PageDown:
+        //             Adapter.MoveNext(_VisibleRowCount());
+        //             e.Handled = true;
+        //             break;
+        //
+        //         case Keys.PageUp:
+        //             Adapter.MoveNext(_VisibleRowCount());
+        //             e.Handled = true;
+        //             break;
+        //
+        //         case Keys.Enter:
+        //             _RaiseItemSelected();
+        //             break;
+        //     }
+        // }
 
-            switch (e.KeyData)
-            {
-                case Keys.Down:
-                    Adapter.MoveNext();
-                    e.Handled = true;
-                    break;
-
-                case Keys.Up:
-                    Adapter.MovePrevious();
-                    e.Handled = true;
-                    break;
-
-                case Keys.PageDown:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    e.Handled = true;
-                    break;
-
-                case Keys.PageUp:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    e.Handled = true;
-                    break;
-
-                case Keys.Enter:
-                    _RaiseItemSelected();
-                    break;
-            }
-        }
-
-        private void _keyBox_KeyDown
-            (
-                object? sender,
-                KeyEventArgs e
-            )
-        {
-            if (ReferenceEquals(Adapter, null))
-            {
-                return;
-            }
-
-            switch (e.KeyData)
-            {
-                case Keys.Down:
-                    Adapter.MoveNext();
-                    e.Handled = true;
-                    break;
-
-                case Keys.Up:
-                    Adapter.MovePrevious();
-                    e.Handled = true;
-                    break;
-
-                case Keys.PageDown:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    e.Handled = true;
-                    break;
-
-                case Keys.PageUp:
-                    Adapter.MoveNext(_VisibleRowCount());
-                    e.Handled = true;
-                    break;
-
-                case Keys.Enter:
-                    _RaiseItemSelected();
-                    break;
-            }
-        }
+        // private void _keyBox_KeyDown
+        //     (
+        //         object? sender,
+        //         KeyEventArgs e
+        //     )
+        // {
+        //     if (ReferenceEquals(Adapter, null))
+        //     {
+        //         return;
+        //     }
+        //
+        //     switch (e.KeyData)
+        //     {
+        //         case Keys.Down:
+        //             Adapter.MoveNext();
+        //             e.Handled = true;
+        //             break;
+        //
+        //         case Keys.Up:
+        //             Adapter.MovePrevious();
+        //             e.Handled = true;
+        //             break;
+        //
+        //         case Keys.PageDown:
+        //             Adapter.MoveNext(_VisibleRowCount());
+        //             e.Handled = true;
+        //             break;
+        //
+        //         case Keys.PageUp:
+        //             Adapter.MoveNext(_VisibleRowCount());
+        //             e.Handled = true;
+        //             break;
+        //
+        //         case Keys.Enter:
+        //             _RaiseItemSelected();
+        //             break;
+        //     }
+        // }
 
         private void _RaiseItemSelected()
         {
@@ -242,7 +270,9 @@ namespace ManagedIrbis.WinForms
         /// </summary>
         public void Clear()
         {
-            _grid.DataSource = Array.Empty<FoundItem>();
+            _grid.Adapter?.Clear();
+            _grid.Clear();
+            _grid.Invalidate();
         }
 
         /// <summary>
@@ -257,19 +287,151 @@ namespace ManagedIrbis.WinForms
                 return;
             }
 
-            _grid.DataSource = adapter.Source;
+            _grid.InitialFill();
 
         } // method Fill
 
-        public void SetAdapter(RecordAdapter adapter)
+        /// <summary>
+        /// Заполнение найденными записями.
+        /// </summary>
+        public void Fill
+            (
+                int[] found
+            )
         {
             if (Adapter is not null)
             {
-                Adapter.Source.CurrentItemChanged -= _adapter_CurrentItemChanged;
+                Adapter.Fill(found);
+                _grid.Invalidate();
+            }
+            else
+            {
+                Clear();
             }
 
-            Adapter = adapter;
-            Adapter.Source.CurrentItemChanged += _adapter_CurrentItemChanged;
+        } // method Fill
+
+        /// <summary>
+        /// Пересоздание грида (паллиативное решение).
+        /// </summary>
+        public void RecreateGrid()
+        {
+            SuspendLayout();
+
+            if (_mfnColumn is not null)
+            {
+                if (_grid is not null)
+                {
+                    _grid.Columns.Remove(_mfnColumn);
+                }
+
+                _mfnColumn.Dispose();
+                _mfnColumn = null;
+            }
+
+            if (_selectionColumn is not null)
+            {
+                if (_grid is not null)
+                {
+                    _grid.Columns.Remove(_selectionColumn);
+                }
+
+                _selectionColumn.Dispose();
+                _selectionColumn = null;
+            }
+
+            if (_iconColumn is not null)
+            {
+                if (_grid is not null)
+                {
+                    _grid.Columns.Remove(_iconColumn);
+                }
+
+                _iconColumn.Dispose();
+                _iconColumn = null;
+            }
+
+            if (_descriptionColumn is not null)
+            {
+                if (_grid is not null)
+                {
+                    _grid.Columns.Remove(_descriptionColumn);
+                }
+
+                _descriptionColumn.Dispose();
+                _descriptionColumn = null;
+            }
+
+            if (_grid is not null)
+            {
+                Controls.Remove(_grid);
+                _grid.Dispose();
+            }
+
+            _grid = new AM.Windows.Forms.VirtualGrid();
+            _mfnColumn = new DataGridViewTextBoxColumn();
+            _selectionColumn = new DataGridViewCheckBoxColumn();
+            _iconColumn = new DataGridViewImageColumn();
+            _descriptionColumn = new DataGridViewTextBoxColumn();
+
+            _grid.AllowUserToAddRows = false;
+            _grid.AllowUserToDeleteRows = false;
+            _grid.AllowUserToResizeRows = false;
+            _grid.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
+            _grid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            _grid.Columns.AddRange(new DataGridViewColumn[] {
+                _mfnColumn,
+                _selectionColumn,
+                _iconColumn,
+                _descriptionColumn});
+            _grid.Dock = DockStyle.Fill;
+            _grid.Location = new System.Drawing.Point(0, 23);
+            _grid.Margin = new Padding(2);
+            _grid.Name = "_grid";
+            _grid.ReadOnly = true;
+            _grid.RowHeadersVisible = false;
+            _grid.RowTemplate.Height = 24;
+            _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            _grid.Size = new System.Drawing.Size(438, 164);
+            _grid.TabIndex = 1;
+
+            _mfnColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            _mfnColumn.HeaderText = "MFN";
+            _mfnColumn.MinimumWidth = 70;
+            _mfnColumn.Name = "_mfnColumn";
+            _mfnColumn.ReadOnly = true;
+            _mfnColumn.Width = 70;
+
+            _selectionColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            _selectionColumn.HeaderText = "";
+            _selectionColumn.MinimumWidth = 30;
+            _selectionColumn.Name = "_selectionColumn";
+            _selectionColumn.ReadOnly = true;
+            _selectionColumn.Resizable = DataGridViewTriState.False;
+            _selectionColumn.SortMode = DataGridViewColumnSortMode.Automatic;
+            _selectionColumn.Width = 30;
+
+            _iconColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+            _iconColumn.HeaderText = "";
+            _iconColumn.MinimumWidth = 30;
+            _iconColumn.Name = "_iconColumn";
+            _iconColumn.ReadOnly = true;
+            _iconColumn.Width = 30;
+
+            _descriptionColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            _descriptionColumn.HeaderText = "Description";
+            _descriptionColumn.Name = "_descriptionColumn";
+            _descriptionColumn.ReadOnly = true;
+            _descriptionColumn.Resizable = DataGridViewTriState.True;
+            _descriptionColumn.SortMode = DataGridViewColumnSortMode.NotSortable;
+
+            Controls.Remove(_topPanel);
+            Controls.Add(_grid);
+            Controls.Add(_topPanel);
+
+            ResumeLayout(false);
+
+            _grid.Adapter = Adapter;
         }
 
         #endregion

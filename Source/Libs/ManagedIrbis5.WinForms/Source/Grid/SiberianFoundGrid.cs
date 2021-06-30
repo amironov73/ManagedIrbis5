@@ -34,6 +34,11 @@ namespace ManagedIrbis.WinForms.Grid
         #region Properties
 
         /// <summary>
+        /// Адаптер, подтягивающий записи с сервера.
+        /// </summary>
+        public RecordAdapter? Adapter { get; set; }
+
+        /// <summary>
         /// MFN.
         /// </summary>
         public SiberianFoundMfnColumn MfnColumn { get; private set; }
@@ -58,7 +63,7 @@ namespace ManagedIrbis.WinForms.Grid
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public SiberianFoundGrid()
         {
@@ -84,6 +89,10 @@ namespace ManagedIrbis.WinForms.Grid
         #endregion
 
         #region Private members
+
+        // private int _firstLine, _lastLine, _lineCount, _rowCount;
+
+        // private FoundLine[]? _cache;
 
         #endregion
 

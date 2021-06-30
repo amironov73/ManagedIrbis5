@@ -389,7 +389,7 @@ namespace ManagedIrbis.Infrastructure
         } // method RemainingText
 
         /// <summary>
-        /// Debug dump.
+        /// Отладочная печать.
         /// </summary>
         public void Debug
             (
@@ -405,6 +405,19 @@ namespace ManagedIrbis.Infrastructure
                     writer.Write($" {b:X2}");
                 }
             }
+
+        } // method Debug
+
+        /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void Debug
+            (
+                string fileName
+            )
+        {
+            using var writer = File.CreateText(fileName);
+            Debug(writer);
 
         } // method Debug
 
@@ -426,6 +439,19 @@ namespace ManagedIrbis.Infrastructure
         } // method DebugUtf
 
         /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void DebugUtf
+            (
+                string fileName
+            )
+        {
+            using var writer = File.CreateText(fileName);
+            DebugUtf(writer);
+
+        } // method DebugUtf
+
+        /// <summary>
         /// Debug dump.
         /// </summary>
         public void DebugAnsi
@@ -439,6 +465,19 @@ namespace ManagedIrbis.Infrastructure
             {
                 writer.Write(IrbisEncoding.Ansi.GetString(memory));
             }
+
+        } // method DebugAnsi
+
+        /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void DebugAnsi
+            (
+                string fileName
+            )
+        {
+            using var writer = File.CreateText(fileName);
+            Debug(writer);
 
         } // method DebugAnsi
 

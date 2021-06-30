@@ -35,7 +35,6 @@ namespace IrbisFormsTests
             using var connection = IrbisFormsTest.GetConnection();
 
             var adapter = new RecordAdapter(connection);
-            adapter.Fill();
 
             using var form = new Form
             {
@@ -48,6 +47,7 @@ namespace IrbisFormsTests
                 Size = new Size(600, 200)
             };
             form.Controls.Add(panel);
+            panel.Fill();
 
             form.ShowDialog(ownerWindow);
         }

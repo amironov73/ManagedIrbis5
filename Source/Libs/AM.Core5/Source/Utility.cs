@@ -3587,7 +3587,7 @@ namespace AM
                 (
                     CultureInfo.InvariantCulture,
                     "{0:00}:{1:00}:{2:00}",
-                    span.Hours + span.Days * 60,
+                    span.Hours + span.Days * 24,
                     span.Minutes,
                     span.Seconds
                 );

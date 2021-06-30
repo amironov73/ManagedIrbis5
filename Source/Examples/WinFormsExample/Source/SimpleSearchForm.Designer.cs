@@ -32,22 +32,29 @@ namespace WinFormsExample
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SimpleSearchForm));
             this._statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this._dictionaryPanel = new ManagedIrbis.WinForms.DictionaryPanel();
+            this._marcEditor = new ManagedIrbis.WinForms.Editors.SimplestMarcEditor();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
+            this._foundPanel = new ManagedIrbis.WinForms.FoundPanel();
+            this._previewPanel = new ManagedIrbis.WinForms.PreviewPanel();
             this._logBox = new AM.Windows.Forms.LogBox();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._databaseToolStrip = new System.Windows.Forms.ToolStrip();
             this._initializationTimer = new System.Windows.Forms.Timer(this.components);
-            this._dictionaryPanel = new ManagedIrbis.WinForms.DictionaryPanel();
-            this._foundPanel = new ManagedIrbis.WinForms.FoundPanel();
-            this._previewPanel = new ManagedIrbis.WinForms.PreviewPanel();
-            this._marcEditor = new ManagedIrbis.WinForms.Editors.SimplestMarcEditor();
+            this._maxMfnLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this._currentMfnLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this._timeLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this._watchLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this._workingTimer = new System.Windows.Forms.Timer(this.components);
+            this._statusStrip.SuspendLayout();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -70,11 +77,17 @@ namespace WinFormsExample
             // _statusStrip
             //
             this._statusStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this._statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this._maxMfnLabel,
+            this._currentMfnLabel,
+            this._timeLabel,
+            this._watchLabel});
             this._statusStrip.Location = new System.Drawing.Point(0, 0);
             this._statusStrip.Name = "_statusStrip";
             this._statusStrip.Size = new System.Drawing.Size(800, 22);
             this._statusStrip.TabIndex = 0;
-            this._statusStrip.Text = "statusStrip1";
+            this._statusStrip.Text = "";
+            this._statusStrip.ShowItemToolTips = true;
             //
             // toolStripContainer1
             //
@@ -135,6 +148,26 @@ namespace WinFormsExample
             this.splitContainer2.SplitterDistance = 265;
             this.splitContainer2.TabIndex = 0;
             //
+            // _dictionaryPanel
+            //
+            this._dictionaryPanel.Adapter = null;
+            this._dictionaryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._dictionaryPanel.Location = new System.Drawing.Point(0, 0);
+            this._dictionaryPanel.Margin = new System.Windows.Forms.Padding(2);
+            this._dictionaryPanel.Name = "_dictionaryPanel";
+            this._dictionaryPanel.Size = new System.Drawing.Size(265, 210);
+            this._dictionaryPanel.TabIndex = 0;
+            //
+            // _marcEditor
+            //
+            this._marcEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._marcEditor.Location = new System.Drawing.Point(0, 0);
+            this._marcEditor.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this._marcEditor.Name = "_marcEditor";
+            this._marcEditor.ReadOnly = false;
+            this._marcEditor.Size = new System.Drawing.Size(531, 210);
+            this._marcEditor.TabIndex = 0;
+            //
             // splitContainer3
             //
             this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -151,6 +184,24 @@ namespace WinFormsExample
             this.splitContainer3.Size = new System.Drawing.Size(800, 106);
             this.splitContainer3.SplitterDistance = 265;
             this.splitContainer3.TabIndex = 0;
+            //
+            // _foundPanel
+            //
+            this._foundPanel.Adapter = null;
+            this._foundPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._foundPanel.Location = new System.Drawing.Point(0, 0);
+            this._foundPanel.Margin = new System.Windows.Forms.Padding(2);
+            this._foundPanel.Name = "_foundPanel";
+            this._foundPanel.Size = new System.Drawing.Size(265, 106);
+            this._foundPanel.TabIndex = 0;
+            //
+            // _previewPanel
+            //
+            this._previewPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._previewPanel.Location = new System.Drawing.Point(0, 0);
+            this._previewPanel.Name = "_previewPanel";
+            this._previewPanel.Size = new System.Drawing.Size(531, 106);
+            this._previewPanel.TabIndex = 0;
             //
             // _logBox
             //
@@ -203,42 +254,51 @@ namespace WinFormsExample
             this._initializationTimer.Enabled = true;
             this._initializationTimer.Tick += new System.EventHandler(this._initializationTimer_Tick);
             //
-            // _dictionaryPanel
+            // _maxMfnLabel
             //
-            this._dictionaryPanel.Adapter = null;
-            this._dictionaryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._dictionaryPanel.Location = new System.Drawing.Point(0, 0);
-            this._dictionaryPanel.Margin = new System.Windows.Forms.Padding(2);
-            this._dictionaryPanel.Name = "_dictionaryPanel";
-            this._dictionaryPanel.Size = new System.Drawing.Size(265, 210);
-            this._dictionaryPanel.TabIndex = 0;
+            this._maxMfnLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this._maxMfnLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this._maxMfnLabel.Name = "_maxMfnLabel";
+            this._maxMfnLabel.Size = new System.Drawing.Size(100, 17);
+            this._maxMfnLabel.ToolTipText = "Максимальный MFN в текущей базе данных";
             //
-            // _foundPanel
+            // _currentMfnLabel
             //
-            this._foundPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._foundPanel.Location = new System.Drawing.Point(0, 0);
-            this._foundPanel.Margin = new System.Windows.Forms.Padding(2);
-            this._foundPanel.Name = "_foundPanel";
-            this._foundPanel.Size = new System.Drawing.Size(265, 106);
-            this._foundPanel.TabIndex = 0;
+            this._currentMfnLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this._currentMfnLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this._currentMfnLabel.Name = "_currentMfnLabel";
+            this._currentMfnLabel.Size = new System.Drawing.Size(100, 17);
+            this._currentMfnLabel.ToolTipText = "Текущий MFN";
             //
-            // _previewPanel
+            // _timeLabel
             //
-            this._previewPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._previewPanel.Location = new System.Drawing.Point(0, 0);
-            this._previewPanel.Name = "_previewPanel";
-            this._previewPanel.Size = new System.Drawing.Size(531, 106);
-            this._previewPanel.TabIndex = 0;
+            this._timeLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this._timeLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this._timeLabel.Name = "_timeLabel";
+            this._timeLabel.Size = new System.Drawing.Size(100, 17);
+            this._timeLabel.ToolTipText = "Отработано времени";
             //
-            // _marcEditor
+            // _watchLabel
             //
-            this._marcEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._marcEditor.Location = new System.Drawing.Point(0, 0);
-            this._marcEditor.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this._marcEditor.Name = "_marcEditor";
-            this._marcEditor.ReadOnly = false;
-            this._marcEditor.Size = new System.Drawing.Size(531, 210);
-            this._marcEditor.TabIndex = 0;
+            this._watchLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top)
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right)
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this._watchLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Sunken;
+            this._watchLabel.Name = "_watchLabel";
+            this._watchLabel.Size = new System.Drawing.Size(100, 17);
+            this._watchLabel.ToolTipText = "Текущее время";
+            //
+            // _workingTimer
+            //
+            this._workingTimer.Enabled = true;
+            this._workingTimer.Interval = 1000;
+            this._workingTimer.Tick += new System.EventHandler(this._workingTimer_Tick);
             //
             // SimpleSearchForm
             //
@@ -250,6 +310,8 @@ namespace WinFormsExample
             this.MainMenuStrip = this._menuStrip;
             this.Name = "SimpleSearchForm";
             this.Text = "SimpleSearchForm";
+            this._statusStrip.ResumeLayout(false);
+            this._statusStrip.PerformLayout();
             this.toolStripContainer1.BottomToolStripPanel.ResumeLayout(false);
             this.toolStripContainer1.BottomToolStripPanel.PerformLayout();
             this.toolStripContainer1.ContentPanel.ResumeLayout(false);
@@ -293,6 +355,11 @@ namespace WinFormsExample
         private ManagedIrbis.WinForms.FoundPanel _foundPanel;
         private ManagedIrbis.WinForms.PreviewPanel _previewPanel;
         private ManagedIrbis.WinForms.Editors.SimplestMarcEditor _marcEditor;
+        private System.Windows.Forms.ToolStripStatusLabel _maxMfnLabel;
+        private System.Windows.Forms.ToolStripStatusLabel _currentMfnLabel;
+        private System.Windows.Forms.ToolStripStatusLabel _timeLabel;
+        private System.Windows.Forms.ToolStripStatusLabel _watchLabel;
+        private System.Windows.Forms.Timer _workingTimer;
     }
 }
 

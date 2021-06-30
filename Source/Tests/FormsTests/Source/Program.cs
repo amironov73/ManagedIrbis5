@@ -2,10 +2,9 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using AM.Windows.Forms;
 
 #endregion
 
@@ -22,6 +21,9 @@ namespace FormsTests
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            InputLanguageUtility.InstallWmInputLanguageRequestFix();
+
             Application.Run(new MainForm());
         }
     }

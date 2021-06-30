@@ -21,10 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Source\Tests" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Remove="tests.json" />
       <Content Include="tests.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

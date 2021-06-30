@@ -57,7 +57,7 @@ namespace ManagedIrbis.WinForms
         {
             InitializeComponent();
 
-            _grid.AutoGenerateColumns = false;
+            _SetupGrid();
             _SetupEvents();
         }
 
@@ -71,7 +71,7 @@ namespace ManagedIrbis.WinForms
         {
             InitializeComponent();
 
-            _grid.AutoGenerateColumns = false;
+            _SetupGrid();
             Adapter = adapter;
             _grid.DataSource = adapter.Source;
             _SetupEvents();
@@ -80,6 +80,21 @@ namespace ManagedIrbis.WinForms
         #endregion
 
         #region Private members
+
+        private void _SetupGrid()
+        {
+            _grid.AutoGenerateColumns = false;
+            _grid.RowHeadersVisible = false;
+            _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            _grid.AllowUserToAddRows = false;
+            _grid.AllowUserToResizeRows = false;
+            _grid.AllowUserToDeleteRows = false;
+            _grid.EnableHeadersVisualStyles = false;
+            _grid.ColumnHeadersDefaultCellStyle.SelectionBackColor
+                = _grid.ColumnHeadersDefaultCellStyle.BackColor;
+            _grid.ColumnHeadersHeightSizeMode
+                = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+        }
 
         private void _SetupEvents()
         {

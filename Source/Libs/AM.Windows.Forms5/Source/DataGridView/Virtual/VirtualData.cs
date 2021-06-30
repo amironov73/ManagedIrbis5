@@ -8,51 +8,43 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
-/* PagingDataGridViewEventArgs.cs --
+/* VirtualData.cs -- порция данных для виртуального грида
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Windows.Forms;
-
-#endregion
 
 #nullable enable
 
 namespace AM.Windows.Forms
 {
     /// <summary>
-    /// EventArgs for <see cref="PagingDataGridView"/>.
+    /// Порция данных для виртуального грида.
     /// </summary>
-    public sealed class PagingDataGridViewEventArgs
-        : EventArgs
+    public class VirtualData
     {
         #region Properties
 
         /// <summary>
-        /// Current row.
+        /// Номер первой строчки.
         /// </summary>
-        public DataGridViewRow? CurrentRow { get; set; }
+        public int FirstLine { get; set; }
 
         /// <summary>
-        /// Initial call?
+        /// Количество строк.
         /// </summary>
-        public bool InitialCall { get; set; }
+        public int LineCount { get; set; }
 
         /// <summary>
-        /// Scroll direction.
+        /// Общее количество строк.
         /// </summary>
-        public bool ScrollDown { get; set; }
+        public int TotalCount { get; set; }
 
         /// <summary>
-        /// Success.
+        /// Строки с данными.
         /// </summary>
-        public bool Success { get; set; }
+        public object?[]? Lines { get; set; }
 
         #endregion
 
-    } // class PagingDataGridViewEventArgs
+    } // class VirtualData
 
 } // namespace AM.Windows.Forms

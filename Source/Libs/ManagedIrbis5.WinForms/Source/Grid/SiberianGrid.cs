@@ -681,7 +681,6 @@ namespace ManagedIrbis.WinForms.Grid
             return null;
         }
 
-
         /// <summary>
         /// Get cell for given column and row.
         /// </summary>

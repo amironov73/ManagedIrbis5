@@ -29,10 +29,7 @@ namespace ManagedIrbis.WinForms.Grid
         #region Control members
 
         /// <inheritdoc />
-        protected override Size DefaultSize
-        {
-            get { return new Size(640, 375); }
-        }
+        protected override Size DefaultSize => new (640, 375);
 
         /// <inheritdoc />
         protected override bool IsInputKey
@@ -44,7 +41,7 @@ namespace ManagedIrbis.WinForms.Grid
             return true;
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.Dispose(bool)"/>
         protected override void Dispose
             (
                 bool disposing
@@ -66,9 +63,10 @@ namespace ManagedIrbis.WinForms.Grid
             {
                 _toolTip.Dispose();
             }
-        }
 
-        /// <inheritdoc/>
+        } // method Dispose
+
+        /// <inheritdoc cref="Control.OnKeyDown"/>
         protected override void OnKeyDown
             (
                 KeyEventArgs e
@@ -111,7 +109,7 @@ namespace ManagedIrbis.WinForms.Grid
                         break;
                 }
             }
-        }
+        } // method OnKeyDown
 
         /// <inheritdoc />
         protected override void OnKeyPress
@@ -238,7 +236,7 @@ namespace ManagedIrbis.WinForms.Grid
                 );
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.OnPaint"/>
         protected override void OnPaint
             (
                 PaintEventArgs paintEvent
@@ -247,7 +245,7 @@ namespace ManagedIrbis.WinForms.Grid
             var graphics = paintEvent.Graphics;
             var clip = paintEvent.ClipRectangle;
 
-            using (Brush brush = new SolidBrush(BackColor))
+            using (var brush = new SolidBrush(BackColor))
             {
                 graphics.FillRectangle(brush, clip);
             }
@@ -296,7 +294,7 @@ namespace ManagedIrbis.WinForms.Grid
             }
 
             x = 0;
-            using (Brush lineBrush = new SolidBrush(Palette.LineColor))
+            using (var lineBrush = new SolidBrush(Palette.LineColor))
             using (var pen = new Pen(lineBrush))
             {
                 // Рисуем линию, отделяющую заголовки от содержимого колонок
@@ -370,7 +368,7 @@ namespace ManagedIrbis.WinForms.Grid
                     x += dx;
                 }
             }
-        }
+        } // method OnPaint
 
         /// <inheritdoc />
         protected override void OnResize
