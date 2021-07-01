@@ -80,7 +80,7 @@ namespace ManagedIrbis.WinForms.Grid
         }
 
         /// <inheritdoc/>
-        public override void Paint
+        public override void OnPaint
             (
                 PaintEventArgs args
             )

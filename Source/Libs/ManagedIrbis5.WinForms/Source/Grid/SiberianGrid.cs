@@ -24,6 +24,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
+using AM;
 using AM.Collections;
 
 #endregion
@@ -54,7 +55,7 @@ namespace ManagedIrbis.WinForms.Grid
 
         #region Properties
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.BackColor" />
         public override Color BackColor
         {
             get => Palette.BackColor;
@@ -64,9 +65,9 @@ namespace ManagedIrbis.WinForms.Grid
                 OnBackColorChanged(EventArgs.Empty);
                 Invalidate();
             }
-        }
+        } // property BackColor
 
-        /// <inheritdoc/>
+        /// <inheritdoc cref="Control.ForeColor" />
         public override Color ForeColor
         {
             get => Palette.ForeColor;
@@ -76,54 +77,55 @@ namespace ManagedIrbis.WinForms.Grid
                 OnForeColorChanged(EventArgs.Empty);
                 Invalidate();
             }
-        }
+        } // property ForeColor
 
         /// <summary>
-        /// Columns.
+        /// Колонки.
         /// </summary>
-        public NonNullCollection<SiberianColumn> Columns { get; private set; }
+        public NonNullCollection<SiberianColumn> Columns { get; }
 
         /// <summary>
-        /// Rows.
+        /// Строки.
         /// </summary>
-        public NonNullCollection<SiberianRow> Rows { get; private set; }
+        public NonNullCollection<SiberianRow> Rows { get; }
 
         /// <summary>
-        /// Current column.
+        /// Текущая колонка.
         /// </summary>
         [Browsable(false)]
         public SiberianColumn? CurrentColumn { get; private set; }
 
         /// <summary>
-        /// Current row.
+        /// Текущая строка.
         /// </summary>
         [Browsable(false)]
-        public SiberianRow? CurrentRow { get; private set; }
+        public virtual SiberianRow? CurrentRow { get; private set; }
 
         /// <summary>
-        /// Current cell.
+        /// Текущая ячейка.
         /// </summary>
         [Browsable(false)]
-        public SiberianCell? CurrentCell { get; private set; }
+        public virtual SiberianCell? CurrentCell { get; private set; }
 
         /// <summary>
-        /// Whether the whole grid itself is read-only.
+        /// Определяет режим работы грида: только для чтения
+        /// или разрешена запись.
         /// </summary>
         public bool ReadOnly { get; private set; }
 
         /// <summary>
-        /// Current editor (if any).
+        /// Текущий редактор (если есть).
         /// </summary>
         [Browsable(false)]
         public Control? Editor { get; internal set; }
 
         /// <summary>
-        /// Header height.
+        /// Размер заголовка в пикселах.
         /// </summary>
         public int HeaderHeight { get; set; }
 
         /// <summary>
-        /// Palette.
+        /// Палитра цветов.
         /// </summary>
         public SiberianPalette Palette { get; set; }
 
@@ -148,10 +150,10 @@ namespace ManagedIrbis.WinForms.Grid
 
                 return result;
             }
-        }
+        } // property UsableSize
 
         /// <summary>
-        /// Count of visible rows.
+        /// Количество видимых строк.
         /// </summary>
         public int VisibleRows => _visibleRows;
 
@@ -160,7 +162,7 @@ namespace ManagedIrbis.WinForms.Grid
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public SiberianGrid()
         {
@@ -187,7 +189,8 @@ namespace ManagedIrbis.WinForms.Grid
             ForeColor = Color.Black;
 
             HeaderHeight = SiberianRow.DefaultHeight;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -206,7 +209,7 @@ namespace ManagedIrbis.WinForms.Grid
 
         private int _visibleRows;
 
-        internal void AutoSizeColumns()
+        public void AutoSizeColumns()
         {
             if (_autoSizeWatch)
             {
@@ -249,20 +252,22 @@ namespace ManagedIrbis.WinForms.Grid
             {
                 _autoSizeWatch = false;
             }
-        }
+
+        } // method AutoSizeColumns
 
         /// <summary>
-        /// Create row.
+        /// Создание новой строки (в самом низу).
         /// </summary>
         protected virtual SiberianRow CreateRow()
         {
             var result = new SiberianRow();
 
             return result;
-        }
+
+        } // method CreateRow
 
         /// <summary>
-        /// Create scroll bars.
+        /// Создание полос прокрутки.
         /// </summary>
         protected virtual void CreateScrollBars()
         {
@@ -283,7 +288,8 @@ namespace ManagedIrbis.WinForms.Grid
             };
             Controls.Add(_verticalScroll);
             _verticalScroll.Scroll += _verticalScroll_Scroll;
-        }
+
+        } // method CreateScrollBar
 
         private int _DoScroll
             (
@@ -293,7 +299,7 @@ namespace ManagedIrbis.WinForms.Grid
         {
             var result = args.OldValue;
 
-            if (!ReferenceEquals(scrollBar, null))
+            if (scrollBar is not null)
             {
                 switch (args.Type)
                 {
@@ -339,7 +345,8 @@ namespace ManagedIrbis.WinForms.Grid
             }
 
             return result;
-        }
+
+        } // method _DoScroll
 
         private void _horizontalScroll_Scroll
             (
@@ -435,21 +442,20 @@ namespace ManagedIrbis.WinForms.Grid
         #region Public methods
 
         /// <summary>
-        /// Close current editor.
+        /// Закрывает текущий редактор (если есть).
         /// </summary>
         public void CloseEditor
             (
                 bool accept
             )
         {
-            if (ReferenceEquals(CurrentCell, null))
+            if (CurrentCell is not null)
             {
-                return;
+                CurrentCell.CloseEditor(accept);
+                Invalidate();
             }
 
-            CurrentCell.CloseEditor(accept);
-            Invalidate();
-        }
+        } // method CloseEditor
 
         /// <summary>
         /// Get count of visible rows.
@@ -457,7 +463,6 @@ namespace ManagedIrbis.WinForms.Grid
         public int CountVisibleRows()
         {
             var usableSize = UsableSize;
-
             var result = (usableSize.Height - HeaderHeight)
                          / SiberianRow.DefaultHeight;
             result = Math.Max(result, 1);
@@ -1012,52 +1017,51 @@ namespace ManagedIrbis.WinForms.Grid
         }
 
         /// <summary>
-        /// Handles click on the cell.
+        /// Обрабатывает клик по гриду.
         /// </summary>
         public virtual void OnClick
             (
                 SiberianClickEventArgs eventArgs
             )
         {
-            GridClick?.Invoke(this, eventArgs);
+            GridClick.Raise(this, eventArgs);
 
-            var cell = eventArgs.Cell;
-            if (!ReferenceEquals(cell, null))
+            if (eventArgs.Cell is { } cell)
             {
                 cell.HandleClick(eventArgs);
 
-                var column = cell.Column;
-                var row = cell.Row;
-                if (column is not null && row is not null)
+                var column = cell.EnsureColumn();
+                var row = cell.EnsureRow();
+                if (column.ReadOnly)
                 {
-                    if (column.ReadOnly)
-                    {
 
-                        cell = row.GetFirstEditableCell();
-                        if (!ReferenceEquals(cell, null))
-                        {
-                            Goto
-                                (
-                                    cell.Column!.Index,
-                                    cell.Row!.Index
-                                );
-                        }
-                    }
-                    else
+                    cell = row.GetFirstEditableCell();
+                    if (!ReferenceEquals(cell, null))
                     {
                         Goto
                             (
-                                column.Index,
-                                row.Index
+                                cell.Column!.Index,
+                                cell.Row!.Index
                             );
                     }
+                }
+                else
+                {
+                    Goto
+                        (
+                            column.Index,
+                            row.Index
+                        );
                 }
             }
 
             eventArgs.Column?.HandleClick(eventArgs);
             eventArgs.Row?.HandleClick(eventArgs);
-        }
+
+        } // method OnClick
 
         #endregion
-    }
-}
+
+    } // class SiberianGrid
+
+} // namespace ManagedIrbis.WinForms.Grid

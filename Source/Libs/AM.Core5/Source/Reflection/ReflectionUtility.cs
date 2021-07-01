@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ReflectionUtility.cs --
+/* ReflectionUtility.cs -- полезные методы для работы с интроспекцией
  *  Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 #endregion
@@ -26,11 +27,186 @@ using System.Reflection;
 namespace AM.Reflection
 {
     /// <summary>
-    ///
+    /// Полезные методы для работы с интроспекцией.
     /// </summary>
     public static class ReflectionUtility
     {
         #region Public methods
+
+        /// <summary>
+        /// Создание типизированного геттера для указанного свойства объекта.
+        /// </summary>
+        public static Func<TObject, TValue> CreateGetter<TObject, TValue>
+            (
+                string propertyName
+            )
+        {
+            const BindingFlags bindingFlags = BindingFlags.Instance
+                                              | BindingFlags.Public | BindingFlags.NonPublic;
+            var propertyInfo = typeof(TObject).GetProperty(propertyName, bindingFlags);
+            if (propertyInfo is null)
+            {
+                throw new ArgumentException($"Can't get property: {propertyName}");
+            }
+
+            return CreateGetter<TObject, TValue>(propertyInfo);
+        }
+
+        /// <summary>
+        /// Создание типизированного геттера для указанного свойства объекта.
+        /// </summary>
+        public static Func<TObject, TValue> CreateGetter<TObject, TValue>
+            (
+                PropertyInfo propertyInfo
+            )
+        {
+            var method = propertyInfo.GetMethod;
+            if (method is null)
+            {
+                throw new ArgumentException($"No method for {propertyInfo.Name}");
+            }
+
+            return method.CreateDelegate<Func<TObject, TValue>>();
+        }
+
+        /// <summary>
+        /// Создание типизированного сеттера для указанного свойства объекта.
+        /// </summary>
+        public static Action<TObject, TValue> CreateSetter<TObject, TValue>
+            (
+                string propertyName
+            )
+        {
+            const BindingFlags bindingFlags = BindingFlags.Instance
+                                              | BindingFlags.Public | BindingFlags.NonPublic;
+            var propertyInfo = typeof(TObject).GetProperty(propertyName, bindingFlags);
+            if (propertyInfo is null)
+            {
+                throw new ArgumentException($"Can't get property: {propertyName}");
+            }
+
+            return CreateSetter<TObject, TValue>(propertyInfo);
+        }
+
+        /// <summary>
+        /// Создание типизированного геттера для указанного свойства объекта.
+        /// </summary>
+        public static Action<TObject, TValue> CreateSetter<TObject, TValue>
+            (
+                PropertyInfo propertyInfo
+            )
+        {
+            var method = propertyInfo.SetMethod;
+            if (method is null)
+            {
+                throw new ArgumentException($"No method for {propertyInfo.Name}");
+            }
+
+            return method.CreateDelegate<Action<TObject, TValue>>();
+        }
+
+        /// <summary>
+        /// Построение нетипизированного геттера для указанного свойства объекта.
+        /// </summary>
+        public static Func<object, object?> CreateUntypedGetter
+            (
+                Type type,
+                string propertyName
+            )
+        {
+            const BindingFlags bindingFlags = BindingFlags.Instance
+                | BindingFlags.Public | BindingFlags.NonPublic;
+            var propertyInfo = type.GetProperty(propertyName, bindingFlags);
+            if (propertyInfo is null)
+            {
+                throw new ArgumentException($"Can't get property: {propertyName}");
+            }
+
+            return CreateUntypedGetter(propertyInfo);
+
+        } // method CreateUntypedGetter
+
+        /// <summary>
+        /// Построение нетипизированного геттера для указанного свойства объекта.
+        /// </summary>
+        public static Func<object, object?> CreateUntypedGetter
+            (
+                PropertyInfo propertyInfo
+            )
+        {
+            var method = propertyInfo.GetMethod;
+            if (method is null)
+            {
+                throw new ArgumentException($"No method for {propertyInfo.Name}");
+            }
+
+            // Конструируем лямбду
+            // (object instance) => (object) method ((T) instance)
+
+            var declaringType = propertyInfo.DeclaringType.ThrowIfNull (nameof (propertyInfo.DeclaringType));
+            var instance = Expression.Parameter (typeof(object));
+            var argument = Expression.Convert (instance, declaringType);
+            var call = Expression.Convert
+                (
+                    Expression.Call (argument, method),
+                    typeof(object)
+                );
+            var lambda = Expression.Lambda<Func<object, object?>> (call, instance);
+
+            return lambda.Compile();
+
+        } // method CreateUntypedGetter
+
+        /// <summary>
+        /// Построение сеттера для указанного свойства объекта.
+        /// </summary>
+        public static Action<object, object?> CreateUntypedSetter
+            (
+                Type type,
+                string propertyName
+            )
+        {
+            const BindingFlags bindingFlags = BindingFlags.Instance
+                | BindingFlags.Public | BindingFlags.NonPublic;
+            var propertyInfo = type.GetProperty(propertyName, bindingFlags);
+            if (propertyInfo is null)
+            {
+                throw new ArgumentException($"Can't get property: {propertyName}");
+            }
+
+            return CreateUntypedSetter(propertyInfo);
+
+        } // method CreateUntypedSetter
+
+        /// <summary>
+        /// Построение нетипизированного сеттера для указанного свойства объекта.
+        /// </summary>
+        public static Action<object, object?> CreateUntypedSetter
+            (
+                PropertyInfo propertyInfo
+            )
+        {
+            var method = propertyInfo.SetMethod;
+            if (method is null)
+            {
+                throw new ArgumentException($"No method for {propertyInfo.Name}");
+            }
+
+            // Конструируем лямбду
+            // method ((T1) instance, (T2) value)
+
+            var declaringType = propertyInfo.DeclaringType.ThrowIfNull (nameof (propertyInfo.DeclaringType));
+            var instance = Expression.Parameter(typeof(object), "instance");
+            var value = Expression.Parameter(typeof(object), "value");
+            var convert1 = Expression.Convert(instance, declaringType);
+            var convert2 = Expression.Convert(value, propertyInfo.PropertyType);
+            var call = Expression.Call(convert1, method, convert2);
+
+            var lambda = Expression.Lambda<Action<object, object?>> (call, instance, value);
+
+            return lambda.Compile();
+
+        } // method CreateUntypedSetter
 
         ///// <summary>
         ///// Получение списка всех типов, загруженных на данный момент
@@ -52,10 +228,6 @@ namespace AM.Reflection
 
         //    return result.ToArray();
         //}
-
-        /// <summary>
-        /// Bridge for UAP.
-        /// </summary>
 
         /// <summary>
         /// Get the custom attribute.
@@ -361,6 +533,8 @@ namespace AM.Reflection
         }
 
         #endregion
-    }
-}
+
+    } // class ReflectionUtility
+
+} // namespace AM.Reflection
 

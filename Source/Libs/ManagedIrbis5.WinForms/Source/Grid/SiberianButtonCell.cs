@@ -40,7 +40,7 @@ namespace ManagedIrbis.WinForms.Grid
         #region SiberianCell members
 
         /// <inheritdoc/>
-        public override void Paint
+        public override void OnPaint
             (
                 PaintEventArgs args
             )

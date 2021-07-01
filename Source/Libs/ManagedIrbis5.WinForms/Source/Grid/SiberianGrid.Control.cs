@@ -362,7 +362,7 @@ namespace ManagedIrbis.WinForms.Grid
                                     )
                             );
                         var cell = row.Cells[columnIndex];
-                        cell.Paint(args);
+                        cell.OnPaint(args);
                         y += dy;
                     }
                     x += dx;

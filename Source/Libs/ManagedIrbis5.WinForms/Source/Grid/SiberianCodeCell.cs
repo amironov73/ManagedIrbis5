@@ -40,7 +40,7 @@ namespace ManagedIrbis.WinForms.Grid
         #region Public methods
 
         /// <inheritdoc/>
-        public override void Paint
+        public override void OnPaint
             (
                 PaintEventArgs args
             )

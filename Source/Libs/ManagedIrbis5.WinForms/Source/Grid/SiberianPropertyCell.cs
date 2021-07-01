@@ -4,15 +4,17 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianFieldCell.cs --
+/* SiberianPropertyCell.cs -- ячейка, привязанная к свойству объекта
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -23,56 +25,63 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Ячейка, привязанная к свойству объекта.
     /// </summary>
-    public class SiberianFieldCell
+    public class SiberianPropertyCell
         : SiberianCell
     {
+        #region Properties
+
+        /// <summary>
+        /// Значение объекта
+        /// </summary>
+        public object? Value
+        {
+            get => default;
+            set => throw new NotImplementedException();
+
+        } // property Value
+
+        #endregion
+
+        #region Private members
+
+        #endregion
+
         #region SiberianCell members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="SiberianCell.CloseEditor" />
         public override void CloseEditor
             (
                 bool accept
             )
         {
-            if (!ReferenceEquals(Grid?.Editor, null))
+            if (this.EnsureGrid().Editor is { } editor)
             {
                 if (accept)
                 {
-                    var field = (SiberianField?)Row?.Data;
-                    if (!ReferenceEquals(field, null))
-                    {
-                        field.Value = Grid.Editor.Text;
-                    }
+                    // State = ....
                 }
             }
 
             base.CloseEditor(accept);
-        }
 
-        /// <inheritdoc cref="Control.Paint" />
+        } // method CloseEditor
+
+        /// <inheritdoc cref="SiberianCell.OnPaint" />
         public override void OnPaint
             (
                 PaintEventArgs args
             )
         {
-            var grid = Grid;
-            if (grid is null)
-            {
-                // TODO: some paint?
-                return;
-            }
-
+            var grid = this.EnsureGrid();
             var graphics = args.Graphics;
             var rectangle = args.ClipRectangle;
 
             var foreColor = Color.Black;
-            var codeColor = Color.FromArgb(220, 0, 0);
             if (ReferenceEquals(Row, grid.CurrentRow))
             {
                 foreColor = Color.White;
-                codeColor = Color.FromArgb(0, 255, 255);
             }
 
             if (ReferenceEquals(this, grid.CurrentCell))
@@ -82,51 +91,34 @@ namespace ManagedIrbis.WinForms.Grid
                 graphics.FillRectangle(brush, rectangle);
             }
 
-            var field = (SiberianField?) Row?.Data;
-            if (!ReferenceEquals(field, null))
+            var theObject = Row?.Data;
+            if (!ReferenceEquals(theObject, null))
             {
-                var text = field.Value;
-                if (!string.IsNullOrEmpty(text))
+                var column = (SiberianPropertyColumn) this.EnsureColumn();
+                var value = column.GetValue(theObject);
+                if (value is not null)
                 {
-                    using var painter = new FieldPainter
-                    {
-                        CodeColor = codeColor,
-                        TextColor = foreColor
-                    };
+                    var flags = TextFormatFlags.TextBoxControl
+                                | TextFormatFlags.EndEllipsis
+                                | TextFormatFlags.NoPrefix
+                                | TextFormatFlags.VerticalCenter;
 
-                    painter.DrawLine
+                    TextRenderer.DrawText
                         (
                             graphics,
+                            value.ToString(),
                             grid.Font,
                             rectangle,
-                            text
+                            foreColor,
+                            flags
                         );
                 }
             }
-        }
+
+        } // method OnPaint
 
         #endregion
 
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var rowIndex = Row?.Index ?? -1;
-            var columnIndex = Column?.Index ?? -1;
-
-            var field = (SiberianField?)Row?.Data;
-            var text = string.Empty;
-            if (!ReferenceEquals(field, null))
-            {
-                text = $"{field.Tag}/{field.Repeat}: {field.Value} ({field.OriginalValue})";
-            }
-
-            return $"FieldCell [{columnIndex}, {rowIndex}]: {text}";
-        }
-
-        #endregion
-
-    } // class SiberianFieldCell
+    } // class SiberianPropertyCell
 
 } // namespace ManagedIrbis.WinForms.Grid

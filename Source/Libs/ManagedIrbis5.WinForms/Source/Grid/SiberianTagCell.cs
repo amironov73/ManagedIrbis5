@@ -31,8 +31,8 @@ namespace ManagedIrbis.WinForms.Grid
     {
         #region SiberianCell members
 
-        /// <inheritdoc cref="SiberianCell.Paint"/>
-        public override void Paint
+        /// <inheritdoc cref="SiberianCell.OnPaint"/>
+        public override void OnPaint
             (
                 PaintEventArgs args
             )

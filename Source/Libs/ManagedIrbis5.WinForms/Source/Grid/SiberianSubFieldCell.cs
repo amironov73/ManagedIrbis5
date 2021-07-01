@@ -52,7 +52,7 @@ namespace ManagedIrbis.WinForms.Grid
         }
 
         /// <inheritdoc cref="Control.Paint" />
-        public override void Paint
+        public override void OnPaint
             (
                 PaintEventArgs args
             )

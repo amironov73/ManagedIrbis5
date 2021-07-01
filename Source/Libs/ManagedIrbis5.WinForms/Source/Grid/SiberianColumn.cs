@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
@@ -62,14 +63,14 @@ namespace ManagedIrbis.WinForms.Grid
         #region Properties
 
         /// <summary>
-        /// Column index.
+        /// Порядковый номер колонки.
         /// </summary>
         public int Index { get; internal set; }
 
         /// <summary>
-        /// Data member (property name).
+        /// Имя свойства, содержащего данные.
         /// </summary>
-        public string? Member { get; set; }
+        public virtual string? Member { get; set; }
 
         /// <summary>
         /// Read only column?

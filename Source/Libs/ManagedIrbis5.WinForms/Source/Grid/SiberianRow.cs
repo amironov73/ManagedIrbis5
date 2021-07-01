@@ -29,14 +29,14 @@ using AM.Collections;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    /// Строка грида.
+    /// Строка грида. Состоит из ячеек.
     /// </summary>
     public class SiberianRow
     {
         #region Constants
 
         /// <summary>
-        /// Default height.
+        /// Высота строки по умолчанию, пикселы.
         /// </summary>
         public const int DefaultHeight = 20;
 
@@ -45,7 +45,7 @@ namespace ManagedIrbis.WinForms.Grid
         #region Events
 
         /// <summary>
-        /// Fired on click.
+        /// Событие, возникающее при щелчке по строке.
         /// </summary>
         public event EventHandler<SiberianClickEventArgs>? Click;
 
@@ -54,27 +54,27 @@ namespace ManagedIrbis.WinForms.Grid
         #region Properties
 
         /// <summary>
-        /// Index.
+        /// Порядковый номер.
         /// </summary>
         public int Index { get; internal set; }
 
         /// <summary>
-        /// Data.
+        /// Данные.
         /// </summary>
         public object? Data { get; set; }
 
         /// <summary>
-        /// Grid.
+        /// Грид, которому принадлежит строка.
         /// </summary>
         public SiberianGrid? Grid { get; internal set; }
 
         /// <summary>
-        /// Cells.
+        /// Ячейки, входящие в строку.
         /// </summary>
         public NonNullCollection<SiberianCell> Cells { get; private set; }
 
         /// <summary>
-        /// Height.
+        /// Актальная высота строки.
         /// </summary>
         [DefaultValue(DefaultHeight)]
         public int Height { get; set; }
@@ -84,13 +84,14 @@ namespace ManagedIrbis.WinForms.Grid
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         internal SiberianRow()
         {
             Height = DefaultHeight;
             Cells = new NonNullCollection<SiberianCell>();
-        }
+
+        } // constructor
 
         #endregion
 
@@ -149,7 +150,7 @@ namespace ManagedIrbis.WinForms.Grid
                     Height = height
                 };
 
-                cell.MeasureContent(dimensions);
+                cell.MeasureCell(dimensions);
             }
 
             if (height > Height)

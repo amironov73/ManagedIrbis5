@@ -46,7 +46,7 @@
   </ItemGroup>
 
     <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
+        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
     
 </Project>

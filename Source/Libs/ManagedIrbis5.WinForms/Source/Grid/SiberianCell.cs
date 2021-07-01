@@ -3,12 +3,13 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SiberianCell.cs --
+/* SiberianCell.cs -- базовый класс для ячейки грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,6 +17,7 @@
 
 using System;
 using System.Windows.Forms;
+using AM;
 
 #endregion
 
@@ -24,43 +26,48 @@ using System.Windows.Forms;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Базовый класс для ячейки грида.
     /// </summary>
     public class SiberianCell
     {
         #region Events
 
         /// <summary>
-        /// Fired on click.
+        /// Клик по ячейке (мышкой либо нажатие Enter на клавиатуре).
         /// </summary>
         public event EventHandler<SiberianClickEventArgs>? Click;
 
         /// <summary>
-        /// Measure content.
+        /// Получение размеров содержимого ячейки.
         /// </summary>
         public event EventHandler<SiberianMeasureEventArgs>? Measure;
 
         /// <summary>
-        /// Fired when tooltip needed.
+        /// Получение тултипа (опционального) для ячейки.
         /// </summary>
         public event EventHandler<SiberianToolTipEventArgs>? ToolTip;
+
+        /// <summary>
+        /// Отрисовка ячейки.
+        /// </summary>
+        public event EventHandler<PaintEventArgs>? Paint;
 
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// Column.
+        /// Колонка, которой принадлежит ячейка.
         /// </summary>
         public SiberianColumn? Column { get; internal set; }
 
         /// <summary>
-        /// Grid.
+        /// Грид, которому принадлежит ячейка.
         /// </summary>
         public SiberianGrid? Grid => Row?.Grid;
 
         /// <summary>
-        /// Row.
+        /// Строка, которой принадлежит ячейка.
         /// </summary>
         public SiberianRow? Row { get; internal set; }
 
@@ -80,84 +87,120 @@ namespace ManagedIrbis.WinForms.Grid
         #region Private members
 
         /// <summary>
-        /// Handle <see cref="Click"/> event.
+        /// Возбуждение события <see cref="Click"/>.
         /// </summary>
         protected internal virtual void HandleClick
             (
                 SiberianClickEventArgs eventArgs
             )
         {
-            Click?.Invoke(this, eventArgs);
-        }
+            Click.Raise(this, eventArgs);
+
+        } // method HandleClick
 
         /// <summary>
-        /// Get tooltip for the cell.
+        /// Возбуждение события <see cref="Measure"/>.
+        /// </summary>
+        protected internal virtual void HandleMeasure
+            (
+                SiberianMeasureEventArgs eventArgs
+            )
+        {
+            Measure.Raise(this, eventArgs);
+
+        } // method HandleMeasure
+
+        /// <summary>
+        /// Возбуждение события <see cref="Paint"/>.
+        /// </summary>
+        protected internal virtual void HandlePaint
+            (
+                PaintEventArgs eventArgs
+            )
+        {
+            Paint.Raise(this, eventArgs);
+
+        } // method HandlePaint
+
+        /// <summary>
+        /// Получение тултипа для ячейки.
         /// </summary>
         protected internal virtual void HandleToolTip
             (
                 SiberianToolTipEventArgs eventArgs
             )
         {
-            var args = new SiberianToolTipEventArgs();
-            ToolTip?.Invoke(this, args);
-        }
+            ToolTip.Raise(this, eventArgs);
+
+        } // method HandleToolTip
 
         /// <summary>
-        /// Measure content of the cell.
+        /// Измерение размера ячейки.
         /// </summary>
-        protected internal virtual void MeasureContent
+        protected internal virtual void MeasureCell
             (
                 SiberianDimensions dimensions
             )
         {
-            Measure?.Invoke(this, new SiberianMeasureEventArgs(dimensions));
-        }
+            HandleMeasure(new SiberianMeasureEventArgs(dimensions));
+
+        } // method MeasureCell
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Close editor.
+        /// Закрытие редактора (возможно, отсутствующего).
         /// </summary>
+        /// <param name="accept">Принимаются ли введенные данные.
+        /// Если нет, то они просто отбрасываются, иначе
+        /// они становятся новым значением ячейки.</param>
         public virtual void CloseEditor
             (
                 bool accept
             )
         {
-            var grid = Grid;
+            var grid = this.EnsureGrid();
 
-            if (grid is {Editor: { }})
+            // в базовом классе мы никак не отрабатываем
+            // параметр accept
+            if (grid.Editor is { } editor)
             {
-                grid.Editor.Dispose();
+                editor.Dispose();
                 grid.Editor = null;
 
                 grid.Invalidate();
             }
-        }
+
+        } // method CloseEditor
 
         /// <summary>
-        /// Handles click on the cell.
+        /// Обработка клика по ячейке.
         /// </summary>
         public virtual void OnClick
             (
                 SiberianClickEventArgs eventArgs
             )
         {
-            // Nothing to do here?
-        }
+            HandleClick(eventArgs);
+
+        } // method OnClick
 
         /// <summary>
-        /// Draw the cell.
+        /// Отрисовка ячейки.
         /// </summary>
-        public virtual void Paint
+        public virtual void OnPaint
             (
                 PaintEventArgs args
             )
         {
-            // Nothing to do here?
-        }
+            HandlePaint(args);
+
+        } // method OnPaint
 
         #endregion
-    }
-}
+
+    } // class SiberianCell
+
+} // namespace ManagedIrbis.WinForms.Grid
