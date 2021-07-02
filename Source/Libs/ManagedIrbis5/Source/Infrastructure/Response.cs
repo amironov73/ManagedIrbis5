@@ -99,12 +99,6 @@ namespace ManagedIrbis.Infrastructure
         private ArraySegment<byte> _currentChunk;
         private int _currentIndex, _currentOffset;
 
-        /// <summary>
-        /// IRBIS_BINARY_DATA
-        /// </summary>
-        private static readonly byte[] BinaryDataPreamble =
-            { 73, 82, 66, 73, 83, 95, 66, 73, 78, 65, 82, 89, 95, 68, 65, 84, 65 };
-
         #endregion
 
         #region Public methods
@@ -151,7 +145,8 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public bool FindPreamble()
         {
-            var preambleLength = BinaryDataPreamble.Length;
+            var preamble = Server.Commands.ReadFileCommand.Preamble;
+            var preambleLength = preamble.Length;
 
             while (!EOT)
             {
@@ -159,7 +154,7 @@ namespace ManagedIrbis.Infrastructure
                 for (var i = 0; i < preambleLength; i++)
                 {
                     var b = ReadByte();
-                    if (b != BinaryDataPreamble[i])
+                    if (b != preamble[i])
                     {
                         found = false;
                         break;

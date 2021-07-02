@@ -6,7 +6,9 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* IrbisText.cs -- работа с текстом, специфичная для ИРБИС
@@ -18,7 +20,8 @@
 using System;
 using System.Text.RegularExpressions;
 
-using CM=System.Configuration.ConfigurationManager;
+using AM;
+using AM.Collections;
 
 #endregion
 
@@ -39,6 +42,11 @@ namespace ManagedIrbis.Infrastructure
         public const string IrbisDelimiter = "\x001F\x001E";
 
         /// <summary>
+        /// Разделитель строк ИРБИС.
+        /// </summary>
+        public static readonly byte[] IrbisDelimiterBytes = { 0x1F, 0x1E };
+
+        /// <summary>
         /// Standard Windows line delimiter.
         /// </summary>
         public const string StandardDelimiter = "\r\n";
@@ -47,6 +55,11 @@ namespace ManagedIrbis.Infrastructure
         /// Standard Windows line delimiter.
         /// </summary>
         public const string WindowsDelimiter = "\r\n";
+
+        /// <summary>
+        /// Стандартный разделитель строк в DOS/Windows.
+        /// </summary>
+        public static readonly byte[] WindowsDelimiterBytes = { 13, 10 };
 
         #endregion
 
@@ -264,8 +277,39 @@ namespace ManagedIrbis.Infrastructure
                 );
 
             return result;
-        }
+
+        } // method WindowsToIrbis
+
+        /// <summary>
+        /// Заменяет стандартные переводы строки Windows на ИРБИС.
+        /// Замена происходит на месте.
+        /// </summary>
+        public static void WindowsToIrbis
+            (
+                byte[]? text
+            )
+        {
+            if (text.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var index = 0;
+            while (true)
+            {
+                index = Utility.IndexOf(text, WindowsDelimiterBytes, index);
+                if (index < 0)
+                {
+                    break;
+                }
+
+                Array.Copy(WindowsDelimiterBytes, 0, text, index, WindowsDelimiterBytes.Length);
+            }
+
+        } // method WindowsToIrbis
 
         #endregion
-    }
-}
+
+    } // class IrbisText
+
+} // namespace ManagedIrbis.Infrastructure

@@ -1743,6 +1743,48 @@ namespace AM
         } // method CompareOrdinal
 
         /// <summary>
+        /// Ищет первое вхождение паттерна в данных.
+        /// </summary>
+        /// <returns>
+        /// Индекс первого вхождения или -1.
+        /// </returns>
+        public static int IndexOf
+            (
+                byte[] data,
+                byte[] pattern,
+                int start = 0
+            )
+        {
+            var patternLength = pattern.Length;
+            var dataLength = data.Length - patternLength;
+            if (patternLength == 0 || dataLength < 0)
+            {
+                return -1;
+            }
+
+            for (var i = start; i <= dataLength; i++)
+            {
+                var found = true;
+                for (var j = 0; j < patternLength; j++)
+                {
+                    if (data[i + j] != pattern[j])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+
+        } // method IndexOf
+
+        /// <summary>
         /// Превращает объект в видимую строку.
         /// </summary>
         [Pure]
