@@ -25,7 +25,6 @@ using System.Linq;
 using System.Windows.Forms;
 
 using AM;
-using AM.Collections;
 
 #endregion
 
@@ -80,14 +79,14 @@ namespace ManagedIrbis.WinForms.Grid
         } // property ForeColor
 
         /// <summary>
-        /// Колонки.
+        /// Коллекция колонок.
         /// </summary>
-        public NonNullCollection<SiberianColumn> Columns { get; }
+        public ISiberianColumnCollection Columns { get; }
 
         /// <summary>
-        /// Строки.
+        /// Коллекция строк.
         /// </summary>
-        public NonNullCollection<SiberianRow> Rows { get; }
+        public ISiberianRowCollection Rows { get; }
 
         /// <summary>
         /// Текущая колонка.
@@ -150,6 +149,7 @@ namespace ManagedIrbis.WinForms.Grid
 
                 return result;
             }
+
         } // property UsableSize
 
         /// <summary>
@@ -165,13 +165,24 @@ namespace ManagedIrbis.WinForms.Grid
         /// Конструктор.
         /// </summary>
         public SiberianGrid()
+            : this (new SiberianColumnCollection(), new SiberianRowCollection())
         {
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public SiberianGrid
+            (
+                ISiberianColumnCollection columns,
+                ISiberianRowCollection rows
+            )
+        {
+            Columns = columns;
+            Rows = rows;
             Palette = SiberianPalette.DefaultPalette.Clone();
 
-            Columns = new NonNullCollection<SiberianColumn>();
-            Rows = new NonNullCollection<SiberianRow>();
-
-            CreateScrollBars();
+            CreateScrollBars(); //-V3068
 
             DoubleBuffered = true;
 
@@ -328,13 +339,7 @@ namespace ManagedIrbis.WinForms.Grid
                         break;
 
                     case ScrollEventType.EndScroll:
-                        result = args.NewValue;
-                        break;
-
                     case ScrollEventType.ThumbPosition:
-                        result = args.NewValue;
-                        break;
-
                     case ScrollEventType.ThumbTrack:
                         result = args.NewValue;
                         break;
@@ -967,18 +972,20 @@ namespace ManagedIrbis.WinForms.Grid
             var result = MoveRelative(0, delta);
 
             return result;
-        }
+
+        } // method MoveOnePageDown
 
         /// <summary>
         /// Move one page up.
         /// </summary>
         public SiberianCell? MoveOnePageUp()
         {
-            var delta = _verticalScroll?.LargeChange ?? 10;
+            var delta = - (_verticalScroll?.LargeChange ?? 10);
             var result = MoveRelative(0, delta);
 
             return result;
-        }
+
+        } // method MoveOnePageUp
 
         /// <summary>
         /// Relative movement.

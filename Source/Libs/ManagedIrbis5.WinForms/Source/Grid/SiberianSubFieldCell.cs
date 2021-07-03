@@ -86,7 +86,7 @@ namespace ManagedIrbis.WinForms.Grid
                 var text = subField.Value;
                 if (!string.IsNullOrEmpty(text))
                 {
-                    var flags = TextFormatFlags.TextBoxControl
+                    const TextFormatFlags flags = TextFormatFlags.TextBoxControl
                                 | TextFormatFlags.EndEllipsis
                                 | TextFormatFlags.NoPrefix
                                 | TextFormatFlags.VerticalCenter;
@@ -102,7 +102,7 @@ namespace ManagedIrbis.WinForms.Grid
                         );
                 }
             }
-        }
+        } // method OnPaint
 
         #endregion
 
@@ -122,7 +122,8 @@ namespace ManagedIrbis.WinForms.Grid
             }
 
             return $"SubFieldCell [{column}, {row}]: {text}";
-        }
+
+        } // method ToString
 
         #endregion
 

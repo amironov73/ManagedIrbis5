@@ -4,10 +4,12 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* SiberianSubField.cs --
+/* SiberianSubField.cs -- представление подполя записи для грида
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,39 +26,39 @@ using ManagedIrbis.Workspace;
 namespace ManagedIrbis.WinForms.Grid
 {
     /// <summary>
-    ///
+    /// Представление подполя записи для грида.
     /// </summary>
     public class SiberianSubField
     {
         #region Properties
 
         /// <summary>
-        /// Subfield code.
+        /// Код подполя.
         /// </summary>
         public char Code { get; set; }
 
         /// <summary>
-        /// Title.
+        /// Заголовок подполя.
         /// </summary>
         public string? Title { get; set; }
 
         /// <summary>
-        /// Value.
+        /// Текущее значение подполя.
         /// </summary>
         public string? Value { get; set; }
 
         /// <summary>
-        /// Original value.
+        /// Оригинальное значение подполя.
         /// </summary>
         public string? OriginalValue { get; set; }
 
         /// <summary>
-        /// Editing mode?
+        /// Режим редактирования.
         /// </summary>
         public string? Mode { get; set; }
 
         /// <summary>
-        /// Modified?
+        /// Признак модификации значения подполя.
         /// </summary>
         public bool Modified { get; set; }
 
@@ -65,25 +67,16 @@ namespace ManagedIrbis.WinForms.Grid
         #region Public methods
 
         /// <summary>
-        /// Create <see cref="SiberianSubField"/> from
-        /// <see cref="WorksheetItem"/>.
+        /// Создание представления подполя из элемента рабочего листа.
         /// </summary>
-        public static SiberianSubField FromWorksheetItem
-            (
-                WorksheetItem item
-            )
-        {
-            var result = new SiberianSubField
+        public static SiberianSubField FromWorksheetItem (WorksheetItem item) => new ()
             {
                 Code = item.Tag.FirstChar(),
                 Title = item.Title
             };
 
-            return result;
-        }
-
-
         #endregion
 
-    }
-}
+    } // class SiberianSubField
+
+} // namespace ManagedIrbis.WinForms.Grid

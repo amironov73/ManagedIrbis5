@@ -2,14 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* IrbisText.cs -- работа с текстом, специфичная для ИРБИС
  * Ars Magna project, http://arsmagna.ru
@@ -37,22 +32,17 @@ namespace ManagedIrbis.Infrastructure
         #region Constants
 
         /// <summary>
-        /// Irbis line delimiter.
+        /// Стандартный разделитель строк ИРБИС.
         /// </summary>
         public const string IrbisDelimiter = "\x001F\x001E";
 
         /// <summary>
-        /// Разделитель строк ИРБИС.
+        /// Стандартный разделитель строк ИРБИС.
         /// </summary>
         public static readonly byte[] IrbisDelimiterBytes = { 0x1F, 0x1E };
 
         /// <summary>
-        /// Standard Windows line delimiter.
-        /// </summary>
-        public const string StandardDelimiter = "\r\n";
-
-        /// <summary>
-        /// Standard Windows line delimiter.
+        /// Стандартный разделитель строк в DOS/Windows.
         /// </summary>
         public const string WindowsDelimiter = "\r\n";
 
@@ -65,6 +55,7 @@ namespace ManagedIrbis.Infrastructure
 
         #region Private members
 
+        // короткий разделитель строк в ИРБИС
         private static readonly char[] _delimiters = { '\x1F' };
 
         private static string _CleanupEvaluator
@@ -87,7 +78,7 @@ namespace ManagedIrbis.Infrastructure
         #region Public methods
 
         /// <summary>
-        /// Cleanup the text.
+        /// Очистка текста от команд форматирования [[]].
         /// </summary>
         public static string? CleanupMarkup
             (
@@ -118,12 +109,12 @@ namespace ManagedIrbis.Infrastructure
                 text = result;
             }
 
-
             return text;
-        }
+
+        } // method CleanupMarkup
 
         /// <summary>
-        /// Cleanup the text.
+        /// Очистка текста от различных ИРБИС-артефактов.
         /// </summary>
         public static string? CleanupText
             (
@@ -135,7 +126,7 @@ namespace ManagedIrbis.Infrastructure
                 return text;
             }
 
-            // Remove repeating area delimiters.
+            // Удаление задвоившихся разделителей областей биб. описания
             var result = Regex.Replace
                 (
                     text,
@@ -143,7 +134,7 @@ namespace ManagedIrbis.Infrastructure
                     ". - "
                 );
 
-            // Cleanup repeating dots
+            // Удаление задвоившихся точек
             result = Regex.Replace
                 (
                     result,
@@ -151,7 +142,8 @@ namespace ManagedIrbis.Infrastructure
                     _CleanupEvaluator
                 );
 
-            // Remove the area delimiters at the paragraph end.
+            // Удаление "повисших" разделителей областей биб. описания
+            // (в конце параграфа)
             result = Regex.Replace
                 (
                     result,
@@ -160,10 +152,11 @@ namespace ManagedIrbis.Infrastructure
                 );
 
             return result;
-        }
+
+        } // method CleanupText
 
         /// <summary>
-        /// Convert IRBIS line endings to standard.
+        /// Преобразование переводов строк ИРБИС в Windows.
         /// </summary>
         public static string? IrbisToWindows
             (
@@ -187,10 +180,39 @@ namespace ManagedIrbis.Infrastructure
                 );
 
             return result;
-        }
+
+        } // method IrbisToWindows
 
         /// <summary>
-        /// Split IRBIS-delimited text to lines.
+        /// Заменяет переводы строк ИРБИС на Windows.
+        /// Замена происходит на месте.
+        /// </summary>
+        public static void IrbisToWindows
+            (
+                byte[]? text
+            )
+        {
+            if (text.IsNullOrEmpty())
+            {
+                return;
+            }
+
+            var index = 0;
+            while (true)
+            {
+                index = Utility.IndexOf(text, IrbisDelimiterBytes, index);
+                if (index < 0)
+                {
+                    break;
+                }
+
+                Array.Copy(WindowsDelimiterBytes, 0, text, index, WindowsDelimiterBytes.Length);
+            }
+
+        } // method IrbisToWindows
+
+        /// <summary>
+        /// Разбивает текст на строки в соответствии с ИРБИС-разделителями.
         /// </summary>
         public static string[] SplitIrbisToLines
             (
@@ -212,10 +234,11 @@ namespace ManagedIrbis.Infrastructure
                     );
 
             return result;
-        }
+
+        } // method SplitIrbisToLines
 
         /// <summary>
-        /// Convert text to lower case.
+        /// Преобразует текст в нижний регистр.
         /// </summary>
         public static string? ToLower
             (
@@ -230,10 +253,11 @@ namespace ManagedIrbis.Infrastructure
             var result = text.ToLowerInvariant();
 
             return result;
-        }
+
+        } // method ToLower
 
         /// <summary>
-        /// Convert text to upper case.
+        /// Преобразует текст в верхний регистр.
         /// </summary>
         public static string? ToUpper
             (
@@ -250,10 +274,11 @@ namespace ManagedIrbis.Infrastructure
             var result = text.ToUpperInvariant();
 
             return result;
-        }
+
+        } // method ToUpper
 
         /// <summary>
-        /// Convert standard line endings to IRBIS.
+        /// Заменяет переводы строк DOS/Windows на ИРБИС.
         /// </summary>
         public static string? WindowsToIrbis
             (
@@ -281,7 +306,7 @@ namespace ManagedIrbis.Infrastructure
         } // method WindowsToIrbis
 
         /// <summary>
-        /// Заменяет стандартные переводы строки Windows на ИРБИС.
+        /// Заменяет переводы строк Windows на ИРБИС.
         /// Замена происходит на месте.
         /// </summary>
         public static void WindowsToIrbis
@@ -303,7 +328,7 @@ namespace ManagedIrbis.Infrastructure
                     break;
                 }
 
-                Array.Copy(WindowsDelimiterBytes, 0, text, index, WindowsDelimiterBytes.Length);
+                Array.Copy(IrbisDelimiterBytes, 0, text, index, IrbisDelimiterBytes.Length);
             }
 
         } // method WindowsToIrbis
