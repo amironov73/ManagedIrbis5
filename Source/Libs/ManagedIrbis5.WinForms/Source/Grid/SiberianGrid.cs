@@ -509,10 +509,10 @@ namespace ManagedIrbis.WinForms.Grid
                 if (!ReferenceEquals(CurrentRow, null))
                 {
                     CurrentCell = GetCell
-                    (
-                        CurrentColumn.Index,
-                        CurrentRow.Index
-                    );
+                        (
+                            CurrentColumn.Index,
+                            CurrentRow.Index
+                        );
                 }
             }
 

@@ -59,7 +59,7 @@ namespace ManagedIrbis.WinForms.Grid
             )
         {
             Adapter = adapter;
-            Count = count;
+            Count = count != 0 ? count : adapter.TotalLength;
             _cache = null;
 
         } // constructor
@@ -131,8 +131,16 @@ namespace ManagedIrbis.WinForms.Grid
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
         public IEnumerator<SiberianRow> GetEnumerator()
         {
-            throw new NotImplementedException();
-        }
+            var dummyRow = new SiberianRow();
+
+            for (var i = 0; i < Count; i++)
+            {
+                dummyRow.Grid = Grid;
+                dummyRow.Index = i;
+                yield return dummyRow;
+            }
+
+        } // method GetEnumerator
 
         #endregion
 

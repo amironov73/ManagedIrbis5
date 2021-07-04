@@ -20,8 +20,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-using AM.Collections;
-
 #endregion
 
 #nullable enable
@@ -71,7 +69,7 @@ namespace ManagedIrbis.WinForms.Grid
         /// <summary>
         /// Ячейки, входящие в строку.
         /// </summary>
-        public NonNullCollection<SiberianCell> Cells { get; private set; }
+        public ISiberianCells Cells { get; }
 
         /// <summary>
         /// Актальная высота строки.
@@ -89,7 +87,7 @@ namespace ManagedIrbis.WinForms.Grid
         internal SiberianRow()
         {
             Height = DefaultHeight;
-            Cells = new NonNullCollection<SiberianCell>();
+            Cells = new SiberianCellCollection();
 
         } // constructor
 

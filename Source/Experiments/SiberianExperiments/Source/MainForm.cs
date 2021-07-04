@@ -50,6 +50,12 @@ namespace SiberianExperiments
             form.ShowDialog(this);
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            using var form = new ListTest();
+            form.ShowDialog(this);
+        }
+
     } // class MainForm
 
 } // namespace SiberianExperiments

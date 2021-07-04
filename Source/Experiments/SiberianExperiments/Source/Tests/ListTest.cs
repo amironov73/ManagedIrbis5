@@ -13,17 +13,8 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using AM;
 
 // using ManagedIrbis.WinForms.Grid;
 
@@ -33,12 +24,12 @@ using AM;
 
 namespace SiberianExperiments
 {
-    public sealed class SimplestTest
+    public class ListTest
         : Form
     {
         #region Properties
 
-        public List<Dummy> Values { get; } = new ();
+        // private IList<Dummy> Values { get; }
 
         #endregion
 
@@ -47,9 +38,10 @@ namespace SiberianExperiments
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public SimplestTest()
+        public ListTest()
         {
-            // var grid = new SiberianGrid
+            // Values = Dummy.GenerateList(100);
+            // var grid = new ListGrid<Dummy> (Values)
             // {
             //     Dock = DockStyle.Fill
             // };
@@ -68,17 +60,7 @@ namespace SiberianExperiments
             //     .SetFillWidth(20)
             //     .SetMinWidth(30);
             // grid.AutoSizeColumns();
-            //
-            // for (var i = 0; i < 100; i++)
-            // {
-            //     grid.CreateRow(new Dummy
-            //     {
-            //         Number = i + 1,
-            //         Text = "Text " + (i + 1).ToInvariantString()
-            //     });
-            // }
-
-        } // constructor
+        }
 
         #endregion
     }
