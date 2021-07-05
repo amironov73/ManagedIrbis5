@@ -2507,6 +2507,7 @@ namespace AM
             }
 
             return result;
+
         } // method SafeToInt32
 
         /// <summary>
@@ -2529,6 +2530,7 @@ namespace AM
             }
 
             return result;
+
         } // method SafeToInt32
 
         /// <summary>
@@ -2550,6 +2552,7 @@ namespace AM
             }
 
             return result;
+
         } // method SafeToInt32
 
         /// <summary>
@@ -2571,6 +2574,7 @@ namespace AM
             }
 
             return result;
+
         } // method SafeToInt32
 
         /// <summary>
@@ -2592,6 +2596,7 @@ namespace AM
             }
 
             return result;
+
         } // method SafeToInt32
 
         /// <summary>
@@ -3281,6 +3286,7 @@ namespace AM
             }
 
             return false;
+
         } // method IsOneOf
 
         /// <summary>
@@ -3807,7 +3813,8 @@ namespace AM
             var result = text.Split('\n');
 
             return result;
-        }
+
+        } // method SplitLines
 
         /// <summary>
         /// Содержит ли строка указанную подстроку?
@@ -3845,7 +3852,8 @@ namespace AM
             }
 
             return !string.IsNullOrEmpty(subtext2) && text.Contains(subtext2);
-        }
+
+        } // method SafeContains
 
         /// <summary>
         /// Содержит ли данная строка одну из перечисленных подстрок?
@@ -3874,7 +3882,8 @@ namespace AM
             }
 
             return !string.IsNullOrEmpty(subtext3) && text.Contains(subtext3);
-        }
+
+        } // method SafeContains
 
         /// <summary>
         /// Содержит ли данная строка одну из перечисленных подстрок?
@@ -3899,7 +3908,8 @@ namespace AM
             }
 
             return false;
-        }
+
+        } // method SafeContains
 
         /// <summary>
         /// Безопасный триминг строки.

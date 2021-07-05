@@ -206,6 +206,7 @@ namespace ManagedIrbis
             Fields.Add(field);
 
             return this;
+
         } // method Add
 
         /// <summary>
@@ -228,6 +229,7 @@ namespace ManagedIrbis
             Fields.Add(field);
 
             return this;
+
         } // method Add
 
         /// <summary>
@@ -249,6 +251,7 @@ namespace ManagedIrbis
             Fields.Add(field);
 
             return this;
+
         } // method Add
 
         /// <summary>
@@ -272,6 +275,7 @@ namespace ManagedIrbis
             Fields.Add(field);
 
             return this;
+
         } // method Add
 
         /// <summary>
@@ -300,6 +304,7 @@ namespace ManagedIrbis
             Fields.Add(field);
 
             return this;
+
         } // method Add
 
         /// <summary>
@@ -620,6 +625,7 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
+
         } // method FMA
 
         /// <summary>

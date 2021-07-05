@@ -103,7 +103,7 @@ namespace ManagedIrbis
                 }
                 else
                 {
-                    if (!value.IsEmpty())
+                    if (!string.IsNullOrEmpty(value))
                     {
                         CreateValueSubField().Value = value;
                     }

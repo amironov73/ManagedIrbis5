@@ -151,7 +151,8 @@ namespace AM.Collections
             }
 
             return true;
-        }
+
+        } // method IsNullOrEmpty
 
         /// <summary>
         /// Throw <see cref="ArgumentNullException"/>
@@ -191,7 +192,8 @@ namespace AM.Collections
             }
 
             return list;
-        }
+
+        } // method ThrowIfNullOrEmpty
 
         /// <summary>
         /// Throw <see cref="ArgumentNullException"/>

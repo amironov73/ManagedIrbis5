@@ -16,7 +16,7 @@ namespace ManagedIrbis.Marc
     /// <summary>
     /// Код статуса записи в формате ISO 2709.
     /// </summary>
-    public enum RecordStatus
+    public enum MarcRecordStatus
     {
         /// <summary>
         /// При изменении записи увеличивается ее уровень.
@@ -42,5 +42,7 @@ namespace ManagedIrbis.Marc
         /// Запись изменилась после того, как была введена с плана издательства.
         /// </summary>
         Publisher = 'p'
-    }
-}
+
+    } // enum MarcRecordStatus
+
+} // namespace ManagedIrbis.Marc

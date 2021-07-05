@@ -283,7 +283,8 @@ namespace ManagedIrbis
             }
 
             return Connected;
-        } // method CheckConnection
+
+        } // method CheckProviderState
 
         /// <inheritdoc cref="IIrbisProvider.Configure"/>
         public void Configure(string configurationString) =>

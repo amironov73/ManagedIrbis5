@@ -325,8 +325,11 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result;
-        }
+
+        } // method ToString
 
         #endregion
-   }
-}
+
+   } // class FileSpecification
+
+} // namespace ManagedIrbis.Infrastructure

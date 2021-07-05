@@ -241,7 +241,7 @@ namespace ManagedIrbis
             foreach (var subField in subFields.NonNullItems())
             {
                 var value = subField.Value;
-                if (!value.IsEmpty())
+                if (!string.IsNullOrEmpty(value))
                 {
                     result ??= new List<string>();
                     result.Add(value);
@@ -251,6 +251,7 @@ namespace ManagedIrbis
             return ReferenceEquals(result, null)
                 ? Array.Empty<string>()
                 : result.ToArray();
+
         } // method GetSubFieldValue
 
         // ==========================================================

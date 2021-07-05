@@ -536,7 +536,7 @@ namespace ManagedIrbis.Infrastructure
             Sure.Positive(count, nameof(count));
 
             var result = new List<string>(count);
-            int index = 0;
+            var index = 0;
             string line;
             for (; index < 1; index++)
             {
@@ -547,6 +547,7 @@ namespace ManagedIrbis.Infrastructure
                 }
                 result.Add(line);
             }
+
             for (; index < count; index++)
             {
                 line = ReadAnsi();
@@ -732,7 +733,6 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         ///
         /// </summary>
-        /// <returns></returns>
         public string[] ReadRemainingAnsiLines()
         {
             var result = new LocalList<string>();
@@ -757,7 +757,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public string[] ReadRemainingUtfLines()
         {
-            LocalList<string> result = new LocalList<string>();
+            var result = new LocalList<string>();
 
             while (!EOT)
             {

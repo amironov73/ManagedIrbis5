@@ -201,6 +201,7 @@ namespace ManagedIrbis.Infrastructure
             }
 
             _oem = encoding;
+
         } // method SetOemEncoding
 
         #endregion

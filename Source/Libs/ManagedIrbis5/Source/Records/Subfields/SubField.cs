@@ -178,11 +178,14 @@ namespace ManagedIrbis
         {
             if (!text.IsEmpty)
             {
-                Code = char.ToLowerInvariant(text[0]);
+                var code = char.ToLowerInvariant(text[0]);
+                SubFieldCode.Verify(code, true);
+                Code = code;
                 var value = text[1..];
                 SubFieldValue.Verify(value, true);
                 Value = value.EmptyToNull();
             }
+
         } // method Decode
 
         /// <summary>
