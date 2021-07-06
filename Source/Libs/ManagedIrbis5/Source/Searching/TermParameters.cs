@@ -108,6 +108,7 @@ namespace ManagedIrbis
             query.AddUtf(StartTerm);
             query.Add(NumberOfTerms);
             query.AddFormat(Format);
+
         } // method Encode
 
         #endregion
@@ -168,11 +169,10 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            return StartTerm.ToVisibleString();
-        }
+        public override string ToString() => StartTerm.ToVisibleString();
 
         #endregion
-    }
-}
+
+    } // class TermParameters
+
+} // namespace ManagedIrbis

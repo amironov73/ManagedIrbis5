@@ -207,11 +207,10 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="Object.ToString" />
-        public override string ToString()
-        {
-            return $"{Mfn}#{Tag}#{Occurrence}#{Count}#{Text}";
-        }
+        public override string ToString() => $"{Mfn}#{Tag}#{Occurrence}#{Count}#{Text}";
 
         #endregion
-    }
-}
+
+    } // class TermPosting
+
+} // namespace ManagedIrbis

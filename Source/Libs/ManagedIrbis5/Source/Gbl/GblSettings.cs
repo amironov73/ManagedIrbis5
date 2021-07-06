@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMethodReturnValue.Global
 
 /* GblSettings.cs -- settings for GBL
  * Ars Magna project, http://arsmagna.ru
@@ -33,7 +34,7 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis.Gbl
 {
     /// <summary>
-    /// Settings for GBL execution.
+    /// Настройки для глобальной корректировки.
     /// </summary>
     public sealed class GblSettings
         : IVerifiable,
@@ -394,6 +395,7 @@ namespace ManagedIrbis.Gbl
             };
 
             return result;
+
         } // method ForSearchExpression
 
         /// <summary>
@@ -407,6 +409,7 @@ namespace ManagedIrbis.Gbl
             FileName = fileName;
 
             return this;
+
         } // method SetFileName
 
         /// <summary>
@@ -426,6 +429,7 @@ namespace ManagedIrbis.Gbl
             NumberOfRecords = numberOfRecords;
 
             return this;
+
         } // method SetRange
 
         /// <summary>
@@ -439,6 +443,7 @@ namespace ManagedIrbis.Gbl
             SearchExpression = searchExpression;
 
             return this;
+
         } // method SetSearchExpression
 
         /*
@@ -478,7 +483,8 @@ namespace ManagedIrbis.Gbl
             NumberOfRecords = reader.ReadPackedInt32();
             SearchExpression = reader.ReadNullableString();
             Statements = reader.ReadNonNullCollection<GblStatement>();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -498,7 +504,8 @@ namespace ManagedIrbis.Gbl
             writer.WritePackedInt32(NumberOfRecords);
             writer.WriteNullable(SearchExpression);
             writer.Write(Statements);
-        }
+
+        } // method SaveToStream
 
         #endregion
 
@@ -526,7 +533,8 @@ namespace ManagedIrbis.Gbl
             }
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 

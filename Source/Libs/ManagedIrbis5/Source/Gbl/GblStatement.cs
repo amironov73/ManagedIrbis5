@@ -173,6 +173,7 @@ namespace ManagedIrbis.Gbl
             result.Append(Delimiter);
 
             return result.ToString();
+
         } // method EncodeForProtocol
 
         /// <summary>
@@ -199,6 +200,7 @@ namespace ManagedIrbis.Gbl
             };
 
             return result;
+
         } // method ParseStream
 
         #endregion
@@ -216,6 +218,7 @@ namespace ManagedIrbis.Gbl
             Parameter2 = reader.ReadNullableString();
             Format1 = reader.ReadNullableString();
             Format2 = reader.ReadNullableString();
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -229,6 +232,7 @@ namespace ManagedIrbis.Gbl
             writer.WriteNullable(Parameter2);
             writer.WriteNullable(Format1);
             writer.WriteNullable(Format2);
+
         } // method SaveToStream
 
         #endregion

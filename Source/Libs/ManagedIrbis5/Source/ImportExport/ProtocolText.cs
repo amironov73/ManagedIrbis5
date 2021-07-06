@@ -73,14 +73,15 @@ namespace ManagedIrbis.ImportExport
             }
 
             return result.ToString().AsMemory();
-        }
+
+        } // method _ReadTo
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Encode subfield.
+        /// Кодирование подполя.
         /// </summary>
         public static void EncodeSubField
             (
@@ -102,10 +103,11 @@ namespace ManagedIrbis.ImportExport
                         subField.Value
                     );
             }
-        }
+
+        } // method EncodeSubField
 
         /// <summary>
-        /// Encode field.
+        /// Кодирование одного поля.
         /// </summary>
         public static void EncodeField
             (
@@ -129,7 +131,8 @@ namespace ManagedIrbis.ImportExport
             }
 
             builder.Append(IrbisText.IrbisDelimiter);
-        }
+
+        } // method EncodeField
 
         /// <summary>
         /// Кодирование записи в клиентское представление.
@@ -169,10 +172,11 @@ namespace ManagedIrbis.ImportExport
             }
 
             return result.ToString();
-        }
+
+        } // method EncodeRecord
 
         /// <summary>
-        /// Parse the line.
+        /// Разбор одной строки (поля).
         /// </summary>
         public static Field ParseLine
             (
@@ -204,7 +208,8 @@ namespace ManagedIrbis.ImportExport
             }
 
             return result;
-        }
+
+        } // method ParseLine
 
         /// <summary>
         /// Parse MFN, status and version of the record
@@ -233,7 +238,8 @@ namespace ManagedIrbis.ImportExport
             }
 
             return record;
-        }
+
+        } // method ParseMfnStatusVersion
 
         /// <summary>
         /// Parse server response for ReadRecordCommand.

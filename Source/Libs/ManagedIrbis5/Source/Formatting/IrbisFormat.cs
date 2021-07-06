@@ -139,6 +139,7 @@ namespace ManagedIrbis.Infrastructure
             } // while
 
             return result.ToString();
+
         } // method RemoveComments
 
         /// <summary>
@@ -192,7 +193,7 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result.ToString();
-            
+
         } // method PrepareFormat
 
         /// <summary>

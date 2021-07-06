@@ -49,7 +49,8 @@ namespace AM.IO
                 );
 
             return result;
-        }
+
+        } // method OpenRead
 
         /// <summary>
         /// Обязательное чтение строки.
@@ -78,8 +79,11 @@ namespace AM.IO
             }
 
             return result;
-        }
+
+        } // method RequireLine
 
         #endregion
-    }
-}
+
+    } // method TextReaderUtility
+
+} // namespace AM.IO

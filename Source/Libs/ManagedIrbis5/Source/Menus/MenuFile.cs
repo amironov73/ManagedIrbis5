@@ -20,7 +20,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 using AM;
@@ -257,6 +256,7 @@ namespace ManagedIrbis.Menus
                 {
                     break;
                 }
+
                 if (code.StartsWith(StopMarker))
                 {
                     break;
@@ -272,6 +272,7 @@ namespace ManagedIrbis.Menus
             }
 
             return result;
+
         } // method ParseStream
 
         /// <summary>

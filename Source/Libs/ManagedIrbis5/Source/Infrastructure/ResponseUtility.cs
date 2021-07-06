@@ -44,10 +44,15 @@ namespace ManagedIrbis.Infrastructure
                 bool dispose = true
             )
         {
-            var result = response is not null && response.CheckReturnCode();
+            if (response is null)
+            {
+                return false;
+            }
+
+            var result = response.CheckReturnCode();
             if (dispose)
             {
-                response?.Dispose();
+                response.Dispose();
             }
 
             return result;
@@ -64,10 +69,15 @@ namespace ManagedIrbis.Infrastructure
                 params int[] goodCodes
             )
         {
-            var result = response is not null && response.CheckReturnCode(goodCodes);
+            if (response is null)
+            {
+                return false;
+            }
+
+            var result = response.CheckReturnCode(goodCodes);
             if (dispose)
             {
-                response?.Dispose();
+                response.Dispose();
             }
 
             return result;

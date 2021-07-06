@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
 /* ReturnCode.cs -- коды возврата сервера ИРБИС64
  * Ars Magna project, http://arsmagna.ru
@@ -311,5 +312,7 @@ namespace ManagedIrbis.Infrastructure
         /// Не подключен к серверу.
         /// </summary>
         NotConnected = -100_003,
-    }
-}
+
+    } // enum ReturnCode
+
+} // namespace ManagedIrbis.Infrastructure

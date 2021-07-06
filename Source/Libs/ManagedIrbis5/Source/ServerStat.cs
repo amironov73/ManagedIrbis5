@@ -28,7 +28,7 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// IRBIS server stat
+    /// Статистика работы сервера ИРБИС64.
     /// </summary>
     [XmlRoot("stat")]
     public sealed class ServerStat
@@ -86,48 +86,60 @@ namespace ManagedIrbis
                 {
                     client.Number = lines[0].EmptyToNull();
                 }
+
                 if (lines.Length > 1)
                 {
                     client.IPAddress = lines[1].EmptyToNull();
                 }
+
                 if (lines.Length > 2)
                 {
                     client.Port = lines[2].EmptyToNull();
                 }
+
                 if (lines.Length > 3)
                 {
                     client.Name = lines[3].EmptyToNull();
                 }
+
                 if (lines.Length > 4)
                 {
                     client.ID = lines[4].EmptyToNull();
                 }
+
                 if (lines.Length > 5)
                 {
                     client.Workstation = lines[5].EmptyToNull();
                 }
+
                 if (lines.Length > 6)
                 {
                     client.Registered = lines[6].EmptyToNull();
                 }
+
                 if (lines.Length > 7)
                 {
                     client.Acknowledged = lines[7].EmptyToNull();
                 }
+
                 if (lines.Length > 8)
                 {
                     client.LastCommand = lines[8].EmptyToNull();
                 }
+
                 if (lines.Length > 9)
                 {
                     client.CommandNumber = lines[9].EmptyToNull();
                 }
+
                 clients.Add(client);
             }
+
             result.RunningClients = clients.ToArray();
 
             return result;
-        }
+
+        } // method Parse
 
         #endregion
 
@@ -152,8 +164,11 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
-        }
+
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class ServerStat
+
+} // namespace ManagedIrbis

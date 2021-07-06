@@ -121,6 +121,7 @@ namespace AM
 
                 return length;
             }
+
         } // method Int32ToChars
 
         /// <summary>
@@ -222,10 +223,11 @@ namespace AM
 
                 return length;
             }
+
         } // method Int32ToBytes
 
         /// <summary>
-        /// Преобразование целого числа в строку (знак игнорируем).
+        /// Преобразование целого числа в строку.
         /// </summary>
         public static unsafe byte* Int32ToBytes
             (
@@ -337,7 +339,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         /// <summary>
         /// Fast number parsing.

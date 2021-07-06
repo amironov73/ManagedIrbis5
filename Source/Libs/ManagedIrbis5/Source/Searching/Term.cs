@@ -62,10 +62,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Clone the <see cref="Term"/>.
         /// </summary>
-        public Term Clone()
-        {
-            return (Term) MemberwiseClone();
-        }
+        public Term Clone() => (Term) MemberwiseClone();
 
         /// <summary>
         /// Разбор ответа сервера.
@@ -182,18 +179,18 @@ namespace ManagedIrbis
                 .Assert(Count >= 0, "Count");
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="Object.ToString"/>
-        public override string ToString()
-        {
-            return $"{Count}#{Text.ToVisibleString()}";
-        }
+        public override string ToString() => $"{Count}#{Text.ToVisibleString()}";
 
         #endregion
-    }
-}
+
+    } // class Term
+
+} // namespace ManagedIrbis

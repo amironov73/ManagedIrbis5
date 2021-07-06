@@ -69,6 +69,7 @@ namespace AM.Text
         /// Pipe sign.
         /// </summary>
         public static readonly char[] Pipe = { '|' };
+
         /// <summary>
         /// Semicolon.
         /// </summary>

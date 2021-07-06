@@ -186,9 +186,10 @@ namespace AM
 
         #region Public methods
 
-                /// <summary>
+        /// <summary>
         /// Состоит ли строка только из указанного символа.
         /// </summary>
+        [Pure]
         public static bool ConsistOf
             (
                 this string? value,
@@ -209,11 +210,13 @@ namespace AM
             }
 
             return true;
-        }
+
+        } // method ConsistOf
 
         /// <summary>
         /// Состоит ли строка только из указанных символов.
         /// </summary>
+        [Pure]
         public static bool ConsistOf
             (
                 this string? value,
@@ -234,11 +237,13 @@ namespace AM
             }
 
             return true;
-        }
+
+        } // method ConsistOf
 
         /// <summary>
         /// Определяет, состоит ли строка только из цифр.
         /// </summary>
+        [Pure]
         public static bool ConsistOfDigits
             (
                 this string? value,
@@ -262,11 +267,13 @@ namespace AM
             }
 
             return true;
-        }
+
+        } // method ConsistOfDigits
 
         /// <summary>
         /// Определяет, состоит ли строка только из цифр.
         /// </summary>
+        [Pure]
         public static bool ConsistOfDigits
             (
                 this string? value
@@ -286,7 +293,8 @@ namespace AM
             }
 
             return true;
-        }
+
+        } // method ConsistOfDigits
 
         /// <summary>
         /// Содержит ли строка любой из перечисленных символов.
@@ -515,7 +523,7 @@ namespace AM
             if (ch >= 'a' && ch <= 'z'
                 || ch >= 'A' && ch <= 'Z'
                 || ch >= '0' && ch <= '9'
-            )
+                )
             {
                 return true;
             }
@@ -717,7 +725,8 @@ namespace AM
             }
 
             return memory;
-        }
+
+        } // method ThrowIfEmpty
 
         /// <summary>
         /// Бросает исключение, если переданное значение пустое,
@@ -742,7 +751,8 @@ namespace AM
             }
 
             return memory;
-        }
+
+        } // method ThrowIfEmpty
 
         /// <summary>
         /// Бросает исключение, если переданное значение равно <c>null</c>,
@@ -809,6 +819,8 @@ namespace AM
         /// Бросает исключение, если переданная строка пустая
         /// или равна <c>null</c>.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static string ThrowIfNullOrEmpty
             (
                 this string? value
@@ -819,13 +831,16 @@ namespace AM
                 throw new ArgumentException();
             }
 
-            return value!;
-        }
+            return value;
+
+        } // method ThrowIfNullOrEmpty
 
         /// <summary>
         /// Бросает исключение, если переданная строка пустая
         /// или равна <c>null</c>.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static string ThrowIfNullOrEmpty
             (
                 this string? value,
@@ -837,13 +852,16 @@ namespace AM
                 throw new ArgumentException(argumentName);
             }
 
-            return value!;
-        }
+            return value;
+
+        } // method ThrowIfNullOrEmpty
 
         /// <summary>
         /// Бросает исключение, если переданная строка пустая
         /// или равна <c>null</c>.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ReadOnlySpan<char> ThrowIfNullOrEmpty
             (
                 this ReadOnlySpan<char> value
@@ -855,12 +873,15 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNullOrEmpty
 
         /// <summary>
         /// Бросает исключение, если переданная строка пробельная
         /// или равна <c>null</c>.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static string ThrowIfNullOrWhiteSpace
             (
                 this string? value
@@ -871,13 +892,16 @@ namespace AM
                 throw new ArgumentException();
             }
 
-            return value!;
-        }
+            return value;
+
+        } // method ThrowIfNullOrWhiteSpace
 
         /// <summary>
         /// Бросает исключение, если переданная строка пробельная
         /// или равна <c>null</c>.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static string ThrowIfNullOrWhiteSpace
             (
                 this string? value,
@@ -889,13 +913,16 @@ namespace AM
                 throw new ArgumentException(name);
             }
 
-            return value!;
-        }
+            return value;
+
+        } // method ThrowIfNullOrWhiteSpace
 
         /// <summary>
         /// Бросает исключение, если переданная строка пробельная
         /// или равна <c>null</c>.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ReadOnlySpan<char> ThrowIfNullOrWhiteSpace
             (
                 this ReadOnlySpan<char> value
@@ -907,12 +934,15 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNullOrWhiteSpace
 
         /// <summary>
         /// Бросает исключение, если переданная строка пробельная
         /// или равна <c>null</c>.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ReadOnlySpan<char> ThrowIfNullOrWhiteSpace
             (
                 this ReadOnlySpan<char> value,
@@ -925,11 +955,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNullOrWhiteSpace
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static int ThrowIfZero
             (
                 this int value
@@ -941,11 +974,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static int ThrowIfZero
             (
                 this int value,
@@ -958,11 +994,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static uint ThrowIfZero
             (
                 this uint value
@@ -974,11 +1013,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static uint ThrowIfZero
             (
                 this uint value,
@@ -991,11 +1033,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static short ThrowIfZero
             (
                 this short value
@@ -1007,11 +1052,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static short ThrowIfZero
             (
                 this short value,
@@ -1024,11 +1072,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ushort ThrowIfZero
             (
                 this ushort value
@@ -1040,11 +1091,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ushort ThrowIfZero
             (
                 this ushort value,
@@ -1057,11 +1111,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static long ThrowIfZero
             (
                 this long value
@@ -1073,11 +1130,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static long ThrowIfZero
             (
                 this long value,
@@ -1090,11 +1150,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ulong ThrowIfZero
             (
                 this ulong value
@@ -1106,11 +1169,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ulong ThrowIfZero
             (
                 this ulong value,
@@ -1123,11 +1189,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static double ThrowIfZero
             (
                 this double value
@@ -1139,11 +1208,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static double ThrowIfZero
             (
                 this double value,
@@ -1156,11 +1228,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static decimal ThrowIfZero
             (
                 this decimal value
@@ -1172,11 +1247,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static decimal ThrowIfZero
             (
                 this decimal value,
@@ -1189,11 +1267,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static int ThrowIfNegative
             (
                 this int value
@@ -1205,11 +1286,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static int ThrowIfNegative
             (
                 this int value,
@@ -1222,11 +1306,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static short ThrowIfNegative
             (
                 this short value
@@ -1238,11 +1325,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static short ThrowIfNegative
             (
                 this short value,
@@ -1255,11 +1345,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static long ThrowIfNegative
             (
                 this long value
@@ -1271,11 +1364,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static long ThrowIfNegative
             (
                 this long value,
@@ -1288,11 +1384,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static double ThrowIfNegative
             (
                 this double value
@@ -1304,11 +1403,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static double ThrowIfNegative
             (
                 this double value,
@@ -1321,11 +1423,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static decimal ThrowIfNegative
             (
                 this decimal value
@@ -1337,11 +1442,14 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static decimal ThrowIfNegative
             (
                 this decimal value,
@@ -1354,12 +1462,15 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static int ThrowIfOutOfTheRange
             (
                 this int value,
@@ -1373,13 +1484,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static int ThrowIfOutOfTheRange
             (
                 this int value,
@@ -1394,13 +1509,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method TrhowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static uint ThrowIfOutOfTheRange
             (
                 this uint value,
@@ -1414,13 +1533,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static uint ThrowIfOutOfTheRange
             (
                 this uint value,
@@ -1435,13 +1558,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static short ThrowIfOutOfTheRange
             (
                 this short value,
@@ -1455,13 +1582,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static short ThrowIfOutOfTheRange
             (
                 this short value,
@@ -1476,13 +1607,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static ushort ThrowIfOutOfTheRange
             (
                 this ushort value,
@@ -1496,13 +1631,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static ushort ThrowIfOutOfTheRange
             (
                 this ushort value,
@@ -1517,13 +1656,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static long ThrowIfOutOfTheRange
             (
                 this long value,
@@ -1537,13 +1680,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static long ThrowIfOutOfTheRange
             (
                 this long value,
@@ -1558,13 +1705,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static ulong ThrowIfOutOfTheRange
             (
                 this ulong value,
@@ -1578,13 +1729,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static ulong ThrowIfOutOfTheRange
             (
                 this ulong value,
@@ -1599,13 +1754,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static double ThrowIfOutOfTheRange
             (
                 this double value,
@@ -1619,13 +1778,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static double ThrowIfOutOfTheRange
             (
                 this double value,
@@ -1640,13 +1803,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static decimal ThrowIfOutOfTheRange
             (
                 this decimal value,
@@ -1660,13 +1827,17 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
         /// </summary>
         // ReSharper disable ParameterOnlyUsedForPreconditionCheck.Global
+        [Pure]
+        [DebuggerStepThrough]
         public static decimal ThrowIfOutOfTheRange
             (
                 this decimal value,
@@ -1681,12 +1852,15 @@ namespace AM
             }
 
             return value;
-        }
+
+        } // method ThrowIfOutOfTheRange
+
         // ReSharper restore ParameterOnlyUsedForPreconditionCheck.Global
 
         /// <summary>
         /// Сравнение двух кусков памяти.
         /// </summary>
+        [Pure]
         public static int CompareOrdinal
             (
                 ReadOnlyMemory<char> first,
@@ -1711,11 +1885,13 @@ namespace AM
                     return result;
                 }
             }
+
         } // method CompareOrdinal
 
         /// <summary>
         /// Посимвольное сравнение двух кусков памяти.
         /// </summary>
+        [Pure]
         public static int CompareOrdinal
             (
                 ReadOnlySpan<char> first,
@@ -1740,6 +1916,7 @@ namespace AM
                     return result;
                 }
             }
+
         } // method CompareOrdinal
 
         /// <summary>
@@ -1748,6 +1925,7 @@ namespace AM
         /// <returns>
         /// Индекс первого вхождения или -1.
         /// </returns>
+        [Pure]
         public static int IndexOf
             (
                 byte[] data,
@@ -1788,6 +1966,7 @@ namespace AM
         /// Превращает объект в видимую строку.
         /// </summary>
         [Pure]
+        [DebuggerStepThrough]
         public static string ToVisibleString<T> (this T? value) where T: class
             => value?.ToString() ?? "(null)";
 
@@ -1795,6 +1974,7 @@ namespace AM
         /// Превращает фрагмент памяти в видимую строку.
         /// </summary>
         [Pure]
+        [DebuggerStepThrough]
         public static string ToVisibleString (this ReadOnlyMemory<char> value)
             => value.IsEmpty ? "(empty)" : value.ToString();
 
@@ -1802,6 +1982,7 @@ namespace AM
         /// Превращает фрагмент памяти в видимую строку.
         /// </summary>
         [Pure]
+        [DebuggerStepThrough]
         public static string ToVisibleString (this ReadOnlySpan<char> value)
             => value.IsEmpty ? "(empty)" : value.ToString();
 
@@ -3239,6 +3420,7 @@ namespace AM
             }
 
             return false;
+
         } // method IsOneOf
 
         /// <summary>
@@ -3263,7 +3445,15 @@ namespace AM
                 int index,
                 T? defaultValue = default
             )
-            => index < 0 || index >= (items?.Length ?? 0) ? defaultValue : items![index];
+        {
+            if (items is null || index < 0 || index >= items.Length)
+            {
+                return defaultValue;
+            }
+
+            return items[index];
+
+        } // method SafeAt
 
         /// <summary>
         /// Определяет, равен ли данный объект
@@ -3395,24 +3585,23 @@ namespace AM
             }
 
             var converterFrom = TypeDescriptor.GetConverter(value);
-            if (!ReferenceEquals(converterFrom, null)
-                && converterFrom.CanConvertTo(targetType))
+            if (converterFrom.CanConvertTo(targetType))
             {
                 return (T)converterFrom.ConvertTo
                             (
                                 value,
                                 targetType
-                            );
+                            )!;
             }
 
             TypeConverter converterTo = TypeDescriptor.GetConverter(targetType);
-            if (!ReferenceEquals(converterTo, null)
-                && converterTo.CanConvertFrom(sourceType))
+            if (converterTo.CanConvertFrom(sourceType))
             {
-                return (T)converterTo.ConvertFrom(value);
+                return (T)converterTo.ConvertFrom(value)!;
             }
 
             throw new ArsMagnaException();
+
         } // method ConvertTo
 
         /// <summary>
@@ -3481,8 +3670,7 @@ namespace AM
             }
 
             var converterFrom = TypeDescriptor.GetConverter(value);
-            if (!ReferenceEquals(converterFrom, null)
-                && converterFrom.CanConvertTo(typeof(bool)))
+            if (converterFrom.CanConvertTo(typeof(bool)))
             {
                 return (bool)converterFrom.ConvertTo
                     (
@@ -3502,7 +3690,8 @@ namespace AM
                 (
                     "Bad value: " + value
                 );
-        }
+
+        } // method ToBoolean
 
         /// <summary>
         /// Raises the specified handler.

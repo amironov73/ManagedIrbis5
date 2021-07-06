@@ -401,7 +401,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method Merge
 
         /// <summary>
         /// Безопасное вычисление длины массива.

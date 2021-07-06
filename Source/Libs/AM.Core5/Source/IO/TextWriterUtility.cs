@@ -49,7 +49,8 @@ namespace AM.IO
                 );
 
             return result;
-        }
+
+        } // method Append
 
         /// <summary>
         /// Open file for writing.
@@ -69,8 +70,11 @@ namespace AM.IO
                 );
 
             return result;
-        }
+
+        } // method Create
 
         #endregion
-    }
-}
+
+    } // method TextWriterUtility
+
+} // namespace AM.IO

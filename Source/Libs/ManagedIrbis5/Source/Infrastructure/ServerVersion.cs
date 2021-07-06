@@ -89,21 +89,20 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            // ReSharper disable once UseStringInterpolation
-            return string.Format
-                (
-                    "Version: {0}, MaxClients: {1}, "
-                    + "ConnectedClients: {2}, Organization: {3}",
-                    Version.ToVisibleString(),
-                    MaxClients,
-                    ConnectedClients,
-                    Organization.ToVisibleString()
-                );
-        }
+        // ReSharper disable UseStringInterpolation
+        public override string ToString() => string.Format
+            (
+                "Version: {0}, MaxClients: {1}, "
+                + "ConnectedClients: {2}, Organization: {3}",
+                Version.ToVisibleString(),
+                MaxClients,
+                ConnectedClients,
+                Organization.ToVisibleString()
+            );
+        // ReSharper restore UseStringInterpolation
 
         #endregion
 
-    }
-}
+    } // class ServerVersion
+
+} // namespace ManagedIrbis

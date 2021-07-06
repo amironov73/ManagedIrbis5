@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable ReplaceSliceWithRangeIndexer
 
 /* ValueTextNavigator.cs -- навигатор по тексту, оформленный как структура
  * Ars Magna project, http://arsmagna.ru
@@ -103,6 +104,7 @@ namespace AM.Text
         {
             _text = text;
             _position = 0;
+
         } // constructor
 
         #endregion
@@ -128,6 +130,7 @@ namespace AM.Text
             };
 
             return result;
+
         } // method Clone
 
         /// <summary>
@@ -146,6 +149,7 @@ namespace AM.Text
             var result = new ValueTextNavigator(text);
 
             return result;
+
         } // method FromFile
 
         /// <summary>
@@ -154,12 +158,9 @@ namespace AM.Text
         /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
         /// </returns>
         [Pure]
-        public ReadOnlySpan<char> GetRemainingText()
-        {
-            return IsEOF
-                ? new ReadOnlySpan<char>()
-                : _text.Slice(_position);
-        } // method GetRemainingText
+        public ReadOnlySpan<char> GetRemainingText() => IsEOF
+            ? new ReadOnlySpan<char>()
+            : _text.Slice(_position);
 
         /// <summary>
         /// Текущий символ - управляющий?
@@ -231,6 +232,7 @@ namespace AM.Text
             return ahead >= _text.Length
                 ? EOF
                 : _text[ahead];
+
         } // method LookAhead
 
         /// <summary>
@@ -249,6 +251,7 @@ namespace AM.Text
             return ahead >= _text.Length
                 ? EOF
                 : _text[ahead];
+
         } // method LookAhead
 
         /// <summary>
@@ -256,12 +259,7 @@ namespace AM.Text
         /// Движения по тексту не происходит.
         /// </summary>
         [Pure]
-        public char LookBehind()
-        {
-            return _position == 0
-                ? EOF
-                : _text[_position - 1];
-        } // method LookBehind
+        public char LookBehind() => _position == 0 ? EOF : _text[_position - 1];
 
         /// <summary>
         /// Заглядывание назад на указанное число позиций.
@@ -282,6 +280,7 @@ namespace AM.Text
             return _position < distance
                 ? EOF
                 : _text[_position - distance];
+
         } // method LookBehind
 
         /// <summary>
@@ -291,13 +290,8 @@ namespace AM.Text
         /// Переместить указатель за пределы текста не получится,
         /// он остановится в крайней (начальной или конечной) позиции.
         /// </remarks>
-        public void Move
-            (
-                int distance
-            )
-        {
+        public void Move (int distance) =>
             _position = Math.Max (0, Math.Min(_position + distance, _text.Length));
-        } // method Move
 
         /// <summary>
         /// Подглядывание текущего символа (т. е. символа в текущей позиции).
@@ -342,6 +336,7 @@ namespace AM.Text
             _position = start;
 
             return result;
+
         } // method PeekString
 
         /// <summary>
@@ -360,6 +355,7 @@ namespace AM.Text
             _position = position;
 
             return result;
+
         } // method PeekTo
 
         /// <summary>
@@ -378,6 +374,7 @@ namespace AM.Text
             _position = position;
 
             return result;
+
         } // method PeekTo
 
         /// <summary>
@@ -396,6 +393,7 @@ namespace AM.Text
             _position = position;
 
             return result;
+
         } // method PeekUntil
 
         /// <summary>
@@ -414,6 +412,7 @@ namespace AM.Text
             _position = position;
 
             return result;
+
         } // metdho PeekUntil
 
         /// <summary>
@@ -429,6 +428,7 @@ namespace AM.Text
             }
 
             return _text[_position++];
+
         } // method ReadChar
 
         /// <summary>
@@ -492,6 +492,7 @@ namespace AM.Text
             }
 
             return result.ToString();
+
         } // method ReadEscapedUntil
 
         /// <summary>
@@ -539,6 +540,7 @@ namespace AM.Text
                     start,
                     _position - start
                 );
+
         } // method ReadFrom
 
         /// <summary>
@@ -585,6 +587,7 @@ namespace AM.Text
                     start,
                     _position - start
                 );
+
         } // metdhod ReadFrom
 
         /// <summary>
@@ -610,6 +613,7 @@ namespace AM.Text
                     startPosition,
                     _position - startPosition
                 );
+
         } // method ReadInteger
 
         /// <summary>
@@ -649,6 +653,7 @@ namespace AM.Text
                     startPosition,
                     stopPosition - startPosition
                 );
+
         } // method ReadLine
 
         /// <summary>
@@ -678,6 +683,7 @@ namespace AM.Text
                     startPosition,
                     _position - startPosition
                 );
+
         } // method ReadString
 
         /// <summary>
@@ -706,6 +712,7 @@ namespace AM.Text
                     startPosition,
                     length: _position - startPosition
                 );
+
         } // method ReadTo
 
         /// <summary>
@@ -754,6 +761,7 @@ namespace AM.Text
                     savePosition,
                     _position - savePosition - stopString.Length
                 );
+
         } // method ReadTo
 
         /// <summary>
@@ -784,6 +792,7 @@ namespace AM.Text
                     length: _position - start
                 );
             return result;
+
         } // method ReadTo
 
         /// <summary>
@@ -813,6 +822,7 @@ namespace AM.Text
                     start,
                     _position - start
                 );
+
         } // method ReadUntil
 
         /// <summary>
@@ -862,7 +872,9 @@ namespace AM.Text
                     _position - position - stopString.Length
                 );
             _position -= stopString.Length;
+
             return result;
+
         } // method ReadUntil
 
         /// <summary>
@@ -893,6 +905,7 @@ namespace AM.Text
                     savePosition,
                     _position - savePosition
                 );
+
         } // method ReadUntil
 
         /// <summary>
@@ -948,6 +961,7 @@ namespace AM.Text
                     start,
                     _position - start
                 );
+
         } // method ReadUntil
 
         /// <summary>
@@ -977,6 +991,7 @@ namespace AM.Text
                     startPosition,
                     _position - startPosition
                 );
+
         } // method ReadWhile
 
         /// <summary>
@@ -1007,6 +1022,7 @@ namespace AM.Text
                     start,
                     _position - start
                 );
+
         } // method ReadWhile
 
         /// <summary>
@@ -1034,6 +1050,7 @@ namespace AM.Text
                     startPosition,
                     _position - startPosition
                 );
+
         } // metdhod ReadWord
 
         /// <summary>
@@ -1067,6 +1084,7 @@ namespace AM.Text
                     savePosition,
                     _position - savePosition
                 );
+
         } // method ReadWord
 
         /// <summary>
@@ -1099,6 +1117,7 @@ namespace AM.Text
             }
 
             return Substring (start, length);
+
         } // method RecentText
 
         /// <summary>
@@ -1119,6 +1138,7 @@ namespace AM.Text
             }
 
             return false;
+
         } // method SkipChar
 
         /// <summary>
@@ -1137,6 +1157,7 @@ namespace AM.Text
             }
 
             return !IsEOF;
+
         } // method SkipChar
 
         /// <summary>
@@ -1157,6 +1178,7 @@ namespace AM.Text
             }
 
             return false;
+
         } // method SkipChar
 
         /// <summary>
@@ -1182,6 +1204,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipControl
 
         /// <summary>
@@ -1207,6 +1230,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipPunctuation
 
         /// <summary>
@@ -1233,6 +1257,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipNonWord
 
         /// <summary>
@@ -1263,6 +1288,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipNonWord
 
         /// <summary>
@@ -1294,6 +1320,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipRange
 
         /// <summary>
@@ -1323,6 +1350,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipWhile
 
         /// <summary>
@@ -1352,6 +1380,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipWhile
 
         /// <summary>
@@ -1380,6 +1409,7 @@ namespace AM.Text
 
                 ReadChar();
             }
+
         } // method SkipTo
 
         /// <summary>
@@ -1409,6 +1439,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipWhileNot
 
         /// <summary>
@@ -1432,6 +1463,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkiWhitespace
 
         /// <summary>
@@ -1455,6 +1487,7 @@ namespace AM.Text
                     return true;
                 }
             }
+
         } // method SkipWhitespaceAndPunctuation
 
         /// <summary>
@@ -1470,6 +1503,7 @@ namespace AM.Text
                 || offset >= _text.Length
                 ? ReadOnlySpan<char>.Empty
                 : _text.Slice(offset);
+
         } // method Substring
 
         /// <summary>
@@ -1492,6 +1526,7 @@ namespace AM.Text
                 || length <= 0
                 ? ReadOnlySpan<char>.Empty
                 : _text.Slice(offset, length);
+
         } // method Substring
 
         #endregion
@@ -1500,10 +1535,7 @@ namespace AM.Text
 
         /// <inheritdoc cref="object.ToString" />
         [Pure]
-        public override string ToString()
-        {
-            return $"Position={Position}";
-        } // method ToString
+        public override string ToString() => $"Position={Position}";
 
         #endregion
 

@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable NonReadonlyMemberInGetHashCode
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -17,6 +18,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 
 using AM;
@@ -96,7 +98,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return first.SameString(second);
-        }
+
+        } // method CompareDatabases
 
         #endregion
 
@@ -117,7 +120,8 @@ namespace ManagedIrbis.Infrastructure
                     + database
                     + "."
                     + fileName;
-         }
+
+         } // method Build
 
         /// <summary>
         /// Parse the text specification.
@@ -127,12 +131,11 @@ namespace ManagedIrbis.Infrastructure
                 string text
             )
         {
-            // Sure.NotNullNorEmpty(text, nameof(text));
-
             var navigator = new TextNavigator(text);
             var path = int.Parse
                 (
-                    navigator.ReadTo(".").ToString()
+                    navigator.ReadTo(".").ToString(),
+                    CultureInfo.InvariantCulture
                 );
             var database = navigator.ReadTo(".").ToString().EmptyToNull();
             var fileName = navigator.GetRemainingText().ToString();
@@ -158,9 +161,9 @@ namespace ManagedIrbis.Infrastructure
                 Content = content
             };
 
-
             return result;
-        }
+
+        } // method Parse
 
         #endregion
 
@@ -179,7 +182,8 @@ namespace ManagedIrbis.Infrastructure
             Database = reader.ReadNullableString();
             FileName = reader.ReadNullableString();
             Content = reader.ReadNullableString();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -195,7 +199,8 @@ namespace ManagedIrbis.Infrastructure
                 .WriteNullable(Database)
                 .WriteNullable(FileName)
                 .WriteNullable(Content);
-        }
+
+        } // method SaveToStream
 
         #endregion
 
@@ -223,7 +228,8 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
@@ -243,7 +249,8 @@ namespace ManagedIrbis.Infrastructure
             return Path == other.Path
                    && _CompareDatabases(Database, other.Database)
                    && FileName.SameString(other.FileName);
-        }
+
+        } // method Equals
 
         /// <inheritdoc cref="object.Equals(object)" />
         public override bool Equals
@@ -261,22 +268,22 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return obj is FileSpecification other && Equals(other);
-        }
+
+        } // method Equals
 
         /// <inheritdoc cref="object.GetHashCode" />
         public override int GetHashCode()
         {
             unchecked
             {
-                int hashCode = (int)Path;
-                hashCode = (hashCode * 397)
-                    ^ (Database != null ? Database.GetHashCode() : 0);
-                hashCode = (hashCode * 397)
-                    ^ (FileName != null ? FileName.GetHashCode() : 0);
+                var hashCode = (int)Path;
+                hashCode = (hashCode * 397) ^ (Database != null ? Database.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (FileName != null ? FileName.GetHashCode() : 0);
 
                 return hashCode;
             }
-        }
+
+        } // method GetHashCode
 
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
@@ -300,22 +307,11 @@ namespace ManagedIrbis.Infrastructure
             {
                 case IrbisPath.System:
                 case IrbisPath.Data:
-                    result = string.Format
-                        (
-                            "{0}..{1}",
-                            (int)Path,
-                            fileName
-                        );
+                    result = $"{(int) Path}..{fileName}";
                     break;
 
                 default:
-                    result = string.Format
-                        (
-                            "{0}.{1}.{2}",
-                            (int)Path,
-                            Database,
-                            fileName
-                        );
+                    result = $"{(int) Path}.{Database}.{fileName}";
                     break;
             }
 

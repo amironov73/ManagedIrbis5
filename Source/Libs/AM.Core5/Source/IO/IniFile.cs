@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -301,6 +302,7 @@ namespace AM.IO
                 )
             {
                 Sure.NotNull(line, nameof(line));
+
                 CheckKeyName(line.Key);
                 if (ContainsKey(line.Key))
                 {
@@ -556,16 +558,10 @@ namespace AM.IO
             #region IEnumerable<Line> members
 
             [ExcludeFromCodeCoverage]
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
-            public IEnumerator<Line> GetEnumerator()
-            {
-                return _lines.GetEnumerator();
-            }
+            public IEnumerator<Line> GetEnumerator() => _lines.GetEnumerator();
 
             #endregion
 
@@ -689,26 +685,27 @@ namespace AM.IO
             {
                 Magna.Error
                     (
-                        "IniFile::CheckKeyName: "
+                        nameof(IniFile) + "::" + nameof(CheckKeyName)
                         + "keyName="
                         + keyName.ToVisibleString()
                     );
 
-                throw new ArgumentException("keyName");
+                throw new ArgumentException(nameof(keyName));
             }
 
             if (keyName.Contains("="))
             {
                 Magna.Error
                     (
-                        "IniFile::CheckKeyName: "
+                        nameof(IniFile) + "::" + nameof(CheckKeyName)
                         + "keyName="
                         + keyName
                     );
 
-                throw new ArgumentException("key");
+                throw new ArgumentException(nameof(keyName));
             }
-        }
+
+        } // method CheckKeyName
 
         private static void _SaveSection
             (
@@ -728,7 +725,8 @@ namespace AM.IO
             {
                 line.Write(writer);
             }
-        }
+
+        } // method _SaveSection
 
         #endregion
 
@@ -1108,7 +1106,8 @@ namespace AM.IO
             }
 
             Modified = false;
-        }
+
+        } // method Save
 
         /// <summary>
         /// Save the INI-file to specified file.
@@ -1128,7 +1127,8 @@ namespace AM.IO
                     encoding
                 );
             Save(writer);
-        }
+
+        } // method Save
 
         /// <summary>
         /// Set value for specified section and key.
@@ -1267,16 +1267,10 @@ namespace AM.IO
         #region IEnumerable<Section> members
 
         [ExcludeFromCodeCoverage]
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
-        public IEnumerator<Section> GetEnumerator()
-        {
-            return _sections.GetEnumerator();
-        }
+        public IEnumerator<Section> GetEnumerator() => _sections.GetEnumerator();
 
         #endregion
 
@@ -1296,5 +1290,7 @@ namespace AM.IO
         }
 
         #endregion
-    }
-}
+
+    } // class IniFile
+
+} // namespace AM.IO

@@ -6,7 +6,10 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ProcessInfo.cs -- информация о процессе на сервере
@@ -17,8 +20,6 @@
 
 using System;
 using System.Collections.Generic;
-
-using AM.Collections;
 
 #endregion
 
@@ -89,7 +90,7 @@ namespace ManagedIrbis.Infrastructure
         #region Public methods
 
         /// <summary>
-        ///
+        /// Разбор ответа сервера.
         /// </summary>
         public static ProcessInfo[] Parse
             (
@@ -129,28 +130,25 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result.ToArray();
-        }
+
+        } // method Parse
 
         #endregion
 
         #region IEquatable members
 
         /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-        public bool Equals(ProcessInfo? other)
-        {
-            return Number?.Equals(other?.Number) ?? false;
-        }
+        public bool Equals(ProcessInfo? other) => Number?.Equals(other?.Number) ?? false;
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return $"{Number} {IpAddress} {Name} {Workstation}";
-        }
+        public override string ToString() => $"{Number} {IpAddress} {Name} {Workstation}";
 
         #endregion
-    }
-}
+
+    } // class ProcessInfo
+
+} // namespace ManagedIrbis.Infrastructure

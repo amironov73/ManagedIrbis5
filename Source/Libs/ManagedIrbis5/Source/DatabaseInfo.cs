@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -263,7 +264,8 @@ namespace ManagedIrbis
             NonActualizedRecords = reader.ReadNullableInt32Array();
             LockedRecords = reader.ReadNullableInt32Array();
             DatabaseLocked = reader.ReadBoolean();
-        }
+
+        } // method ReadFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -282,7 +284,8 @@ namespace ManagedIrbis
                 .WriteNullableArray(NonActualizedRecords)
                 .WriteNullableArray(LockedRecords)
                 .Write(DatabaseLocked);
-        }
+
+        } // method SaveToStream
 
         #endregion
 
@@ -297,7 +300,8 @@ namespace ManagedIrbis
             }
 
             return $"{Name} - {Description}";
-        }
+
+        } // method ToString
 
         #endregion
 

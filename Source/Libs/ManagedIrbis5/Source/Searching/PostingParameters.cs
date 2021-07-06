@@ -187,6 +187,6 @@ namespace ManagedIrbis
 
         #endregion
 
-    } // namespace PostingParameters
+    } // class PostingParameters
 
 } // namespace ManagedIrbis

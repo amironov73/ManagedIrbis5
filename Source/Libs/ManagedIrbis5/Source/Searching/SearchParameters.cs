@@ -160,6 +160,7 @@ namespace ManagedIrbis
             Expression = reader.ReadNullableString();
             Sequential = reader.ReadNullableString();
             Filter = reader.ReadNullableString();
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -180,13 +181,14 @@ namespace ManagedIrbis
                 .WriteNullable(Expression)
                 .WriteNullable(Sequential)
                 .WriteNullable(Filter);
+
         } // method SaveToStream
 
         #endregion
 
         #region IVerifiable members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="IVerifiable.Verify" />
         public bool Verify
             (
                 bool throwOnError
@@ -203,6 +205,7 @@ namespace ManagedIrbis
                 );
 
             return verifier.Result;
+
         } // method Verify
 
         #endregion

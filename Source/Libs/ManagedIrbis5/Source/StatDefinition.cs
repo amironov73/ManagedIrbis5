@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
@@ -27,7 +28,7 @@ using ManagedIrbis.Providers;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Signature for Stat command.
+    /// Параметры для команды Stat.
     /// </summary>
     public sealed class StatDefinition
     {
