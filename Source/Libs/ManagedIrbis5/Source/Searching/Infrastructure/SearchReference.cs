@@ -15,6 +15,8 @@ using System;
 
 using AM;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable

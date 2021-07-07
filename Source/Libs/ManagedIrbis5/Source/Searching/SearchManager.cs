@@ -22,8 +22,8 @@ using AM;
 using AM.Collections;
 using AM.IO;
 
-using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -104,7 +104,7 @@ namespace ManagedIrbis
             )
         {
             Provider.Database = database;
-            int[] found = Provider.Search(expression);
+            var found = Provider.Search(expression);
             FoundLine[] result = new FoundLine[found.Length];
             for (int i = 0; i < found.Length; i++)
             {

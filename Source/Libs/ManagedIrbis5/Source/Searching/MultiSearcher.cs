@@ -20,6 +20,8 @@
 
 using System.Collections.Generic;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable

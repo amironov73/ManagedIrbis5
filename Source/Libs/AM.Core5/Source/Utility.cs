@@ -2981,222 +2981,296 @@ namespace AM
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static short ParseInt16(this string text) =>
             short.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static short ParseInt16(this ReadOnlyMemory<char> text) =>
             short.Parse(text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static short ParseInt16(this ReadOnlySpan<char> text) =>
             short.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static int ParseInt32(this string text) =>
             int.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static int ParseInt32(this ReadOnlyMemory<char> text) =>
             int.Parse(text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static int ParseInt32(this ReadOnlySpan<char> text) =>
             int.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static long ParseInt64(this string text) =>
             long.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static long ParseInt64(this ReadOnlyMemory<char> text) =>
             long.Parse(text.Span, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static long ParseInt64(this ReadOnlySpan<char> text) =>
             long.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ushort ParseUInt16(this string text) =>
             ushort.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ushort ParseUInt16(this ReadOnlySpan<char> text) =>
             ushort.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static uint ParseUInt32(this string text) =>
             uint.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static uint ParseUInt32(this ReadOnlySpan<char> text) =>
             uint.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ulong ParseUInt64(this string text) =>
             ulong.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ulong ParseUInt64(this ReadOnlySpan<char> text) =>
             ulong.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static float ParseSingle(this string text) =>
             float.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static float ParseSingle(this ReadOnlySpan<char> text) =>
             float.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static double ParseDouble(this string text) =>
             double.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static double ParseDouble(this ReadOnlySpan<char> text) =>
             double.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static decimal ParseDecimal(this string text) =>
             decimal.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для Parse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static decimal ParseDecimal(this ReadOnlySpan<char> text) =>
             decimal.Parse(text, NumberStyles.Any, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseInt16(string? text, out short result) =>
             short.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseInt16(ReadOnlySpan<char> text, out short result) =>
             short.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseInt32(string? text, out int result) =>
             int.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseInt32(ReadOnlySpan<char> text, out int result) =>
             int.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseInt64(string? text, out long result) =>
             long.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseInt64(ReadOnlySpan<char> text, out long result) =>
             long.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseUInt16(string? text, out ushort result) =>
             ushort.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseUInt16(ReadOnlySpan<char> text, out ushort result) =>
             ushort.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseUInt32(string? text, out uint result) =>
             uint.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseUInt32(ReadOnlySpan<char> text, out uint result) =>
             uint.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseUInt64(string? text, out ulong result) =>
             ulong.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseUInt64(ReadOnlySpan<char> text, out ulong result) =>
             ulong.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseDouble(string? text, out double result) =>
             double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseDouble(ReadOnlySpan<char> text, out double result) =>
             double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseSingle(string? text, out float result) =>
             float.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 
         /// <summary>
         /// Сокращение для TryParse.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static bool TryParseSingle(ReadOnlySpan<char> text, out float result) =>
             float.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
 

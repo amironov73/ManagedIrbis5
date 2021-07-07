@@ -34,9 +34,6 @@
 
   <ItemGroup>
     <None Remove="ArsMagnaSslSocket.cer" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EmbeddedResource Include="ArsMagnaSslSocket.cer" />
   </ItemGroup>
 
@@ -75,5 +72,5 @@
     <ItemGroup>
         <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
-    
+
 </Project>

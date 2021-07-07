@@ -41,46 +41,28 @@ using System.Threading;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Разнообразные полезные методы и расширения.
+    /// Полезные, при этом не публичные методы расширения.
     /// </summary>
-    public static class Utility
+    [DebuggerStepThrough]
+    internal static class Private
     {
         /// <summary>
         /// Превращает объект в видимую строку.
         /// </summary>
-        [DebuggerStepThrough]
-        public static string ToVisibleString<T> (this T? value) where T: class
-            => value?.ToString() ?? "(null)";
+        public static string ToVisibleString<T> (this T? value) where T: class =>
+            value?.ToString() ?? "(null)";
 
         /// <summary>
         /// Безопасный доступ по индексу.
         /// </summary>
-        public static T? SafeAt<T>
-            (
-                this IList<T?> items,
-                int index,
-                T? defaultValue = default
-            )
-            => index < 0 || index >= items.Count ? defaultValue : items[index];
+        public static T? SafeAt<T> (this IList<T?> items, int index, T? defaultValue = default) =>
+            index < 0 || index >= items.Count ? defaultValue : items[index];
 
         /// <summary>
         /// Безопасный доступ по индексу.
         /// </summary>
-        public static T? SafeAt<T>
-            (
-                this T?[]? items,
-                int index,
-                T? defaultValue = default
-            )
-        {
-            if (items is null || index < 0 || index >= items.Length)
-            {
-                return defaultValue;
-            }
-
-            return items[index];
-
-        } // method SafeAt
+        public static T? SafeAt<T> (this T?[]? items, int index, T? defaultValue = default) =>
+            items is null || index < 0 || index >= items.Length ? defaultValue : items[index];
 
         /// <summary>
         /// Безопасное получение первого символа в строке.
@@ -91,33 +73,24 @@ namespace ManagedIrbis
         /// <summary>
         /// Безопасное получение первого символа в строке.
         /// </summary>
-        public static char FirstChar(this ReadOnlyMemory<char> text) =>
+        public static char FirstChar (this ReadOnlyMemory<char> text) =>
             text.Length == 0 ? '\0' : text.Span[0];
 
         /// <summary>
         /// Безопасное получение первого символа в строке.
         /// </summary>
-        public static char FirstChar(this ReadOnlySpan<char> text) =>
+        public static char FirstChar (this ReadOnlySpan<char> text) =>
             text.Length == 0 ? '\0' : text[0];
 
         /// <summary>
         /// Определяет, равен ли данный объект
         /// любому из перечисленных.
         /// </summary>
-        public static bool IsOneOf<T>
-            (
-                this T value,
-                IEnumerable<T> items
-            )
-            where T: IComparable<T>
+        public static bool IsOneOf<T> (this T value, IEnumerable<T> items) where T: IComparable<T>
         {
             foreach (var one in items)
-            {
                 if (value.CompareTo(one) == 0)
-                {
                     return true;
-                }
-            }
 
             return false;
 
@@ -127,88 +100,41 @@ namespace ManagedIrbis
         /// Разбивка текста на отдельные строки.
         /// </summary>
         /// <remarks>Пустые строки не удаляются.</remarks>
-        /// <param name="text">Текст для разбиения.</param>
-        /// <returns>Массив строк.</returns>
-        public static string[] SplitLines
-            (
-                this string text
-            )
-        {
-            text = text.Replace("\r\n", "\n");
-            var result = text.Split('\n');
-
-            return result;
-
-        } // method SplitLines
+        public static string[] SplitLines (this string text) =>
+            text.Replace("\r\n", "\n").Split('\n');
 
         /// <summary>
         /// Обязательное чтение строки.
         /// </summary>
-        public static string RequireLine
-            (
-                this TextReader reader
-            )
+        public static string RequireLine (this TextReader reader)
         {
             var result = reader.ReadLine();
             if (ReferenceEquals(result, null))
-            {
                 throw new IrbisException ("Unexpected end of stream");
-            }
 
             return result;
 
         } // method RequireLine
 
         /// <summary>
-        /// Open file for writing.
+        /// Создает текстовый файл в указанной кодировке.
         /// </summary>
-        public static StreamWriter Create
-            (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            var result = new StreamWriter
-                (
-                    new FileStream(fileName, FileMode.Create),
-                    encoding
-                );
-
-            return result;
-
-        } // method Create
+        public static StreamWriter CreateTextFile (string fileName, Encoding encoding) =>
+            new (new FileStream (fileName, FileMode.Create), encoding);
 
         /// <summary>
-        /// Open file for reading.
+        /// Открывает текстовый файл в указанной кодировке.
         /// </summary>
-        public static StreamReader OpenRead
-            (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            var result = new StreamReader
-            (
-                File.OpenRead(fileName),
-                encoding
-            );
-
-            return result;
-
-        } // method OpenRead
+        public static StreamReader OpenRead (string fileName, Encoding encoding) =>
+            new (File.OpenRead (fileName), encoding);
 
         /// <summary>
         /// Разбор целого 32-битного числа со знаком.
         /// </summary>
-        public static unsafe int ParseInt32
-            (
-                ReadOnlyMemory<char> text
-            )
+        public static unsafe int ParseInt32 (ReadOnlyMemory<char> text)
         {
             if (text.IsEmpty)
-            {
                 return 0;
-            }
 
             var result = 0;
             var sign = false;
@@ -224,14 +150,10 @@ namespace ManagedIrbis
                     }
 
                     for (; index < text.Length; index++)
-                    {
                         result = result * 10 + ptr[index] - '0';
-                    }
 
                     if (sign)
-                    {
                         result = -result;
-                    }
                 }
             }
 
@@ -242,10 +164,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Fast number parsing.
         /// </summary>
-        public static unsafe int ParseInt32
-            (
-                string text
-            )
+        public static unsafe int ParseInt32 (string text)
         {
             var result = 0;
             unchecked
@@ -264,16 +183,12 @@ namespace ManagedIrbis
 
         } // method ParseInt32
 
-
         /// <summary>
         /// Converts given value to the specified type.
         /// </summary>
         /// <param name="value">The value to be converted.</param>
         /// <returns>Converted value.</returns>
-        public static T ConvertTo<T>
-            (
-                object? value
-            )
+        public static T ConvertTo<T> (object? value)
         {
             if (ReferenceEquals(value, null))
             {
@@ -284,35 +199,21 @@ namespace ManagedIrbis
             var targetType = typeof(T);
 
             if (targetType == typeof(string))
-            {
-                return (T)(object)value.ToString()!;
-            }
+                return (T)(object) value.ToString()!;
 
-            if (targetType.IsAssignableFrom(sourceType))
-            {
+            if (targetType.IsAssignableFrom (sourceType))
                 return (T)value;
-            }
 
             if (value is IConvertible)
-            {
-                return (T)Convert.ChangeType(value, targetType);
-            }
+                return (T)Convert.ChangeType (value, targetType);
 
-            var converterFrom = TypeDescriptor.GetConverter(value);
-            if (converterFrom.CanConvertTo(targetType))
-            {
-                return (T)converterFrom.ConvertTo
-                    (
-                        value,
-                        targetType
-                    )!;
-            }
+            var converterFrom = TypeDescriptor.GetConverter (value);
+            if (converterFrom.CanConvertTo (targetType))
+                return (T) converterFrom.ConvertTo (value, targetType)!;
 
-            TypeConverter converterTo = TypeDescriptor.GetConverter(targetType);
-            if (converterTo.CanConvertFrom(sourceType))
-            {
-                return (T)converterTo.ConvertFrom(value)!;
-            }
+            var converterTo = TypeDescriptor.GetConverter (targetType);
+            if (converterTo.CanConvertFrom (sourceType))
+                return (T) converterTo.ConvertFrom(value)!;
 
             throw new IrbisException();
 
@@ -329,9 +230,7 @@ namespace ManagedIrbis
             )
         {
             if (memory.IsEmpty)
-            {
                 throw new ArgumentException (message);
-            }
 
             return memory;
 
@@ -360,7 +259,6 @@ namespace ManagedIrbis
         /// Бросает исключение, если переданное значение равно <c>null</c>,
         /// иначе просто возвращает его.
         /// </summary>
-        [DebuggerStepThrough]
         public static T ThrowIfNull<T>
             (
                 this T? value,
@@ -380,7 +278,6 @@ namespace ManagedIrbis
         /// <summary>
         /// Подстановка значения по умолчанию вместо <c>null</c>.
         /// </summary>
-        [DebuggerStepThrough]
         public static T IfNull<T>(this T? value, T defaultValue)
             where T: class
             => value ?? defaultValue;
@@ -388,7 +285,6 @@ namespace ManagedIrbis
         /// <summary>
         /// Подстановка значения по умолчания вместо пустой строки.
         /// </summary>
-        [DebuggerStepThrough]
         public static string IfEmpty(this string? value, string defaultValue)
             => ReferenceEquals(value, null) || value.Length == 0
                 ? defaultValue.Length == 0
@@ -400,7 +296,6 @@ namespace ManagedIrbis
         /// Бросает исключение, если переданное значение равно <c>null</c>,
         /// иначе просто возвращает его.
         /// </summary>
-        [DebuggerStepThrough]
         public static T ThrowIfNull<T> (this T? value) where T: class =>
             ThrowIfNull (value, "Null value detected");
 
@@ -408,7 +303,6 @@ namespace ManagedIrbis
         /// Бросает исключение, если переданная строка пустая
         /// или равна <c>null</c>.
         /// </summary>
-        [DebuggerStepThrough]
         public static string ThrowIfNullOrEmpty
             (
                 this string? value
@@ -427,7 +321,6 @@ namespace ManagedIrbis
         /// Бросает исключение, если переданная строка пустая
         /// или равна <c>null</c>.
         /// </summary>
-        [DebuggerStepThrough]
         public static string ThrowIfNullOrEmpty
             (
                 this string? value,
@@ -447,7 +340,6 @@ namespace ManagedIrbis
         /// Бросает исключение, если переданная строка пустая
         /// или равна <c>null</c>.
         /// </summary>
-        [DebuggerStepThrough]
         public static ReadOnlySpan<char> ThrowIfNullOrEmpty
             (
                 this ReadOnlySpan<char> value
@@ -509,29 +401,13 @@ namespace ManagedIrbis
         } // method Int32ToBytes
 
         /// <summary>
-        /// Однобайтовая кодировка по умолчанию.
-        /// Как правило, кодовая страница 1251.
-        /// </summary>
-        public static Encoding Ansi => _ansi ??= Encoding.GetEncoding(1251);
-
-        private static Encoding? _ansi;
-
-        /// <summary>
         /// Проверяет, содержит ли спан указанный символ.
         /// </summary>
-        public static bool Contains
-            (
-                ReadOnlySpan<char> span,
-                char chr
-            )
+        public static bool Contains (ReadOnlySpan<char> span, char chr)
         {
             foreach (var c in span)
-            {
                 if (c == chr)
-                {
                     return true;
-                }
-            }
 
             return false;
 
@@ -549,20 +425,13 @@ namespace ManagedIrbis
             )
         {
             if (string.IsNullOrEmpty(text))
-            {
                 return defaultValue;
-            }
 
             if (!int.TryParse(text, out var result))
-            {
                 result = defaultValue;
-            }
 
-            if (result < minValue
-                || result > maxValue)
-            {
+            if (result < minValue || result > maxValue)
                 result = defaultValue;
-            }
 
             return result;
 
@@ -664,19 +533,13 @@ namespace ManagedIrbis
             )
         {
             if (ReferenceEquals(text, null) || text.Length == 0)
-            {
                 return false;
-            }
 
             if (!ReferenceEquals(subtext1, null) && text.Contains(subtext1))
-            {
                 return true;
-            }
 
             if (!ReferenceEquals(subtext2, null) && text.Contains(subtext2))
-            {
                 return true;
-            }
 
             return !ReferenceEquals(subtext3, null) && text.Contains(subtext3);
 
@@ -692,48 +555,15 @@ namespace ManagedIrbis
             )
         {
             if (ReferenceEquals(text, null) || text.Length == 0)
-            {
                 return false;
-            }
 
             foreach (var subtext in subtexts)
-            {
                 if (!ReferenceEquals(subtext, null) && text.Contains(subtext))
-                {
                     return true;
-                }
-            }
 
             return false;
 
         } // method SafeContains
-
-        /// <summary>
-        /// Регистрация кодировок, основанных на кодовых страницах.
-        /// </summary>
-        public static void RegisterEncodingProviders() =>
-            Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
-
-        private static Encoding? _windows1251;
-
-        /// <summary>
-        /// Получение кодировки Windows-1251 (cyrillic) <see cref="Encoding"/>.
-        /// </summary>
-        public static Encoding Windows1251
-        {
-            [DebuggerStepThrough]
-            get
-            {
-                if (ReferenceEquals(_windows1251, null))
-                {
-                    RegisterEncodingProviders();
-                    _windows1251 = Encoding.GetEncoding(1251);
-                }
-
-                return _windows1251;
-            }
-
-        } // property Windows1251
 
         /// <summary>
         /// Сравнивает символы с точностью до регистра
@@ -1025,6 +855,7 @@ namespace ManagedIrbis
             }
 
             return false;
+
         } // method SameString
 
         /// <summary>
@@ -1216,68 +1047,41 @@ namespace ManagedIrbis
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this double value) =>
-            value.ToString(CultureInfo.InvariantCulture);
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this double value, string format) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this decimal value) =>
-            value.ToString(CultureInfo.InvariantCulture);
+            value.ToString (CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Преобразование числа в строку по правилам инвариантной
         /// (не зависящей от региона) культуры.
         /// </summary>
         public static string ToInvariantString (this decimal value, string format) =>
-            value.ToString(format, CultureInfo.InvariantCulture);
+            value.ToString (format, CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Is the list is <c>null</c> or empty?
         /// </summary>
-        public static bool IsNullOrEmpty<T>
-            (
-                this IList<T>? list
-            )
-        {
-            if (!ReferenceEquals(list, null))
-            {
-                return list.Count == 0;
-            }
-
-            return true;
-
-        } // method IsNullOrEmpty
+        public static bool IsNullOrEmpty<T> (this IList<T>? list) =>
+            ReferenceEquals (list, null) || list.Count == 0;
 
         /// <summary>
         /// Throw <see cref="ArgumentNullException"/>
         /// if the list is <c>null</c> or empty.
         /// </summary>
-        public static IList<T> ThrowIfNullOrEmpty<T>
-            (
-                this IList<T>? list
-            )
-        {
-            if (ReferenceEquals(list, null))
-            {
-                throw new IrbisException();
-            }
-
-            if (list.Count == 0)
-            {
-                throw new IrbisException();
-            }
-
-            return list;
-
-        } // method ThrowIfNullOrEmpty
+        public static IList<T> ThrowIfNullOrEmpty<T> (this IList<T>? list) =>
+            ReferenceEquals (list, null) || list.Count == 0 ? throw new IrbisException() : list;
 
         /// <summary>
         /// Ищет первое вхождение паттерна в данных.
@@ -1295,26 +1099,20 @@ namespace ManagedIrbis
             var patternLength = pattern.Length;
             var dataLength = data.Length - patternLength;
             if (patternLength == 0 || dataLength < 0)
-            {
                 return -1;
-            }
 
             for (var i = start; i <= dataLength; i++)
             {
                 var found = true;
                 for (var j = 0; j < patternLength; j++)
-                {
                     if (data[i + j] != pattern[j])
                     {
                         found = false;
                         break;
                     }
-                }
 
                 if (found)
-                {
                     return i;
-                }
             }
 
             return -1;
@@ -1324,20 +1122,13 @@ namespace ManagedIrbis
         /// <summary>
         /// Преобразование переводов строк ИРБИС в Windows.
         /// </summary>
-        public static string? IrbisToWindows
-            (
-                string? text
-            )
+        public static string? IrbisToWindows (string? text)
         {
             if (ReferenceEquals(text, null) || text.Length == 0)
-            {
                 return text;
-            }
 
             if (!text.Contains(Constants.IrbisDelimiter))
-            {
                 return text;
-            }
 
             var result = text.Replace
                 (
@@ -1359,18 +1150,14 @@ namespace ManagedIrbis
             )
         {
             if (ReferenceEquals(text, null) || text.Length == 0)
-            {
                 return;
-            }
 
             var index = 0;
             while (true)
             {
                 index = IndexOf(text, Constants.IrbisDelimiterBytes, index);
                 if (index < 0)
-                {
                     break;
-                }
 
                 Array.Copy(Constants.WindowsDelimiterBytes, 0, text, index, Constants.WindowsDelimiterBytes.Length);
             }
@@ -1498,339 +1285,29 @@ namespace ManagedIrbis
         } // method WindowsToIrbis
 
         /// <summary>
-        /// Проверка: валиден ли код подполя.
+        /// Проверяем, хороший ли пришел ответ от сервера.
         /// </summary>
-        public static bool IsValidSubFieldCode(char code) =>
-            code is >= Constants.FirstCode and <= Constants.LastCode and not '^';
-
-        /// <summary>
-        /// Верификация кода подполя с выбросом исключения.
-        /// </summary>
-        public static bool VerifySubFieldCode(char code, bool trhowOnError = true) =>
-            IsValidSubFieldCode(code) || (trhowOnError ? throw new IrbisException() : false);
-
-        /// <summary>
-        /// Нормализация кода подполя.
-        /// </summary>
-        public static char NormalizeCode (char code) => char.ToLowerInvariant(code);
-
-        /// <summary>
-        /// Проверка: валидно ли значение подполя.
-        /// </summary>
-        public static bool IsValidSubFieldValue
-            (
-                ReadOnlySpan<char> value
-            )
-        {
-            foreach (var c in value)
-            {
-                if (c == SubField.Delimiter)
-                {
-                    return false;
-                }
-            }
-
-            return true;
-
-        } // method IsValidSubFieldValue
-
-        /// <summary>
-        /// Верификация значения подполя с выбромо исключения.
-        /// </summary>
-        public static bool VerifySubFieldValue(ReadOnlySpan<char> value, bool throwOnError = true) =>
-            IsValidSubFieldValue(value) || (throwOnError ? throw new IrbisException() : false);
-
-        /// <summary>
-        /// Нормализация значения подполя.
-        /// </summary>
-        public static string? NormalizeSubFieldValue
-            (
-                string? value
-            )
-        {
-            if (ReferenceEquals(value, null) || value.Length == 0)
-            {
-                return value;
-            }
-
-            var result = value.Trim();
-
-            return result;
-
-        } // method Normalize
-
-        /// <summary>
-        /// Первое вхождение подполя с указанным кодом.
-        /// </summary>
-        public static SubField? GetFirstSubField
-            (
-                this IEnumerable<SubField> subFields,
-                char code
-            )
-        {
-            foreach (var subField in subFields)
-            {
-                if (subField.Code.SameChar(code))
-                {
-                    return subField;
-                }
-            }
-
-            return null;
-        } // method GetFirstSubField
-
-        /// <summary>
-        /// Первое вхождение подполя с одним из указанных кодов.
-        /// </summary>
-        public static SubField? GetFirstSubField
-            (
-                this IEnumerable<SubField> subFields,
-                params char[] codes
-            )
-        {
-            foreach (var subField in subFields)
-            {
-                foreach (var code in codes)
-                {
-                    if (subField.Code.SameChar(code))
-                    {
-                        return subField;
-                    }
-                }
-            }
-
-            return null;
-
-        } // method GetFirstSubField
-
-        /// <summary>
-        /// Первое вхождение подполя с указанными кодом
-        /// и значением (с учётом регистра символов).
-        /// </summary>
-        public static SubField? GetFirstSubField
-            (
-                this IEnumerable<SubField> subFields,
-                char code,
-                string? value
-            )
-        {
-            foreach (var subField in subFields)
-            {
-                if (subField.Code.SameChar(code)
-                    && subField.Value.SameString(value))
-                {
-                    return subField;
-                }
-            }
-
-            return null;
-
-        } // method GetFirstSubField
-
-        /// <summary>
-        /// Фильтрация подполей.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<SubField> subFields,
-                char code
-            )
-        {
-            List<SubField>? result = null;
-            foreach (var subField in subFields)
-            {
-                if (subField.Code.SameChar(code))
-                {
-                    result ??= new List<SubField>();
-                    result.Add(subField);
-                }
-            }
-
-            return ReferenceEquals(result, null)
-                ? Array.Empty<SubField>()
-                : result.ToArray();
-        } // method GetSubField
-
-        /// <summary>
-        /// Фильтрация подполей.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<SubField> subFields,
-                params char[] codes
-            )
-        {
-            List<SubField>? result = null;
-            foreach (var subField in subFields)
-            {
-                if (subField.Code.SameChar(codes))
-                {
-                    result ??= new();
-                    result.Add(subField);
-                }
-            }
-
-            return ReferenceEquals(result, null)
-                ? Array.Empty<SubField>()
-                : result.ToArray();
-        } // method GetSubField
-
-        /// <summary>
-        /// Выполнение неких действий над подполями.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<SubField> subFields,
-                Action<SubField>? action
-            )
-        {
-            var result = subFields.ToArray();
-
-            if (!ReferenceEquals(action, null))
-            {
-                foreach (var subField in result)
-                {
-                    action(subField);
-                }
-            }
-
-            return result;
-        } // method GetSubField
-
-        /// <summary>
-        /// Фильтрация подполей.
-        /// </summary>
-        public static SubField[] GetSubField
-            (
-                this IEnumerable<Field> fields,
-                Func<Field, bool> fieldPredicate,
-                Func<SubField, bool> subPredicate
-            )
-        {
-            List<SubField>? result = null;
-            foreach (var field in fields)
-            {
-                if (fieldPredicate(field))
-                {
-                    foreach (SubField subField in field.Subfields)
-                    {
-                        if (subPredicate(subField))
-                        {
-                            result ??= new List<SubField>();
-                            result.Add(subField);
-                        }
-                    }
-                }
-            }
-
-            return ReferenceEquals(result, null)
-                ? Array.Empty<SubField>()
-                : result.ToArray();
-        } // method GetSubField
-
-        /// <summary>
-        /// Получение значения подполя.
-        /// </summary>
-        public static string[] GetSubFieldValue
-            (
-                this IEnumerable<SubField> subFields
-            )
-        {
-            List<string>? result = null;
-            foreach (var subField in subFields.NonNullItems())
-            {
-                var value = subField.Value;
-                if (!ReferenceEquals(value, null) && value.Length != 0)
-                {
-                    result ??= new List<string>();
-                    result.Add(value);
-                }
-            }
-
-            return ReferenceEquals(result, null)
-                ? Array.Empty<string>()
-                : result.ToArray();
-
-        } // method GetSubFieldValue
+        public static bool IsGood (this Response? response) =>
+            response is not null && response.CheckReturnCode();
 
         /// <summary>
         /// Проверяем, хороший ли пришел ответ от сервера.
         /// </summary>
-        public static bool IsGood
-            (
-                this Response? response,
-                bool dispose = true
-            )
-        {
-            if (response is null)
-            {
-                return false;
-            }
-
-            var result = response.CheckReturnCode();
-            if (dispose)
-            {
-                response.Dispose();
-            }
-
-            return result;
-
-        } // method IsGood
-
-        /// <summary>
-        /// Проверяем, хороший ли пришел ответ от сервера.
-        /// </summary>
-        public static bool IsGood
-            (
-                this Response? response,
-                bool dispose = true,
-                params int[] goodCodes
-            )
-        {
-            if (response is null)
-            {
-                return false;
-            }
-
-            var result = response.CheckReturnCode(goodCodes);
-            if (dispose)
-            {
-                response.Dispose();
-            }
-
-            return result;
-
-        } // method IsGood
+        public static bool IsGood (this Response? response, params int[] goodCodes) =>
+            response is not null && response.CheckReturnCode((goodCodes));
 
         /// <summary>
         /// Трансформация запроса во что-нибудь полезное.
         /// </summary>
-        public static T? Transform<T>
-            (
-                this Response? response,
-                Func<Response, T?> transformer
-            )
-            where T : class
-        {
-            var result = response.IsGood(false) ? transformer(response!) : null;
-            response?.Dispose();
-
-            return result;
-
-        } // method Transform
+        public static T? Transform<T> (this Response? response, Func<Response, T?> transformer) where T : class =>
+            response.IsGood() ? transformer(response!) : null;
 
         /// <summary>
         /// Трансформация запроса во что-нибудь полезное.
         /// </summary>
-        public static T? TransformNoCheck<T>
-            (
-                this Response? response,
-                Func<Response, T?> transformer
-            )
-            where T : class
+        public static T? TransformNoCheck<T> (this Response? response, Func<Response, T?> transformer)  where T : class
         {
             var result = response is not null ? transformer(response) : null;
-            response?.Dispose();
 
             return result;
 
@@ -2115,7 +1592,7 @@ namespace ManagedIrbis
             var reader = new StringReader(line);
             var result = new Field
             {
-                Tag = Utility.ParseInt32(_ReadTo(reader, '#')),
+                Tag = Private.ParseInt32(_ReadTo(reader, '#')),
                 Value = _ReadTo(reader, '^').EmptyToNull()
             };
 
@@ -2152,15 +1629,15 @@ namespace ManagedIrbis
         {
             var regex = new Regex(@"^(-?\d+)\#(\d*)?");
             var match = regex.Match(line1);
-            record.Mfn = Math.Abs(Utility.ParseInt32(match.Groups[1].Value));
+            record.Mfn = Math.Abs(Private.ParseInt32(match.Groups[1].Value));
             if (match.Groups[2].Length > 0)
             {
-                record.Status = (RecordStatus) Utility.ParseInt32(match.Groups[2].Value);
+                record.Status = (RecordStatus) Private.ParseInt32(match.Groups[2].Value);
             }
             match = regex.Match(line2);
             if (match.Groups[2].Length > 0)
             {
-                record.Version = Utility.ParseInt32(match.Groups[2].Value);
+                record.Version = Private.ParseInt32(match.Groups[2].Value);
             }
 
             return record;
@@ -2241,6 +1718,1918 @@ namespace ManagedIrbis
             return result;
 
         } // method Merge
+
+        /// <summary>
+        /// Выборка элемента из массива.
+        /// </summary>
+        /// <remarks>
+        /// Возможна отрицательная нумерация
+        /// (означает индекс с конца массива).
+        /// При выходе за границы массива
+        /// выдаётся значение по умолчанию.
+        /// </remarks>
+        public static T? GetOccurrence<T> (this T[] array, int occurrence)
+        {
+            var length = array.Length;
+
+            occurrence = occurrence >= 0 ? occurrence : length + occurrence;
+
+            var result = default(T);
+
+            if (length != 0 && occurrence >= 0 && occurrence < length)
+                result = array[occurrence];
+
+            return result;
+
+        } // method GetOccurrence
+
+    } // class Private
+
+    /// <summary>
+    /// Разнообразные полезные методы расширения.
+    /// </summary>
+    public static class Utility
+    {
+        /// <summary>
+        /// Однобайтовая кодировка по умолчанию.
+        /// Как правило, кодовая страница 1251.
+        /// </summary>
+        public static Encoding Ansi => Windows1251;
+
+        /// <summary>
+        /// Регистрация кодировок, основанных на кодовых страницах.
+        /// </summary>
+        public static void RegisterEncodingProviders() =>
+            Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
+        private static Encoding? _windows1251;
+
+        /// <summary>
+        /// Получение кодировки Windows-1251 (cyrillic) <see cref="Encoding"/>.
+        /// </summary>
+        public static Encoding Windows1251
+        {
+            [DebuggerStepThrough]
+            get
+            {
+                if (ReferenceEquals(_windows1251, null))
+                {
+                    RegisterEncodingProviders();
+                    _windows1251 = Encoding.GetEncoding(1251);
+                }
+
+                return _windows1251;
+            }
+
+        } // property Windows1251
+
+        /// <summary>
+        /// Проверка: валиден ли код подполя.
+        /// </summary>
+        public static bool IsValidSubFieldCode(char code) =>
+            code is >= Constants.FirstCode and <= Constants.LastCode and not '^';
+
+        /// <summary>
+        /// Верификация кода подполя с выбросом исключения.
+        /// </summary>
+        public static bool VerifySubFieldCode(char code, bool trhowOnError = true) =>
+            IsValidSubFieldCode(code) || (trhowOnError ? throw new IrbisException() : false);
+
+        /// <summary>
+        /// Нормализация кода подполя.
+        /// </summary>
+        public static char NormalizeCode (char code) => char.ToLowerInvariant(code);
+
+        /// <summary>
+        /// Проверка: валидно ли значение подполя.
+        /// </summary>
+        public static bool IsValidSubFieldValue
+            (
+                ReadOnlySpan<char> value
+            )
+        {
+            foreach (var c in value)
+            {
+                if (c == SubField.Delimiter)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+
+        } // method IsValidSubFieldValue
+
+        /// <summary>
+        /// Верификация значения подполя с выбромо исключения.
+        /// </summary>
+        public static bool VerifySubFieldValue(ReadOnlySpan<char> value, bool throwOnError = true) =>
+            IsValidSubFieldValue(value) || (throwOnError ? throw new IrbisException() : false);
+
+        /// <summary>
+        /// Нормализация значения подполя.
+        /// </summary>
+        public static string? NormalizeSubFieldValue
+            (
+                string? value
+            )
+        {
+            if (ReferenceEquals(value, null) || value.Length == 0)
+            {
+                return value;
+            }
+
+            var result = value.Trim();
+
+            return result;
+
+        } // method Normalize
+
+        /// <summary>
+        /// Первое вхождение подполя с указанным кодом.
+        /// </summary>
+        public static SubField? GetFirstSubField
+            (
+                this IEnumerable<SubField> subFields,
+                char code
+            )
+        {
+            foreach (var subField in subFields)
+            {
+                if (subField.Code.SameChar(code))
+                {
+                    return subField;
+                }
+            }
+
+            return null;
+        } // method GetFirstSubField
+
+        /// <summary>
+        /// Первое вхождение подполя с одним из указанных кодов.
+        /// </summary>
+        public static SubField? GetFirstSubField
+            (
+                this IEnumerable<SubField> subFields,
+                params char[] codes
+            )
+        {
+            foreach (var subField in subFields)
+            {
+                foreach (var code in codes)
+                {
+                    if (subField.Code.SameChar(code))
+                    {
+                        return subField;
+                    }
+                }
+            }
+
+            return null;
+
+        } // method GetFirstSubField
+
+        /// <summary>
+        /// Первое вхождение подполя с указанными кодом
+        /// и значением (с учётом регистра символов).
+        /// </summary>
+        public static SubField? GetFirstSubField
+            (
+                this IEnumerable<SubField> subFields,
+                char code,
+                string? value
+            )
+        {
+            foreach (var subField in subFields)
+            {
+                if (subField.Code.SameChar(code)
+                    && subField.Value.SameString(value))
+                {
+                    return subField;
+                }
+            }
+
+            return null;
+
+        } // method GetFirstSubField
+
+        /// <summary>
+        /// Фильтрация подполей.
+        /// </summary>
+        public static SubField[] GetSubField
+            (
+                this IEnumerable<SubField> subFields,
+                char code
+            )
+        {
+            List<SubField>? result = null;
+            foreach (var subField in subFields)
+            {
+                if (subField.Code.SameChar(code))
+                {
+                    result ??= new List<SubField>();
+                    result.Add(subField);
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<SubField>()
+                : result.ToArray();
+        } // method GetSubField
+
+        /// <summary>
+        /// Фильтрация подполей.
+        /// </summary>
+        public static SubField[] GetSubField
+            (
+                this IEnumerable<SubField> subFields,
+                params char[] codes
+            )
+        {
+            List<SubField>? result = null;
+            foreach (var subField in subFields)
+            {
+                if (subField.Code.SameChar(codes))
+                {
+                    result ??= new();
+                    result.Add(subField);
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<SubField>()
+                : result.ToArray();
+        } // method GetSubField
+
+        /// <summary>
+        /// Выполнение неких действий над подполями.
+        /// </summary>
+        public static SubField[] GetSubField
+            (
+                this IEnumerable<SubField> subFields,
+                Action<SubField>? action
+            )
+        {
+            var result = subFields.ToArray();
+
+            if (!ReferenceEquals(action, null))
+            {
+                foreach (var subField in result)
+                {
+                    action(subField);
+                }
+            }
+
+            return result;
+        } // method GetSubField
+
+        /// <summary>
+        /// Фильтрация подполей.
+        /// </summary>
+        public static SubField[] GetSubField
+            (
+                this IEnumerable<Field> fields,
+                Func<Field, bool> fieldPredicate,
+                Func<SubField, bool> subPredicate
+            )
+        {
+            List<SubField>? result = null;
+            foreach (var field in fields)
+            {
+                if (fieldPredicate(field))
+                {
+                    foreach (SubField subField in field.Subfields)
+                    {
+                        if (subPredicate(subField))
+                        {
+                            result ??= new List<SubField>();
+                            result.Add(subField);
+                        }
+                    }
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<SubField>()
+                : result.ToArray();
+        } // method GetSubField
+
+        /// <summary>
+        /// Получение значения подполя.
+        /// </summary>
+        public static string[] GetSubFieldValue
+            (
+                this IEnumerable<SubField> subFields
+            )
+        {
+            List<string>? result = null;
+            foreach (var subField in subFields.NonNullItems())
+            {
+                var value = subField.Value;
+                if (!ReferenceEquals(value, null) && value.Length != 0)
+                {
+                    result ??= new List<string>();
+                    result.Add(value);
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<string>()
+                : result.ToArray();
+
+        } // method GetSubFieldValue
+
+        /// <summary>
+        /// Добавление подполя, при условии, что оно не пустое.
+        /// </summary>
+        public static Field AddNonEmptySubField
+            (
+                this Field field,
+                char code,
+                string? value
+            )
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                field.Add(code, value);
+            }
+
+            return field;
+
+        } // method AddNonEmptySubField
+
+        /// <summary>
+        /// Добавление подполя.
+        /// </summary>
+        public static Field AddNonEmptySubField
+            (
+                this Field field,
+                char code,
+                bool flag,
+                string? value
+            )
+        {
+            if (flag && !string.IsNullOrEmpty(value))
+            {
+                field.Add(code, value);
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Добавление подполя.
+        /// </summary>
+        public static Field AddNonEmptySubField
+            (
+                this Field field,
+                char code,
+                int? value
+            )
+        {
+            if (value.HasValue)
+            {
+                field.Add(code, value.Value);
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Добавление подполя.
+        /// </summary>
+        public static Field AddNonEmptySubField
+            (
+                this Field field,
+                char code,
+                long? value
+            )
+        {
+            if (value.HasValue)
+            {
+                field.Add(code, value.Value);
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Добавление подполей.
+        /// </summary>
+        public static Field AddSubFields
+            (
+                this Field field,
+                IEnumerable<SubField>? subFields
+            )
+        {
+            if (!ReferenceEquals(subFields, null))
+            {
+                foreach (var subField in subFields)
+                {
+                    field.Subfields.Add(subField);
+                }
+            }
+
+            return field;
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Все подполя.
+        /// </summary>
+        public static SubField[] AllSubFields
+            (
+                this IEnumerable<Field> fields
+            )
+        {
+            return fields
+                .SelectMany(field => field.Subfields)
+                .NonNullItems()
+                .ToArray();
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Apply subfield value.
+        /// </summary>
+        public static Field ApplySubField
+            (
+                this Field field,
+                char code,
+                object? value
+            )
+        {
+            if (code == SubField.NoCode)
+                return field;
+
+            if (ReferenceEquals(value, null))
+            {
+                field.RemoveSubField(code);
+            }
+            else
+            {
+                var subField = field.GetFirstSubField(code);
+                if (ReferenceEquals(subField, null))
+                {
+                    subField = new SubField { Code = code };
+                    field.Subfields.Add(subField);
+                }
+                subField.Value = value.ToString();
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Apply subfield value.
+        /// </summary>
+        public static Field ApplySubField
+            (
+                this Field field,
+                char code,
+                bool value,
+                string text
+            )
+        {
+            if (code == SubField.NoCode)
+            {
+                return field;
+            }
+
+            if (value == false)
+            {
+                field.RemoveSubField(code);
+            }
+            else
+            {
+                var subField = field.GetFirstSubField(code);
+                if (ReferenceEquals(subField, null))
+                {
+                    subField = new SubField { Code = code };
+                    field.Subfields.Add(subField);
+                }
+                subField.Value = text;
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Apply subfield value.
+        /// </summary>
+        public static Field ApplySubField
+            (
+                this Field field,
+                char code,
+                string? value
+            )
+        {
+            if (code == SubField.NoCode)
+            {
+                return field;
+            }
+
+            if (string.IsNullOrEmpty(value))
+            {
+                field.RemoveSubField(code);
+            }
+            else
+            {
+                var subField = field.GetFirstSubField(code);
+                if (ReferenceEquals(subField, null))
+                {
+                    subField = new SubField { Code = code };
+                    field.Subfields.Add(subField);
+                }
+                subField.Value = value;
+            }
+
+            return field;
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Отбор подполей с указанными кодами.
+        /// </summary>
+        public static SubField[] FilterSubFields
+            (
+                this IEnumerable<SubField> subFields,
+                params char[] codes
+            )
+        {
+
+            return subFields
+                .Where
+                    (
+                        subField => subField.Code.IsOneOf(codes)
+                    )
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Отбор подполей с указанными кодами.
+        /// </summary>
+        public static SubField[] FilterSubFields
+            (
+                this Field field,
+                params char[] codes
+            )
+        {
+            return field.Subfields
+                .FilterSubFields(codes);
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                int tag
+            )
+        {
+            return fields
+                .Where(field => field.Tag == tag)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field? GetField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                int occurrence
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (occurrence == 0)
+                    {
+                        return field;
+                    }
+                    occurrence--;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                int[] tags
+            )
+        {
+            return fields
+                .Where(field => field.Tag.IsOneOf(tags))
+                .ToArray();
+        }
+
+        ///// <summary>
+        ///// Фильтрация полей.
+        ///// </summary>
+        //[NotNull]
+        //[ItemNotNull]
+        //public static RecordField[] GetField
+        //    (
+        //        this RecordFieldCollection fields,
+        //        params int[] tags
+        //    )
+        //{
+        //    Code.NotNull(fields, "fields");
+
+        //    List<RecordField> result = null;
+        //    int count = fields.Count;
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        if (fields[i].Tag.OneOf(tags))
+        //        {
+        //            if (ReferenceEquals(result, null))
+        //            {
+        //                result = new List<RecordField>();
+        //            }
+        //            result.Add(fields[i]);
+        //        }
+        //    }
+
+        //    return ReferenceEquals(result, null)
+        //        ? EmptyArray
+        //        : result.ToArray();
+        //}
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field? GetField
+            (
+                this IEnumerable<Field> fields,
+                int[] tags,
+                int occurrence
+            )
+        {
+            return fields
+                .GetField(tags)
+                .GetOccurrence(occurrence);
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                Func<Field, bool> predicate
+            )
+        {
+            return fields
+                .NonNullItems()
+                .Where(predicate)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Выполнение неких действий над полями.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                Action<Field>? action
+            )
+        {
+            var result = fields.ToArray();
+            if (!ReferenceEquals(action, null))
+            {
+                foreach (var field in result)
+                {
+                    action(field);
+                }
+            }
+
+            return result;
+        } // method GetField
+
+        /// <summary>
+        /// Выполнение неких действий над полями и подполями.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                Action<Field>? fieldAction,
+                Action<SubField>? subFieldAction
+            )
+        {
+            var result = fields.ToArray();
+            if (!ReferenceEquals(fieldAction, null)
+                || !ReferenceEquals(subFieldAction, null))
+            {
+                foreach (var field in result)
+                {
+                    fieldAction?.Invoke(field);
+
+                    if (!ReferenceEquals(subFieldAction, null))
+                    {
+                        foreach (var subField in field.Subfields)
+                        {
+                            subFieldAction(subField);
+                        }
+                    }
+                }
+            } // method GetField
+
+            return result;
+        }
+
+        /// <summary>
+        /// Выполнение неких действий над подполями.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                Action<SubField>? action
+            )
+        {
+            var result = fields.ToArray();
+            if (!ReferenceEquals(action, null))
+            {
+                foreach (var field in result)
+                {
+                    foreach (var subField in field.Subfields)
+                    {
+                        action(subField);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                Func<SubField, bool> predicate
+            )
+        {
+            return fields
+                .Where(field => field.Subfields.Any(predicate))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                char[] codes,
+                Func<SubField, bool> predicate
+            )
+        {
+            return fields
+                .NonNullItems()
+                .Where
+                    (
+                        field => field.Subfields
+                            .NonNullItems()
+                            .Any
+                                (
+                                    sub => sub.Code.SameChar(codes)
+                                        && predicate(sub)
+                                )
+                    )
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                char[] codes,
+                params string[] values
+            )
+        {
+            return fields
+                .Where
+                    (
+                        field => field.Subfields
+                            .Any
+                                (
+                                    sub => sub.Code.SameChar(codes)
+                                        && sub.Value.SameString(values)
+                                )
+                    )
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                char code,
+                string? value
+            )
+        {
+            return fields
+                .Where
+                    (
+                        field => field.Subfields
+                            .Any
+                                (
+                                    sub => sub.Code.SameChar(code)
+                                        && sub.Value.SameString(value)
+                                )
+                    )
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                int[] tags,
+                char[] codes,
+                string[] values
+            )
+        {
+            return fields
+                .Where(field => field.Tag.IsOneOf(tags))
+                .Where
+                    (
+                        field => field.Subfields
+                            .Any
+                                (
+                                    sub => sub.Code.SameChar(codes)
+                                        && sub.Value.SameString(values)
+                                )
+                    )
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetField
+            (
+                this IEnumerable<Field> fields,
+                Func<Field, bool> fieldPredicate,
+                Func<SubField, bool> subPredicate
+            )
+        {
+            return fields
+                .Where(fieldPredicate)
+                .Where(field => field.Subfields.Any(subPredicate))
+                .ToArray();
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Количество повторений поля.
+        /// </summary>
+        public static int GetFieldCount
+            (
+                this IEnumerable<Field> fields,
+                int tag
+            )
+        {
+            var result = 0;
+
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    result++;
+                }
+            }
+
+            return result;
+        } // method GetFieldCount
+
+        // ==========================================================
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetFieldRegex
+            (
+                this IEnumerable<Field> fields,
+                string tagRegex
+            )
+        {
+            return fields
+                .Where
+                    (
+                        field =>
+                        {
+                            var tag = field.Tag.ToInvariantString();
+
+                            return !string.IsNullOrEmpty(tag)
+                                && Regex.IsMatch
+                                   (
+                                       tag,
+                                       tagRegex
+                                   );
+                        }
+                    )
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field? GetFieldRegex
+            (
+                this IEnumerable<Field> fields,
+                string tagRegex,
+                int occurrence
+            )
+        {
+            return fields
+                .GetFieldRegex(tagRegex)
+                .GetOccurrence(occurrence);
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetFieldRegex
+            (
+                this IEnumerable<Field> fields,
+                int[] tags,
+                string textRegex
+            )
+        {
+            return fields
+                .GetField(tags)
+                .Where
+                    (
+                        field =>
+                        {
+                            var value = field.Value;
+                            return !ReferenceEquals(value, null) && value.Length != 0
+                                   && Regex.IsMatch(value, textRegex);
+                        })
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field? GetFieldRegex
+            (
+                this IEnumerable<Field> fields,
+                int[] tags,
+                string textRegex,
+                int occurrence
+            )
+        {
+            return fields
+                .GetFieldRegex(tags, textRegex)
+                .GetOccurrence(occurrence);
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] GetFieldRegex
+            (
+                this IEnumerable<Field> fields,
+                int[] tags,
+                char[] codes,
+                string textRegex
+            )
+        {
+            var regex = new Regex(textRegex);
+            return fields
+                .GetField(tags)
+                .Where(field => field.FilterSubFields(codes)
+                    .Any(sub =>
+                    {
+                        var value = sub.Value;
+
+                        return !ReferenceEquals(value, null) && value.Length != 0
+                            && regex.IsMatch(value);
+                    }))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field? GetFieldRegex
+            (
+                this IEnumerable<Field> fields,
+                int[] tags,
+                char[] codes,
+                string textRegex,
+                int occurrence
+            )
+        {
+            return fields
+                .GetFieldRegex(tags, codes, textRegex)
+                .GetOccurrence(occurrence);
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Получение значения поля.
+        /// </summary>
+        public static string[] GetFieldValue
+            (
+                this IEnumerable<Field> fields
+            )
+        {
+            return fields
+                .Select (field => field.Value!)
+                .Where(line => !ReferenceEquals(line, null) && line.Length != 0)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Непустые значения полей с указанным тегом.
+        /// </summary>
+        public static string[] GetFieldValue
+            (
+                this IEnumerable<Field> fields,
+                int tag
+            )
+        {
+            var result = new List<string>();
+            foreach (var field in fields.NonNullItems())
+                if (field.Tag == tag && !ReferenceEquals(field.Value, null) && field.Value.Length != 0)
+                    result.Add(field.Value);
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Первое вхождение поля с указанным тегом.
+        /// </summary>
+        public static Field? GetFirstField
+            (
+                this IEnumerable<Field> fields,
+                int tag
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    return field;
+                }
+            }
+
+            return null;
+        } // method GetFirstField
+
+        /// <summary>
+        /// Первое вхождение поля с указанным тегом.
+        /// </summary>
+        public static Field? GetFirstField
+            (
+                this IEnumerable<Field> fields,
+                int tag1,
+                int tag2
+            )
+        {
+            foreach (var field in fields)
+            {
+                var tag = field.Tag;
+                if (tag == tag1 || tag == tag2)
+                {
+                    return field;
+                }
+            }
+
+            return null;
+        } // method GetFirstField
+
+        /// <summary>
+        /// Первое вхождение поля с указанным тегом.
+        /// </summary>
+        public static Field? GetFirstField
+            (
+                this IEnumerable<Field> fields,
+                int tag1,
+                int tag2,
+                int tag3
+            )
+        {
+            foreach (var field in fields)
+            {
+                var tag = field.Tag;
+                if (tag == tag1 || tag == tag2 || tag == tag3)
+                {
+                    return field;
+                }
+            }
+
+            return null;
+        } // method GetFirstField
+
+        /// <summary>
+        /// Первое вхождение поля с любым из перечисленных тегов.
+        /// </summary>
+        public static Field? GetFirstField
+            (
+                this IEnumerable<Field> fields,
+                params int[] tags
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag.IsOneOf(tags))
+                {
+                    return field;
+                }
+            }
+
+            return null;
+        }
+
+        // ==========================================================
+
+        ///// <summary>
+        ///// Значение первого поля с указанным тегом или <c>null</c>.
+        ///// </summary>
+        //[CanBeNull]
+        //public static string GetFirstFieldValue
+        //    (
+        //        this IEnumerable<RecordField> fields,
+        //        int tag
+        //    )
+        //{
+        //    Code.NotNull(fields, "fields");
+
+        //    foreach (RecordField field in fields)
+        //    {
+        //        if (field.Tag == tag)
+        //        {
+        //            return field.Value;
+        //        }
+        //    }
+
+        //    return null;
+        //}
+
+        // ==========================================================
+
+        /// <summary>
+        /// Gets the first subfield.
+        /// </summary>
+        public static SubField? GetFirstSubField
+            (
+                this Field field,
+                char code
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code))
+                {
+                    return subFields[i];
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Первое вхождение подполя, соответствующего указанным
+        /// критериям.
+        /// </summary>
+        public static SubField? GetFirstSubField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    var subFields = field.Subfields;
+                    var count = subFields.Count;
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (subFields[i].Code.SameChar(code))
+                        {
+                            return subFields[i];
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Получение текста указанного подполя
+        /// </summary>
+        public static string? GetFirstSubFieldValue
+            (
+                this Field field,
+                char code
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code))
+                {
+                    return subFields[i].Value;
+                }
+            }
+
+            return default;
+        }
+
+        /// <summary>
+        /// Значение первого подполя с указанными тегом и кодом
+        /// или <c>null</c>.
+        /// </summary>
+        public static string? GetFirstSubFieldValue
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    foreach (var subField in field.Subfields)
+                    {
+                        if (subField.Code.SameChar(code))
+                        {
+                            return subField.Value;
+                        }
+                    }
+                }
+            }
+
+            return default;
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Перечень подполей с указанным кодом.
+        /// </summary>
+        public static SubField[] GetSubField
+            (
+                this Field field,
+                char code
+            )
+        {
+            List<SubField>? result = null;
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code))
+                {
+                    result ??= new List<SubField>();
+                    result.Add(subFields[i]);
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<SubField>()
+                : result.ToArray();
+        }
+
+        /// <summary>
+        /// Указанное повторение подполя с данным кодом.
+        /// </summary>
+        public static SubField? GetSubField
+            (
+                this Field field,
+                char code,
+                int occurrence
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code))
+                {
+                    if (occurrence == 0)
+                    {
+                        return subFields[i];
+                    }
+                    occurrence--;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Получение подполей.
+        /// </summary>
+        public static SubField[] GetSubField
+            (
+                this IEnumerable<Field> fields,
+                char code
+            )
+        {
+            List<SubField>? result = null;
+            foreach (var field in fields)
+            {
+                var subFields = field.Subfields;
+                var count = subFields.Count;
+                for (var i = 0; i < count; i++)
+                {
+                    if (subFields[i].Code.SameChar(code))
+                    {
+                        result ??= new List<SubField>();
+                        result.Add(subFields[i]);
+                    }
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<SubField>()
+                : result.ToArray();
+        }
+
+        /// <summary>
+        /// Получение подполей.
+        /// </summary>
+        public static SubField[] GetSubField
+            (
+                this IEnumerable<Field> fields,
+                params char[] codes
+            )
+        {
+            List<SubField>? result = null;
+            foreach (var field in fields)
+            {
+                var subFields = field.Subfields;
+                var count = subFields.Count;
+                for (var i = 0; i < count; i++)
+                {
+                    if (subFields[i].Code.IsOneOf(codes))
+                    {
+                        result ??= new List<SubField>();
+                        result.Add(subFields[i]);
+                    }
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<SubField>()
+                : result.ToArray();
+        }
+
+        /// <summary>
+        /// Получение подполей.
+        /// </summary>
+        public static SubField[] GetSubField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code
+            )
+        {
+            List<SubField>? result = null;
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    foreach (var subField in field.Subfields)
+                    {
+                        if (subField.Code.SameChar(code))
+                        {
+                            result ??= new List<SubField>();
+                            result.Add(subField);
+                        }
+                    }
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<SubField>()
+                : result.ToArray();
+        }
+
+        /// <summary>
+        /// Получение подполя.
+        /// </summary>
+        public static SubField? GetSubField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                int fieldOccurrence,
+                char code,
+                int subOccurrence
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (fieldOccurrence == 0)
+                    {
+                        var subFields = field.Subfields;
+                        var subCount = subFields.Count;
+                        for (var j = 0; j < subCount; j++)
+                        {
+                            if (subFields[j].Code.SameChar(code))
+                            {
+                                if (subOccurrence == 0)
+                                {
+                                    return subFields[j];
+                                }
+                                subOccurrence--;
+                            }
+                        }
+
+                        return null;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Получение подполя.
+        /// </summary>
+        public static SubField? GetSubField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code,
+                int occurrence
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    var subFields = field.Subfields;
+                    var subCount = subFields.Count;
+                    for (var j = 0; j < subCount; j++)
+                    {
+                        if (subFields[j].Code.SameChar(code))
+                        {
+                            if (occurrence == 0)
+                            {
+                                return subFields[j];
+                            }
+                            occurrence--;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Получение текста указанного подполя.
+        /// </summary>
+        public static string? GetSubFieldValue
+            (
+                this Field field,
+                char code,
+                int occurrence
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code))
+                {
+                    if (occurrence == 0)
+                    {
+                        return subFields[i].Value;
+                    }
+                    occurrence--;
+                }
+            }
+
+            return default;
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Непустые значения подполей с указанными тегом и кодом.
+        /// </summary>
+        public static string[] GetSubFieldValue
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code
+            )
+        {
+            var result = new List<string>();
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    foreach (var subField in field.Subfields)
+                    {
+                        if (subField.Code.SameChar(code)
+                            && !ReferenceEquals(subField.Value, null) && subField.Value.Length != 0)
+                        {
+                            result.Add(subField.Value);
+                        }
+                    }
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Есть хотя бы одно подполе с указанным кодом?
+        /// </summary>
+        public static bool HaveSubField
+            (
+                this Field field,
+                char code
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Есть хотя бы одно подполе с указанным кодом?
+        /// </summary>
+        public static bool HaveSubField
+            (
+                this Field field,
+                char code,
+                string value
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code)
+                    && subFields[i].Value.SameString(value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Есть хотя бы одно поле с любым из указанных кодов?
+        /// </summary>
+        public static bool HaveSubField
+            (
+                this Field field,
+                params char[] codes
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(codes))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Нет ни одного подполя с указанным кодом?
+        /// </summary>
+        public static bool HaveNotSubField
+            (
+                this Field field,
+                char code
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(code))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Нет ни одного подполя с указанными кодами?
+        /// </summary>
+        public static bool HaveNotSubField
+            (
+                this Field field,
+                params char[] codes
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                if (subFields[i].Code.SameChar(codes))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] NotNullTag
+            (
+                this IEnumerable<Field> fields
+            )
+        {
+            return fields
+                .Where
+                    (
+                        field => field.Tag != 0
+                    )
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] NotNullValue
+            (
+                this IEnumerable<Field> fields
+            )
+        {
+            return fields .Where(field => !ReferenceEquals(field.Value, null) && field.Value.Length != 0)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Меняем значение подполя.
+        /// </summary>
+        public static Field ReplaceSubField
+            (
+                this Field field,
+                char code,
+                string oldValue,
+                string newValue
+            )
+        {
+            var subFields = field.Subfields;
+            var count = subFields.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var subField = subFields[i];
+                if (subField.Code.SameChar(code))
+                {
+                    if (subField.Value == oldValue)
+                    {
+                        subField.Value = newValue;
+                    }
+                }
+            }
+
+            return field;
+        }
+
+        /// <summary>
+        /// Меняем значение подполя.
+        /// </summary>
+        public static Field ReplaceSubField
+            (
+                this Field field,
+                char code,
+                string newValue,
+                bool ignoreCase
+            )
+        {
+            var oldValue = field.GetSubFieldValue
+                (
+                    code
+                );
+            var changed = string.CompareOrdinal(oldValue, newValue);
+
+            if (changed != 0)
+            {
+                field.SetSubFieldValue(code, newValue);
+            }
+
+            return field;
+
+        }
+
+        /// <summary>
+        /// Get unknown subfields.
+        /// </summary>
+        public static SubField[] GetUnknownSubFields
+            (
+                this IEnumerable<SubField> subFields,
+                ReadOnlySpan<char> knownCodes
+            )
+        {
+            List<SubField>? result = null;
+            foreach (var subField in subFields)
+            {
+                if (subField.Code != '\0'
+                    && !subField.Code.SameChar(knownCodes))
+                {
+                    result ??= new List<SubField>();
+                    result.Add(subField);
+                }
+            }
+
+            return ReferenceEquals(result, null)
+                ? Array.Empty<SubField>()
+                : result.ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] WithNullTag
+            (
+                this IEnumerable<Field> fields
+            )
+        {
+            return fields
+                .Where
+                    (
+                        field => field.Tag == 0
+                    )
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] WithNullValue
+            (
+                this IEnumerable<Field> fields
+            )
+        {
+            return fields .Where(field => ReferenceEquals(field.Value, null) || field.Value.Length == 0)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] WithoutSubFields (this IEnumerable<Field> fields) =>
+            fields.Where (field => field.Subfields.Count == 0).ToArray();
+
+        /// <summary>
+        /// Есть ли в поле подполя с кодами?
+        /// </summary>
+        public static bool HaveSubFields (this Field field)
+        {
+            foreach (var subfield in field.Subfields)
+                if (subfield.Code != SubField.NoCode)
+                    return true;
+
+            return false;
+
+        } // method HaveSubFields
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] WithSubFields (this IEnumerable<Field> fields) =>
+            fields.Where (field => field.HaveSubFields()).ToArray();
+
+        /// <summary>
+        /// Поиск поля, которое обязательно должно быть.
+        /// </summary>
+        public static Field RequireField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                int occurrence = default
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (occurrence == 0)
+                    {
+                        return field;
+                    }
+                    occurrence--;
+                }
+            }
+
+            throw new KeyNotFoundException($"Tag={tag}");
+
+        } // method RequireField
+
+        /// <summary>
+        /// Перечисление полей с указанной меткой.
+        /// </summary>
+        public static IEnumerable<Field> EnumerateField (this IEnumerable<Field> fields, int tag)
+        {
+            foreach (var field in fields)
+                if (field.Tag == tag)
+                    yield return field;
+
+        } // method EnumerateField
+
+        /// <summary>
+        /// Перечисление полей с указанной меткой.
+        /// </summary>
+        public static IEnumerable<Field> EnumerateField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (field.HaveSubField(code))
+                    {
+                        yield return field;
+                    }
+                }
+            }
+        } // method EnumerateField
+
+        /// <summary>
+        /// Перечисление полей с указанной меткой.
+        /// </summary>
+        public static IEnumerable<Field> EnumerateField
+            (
+                this IEnumerable<Field> fields,
+                int tag,
+                char code,
+                string value
+            )
+        {
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (field.HaveSubField(code, value))
+                    {
+                        yield return field;
+                    }
+                }
+            }
+        } // method EnumerateField
 
     } // class Utility
 
@@ -2568,7 +3957,9 @@ namespace ManagedIrbis
         /// </summary>
         public const string IrbisDelimiter = "\x001F\x001E";
 
-        // короткий разделитель строк в ИРБИС
+        /// <summary>
+        /// Короткий разделитель строк в ИРБИС.
+        /// </summary>
         public static readonly char[] ShortIrbisDelimiterBytes = { '\x1F' };
 
         /// <summary>
@@ -4759,6 +6150,9 @@ namespace ManagedIrbis
 
         } // method Clone
 
+        /// <summary>
+        /// Декодирование ответа сервера.
+        /// </summary>
         public void Decode
             (
                 Response response
@@ -4852,6 +6246,9 @@ namespace ManagedIrbis
 
         } // method Decode
 
+        /// <summary>
+        /// Кодирование записи.
+        /// </summary>
         public string Encode
             (
                 string? delimiter = Constants.IrbisDelimiter
@@ -4944,7 +6341,6 @@ namespace ManagedIrbis
             {
                 if (field.Tag == tag)
                 {
-                    // TODO: Value, если есть, всегда первое в списке подполей
                     var value = code == '*'
                         ? field.GetValueOrFirstSubField()
                         : field.GetSubFieldValue(code);
@@ -5112,7 +6508,6 @@ namespace ManagedIrbis
     /// Ответ сервера ИРБИС64.
     /// </summary>
     public sealed class Response
-        : IDisposable
     {
         #region Properties
 
@@ -5873,17 +7268,6 @@ namespace ManagedIrbis
 
         #endregion
 
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            // TODO: проверять на повторный вызов Dispose
-            // Nothing yet
-        }
-
-        #endregion
-
     } // class Response
 
     /// <summary>
@@ -5891,7 +7275,6 @@ namespace ManagedIrbis
     /// (для синхронного сценария).
     /// </summary>
     public readonly struct SyncQuery
-        : IDisposable
     {
         #region Construction
 
@@ -5940,7 +7323,7 @@ namespace ManagedIrbis
             )
         {
             var buffer = new byte[12];
-            var length = Utility.Int32ToBytes(value, buffer);
+            var length = Private.Int32ToBytes(value, buffer);
             _writer.Write(buffer, 0, length);
             NewLine();
 
@@ -6014,7 +7397,7 @@ namespace ManagedIrbis
                     }
                     else
                     {
-                        var prepared = Utility.PrepareFormat(format);
+                        var prepared = Private.PrepareFormat(format);
                         AddUtf("!" + prepared);
                     }
                 }
@@ -6083,13 +7466,6 @@ namespace ManagedIrbis
         /// Добавление одного перевода строки.
         /// </summary>
         public void NewLine() => _writer.WriteByte(10);
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => _writer.Dispose();
 
         #endregion
 
@@ -6561,7 +7937,7 @@ namespace ManagedIrbis
             }
 
             var start = _position;
-            if (!Utility.Contains(openChars, PeekChar()))
+            if (!Private.Contains(openChars, PeekChar()))
             {
                 return ReadOnlySpan<char>.Empty;
             }
@@ -6575,7 +7951,7 @@ namespace ManagedIrbis
                     _position = start;
                     return ReadOnlySpan<char>.Empty;
                 }
-                if (Utility.Contains(closeChars, c))
+                if (Private.Contains(closeChars, c))
                 {
                     break;
                 }
@@ -6929,20 +8305,20 @@ namespace ManagedIrbis
                     return ReadOnlySpan<char>.Empty;
                 }
 
-                if (Utility.Contains(openChars, c))
+                if (Private.Contains(openChars, c))
                 {
                     level++;
                 }
-                else if (Utility.Contains(closeChars, c))
+                else if (Private.Contains(closeChars, c))
                 {
                     if (level == 0
-                        && Utility.Contains(stopChars, c))
+                        && Private.Contains(stopChars, c))
                     {
                         break;
                     }
                     level--;
                 }
-                else if (Utility.Contains(stopChars, c))
+                else if (Private.Contains(stopChars, c))
                 {
                     if (level == 0)
                     {
@@ -7742,7 +9118,7 @@ namespace ManagedIrbis
 
             if (!ReferenceEquals(Content, null))
             {
-                result = result + "&" + Utility.WindowsToIrbis(Content);
+                result = result + "&" + Private.WindowsToIrbis(Content);
             }
 
             return result;
@@ -8079,7 +9455,7 @@ namespace ManagedIrbis
                     return defaultValue;
                 }
 
-                var result = Utility.ConvertTo<T>(value);
+                var result = Private.ConvertTo<T>(value);
 
                 return result;
             }
@@ -8619,7 +9995,7 @@ namespace ManagedIrbis
                 Encoding encoding
             )
         {
-            using var reader = Utility.OpenRead (fileName, encoding);
+            using var reader = Private.OpenRead (fileName, encoding);
             Read(reader);
         }
 
@@ -8717,7 +10093,7 @@ namespace ManagedIrbis
         {
             var encoding = Encoding ?? Encoding.Default;
 
-            using var writer = Utility.Create
+            using var writer = Private.CreateTextFile
                 (
                     fileName,
                     encoding
@@ -9344,7 +10720,7 @@ namespace ManagedIrbis
                 Encoding encoding
             )
         {
-            using var reader = Utility.OpenRead
+            using var reader = Private.OpenRead
                 (
                     fileName,
                     encoding
@@ -9822,7 +11198,7 @@ namespace ManagedIrbis
                 MenuFile clientIni
             )
         {
-            using var reader = Utility.OpenRead(fileName, Utility.Ansi);
+            using var reader = Private.OpenRead(fileName, Utility.Ansi);
 
             return ParseStream(reader, clientIni);
 
@@ -10727,7 +12103,7 @@ namespace ManagedIrbis
                 var parts = line.Split(Constants.NumberSign, 2);
                 var item = new FoundItem
                 {
-                    Mfn = Utility.ParseInt32(parts[0]),
+                    Mfn = Private.ParseInt32(parts[0]),
                     Text = parts.Length == 2 ? parts[1] : string.Empty
                 };
                 result.Add(item);
@@ -10813,9 +12189,11 @@ namespace ManagedIrbis
 
         #region Object members
 
+        /// <inheritdoc cref="object.Equals(object)"/>
         public override bool Equals(object? obj) =>
             ReferenceEquals(this, obj) || obj is FoundItem other && Equals(other);
 
+        /// <inheritdoc cref="object.GetHashCode"/>
         public override int GetHashCode() =>
             unchecked(((Text != null ? Text.GetHashCode() : 0) * 397) ^ Mfn);
 
@@ -11711,11 +13089,7 @@ namespace ManagedIrbis
             Protocol ??= Array.Empty<GblProtocolLine>();
             var otherLines
                 = intermediateResult.Protocol ?? Array.Empty<GblProtocolLine>();
-            Protocol = Utility.Merge
-                (
-                    Protocol,
-                    otherLines
-                );
+            Protocol = Private.Merge (Protocol, otherLines);
         } // method MergeResult
 
         /// <summary>
@@ -12794,31 +14168,72 @@ namespace ManagedIrbis
     /// Синхронное подключение к серверу ИРБИС64.
     /// </summary>
     public class SyncConnection
+        : IDisposable
     {
         #region Properties
 
+        /// <summary>
+        /// Адрес или имя хоста сервера ИРБИС64.
+        /// </summary>
+        /// <remarks>Значение по умолчанию "127.0.0.1".</remarks>
         public string? Host { get; set; } = "127.0.0.1";
 
+        /// <summary>
+        /// Номер порта, на котором сервер ИРБИС64 принимает клиентские подключения.
+        /// </summary>
+        /// <remarks>Значение по умолчанию 6666.</remarks>
         public ushort Port { get; set; } = 6666;
 
+        /// <summary>
+        /// Имя (логин) пользователя системы ИРБИС64.
+        /// </summary>
+        /// <remarks>Значение по умолчанию <c>null</c>,
+        /// с таким значением подключение не может быть установлено.</remarks>
         public string? Username { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Пароль пользователя системы ИРБИС64.
+        /// </summary>
+        /// <remarks>Значение по умолчанию <c>null</c>,
+        /// с таким значением подключение не может быть установлено.</remarks>
         public string? Password { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Имя базы данных.
+        /// </summary>
+        /// <remarks>Значение по умолчанию <c>"IBIS"</c>.
+        /// </remarks>
         public string? Database { get; set; } = "IBIS";
 
+        /// <summary>
+        /// Код типа приложения.
+        /// </summary>
+        /// <remarks>Значение по умолчанию <c>null</c>.
+        /// </remarks>
         public string? Workstation { get; set; } = "C";
 
+        /// <summary>
+        /// Уникальный идентификатор клиента.
+        /// </summary>
         public int ClientId { get; protected internal set; }
 
+        /// <summary>
+        /// Порядковый номер команды.
+        /// </summary>
         public int QueryId
         {
             get => _queryId; // переменная нужна для Interlocked.Increment
             protected internal set => _queryId = value;
         }
 
+        /// <summary>
+        /// Признак активного подключения к серверу.
+        /// </summary>
         public bool Connected { get; protected internal set; }
 
+        /// <summary>
+        /// Код ошибки, установленный последней командой.
+        /// </summary>
         public int LastError { get; protected internal set; }
 
         /// <summary>
@@ -12901,7 +14316,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            using var query = new SyncQuery(this, command);
+            var query = new SyncQuery(this, command);
             foreach (var arg in args)
             {
                 query.AddAnsi(arg.ToString());
@@ -12928,7 +14343,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            using var query = new SyncQuery(this, command);
+            var query = new SyncQuery(this, command);
             var result = ExecuteSync(query);
 
             return result;
@@ -12952,7 +14367,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            using var query = new SyncQuery(this, command);
+            var query = new SyncQuery(this, command);
             query.AddAnsi(arg1.ToString());
 
             var result = ExecuteSync(query);
@@ -12961,6 +14376,9 @@ namespace ManagedIrbis
 
         } // method ExecuteSync
 
+        /// <summary>
+        /// Выполнение обмена с сервером.
+        /// </summary>
         public Response? TransactSync
             (
                 SyncQuery query
@@ -12982,7 +14400,7 @@ namespace ManagedIrbis
             var socket = client.Client;
             var length = query.GetLength();
             var prefix = new byte[12];
-            length = Utility.Int32ToBytes(length, prefix);
+            length = Private.Int32ToBytes(length, prefix);
             prefix[length] = 10; // перевод строки
             var body = query.GetBody();
 
@@ -13078,10 +14496,10 @@ namespace ManagedIrbis
                 return null;
             }
 
-            using var query = new SyncQuery(this, Constants.DatabaseStat);
+            var query = new SyncQuery(this, Constants.DatabaseStat);
             definition.Encode(this, query);
 
-            using var response = ExecuteSync(query);
+            var response = ExecuteSync(query);
             if (!response.IsGood())
             {
                 return null;
@@ -13123,6 +14541,13 @@ namespace ManagedIrbis
         #region ISyncProvider members
 
         /// <summary>
+        /// Актуализация всех неактуализированных записей
+        /// в указанной базе данных.
+        /// </summary>
+        public bool ActualizeDatabase (string? database = default) =>
+            ActualizeRecord ( new() { Database = database, Mfn = 0 } );
+
+        /// <summary>
         /// Актуализация записи.
         /// </summary>
         public bool ActualizeRecord (ActualizeRecordParameters parameters) => ExecuteSync
@@ -13148,48 +14573,36 @@ namespace ManagedIrbis
             ClientId = new Random().Next(100000, 999999);
 
             // нельзя использовать using response из-за goto
-            Response? response;
-            using (var query = new SyncQuery(this, Constants.RegisterClient))
-            {
-                query.AddAnsi(Username);
-                query.AddAnsi(Password);
+            var query = new SyncQuery(this, Constants.RegisterClient);
+            query.AddAnsi(Username);
+            query.AddAnsi(Password);
 
-                response = ExecuteSync(query);
-                if (response is null)
-                {
-                    LastError = -100_500;
-                    return false;
-                }
+            var response = ExecuteSync(query);
+            if (response is null)
+            {
+                LastError = -100_500;
+                return false;
             }
 
             if (response.GetReturnCode() == -3337)
             {
-                response.Dispose();
                 goto AGAIN;
             }
 
             if (response.ReturnCode < 0)
             {
                 LastError = response.ReturnCode;
-                response.Dispose();
                 return false;
             }
 
-            try
-            {
-                ServerVersion = response.ServerVersion;
-                Interval = response.ReadInteger();
+            ServerVersion = response.ServerVersion;
+            Interval = response.ReadInteger();
 
-                IniFile = new IniFile();
-                var remainingText = response.RemainingText(Utility.Ansi);
-                var reader = new StringReader(remainingText);
-                IniFile.Read(reader);
-                Connected = true;
-            }
-            finally
-            {
-                response.Dispose();
-            }
+            IniFile = new IniFile();
+            var remainingText = response.RemainingText(Utility.Ansi);
+            var reader = new StringReader(remainingText);
+            IniFile.Read(reader);
+            Connected = true;
 
             return true;
 
@@ -13208,31 +14621,65 @@ namespace ManagedIrbis
                 return false;
             }
 
-            using var query = new SyncQuery(this, Constants.CreateDatabase);
+            var query = new SyncQuery(this, Constants.CreateDatabase);
             query.AddAnsi(EnsureDatabase(parameters.Database));
             query.AddAnsi(parameters.Description);
             query.Add(parameters.ReaderAccess);
-            using var response = ExecuteSync(query);
+            var response = ExecuteSync(query);
 
             return response.IsGood();
 
         } // method CreateDatabase
 
+        /// <summary>
+        /// Создание словаря в указанной базе данных.
+        /// </summary>
         public bool CreateDictionary (string? databaseName = default) =>
             ExecuteSync(Constants.CreateDictionary,
                 EnsureDatabase(databaseName)).IsGood();
 
+        /// <summary>
+        /// Удаление базы данных на сервере.
+        /// </summary>
         public bool DeleteDatabase (string? databaseName = default) =>
             ExecuteSync(Constants.DeleteDatabase,
                 EnsureDatabase(databaseName)).IsGood();
 
+        /// <summary>
+        /// Удаление записи с указанным MFN.
+        /// </summary>
+        public bool DeleteRecord
+            (
+                int mfn
+            )
+        {
+            var record = ReadRecord(mfn);
+            if (record is null)
+            {
+                return false;
+            }
+
+            if (record.Deleted)
+            {
+                return true;
+            }
+
+            record.Status |= RecordStatus.LogicallyDeleted;
+
+            return WriteRecord(record, dontParse: true);
+
+        } // method DeleteRecord
+
+        /// <summary>
+        /// Отключение от сервера.
+        /// </summary>
         public bool Disconnect()
         {
             if (Connected)
             {
                 try
                 {
-                    using var _ = ExecuteSync(Constants.UnregisterClient);
+                    var _ = ExecuteSync(Constants.UnregisterClient);
                 }
                 catch (Exception)
                 {
@@ -13246,6 +14693,9 @@ namespace ManagedIrbis
 
         } // method Disconnect
 
+        /// <summary>
+        /// Файл существует?
+        /// </summary>
         public bool FileExist(FileSpecification specification) =>
             !string.IsNullOrEmpty(ReadTextFile(specification));
 
@@ -13263,7 +14713,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            using var query = new SyncQuery(this, Constants.FormatRecord);
+            var query = new SyncQuery(this, Constants.FormatRecord);
             query.AddAnsi(Database);
             query.AddFormat(format);
             query.Add(1);
@@ -13280,6 +14730,9 @@ namespace ManagedIrbis
 
         } // method FormatRecord
 
+        /// <summary>
+        /// Форматирование записи.
+        /// </summary>
         public bool FormatRecords
             (
                 FormatRecordParameters parameters
@@ -13298,7 +14751,7 @@ namespace ManagedIrbis
                 return true;
             }
 
-            using var query = new SyncQuery(this, Constants.FormatRecord);
+            var query = new SyncQuery(this, Constants.FormatRecord);
             query.AddAnsi(EnsureDatabase(parameters.Database));
             query.AddFormat(parameters.Format);
             query.Add(parameters.Mfns!.Length);
@@ -13307,8 +14760,8 @@ namespace ManagedIrbis
                 query.Add(mfn);
             }
 
-            using var response = ExecuteSync(query);
-            if (!response.IsGood(false))
+            var response = ExecuteSync(query);
+            if (!response.IsGood())
             {
                 return false;
             }
@@ -13343,6 +14796,42 @@ namespace ManagedIrbis
         } // method FormatRecords
 
         /// <summary>
+        /// Форматирование записи в клиентском представлении.
+        /// </summary>
+        public string? FormatRecord
+            (
+                string format,
+                Record record
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(format))
+            {
+                return string.Empty;
+            }
+
+            var query = new SyncQuery(this, Constants.FormatRecord);
+            query.AddAnsi(EnsureDatabase(string.Empty));
+            query.AddFormat(format);
+            query.Add(-2);
+            query.AddUtf(record.Encode());
+            var response = ExecuteSync(query);
+            if (!response.IsGood())
+            {
+                return null;
+            }
+
+            var result = response!.ReadRemainingUtfText().TrimEnd();
+
+            return result;
+
+        } // method FormatRecord
+
+        /// <summary>
         /// Форматирование записей по их MFN.
         /// </summary>
         public string[]? FormatRecords
@@ -13364,6 +14853,9 @@ namespace ManagedIrbis
 
         } // method FormatRecords
 
+        /// <summary>
+        /// Полнотекстовый поиск.
+        /// </summary>
         public FullTextResult? FullTextSearch
             (
                 SearchParameters searchParameters,
@@ -13375,11 +14867,11 @@ namespace ManagedIrbis
                 return null;
             }
 
-            using var query = new SyncQuery(this, Constants.NewFulltextSearch);
+            var query = new SyncQuery(this, Constants.NewFulltextSearch);
             searchParameters.Encode(this, query);
             textParameters.Encode(this, query);
-            using var response = ExecuteSync(query);
-            if (!response.IsGood(false))
+            var response = ExecuteSync(query);
+            if (!response.IsGood())
             {
                 return null;
             }
@@ -13391,34 +14883,42 @@ namespace ManagedIrbis
 
         } // method FullTextSearch
 
+        /// <summary>
+        /// Получение информации о базе данных.
+        /// </summary>
         public DatabaseInfo? GetDatabaseInfo(string? databaseName = default) =>
             ExecuteSync(Constants.RecordList, EnsureDatabase(databaseName))
-                .Transform
-                    (
-                        resp => DatabaseInfo.Parse
-                            (
-                                EnsureDatabase(databaseName),
-                                resp
-                            )
-                    );
+                .Transform (resp => DatabaseInfo.Parse (EnsureDatabase(databaseName), resp));
 
+        /// <summary>
+        /// Получение максимального MFN для указанной базы данных.
+        /// </summary>
         public int GetMaxMfn
             (
                 string? databaseName = default
             )
         {
-            using var response = ExecuteSync(Constants.GetMaxMfn, EnsureDatabase(databaseName));
+            var response = ExecuteSync(Constants.GetMaxMfn, EnsureDatabase(databaseName));
 
             return response.IsGood() ? response!.ReturnCode : 0;
 
         } // method GetMaxMfn
 
+        /// <summary>
+        /// Получение статистики работы сервера ИРБИС64.
+        /// </summary>
         public ServerStat? GetServerStat() =>
             ExecuteSync(Constants.GetServerStat).Transform(ServerStat.Parse);
 
+        /// <summary>
+        /// Получение информации о версии сервера.
+        /// </summary>
         public ServerVersion? GetServerVersion() =>
             ExecuteSync(Constants.ServerInfo).Transform(ManagedIrbis.ServerVersion.Parse);
 
+        /// <summary>
+        /// Глобальная корректировка.
+        /// </summary>
         public GblResult? GlobalCorrection
             (
                 GblSettings settings
@@ -13430,11 +14930,11 @@ namespace ManagedIrbis
             }
 
             var database = EnsureDatabase(settings.Database);
-            using var query = new SyncQuery(this, Constants.GlobalCorrection);
+            var query = new SyncQuery(this, Constants.GlobalCorrection);
             query.AddAnsi(database);
             settings.Encode(query);
 
-            using var response = ExecuteSync(query);
+            var response = ExecuteSync(query);
             if (!response.IsGood())
             {
                 return null;
@@ -13446,6 +14946,25 @@ namespace ManagedIrbis
             return result;
 
         } // method GlobalCorrection
+
+        /// <summary>
+        /// Получение списка баз данных.
+        /// </summary>
+        public DatabaseInfo[] ListDatabases
+            (
+                string listFile = "dbnam3.mnu"
+            )
+        {
+            var specification = new FileSpecification
+            {
+                Path = IrbisPath.Data,
+                FileName = listFile
+            };
+            var menu = RequireMenuFile(specification);
+
+            return DatabaseInfo.ParseMenu(menu);
+
+        } // method ListDatabases
 
         /// <summary>
         /// Получение списка файлов из ответа сервера.
@@ -13465,7 +14984,7 @@ namespace ManagedIrbis
             var delimiters = new [] { Constants.WindowsDelimiter };
             foreach (var line in lines)
             {
-                var files = Utility.SplitIrbisToLines(line);
+                var files = Private.SplitIrbisToLines(line);
                 foreach (var file1 in files)
                 {
                     if (!string.IsNullOrEmpty(file1))
@@ -13485,6 +15004,9 @@ namespace ManagedIrbis
 
         } // method ListFiles
 
+        /// <summary>
+        /// Получение списка файлов.
+        /// </summary>
         public string[]? ListFiles
             (
                 params FileSpecification[] specifications
@@ -13500,45 +15022,102 @@ namespace ManagedIrbis
                 return Array.Empty<string>();
             }
 
-            using var query = new SyncQuery(this, Constants.ListFiles);
+            var query = new SyncQuery(this, Constants.ListFiles);
             foreach (var specification in specifications)
             {
                 query.AddAnsi(specification.ToString());
             }
 
-            using var response = ExecuteSync(query);
+            var response = ExecuteSync(query);
 
             return ListFiles(response);
 
         } // method ListFiles
 
+        /// <summary>
+        /// Получение списка файлов, соответствующих спецификации.
+        /// </summary>
+        public string[]? ListFiles
+            (
+                string specification
+            )
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(specification))
+            {
+                return Array.Empty<string>();
+            }
+
+            var response = ExecuteSync(Constants.ListFiles, specification);
+
+            return ListFiles(response);
+
+        } // method ListFiles
+
+        /// <summary>
+        /// Список серверных процессов.
+        /// </summary>
         public ProcessInfo[]? ListProcesses() =>
             ExecuteSync(Constants.GetProcessList).Transform(ProcessInfo.Parse);
 
+        /// <summary>
+        /// Список пользователей, зарегистрированных в системе.
+        /// </summary>
         public UserInfo[]? ListUsers() =>
             ExecuteSync(Constants.GetUserList).Transform(UserInfo.Parse);
 
+        /// <summary>
+        /// Блокирование указанной записи.
+        /// </summary>
+        public bool LockRecord
+            (
+                int mfn
+            )
+        {
+            var parameters = new ReadRecordParameters
+            {
+                Mfn = mfn,
+                Lock = true
+            };
+
+            return ReadRecord (parameters) is not null;
+
+        } // method LockRecord
+
+        /// <summary>
+        /// Пустая операция - подтверждение регистрации.
+        /// </summary>
         public bool NoOperation() => ExecuteSync(Constants.Nop).IsGood();
 
+        /// <summary>
+        /// Построение таблицы.
+        /// </summary>
         public string? PrintTable (TableDefinition definition)
         {
-            using var query = new SyncQuery(this, Constants.Print);
+            var query = new SyncQuery(this, Constants.Print);
             query.AddAnsi(EnsureDatabase(definition.DatabaseName));
             definition.Encode(query);
 
-            using var response = ExecuteSync(query);
+            var response = ExecuteSync(query);
 
             return response?.ReadRemainingUtfText();
 
         } // method PrintTable
 
+        /// <summary>
+        /// Чтение двоичного файла с сервера.
+        /// </summary>
         public byte[]? ReadBinaryFile
             (
                 FileSpecification specification
             )
         {
             specification.BinaryFile = true;
-            using var response = ExecuteSync(Constants.ReadDocument, specification.ToString());
+            var response = ExecuteSync(Constants.ReadDocument, specification.ToString());
             if (response is null || !response.FindPreamble())
             {
                 return null;
@@ -13548,16 +15127,60 @@ namespace ManagedIrbis
 
         } // method ReadBinaryFile
 
+        /// <summary>
+        /// Чтение INI-файла как текстового.
+        /// </summary>
+        public IniFile? ReadIniFile (FileSpecification specification)
+        {
+            var content = ReadTextFile(specification);
+            if (content is null)
+            {
+                return default;
+            }
+
+            using var reader = new StringReader(content);
+            var result = new IniFile { FileName = specification.FileName };
+            result.Read(reader);
+
+            return result;
+
+        } // method ReadIniFile
+
+        /// <summary>
+        /// Чтение меню как текстового файла.
+        /// </summary>
+        public MenuFile? ReadMenuFile
+            (
+                FileSpecification specification
+            )
+        {
+            var content = ReadTextFile(specification);
+            if (content is null)
+            {
+                return default;
+            }
+
+            using var reader = new StringReader(content);
+            var result = MenuFile.ParseStream(reader);
+            result.FileName = specification.FileName;
+
+            return result;
+
+        } // method ReadMenuFile
+
+        /// <summary>
+        /// Чтение постингов термина.
+        /// </summary>
         public TermPosting[]? ReadPostings
             (
                 PostingParameters parameters
             )
         {
-            using var query = new SyncQuery(this, Constants.ReadPostings);
+            var query = new SyncQuery(this, Constants.ReadPostings);
             parameters.Encode(this, query);
 
-            using var response = ExecuteSync(query);
-            if (!response.IsGood(false, Constants.GoodCodesForReadTerms))
+            var response = ExecuteSync(query);
+            if (!response.IsGood(Constants.GoodCodesForReadTerms))
             {
                 return null;
             }
@@ -13566,6 +15189,9 @@ namespace ManagedIrbis
 
         } // method ReadPosting
 
+        /// <summary>
+        /// Чтение библиографической записи.
+        /// </summary>
         public Record? ReadRecord
             (
                 ReadRecordParameters parameters
@@ -13576,7 +15202,7 @@ namespace ManagedIrbis
             try
             {
                 var database = EnsureDatabase(parameters.Database);
-                using var query = new SyncQuery(this, Constants.ReadRecord);
+                var query = new SyncQuery(this, Constants.ReadRecord);
                 query.AddAnsi(database);
                 query.Add(parameters.Mfn);
                 if (parameters.Version != 0)
@@ -13590,8 +15216,8 @@ namespace ManagedIrbis
 
                 query.AddFormat(parameters.Format);
 
-                using var response = ExecuteSync(query);
-                if (!response.IsGood(false, Constants.GoodCodesForReadRecord))
+                var response = ExecuteSync(query);
+                if (!response.IsGood(Constants.GoodCodesForReadRecord))
                 {
                     return null;
                 }
@@ -13635,6 +15261,27 @@ namespace ManagedIrbis
 
         } // method ReadRecord
 
+        /// <summary>
+        /// Чтение библиографической записи.
+        /// </summary>
+        public Record? ReadRecord
+            (
+                int mfn
+            )
+        {
+            var parameters = new ReadRecordParameters
+            {
+                Database = Database,
+                Mfn = mfn
+            };
+
+            return ReadRecord(parameters);
+
+        } // method ReadRecord
+
+        /// <summary>
+        /// Чтение постингов, относящихся к указанной записи.
+        /// </summary>
         public TermPosting[]? ReadRecordPostings
             (
                 ReadRecordParameters parameters,
@@ -13646,7 +15293,7 @@ namespace ManagedIrbis
                 return null;
             }
 
-            using var query = new SyncQuery(this, Constants.GetRecordPostings);
+            var query = new SyncQuery(this, Constants.GetRecordPostings);
             query.AddAnsi(EnsureDatabase(parameters.Database));
             query.Add(parameters.Mfn);
             query.AddUtf(prefix);
@@ -13655,6 +15302,9 @@ namespace ManagedIrbis
 
         } // method ReadRecordPostings
 
+        /// <summary>
+        /// Чтение терминов поискового словаря.
+        /// </summary>
         public Term[]? ReadTerms
             (
                 TermParameters parameters
@@ -13668,60 +15318,260 @@ namespace ManagedIrbis
             var command = parameters.ReverseOrder
                 ? Constants.ReadTermsReverse
                 : Constants.ReadTerms;
-            using var query = new SyncQuery(this, command);
+            var query = new SyncQuery(this, command);
             parameters.Encode(this, query);
-            using var response = ExecuteSync(query);
+            var response = ExecuteSync(query);
 
-            return !response.IsGood(false, Constants.GoodCodesForReadTerms) ? null : Term.Parse(response!);
+            return !response.IsGood(Constants.GoodCodesForReadTerms) ? null : Term.Parse(response!);
 
         } // method ReadTerms
 
+        /// <summary>
+        /// Чтение терминов словаря.
+        /// </summary>
+        /// <param name="startTerm">Параметры терминов.</param>
+        /// <param name="numberOfTerms">Максимальное число терминов.</param>
+        /// <returns>Массив прочитанных терминов.</returns>
+        public Term[]? ReadTerms
+            (
+                string startTerm,
+                int numberOfTerms
+            )
+        {
+            var parameters = new TermParameters
+            {
+                Database = EnsureDatabase(),
+                StartTerm = startTerm,
+                NumberOfTerms = numberOfTerms
+            };
+
+            return ReadTerms(parameters);
+
+        } // method ReadTerms
+
+        /// <summary>
+        /// Чтение текстового файла с сервера.
+        /// </summary>
         public string? ReadTextFile (FileSpecification specification) =>
             ExecuteSync(Constants.ReadDocument, specification.ToString())
-                .TransformNoCheck
-                    (
-                        resp => Utility.IrbisToWindows(resp.ReadAnsi())
-                    );
+                .TransformNoCheck (resp => Private.IrbisToWindows(resp.ReadAnsi()));
 
-        public bool ReloadDictionary(string? databaseName = default) =>
+        /// <summary>
+        /// Чтение несколькних текстовых файлов с сервера.
+        /// </summary>
+        public string[]? ReadTextFiles (FileSpecification[] specifications)
+        {
+            var query = new SyncQuery(this, Constants.ReadDocument);
+            foreach (var specification in specifications)
+            {
+                query.AddAnsi(specification.ToString());
+            }
+
+            var response = ExecuteSync(query);
+
+            return response.IsGood() ? response!.ReadRemainingAnsiLines() : null;
+
+        } // method ReadTextFiles
+
+        /// <summary>
+        /// Перезагрузка словаря для указанной базы данных.
+        /// </summary>
+        public bool ReloadDictionary (string? databaseName = default) =>
             ExecuteSync(Constants.ReloadDictionary, EnsureDatabase(databaseName)).IsGood();
 
+        /// <summary>
+        /// Перезагрузка файла документов в указанной базе данных.
+        /// </summary>
         public bool ReloadMasterFile (string? databaseName = default) =>
             ExecuteSync(Constants.ReloadMasterFile,
                 databaseName ?? Database.ThrowIfNull(nameof(Database))).IsGood();
 
+        /// <summary>
+        /// Чтение с сервера записи, которая обязательно должна быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
+        public Record RequireRecord (int mfn) => ReadRecord(mfn)
+            ?? throw new IrbisException($"Record not found: MFN={mfn}");
+
+        /// <summary>
+        /// Чтение с сервера записи, которая обязательно должна быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Запись отсутствует или другая ошибка при чтении.</exception>
+        public Record RequireRecord (string expression) => SearchReadOneRecord(expression)
+            ?? throw new IrbisException($"Record not found: expression={expression}");
+
+        /// <summary>
+        /// Чтение с сервера текстового файла, который обязательно должен быть.
+        /// </summary>
+        /// <exception cref="FileNotFoundException">Файл отсутствует или другая ошибка при чтении.</exception>
+        public string RequireTextFile (FileSpecification specification) => ReadTextFile(specification)
+            ?? throw new IrbisException($"File not found: {specification}");
+
+        /// <summary>
+        /// Чтение с сервера INI-файла, который обязательно должен быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
+        public IniFile RequireIniFile (FileSpecification specification) => ReadIniFile(specification)
+            ?? throw new IrbisException($"INI not found: {specification}");
+
+        /// <summary>
+        /// Чтение с сервера файла меню, которое обязательно должно быть.
+        /// </summary>
+        /// <exception cref="IrbisException">Файл отсутствует или другая ошибка при чтении.</exception>
+        public MenuFile RequireMenuFile (FileSpecification specification) => ReadMenuFile(specification)
+            ?? throw new IrbisException($"Menu not found: {specification}");
+
+        /// <summary>
+        /// Перезапуск сервера.
+        /// </summary>
         public bool RestartServer() => ExecuteSync(Constants.RestartServer).IsGood();
 
-        public FoundItem[]? Search
-            (
-                SearchParameters parameters
-            )
+        /// <summary>
+        /// Поиск записей.
+        /// </summary>
+        public FoundItem[]? Search (SearchParameters parameters)
         {
             if (!CheckProviderState())
             {
                 return null;
             }
 
-            using var query = new SyncQuery(this, Constants.Search);
+            var query = new SyncQuery(this, Constants.Search);
             parameters.Encode(this, query);
 
             return ExecuteSync(query).Transform(FoundItem.Parse);
 
         } // method Search
 
+        /// <summary>
+        /// Упрощенный поиск.
+        /// </summary>
+        /// <param name="expression">Выражение для поиска по словарю.</param>
+        /// <returns>Массив MFN найденных записей.</returns>
+        public int[] Search (string expression)
+        {
+            if (!CheckProviderState())
+            {
+                return Array.Empty<int>();
+            }
+
+            var query = new SyncQuery(this, Constants.Search);
+            var parameters = new SearchParameters
+            {
+                Database = Database,
+                Expression = expression
+            };
+            parameters.Encode(this, query);
+            var response = ExecuteSync(query);
+            if (!response.IsGood())
+            {
+                return Array.Empty<int>();
+            }
+
+            return FoundItem.ParseMfn(response!);
+
+        } // method Search
+
+        /// <summary>
+        /// Определение количества записей, удовлетворяющих
+        /// заданному запросу.
+        /// </summary>
+        /// <param name="expression">Выражение для поиска по словарю.</param>
+        /// <returns>Количество найденных записей либо -1, если произошла ошибка.</returns>
+        public int SearchCount (string expression)
+        {
+            if (!CheckProviderState())
+            {
+                return -1;
+            }
+
+            var query = new SyncQuery(this, Constants.Search);
+            var parameters = new SearchParameters
+            {
+                Database = Database,
+                Expression = expression,
+                FirstRecord = 0
+            };
+            parameters.Encode(this, query);
+            var response = ExecuteSync(query);
+            if (response is null
+                || !response.CheckReturnCode())
+            {
+                return -1;
+            }
+
+            return response.ReadInteger();
+
+        } // method SearchCount
+
+        /// <summary>
+        /// Поиск с последующим чтением записей.
+        /// </summary>
+        public Record[]? SearchRead (string expression)
+        {
+            if (!CheckProviderState())
+            {
+                return null;
+            }
+
+            var found = Search(expression);
+            var result = new List<Record>(found.Length);
+            foreach (var mfn in found)
+            {
+                var record = ReadRecord(mfn);
+                if (record is not null)
+                {
+                    result.Add(record);
+                }
+            }
+
+            return result.ToArray();
+
+        } // method SearchRead
+
+        /// <summary>
+        /// Поиск с последующим чтением одной записи.
+        /// </summary>
+        public Record? SearchReadOneRecord
+            (
+                string expression
+            )
+        {
+            var parameters = new SearchParameters
+            {
+                Expression = expression,
+                NumberOfRecords = 1
+            };
+            var found = Search(parameters);
+
+            return found is { Length: 1 }
+                ? ReadRecord(found[0].Mfn)
+                : default;
+
+        } // method SearchReadOneRecord
+
+        /// <summary>
+        /// Очистка базы данных (до нулевой длины).
+        /// </summary>
         public bool TruncateDatabase (string? databaseName = default) =>
             ExecuteSync(Constants.EmptyDatabase, EnsureDatabase(databaseName)).IsGood();
 
+        /// <summary>
+        /// Разблокирование базы данных.
+        /// </summary>
         public bool UnlockDatabase (string? databaseName = default) =>
             ExecuteSync(Constants.UnlockDatabase, EnsureDatabase(databaseName)).IsGood();
 
+        /// <summary>
+        /// Разблокирование записей.
+        /// </summary>
         public bool UnlockRecords
             (
                 IEnumerable<int> mfnList,
                 string? databaseName = default
             )
         {
-            using var query = new SyncQuery(this, Constants.UnlockRecords);
+            var query = new SyncQuery(this, Constants.UnlockRecords);
             query.AddAnsi(EnsureDatabase(databaseName));
             var counter = 0;
             foreach (var mfn in mfnList)
@@ -13740,12 +15590,12 @@ namespace ManagedIrbis
 
         } // method UnlockRecords
 
-        public bool UpdateIniFile
-            (
-                IEnumerable<string> lines
-            )
+        /// <summary>
+        /// Обновление сервеного INI-файла.
+        /// </summary>
+        public bool UpdateIniFile (IEnumerable<string> lines)
         {
-            using var query = new SyncQuery(this, Constants.UpdateIniFile);
+            var query = new SyncQuery(this, Constants.UpdateIniFile);
             var counter = 0;
             foreach (var line in lines)
             {
@@ -13766,17 +15616,17 @@ namespace ManagedIrbis
 
         } // method UpdateIniFile
 
-        public bool UpdateUserList
-            (
-                IEnumerable<UserInfo> users
-            )
+        /// <summary>
+        /// Обновление списка зарегистрированных в системе пользователей.
+        /// </summary>
+        public bool UpdateUserList (IEnumerable<UserInfo> users)
         {
             if (!CheckProviderState())
             {
                 return false;
             }
 
-            using var query = new SyncQuery(this, Constants.SetUserList);
+            var query = new SyncQuery(this, Constants.SetUserList);
             var counter = 0;
             foreach (var user in users)
             {
@@ -13794,6 +15644,9 @@ namespace ManagedIrbis
 
         } // method UpdateUserList
 
+        /// <summary>
+        /// Сохранение записи на сервере.
+        /// </summary>
         public bool WriteRecord
             (
                 WriteRecordParameters parameters
@@ -13803,13 +15656,13 @@ namespace ManagedIrbis
             if (record is not null)
             {
                 var database = EnsureDatabase(record.Database);
-                using var query = new SyncQuery(this, Constants.UpdateRecord);
+                var query = new SyncQuery(this, Constants.UpdateRecord);
                 query.AddAnsi(database);
                 query.Add(parameters.Lock);
                 query.Add(parameters.Actualize);
                 query.AddUtf(record.Encode());
 
-                using var response = ExecuteSync(query);
+                var response = ExecuteSync(query);
                 if (!response.IsGood())
                 {
                     return false;
@@ -13856,6 +15709,29 @@ namespace ManagedIrbis
         } // method WriteRecord
 
         /// <summary>
+        /// Сохранение/обновление записи в базе данных.
+        /// </summary>
+        public bool WriteRecord
+            (
+                Record record,
+                bool actualize = true,
+                bool lockRecord = false,
+                bool dontParse = false
+            )
+        {
+            var parameters = new WriteRecordParameters
+            {
+                Record = record,
+                Actualize = actualize,
+                Lock = lockRecord,
+                DontParse = dontParse
+            };
+
+            return WriteRecord(parameters);
+
+        } // method WriteRecord
+
+        /// <summary>
         /// Сохранение записей на сервере.
         /// </summary>
         public bool WriteRecords
@@ -13879,7 +15755,7 @@ namespace ManagedIrbis
             {
                 var line = EnsureDatabase(record.Database)
                            + Constants.IrbisDelimiter
-                           + Utility.EncodeRecord(record);
+                           + Private.EncodeRecord(record);
                 query.AddUtf(line);
                 recordList.Add(record);
             }
@@ -13899,7 +15775,7 @@ namespace ManagedIrbis
             {
                 foreach (var record in recordList)
                 {
-                    Utility.ParseResponseForWriteRecords(response!, record);
+                    Private.ParseResponseForWriteRecords(response!, record);
                 }
             }
 
@@ -13907,6 +15783,9 @@ namespace ManagedIrbis
 
         } // method WriteRecords
 
+        /// <summary>
+        /// Сохранение на сервере текстового файла.
+        /// </summary>
         public bool WriteTextFile(FileSpecification specification) =>
             ExecuteSync(Constants.ReadDocument, specification.ToString()).IsGood();
 

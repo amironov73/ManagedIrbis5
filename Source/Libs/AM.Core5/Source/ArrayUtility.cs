@@ -248,7 +248,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method GetOccurrence
 
         /// <summary>
         /// Выборка элемента из массива.

@@ -201,7 +201,6 @@ namespace ManagedIrbis
                         .ToArray();
             }
 
-
             // TODO: implement
 
             return Array.Empty<Record>();
@@ -285,27 +284,6 @@ namespace ManagedIrbis
             }
 
             return FoundItem.ParseMfn(response);
-
-        } // method Search
-
-        /// <summary>
-        /// Упрощенный поиск.
-        /// </summary>
-        public static int[] Search
-            (
-                this ISyncProvider connection,
-                string expression
-            )
-        {
-            var parameters = new SearchParameters
-            {
-                Database = connection.Database,
-                Expression = expression
-            };
-            var lines = connection.Search(parameters);
-            var result = FoundItem.ToMfn(lines);
-
-            return result;
 
         } // method Search
 

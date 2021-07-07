@@ -26,6 +26,8 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable

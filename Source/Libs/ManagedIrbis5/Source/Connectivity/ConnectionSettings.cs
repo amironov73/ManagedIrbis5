@@ -74,7 +74,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Адрес или имя хоста сервера ИРБИС64.
         /// </summary>
-        /// <remarks>Default value is "127.0.0.1".</remarks>
+        /// <remarks>Значение по умолчанию "127.0.0.1".</remarks>
         [XmlAttribute("host")]
         [JsonPropertyName("host")]
         public string? Host { get; set; } = DefaultHost;
@@ -82,7 +82,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Номер порта, на котором сервер ИРБИС64 принимает клиентские подключения.
         /// </summary>
-        /// <remarks>Default value is 6666.</remarks>
+        /// <remarks>Значение по умолчанию 6666.</remarks>
         [XmlAttribute("port")]
         [JsonPropertyName("port")]
         public ushort Port { get; set; } = DefaultPort;
@@ -90,8 +90,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Имя (логин) пользователя системы ИРБИС64.
         /// </summary>
-        /// <remarks>Default value is <c>null</c>,
-        /// so connection can't be made.</remarks>
+        /// <remarks>Значение по умолчанию <c>null</c>,
+        /// с таким значением подключение не может быть установлено.</remarks>
         [XmlAttribute("username")]
         [JsonPropertyName("username")]
         public string? Username { get; set; } = string.Empty;
@@ -99,8 +99,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Пароль пользователя системы ИРБИС64.
         /// </summary>
-        /// <remarks>Default value is <c>null</c>,
-        /// so connection can't be made.</remarks>
+        /// <remarks>Значение по умолчанию <c>null</c>,
+        /// с таким значением подключение не может быть установлено.</remarks>
         [XmlAttribute("password")]
         [JsonPropertyName("password")]
         public string? Password { get; set; } = string.Empty;
@@ -108,18 +108,16 @@ namespace ManagedIrbis
         /// <summary>
         /// Имя базы данных.
         /// </summary>
-        /// <remarks>Default value is "IBIS".
-        /// Database with such a name can be
-        /// non-existent.
+        /// <remarks>Значение по умолчанию <c>null</c>.
         /// </remarks>
         [XmlAttribute("database")]
         [JsonPropertyName("database")]
         public string? Database { get; set; }
 
         /// <summary>
-        /// Workstation application kind.
+        /// Код типа приложения.
         /// </summary>
-        /// <remarks>Default value is "C".
+        /// <remarks>Значение по умолчанию <c>null</c>.
         /// </remarks>
         [XmlAttribute("workstation")]
         [JsonPropertyName("workstation")]

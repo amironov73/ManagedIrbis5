@@ -23,6 +23,8 @@ using System.Linq;
 
 using AM;
 
+using ManagedIrbis.Providers;
+
 #endregion
 
 #nullable enable

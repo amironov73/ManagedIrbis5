@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -15,6 +16,8 @@
 
 using AM;
 using AM.Text;
+
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -39,6 +42,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     {
         #region Public methods
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="node"></param>
+        /// <param name="expression"></param>
         public static void GetTermRecordCountDB
             (
                 PftContext context,

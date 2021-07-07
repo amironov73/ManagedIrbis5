@@ -465,6 +465,27 @@ namespace ManagedIrbis.Providers
             ?? throw new IrbisException($"PAR not found: {specification}");
 
         /// <summary>
+        /// Упрощенный поиск.
+        /// </summary>
+        public static int[] Search
+            (
+                this ISyncProvider connection,
+                string expression
+            )
+        {
+            var parameters = new SearchParameters
+            {
+                Database = connection.Database,
+                Expression = expression
+            };
+            var lines = connection.Search(parameters);
+            var result = FoundItem.ToMfn(lines);
+
+            return result;
+
+        } // method Search
+
+        /// <summary>
         /// Поиск с последующим чтением одной записи.
         /// </summary>
         public static Record? SearchReadOneRecord

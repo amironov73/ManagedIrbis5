@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable ReplaceSliceWithRangeIndexer
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
@@ -844,6 +845,7 @@ namespace ManagedIrbis
             }
 
             return null;
+
         } // method GetFirstField
 
         /// <summary>
@@ -866,6 +868,7 @@ namespace ManagedIrbis
             }
 
             return null;
+
         } // method GetFirstField
 
         /// <summary>
@@ -889,6 +892,7 @@ namespace ManagedIrbis
             }
 
             return null;
+
         } // method GetFirstField
 
         /// <summary>
@@ -910,31 +914,6 @@ namespace ManagedIrbis
 
             return null;
         }
-
-        // ==========================================================
-
-        ///// <summary>
-        ///// Значение первого поля с указанным тегом или <c>null</c>.
-        ///// </summary>
-        //[CanBeNull]
-        //public static string GetFirstFieldValue
-        //    (
-        //        this IEnumerable<RecordField> fields,
-        //        int tag
-        //    )
-        //{
-        //    Code.NotNull(fields, "fields");
-
-        //    foreach (RecordField field in fields)
-        //    {
-        //        if (field.Tag == tag)
-        //        {
-        //            return field.Value;
-        //        }
-        //    }
-
-        //    return null;
-        //}
 
         // ==========================================================
 
@@ -975,7 +954,7 @@ namespace ManagedIrbis
             {
                 if (field.Tag == tag)
                 {
-                    SubFieldCollection subFields = field.Subfields;
+                    var subFields = field.Subfields;
                     var count = subFields.Count;
                     for (var i = 0; i < count; i++)
                     {
@@ -1109,7 +1088,7 @@ namespace ManagedIrbis
             List<SubField>? result = null;
             foreach (var field in fields)
             {
-                SubFieldCollection subFields = field.Subfields;
+                var subFields = field.Subfields;
                 var count = subFields.Count;
                 for (var i = 0; i < count; i++)
                 {
@@ -1204,7 +1183,7 @@ namespace ManagedIrbis
                 {
                     if (fieldOccurrence == 0)
                     {
-                        SubFieldCollection subFields = field.Subfields;
+                        var subFields = field.Subfields;
                         var subCount = subFields.Count;
                         for (var j = 0; j < subCount; j++)
                         {
@@ -1241,7 +1220,7 @@ namespace ManagedIrbis
             {
                 if (field.Tag == tag)
                 {
-                    SubFieldCollection subFields = field.Subfields;
+                    var subFields = field.Subfields;
                     var subCount = subFields.Count;
                     for (var j = 0; j < subCount; j++)
                     {
@@ -1401,7 +1380,7 @@ namespace ManagedIrbis
         {
             Sure.NotNull(field, nameof(field));
 
-            SubFieldCollection subFields = field.Subfields;
+            var subFields = field.Subfields;
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
@@ -1840,20 +1819,30 @@ namespace ManagedIrbis
         // ==========================================================
 
         /// <summary>
-        /// Фильтрация полей.
+        /// Есть ли в поле подполя с кодами?
         /// </summary>
-        public static Field[] WithSubFields
+        public static bool HaveSubFields
             (
-                this IEnumerable<Field> fields
+                this Field field
             )
         {
-            return fields
-                .Where
-                    (
-                        field => field.Subfields.Count != 0
-                    )
-                .ToArray();
-        }
+            foreach (var subfield in field.Subfields)
+            {
+                if (subfield.Code != SubField.NoCode)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+
+        } // method HaveSubFields
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] WithSubFields (this IEnumerable<Field> fields) =>
+            fields.Where (field => field.HaveSubFields()).ToArray();
 
         // ==========================================================
 

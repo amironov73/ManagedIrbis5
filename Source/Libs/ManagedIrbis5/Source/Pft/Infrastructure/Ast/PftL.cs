@@ -17,6 +17,7 @@ using System.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
+using ManagedIrbis.Providers;
 
 #endregion
 
