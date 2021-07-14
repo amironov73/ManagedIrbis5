@@ -75,11 +75,11 @@ namespace ManagedIrbis
                         throw new FormatException();
                     }
 
-                    var tag = int.Parse(value.AsSpan().Slice(0, 3));
+                    var tag = int.Parse(value.AsSpan()[..3]);
                     found = new Field { Tag = tag };
                     if (tag < 10 && value.Length > 3)
                     {
-                        found.Value = value.Substring(0, 3);
+                        found.Value = value.Substring(3);
                     }
                 }
                 else
@@ -94,16 +94,13 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
+
         } // method GetEmbeddedFields
 
         /// <summary>
         /// Получение встроенных полей с указанным тегом.
         /// </summary>
-        public static Field[] GetEmbeddedField
-            (
-                this Field field,
-                int tag
-            )
+        public static Field[] GetEmbeddedField(this Field field, int tag)
             => GetEmbeddedFields(field.Subfields).GetField(tag);
 
         #endregion

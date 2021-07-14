@@ -4,6 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /* ArrayPoolWriter.cs -- буфер поверх цепочки массивов
  * Ars Magna project, http://arsmagna.ru
@@ -24,6 +26,24 @@ using System.IO;
 
 namespace ChunkedExperiment
 {
+    /*
+
+        Как работает IBufferWriter:
+
+        1. Клиент вызывает GetSpan (или GetMemory, что ему удобнее),
+           при этом указывает, какой длины регион непрерывной памяти
+           ему нужен. Как правило 0, т. е. "давай сколько есть".
+           Если IBufferWriter не может удовлетворить запрос
+           (т. е. выдать непрерывный регион), он выбрасывает исключение.
+           Выдавать меньший регион в ответ на запрос нельзя!
+
+        2. Клиент что-то туда записывает и вызывает Advance,
+           чтобы IBufferWriter сдвинул указатель у себя.
+
+        3. Пункты 1 и 2 повторяются по мере необходимости.
+
+     */
+
     /// <summary>
     /// Буфер поверх цепочки массивов.
     /// </summary>

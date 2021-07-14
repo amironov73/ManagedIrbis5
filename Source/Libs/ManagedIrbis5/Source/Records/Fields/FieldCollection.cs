@@ -144,6 +144,13 @@ namespace ManagedIrbis
         {
             ThrowIfReadOnly();
 
+            if (fields is IList<Field> outer)
+            {
+                var inner = _GetInnerList();
+                var newCapacity = inner.Count + outer.Count;
+                EnsureCapacity(newCapacity);
+            }
+
             foreach (var field in fields)
             {
                 Add(field);
@@ -286,10 +293,7 @@ namespace ManagedIrbis
                 Predicate<Field> predicate
             )
         {
-            return this.FirstOrDefault
-            (
-                field => predicate(field)
-            );
+            return this.FirstOrDefault (field => predicate(field));
         }
 
         /// <summary>
@@ -357,10 +361,7 @@ namespace ManagedIrbis
             if (index >= 0 && index < Count)
             {
                 var field = this[index];
-                if (field != null)
-                {
-                    field.Record = null;
-                }
+                field.Record = null;
             }
 
             base.RemoveItem(index);

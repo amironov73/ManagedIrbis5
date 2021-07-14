@@ -66,53 +66,92 @@ namespace UnitTests.ManagedIrbis.Records.Fields
             return result;
         }
 
-        /*
-
-        [TestMethod]
-        public void EmbeddedField_GetEmbeddedFields_1()
-        {
-            Field field = _GetField_1();
-            Field[] embeddedFields = field.GetEmbeddedFields();
-            Assert.AreEqual(1, embeddedFields.Length);
-        }
-
-        [TestMethod]
-        public void EmbeddedField_GetEmbeddedFields_2()
-        {
-            Field field = _GetField_2();
-            Field[] embeddedFields = field.GetEmbeddedFields();
-            Assert.AreEqual(2, embeddedFields.Length);
-        }
-
-        [TestMethod]
-        public void EmbeddedField_GetEmbeddedFields_3()
-        {
-            Field field = _GetField_4();
-            Field[] embeddedFields = field.GetEmbeddedFields();
-            Assert.AreEqual(1, embeddedFields.Length);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(FormatException))]
-        public void EmbeddedField_GetEmbeddedFields_Exception_1()
-        {
-            Field field = _GetField_3();
-            Field[] embeddedFields = field.GetEmbeddedFields();
-            Assert.AreEqual(2, embeddedFields.Length);
-        }
-
-        */
-
         [TestMethod]
         public void EmbeddedField_GetEmbeddedField_1()
         {
-            Field field = _GetField_1();
+            var field = _GetField_1();
 
-            Field[] embeddedFields = field.GetEmbeddedField(200);
+            var embeddedFields = field.GetEmbeddedField(200);
             Assert.AreEqual(1, embeddedFields.Length);
 
             embeddedFields = field.GetEmbeddedField(210);
             Assert.AreEqual(0, embeddedFields.Length);
         }
+
+        [TestMethod]
+        public void EmbeddedField_GetEmbeddedFields_1()
+        {
+            var subbfields = Array.Empty<SubField>();
+            var embeddedFields = EmbeddedField.GetEmbeddedFields(subbfields);
+            Assert.AreEqual(0, embeddedFields.Length);
+        }
+
+        [TestMethod]
+        public void EmbeddedField_GetEmbeddedFields_2()
+        {
+            var subfields = new SubField[]
+            {
+                new ('1', "2001#"),
+                new ('a', "Златая цепь"),
+                new ('e', "Записки. Повести. Рассказы"),
+                new ('f', "Бондарин С. А."),
+                new ('v', "С. 76-132"),
+                new ('1', "2001#"),
+                new ('a', "Руслан и Людмила"),
+                new ('f', "Пушкин А. С.")
+            };
+            var embeddedFields = EmbeddedField.GetEmbeddedFields(subfields);
+            Assert.AreEqual(2, embeddedFields.Length);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void EmbeddedField_GetEmbeddedFields_3()
+        {
+            var subfields = new SubField[]
+            {
+                new ('1')
+            };
+            EmbeddedField.GetEmbeddedFields(subfields);
+        }
+
+        [TestMethod]
+        public void EmbeddedField_GetEmbeddedFields_4()
+        {
+            var subfields = new SubField[]
+            {
+                new ('1', "001Value")
+            };
+            var embeddedFields = EmbeddedField.GetEmbeddedFields(subfields);
+            Assert.AreEqual(1, embeddedFields.Length);
+            var first = embeddedFields[0];
+            Assert.AreEqual(1, first.Tag);
+            Assert.AreEqual("Value", first.Value);
+        }
+
+        [TestMethod]
+        public void EmbeddedField_GetEmbeddedFields_5()
+        {
+            Field field = _GetField_2();
+            Field[] embeddedFields = EmbeddedField.GetEmbeddedFields(field.Subfields);
+            Assert.AreEqual(2, embeddedFields.Length);
+        }
+
+        [TestMethod]
+        public void EmbeddedField_GetEmbeddedFields_6()
+        {
+            Field field = _GetField_4();
+            Field[] embeddedFields = EmbeddedField.GetEmbeddedFields(field.Subfields);
+            Assert.AreEqual(1, embeddedFields.Length);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormatException))]
+        public void EmbeddedField_GetEmbeddedFields_7()
+        {
+            Field field = _GetField_3();
+            EmbeddedField.GetEmbeddedFields(field.Subfields);
+        }
+
     }
 }

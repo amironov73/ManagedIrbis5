@@ -86,16 +86,22 @@ namespace UnitTests.ManagedIrbis.Records.Fields
 
         [TestMethod]
         [ExpectedException(typeof(VerificationException))]
-        public void FieldTag_Verify_Exception_1()
+        public void FieldTag_Verify_3()
         {
             FieldTag.Verify("Ф", true);
         }
 
         [TestMethod]
         [ExpectedException(typeof(VerificationException))]
-        public void FieldTag_Verify_Exception_2()
+        public void FieldTag_Verify_4()
         {
             FieldTag.Verify(-100, true);
+        }
+
+        [TestMethod]
+        public void FieldTag_Verify_5()
+        {
+            Assert.IsFalse(FieldTag.Verify(0));
         }
     }
 }

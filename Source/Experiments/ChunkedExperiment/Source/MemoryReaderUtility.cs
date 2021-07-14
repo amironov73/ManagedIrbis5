@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable ReplaceSliceWithRangeIndexer
+// ReSharper disable UnusedMember.Global
 
 /* MemoryReaderUtility.cs -- методы расширения для MemoryReader
  * Ars Magna project, http://arsmagna.ru

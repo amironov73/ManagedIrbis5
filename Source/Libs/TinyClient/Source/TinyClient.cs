@@ -2601,8 +2601,6 @@ namespace ManagedIrbis
                 .ToArray();
         }
 
-        // ==========================================================
-
         /// <summary>
         /// Количество повторений поля.
         /// </summary>
@@ -2623,9 +2621,8 @@ namespace ManagedIrbis
             }
 
             return result;
-        } // method GetFieldCount
 
-        // ==========================================================
+        } // method GetFieldCount
 
         /// <summary>
         /// Фильтрация полей.
@@ -2652,7 +2649,8 @@ namespace ManagedIrbis
                         }
                     )
                 .ToArray();
-        }
+
+        } // method GetFieldRegex
 
         /// <summary>
         /// Фильтрация полей.
@@ -2663,11 +2661,10 @@ namespace ManagedIrbis
                 string tagRegex,
                 int occurrence
             )
-        {
-            return fields
+            =>
+            fields
                 .GetFieldRegex(tagRegex)
                 .GetOccurrence(occurrence);
-        }
 
         /// <summary>
         /// Фильтрация полей.
@@ -2678,19 +2675,18 @@ namespace ManagedIrbis
                 int[] tags,
                 string textRegex
             )
-        {
-            return fields
+            =>
+            fields
                 .GetField(tags)
                 .Where
-                    (
-                        field =>
-                        {
-                            var value = field.Value;
-                            return !ReferenceEquals(value, null) && value.Length != 0
-                                   && Regex.IsMatch(value, textRegex);
-                        })
+                (
+                    field =>
+                    {
+                        var value = field.Value;
+                        return !ReferenceEquals(value, null) && value.Length != 0
+                                                             && Regex.IsMatch(value, textRegex);
+                    })
                 .ToArray();
-        }
 
         /// <summary>
         /// Фильтрация полей.
@@ -2702,11 +2698,10 @@ namespace ManagedIrbis
                 string textRegex,
                 int occurrence
             )
-        {
-            return fields
+            =>
+            fields
                 .GetFieldRegex(tags, textRegex)
                 .GetOccurrence(occurrence);
-        }
 
         /// <summary>
         /// Фильтрация полей.
@@ -2731,7 +2726,8 @@ namespace ManagedIrbis
                             && regex.IsMatch(value);
                     }))
                 .ToArray();
-        }
+
+        } // method GetFieldRegex
 
         /// <summary>
         /// Фильтрация полей.
@@ -2744,27 +2740,19 @@ namespace ManagedIrbis
                 string textRegex,
                 int occurrence
             )
-        {
-            return fields
+            =>
+            fields
                 .GetFieldRegex(tags, codes, textRegex)
                 .GetOccurrence(occurrence);
-        }
-
-        // ==========================================================
 
         /// <summary>
         /// Получение значения поля.
         /// </summary>
-        public static string[] GetFieldValue
-            (
-                this IEnumerable<Field> fields
-            )
-        {
-            return fields
+        public static string[] GetFieldValue (this IEnumerable<Field> fields)
+            => fields
                 .Select (field => field.Value!)
                 .Where(line => !ReferenceEquals(line, null) && line.Length != 0)
                 .ToArray();
-        }
 
         /// <summary>
         /// Непустые значения полей с указанным тегом.
@@ -2801,6 +2789,7 @@ namespace ManagedIrbis
             }
 
             return null;
+
         } // method GetFirstField
 
         /// <summary>
@@ -2823,6 +2812,7 @@ namespace ManagedIrbis
             }
 
             return null;
+
         } // method GetFirstField
 
         /// <summary>
@@ -3213,7 +3203,8 @@ namespace ManagedIrbis
             }
 
             return null;
-        }
+
+        } // method GetSubField
 
         /// <summary>
         /// Получение текста указанного подполя.

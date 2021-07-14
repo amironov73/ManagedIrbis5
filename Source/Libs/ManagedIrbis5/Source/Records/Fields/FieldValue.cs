@@ -10,7 +10,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-/* FieldValue.cs -- field value related routines
+/* FieldValue.cs -- валидация и нормализация значений полей
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,8 +20,6 @@ using System.Diagnostics.CodeAnalysis;
 
 using AM;
 
-using ManagedIrbis.Properties;
-
 #endregion
 
 #nullable enable
@@ -29,14 +27,14 @@ using ManagedIrbis.Properties;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Field value related routines.
+    /// Валидация и нормализация значений полей.
     /// </summary>
     public static class FieldValue
     {
         #region Properties
 
         /// <summary>
-        /// Throw exception on verification error.
+        /// Бросать исключения при валидации?
         /// </summary>
         [ExcludeFromCodeCoverage]
         public static bool ThrowOnVerify { get; set; }
@@ -46,7 +44,7 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
-        /// Whether the value valid.
+        /// Проверка значения поля на валидность.
         /// </summary>
         public static bool IsValidValue
             (
@@ -57,7 +55,9 @@ namespace ManagedIrbis
             {
                 foreach (var c in value)
                 {
-                    if (c == SubField.Delimiter || c < ' ')
+                    // в значении поля должны отстуствовать
+                    // разделители и управляющие символы
+                    if (c is SubField.Delimiter or < ' ')
                     {
                         return false;
                     }
@@ -65,10 +65,13 @@ namespace ManagedIrbis
             }
 
             return true;
+
         } // method IsValidValue
 
         /// <summary>
-        /// Field value normalization.
+        /// Нормализация значения поля.
+        /// Удаляет начальные и конечные пробелы.
+        /// Не для всех полей это правильно в общем случае.
         /// </summary>
         public static string? Normalize
             (
@@ -83,15 +86,20 @@ namespace ManagedIrbis
             var result = value.Trim();
 
             return result;
+
         } // method Normalize
 
         /// <summary>
-        /// Verify subfield value.
+        /// Проверка значения подполя на валидность.
+        /// Может выбросить исключение, если
+        /// <see cref="ThrowOnVerify"/> установлено в <c>true</c>.
         /// </summary>
         public static bool Verify (string? value) => Verify(value, ThrowOnVerify);
 
         /// <summary>
-        /// Verify subfield code.
+        /// Проверка значения поля на валидность.
+        /// Может выбросить исключение, если
+        /// <paramref name="throwOnError"/> установлено в <c>true</c>.
         /// </summary>
         public static bool Verify
             (
@@ -121,6 +129,7 @@ namespace ManagedIrbis
             }
 
             return result;
+
         } // method Verify
 
         #endregion

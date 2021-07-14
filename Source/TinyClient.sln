@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyClient", "TinyClient.csproj", "{893263CB-2AA3-4D4A-83E1-A32EFCD18186}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyClient", "Libs\TinyClient\TinyClient.csproj", "{893263CB-2AA3-4D4A-83E1-A32EFCD18186}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyExample", "Examples\TinyExample\TinyExample.csproj", "{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +32,17 @@ Global
 		{893263CB-2AA3-4D4A-83E1-A32EFCD18186}.Release|x64.Build.0 = Release|Any CPU
 		{893263CB-2AA3-4D4A-83E1-A32EFCD18186}.Release|x86.ActiveCfg = Release|Any CPU
 		{893263CB-2AA3-4D4A-83E1-A32EFCD18186}.Release|x86.Build.0 = Release|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Debug|x64.Build.0 = Debug|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Debug|x86.Build.0 = Debug|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Release|x64.ActiveCfg = Release|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Release|x64.Build.0 = Release|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Release|x86.ActiveCfg = Release|Any CPU
+		{D6D9D102-0115-4BD8-96F8-1F0AD04D75A7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

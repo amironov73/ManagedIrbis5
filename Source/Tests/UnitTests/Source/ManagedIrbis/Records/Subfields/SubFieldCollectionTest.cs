@@ -23,9 +23,9 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         {
             var result = new SubFieldCollection
             {
-                new SubField('a', "Subfield A"),
-                new SubField('b', "Subfield B"),
-                new SubField('c', "Subfield C")
+                new ('a', "Subfield A"),
+                new ('b', "Subfield B"),
+                new ('c', "Subfield C")
             };
 
             return result;
@@ -36,9 +36,9 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         {
             var collection = new SubFieldCollection
                 {
-                    new SubField(),
-                    new SubField('a'),
-                    new SubField('b', "Value")
+                    new (),
+                    new ('a'),
+                    new ('b', "Value")
                 };
             Assert.AreEqual(3, collection.Count);
         }
@@ -73,7 +73,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             }
         }
 
-        [Ignore]
         [TestMethod]
         public void SubFieldCollection_Serialization_1()
         {
@@ -100,13 +99,12 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.AreEqual(2, collection.Count);
         }
 
-        [Ignore]
         [TestMethod]
         [ExpectedException(typeof(ReadOnlyException))]
         public void SubFieldCollection_ReadOnly_1()
         {
-            var field = new Field().AsReadOnly();
-            field.Subfields.Add(new SubField());
+            var collection = new SubFieldCollection().AsReadOnly();
+            collection.Add(new SubField());
         }
 
         [TestMethod]
@@ -194,8 +192,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             }
         }
 
-        /*
-
         [TestMethod]
         public void SubFieldCollection_SetField_1()
         {
@@ -204,12 +200,10 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             field.Subfields.Add(subFieldA);
             var subFieldE = new SubField('e', "Subtitle");
             field.Subfields.Add(subFieldE);
-            field.SetSubField('a', "Title2");
+            field.SetSubFieldValue('a', "Title2");
             Assert.AreEqual("Title2", subFieldA.Value);
             Assert.AreEqual("Subtitle", subFieldE.Value);
         }
-
-        */
 
         [TestMethod]
         public void SubFieldCollection_Clone_1()

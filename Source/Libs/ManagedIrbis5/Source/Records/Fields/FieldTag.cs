@@ -2,16 +2,13 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
-/* FieldTag.cs -- field tag related routines
+/* FieldTag.cs -- валидация и нормализация меток полей
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,8 +19,6 @@ using System.Diagnostics.CodeAnalysis;
 using AM;
 using AM.Collections;
 
-using ManagedIrbis.Properties;
-
 #endregion
 
 #nullable enable
@@ -31,7 +26,7 @@ using ManagedIrbis.Properties;
 namespace ManagedIrbis
 {
     /// <summary>
-    /// Field tag related routines.
+    /// Валидация и нормализация меток полей.
     /// </summary>
     public static class FieldTag
     {
@@ -49,21 +44,24 @@ namespace ManagedIrbis
 
         static FieldTag()
         {
-            GoodCharacters = new CharSet().AddRange('0', '9');
+            _goodCharacters = new CharSet().AddRange('0', '9');
         }
 
         #endregion
 
         #region Private members
 
-        private static readonly CharSet GoodCharacters;
+        /// <summary>
+        /// Символы, которые могут встречаться в метке поля.
+        /// </summary>
+        private static readonly CharSet _goodCharacters;
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Whether given tag is valid?
+        /// Проверка метки поля на валидность.
         /// </summary>
         public static bool IsValidTag
             (
@@ -75,15 +73,17 @@ namespace ManagedIrbis
                 return false;
             }
 
-            var result = GoodCharacters.CheckText(tag)
+            var result = _goodCharacters.CheckText(tag)
                          && Normalize(tag) != "0"
                          && tag.Length < 6; // ???
 
             return result;
+
         } // method IsValidTag
 
         /// <summary>
-        /// Normalization.
+        /// Нормализация метки поля.
+        /// Удаляет лидирующие нули, если таковые имеются.
         /// </summary>
         public static string? Normalize
             (
@@ -102,10 +102,13 @@ namespace ManagedIrbis
             }
 
             return result;
+
         } // method Normalize
 
         /// <summary>
-        /// Verify the tag value.
+        /// Проверка метки поля.
+        /// Может выбросить ислкючение,
+        /// если <paramref name="throwOnError"/> установлено в <c>true</c>.
         /// </summary>
         public static bool Verify
             (
@@ -136,10 +139,13 @@ namespace ManagedIrbis
             }
 
             return result;
+
         } // method Verify
 
         /// <summary>
-        /// Verify the tag value.
+        /// Проверка метки поля.
+        /// Может выбросить ислкючение,
+        /// если <paramref name="throwOnError"/> установлено в <c>true</c>.
         /// </summary>
         public static bool Verify
             (
@@ -170,29 +176,22 @@ namespace ManagedIrbis
             }
 
             return result;
+
         } // method Verify
 
         /// <summary>
-        /// Verify the tag value.
+        /// Проверка метки поля.
+        /// Может выбросить исключение,
+        /// если <see cref="ThrowOnValidate"/> установлено в <c>true</c>.
         /// </summary>
-        public static bool Verify
-            (
-                int tag
-            )
-        {
-            return Verify(tag, ThrowOnValidate);
-        } // method Verify
+        public static bool Verify (int tag) => Verify(tag, ThrowOnValidate);
 
         /// <summary>
-        /// Verify the tag value.
+        /// Проверка метки поля.
+        /// Может выбросить исключение,
+        /// если <see cref="ThrowOnValidate"/> установлено в <c>true</c>.
         /// </summary>
-        public static bool Verify
-            (
-                string? tag
-            )
-        {
-            return Verify(tag, ThrowOnValidate);
-        } // method Verify
+        public static bool Verify(string? tag) => Verify(tag, ThrowOnValidate);
 
         #endregion
 

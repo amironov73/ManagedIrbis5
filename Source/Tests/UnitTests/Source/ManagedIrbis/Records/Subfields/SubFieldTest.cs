@@ -5,9 +5,10 @@
 
 using System;
 using System.Text.Json;
-using AM;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using AM;
 using AM.Runtime;
 using AM.Xml;
 
@@ -392,6 +393,14 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             Assert.IsTrue(subField.Verify(false));
         }
 
+        [TestMethod]
+        [Description("При верификации выбрасывается исключение")]
+        public void SubField_Verify_2()
+        {
+            var subField = new SubField();
+            subField.Verify(true);
+        }
+
         /*
 
         [TestMethod]
@@ -448,5 +457,39 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             subField = new SubField ('a', "Title");
             Assert.AreEqual("^aTitle", subField.ToString());
         }
+
+        [Ignore]
+        [TestMethod]
+        [Description("Свойство read-only меняется на false")]
+        public void SubField_AsReadOnly_1()
+        {
+            var original = new SubField();
+            Assert.IsFalse(original.ReadOnly);
+
+            var readOnly = original.AsReadOnly();
+            Assert.IsTrue(original.ReadOnly);
+            Assert.IsTrue(readOnly.ReadOnly);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ReadOnlyException))]
+        [Description("Нельзя менять значение у read-only подполей")]
+        public void SubField_AsReadOnly_2()
+        {
+            var original = new SubField();
+            var readOnly = original.AsReadOnly();
+            readOnly.Value = "new value";
+        }
+
+        [TestMethod]
+        [Description("Можно менять код у read-only подполей")]
+        public void SubField_AsReadOnly_3()
+        {
+            var original = new SubField();
+            var readOnly = original.AsReadOnly();
+            readOnly.Code = 'a';
+        }
+
+
     }
 }

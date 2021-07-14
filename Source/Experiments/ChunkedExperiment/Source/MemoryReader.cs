@@ -4,7 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable ReplaceSliceWithRangeIndexer
+// ReSharper disable UnusedMember.Global
 
 /* MemoryReader.cs -- позволяет как бы непрерывно считывать память, разбросанную по фрагментам
  * Ars Magna project, http://arsmagna.ru
