@@ -86,6 +86,8 @@ namespace ManagedIrbis.Direct
             FileName = Unix.FindFileOrThrow(fileName);
             Mode = mode;
 
+            Magna.Trace(nameof(XrfFile64) + "::Constructor: " + FileName);
+
             _stream = DirectUtility.OpenFile(fileName, mode);
         }
 
@@ -213,6 +215,9 @@ namespace ManagedIrbis.Direct
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
+            Magna.Trace(nameof(XrfFile64) + "::" + nameof(Dispose)
+                        + ": " + FileName);
+
             lock (this)
             {
                 _stream.Dispose();

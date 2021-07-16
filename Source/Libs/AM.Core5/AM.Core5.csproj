@@ -11,7 +11,7 @@
     <Product>Ars Magna</Product>
     <Description>Ars Magna core services</Description>
     <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-    <RootNamespace>AM.Core</RootNamespace>
+    <RootNamespace>AM</RootNamespace>
     <Title>ArsMagna core services</Title>
     <Authors>Alexey Mironov</Authors>
     <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
