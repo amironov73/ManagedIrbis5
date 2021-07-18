@@ -276,6 +276,11 @@ namespace ManagedIrbis
         } // method Reconnect
 
         /// <summary>
+        /// Принудительная установка логгера.
+        /// </summary>
+        public void SetLogger(ILogger logger) => _logger = logger;
+
+        /// <summary>
         /// Остановка сервера (расширенная команда).
         /// </summary>
         public bool StopServer()
@@ -541,7 +546,9 @@ namespace ManagedIrbis
         {
             using var response = ExecuteSync(CommandCode.GetMaxMfn, EnsureDatabase(databaseName));
 
-            return response.IsGood() ? response.ReturnCode : 0;
+            response.IsGood();
+
+            return response?.ReturnCode ?? LastError;
 
         } // method GetMaxMfn
 

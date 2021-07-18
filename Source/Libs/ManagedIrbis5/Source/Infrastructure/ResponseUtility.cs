@@ -10,6 +10,7 @@
 // ReSharper disable ReplaceSliceWithRangeIndexer
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ResponseUtility.cs -- методы расширения для работы с Response
@@ -89,7 +90,27 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public static async Task<bool> IsGoodAsync
             (
-                [NotNullWhen(true)] this Task<Response?> task,
+                this Task<Response?> task,
+                bool dispose = true
+            )
+        {
+            var response = await task;
+            var result = response is not null && response.CheckReturnCode();
+            if (dispose)
+            {
+                response?.Dispose();
+            }
+
+            return result;
+
+        } // method IsGoodAsync
+
+        /// <summary>
+        /// Проверяем, хороший ли пришел ответ от сервера.
+        /// </summary>
+        public static async ValueTask<bool> IsGoodAsync
+            (
+                this ValueTask<Response?> task,
                 bool dispose = true
             )
         {
@@ -109,7 +130,28 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public static async Task<bool> IsGoodAsync
             (
-                [NotNullWhen(true)] this Task<Response?> task,
+                this Task<Response?> task,
+                bool dispose = true,
+                params int[] goodCodes
+            )
+        {
+            var response = await task;
+            var result = response is not null && response.CheckReturnCode(goodCodes);
+            if (dispose)
+            {
+                response?.Dispose();
+            }
+
+            return result;
+
+        } // method IsGoodAsync
+
+        /// <summary>
+        /// Проверяем, хороший ли пришел ответ от сервера.
+        /// </summary>
+        public static async ValueTask<bool> IsGoodAsync
+            (
+                this ValueTask<Response?> task,
                 bool dispose = true,
                 params int[] goodCodes
             )
@@ -180,9 +222,45 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Трансформация запроса во что-нибудь полезное.
         /// </summary>
+        public static async ValueTask<T?> TransformAsync<T>
+            (
+                this ValueTask<Response?> response,
+                Func<Response, T?> transformer
+            )
+            where T : class
+        {
+            var waited = await response;
+            var result = waited.IsGood(false) ? transformer(waited) : null;
+            waited?.Dispose();
+
+            return result;
+
+        } // method TransformAsync
+
+        /// <summary>
+        /// Трансформация запроса во что-нибудь полезное.
+        /// </summary>
         public static async Task<T?> TransformNoCheckAsync<T>
             (
                 this Task<Response?> response,
+                Func<Response, T?> transformer
+            )
+            where T: class
+        {
+            var waited = await response;
+            var result = waited is not null ? transformer(waited) : null;
+            waited?.Dispose();
+
+            return result;
+
+        } // method TransformNoCheckAsync
+
+        /// <summary>
+        /// Трансформация запроса во что-нибудь полезное.
+        /// </summary>
+        public static async ValueTask<T?> TransformNoCheckAsync<T>
+            (
+                this ValueTask<Response?> response,
                 Func<Response, T?> transformer
             )
             where T: class

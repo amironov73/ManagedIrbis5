@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+      <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+      <ProjectReference Include="..\..\Libs\RestfulIrbis5\RestfulIrbis5.csproj" />
+    </ItemGroup>
+
+</Project>

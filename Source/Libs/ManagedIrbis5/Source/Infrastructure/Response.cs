@@ -86,15 +86,21 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public Response()
+        public Response
+            (
+                ISetLastError connection
+            )
         {
+            _connection = connection;
             _memory = new List<ArraySegment<byte>>();
-        }
+
+        } // constructor
 
         #endregion
 
         #region Private members
 
+        private readonly ISetLastError _connection;
         private readonly List<ArraySegment<byte>> _memory;
         private ArraySegment<byte> _currentChunk;
         private int _currentIndex, _currentOffset;
@@ -117,7 +123,17 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Проверка кода возврата.
         /// </summary>
-        public bool CheckReturnCode() => GetReturnCode() >= 0;
+        public bool CheckReturnCode()
+        {
+            if (GetReturnCode() < 0)
+            {
+                _connection.SetLastError(ReturnCode);
+                return false;
+            }
+
+            return true;
+
+        } // method CheckReturnCode
 
         /// <summary>
         /// Проверка кода возврата.
@@ -131,7 +147,7 @@ namespace ManagedIrbis.Infrastructure
             {
                 if (Array.IndexOf(goodCodes, ReturnCode) < 0)
                 {
-                    // throw new IrbisException(ReturnCode);
+                    _connection.SetLastError(ReturnCode);
                     return false;
                 }
             }

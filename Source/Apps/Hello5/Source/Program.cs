@@ -59,8 +59,11 @@ internal class Program
             WriteLine(version);
 
             var processes = await connection.ListProcessesAsync();
-            WriteLine("Processes: "
-                + string.Join<ProcessInfo>(" | ", processes!));
+            if (processes is not null)
+            {
+                WriteLine("Processes: "
+                       + string.Join<ProcessInfo>(" | ", processes!));
+            }
 
             var maxMfn = await connection.GetMaxMfnAsync();
             WriteLine($"Max MFN={maxMfn}");

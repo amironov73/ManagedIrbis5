@@ -97,7 +97,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
                 return default;
             }
 
-            var result = new Response();
+            var result = new Response(Connection.ThrowIfNull(nameof(Connection)));
             try
             {
                 while (true)
