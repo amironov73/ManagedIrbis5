@@ -91,7 +91,8 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Удаляет префиксы с терминов.
@@ -127,7 +128,42 @@ namespace ManagedIrbis
             }
 
             return result.ToArray();
-        }
+
+        } // method TrimPrefix
+
+        /// <summary>
+        /// Удаляет префиксы с терминов.
+        /// </summary>
+        public static string[] TrimToString
+            (
+                ICollection<Term> terms,
+                string prefix
+            )
+        {
+            var prefixLength = prefix.Length;
+            var result = new List<string>(terms.Count);
+            if (prefixLength == 0)
+            {
+                foreach (var term in terms)
+                {
+                    result.Add(term.Text ?? string.Empty);
+                }
+            }
+            else
+            {
+                foreach (var term in terms)
+                {
+                    var item = term.Text;
+                    if (!string.IsNullOrEmpty(item) && item.StartsWith(prefix))
+                    {
+                        result.Add(item.Substring(prefixLength));
+                    }
+                }
+            }
+
+            return result.ToArray();
+
+        } // method TrimPrefix
 
         #endregion
 
@@ -141,7 +177,8 @@ namespace ManagedIrbis
         {
             Count = reader.ReadPackedInt32();
             Text = reader.ReadNullableString();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public virtual void SaveToStream
@@ -152,7 +189,8 @@ namespace ManagedIrbis
             writer
                 .WritePackedInt32(Count)
                 .WriteNullable(Text);
-        }
+
+        } // method SaveToStream
 
         #endregion
 

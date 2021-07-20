@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package ManagedIrbis.Grpc;
+
+// подполе
+message ProtoSubField
+{
+  string code = 1;
+  string value = 2;
+}
+
+// поле
+message ProtoField
+{
+  int32 tag = 1;
+  repeated ProtoSubField subfields = 2;
+}
+
+// запись
+message ProtoRecord
+{
+  int32 mfn = 1;
+  optional string database = 2;
+  int32 status = 3;
+  int32 version = 4;
+  repeated ProtoField fields = 5;
+}

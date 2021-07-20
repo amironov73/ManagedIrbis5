@@ -15,11 +15,15 @@
 #region Using directives
 
 using System;
-
+using System.Linq;
 using AM;
 
 using ManagedIrbis;
 using ManagedIrbis.CommandLine;
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Menus;
+using ManagedIrbis.Providers;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -129,21 +133,149 @@ namespace Restaurant.Controllers
 
         } // method GetConnection
 
-        private IActionResult DbInfo(string? db) => Ok($"Информация о базе '{db}'");
+        /// <summary>
+        /// Получение информации о базе данных.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.</param>
+        private IActionResult DbInfo
+            (
+                string? databaseName
+            )
+        {
+            if (databaseName.IsEmpty())
+            {
+                return BadRequest("Database not specified");
+            }
 
-        private IActionResult ListDb(string? spec) => Ok($"Список баз данных '{spec}'");
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
 
-        private IActionResult ListFiles(string? spec) => Ok($"Список файлов '{spec}'");
+            var result = connection.GetDatabaseInfo(databaseName);
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
 
-        private IActionResult ListProcesses() => Ok();
+            return Ok(result);
 
-        private IActionResult ListTerms(string? db, string? prefix) => Ok();
+        } // method DbInfo
+
+        /// <summary>
+        /// Получение списка баз данных.
+        /// </summary>
+        /// <param name="spec">Спецификация MNU-файла со списком баз.</param>
+        private IActionResult ListDb
+            (
+                string? spec
+            )
+        {
+            spec ??= "dbnam3.mnu";
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var result = connection.ListDatabases(spec);
+
+            return Ok(result);
+
+        } // method ListDb
+
+        /// <summary>
+        /// Получение списка файлов.
+        /// </summary>
+        /// <param name="pattern">Спецификация.</param>
+        private IActionResult ListFiles
+            (
+                string? pattern
+            )
+        {
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            pattern ??= $"2.{connection.Database}.*.*";
+            var specification = FileSpecification.Parse(pattern);
+            var result = connection.ListFiles(specification);
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method ListFiles
+
+        /// <summary>
+        /// Получение списка серверных процессов.
+        /// </summary>
+        private IActionResult ListProcesses()
+        {
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var result = connection.ListProcesses();
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method ListProcesses
+
+        /// <summary>
+        /// Получение списка терминов поискового словаря.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных</param>
+        /// <param name="prefix">Префикс</param>
+        private IActionResult ListTerms
+            (
+                string? databaseName,
+                string? prefix
+            )
+        {
+            if (databaseName.IsEmpty())
+            {
+                return BadRequest("Database not specified");
+            }
+
+            if (prefix.IsEmpty())
+            {
+                return BadRequest("Prefix not specified");
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            connection.Database = databaseName;
+            var result = connection.ReadAllTerms(prefix);
+            if (connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(Term.TrimToString(result, prefix));
+
+        } // method ListTerms
 
         /// <summary>
         /// Получение максимального MFN для указанной базы данных.
         /// </summary>
-        /// <param name="databaseName"></param>
-        /// <returns></returns>
+        /// <param name="databaseName">Имя базы данных.</param>
         private IActionResult MaxMfn
             (
                 string? databaseName
@@ -175,31 +307,397 @@ namespace Restaurant.Controllers
 
         } // method MaxMfn
 
-        private IActionResult ReadRecord(string? db, string? mfn) => Ok();
+        /// <summary>
+        /// Получение меню с сервера.
+        /// </summary>
+        /// <param name="fileName">Спецификация.</param>
+        private IActionResult ReadMenu
+            (
+                string? fileName
+            )
+        {
+            if (fileName.IsEmpty())
+            {
+                return BadRequest("File name not specified");
+            }
 
-        private IActionResult ReadMenu(string? spec) => Ok();
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var specification = FileSpecification.Parse(fileName);
+            var result = connection.ReadMenu(specification);
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method ReadMenu
+
+        /// <summary>
+        /// Чтение записи с сервера.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.</param>
+        /// <param name="mfn">MFN записи.</param>
+        private IActionResult ReadRecord
+            (
+                string? databaseName,
+                string? mfn
+            )
+        {
+            if (databaseName.IsEmpty())
+            {
+                return BadRequest("Database not specified");
+            }
+
+            if (mfn.IsEmpty())
+            {
+                return BadRequest("MFN not specified");
+            }
+
+            var number = mfn.SafeToInt32();
+            if (number <= 0)
+            {
+                return BadRequest("Bad MFN value");
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var result = connection.ReadRecord(number);
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method ReadRecord
 
         private IActionResult ReadOpt(string? spec) => Ok();
 
-        private IActionResult ReadTerms() => Ok();
+        /// <summary>
+        /// Чтение терминов поискового словаря.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных.</param>
+        /// <param name="startTerm">Начальный термин.</param>
+        /// <param name="count">Количество считываемых терминов.</param>
+        private IActionResult ReadTerms
+            (
+                string? databaseName,
+                string? startTerm,
+                string? count
+            )
+        {
+            if (databaseName.IsEmpty())
+            {
+                return BadRequest("Database not specified");
+            }
 
-        private IActionResult ReadTextFile(string? spec) => Ok();
+            if (startTerm.IsEmpty())
+            {
+                return BadRequest("Start term not specified");
+            }
 
-        private IActionResult Restart() => Ok();
+            var number = count.SafeToInt32(100);
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
 
-        private IActionResult Scenarios() => Ok();
+            var paremeters = new TermParameters()
+            {
+                Database = databaseName,
+                StartTerm = startTerm,
+                NumberOfTerms = number
+            };
+            var result = connection.ReadTerms(paremeters);
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
 
-        private IActionResult Search(string? db, string? expr) => Ok();
+            return Ok(result);
 
-        private IActionResult SearchCount(string? db, string? expr) => Ok();
+        } // method ReadTerms
 
-        private IActionResult SearchFormat(string? db, string? expr, string? format) => Ok();
+        /// <summary>
+        /// Получение текстового файла с сервера.
+        /// </summary>
+        private IActionResult ReadTextFile
+            (
+                string? fileName
+            )
+        {
+            if (fileName.IsEmpty())
+            {
+                return BadRequest("File name not specified");
+            }
 
-        private IActionResult ServerStat() => Ok();
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
 
-        private IActionResult UserList() => Ok();
+            var specification = FileSpecification.Parse(fileName);
+            var result = connection.ReadTextFile(specification);
+            if (connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
 
-        private IActionResult Version() => Ok();
+            return Ok(result);
+
+        } // method ReadTextFile
+
+        /// <summary>
+        /// Перезапуск сервиса.
+        /// </summary>
+        private IActionResult Restart()
+        {
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            if (!connection.RestartServer())
+            {
+                return Problem("Can't restart server");
+            }
+
+            return Ok();
+
+        } // method Restart
+
+        /// <summary>
+        /// Получение поисковых сценариев.
+        /// </summary>
+        private IActionResult Scenarios()
+        {
+            // TODO поддержать стандартный сценарий поиска
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            return BadRequest("Not supported");
+
+        } // method Scenarios
+
+        /// <summary>
+        /// Поиск записей.
+        /// </summary>
+        /// <param name="databaseName"></param>
+        /// <param name="expression"></param>
+        private IActionResult Search
+            (
+                string? databaseName,
+                string? expression
+            )
+        {
+            if (databaseName.IsEmpty())
+            {
+                return BadRequest("Database not specified");
+            }
+
+            if (expression.IsEmpty())
+            {
+                return BadRequest("Expression not specified");
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var result = connection.Search(expression);
+            if (connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method Search
+
+        /// <summary>
+        /// Получение количества записей, удовлетворяющих запросу.
+        /// </summary>
+        /// <param name="databaseName"></param>
+        /// <param name="expression"></param>
+        private IActionResult SearchCount
+            (
+                string? databaseName,
+                string? expression
+            )
+        {
+            if (databaseName.IsEmpty())
+            {
+                return BadRequest("Database not specified");
+            }
+
+            if (expression.IsEmpty())
+            {
+                return BadRequest("Expression not specified");
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            // var parameters = new SearchParameters
+            // {
+            //     Database = databaseName,
+            //     Expression = expression,
+            //     NumberOfRecords = 0
+            // };
+            var result = connection switch
+            {
+                ISyncConnection syncConnection => syncConnection.SearchCount(expression),
+
+                // TODO поддерка других типов подключений
+
+                _ => throw new IrbisException()
+            };
+
+            if (connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method SearchCount
+
+        /// <summary>
+        /// Поиск с форматированием.
+        /// </summary>
+        /// <param name="databaseName">Имя базы данных</param>
+        /// <param name="expression">Поисковое выражение.</param>
+        /// <param name="format">Формат.</param>
+        private IActionResult SearchFormat
+            (
+                string? databaseName,
+                string? expression,
+                string? format
+            )
+        {
+            if (databaseName.IsEmpty())
+            {
+                return BadRequest("Database not specified");
+            }
+
+            if (expression.IsEmpty())
+            {
+                return BadRequest("Expression not specified");
+            }
+
+            if (format.IsEmpty())
+            {
+                return BadRequest("Format not specified");
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var parameters = new SearchParameters
+            {
+                Database = databaseName,
+                Expression = expression,
+                Format = format
+            };
+            var found = connection.Search(parameters);
+            if (found is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            var result = found.Select(item => item.Text).ToArray();
+
+            return Ok(result);
+
+        } // method SearchFormat
+
+        /// <summary>
+        /// Получение статистики работы сервера ИРБИС64.
+        /// </summary>
+        private IActionResult ServerStat()
+        {
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var result = connection.ListUsers();
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method ServerStat
+
+        /// <summary>
+        /// Получение списка зарегистрированных в система пользователей.
+        /// </summary>
+        private IActionResult UserList()
+        {
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var result = connection.ListUsers();
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method UserList
+
+        /// <summary>
+        /// Получение версии сервера ИРБИС64.
+        /// </summary>
+        private IActionResult Version()
+        {
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var result = connection.GetServerVersion();
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method Version
 
         #endregion
 
@@ -215,6 +713,8 @@ namespace Restaurant.Controllers
         /// <param name="mfn">MFN</param>
         /// <param name="expr">Поисковое выражение</param>
         /// <param name="format">Формат</param>
+        /// <param name="start">Стартовый термин</param>
+        /// <param name="count">Количество считываемых терминов</param>
         /// <returns>Результат выполнения.</returns>
         [HttpGet]
         public IActionResult Index
@@ -225,7 +725,9 @@ namespace Restaurant.Controllers
                 string? spec,
                 string? mfn,
                 string? expr,
-                string? format
+                string? format,
+                string? start,
+                string? count
             )
         {
             _logger.LogTrace(Request.Path);
@@ -267,7 +769,7 @@ namespace Restaurant.Controllers
                     return ReadOpt(spec);
 
                 case "read_terms":
-                    return ReadTerms();
+                    return ReadTerms(db, start, count);
 
                 case "read_text":
                     return ReadTextFile(spec);
@@ -300,8 +802,7 @@ namespace Restaurant.Controllers
                     return BadRequest("unknown operation");
             }
 
-            // return Ok("Hello from controller: " + op);
-        }
+        } // method Index
 
         #endregion
 

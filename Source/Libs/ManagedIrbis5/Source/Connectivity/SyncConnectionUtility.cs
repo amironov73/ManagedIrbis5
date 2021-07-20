@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using AM;
-
+using AM.Collections;
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
@@ -206,31 +206,6 @@ namespace ManagedIrbis
             return Array.Empty<Record>();
 
         } // method ReadRecords
-
-        /// <summary>
-        /// Чтение терминов словаря.
-        /// </summary>
-        /// <param name="connection">Подключение.</param>
-        /// <param name="startTerm">Параметры терминов.</param>
-        /// <param name="numberOfTerms">Максимальное число терминов.</param>
-        /// <returns>Массив прочитанных терминов.</returns>
-        public static Term[]? ReadTerms
-            (
-                this SyncConnection connection,
-                string startTerm,
-                int numberOfTerms
-            )
-        {
-            var parameters = new TermParameters
-            {
-                Database = connection.Database,
-                StartTerm = startTerm,
-                NumberOfTerms = numberOfTerms
-            };
-
-            return connection.ReadTerms(parameters);
-
-        } // method ReadTerms
 
         /// <summary>
         /// Чтение несколькних текстовых файлов с сервера.

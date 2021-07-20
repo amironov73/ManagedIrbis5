@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 
 using AM;
+using AM.Collections;
 using AM.IO;
 
 using ManagedIrbis.Fst;
@@ -208,6 +209,66 @@ namespace ManagedIrbis.Providers
             return connection.ReadRecord<NullRecord>(parameters) is not null;
 
         } // method LockRecord
+
+        /// <summary>
+        /// Чтение всех терминов с указанным префиксом.
+        /// </summary>
+        public static Term[] ReadAllTerms
+            (
+                this ISyncProvider connection,
+                string prefix
+            )
+        {
+            if (!connection.CheckProviderState())
+            {
+                return Array.Empty<Term>();
+            }
+
+            prefix = prefix.ToUpperInvariant();
+            var result = new List<Term>();
+            var startTerm = prefix;
+            var flag = true;
+            while (flag)
+            {
+                var terms = connection.ReadTerms(startTerm, 1024);
+                if (terms.IsNullOrEmpty())
+                {
+                    break;
+                }
+
+                var startIndex = 0;
+                if (result.Count != 0)
+                {
+                    var lastTerm = result[^1];
+                    var firstTerm = terms![0];
+                    if (firstTerm.Text == lastTerm.Text)
+                    {
+                        startIndex = 1;
+                    }
+                }
+
+                for (var i = startIndex; i < terms!.Length; i++)
+                {
+                    var term = terms[i];
+                    var text = term.Text;
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        break;
+                    }
+
+                    if (!text.StartsWith(prefix))
+                    {
+                        flag = false;
+                        break;
+                    }
+
+                    result.Add(term);
+                }
+            }
+
+            return result.ToArray();
+
+        } // method ReadAllTermsAsync
 
         /// <summary>
         /// Чтение FST-файла как текстового.
@@ -407,6 +468,31 @@ namespace ManagedIrbis.Providers
             return result.ToArray();
 
         } // method ReadRecords
+
+        /// <summary>
+        /// Чтение терминов словаря.
+        /// </summary>
+        /// <param name="connection">Подключение.</param>
+        /// <param name="startTerm">Параметры терминов.</param>
+        /// <param name="numberOfTerms">Максимальное число терминов.</param>
+        /// <returns>Массив прочитанных терминов.</returns>
+        public static Term[]? ReadTerms
+            (
+                this ISyncProvider connection,
+                string startTerm,
+                int numberOfTerms
+            )
+        {
+            var parameters = new TermParameters
+            {
+                Database = connection.Database,
+                StartTerm = startTerm,
+                NumberOfTerms = numberOfTerms
+            };
+
+            return connection.ReadTerms(parameters);
+
+        } // method ReadTerms
 
         /// <summary>
         /// Чтение с сервера записи, которая обязательно должна быть.

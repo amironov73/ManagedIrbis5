@@ -251,7 +251,6 @@ namespace ManagedIrbis
 
         } // method ReadAllTermsAsync
 
-
         /// <summary>
         /// Чтение постингов указанного термина.
         /// </summary>
