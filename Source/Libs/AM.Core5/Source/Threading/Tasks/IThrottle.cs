@@ -9,9 +9,10 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable UnusedParameter.Local
 
-/* IThrottle.cs --
+/* IThrottle.cs -- интерфейс дросселя (ограничителя)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,19 +28,20 @@ using System.Threading.Tasks;
 namespace AM.Threading.Tasks
 {
     /// <summary>
-    ///
+    /// Интерфейс дросселя, т. е. устройства, ограничивающего
+    /// пропускание задач.
     /// </summary>
     public interface IThrottle
     {
         /// <summary>
-        /// Get next task.
+        /// Получение следующей задачи.
         /// </summary>
         Task GetNext();
 
         /// <summary>
-        /// Get next task.
+        /// Получение следующей задачи.
         /// </summary>
-        Task GetNext(out TimeSpan delay);
+        Task GetNext (out TimeSpan delay);
 
     } // interface IThrottle
 

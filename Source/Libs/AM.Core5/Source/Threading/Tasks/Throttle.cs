@@ -10,8 +10,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedType.Global
 
-/* Throttle .cs --
+/* Throttle .cs -- дефолтная реализация дросселя (ограничителя)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +28,8 @@ using System.Threading.Tasks;
 namespace AM.Threading.Tasks
 {
     /// <summary>
-    ///
+    /// Дефолтная реализация дросселя, т. е. ограничителя
+    /// пропускания задач.
     /// </summary>
     /// <remarks>Borrowed from Tom DuPont:
     /// http://www.tomdupont.net/2015/02/await-interval-with-throttle-class-in.html
@@ -38,7 +40,7 @@ namespace AM.Threading.Tasks
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public Throttle
             (
@@ -63,18 +65,14 @@ namespace AM.Threading.Tasks
 
         #region Public methods
 
-        /// <summary>
-        /// Get next task.
-        /// </summary>
-        public Task GetNext()
+        /// <inheritdoc cref="IThrottle.GetNext()"/>
+        public virtual Task GetNext()
         {
             return GetNext(out _);
         }
 
-        /// <summary>
-        /// Get next task.
-        /// </summary>
-        public Task GetNext
+        /// <inheritdoc cref="IThrottle.GetNext(out System.TimeSpan)"/>
+        public virtual Task GetNext
             (
                 out TimeSpan delay
             )

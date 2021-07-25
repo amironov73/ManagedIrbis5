@@ -10,8 +10,9 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedType.Global
 
-/* SimplestTaskProcessor.cs -- simplest task processor
+/* SimplestTaskProcessor.cs -- простейший процессор задач
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,7 +33,7 @@ using AM.Collections;
 namespace AM.Threading.Tasks
 {
     /// <summary>
-    /// Simplest task processor.
+    /// Простейший процессор задач.
     /// </summary>
     public sealed class SimplestTaskProcessor
     {
@@ -54,9 +55,9 @@ namespace AM.Threading.Tasks
                 }
                 catch (Exception ex)
                 {
-                    lock (Processor!._exceptions)
+                    lock (Processor!.Exceptions)
                     {
-                        Processor._exceptions.Add(ex);
+                        Processor.Exceptions.Add(ex);
                     }
                 }
 
@@ -75,12 +76,12 @@ namespace AM.Threading.Tasks
         #region Properties
 
         /// <summary>
-        /// Exceptions.
+        /// Исключения, возникшие при выполнении задач.
         /// </summary>
-        public NonNullCollection<Exception> Exceptions => _exceptions;
+        public NonNullCollection<Exception> Exceptions { get; }
 
         /// <summary>
-        /// Have errors?
+        /// Возникали ли исключения?
         /// </summary>
         public bool HaveErrors => Exceptions.Count != 0;
 
@@ -89,7 +90,7 @@ namespace AM.Threading.Tasks
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public SimplestTaskProcessor
             (
@@ -112,11 +113,12 @@ namespace AM.Threading.Tasks
 
             _queue = new BlockingCollection<Action>();
             _running = new NonNullCollection<ActionWrapper>();
-            _exceptions = new NonNullCollection<Exception>();
+            Exceptions = new NonNullCollection<Exception>();
             _semaphore = new SemaphoreSlim(parallelism, parallelism);
 
             Task.Factory.StartNew(_MainWorker);
-        }
+
+        } // constructor
 
         #endregion
 
@@ -124,7 +126,6 @@ namespace AM.Threading.Tasks
 
         private readonly BlockingCollection<Action> _queue;
         private readonly NonNullCollection<ActionWrapper> _running;
-        private readonly NonNullCollection<Exception> _exceptions;
 
         private readonly SemaphoreSlim _semaphore;
 
@@ -152,14 +153,15 @@ namespace AM.Threading.Tasks
                 }
                 wrapper.Task.Start();
             }
-        }
+
+        } // method _MainWorker
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        ///
+        /// Задачи больше добавляться не будут.
         /// </summary>
         public void Complete()
         {
@@ -167,10 +169,11 @@ namespace AM.Threading.Tasks
                 + nameof(Complete));
 
             _queue.CompleteAdding();
-        }
+
+        } // method Complete
 
         /// <summary>
-        ///
+        /// Добавление задачи.
         /// </summary>
         public void Enqueue
             (
@@ -181,10 +184,11 @@ namespace AM.Threading.Tasks
                 + nameof(Enqueue));
 
             _queue.Add(action);
-        }
+
+        } // method Enqueue
 
         /// <summary>
-        /// Wait for completion.
+        /// Ожидание завершения всех задач.
         /// </summary>
         public void WaitForCompletion()
         {
@@ -207,8 +211,10 @@ namespace AM.Threading.Tasks
 
             Task.WaitAll(tasks);
 
-            Magna.Trace(nameof(SimplestTaskProcessor) + "::" + nameof(WaitForCompletion) + ": end");
-        }
+            Magna.Trace(nameof(SimplestTaskProcessor) + "::"
+                + nameof(WaitForCompletion) + ": end");
+
+        } // method WaitForCompletion
 
         #endregion
 
