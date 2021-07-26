@@ -57,13 +57,13 @@ namespace AM.Threading.Tasks
                 {
                     lock (Processor!.Exceptions)
                     {
-                        Processor.Exceptions.Add(ex);
+                        Processor.Exceptions.Add (ex);
                     }
                 }
 
                 lock (Processor!._running)
                 {
-                    Processor._running.Remove(this);
+                    Processor._running.Remove (this);
                 }
 
                 var semaphore = Processor._semaphore;
@@ -97,26 +97,26 @@ namespace AM.Threading.Tasks
                 int parallelism
             )
         {
-            Magna.Trace(nameof(SimplestTaskProcessor) + "::Constructor");
+            Magna.Trace (nameof (SimplestTaskProcessor) + "::Constructor");
 
-            if (parallelism < 0)
+            if (parallelism <= 0)
             {
                 Magna.Error
                     (
-                        nameof(SimplestTaskProcessor) + "::Constructor: "
+                        nameof (SimplestTaskProcessor) + "::Constructor: "
                         + "parallelism="
                         + parallelism
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(parallelism));
+                throw new ArgumentOutOfRangeException (nameof (parallelism));
             }
 
             _queue = new BlockingCollection<Action>();
             _running = new NonNullCollection<ActionWrapper>();
             Exceptions = new NonNullCollection<Exception>();
-            _semaphore = new SemaphoreSlim(parallelism, parallelism);
+            _semaphore = new SemaphoreSlim (parallelism, parallelism);
 
-            Task.Factory.StartNew(_MainWorker);
+            Task.Factory.StartNew (_MainWorker);
 
         } // constructor
 
@@ -135,7 +135,7 @@ namespace AM.Threading.Tasks
             {
                 _semaphore.Wait();
 
-                if (!_queue.TryTake(out var action))
+                if (!_queue.TryTake (out var action))
                 {
                     continue;
                 }
@@ -145,11 +145,11 @@ namespace AM.Threading.Tasks
                     Action = action,
                     Processor = this
                 };
-                var task = new Task(wrapper.Worker);
+                var task = new Task (wrapper.Worker);
                 wrapper.Task = task;
                 lock (_running)
                 {
-                    _running.Add(wrapper);
+                    _running.Add (wrapper);
                 }
                 wrapper.Task.Start();
             }
@@ -165,8 +165,8 @@ namespace AM.Threading.Tasks
         /// </summary>
         public void Complete()
         {
-            Magna.Trace(nameof(SimplestTaskProcessor) + "::"
-                + nameof(Complete));
+            Magna.Trace (nameof (SimplestTaskProcessor) + "::"
+                + nameof (Complete));
 
             _queue.CompleteAdding();
 
@@ -180,8 +180,8 @@ namespace AM.Threading.Tasks
                 Action action
             )
         {
-            Magna.Trace(nameof(SimplestTaskProcessor) + "::"
-                + nameof(Enqueue));
+            Magna.Trace (nameof (SimplestTaskProcessor) + "::"
+                + nameof (Enqueue));
 
             _queue.Add(action);
 
@@ -192,12 +192,12 @@ namespace AM.Threading.Tasks
         /// </summary>
         public void WaitForCompletion()
         {
-            Magna.Trace(nameof(SimplestTaskProcessor) + "::"
-                + nameof(WaitForCompletion) + ": begin");
+            Magna.Trace (nameof (SimplestTaskProcessor) + "::"
+                + nameof (WaitForCompletion) + ": begin");
 
             while (!_queue.IsCompleted)
             {
-                Thread.SpinWait(100000);
+                Thread.SpinWait (100000);
             }
 
             Task[] tasks;
@@ -209,10 +209,10 @@ namespace AM.Threading.Tasks
                     .ToArray();
             }
 
-            Task.WaitAll(tasks);
+            Task.WaitAll (tasks);
 
-            Magna.Trace(nameof(SimplestTaskProcessor) + "::"
-                + nameof(WaitForCompletion) + ": end");
+            Magna.Trace (nameof (SimplestTaskProcessor) + "::"
+                + nameof (WaitForCompletion) + ": end");
 
         } // method WaitForCompletion
 

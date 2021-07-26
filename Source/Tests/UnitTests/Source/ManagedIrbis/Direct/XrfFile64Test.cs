@@ -21,6 +21,7 @@ namespace UnitTests.ManagedIrbis.Direct
             Unix.FindFileOrThrow (DirectUtility.CombinePath (Irbis64RootPath, "Datai/IBIS/ibis.xrf"));
 
         [TestMethod]
+        [Ignore]
         public void XrfFile64_ReadRecord_1()
         {
             var fileName = _GetFileName();
@@ -28,12 +29,14 @@ namespace UnitTests.ManagedIrbis.Direct
             using var file = new XrfFile64(fileName, mode);
             Assert.AreEqual(mode, file.Mode);
             Assert.AreEqual(fileName, file.FileName);
+
             var record = file.ReadRecord(1);
             Assert.AreEqual(22951100L, record.Offset);
             Assert.AreEqual(0, (int)record.Status);
         }
 
         [TestMethod]
+        [Ignore]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void XrfFile64_ReadRecord_2()
         {
@@ -44,6 +47,7 @@ namespace UnitTests.ManagedIrbis.Direct
         }
 
         [TestMethod]
+        [Ignore]
         public void XrfFile64_LockRecord_1()
         {
             var fileName = _GetFileName();
@@ -62,6 +66,7 @@ namespace UnitTests.ManagedIrbis.Direct
         }
 
         [TestMethod]
+        [Ignore]
         public void XrfFile64_ReopenFile_1()
         {
             var fileName = _GetFileName();
