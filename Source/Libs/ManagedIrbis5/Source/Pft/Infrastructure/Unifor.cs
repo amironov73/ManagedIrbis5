@@ -208,6 +208,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             Registry.Add("[", UniforSquareBracket.CleanContextMarkup);
             Registry.Add("&", UniforAmpersand.Unknown);
             Registry.Add(":", UniforColon.CheckRights);
+            Registry.Add("$", UniforDollar.Md5Hash);
 
         } // method RegisterActions
 

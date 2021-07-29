@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* Unifor0.cs --
+/* Unifor0.cs -- выдать содержимое документа полностью в формате RTF
  * Ars Magna project, http://arsmagna.ru
  */
 

@@ -8,6 +8,8 @@ using ManagedIrbis.Pft.Infrastructure;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Pft.Infrastructure.Unifors
 {
     [TestClass]
