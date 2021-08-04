@@ -1,8 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net5.0-windows</TargetFramework>
-        <UseWPF>true</UseWPF>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>AM.Windows</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>WPF general controls and dialogs for Ars Magna project</Title>
+    <Description>WPF general controls and dialogs for Ars Magna project</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\AM.Windows5.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\AM.Windows5.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+  </ItemGroup>
 
 </Project>

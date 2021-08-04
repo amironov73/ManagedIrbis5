@@ -1,0 +1,16 @@
+<!-- Common properties for benchmarks -->
+
+<Project>
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+    </ItemGroup>
+
+</Project>

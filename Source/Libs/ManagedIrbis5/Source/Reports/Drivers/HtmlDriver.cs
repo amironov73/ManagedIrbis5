@@ -16,17 +16,7 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using AM;
-using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 using AM.Text;
 
 #endregion
@@ -79,11 +69,7 @@ namespace ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            string table = string.Format
-                (
-                    "<table border={0}>",
-                    Borders ? "1" : "0"
-                );
+            var table = $"<table border={(Borders ? "1" : "0")}>";
 
             context.Output.Write(table);
         }
@@ -115,7 +101,7 @@ namespace ManagedIrbis.Reports
                 IrbisReport report
             )
         {
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write("</table>");
             output.Write(Environment.NewLine);
         }
@@ -127,7 +113,7 @@ namespace ManagedIrbis.Reports
                 ReportBand band
             )
         {
-            ReportOutput output = context.Output;
+            var output = context.Output;
             output.Write("</tr>");
             output.Write(Environment.NewLine);
         }
@@ -136,16 +122,21 @@ namespace ManagedIrbis.Reports
         public override void Write
             (
                 ReportContext context,
-                string text
+                string? text
             )
         {
-            context.Output.Write
-                (
-                    HtmlText.Encode(text)
-                );
+            if (!string.IsNullOrEmpty(text))
+            {
+                var encoded = HtmlText.Encode(text);
+                if (!string.IsNullOrEmpty(encoded))
+                {
+                    context.Output.Write(encoded);
+                }
+            }
         }
 
         #endregion
 
-    }
-}
+    } // class HtmlDriver
+
+} // namespace ManagedIrbis.Reports

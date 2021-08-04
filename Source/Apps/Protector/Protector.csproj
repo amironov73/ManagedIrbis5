@@ -2,13 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-        <IsPackable>false</IsPackable>
         <ApplicationIcon>Lock.ico</ApplicationIcon>
     </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
-    </ItemGroup>
 
 </Project>

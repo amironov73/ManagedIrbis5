@@ -1,5 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>AM.Windows.Forms</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>WinForms general controls and dialogs for Ars Magna project</Title>
+    <Description>WinForms general controls and dialogs for Ars Magna project</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\AM.Windows.Forms5.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\AM.Windows.Forms5.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
@@ -7,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,40 +58,5 @@
     <None Remove="Images\NEW.BMP" />
     <Resource Include="Images\NEW.BMP" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <RootNamespace>AM.Windows.Forms</RootNamespace>
-    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-    <PackageVersion>5.0.0</PackageVersion>
-    <Title>WinForms general controls and dialogs for Ars Magna project</Title>
-    <Authors>Alexey Mironov</Authors>
-    <Description>WiForms general controls and dialogs for Ars Magna project.</Description>
-    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>arsmagna-icon.png</PackageIcon>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
-  </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\AM.Windows.Forms5.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\AM.Windows.Forms5.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL</DefineConstants>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
 
 </Project>

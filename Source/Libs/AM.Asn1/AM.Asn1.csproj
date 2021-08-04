@@ -1,44 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-        <PackageVersion>5.0.0</PackageVersion>
-        <Title>Ars Magna ASN.1 handling</Title>
-        <Authors>Alexey Mironov</Authors>
-        <Description>Ars Magnag ASN.1 handling</Description>
-        <Copyright>Copyright Alexey Mironov 2019-2021</Copyright>
-        <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageIcon>arsmagna-icon.png</PackageIcon>
-        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-        <SignAssembly>true</SignAssembly>
-        <DelaySign>false</DelaySign>
-        <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-        <ApplicationIcon>BlueBook.ico</ApplicationIcon>
+        <RootNamespace>AM</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
-    <ItemGroup>
-      <Folder Include="Source" />
-    </ItemGroup>
+    <PropertyGroup>
+        <Title>Ars Magna ASN.1 handling</Title>
+        <Description>Ars Magnag ASN.1 handling</Description>
+    </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
         <DocumentationFile>bin\Debug\AM.Asn1.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <DocumentationFile>bin\Release\AM.Asn1.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     </ItemGroup>
 
 </Project>

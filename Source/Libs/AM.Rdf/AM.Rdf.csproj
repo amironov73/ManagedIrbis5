@@ -1,40 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
-        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-        <PackageVersion>5.0.0</PackageVersion>
-        <Title>RDF manipulation services for Ars Magna project</Title>
-        <Authors>Alexey Mironov</Authors>
-        <Description>RDF manipulation services for Ars Magna project</Description>
-        <Copyright>Copyright Alexey Mironov 2019-2021</Copyright>
-        <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageIcon>arsmagna-icon.png</PackageIcon>
-        <SignAssembly>true</SignAssembly>
-        <DelaySign>false</DelaySign>
-        <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-        <ApplicationIcon>BlueBook.ico</ApplicationIcon>
-    </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>AM.Rdf</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\AM.Rdf.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Description>RDF manipulation services for Ars Magna project</Description>
+    <Title>RDF manipulation services for Ars Magna project</Title>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\AM.Rdf.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\AM.Rdf.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\AM.Rdf.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -1,45 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RootNamespace>AM.Drawing</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>Ars Magna GDI+ drawing services</Title>
+    <Description>Ars Magna GDI+ drawing services</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\AM.Drawing5.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\AM.Drawing5.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <PackageVersion>5.0.0</PackageVersion>
-    <Title>Ars Magna GDI+ drawing services</Title>
-    <Authors>Alexey Mironov</Authors>
-    <Description>Ars Magna GDI+ drawing services</Description>
-    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>arsmagna-icon.png</PackageIcon>
-    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\AM.Drawing5.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\AM.Drawing5.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL</DefineConstants>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
-    </ItemGroup>
-
 
 </Project>

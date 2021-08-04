@@ -1,5 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <RootNamespace>RestfulIrbis</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>REST server and client for popular russian library automation system IRBIS64</Title>
+    <Description>REST server and client for popular russian library automation system IRBIS64</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\RestfulIrbis5.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\RestfulIrbis5.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="RestSharp" Version="106.11.7" />
   </ItemGroup>
@@ -8,38 +26,5 @@
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <PackageVersion>5.0.0</PackageVersion>
-    <Title>REST server and client for popular russian library automation system IRBIS64</Title>
-    <Authors>Alexey Mironov</Authors>
-    <Description>REST server and client for popular russian library automation system IRBIS64.</Description>
-    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>arsmagna-icon.png</PackageIcon>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
-  </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\RestfulIrbis5.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\RestfulIrbis5.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL</DefineConstants>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
 
 </Project>

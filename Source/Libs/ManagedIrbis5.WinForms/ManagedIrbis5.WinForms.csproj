@@ -4,23 +4,21 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>ManagedIrbis.WinForms</RootNamespace>
-    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-    <PackageVersion>5.0.0</PackageVersion>
-    <Title>WinForms-based controls and dialogs for Ars Magna project</Title>
-    <Description>WinForms-based controls and dialogs for Ars Magna project</Description>
-    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>arsmagna-icon.png</PackageIcon>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Source\" />
-  </ItemGroup>
+  <PropertyGroup>
+    <Description>WinForms-based controls and dialogs for Ars Magna project</Description>
+    <Title>WinForms-based controls and dialogs for Ars Magna project</Title>
+  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\ManagedIrbis.WinForms.xml</DocumentationFile>
+  </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\ManagedIrbis.WinForms.xml</DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
@@ -45,8 +43,4 @@
     </EmbeddedResource>
   </ItemGroup>
 
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
-    
 </Project>

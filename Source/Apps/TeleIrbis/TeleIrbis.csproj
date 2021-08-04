@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
-    <IsPackable>false</IsPackable>
     <ApplicationIcon>airplane.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -21,11 +19,6 @@
     <PackageReference Include="Telegram.Bot" Version="15.7.1" />
     <PackageReference Include="Topshelf" Version="4.2.1" />
     <PackageReference Include="Topshelf.NLog" Version="4.2.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
-    <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
   </ItemGroup>
 
 </Project>

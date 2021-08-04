@@ -1,5 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <RootNamespace>Istu</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Title>INRTU-specific services</Title>
+    <Description>INTRTU-specific services</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\Istu5.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\Istu5.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="linq2db" Version="3.1.6" />
   </ItemGroup>
@@ -7,38 +25,5 @@
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-    <PackageVersion>5.0.0</PackageVersion>
-    <Title>INRTU-specific services</Title>
-    <Authors>Alexey Mironov</Authors>
-    <Description>INTRTU-specific services</Description>
-    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>arsmagna-icon.png</PackageIcon>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
-  </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\Istu5.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\Istu5.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL</DefineConstants>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
 
 </Project>

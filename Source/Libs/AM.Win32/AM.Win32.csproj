@@ -1,45 +1,34 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net5.0-windows</TargetFramework>
-        <UseWindowsForms>true</UseWindowsForms>
-        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
-        <PackageVersion>5.0.0</PackageVersion>
-        <Title>Win32 services for Ars Magna project</Title>
-        <Authors>Alexey Mironov</Authors>
-        <Description>Win32 services for Ars Magna project.</Description>
-        <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-        <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageIcon>arsmagna-icon.png</PackageIcon>
-        <SignAssembly>true</SignAssembly>
-        <DelaySign>false</DelaySign>
-        <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-        <ApplicationIcon>BlueBook.ico</ApplicationIcon>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>bin\Debug\AM.Win32.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>AM.Win32</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\AM.Win32.xml</DocumentationFile>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <DefineConstants>TRACECOREAPP;CONTRACTS_FULL</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Description>Win32 services for Ars Magna project.</Description>
+    <Title>Win32 services for Ars Magna project</Title>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
-    </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\AM.Win32.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.0" />
-    </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+     <DocumentationFile>bin\Release\AM.Win32.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
+  </ItemGroup>
 
 </Project>

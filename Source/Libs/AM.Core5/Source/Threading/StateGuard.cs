@@ -20,6 +20,8 @@ using System;
 
 #endregion
 
+#nullable disable
+
 namespace AM.Threading
 {
     /// <summary>

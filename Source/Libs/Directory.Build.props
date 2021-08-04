@@ -1,0 +1,53 @@
+<!-- Common properties for libraries -->
+
+<Project>
+
+    <!-- Framework and language -->
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <LangVersion>9</LangVersion>
+        <Nullable>enable</Nullable>
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    </PropertyGroup>
+
+    <!-- Icon -->
+    <PropertyGroup>
+        <ApplicationIcon>..\..\Common\BlueBook.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <!-- Assembly -->
+    <PropertyGroup>
+        <Version>5.0.0</Version>
+        <SignAssembly>true</SignAssembly>
+        <DelaySign>false</DelaySign>
+        <AssemblyOriginatorKeyFile>..\..\Common\ArsMagna.private.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DefineConstants>CONTRACTS_FULL;COREAPP;TRACE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DefineConstants>COREAPP;CONTRACTS_FULL</DefineConstants>
+    </PropertyGroup>
+
+    <!-- NuGet related stuff -->
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <Product>Ars Magna</Product>
+        <PackageVersion>5.0.0</PackageVersion>
+        <Company>Ars Magna Project</Company>
+        <Authors>Alexey Mironov</Authors>
+        <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
+        <PackageIcon>arsmagna-icon.png</PackageIcon>
+    </PropertyGroup>
+
+    <!-- Icon for the NuGet package -->
+    <ItemGroup>
+        <None Include="..\..\Common\arsmagna-icon.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+</Project>

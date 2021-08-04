@@ -3,11 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyName>AM.Windows.DevExpress5</AssemblyName>
-    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>arsmagna-icon.png</PackageIcon>
-    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
+    <RootNamespace>AM.DevExpress</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>DevExpress components for Ars Magna</Description>
+    <Title>DevExpress components for Ars Magna</Title>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,9 +23,5 @@
     <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
     <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
   </ItemGroup>
-
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\"/>
-    </ItemGroup>
     
 </Project>

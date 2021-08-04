@@ -1,40 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <ApplicationIcon>BlueBook.ico</ApplicationIcon>
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-    <AssemblyOriginatorKeyFile>ArsMagna.private.snk</AssemblyOriginatorKeyFile>
-    <Version>5.0.0</Version>
-    <Company>Ars Magna Project</Company>
-    <Product>Ars Magna</Product>
-    <Description>Ars Magna core services</Description>
-    <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
     <RootNamespace>AM</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>Ars Magna core services</Description>
     <Title>ArsMagna core services</Title>
-    <Authors>Alexey Mironov</Authors>
-    <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>arsmagna-icon.png</PackageIcon>
-    <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\AM.Core5.xml</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>TRACECOREAPP;CONTRACTS_FULLCOREAPP;TRACE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\AM.Core5.xml</DocumentationFile>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DefineConstants>TRACECOREAPP;CONTRACTS_FULL</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="ArsMagnaSslSocket.cer" />
-    <EmbeddedResource Include="ArsMagnaSslSocket.cer" />
+    <EmbeddedResource Include="..\..\Common\ArsMagnaSslSocket.cer" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,9 +53,5 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
-    <ItemGroup>
-        <None Include="arsmagna-icon.png" Pack="true" PackagePath="\" />
-    </ItemGroup>
 
 </Project>

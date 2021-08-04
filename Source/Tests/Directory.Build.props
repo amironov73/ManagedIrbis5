@@ -1,0 +1,17 @@
+<!-- Common properties for tests -->
+
+<Project>
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+    </ItemGroup>
+
+</Project>

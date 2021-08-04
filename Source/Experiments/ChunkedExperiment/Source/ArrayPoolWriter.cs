@@ -63,7 +63,7 @@ namespace ChunkedExperiment
         #region Properties
 
         /// <summary>
-        /// Размер фрагмента.
+        /// Размер фрагмента (общий для всех).
         /// </summary>
         public int ChunkSize => _chunkSize;
 

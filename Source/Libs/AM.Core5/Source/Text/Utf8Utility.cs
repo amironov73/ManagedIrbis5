@@ -47,28 +47,31 @@ namespace AM.Text
         {
             var result = 0u;
 
-            while (length-- != 0) unchecked
+            unchecked
             {
-                uint c = *text++;
-                ++result;
-                if (c >= 1u << 7)
+                while (length-- != 0)
                 {
+                    uint c = *text++;
                     ++result;
-                }
+                    if (c >= 1u << 7)
+                    {
+                        ++result;
+                    }
 
-                if (c >= 1u << 11)
-                {
-                    ++result;
-                }
+                    if (c >= 1u << 11)
+                    {
+                        ++result;
+                    }
 
-                if (c >= 1u << 16)
-                {
-                    ++result;
-                }
+                    if (c >= 1u << 16)
+                    {
+                        ++result;
+                    }
 
-                if (c >= 1u << 21)
-                {
-                    ++result;
+                    if (c >= 1u << 21)
+                    {
+                        ++result;
+                    }
                 }
             }
 
@@ -288,111 +291,114 @@ namespace AM.Text
                 return true;
             }
 
-            while (length-- != 0) unchecked
+            unchecked
             {
-                var b1 = *data++;
-
-                if (b1 <= 0x7F)
+                while (length-- != 0)
                 {
-                    continue;
-                }
+                    var b1 = *data++;
 
-                if (b1 < 0xC2)
-                {
+                    if (b1 <= 0x7F)
+                    {
+                        continue;
+                    }
+
+                    if (b1 < 0xC2)
+                    {
+                        return false;
+                    }
+
+                    if (length == 0)
+                    {
+                        return false;
+                    }
+
+                    --length;
+                    var b2 = *data++;
+
+                    if (b1 <= 0xDF)
+                    {
+                        if (!(b2 is >= 0x80 and <= 0xBF))
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
+                    if (length == 0)
+                    {
+                        return false;
+                    }
+
+                    --length;
+                    var b3 = *data++;
+
+                    if (b1 == 0xE0)
+                    {
+                        if (!(b2 is >= 0xA0 and <= 0xBF && b3 is >= 0x80 and <= 0xBF))
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
+                    if (b1 <= 0xEC)
+                    {
+                        if (!(b2 is >= 0x80 and <= 0xBF && b3 is >= 0x80 and <= 0xBF))
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
+                    if (b1 == 0xED)
+                    {
+                        if (!(b2 is >= 0x80 and <= 0x9F && b3 is >= 0x80 and <= 0xBF))
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
+                    if (b1 <= 0xEF)
+                    {
+                        if (!(b2 is >= 0x80 and <= 0xBF && b3 is >= 0x80 and <= 0xBF))
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
+                    --length;
+                    var b4 = *data++;
+
+                    if (b1 == 0xF0)
+                    {
+                        if (!(b2 is >= 0x90 and <= 0xBF && b3 is >= 0x80 and <= 0xBF && b4 is >= 0x80 and <= 0xBF))
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
+                    if (b1 <= 0xF4)
+                    {
+                        if (!(b2 is >= 0x80 and <= 0xBF && b3 is >= 0x80 and <= 0xBF && b4 is >= 0x80 and <= 0xBF))
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
                     return false;
+
                 }
-
-                if (length == 0)
-                {
-                    return false;
-                }
-
-                --length;
-                var b2 = *data++;
-
-                if (b1 <= 0xDF)
-                {
-                    if (!(b2 is >= 0x80 and <= 0xBF))
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                if (length == 0)
-                {
-                    return false;
-                }
-
-                --length;
-                var b3 = *data++;
-
-                if (b1 == 0xE0)
-                {
-                    if (!(b2 is >= 0xA0 and <= 0xBF && b3 is >= 0x80 and <= 0xBF))
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                if (b1 <= 0xEC)
-                {
-                    if (!(b2 is >= 0x80 and <= 0xBF && b3 is >= 0x80 and <= 0xBF))
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                if (b1 == 0xED)
-                {
-                    if (!(b2 is >= 0x80 and <= 0x9F && b3 is >= 0x80 and <= 0xBF))
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                if (b1 <= 0xEF)
-                {
-                    if (!(b2 is >= 0x80 and <= 0xBF && b3 is >= 0x80 and <= 0xBF))
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                --length;
-                var b4 = *data++;
-
-                if (b1 == 0xF0)
-                {
-                    if (!(b2 is >= 0x90 and <= 0xBF && b3 is >= 0x80 and <= 0xBF && b4 is >= 0x80 and <= 0xBF))
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                if (b1 <= 0xF4)
-                {
-                    if (!(b2 is >= 0x80 and <= 0xBF && b3 is >= 0x80 and <= 0xBF && b4 is >= 0x80 and <= 0xBF))
-                    {
-                        return false;
-                    }
-
-                    continue;
-                }
-
-                return false;
-
             }
 
             return true;

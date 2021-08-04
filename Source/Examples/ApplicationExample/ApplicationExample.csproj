@@ -2,13 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-        <IsPackable>false</IsPackable>
     </PropertyGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
-    </ItemGroup>
 
     <ItemGroup>
       <None Update="appsettings.json">
