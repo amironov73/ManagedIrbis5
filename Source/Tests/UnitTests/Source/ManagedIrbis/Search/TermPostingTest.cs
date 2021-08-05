@@ -1,10 +1,14 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis;
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Search
 {
@@ -17,12 +21,11 @@ namespace UnitTests.ManagedIrbis.Search
                 TermPosting first
             )
         {
-            byte[] bytes = first.SaveToMemory();
+            var bytes = first.SaveToMemory();
 
-            TermPosting second = bytes
-                .RestoreObjectFromMemory<TermPosting>();
-
-            Assert.AreEqual(first.Count, second.Count);
+            var second = bytes.RestoreObjectFromMemory<TermPosting>();
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Count, second!.Count);
             Assert.AreEqual(first.Mfn, second.Mfn);
             Assert.AreEqual(first.Occurrence, second.Occurrence);
             Assert.AreEqual(first.Tag, second.Tag);
@@ -32,7 +35,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TestTermPosting_Serialization()
         {
-            TermPosting posting = new TermPosting();
+            var posting = new TermPosting();
             _TestSerialization(posting);
 
             posting = new TermPosting
@@ -49,7 +52,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TestTermPosting_ToString()
         {
-            TermPosting posting = new TermPosting
+            var posting = new TermPosting
             {
                 Count = 10,
                 Mfn = 20,
@@ -57,7 +60,7 @@ namespace UnitTests.ManagedIrbis.Search
                 Tag = 40,
                 Text = "T=HELLO"
             };
-            string actual = posting.ToString();
+            var actual = posting.ToString();
             Assert.AreEqual
                 (
                     "MFN=20 Tag=40 Occurrence=30 Count=10 Text=\"T=HELLO\"",
@@ -68,7 +71,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TestTermPosting_Clone()
         {
-            TermPosting expected = new TermPosting
+            var expected = new TermPosting
             {
                 Count = 10,
                 Mfn = 20,
@@ -76,7 +79,7 @@ namespace UnitTests.ManagedIrbis.Search
                 Tag = 40,
                 Text = "T=HELLLO"
             };
-            TermPosting actual = expected.Clone();
+            var actual = expected.Clone();
             Assert.AreEqual(expected.Count, actual.Count);
             Assert.AreEqual(expected.Mfn, actual.Mfn);
             Assert.AreEqual(expected.Occurrence, actual.Occurrence);
@@ -87,7 +90,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TestTermPosting_Verify()
         {
-            TermPosting posting = new TermPosting();
+            var posting = new TermPosting();
             Assert.IsTrue(posting.Verify(false));
         }
     }

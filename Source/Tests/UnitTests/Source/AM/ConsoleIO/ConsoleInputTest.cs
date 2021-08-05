@@ -11,7 +11,7 @@ namespace UnitTests.AM.ConsoleIO
     [TestClass]
     public class ConsoleInputTest
     {
-        private static IConsoleDriver _saveDriver;
+        private static IConsoleDriver? _saveDriver;
 
         [ClassInitialize]
         public static void Setup(TestContext context)
@@ -22,7 +22,10 @@ namespace UnitTests.AM.ConsoleIO
         [ClassCleanup]
         public static void Cleanup()
         {
-            ConsoleInput.SetDriver(_saveDriver);
+            if (_saveDriver is not null)
+            {
+                ConsoleInput.SetDriver(_saveDriver);
+            }
         }
 
         [TestMethod]

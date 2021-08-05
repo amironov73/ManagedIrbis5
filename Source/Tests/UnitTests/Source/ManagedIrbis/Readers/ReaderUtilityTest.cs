@@ -6,30 +6,32 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis.Readers;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Readers
 {
     [TestClass]
     public class ReaderUtilityTest
     {
-        private static void _TestFixName(string name, string expected)
+        private static void _TestFixName(string? name, string? expected)
         {
             var actual = ReaderUtility.FixName(name);
             Assert.AreEqual(expected, actual);
         }
 
-        private static void _TestFixTicket(string ticket, string expected)
+        private static void _TestFixTicket(string? ticket, string? expected)
         {
             var actual = ReaderUtility.FixTicket(ticket);
             Assert.AreEqual(expected, actual);
         }
 
-        private static void _TestFixPhone(string phone, string expected)
+        private static void _TestFixPhone(string? phone, string? expected)
         {
             var actual = ReaderUtility.FixPhone(phone);
             Assert.AreEqual(expected, actual);
         }
 
-        private static void _TestFixEmail(string email, string expected)
+        private static void _TestFixEmail(string? email, string? expected)
         {
             var actual = ReaderUtility.FixEmail(email);
             Assert.AreEqual(expected, actual);

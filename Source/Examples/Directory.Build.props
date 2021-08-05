@@ -2,16 +2,22 @@
 
 <Project>
 
+    <!-- Assembly version and strong name -->
+    <Import Project="..\Common\ArsMagna.targets" />
+
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <IsPackable>false</IsPackable>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
     <ItemGroup>
-      <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
-      <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
     </ItemGroup>
 
 </Project>

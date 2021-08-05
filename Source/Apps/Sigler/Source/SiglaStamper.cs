@@ -70,7 +70,7 @@ namespace Sigler
 
         #region Private members
 
-        private Stopwatch _stopwatch;
+        private Stopwatch? _stopwatch;
 
         /// <summary>
         /// Форматируем отрезок времени
@@ -81,13 +81,7 @@ namespace Sigler
                 TimeSpan timeSpan
             )
         {
-            string result = string.Format
-                (
-                    "{0:00}:{1:00}:{2:00}",
-                    timeSpan.Hours,
-                    timeSpan.Minutes,
-                    timeSpan.Seconds
-                );
+            string result = $"{timeSpan.Hours:00}:{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
 
             return result;
         }
@@ -114,14 +108,14 @@ namespace Sigler
                 return;
             }
 
-            var existingSigla = field.GetSubFieldValue('d', 0).ToString();
+            var existingSigla = field.GetSubFieldValue('d');
             if (newSigla.SameString(existingSigla))
             {
                 Output.Write("{0} ", record.Mfn);
             }
             else
             {
-                if (field.GetSubFieldValue('a', 0).SameString("5"))
+                if (field.GetSubFieldValue('a').SameString("5"))
                 {
                     field.SetSubFieldValue('a', "0");
                 }
@@ -145,12 +139,15 @@ namespace Sigler
                 return;
             }
 
-            Output.Write
-                (
-                    "{0,6}) {1} ",
-                    index,
-                    _FormatTimeSpan(_stopwatch.Elapsed)
-                );
+            if (_stopwatch is not null)
+            {
+                Output.Write
+                    (
+                        "{0,6}) {1} ",
+                        index,
+                        _FormatTimeSpan(_stopwatch.Elapsed)
+                    );
+            }
 
             int[] mfns = Connection.Search("\"IN=" + number + "\"");
             if (mfns.Length == 0)
@@ -165,12 +162,15 @@ namespace Sigler
             foreach (int mfn in mfns)
             {
                 var record = Connection.ReadRecord(mfn);
-                ProcessRecord
-                (
-                    record,
-                    sigla,
-                    number
-                );
+                if (record is not null)
+                {
+                    ProcessRecord
+                        (
+                            record,
+                            sigla,
+                            number
+                        );
+                }
             }
 
             Console.WriteLine();
@@ -188,7 +188,7 @@ namespace Sigler
             var index = 0;
 
             using var reader = new StreamReader(fileName, Encoding.Default);
-            string line;
+            string? line;
 
             while ((line = reader.ReadLine()) != null)
             {

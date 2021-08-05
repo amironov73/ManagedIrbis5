@@ -1,10 +1,10 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-/* EnumTypeConverter.cs -- 
- * Ars Magna project, http://arsmagna.ru 
- * -------------------------------------------------------
- * Status: poor
+// ReSharper disable CheckNamespace
+
+/* EnumTypeConverter.cs --
+ * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
@@ -15,10 +15,12 @@ using System.Globalization;
 
 #endregion
 
+#nullable enable
+
 namespace AM.Windows.Forms
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     internal sealed class EnumTypeConverter
         : TypeConverter
@@ -91,20 +93,20 @@ namespace AM.Windows.Forms
         /// An <see cref="T:System.Object"></see> that represents the converted value.
         /// </returns>
         /// <exception cref="T:System.NotSupportedException">The conversion cannot be performed. </exception>
-        public override object ConvertFrom
+        public override object? ConvertFrom
             (
                 ITypeDescriptorContext context,
                 CultureInfo culture,
                 object value
             )
         {
-            string s = value as string;
+            var s = value as string;
             if (!string.IsNullOrEmpty(s))
             {
                 return Type.GetType(s);
             }
-            Type t = value as Type;
-            if (t != null)
+
+            if (value is Type t)
             {
                 return t.FullName;
             }
@@ -129,7 +131,7 @@ namespace AM.Windows.Forms
         /// </returns>
         /// <exception cref="T:System.NotSupportedException">The conversion cannot be performed. </exception>
         /// <exception cref="T:System.ArgumentNullException">The destinationType parameter is null. </exception>
-        public override object ConvertTo
+        public override object? ConvertTo
             (
                 ITypeDescriptorContext context,
                 CultureInfo culture,
@@ -137,15 +139,15 @@ namespace AM.Windows.Forms
                 Type destinationType
             )
         {
-            string s = value as string;
+            var s = value as string;
             if (!string.IsNullOrEmpty(s)
                  && (destinationType == typeof(Type)))
             {
                 return Type.GetType(s);
             }
-            Type t = value as Type;
-            if ((t != null)
-                 && (destinationType == typeof(string)))
+
+            if ((value is Type t)
+                && (destinationType == typeof(string)))
             {
                 return t.FullName;
             }

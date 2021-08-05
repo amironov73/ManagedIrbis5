@@ -1,6 +1,13 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
+
 /* PftParser.Tables.cs --
  * Ars Magna project, http://arsmagna.ru
  */
@@ -10,8 +17,9 @@
 using System;
 using System.Collections.Generic;
 
-
 #endregion
+
+#nullable enable
 
 namespace ManagedIrbis.Pft.Infrastructure
 {
@@ -22,9 +30,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Field reference context.
         /// </summary>
-        private Dictionary<PftTokenKind, Func<PftNode>> FieldMap { get; set; }
+        private Dictionary<PftTokenKind, Func<PftNode>>? FieldMap { get; set; }
 
-        private static PftTokenKind[] LeftHandItems1 =
+        private static readonly PftTokenKind[] LeftHandItems1 =
         {
             PftTokenKind.ConditionalLiteral, PftTokenKind.C,
             PftTokenKind.Comma, PftTokenKind.Comment, PftTokenKind.Hash,
@@ -32,7 +40,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             PftTokenKind.Slash, PftTokenKind.X
         };
 
-        private static PftTokenKind[] LeftHandItems2 =
+        private static readonly PftTokenKind[] LeftHandItems2 =
         {
             PftTokenKind.C, PftTokenKind.Comma, PftTokenKind.Comment,
             PftTokenKind.Hash, PftTokenKind.Nl, PftTokenKind.Percent,
@@ -42,15 +50,14 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Main script context.
         /// </summary>
-        private Dictionary<PftTokenKind, Func<PftNode>> MainModeMap { get; set; }
+        private Dictionary<PftTokenKind, Func<PftNode>>? MainModeMap { get; set; }
 
         /// <summary>
         /// Numeric expression context.
         /// </summary>
-        // ReSharper disable once NotNullMemberIsNotInitialized
-        private static Dictionary<PftTokenKind, Func<PftNode>> NumericMap { get; set; }
+        private static Dictionary<PftTokenKind, Func<PftNode>>? NumericMap { get; set; }
 
-        private static PftTokenKind[] NumericModeItems =
+        private static readonly PftTokenKind[] NumericModeItems =
         {
             PftTokenKind.Number, PftTokenKind.Val, PftTokenKind.Rsum,
             PftTokenKind.Ravr, PftTokenKind.Rmax, PftTokenKind.Rmin,
@@ -65,13 +72,13 @@ namespace ManagedIrbis.Pft.Infrastructure
             PftTokenKind.L,
         };
 
-        private static PftTokenKind[] RightHandItems =
+        private static readonly PftTokenKind[] RightHandItems =
         {
             PftTokenKind.C, PftTokenKind.Comment,
             PftTokenKind.Nl, PftTokenKind.X
         };
 
-        private static PftTokenKind[] MainModeItems =
+        private static readonly PftTokenKind[] MainModeItems =
         {
             PftTokenKind.Break, PftTokenKind.Comma, PftTokenKind.C,
             PftTokenKind.Hash, PftTokenKind.Mfn, PftTokenKind.Mpl,
@@ -222,12 +229,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         // Open and close tokens
         //================================================================
 
-        private static PftTokenKind[] _andStop =
+        private static readonly PftTokenKind[] _andStop =
         {
             PftTokenKind.And, PftTokenKind.Or
         };
 
-        private static PftTokenKind[] _comparisonStop =
+        private static readonly PftTokenKind[] _comparisonStop =
         {
             PftTokenKind.Less, PftTokenKind.LessEqual,
             PftTokenKind.More, PftTokenKind.MoreEqual,
@@ -237,116 +244,69 @@ namespace ManagedIrbis.Pft.Infrastructure
             PftTokenKind.Colon, PftTokenKind.Tilda
         };
 
-        private static TokenPair[] _curlyPair =
-        {
-            new TokenPair
-            {
-                Open = PftTokenKind.LeftCurly,
-                Close = PftTokenKind.RightCurly
-            }
-        };
-
-        private static PftTokenKind[] _curlyClose =
+        private static readonly PftTokenKind[] _curlyClose =
         {
             PftTokenKind.RightCurly
         };
 
-        private static PftTokenKind[] _curlyOpen =
+        private static readonly PftTokenKind[] _curlyOpen =
         {
             PftTokenKind.LeftCurly
         };
 
-        private static PftTokenKind[] _curlyStop =
+        private static readonly PftTokenKind[] _curlyStop =
         {
             PftTokenKind.RightCurly
         };
 
-        private static PftTokenKind[] _doStop =
+        private static readonly PftTokenKind[] _doStop =
         {
             PftTokenKind.Do
         };
 
-        private static PftTokenKind[] _elseStop =
+        private static readonly PftTokenKind[] _elseStop =
         {
             PftTokenKind.Else, PftTokenKind.Fi
         };
 
-        private static PftTokenKind[] _emptyClose = { };
-
-        private static PftTokenKind[] _emptyOpen = { };
-
-        private static PftTokenKind[] _fiStop =
+        private static readonly PftTokenKind[] _fiStop =
         {
             PftTokenKind.Fi
         };
 
-        private static PftTokenKind[] _ifClose =
+        private static readonly PftTokenKind[] _ifClose =
         {
             PftTokenKind.Fi
         };
 
-        private static PftTokenKind[] _ifOpen =
+        private static readonly PftTokenKind[] _ifOpen =
         {
             PftTokenKind.If
         };
 
-        private static TokenPair[] _loopPairs =
-        {
-            new TokenPair
-            {
-                Open = PftTokenKind.For,
-                Close = PftTokenKind.End
-            },
-            new TokenPair
-            {
-                Open = PftTokenKind.ForEach,
-                Close = PftTokenKind.End
-            },
-            new TokenPair
-            {
-                Open = PftTokenKind.Local,
-                Close = PftTokenKind.End
-            },
-            new TokenPair
-            {
-                Open = PftTokenKind.With,
-                Close = PftTokenKind.End
-            },
-            new TokenPair
-            {
-                Open = PftTokenKind.While,
-                Close = PftTokenKind.End
-            },
-            new TokenPair
-            {
-                Open = PftTokenKind.LeftCurly,
-                Close = PftTokenKind.RightCurly
-            }
-        };
-
-        private static PftTokenKind[] _loopClose =
+        private static readonly PftTokenKind[] _loopClose =
         {
             PftTokenKind.End, PftTokenKind.RightCurly
         };
 
-        private static PftTokenKind[] _loopOpen =
+        private static readonly PftTokenKind[] _loopOpen =
         {
             PftTokenKind.For, PftTokenKind.ForEach,
             PftTokenKind.Local, PftTokenKind.While,
             PftTokenKind.With, PftTokenKind.LeftCurly
         };
 
-        private static PftTokenKind[] _loopStop =
+        private static readonly PftTokenKind[] _loopStop =
         {
             PftTokenKind.End
         };
 
-        private static PftTokenKind[] _orderStop =
+        private static readonly PftTokenKind[] _orderStop =
         {
             PftTokenKind.Order, PftTokenKind.End
         };
 
-        private static TokenPair[] _parenthesisPairs =
+        private static readonly TokenPair[] _parenthesisPairs =
         {
             new TokenPair
             {
@@ -360,60 +320,61 @@ namespace ManagedIrbis.Pft.Infrastructure
             },
         };
 
-        private static PftTokenKind[] _parenthesisClose =
+        private static readonly PftTokenKind[] _parenthesisClose =
         {
             PftTokenKind.RightParenthesis, PftTokenKind.RightCurly
         };
 
-        private static PftTokenKind[] _parenthesisOpen =
+        private static readonly PftTokenKind[] _parenthesisOpen =
         {
             PftTokenKind.LeftParenthesis, PftTokenKind.LeftCurly
         };
 
-        private static PftTokenKind[] _parenthesisStop =
+        private static readonly PftTokenKind[] _parenthesisStop =
         {
             PftTokenKind.RightParenthesis
         };
 
-        private static PftTokenKind[] _procedureStop =
+        private static readonly PftTokenKind[] _procedureStop =
         {
             PftTokenKind.End
         };
 
-        private static PftTokenKind[] _selectStop =
+        private static readonly PftTokenKind[] _selectStop =
         {
             PftTokenKind.Select
         };
 
-        private static PftTokenKind[] _semicolonStop =
+        private static readonly PftTokenKind[] _semicolonStop =
         {
             PftTokenKind.Semicolon
         };
 
-        private static PftTokenKind[] _squareClose =
+        private static readonly PftTokenKind[] _squareClose =
         {
             PftTokenKind.RightSquare
         };
 
-        private static PftTokenKind[] _squareOpen =
+        private static readonly PftTokenKind[] _squareOpen =
         {
             PftTokenKind.LeftSquare
         };
 
-        private static PftTokenKind[] _squareStop =
+        private static readonly PftTokenKind[] _squareStop =
         {
             PftTokenKind.RightSquare
         };
 
-        private static PftTokenKind[] _thenStop =
+        private static readonly PftTokenKind[] _thenStop =
         {
             PftTokenKind.Then
         };
 
-        private static PftTokenKind[] _whereStop =
+        private static readonly PftTokenKind[] _whereStop =
         {
             PftTokenKind.Where, PftTokenKind.Select
         };
 
-    }
-}
+    } // class PftParser
+
+} // namespace ManagedIrbis.Pft.Infrastructure

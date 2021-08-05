@@ -1,0 +1,12 @@
+<!-- Общая для всех проектов версия -->
+
+<Project>
+
+    <PropertyGroup>
+        <Version>5.0.0</Version>
+        <SignAssembly>true</SignAssembly>
+        <DelaySign>false</DelaySign>
+        <AssemblyOriginatorKeyFile>..\..\Common\ArsMagna.private.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+</Project>

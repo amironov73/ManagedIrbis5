@@ -69,7 +69,11 @@ namespace ManagedIrbis.Reports
             var text = Compute(context);
             var driver = context.Driver;
             driver.BeginCell(context, this);
-            context.Output.Write(text);
+            if (!string.IsNullOrEmpty(text))
+            {
+                context.Output.Write(text);
+            }
+
             driver.EndCell(context, this);
         } // method Render
 

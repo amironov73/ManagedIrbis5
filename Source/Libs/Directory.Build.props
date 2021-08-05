@@ -2,6 +2,9 @@
 
 <Project>
 
+    <!-- Assembly version and strong name -->
+    <Import Project="..\Common\ArsMagna.targets" />
+
     <!-- Framework and language -->
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
@@ -13,14 +16,6 @@
     <!-- Icon -->
     <PropertyGroup>
         <ApplicationIcon>..\..\Common\BlueBook.ico</ApplicationIcon>
-    </PropertyGroup>
-
-    <!-- Assembly -->
-    <PropertyGroup>
-        <Version>5.0.0</Version>
-        <SignAssembly>true</SignAssembly>
-        <DelaySign>false</DelaySign>
-        <AssemblyOriginatorKeyFile>..\..\Common\ArsMagna.private.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">

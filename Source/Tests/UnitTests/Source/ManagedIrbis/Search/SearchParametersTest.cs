@@ -1,8 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.Runtime;
 
 using ManagedIrbis;
+
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Search
 {
@@ -16,10 +21,9 @@ namespace UnitTests.ManagedIrbis.Search
         {
             var bytes = first.SaveToMemory();
 
-            var second
-                = bytes.RestoreObjectFromMemory<SearchParameters>();
-
-            Assert.AreEqual(first.Database, second.Database);
+            var second = bytes.RestoreObjectFromMemory<SearchParameters>();
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Database, second!.Database);
             Assert.AreEqual(first.FirstRecord, second.FirstRecord);
             Assert.AreEqual(first.Format, second.Format);
             Assert.AreEqual(first.MaxMfn, second.MaxMfn);

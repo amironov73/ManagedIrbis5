@@ -18,6 +18,8 @@ using AM;
 
 #endregion
 
+#nullable enable
+
 namespace ManagedIrbis.Infrastructure
 {
     //
@@ -237,11 +239,17 @@ namespace ManagedIrbis.Infrastructure
 
                     throw new SearchSyntaxException();
                 }
-                context.Add(token.Text);
+
+                if (!string.IsNullOrEmpty(token.Text))
+                {
+                    context.Add (token.Text);
+                }
 
                 Tokens.RequireNext();
-            }
-        }
+
+            } // while
+
+        } // method ParseTerm
 
         /// <summary>
         /// Term, Reference or Parenthesis
@@ -458,7 +466,8 @@ namespace ManagedIrbis.Infrastructure
             _AssignParentToChildren(result);
 
             return result;
-        }
+
+        } // method Parse
 
         #endregion
 

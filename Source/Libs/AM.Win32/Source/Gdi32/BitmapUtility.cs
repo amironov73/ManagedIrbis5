@@ -39,7 +39,7 @@ namespace AM.Win32
                 (
                     dibptr,
                     typeof(BITMAPINFOHEADER)
-                );
+                )!;
             unchecked
             {
                 if ( bmi.biSizeImage == 0 )

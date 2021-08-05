@@ -11,7 +11,7 @@ init:
 
 dotnet_csproj:
   patch: true
-  file: '**\*.csproj'
+  file: 'Source\Common\ArsMagna.targets'
   version: '{version}'
   package_version: '{version}'
   assembly_version: '{version}'

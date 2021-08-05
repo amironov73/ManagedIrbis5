@@ -77,7 +77,7 @@ namespace UnitTests.AM.IO
             var actual = BinaryReaderUtility.ReadNullableByte(reader);
             Assert.IsTrue(actual.HasValue);
             Assert.IsNotNull(expected);
-            Assert.AreEqual(expected.Value, actual.Value);
+            Assert.AreEqual(expected.Value, actual!.Value);
         }
 
         [TestMethod]
@@ -112,7 +112,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableDateTime(reader);
             Assert.IsTrue(actual.HasValue);
-            Assert.AreEqual(expected.Value, actual.Value);
+            Assert.AreEqual(expected.Value, actual!.Value);
         }
 
         [TestMethod]
@@ -147,7 +147,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableDecimal(reader);
             Assert.IsTrue(actual.HasValue);
-            Assert.AreEqual(expected.Value, actual.Value);
+            Assert.AreEqual(expected.Value, actual!.Value);
         }
 
         [TestMethod]
@@ -182,7 +182,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableDouble(reader);
             Assert.IsTrue(actual.HasValue);
-            Assert.AreEqual(expected.Value, actual.Value);
+            Assert.AreEqual(expected.Value, actual!.Value);
         }
 
         [TestMethod]
@@ -218,7 +218,7 @@ namespace UnitTests.AM.IO
             var actual = BinaryReaderUtility.ReadNullableInt16(reader);
             Assert.IsTrue(actual.HasValue);
             Assert.IsNotNull(expected);
-            Assert.AreEqual(expected.Value, actual.Value);
+            Assert.AreEqual(expected.Value, actual!.Value);
         }
 
         [TestMethod]
@@ -253,7 +253,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableInt32(reader);
             Assert.IsTrue(actual.HasValue);
-            Assert.AreEqual(expected.Value, actual.Value);
+            Assert.AreEqual(expected.Value, actual!.Value);
         }
 
         [TestMethod]
@@ -288,7 +288,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableInt64(reader);
             Assert.IsTrue(actual.HasValue);
-            Assert.AreEqual(expected.Value, actual.Value);
+            Assert.AreEqual(expected.Value, actual!.Value);
         }
 
         [TestMethod]
@@ -343,11 +343,14 @@ namespace UnitTests.AM.IO
             var bytes = stream.ToArray();
             stream = new MemoryStream(bytes);
             var reader = new BinaryReader(stream);
+
+            // ReSharper disable ForCanBeConvertedToForeach
             for (var i = 0; i < values.Length; i++)
             {
                 var value = reader.ReadPackedInt32();
                 Assert.AreEqual(values[i], value);
             }
+            // ReSharper restore ForCanBeConvertedToForeach
         }
 
         [TestMethod]
@@ -367,11 +370,14 @@ namespace UnitTests.AM.IO
             var bytes = stream.ToArray();
             stream = new MemoryStream(bytes);
             var reader = new BinaryReader(stream);
+
+            // ReSharper disable ForCanBeConvertedToForeach
             for (var i = 0; i < values.Length; i++)
             {
                 var value = reader.ReadPackedInt64();
                 Assert.AreEqual(values[i], value);
             }
+            // ReSharper restore ForCanBeConvertedToForeach
         }
 
         [TestMethod]
@@ -571,7 +577,7 @@ namespace UnitTests.AM.IO
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
 
-            string expected = null;
+            string? expected = null;
             BinaryWriterUtility.WriteNullable(writer, expected);
 
             var bytes = stream.ToArray();
@@ -600,7 +606,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableInt32Array(reader);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Length, actual.Length);
+            Assert.AreEqual(expected.Length, actual!.Length);
             for (var i = 0; i < expected.Length; i++)
             {
                 Assert.AreEqual(expected[i], actual[i]);
@@ -610,7 +616,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void BinaryWriterUtility_WriteNullableArray_Int32_2()
         {
-            int[] expected = null;
+            int[]? expected = null;
 
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
@@ -643,7 +649,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableStringArray(reader);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Length, actual.Length);
+            Assert.AreEqual(expected.Length, actual!.Length);
             for (var i = 0; i < expected.Length; i++)
             {
                 Assert.AreEqual(expected[i], actual[i]);
@@ -653,7 +659,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void BinaryWriterUtility_WriteNullableArray_String_2()
         {
-            string[] expected = null;
+            string[]? expected = null;
 
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);
@@ -686,7 +692,7 @@ namespace UnitTests.AM.IO
 
             var actual = BinaryReaderUtility.ReadNullableArray<Dummy>(reader);
             Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Length, actual.Length);
+            Assert.AreEqual(expected.Length, actual!.Length);
             for (var i = 0; i < expected.Length; i++)
             {
                 var item1 = expected[i];
@@ -698,7 +704,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void BinaryWriterUtility_WriteNullableArrayT_2()
         {
-            Dummy[] expected = null;
+            Dummy[]? expected = null;
 
             var stream = new MemoryStream();
             var writer = new BinaryWriter(stream);

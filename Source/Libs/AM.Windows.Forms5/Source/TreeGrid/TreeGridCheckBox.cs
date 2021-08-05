@@ -49,19 +49,13 @@ namespace AM.Windows.Forms
         /// Gets the control.
         /// </summary>
         /// <value>The control.</value>
-        public override Control Control
-        {
-            get { return _control; }
-        }
+        public override Control Control => _control;
 
         /// <summary>
         /// Gets the check box.
         /// </summary>
         /// <value>The check box.</value>
-        public CheckBox CheckBox
-        {
-            get { return _control; }
-        }
+        public CheckBox CheckBox => _control;
 
         #endregion
 
@@ -71,7 +65,7 @@ namespace AM.Windows.Forms
         /// Sets the value.
         /// </summary>
         /// <param name="value">The value.</param>
-        public override void SetValue(string value)
+        public override void SetValue(string? value)
         {
             _control.Checked = Convert.ToBoolean(value);
         }

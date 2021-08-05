@@ -3,20 +3,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 using AM;
 
 using BenchmarkDotNet.Attributes;
+
+#nullable enable
 
 namespace CoreBenchmarks
 {
     [MemoryDiagnoser]
     public class FastNumberBenchmark
     {
-        private List<string> _lines;
+        private List<string>? _lines;
         private int _data;
-        private string _data2;
+        private string? _data2;
 
         [GlobalSetup]
         public void Setup()
@@ -31,7 +32,7 @@ namespace CoreBenchmarks
         [Benchmark(Baseline = true)]
         public void Int32_Parse()
         {
-            foreach (var line in _lines)
+            foreach (var line in _lines!)
             {
                 _data = int.Parse(line);
             }
@@ -40,7 +41,7 @@ namespace CoreBenchmarks
         [Benchmark]
         public void FastNumber_ParseInt32_String()
         {
-            foreach (var line in _lines)
+            foreach (var line in _lines!)
             {
                 _data = FastNumber.ParseInt32(line);
             }
@@ -49,7 +50,7 @@ namespace CoreBenchmarks
         [Benchmark]
         public unsafe void FastNumber_ParseInt32_Pointer()
         {
-            foreach (var line in _lines)
+            foreach (var line in _lines!)
             {
                 fixed (char* pointer = line)
                 {

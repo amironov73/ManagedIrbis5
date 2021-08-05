@@ -80,10 +80,10 @@ namespace ManagedIrbis
             }
 
             var length = items.Sum(item => item.Length + 3);
-            StringBuilder result = new StringBuilder(length);
+            var result = new StringBuilder(length);
             result.Append('(');
             var first = true;
-            foreach (string item in items)
+            foreach (var item in items)
             {
                 if (string.IsNullOrEmpty(item))
                 {
@@ -112,7 +112,7 @@ namespace ManagedIrbis
                 params string[] items
             )
         {
-            string result = WrapIfNeeded(string.Concat(items));
+            var result = WrapIfNeeded(string.Concat(items));
 
             return result;
         }
@@ -123,10 +123,10 @@ namespace ManagedIrbis
         public static string Equals
             (
                 this string prefix,
-                string value
+                string? value
             )
         {
-            return Concat(prefix, value);
+            return Concat(prefix, value ?? string.Empty);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace ManagedIrbis
         public static string Equals
             (
                 this string prefix,
-                params string[] values
+                params string?[] values
             )
         {
             if (values.Length == 0)
@@ -173,11 +173,11 @@ namespace ManagedIrbis
                 return Equals(prefix, values[0]);
             }
 
-            var length = values.Sum(item => item.Length + prefix.Length + 3);
-            StringBuilder result = new StringBuilder(length);
+            var length = values.Sum(item => (item?.Length ?? 0) + prefix.Length + 3);
+            var result = new StringBuilder(length);
             result.Append('(');
             var first = true;
-            foreach (string value in values)
+            foreach (var value in values)
             {
                 if (!first)
                 {
@@ -266,10 +266,10 @@ namespace ManagedIrbis
             }
 
             var length = items.Sum(item => item.Length + 3);
-            StringBuilder result = new StringBuilder(length);
+            var result = new StringBuilder(length);
             result.Append('(');
             var first = true;
-            foreach (string item in items)
+            foreach (var item in items)
             {
                 if (string.IsNullOrEmpty(item))
                 {
@@ -326,10 +326,10 @@ namespace ManagedIrbis
             }
 
             var length = items.Sum(item => item.Length + 3);
-            StringBuilder result = new StringBuilder(length);
+            var result = new StringBuilder(length);
             result.Append('(');
             var first = true;
-            foreach (string item in items)
+            foreach (var item in items)
             {
                 if (string.IsNullOrEmpty(item))
                 {
@@ -389,7 +389,7 @@ namespace ManagedIrbis
             var result = new StringBuilder(length);
             result.Append('(');
             var first = true;
-            foreach (string item in items)
+            foreach (var item in items)
             {
                 if (string.IsNullOrEmpty(item))
                 {

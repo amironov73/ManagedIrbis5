@@ -67,8 +67,11 @@ namespace ManagedIrbis.Reports
             )
         {
             var text = Compute(context);
+            if (!string.IsNullOrEmpty(text))
+            {
+                context.Output.Write(text);
+            }
 
-            context.Output.Write(text);
         } // method Render
 
         #endregion

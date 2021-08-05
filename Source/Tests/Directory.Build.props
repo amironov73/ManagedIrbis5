@@ -2,11 +2,17 @@
 
 <Project>
 
+    <!-- Assembly version and strong name -->
+    <Import Project="..\Common\ArsMagna.targets" />
+
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <IsPackable>false</IsPackable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>

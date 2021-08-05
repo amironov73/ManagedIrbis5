@@ -49,8 +49,13 @@ namespace ManagedIrbis.Reports
             var driver = context.Driver;
             var formatted = Compute(context);
             driver.BeginCell(context, this);
-            context.Output.Write(formatted);
+            if (!string.IsNullOrEmpty(formatted))
+            {
+                context.Output.Write(formatted);
+            }
+
             driver.EndCell(context, this);
+
         } // method Render
 
         #endregion

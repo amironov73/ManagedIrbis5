@@ -25,8 +25,8 @@ namespace UnitTests.AM.Parameters
         {
             var bytes = first.SaveToMemory();
             var second = bytes.RestoreObjectFromMemory<Parameter>();
-
-            Assert.AreEqual(first.Name, second.Name);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Name, second!.Name);
             Assert.AreEqual(first.Value, second.Value);
         }
 

@@ -9,6 +9,8 @@ using AM.CommandLine;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#nullable enable
+
 namespace UnitTests.AM.CommandLine
 {
     [TestClass]
@@ -16,8 +18,8 @@ namespace UnitTests.AM.CommandLine
     {
         class HelloClass
         {
-            public string Verb { get; set; }
-            public string Noun { get; set; }
+            public string? Verb { get; set; }
+            public string? Noun { get; set; }
             public override string ToString() =>
                 $"{nameof(Verb)}: {Verb}, {nameof(Noun)}: {Noun}";
         }

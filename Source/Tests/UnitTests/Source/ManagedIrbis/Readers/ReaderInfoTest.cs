@@ -8,6 +8,8 @@ using AM.Runtime;
 
 using ManagedIrbis.Readers;
 
+#nullable enable
+
 namespace UnitTests.ManagedIrbis.Readers
 {
     [TestClass]
@@ -21,8 +23,8 @@ namespace UnitTests.ManagedIrbis.Readers
             var bytes = first.SaveToMemory();
 
             var second = bytes.RestoreObjectFromMemory<ReaderInfo>();
-
-            Assert.AreEqual(first.Age, second.Age);
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Age, second!.Age);
             Assert.AreEqual(first.DateOfBirth, second.DateOfBirth);
             Assert.AreEqual(first.Category, second.Category);
             Assert.AreEqual(first.Description, second.Description);

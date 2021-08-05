@@ -37,5 +37,7 @@ namespace AM
 
 
         #endregion
-    }
-}
+
+    } // class
+
+} // namespace

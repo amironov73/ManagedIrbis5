@@ -1,4 +1,9 @@
-﻿using System.IO;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Local
+
+using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -13,8 +18,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Newtonsoft.Json;
 
-// ReSharper disable IdentifierTypo
-// ReSharper disable CheckNamespace
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Menus
 {
@@ -26,11 +30,10 @@ namespace UnitTests.ManagedIrbis.Menus
                 MenuSpecification first
             )
         {
-            byte[] bytes = first.SaveToMemory();
-            MenuSpecification second = bytes
-                .RestoreObjectFromMemory<MenuSpecification>();
-
-            Assert.AreEqual(first.FileName, second.FileName);
+            var bytes = first.SaveToMemory();
+            var second = bytes.RestoreObjectFromMemory<MenuSpecification>();
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.FileName, second!.FileName);
             Assert.AreEqual(first.Database, second.Database);
             Assert.AreEqual(first.Path, second.Path);
             Assert.AreEqual(first.SortMode, second.SortMode);
@@ -38,7 +41,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuSpecification_Serialization_1()
         {
-            MenuSpecification specification = new MenuSpecification();
+            var specification = new MenuSpecification();
             _TestSerialization(specification);
             specification.FileName = "123.mnu";
             _TestSerialization(specification);
@@ -56,10 +59,10 @@ namespace UnitTests.ManagedIrbis.Menus
                 string expected
             )
         {
-            JsonSerializer serializer = new JsonSerializer();
-            StringWriter writer = new StringWriter();
+            var serializer = new JsonSerializer();
+            var writer = new StringWriter();
             serializer.Serialize(writer, specification);
-            string actual = writer.ToString();
+            var actual = writer.ToString();
             Assert.AreEqual(expected, actual);
         }
 
@@ -93,28 +96,28 @@ namespace UnitTests.ManagedIrbis.Menus
                 string expected
             )
         {
-            XmlWriterSettings settings = new XmlWriterSettings
+            var settings = new XmlWriterSettings
             {
                 OmitXmlDeclaration = true,
                 Indent = false,
                 NewLineHandling = NewLineHandling.None
             };
-            StringBuilder output = new StringBuilder();
-            XmlSerializerNamespaces namespaces = new XmlSerializerNamespaces();
+            var output = new StringBuilder();
+            var namespaces = new XmlSerializerNamespaces();
             namespaces.Add(string.Empty, string.Empty);
-            using (XmlWriter writer = XmlWriter.Create(output, settings))
+            using (var writer = XmlWriter.Create(output, settings))
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(MenuSpecification));
+                var serializer = new XmlSerializer(typeof(MenuSpecification));
                 serializer.Serialize(writer, specification, namespaces);
             }
-            string actual = output.ToString();
+            var actual = output.ToString();
             Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
         public void MenuSpecification_ToXml_1()
         {
-            MenuSpecification specification = new MenuSpecification
+            var specification = new MenuSpecification
             {
                 FileName = "123.mnu",
                 Database = "IBIS",
@@ -160,7 +163,7 @@ namespace UnitTests.ManagedIrbis.Menus
                 Path = IrbisPath.System,
                 FileName = "123.mnu"
             };
-            MenuSpecification menuSpecification
+            var menuSpecification
                 = MenuSpecification.FromFileSpecification(fileSpecification);
             Assert.AreEqual(fileSpecification.FileName, menuSpecification.FileName);
             Assert.IsNull(menuSpecification.Database);
@@ -171,7 +174,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuSpecification_ToFileSpecification_1()
         {
-            MenuSpecification menuSpecification
+            var menuSpecification
                 = new MenuSpecification
                 {
                     FileName = "123.mnu",
@@ -179,7 +182,7 @@ namespace UnitTests.ManagedIrbis.Menus
                     Path = IrbisPath.MasterFile,
                     SortMode = 2
                 };
-            FileSpecification fileSpecification
+            var fileSpecification
                 = menuSpecification.ToFileSpecification();
             Assert.AreEqual(menuSpecification.FileName, fileSpecification.FileName);
             Assert.AreEqual(menuSpecification.Database, fileSpecification.Database);
@@ -189,13 +192,13 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuSpecification_ToFileSpecification_2()
         {
-            MenuSpecification menuSpecification
+            var menuSpecification
                 = new MenuSpecification
                 {
                     FileName = "123.mnu",
                     Path = IrbisPath.System
                 };
-            FileSpecification fileSpecification
+            var fileSpecification
                 = menuSpecification.ToFileSpecification();
             Assert.AreEqual(menuSpecification.FileName, fileSpecification.FileName);
             Assert.IsNull(fileSpecification.Database);
@@ -205,7 +208,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuSpecification_Parse_1()
         {
-            MenuSpecification specification
+            var specification
                 = MenuSpecification.Parse("123.mnu");
             Assert.AreEqual("123.mnu", specification.FileName);
             Assert.IsNull(specification.Database);
@@ -216,7 +219,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuSpecification_Parse_2()
         {
-            MenuSpecification specification
+            var specification
                 = MenuSpecification.Parse("123.mnu\\IBIS");
             Assert.AreEqual("123.mnu", specification.FileName);
             Assert.AreEqual("IBIS", specification.Database);
@@ -227,7 +230,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuSpecification_Parse_3()
         {
-            MenuSpecification specification
+            var specification
                 = MenuSpecification.Parse("123.mnu\\IBIS\\2");
             Assert.AreEqual("123.mnu", specification.FileName);
             Assert.AreEqual("IBIS", specification.Database);
@@ -238,7 +241,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuSpecification_Verify_1()
         {
-            MenuSpecification specification = new MenuSpecification();
+            var specification = new MenuSpecification();
             Assert.IsFalse(specification.Verify(false));
             specification.FileName = "123.mnu";
             Assert.IsTrue(specification.Verify(false));
@@ -247,7 +250,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuSpecification_ToString_1()
         {
-            MenuSpecification specification = new MenuSpecification();
+            var specification = new MenuSpecification();
             Assert.AreEqual("(null)", specification.ToString());
             specification.FileName = "123.mnu";
             Assert.AreEqual("123.mnu", specification.ToString());

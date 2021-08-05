@@ -95,8 +95,11 @@ namespace ManagedIrbis.Reports
                 string? text
             )
         {
-            context.Output.Write(text);
-        }
+            if (!string.IsNullOrEmpty(text))
+            {
+                context.Output.Write(text);
+            }
+        } // method Write
 
         #endregion
 

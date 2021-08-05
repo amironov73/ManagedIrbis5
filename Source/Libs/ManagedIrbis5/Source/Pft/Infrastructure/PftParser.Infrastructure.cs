@@ -120,11 +120,16 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public PftNode? Get
             (
-                Dictionary<PftTokenKind, Func<PftNode>> map,
+                Dictionary<PftTokenKind, Func<PftNode>>? map,
                 PftTokenKind[] expectedTokens
             )
         {
             PftNode? result = null;
+            if (map is null)
+            {
+                return result;
+            }
+
             var token = Tokens.Current;
 
             if (Array.IndexOf(expectedTokens, token.Kind) >= 0)

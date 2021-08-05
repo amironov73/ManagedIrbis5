@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <ApplicationIcon>airplane.ico</ApplicationIcon>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,10 +16,11 @@
     </Content>
   </ItemGroup>
 
+  <!-- К сожалению, Telegram.Bot не имеет сильного имени -->
   <ItemGroup>
-    <PackageReference Include="Telegram.Bot" Version="15.7.1" />
-    <PackageReference Include="Topshelf" Version="4.2.1" />
-    <PackageReference Include="Topshelf.NLog" Version="4.2.1" />
+    <PackageReference Include="Telegram.Bot" Version="16.0.2" />
+    <PackageReference Include="Topshelf" Version="4.3.0" />
+    <PackageReference Include="Topshelf.NLog" Version="4.3.0" />
   </ItemGroup>
 
 </Project>

@@ -33,7 +33,7 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Raised on scroll.
         /// </summary>
-        public event ScrollEventHandler Scroll;
+        public event ScrollEventHandler? Scroll;
 
         #endregion
 
@@ -76,17 +76,17 @@ namespace AM.Windows.Forms
 
         private bool _pressed;
 
-        private ScrollEventArgs _eventArgs;
+        private ScrollEventArgs? _eventArgs;
 
         private void _timer_Tick
             (
-                object sender,
+                object? sender,
                 EventArgs e
             )
         {
             if (_pressed)
             {
-                Scroll?.Invoke(this, _eventArgs);
+                Scroll?.Invoke(this, _eventArgs.ThrowIfNull(nameof(_eventArgs)));
             }
         }
 
@@ -116,7 +116,7 @@ namespace AM.Windows.Forms
                 return;
             }
 
-            ScrollEventType type = e.Y > Height / 2
+            var type = e.Y > Height / 2
                 ? ScrollEventType.LargeIncrement
                 : ScrollEventType.LargeDecrement;
 
@@ -135,7 +135,7 @@ namespace AM.Windows.Forms
                     0
                 );
 
-            ScrollEventHandler handler = Scroll;
+            var handler = Scroll;
             if (!ReferenceEquals(handler, null))
             {
                 _pressed = true;
@@ -163,7 +163,7 @@ namespace AM.Windows.Forms
                 PaintEventArgs e
             )
         {
-            Graphics graphics = e.Graphics;
+            var graphics = e.Graphics;
 
             using (Brush brush = new SolidBrush(BackColor))
             {
@@ -198,7 +198,7 @@ namespace AM.Windows.Forms
                 );
             }
 
-            using (Pen pen = new Pen(ForeColor, 0.5f))
+            using (var pen = new Pen(ForeColor, 0.5f))
             {
                 graphics.DrawRectangle(pen, 0, 0, Width - 1, Height - 1);
                 graphics.DrawRectangle(pen, 0, 0, Width, 16);

@@ -1,16 +1,17 @@
-﻿using System.IO;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable ExpressionIsAlwaysNull
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedMember.Local
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using AM.Runtime;
 using AM.Text;
 
 using ManagedIrbis;
-using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 
-// ReSharper disable CheckNamespace
-// ReSharper disable ExpressionIsAlwaysNull
+#nullable enable
 
 namespace UnitTests.ManagedIrbis.Menus
 {
@@ -26,14 +27,14 @@ namespace UnitTests.ManagedIrbis.Menus
         {
             Assert.AreEqual(first.FileName, second.FileName);
 
-            MenuEntry[] firstEntries = first.SortEntries(MenuSort.None);
-            MenuEntry[] secondEntries = second.SortEntries(MenuSort.None);
+            var firstEntries = first.SortEntries(MenuSort.None);
+            var secondEntries = second.SortEntries(MenuSort.None);
 
             Assert.AreEqual(firstEntries.Length, secondEntries.Length);
-            for (int i = 0; i < firstEntries.Length; i++)
+            for (var i = 0; i < firstEntries.Length; i++)
             {
-                MenuEntry entry1 = firstEntries[i];
-                MenuEntry entry2 = secondEntries[i];
+                var entry1 = firstEntries[i];
+                var entry2 = secondEntries[i];
 
                 Assert.AreEqual(entry1.Code, entry2.Code);
                 Assert.AreEqual(entry1.Comment, entry2.Comment);
@@ -55,7 +56,7 @@ namespace UnitTests.ManagedIrbis.Menus
 
         private MenuFile _GetMenu()
         {
-            MenuFile result = new MenuFile();
+            var result = new MenuFile();
 
             result
                 .Add("a", "Comment for a")
@@ -68,10 +69,10 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuFile_Constructor_1()
         {
-            MenuFile menu = _GetMenu();
+            var menu = _GetMenu();
 
             Assert.AreEqual(3, menu.Entries.Count);
-            string actual = menu.GetString("c");
+            var actual = menu.GetString("c");
             Assert.AreEqual("Comment for c", actual);
 
             //_TestSerialization(menu);
@@ -94,7 +95,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuFile_FindEntrySensitive_1()
         {
-            MenuFile menu = _GetMenu();
+            var menu = _GetMenu();
             Assert.IsNotNull(menu.FindEntrySensitive("a"));
             Assert.IsNull(menu.FindEntrySensitive("A"));
         }
@@ -102,7 +103,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuFile_GetEntry_1()
         {
-            MenuFile menu = _GetMenu();
+            var menu = _GetMenu();
 
             Assert.IsNotNull(menu.GetEntry("a"));
             Assert.IsNull(menu.GetEntry("e"));
@@ -119,7 +120,7 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuFile_GetEntrySensitive_1()
         {
-            MenuFile menu = _GetMenu();
+            var menu = _GetMenu();
 
             Assert.IsNotNull(menu.GetEntrySensitive("a"));
             Assert.IsNull(menu.GetEntrySensitive("e"));
@@ -138,8 +139,8 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuFile_GetStringSensitive_1()
         {
-            string defaultValue = "default value";
-            MenuFile menu = _GetMenu();
+            var defaultValue = "default value";
+            var menu = _GetMenu();
 
             Assert.AreEqual("Comment for a", menu.GetStringSensitive("a"));
             Assert.AreEqual(defaultValue, menu.GetStringSensitive("d", defaultValue));
@@ -325,12 +326,12 @@ namespace UnitTests.ManagedIrbis.Menus
         [TestMethod]
         public void MenuFile_SortEntries_1()
         {
-            MenuFile menu = new MenuFile()
+            var menu = new MenuFile()
                 .Add("2", "2")
                 .Add("1", "3")
                 .Add("3", "1");
 
-            MenuEntry[] sorted = menu.SortEntries(MenuSort.None);
+            var sorted = menu.SortEntries(MenuSort.None);
             Assert.AreEqual(3, sorted.Length);
             Assert.AreEqual("2", sorted[0].Code);
             Assert.AreEqual("1", sorted[1].Code);
@@ -353,24 +354,24 @@ namespace UnitTests.ManagedIrbis.Menus
         [ExpectedException(typeof(IrbisException))]
         public void MenuFile_SortEntries_2()
         {
-            MenuFile menu = _GetMenu();
+            var menu = _GetMenu();
             menu.SortEntries((MenuSort)333);
         }
 
         [TestMethod]
         public void MenuFile_ToText_1()
         {
-            MenuFile menu = _GetMenu();
-            string expected = "a\nComment for a\nb\nComment for b\nc\nComment for c\n*****\n";
-            string actual = menu.ToText().DosToUnix();
+            var menu = _GetMenu();
+            var expected = "a\nComment for a\nb\nComment for b\nc\nComment for c\n*****\n";
+            var actual = menu.ToText().DosToUnix();
             Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
         public void MenuFile_ToString_1()
         {
-            string fileName = "menu.mnu";
-            MenuFile menu = new MenuFile
+            var fileName = "menu.mnu";
+            var menu = new MenuFile
             {
                 FileName = fileName
             };

@@ -79,7 +79,11 @@ namespace ManagedIrbis.Reports
         {
             var output = context.Output;
             output.TrimEnd();
-            output.Write(RowDelimiter);
+            if (!string.IsNullOrEmpty(RowDelimiter))
+            {
+                output.Write(RowDelimiter);
+            }
+
         } // method RowDelimiter
 
         /// <inheritdoc cref="ReportDriver.EndCell" />
@@ -89,7 +93,11 @@ namespace ManagedIrbis.Reports
                 ReportCell cell
             )
         {
-            context.Output.Write(CellDelimiter);
+            if (!string.IsNullOrEmpty(CellDelimiter))
+            {
+                context.Output.Write(CellDelimiter);
+            }
+
         } // method EndCell
 
         /// <inheritdoc cref="ReportDriver.Write" />
@@ -99,7 +107,11 @@ namespace ManagedIrbis.Reports
                 string? text
             )
         {
-            context.Output.Write(text);
+            if (!string.IsNullOrEmpty(text))
+            {
+                context.Output.Write(text);
+            }
+
         } // method Write
 
         #endregion

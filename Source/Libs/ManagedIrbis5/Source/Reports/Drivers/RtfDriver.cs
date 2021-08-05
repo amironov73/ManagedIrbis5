@@ -114,7 +114,11 @@ namespace ManagedIrbis.Reports
         {
             var encoded = RichText.Encode(text, null);
             var output = context.Output;
-            output.Write(encoded);
+            if (!string.IsNullOrEmpty(encoded))
+            {
+                output.Write (encoded);
+            }
+
         } // method Write
 
         /// <inheritdoc cref="ReportDriver.WriteServiceText"/>
@@ -125,7 +129,11 @@ namespace ManagedIrbis.Reports
             )
         {
             var output = context.Output;
-            output.Write(text);
+            if (!string.IsNullOrEmpty(text))
+            {
+                output.Write(text);
+            }
+
         } // method WriteServiceText
 
         #endregion

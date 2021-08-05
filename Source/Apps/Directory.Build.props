@@ -2,12 +2,18 @@
 
 <Project>
 
+    <!-- Assembly version and strong name -->
+    <Import Project="..\Common\ArsMagna.targets" />
+
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
-        <IsPackable>false</IsPackable>
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>

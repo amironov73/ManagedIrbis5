@@ -41,7 +41,7 @@ namespace AM.Windows.Forms
         ///</summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string SelectedFontName
+        public string? SelectedFontName
         {
             [DebuggerStepThrough]
             get

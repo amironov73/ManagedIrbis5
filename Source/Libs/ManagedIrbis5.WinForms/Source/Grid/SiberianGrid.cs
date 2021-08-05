@@ -220,6 +220,9 @@ namespace ManagedIrbis.WinForms.Grid
 
         private int _visibleRows;
 
+        /// <summary>
+        /// Автоматическое установление размера колонок.
+        /// </summary>
         public void AutoSizeColumns()
         {
             if (_autoSizeWatch)

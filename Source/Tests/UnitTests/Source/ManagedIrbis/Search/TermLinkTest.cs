@@ -1,7 +1,8 @@
-﻿using System;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using AM.IO;
 using AM.Runtime;
 
 using ManagedIrbis;
@@ -16,12 +17,10 @@ namespace UnitTests.ManagedIrbis.Search
                 TermLink first
             )
         {
-            byte[] bytes = first.SaveToMemory();
-
-            TermLink second = bytes
-                .RestoreObjectFromMemory<TermLink>();
-
-            Assert.AreEqual(first.Index, second.Index);
+            var bytes = first.SaveToMemory();
+            var second = bytes.RestoreObjectFromMemory<TermLink>();
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Index, second!.Index);
             Assert.AreEqual(first.Mfn, second.Mfn);
             Assert.AreEqual(first.Occurrence, second.Occurrence);
             Assert.AreEqual(first.Tag, second.Tag);
@@ -30,7 +29,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TestTermLink_Serialization()
         {
-            TermLink termLink = new TermLink();
+            var termLink = new TermLink();
             _TestSerialization(termLink);
 
             termLink = new TermLink
@@ -46,14 +45,14 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TestTermLink_Clone()
         {
-            TermLink first = new TermLink
+            var first = new TermLink
             {
                 Index = 10,
                 Mfn = 20,
                 Occurrence = 30,
                 Tag = 40
             };
-            TermLink second = first.Clone();
+            var second = first.Clone();
 
             Assert.AreEqual(first.Index, second.Index);
             Assert.AreEqual(first.Mfn, second.Mfn);
@@ -64,28 +63,28 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TestTermLink_ToString()
         {
-            TermLink termLink = new TermLink
+            var termLink = new TermLink
             {
                 Index = 10,
                 Mfn = 20,
                 Occurrence = 30,
                 Tag = 40
             };
-            string actual = termLink.ToString();
+            var actual = termLink.ToString();
             Assert.AreEqual("[20] 40/30 10", actual);
         }
 
         [TestMethod]
         public void TestTermLink_Equals()
         {
-            TermLink first = new TermLink
+            var first = new TermLink
             {
                 Index = 10,
                 Mfn = 20,
                 Occurrence = 30,
                 Tag = 40
             };
-            TermLink second = first.Clone();
+            var second = first.Clone();
             Assert.IsTrue(first.Equals(second));
             Assert.IsTrue(first.Equals((object)second));
 
@@ -94,7 +93,7 @@ namespace UnitTests.ManagedIrbis.Search
             second.Mfn = 220;
             Assert.IsFalse(first.Equals(second));
 
-            Assert.IsFalse(first.Equals((object)null));
+            Assert.IsFalse(first.Equals((object?) null));
         }
     }
 }

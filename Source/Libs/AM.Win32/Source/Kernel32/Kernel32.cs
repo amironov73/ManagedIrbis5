@@ -591,7 +591,7 @@ namespace AM.Win32
         public static extern JobObjectHandle CreateJobObject
             (
                 IntPtr lpJobAttributes,
-                string lpName
+                string? lpName
             );
 
         /// <summary>

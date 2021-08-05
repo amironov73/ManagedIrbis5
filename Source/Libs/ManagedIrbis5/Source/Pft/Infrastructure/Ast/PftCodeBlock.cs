@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -65,17 +66,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             /// Указатель на текущую ноду,
             /// в которой сосредоточен C#-код.
             /// </summary>
-            public PftNode node;
+            public PftNode? Node;
 
             /// <summary>
             /// Контекст форматирования.
             /// </summary>
-            public PftContext context;
+            public PftContext? Context;
 
             /// <summary>
             /// Текущая MARC-запись.
             /// </summary>
-            public Record record;
+            public Record? Record;
 
             // ReSharper restore NotAccessedField.Global
             // ReSharper restore InconsistentNaming
@@ -155,9 +156,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 var globals = new Globals
                 {
-                    node = this,
-                    context = context,
-                    record = context.Record
+                    Node = this,
+                    Context = context,
+                    Record = context.Record.ThrowIfNull(nameof(context.Record))
                 };
 
                 var scriptOptions = ScriptOptions.Default

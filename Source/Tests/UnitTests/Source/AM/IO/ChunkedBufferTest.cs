@@ -15,8 +15,8 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Construction_1()
         {
-            int chunkSize = 4096;
-            ChunkedBuffer buffer = new ChunkedBuffer(chunkSize);
+            var chunkSize = 4096;
+            var buffer = new ChunkedBuffer(chunkSize);
             Assert.AreEqual(chunkSize, buffer.ChunkSize);
             Assert.AreEqual(0, buffer.Length);
             Assert.IsTrue(buffer.Eof);
@@ -25,7 +25,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Construction_2()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             Assert.AreEqual(ChunkedBuffer.DefaultChunkSize, buffer.ChunkSize);
             Assert.AreEqual(0, buffer.Length);
             Assert.IsTrue(buffer.Eof);
@@ -34,46 +34,46 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_CopyFrom_1()
         {
-            MemoryStream memory = new MemoryStream();
-            for (int i = 0; i < 20; i++)
+            var memory = new MemoryStream();
+            for (var i = 0; i < 20; i++)
             {
-                for (int j = 0; j < 256; j++)
+                for (var j = 0; j < 256; j++)
                 {
                     memory.WriteByte((byte) j);
                 }
             }
 
             memory.Position = 0;
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             buffer.CopyFrom(memory, 1024);
             Assert.AreEqual(20 * 256, buffer.Length);
-            byte[] original = memory.ToArray();
-            byte[] copy = buffer.ToBigArray();
+            var original = memory.ToArray();
+            var copy = buffer.ToBigArray();
             CollectionAssert.AreEqual(original, copy);
         }
 
         [TestMethod]
         public void ChunkedBuffer_Read_1()
         {
-            MemoryStream memory = new MemoryStream();
-            for (int i = 0; i < 20; i++)
+            var memory = new MemoryStream();
+            for (var i = 0; i < 20; i++)
             {
-                for (int j = 0; j < 256; j++)
+                for (var j = 0; j < 256; j++)
                 {
                     memory.WriteByte((byte) j);
                 }
             }
 
             memory.Position = 0;
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             buffer.CopyFrom(memory, 1024);
             buffer.Rewind();
-            for (int i = 0; i < 20; i++)
+            for (var i = 0; i < 20; i++)
             {
                 Assert.IsFalse(buffer.Eof);
-                byte[] bytes = new byte[256];
+                var bytes = new byte[256];
                 Assert.AreEqual(256, buffer.Read(bytes));
-                for (int j = 0; j < 256; j++)
+                for (var j = 0; j < 256; j++)
                 {
                     Assert.AreEqual(j, bytes[j]);
                 }
@@ -84,11 +84,11 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Read_2()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             buffer.WriteByte(1);
             buffer.WriteByte(2);
             buffer.WriteByte(3);
-            byte[] bytes = new byte[3];
+            var bytes = new byte[3];
             Assert.AreEqual(0, buffer.Read(bytes, 0, -1));
             Assert.AreEqual(0, buffer.Read(bytes, 0, 0));
             Assert.AreEqual(3, buffer.Read(bytes, 0, 3));
@@ -98,8 +98,8 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Read_3()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer();
-            byte[] bytes = new byte[3];
+            var buffer = new ChunkedBuffer();
+            var bytes = new byte[3];
             Assert.AreEqual(0, buffer.Read(bytes, 0, -1));
             Assert.AreEqual(0, buffer.Read(bytes, 0, 0));
             Assert.AreEqual(0, buffer.Read(bytes, 0, 3));
@@ -109,7 +109,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Peek_1()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             buffer.WriteByte(1);
             buffer.WriteByte(2);
             buffer.WriteByte(3);
@@ -130,24 +130,24 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Peek_2()
         {
-            MemoryStream memory = new MemoryStream();
-            for (int i = 0; i < 16; i++)
+            var memory = new MemoryStream();
+            for (var i = 0; i < 16; i++)
             {
-                for (int j = 0; j < 256; j++)
+                for (var j = 0; j < 256; j++)
                 {
                     memory.WriteByte((byte) j);
                 }
             }
 
             memory.Position = 0;
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             buffer.CopyFrom(memory, 1024);
             buffer.Rewind();
             Assert.AreEqual(0, buffer.Peek());
             Assert.AreEqual(0, buffer.Peek());
             Assert.AreEqual(0, buffer.ReadByte());
-            int size = ChunkedBuffer.DefaultChunkSize - 1;
-            byte[] bytes = new byte[size];
+            var size = ChunkedBuffer.DefaultChunkSize - 1;
+            var bytes = new byte[size];
             Assert.AreEqual(size, buffer.Read(bytes));
             Assert.AreEqual(0, buffer.Peek());
             Assert.AreEqual(0, buffer.Peek());
@@ -161,7 +161,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Peek_3()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.WriteByte(1);
             buffer.WriteByte(2);
             buffer.WriteByte(3);
@@ -195,7 +195,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadByte_1()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.WriteByte(1);
             buffer.WriteByte(2);
             buffer.WriteByte(3);
@@ -215,7 +215,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadByte_2()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             Assert.AreEqual(-1, buffer.Peek());
             Assert.AreEqual(-1, buffer.Peek());
             Assert.AreEqual(-1, buffer.ReadByte());
@@ -224,7 +224,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadByte_3()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             buffer.WriteByte(1);
             Assert.AreEqual(1, buffer.Peek());
             Assert.AreEqual(1, buffer.Peek());
@@ -237,9 +237,9 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ToArrays_1()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             Assert.AreEqual(0, buffer.Length);
-            byte[][] arrays = buffer.ToArrays(0);
+            var arrays = buffer.ToArrays(0);
             Assert.AreEqual(0, arrays.Length);
             arrays = buffer.ToArrays(1);
             Assert.AreEqual(1, arrays.Length);
@@ -253,14 +253,14 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ToArrays_2()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.WriteByte(1);
             buffer.WriteByte(2);
             buffer.WriteByte(3);
             buffer.WriteByte(4);
             buffer.WriteByte(5);
             Assert.AreEqual(5, buffer.Length);
-            byte[][] arrays = buffer.ToArrays(0);
+            var arrays = buffer.ToArrays(0);
             Assert.AreEqual(3, arrays.Length);
             Assert.AreEqual(2, arrays[0].Length);
             Assert.AreEqual(1, arrays[0][0]);
@@ -281,23 +281,23 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ToBigArray_1()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer();
+            var buffer = new ChunkedBuffer();
             Assert.AreEqual(0, buffer.Length);
-            byte[] array = buffer.ToBigArray();
+            var array = buffer.ToBigArray();
             Assert.AreEqual(0, array.Length);
         }
 
         [TestMethod]
         public void ChunkedBuffer_ToBigArray_2()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.WriteByte(1);
             buffer.WriteByte(2);
             buffer.WriteByte(3);
             buffer.WriteByte(4);
             buffer.WriteByte(5);
             Assert.AreEqual(5, buffer.Length);
-            byte[] array = buffer.ToBigArray();
+            var array = buffer.ToBigArray();
             Assert.AreEqual(5, array.Length);
             Assert.AreEqual(1, array[0]);
             Assert.AreEqual(2, array[1]);
@@ -309,9 +309,9 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Write_1()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             Assert.AreEqual(0, buffer.Length);
-            byte[] array = new byte[0];
+            var array = new byte[0];
             buffer.Write(array);
             Assert.AreEqual(0, buffer.Length);
             buffer.Write(array, 0, -1);
@@ -322,7 +322,7 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Write_2()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             Assert.AreEqual(0, buffer.Length);
             byte[] array = { 1, 2, 3, 4, 5 };
             buffer.Write(array);
@@ -332,12 +332,12 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Write_3()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             Assert.AreEqual(0, buffer.Length);
             buffer.Write("Hello", Encoding.ASCII);
             Assert.AreEqual(5, buffer.Length);
             buffer.Rewind();
-            byte[] array = buffer.ToBigArray();
+            var array = buffer.ToBigArray();
             Assert.AreEqual(5, array.Length);
             Assert.AreEqual(72, array[0]);
             Assert.AreEqual(101, array[1]);
@@ -349,20 +349,20 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_Write_4()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             Assert.AreEqual(0, buffer.Length);
             buffer.Write(string.Empty, Encoding.ASCII);
             Assert.AreEqual(0, buffer.Length);
             buffer.Rewind();
-            byte[] array = buffer.ToBigArray();
+            var array = buffer.ToBigArray();
             Assert.AreEqual(0, array.Length);
         }
 
         [TestMethod]
         public void ChunkedBuffer_ReadLine_1()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
-            string line = buffer.ReadLine(Encoding.ASCII);
+            var buffer = new ChunkedBuffer(2);
+            var line = buffer.ReadLine(Encoding.ASCII);
             Assert.IsNull(line);
             line = buffer.ReadLine(Encoding.ASCII);
             Assert.IsNull(line);
@@ -371,10 +371,10 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadLine_2()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
-            string expected = "Hello";
+            var buffer = new ChunkedBuffer(2);
+            var expected = "Hello";
             buffer.Write(expected, Encoding.ASCII);
-            string actual = buffer.ReadLine(Encoding.ASCII);
+            var actual = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual(expected, actual);
             actual = buffer.ReadLine(Encoding.ASCII);
             Assert.IsNull(actual);
@@ -383,9 +383,9 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadLine_3()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.Write("Hello\nworld", Encoding.ASCII);
-            string line = buffer.ReadLine(Encoding.ASCII);
+            var line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual("Hello", line);
             line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual("world", line);
@@ -396,9 +396,9 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadLine_4()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.Write("Hello\r\nworld", Encoding.ASCII);
-            string line = buffer.ReadLine(Encoding.ASCII);
+            var line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual("Hello", line);
             line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual("world", line);
@@ -409,9 +409,9 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadLine_5()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.Write("Hello\rworld", Encoding.ASCII);
-            string line = buffer.ReadLine(Encoding.ASCII);
+            var line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual("Hello", line);
             line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual("world", line);
@@ -422,9 +422,9 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadLine_6()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.Write("Hello\rworld\n", Encoding.ASCII);
-            string line = buffer.ReadLine(Encoding.ASCII);
+            var line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual("Hello", line);
             line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual("world", line);
@@ -435,9 +435,9 @@ namespace UnitTests.AM.IO
         [TestMethod]
         public void ChunkedBuffer_ReadLine_7()
         {
-            ChunkedBuffer buffer = new ChunkedBuffer(2);
+            var buffer = new ChunkedBuffer(2);
             buffer.Write("\n\r\n\r", Encoding.ASCII);
-            string line = buffer.ReadLine(Encoding.ASCII);
+            var line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual(string.Empty, line);
             line = buffer.ReadLine(Encoding.ASCII);
             Assert.AreEqual(string.Empty, line);

@@ -1,8 +1,10 @@
-﻿using AM.Json;
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+
+using AM.Json;
 using AM.Runtime;
 using AM.Xml;
 
-using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -30,7 +32,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfoEx_Construction_1()
         {
-            TermInfoEx term = new TermInfoEx();
+            var term = new TermInfoEx();
             Assert.AreEqual(0, term.Count);
             Assert.IsNull(term.Text);
             Assert.AreEqual(0, term.Mfn);
@@ -45,12 +47,11 @@ namespace UnitTests.ManagedIrbis.Search
                 TermInfoEx first
             )
         {
-            byte[] bytes = first.SaveToMemory();
+            var bytes = first.SaveToMemory();
 
-            TermInfoEx second
-                = bytes.RestoreObjectFromMemory<TermInfoEx>();
-
-            Assert.AreEqual(first.Count, second.Count);
+            var second = bytes.RestoreObjectFromMemory<TermInfoEx>();
+            Assert.IsNotNull(second);
+            Assert.AreEqual(first.Count, second!.Count);
             Assert.AreEqual(first.Text, second.Text);
             Assert.AreEqual(first.Mfn, second.Mfn);
             Assert.AreEqual(first.Tag, second.Tag);
@@ -62,7 +63,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfoEx_Serialization_1()
         {
-            TermInfoEx term = new TermInfoEx();
+            var term = new TermInfoEx();
             _TestSerialization(term);
 
             term = _GetTerm();
@@ -72,7 +73,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfoEx_Verify_1()
         {
-            TermInfoEx term = new TermInfoEx();
+            var term = new TermInfoEx();
             Assert.IsFalse(term.Verify(false));
 
             term = _GetTerm();
@@ -82,7 +83,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfoEx_ToString_1()
         {
-            TermInfoEx term = new TermInfoEx();
+            var term = new TermInfoEx();
             Assert.AreEqual("0#(null)", term.ToString());
 
             term = _GetTerm();
@@ -92,7 +93,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfoEx_ToXml_1()
         {
-            TermInfoEx term = new TermInfoEx();
+            var term = new TermInfoEx();
             Assert.AreEqual("<termInfo />", XmlUtility.SerializeShort(term));
 
             term = _GetTerm();
@@ -102,7 +103,7 @@ namespace UnitTests.ManagedIrbis.Search
         [TestMethod]
         public void TermInfo_ToJson_1()
         {
-            TermInfoEx term = new TermInfoEx();
+            var term = new TermInfoEx();
             Assert.AreEqual("{}", JsonUtility.SerializeShort(term));
 
             term = _GetTerm();

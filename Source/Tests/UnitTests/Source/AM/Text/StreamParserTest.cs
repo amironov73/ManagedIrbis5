@@ -46,12 +46,12 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var int16 = parser.ReadInt16();
             Assert.IsTrue(int16.HasValue);
-            Assert.AreEqual(1234, int16.Value);
+            Assert.AreEqual(1234, int16!.Value);
 
             parser = StreamParser.FromString(" -1234 ");
             int16 = parser.ReadInt16();
             Assert.IsTrue(int16.HasValue);
-            Assert.AreEqual(-1234, int16.Value);
+            Assert.AreEqual(-1234, int16!.Value);
 
             parser = StreamParser.FromString("  ");
             int16 = parser.ReadInt16();
@@ -65,7 +65,7 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var uint16 = parser.ReadUInt16();
             Assert.IsTrue(uint16.HasValue);
-            Assert.AreEqual(1234u, uint16.Value);
+            Assert.AreEqual(1234u, uint16!.Value);
 
 
             parser = StreamParser.FromString("  ");
@@ -80,12 +80,12 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var int32 = parser.ReadInt32();
             Assert.IsTrue(int32.HasValue);
-            Assert.AreEqual(1234, int32.Value);
+            Assert.AreEqual(1234, int32!.Value);
 
             parser = StreamParser.FromString(" -1234 ");
             int32 = parser.ReadInt32();
             Assert.IsTrue(int32.HasValue);
-            Assert.AreEqual(-1234, int32.Value);
+            Assert.AreEqual(-1234, int32!.Value);
 
             parser = StreamParser.FromString("  ");
             int32 = parser.ReadInt32();
@@ -108,7 +108,7 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var uint32 = parser.ReadUInt32();
             Assert.IsTrue(uint32.HasValue);
-            Assert.AreEqual(1234u, uint32.Value);
+            Assert.AreEqual(1234u, uint32!.Value);
 
             parser = StreamParser.FromString("  ");
             uint32 = parser.ReadUInt32();
@@ -122,12 +122,12 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var int64 = parser.ReadInt64();
             Assert.IsTrue(int64.HasValue);
-            Assert.AreEqual(1234, int64.Value);
+            Assert.AreEqual(1234, int64!.Value);
 
             parser = StreamParser.FromString(" -1234 ");
             int64 = parser.ReadInt64();
             Assert.IsTrue(int64.HasValue);
-            Assert.AreEqual(-1234, int64.Value);
+            Assert.AreEqual(-1234, int64!.Value);
 
             parser = StreamParser.FromString("  ");
             int64 = parser.ReadInt64();
@@ -141,7 +141,7 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var uint64 = parser.ReadUInt64();
             Assert.IsTrue(uint64.HasValue);
-            Assert.AreEqual(1234u, uint64.Value);
+            Assert.AreEqual(1234u, uint64!.Value);
 
 
             parser = StreamParser.FromString("  ");
@@ -158,7 +158,7 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var number = parser.ReadDouble();
             Assert.IsTrue(number.HasValue);
-            Assert.AreEqual(expected, number.Value);
+            Assert.AreEqual(expected, number!.Value);
         }
 
         [TestMethod]
@@ -195,7 +195,7 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var number = parser.ReadSingle();
             Assert.IsTrue(number.HasValue);
-            Assert.AreEqual(expected, number.Value);
+            Assert.AreEqual(expected, number!.Value);
         }
 
         [TestMethod]
@@ -223,7 +223,7 @@ namespace UnitTests.AM.Text
             var parser = StreamParser.FromString(text);
             var number = parser.ReadDecimal();
             Assert.IsTrue(number.HasValue);
-            Assert.AreEqual(expected, number.Value);
+            Assert.AreEqual(expected, number!.Value);
         }
 
 
