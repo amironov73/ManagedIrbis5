@@ -31,6 +31,7 @@ namespace ClearInventarization
         private static string _connectionString = string.Empty;
         private static string _searchExpression = string.Empty;
         private static Regex _placeRegex = new ("^$");
+        private static Regex? _realPlaceRegex = null;
         private static readonly SyncConnection _connection
             = ConnectionFactory.Shared.CreateSyncConnection();
 
@@ -58,6 +59,14 @@ namespace ClearInventarization
 
                 if (!string.IsNullOrEmpty(exemplar.RealPlace))
                 {
+                    if (_realPlaceRegex is not null)
+                    {
+                        if (!_realPlaceRegex.IsMatch(exemplar.RealPlace))
+                        {
+                            continue;
+                        }
+                    }
+
                     exemplar.Field!.SetSubFieldValue('!', null);
                     found = true;
                 }
@@ -83,7 +92,7 @@ namespace ClearInventarization
 
         static int Main(string[] args)
         {
-            if (args.Length != 3)
+            if (args.Length < 3)
             {
                 Console.WriteLine("USAGE: ClearInventarization <connectionString> <searchExpression> <placeRegex>");
                 return 1;
@@ -92,6 +101,10 @@ namespace ClearInventarization
             _connectionString = args[0];
             _searchExpression = args[1];
             _placeRegex = new Regex(args[2]);
+            if (args.Length > 3)
+            {
+                _realPlaceRegex = new Regex(args[3]);
+            }
 
             try
             {

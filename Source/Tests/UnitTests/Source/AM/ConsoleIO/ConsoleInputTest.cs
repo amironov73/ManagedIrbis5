@@ -6,6 +6,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.ConsoleIO;
 
+#nullable enable
+
 namespace UnitTests.AM.ConsoleIO
 {
     [TestClass]

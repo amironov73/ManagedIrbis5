@@ -355,5 +355,9 @@ MigrationBackup/
 # sphinx
 _build/
 
+# NuGet and Publish
+NuGet/
+Publish/
+
 # debug break files
 debug.break

@@ -9,41 +9,40 @@ environment:
 init:
   - git config --global core.autocrlf true
 
-dotnet_csproj:
-  patch: true
-  file: 'Source\Common\ArsMagna.targets'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
-
 before_build:
 - systeminfo
 - '"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"'
 - python -m pip install --upgrade pip
 - pip install --upgrade pygount sphinx sphinx_rtd_theme
-- pygount -f summary Source/Libs -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Libs  -s cs -N "*.Designer.cs" -F "obj"
 - pygount -f summary Source/Tests -s cs -N "*.Designer.cs" -F "obj"
-- pygount -f summary Source/Apps -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Apps  -s cs -N "*.Designer.cs" -F "obj"
 - pwsh: |
     Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
     ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-preview.6.21355.2"
 - dotnet --info
 - dotnet tool install -g JetBrains.ReSharper.GlobalTools
+- dotnet restore Source/Utils/Utils.sln
+- dotnet build --no-restore              --configuration Release Source/Utils/Utils.sln
+- dotnet run   --no-restore --no-build   --configuration Release --project Source/Utils/PatchVersion/PatchVersion.csproj Source/Common/ArsMagna.targets %APPVEYOR_BUILD_VERSION%
 
 build_script:
 - dotnet restore                                    Source/ManagedIrbis5-windows.sln
+- dotnet restore                                    Source/TinyClient.sln
 - dotnet build --no-restore --configuration Release Source/ManagedIrbis5-windows.sln
+- dotnet build --no-restore --configuration Release Source/TinyClient.sln
 
 test_script:
 - dotnet test --no-restore --no-build --configuration Release --settings sequential.runsettings Source/ManagedIrbis5-windows.sln
-- dotnet run  --no-restore --no-build --configuration Release --project Source/Tests/PftTests/PftTests.csproj
+- dotnet run  --no-restore --no-build --configuration Release --project                         Source/Tests/PftTests/PftTests.csproj
 
 after_build:
-- dotnet pack --no-restore --no-build --configuration Release Source/ManagedIrbis5-windows.sln
-- jb inspectcode --verbosity=OFF -o=inspectcode-result.xml Source\ManagedIrbis5-windows.sln
-- jb dupfinder   --verbosity=OFF -o=dupfinder-result.xml   Source\ManagedIrbis5-windows.sln
+- dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source/ManagedIrbis5-publish.sln
+- dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source/Libs/TinyClient/TinyClient.csproj
+- dotnet publish --no-restore --no-build --configuration Release --output Publish Source/ManagedIrbis5-publish.sln
+- dotnet publish --no-restore --no-build --configuration Release --output Publish Source/Libs/TinyClient/TinyClient.csproj
+- jb inspectcode --verbosity=OFF -o=inspectcode-result.xml --no-build             Source/ManagedIrbis5-windows.sln
+- jb dupfinder   --verbosity=OFF -o=dupfinder-result.xml                          Source/ManagedIrbis5-windows.sln
 - cd
 
 artifacts:

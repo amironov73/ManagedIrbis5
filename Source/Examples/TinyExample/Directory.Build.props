@@ -1,0 +1,16 @@
+<!-- Common properties for examples -->
+
+<Project>
+
+    <!-- Assembly version and strong name -->
+    <Import Project="..\..\Common\ArsMagna.targets" />
+
+    <PropertyGroup>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+</Project>
