@@ -15,8 +15,8 @@
 
 using System;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
@@ -25,6 +25,8 @@ using ManagedIrbis;
 
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Extensions.Polling;
+using Telegram.Bot.Types;
 
 using Topshelf;
 using Topshelf.Logging;
@@ -36,14 +38,15 @@ using Topshelf.Logging;
 namespace TeleIrbis
 {
     public sealed class BotService
-        : ServiceControl
+        : ServiceControl, IUpdateHandler
     {
         #region Private members
 
         private LogWriter? _log;
-        private IWebProxy? _proxy;
+        // private IWebProxy? _proxy;
         private string? _token;
         private TelegramBotClient? _client;
+        private readonly CancellationTokenSource _cancellation = new ();
 
         #endregion
 
@@ -60,16 +63,17 @@ namespace TeleIrbis
             _log = HostLogger.Get<BotService>();
             _log.Info(nameof(BotService) + "::" + nameof(Start));
 
-            var uri = new Uri("http://172.27.100.5:4444");
-            _proxy = new WebProxy(uri);
+            //var uri = new Uri("http://172.27.100.5:4444");
+            //_proxy = new WebProxy(uri);
             _token = "no:such:token";
-            _client = new TelegramBotClient(_token, _proxy);
+            //_client = new TelegramBotClient(_token, _proxy);
+            _client = new TelegramBotClient(_token);
 
             var me = _client.GetMeAsync().Result;
             _log.Info($"BOT: {me.Username}");
 
-            _client.OnMessage += OnMessageReceived;
-            _client.StartReceiving(Array.Empty<UpdateType>());
+            var cancellationToken = _cancellation.Token;
+            _client.StartReceiving(this, cancellationToken);
 
             return true;
         }
@@ -137,14 +141,28 @@ namespace TeleIrbis
                 .ToArray();
         }
 
-        private async void OnMessageReceived
+        public UpdateType[] AllowedUpdates => new [] { UpdateType.Message };
+
+        public Task HandleError
             (
-                object? sender,
-                Telegram.Bot.Args.MessageEventArgs e
+                ITelegramBotClient botClient,
+                Exception exception,
+                CancellationToken cancellationToken
             )
         {
-            var message = e.Message;
-            if (message == null || message.Type != MessageType.Text)
+            _log?.Error(exception);
+
+            return Task.CompletedTask;
+        }
+
+        public async Task HandleUpdate
+            (
+                ITelegramBotClient botClient,
+                Update update,
+                CancellationToken cancellationToken
+            )
+        {
+            if (update.Message is not { Type: MessageType.Text } message)
             {
                 // наш бот не умеет обрабатывать нетекстовые сообщения.
                 return;
@@ -166,7 +184,8 @@ namespace TeleIrbis
                     await _client.SendTextMessageAsync
                         (
                             chatId: message.Chat.Id,
-                            text: "Введите ключевое слово, заглавие книги или фамилию автора"
+                            text: "Введите ключевое слово, заглавие книги или фамилию автора",
+                            cancellationToken: cancellationToken
                         );
                 }
                 return;
@@ -174,7 +193,12 @@ namespace TeleIrbis
 
             if (_client is not null)
             {
-                await _client.SendChatActionAsync(message.Chat.Id, ChatAction.Typing);
+                await _client.SendChatActionAsync
+                    (
+                        message.Chat.Id,
+                        ChatAction.Typing, cancellationToken:
+                        cancellationToken
+                    );
 
                 var found = await GetBooks(text);
 
@@ -184,7 +208,8 @@ namespace TeleIrbis
                         (
                             chatId: message.Chat.Id,
                             text: book,
-                            ParseMode.Html
+                            ParseMode.Html,
+                            cancellationToken: cancellationToken
                         );
                 }
             }
@@ -200,7 +225,7 @@ namespace TeleIrbis
         {
             _log?.Info(nameof(BotService) + "::" + nameof(Stop));
 
-            _client?.StopReceiving();
+            _cancellation.Cancel();
 
             return true;
         }

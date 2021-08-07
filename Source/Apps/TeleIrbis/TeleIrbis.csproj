@@ -19,6 +19,7 @@
   <!-- К сожалению, Telegram.Bot не имеет сильного имени -->
   <ItemGroup>
     <PackageReference Include="Telegram.Bot" Version="16.0.2" />
+    <PackageReference Include="Telegram.Bot.Extensions.Polling" Version="0.2.0" />
     <PackageReference Include="Topshelf" Version="4.3.0" />
     <PackageReference Include="Topshelf.NLog" Version="4.3.0" />
   </ItemGroup>
