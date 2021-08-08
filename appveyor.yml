@@ -39,12 +39,12 @@ test_script:
 - dotnet run  --no-restore --no-build --configuration Release --project                         Source\Tests\PftTests\PftTests.csproj
 
 after_build:
-- dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source\ManagedIrbis5-publish.sln
-- dotnet pack    --no-restore --no-build --configuration Release --output NuGet   Source\Libs/TinyClient\TinyClient.csproj
-- dotnet publish --no-restore --no-build --configuration Release --output Publish Source\ManagedIrbis5-publish.sln
-- dotnet publish --no-restore --no-build --configuration Release --output Publish Source\Libs\TinyClient\TinyClient.csproj
-- jb inspectcode --verbosity=OFF -o=inspectcode-result.xml --no-build             Source\ManagedIrbis5-windows.sln
-- jb dupfinder   --verbosity=OFF -o=dupfinder-result.xml                          Source\ManagedIrbis5-windows.sln
+- dotnet pack    --no-restore --no-build --configuration Release -p:PackageVersion=%APPVEYOR_BUILD_VERSION% --include-symbols --include-source --output NuGet   Source\ManagedIrbis5-publish.sln
+- dotnet pack    --no-restore --no-build --configuration Release -p:PackageVersion=%APPVEYOR_BUILD_VERSION% --include-symbols --include-source --output NuGet   Source\Libs\TinyClient\TinyClient.csproj
+- dotnet publish --no-restore --no-build --configuration Release                                                                               --output Publish Source\ManagedIrbis5-publish.sln
+- dotnet publish --no-restore --no-build --configuration Release                                                                               --output Publish Source\Libs\TinyClient\TinyClient.csproj
+- jb inspectcode --verbosity=OFF -o=inspectcode-result.xml --no-build                                                                                           Source\ManagedIrbis5-windows.sln
+- jb dupfinder   --verbosity=OFF -o=dupfinder-result.xml                                                                                                        Source\ManagedIrbis5-windows.sln
 - cd
 
 artifacts:
