@@ -19,20 +19,18 @@ before_build:
 - pygount -f summary Source/Apps  -s cs -N "*.Designer.cs" -F "obj"
 - pwsh: |
     Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
-    ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-preview.6.21355.2"
+    ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-preview.7.21379.14"
 - dotnet --info
 - dotnet tool install -g JetBrains.ReSharper.GlobalTools
 - dotnet restore Source\Utils\Utils.sln
-- dotnet build --no-restore              --configuration Release Source\Utils\Utils.sln
+- dotnet build --no-restore --configuration Release -p:Version=%APPVEYOR_BUILD_VERSION% Source\Utils\Utils.sln
 - echo VERSION %APPVEYOR_BUILD_VERSION%
-- dotnet run   --no-restore --no-build   --configuration Release --project Source\Utils\PatchVersion\PatchVersion.csproj Source\Common\ArsMagna.targets %APPVEYOR_BUILD_VERSION%
-- type Source\Common\ArsMagna.targets
 
 build_script:
-- dotnet restore                                    Source\ManagedIrbis5-windows.sln
-- dotnet restore                                    Source\TinyClient.sln
-- dotnet build --no-restore --configuration Release Source\ManagedIrbis5-windows.sln
-- dotnet build --no-restore --configuration Release Source\TinyClient.sln
+- dotnet restore                                                                        Source\ManagedIrbis5-windows.sln
+- dotnet restore                                                                        Source\TinyClient.sln
+- dotnet build --no-restore --configuration Release -p:Version=%APPVEYOR_BUILD_VERSION% Source\ManagedIrbis5-windows.sln
+- dotnet build --no-restore --configuration Release -p:Version=%APPVEYOR_BUILD_VERSION% Source\TinyClient.sln
 
 test_script:
 - dotnet test --no-restore --no-build --configuration Release --settings sequential.runsettings Source\ManagedIrbis5-windows.sln
@@ -44,7 +42,6 @@ after_build:
 - dotnet publish --no-restore --no-build --configuration Release                                                                               --output Publish Source\ManagedIrbis5-publish.sln
 - dotnet publish --no-restore --no-build --configuration Release                                                                               --output Publish Source\Libs\TinyClient\TinyClient.csproj
 - jb inspectcode --verbosity=OFF -o=inspectcode-result.xml --no-build                                                                                           Source\ManagedIrbis5-windows.sln
-- jb dupfinder   --verbosity=OFF -o=dupfinder-result.xml                                                                                                        Source\ManagedIrbis5-windows.sln
 - cd
 
 artifacts:
@@ -56,6 +53,3 @@ artifacts:
 
   - path: 'inspectcode-result.xml'
     name: 'Inspection result'
-
-  - path: 'dupfinder-result.xml'
-    name: 'Duplicates'
