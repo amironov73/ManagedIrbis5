@@ -1,11 +1,20 @@
 language: csharp
+
+env:
+  - VERSION=5.0.0.$(TRAVIS_BUILD_NUMBER)
+
 dist: bionic
+
 solution: ManagedIrbis5.sln
+
 mono: none
-dotnet: 5.0.100
+
+dotnet: 5.0.400
+
 script:
-  - dotnet restore                                               ./Source/ManagedIrbis5.sln
-  - dotnet build --no-restore            --configuration Release ./Source/ManagedIrbis5.sln
-  - dotnet test  --no-restore --no-build --configuration Release ./Source/ManagedIrbis5.sln
-  - dotnet run   --no-restore --no-build --configuration Release --project Source/Tests/PftTests/PftTests.csproj
-  - dotnet pack  --no-restore --no-build --configuration Release ./Source/ManagedIrbis5.sln
+  - echo $(VERSION)
+  - dotnet restore                                                                           Source/ManagedIrbis5.sln
+  - dotnet build --no-restore            --configuration Release -p:Version=%VERSION%        Source/ManagedIrbis5.sln
+  - dotnet test  --no-restore --no-build --configuration Release                             Source/ManagedIrbis5.sln
+  - dotnet run   --no-restore --no-build --configuration Release --project                   Source/Tests/PftTests/PftTests.csproj
+  - dotnet pack  --no-restore --no-build --configuration Release -p:PackageVersion=%VERSION% Source/ManagedIrbis5.sln
