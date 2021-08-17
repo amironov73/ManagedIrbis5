@@ -27,7 +27,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace AM
+namespace AM.Linq
 {
     /// <summary>
     /// Возня вокруг <see cref="IEnumerable{T}"/>.
@@ -37,21 +37,258 @@ namespace AM
         #region Public methods
 
         /// <summary>
+        /// Получение всей последовательности IDisposable-объектов
+        /// в виде массива. Если при получении любого объекта происходит
+        /// ошибка, все они освобождаются, а исключение пробрасывается
+        /// в пользовательский код.
+        /// </summary>
+        public static T[] Acquire<T>
+            (
+                this IEnumerable<T> list
+            )
+            where T: IDisposable
+        {
+            var result = new List<T>();
+            try
+            {
+                result.AddRange(list);
+            }
+            catch
+            {
+                foreach (var disposable in result)
+                {
+                    disposable.Dispose();
+                }
+
+                throw;
+            }
+
+            return result.ToArray();
+
+        } // method Acquire
+
+        /// <summary>
+        /// Добавление двух элементов в конец последовательности.
+        /// </summary>
+        public static IEnumerable<T?> Append<T>
+            (
+                this IEnumerable<T?> head,
+                Func<T?> tail
+            )
+        {
+            foreach (var item in head)
+            {
+                yield return item;
+            }
+
+            yield return tail();
+
+        } // method Append
+
+        /// <summary>
+        /// Добавление двух элементов в конец последовательности.
+        /// </summary>
+        /// <remarks>
+        /// Метод для добавления одного элемента входит в .NET 5.
+        /// </remarks>
+        public static IEnumerable<T?> Append<T>
+            (
+                this IEnumerable<T?> head,
+                T? tail1,
+                T? tail2
+            )
+        {
+            foreach (var item in head)
+            {
+                yield return item;
+            }
+
+            yield return tail1;
+            yield return tail2;
+
+        } // method Append
+
+        /// <summary>
+        /// Добавление двух элементов в конец последовательности.
+        /// </summary>
+        public static IEnumerable<T?> Append<T>
+            (
+                this IEnumerable<T?> head,
+                Func<T?> tail1,
+                Func<T?> tail2
+            )
+        {
+            foreach (var item in head)
+            {
+                yield return item;
+            }
+
+            yield return tail1();
+            yield return tail2();
+
+        } // method Append
+
+        /// <summary>
+        /// Добавление трех элементов в конец последовательности.
+        /// </summary>
+        /// <remarks>
+        /// Метод для добавления одного элемента входит в .NET 5.
+        /// </remarks>
+        public static IEnumerable<T?> Append<T>
+            (
+                this IEnumerable<T?> head,
+                T? tail1,
+                T? tail2,
+                T? tail3
+            )
+        {
+            foreach (var item in head)
+            {
+                yield return item;
+            }
+
+            yield return tail1;
+            yield return tail2;
+            yield return tail3;
+
+        } // method Append
+
+        /// <summary>
+        /// Добавление трех элементов в конец последовательности.
+        /// </summary>
+        public static IEnumerable<T?> Append<T>
+            (
+                this IEnumerable<T?> head,
+                Func<T?> tail1,
+                Func<T?> tail2,
+                Func<T?> tail3
+            )
+        {
+            foreach (var item in head)
+            {
+                yield return item;
+            }
+
+            yield return tail1();
+            yield return tail2();
+            yield return tail3();
+
+        } // method Append
+
+        /// <summary>
+        /// Проверка условия для всех элементов последовательности.
+        /// Если условие не выполняется, генерируется исключение.
+        /// </summary>
+        public static IEnumerable<T?> Assert<T>
+            (
+                this IEnumerable<T?> list,
+                Func<T?, bool> predicate,
+                Func<T?, Exception>? errorSelector = null
+            )
+        {
+            foreach (var item in list)
+            {
+                if (!predicate(item))
+                {
+                    errorSelector ??= _ => throw new InvalidOperationException();
+                    throw errorSelector(item);
+                }
+
+                yield return item;
+            }
+
+        } // method Assert
+
+        /// <summary>
+        /// Нарезает последовательность на куски (массивы)
+        /// не больше указанного размера.
+        /// </summary>
+        public static IEnumerable<T[]> Chunk<T>
+        (
+            this IEnumerable<T> sequence,
+            int pieceSize
+        )
+        {
+            if (pieceSize <= 0)
+            {
+                Magna.Error
+                (
+                    nameof(Sequence) + "::" + nameof(Chunk)
+                    + "pieceSize="
+                    + pieceSize
+                );
+
+                throw new ArgumentOutOfRangeException(nameof(pieceSize));
+            }
+
+            var piece = new List<T>(pieceSize);
+            foreach (T item in sequence)
+            {
+                piece.Add(item);
+                if (piece.Count >= pieceSize)
+                {
+                    yield return piece.ToArray();
+                    piece = new List<T>(pieceSize);
+                }
+            }
+
+            if (piece.Count != 0)
+            {
+                yield return piece.ToArray();
+            }
+
+        } // method Chunk
+
+        /// <summary>
+        /// Просто перебирает все элементы последовательности,
+        /// чтобы "прокрутить" ее до конца.
+        /// </summary>
+        /// <remarks>
+        /// Заимствовано из MoreLinq.
+        /// </remarks>
+        public static void Consume<T>
+            (
+                this IEnumerable<T> sequence
+            )
+        {
+            foreach (var _ in sequence)
+            {
+                // Do nothing
+            }
+
+        } // method Consume
+
+        /// <summary>
+        /// Вычисление последовательности функций.
+        /// </summary>
+        public static IEnumerable<T?> Evaluate<T>
+            (
+                this IEnumerable<Func<T?>> sequence
+            )
+        {
+            foreach (var function in sequence)
+            {
+                yield return function();
+            }
+
+        } // method Evaluate
+
+        /// <summary>
         /// Первый элемент из последовательности либо значение по умолчанию.
         /// </summary>
         public static T? FirstOr<T>
             (
-                this IEnumerable<T> list,
+                this IEnumerable<T?> list,
                 T? defaultValue
             )
-            where T: class
         {
-            foreach (T item in list)
+            foreach (var item in list)
             {
                 return item;
             }
 
             return defaultValue;
+
         } // method FirstOr
 
         /// <summary>
@@ -59,17 +296,17 @@ namespace AM
         /// </summary>
         public static T? FirstOr<T>
             (
-                this IEnumerable<T> list,
-                T? defaultValue
+                this IEnumerable<T?> list,
+                Func<T?> defaultValue
             )
-            where T: struct
         {
-            foreach (T item in list)
+            foreach (var item in list)
             {
                 return item;
             }
 
-            return defaultValue;
+            return defaultValue();
+
         } // method FirstOr
 
         /// <summary>
@@ -228,6 +465,24 @@ namespace AM
         } // method MaxOrDefault
 
         /// <summary>
+        /// Получение следующего элемента из последовательности.
+        /// </summary>
+        public static T? NextOrDefault<T> (this IEnumerator<T> sequence, T? defaultValue = default) =>
+            sequence.MoveNext() ? sequence.Current : defaultValue;
+
+        /// <summary>
+        /// Получение следующего элемента из последовательности.
+        /// </summary>
+        public static T? NextOrDefault<T>(this IEnumerator<T> sequence, Func<T?> defaultValue) =>
+            sequence.MoveNext() ? sequence.Current : defaultValue();
+
+        // /// <summary>
+        // /// Получение следующего элемента из последовательности.
+        // /// </summary>
+        // public static T? NextOrDefault<T> (this IEnumerator sequence, T? defaultValue = default) =>
+        //     sequence.MoveNext() ? (T) sequence.Current : defaultValue;
+
+        /// <summary>
         /// Отбирает из последовательности только
         /// ненулевые элементы.
         /// </summary>
@@ -316,6 +571,7 @@ namespace AM
                     yield return value;
                 }
             }
+
         } // method Repeat
 
         /// <summary>
@@ -402,59 +658,42 @@ namespace AM
                 }
                 yield return obj;
             }
+
         } // method Separate
 
         /// <summary>
-        /// Нарезает последовательность на куски (массивы)
-        /// не больше указанного размера.
+        /// Попытка получить количество элементов в последовательности
+        /// без перебора этой последовательности.
         /// </summary>
-        public static IEnumerable<T[]> Chunk<T>
+        public static bool TryGetCount<TSource>
             (
-                this IEnumerable<T> sequence,
-                int pieceSize
+                this IEnumerable<TSource> source,
+                out int count
             )
         {
-            if (pieceSize <= 0)
+            if (source is ICollection<TSource> collectionoft)
             {
-                Magna.Error
-                    (
-                        nameof(Sequence) + "::" + nameof(Chunk)
-                        + "pieceSize="
-                        + pieceSize
-                    );
-
-                throw new ArgumentOutOfRangeException(nameof(pieceSize));
+                count = collectionoft.Count;
+                return true;
             }
 
-            var piece = new List<T>(pieceSize);
-            foreach (T item in sequence)
+            if (source is IReadOnlyCollection<TSource> readOnlyCollection)
             {
-                piece.Add(item);
-                if (piece.Count >= pieceSize)
-                {
-                    yield return piece.ToArray();
-                    piece = new List<T>(pieceSize);
-                }
+                count = readOnlyCollection.Count;
+                return true;
             }
 
-            if (piece.Count != 0)
+            if (source is ICollection collection)
             {
-                yield return piece.ToArray();
+                count = collection.Count;
+                return true;
             }
 
-        } // method Chunk
+            count = 0;
 
-        /// <summary>
-        /// Get next item from the sequence.
-        /// </summary>
-        public static T? NetOrDefault<T> (this IEnumerator<T> sequence, T? defaultValue = default) =>
-            sequence.MoveNext() ? sequence.Current : defaultValue;
+            return false;
 
-        /// <summary>
-        /// Get next item from the sequence.
-        /// </summary>
-        public static T? NetOrDefault<T> (this IEnumerator sequence, T? defaultValue = default) =>
-            sequence.MoveNext() ? (T) sequence.Current : defaultValue;
+        } // method TryGetCount
 
         #endregion
 

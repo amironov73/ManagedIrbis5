@@ -22,6 +22,7 @@ using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
 
 using AM;
+using AM.Linq;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Pft;

@@ -20,6 +20,7 @@ using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
+using AM.Linq;
 using AM.Runtime;
 
 using ManagedIrbis.Mapping;

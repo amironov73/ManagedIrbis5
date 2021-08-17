@@ -18,6 +18,7 @@ using System.Text;
 using System.Xml.Serialization;
 
 using AM;
+using AM.Linq;
 
 using ManagedIrbis.Gbl.Infrastructure;
 using ManagedIrbis.Infrastructure;

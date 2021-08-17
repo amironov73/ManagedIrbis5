@@ -23,7 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-using AM;
+using AM.Linq;
 
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;

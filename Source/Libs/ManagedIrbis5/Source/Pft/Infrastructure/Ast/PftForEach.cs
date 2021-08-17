@@ -21,6 +21,7 @@ using System.Linq;
 using System.Text;
 
 using AM;
+using AM.Linq;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;

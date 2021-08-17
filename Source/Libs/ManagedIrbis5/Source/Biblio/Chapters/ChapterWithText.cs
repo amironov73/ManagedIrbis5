@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 
 using AM;
+using AM.Linq;
 
 using ManagedIrbis.Reports;
 

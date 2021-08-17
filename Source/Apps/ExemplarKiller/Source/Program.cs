@@ -24,6 +24,7 @@ using System.Text;
 
 using AM;
 using AM.Configuration;
+using AM.Linq;
 
 using ManagedIrbis;
 using ManagedIrbis.Batch;

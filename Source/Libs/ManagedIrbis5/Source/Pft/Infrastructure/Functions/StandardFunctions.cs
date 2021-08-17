@@ -20,6 +20,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using AM;
+using AM.Linq;
 using AM.Text;
 
 using ManagedIrbis.Infrastructure;

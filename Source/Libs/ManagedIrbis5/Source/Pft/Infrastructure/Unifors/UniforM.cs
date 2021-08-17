@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforM.cs --
+/* UniforM.cs -- сортировка повторений поля
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,6 +17,7 @@
 using System.Linq;
 
 using AM;
+using AM.Linq;
 using AM.Text;
 
 #endregion

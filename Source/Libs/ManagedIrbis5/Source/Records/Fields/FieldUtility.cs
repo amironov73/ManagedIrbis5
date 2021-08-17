@@ -29,6 +29,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 using AM;
+using AM.Linq;
 
 using ManagedIrbis.Infrastructure;
 

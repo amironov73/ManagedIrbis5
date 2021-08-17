@@ -20,8 +20,8 @@ using System.Collections.Generic;
 
 using System.Linq;
 
-using AM;
-using AM.Collections;
+using AM.Linq;
+
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;

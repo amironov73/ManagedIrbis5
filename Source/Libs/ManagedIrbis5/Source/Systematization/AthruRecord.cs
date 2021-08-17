@@ -18,6 +18,7 @@
 using System.Linq;
 
 using AM;
+using AM.Linq;
 
 using ManagedIrbis.Mapping;
 

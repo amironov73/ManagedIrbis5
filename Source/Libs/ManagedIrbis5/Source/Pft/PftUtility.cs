@@ -27,6 +27,7 @@ using System.Text.RegularExpressions;
 
 using AM;
 using AM.ConsoleIO;
+using AM.Linq;
 using AM.Text;
 
 using ManagedIrbis.Infrastructure;

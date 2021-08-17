@@ -23,6 +23,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
+using AM.Linq;
 using AM.Security;
 
 using CM = System.Configuration.ConfigurationManager;

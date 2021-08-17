@@ -22,9 +22,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-using AM;
 using AM.Collections;
 using AM.IO;
+using AM.Linq;
 
 using ManagedIrbis.Fst;
 using ManagedIrbis.Infrastructure;
