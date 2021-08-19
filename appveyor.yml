@@ -21,7 +21,6 @@ before_build:
     Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
     ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-preview.7.21379.14"
 - dotnet --info
-- dotnet tool install -g JetBrains.ReSharper.GlobalTools
 - dotnet restore Source\Utils\Utils.sln
 - dotnet build --no-restore --configuration Release -p:Version=%APPVEYOR_BUILD_VERSION% Source\Utils\Utils.sln
 - echo VERSION %APPVEYOR_BUILD_VERSION%
@@ -41,8 +40,6 @@ after_build:
 - dotnet pack    --no-restore --no-build --configuration Release -p:PackageVersion=%APPVEYOR_BUILD_VERSION% --include-symbols --include-source --output NuGet   Source\Libs\TinyClient\TinyClient.csproj
 - dotnet publish --no-restore --no-build --configuration Release                                                                               --output Publish Source\ManagedIrbis5-publish.sln
 - dotnet publish --no-restore --no-build --configuration Release                                                                               --output Publish Source\Libs\TinyClient\TinyClient.csproj
-- jb inspectcode --verbosity=OFF -o=inspectcode-result.xml --no-build                                                                                           Source\ManagedIrbis5-windows.sln
-- cd
 
 artifacts:
   - path: 'NuGet\'
