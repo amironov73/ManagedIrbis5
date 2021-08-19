@@ -371,9 +371,10 @@ internal class Program : IrbisApplication
                 string[] args
             )
         {
-            var refOption = new Option<string[]>("r", arity: ArgumentArity.ZeroOrMore)
+            var refOption = new Option<string[]>("r")
             {
-                Description = "reference to assembly"
+                Description = "reference to assembly",
+                Arity = ArgumentArity.ZeroOrMore
             };
             var compileOption = new Option<bool>("c")
             {
@@ -391,13 +392,15 @@ internal class Program : IrbisApplication
             {
                 Description = "application mode"
             };
-            var defineOption = new Option<string[]>("d", arity: ArgumentArity.ZeroOrMore)
+            var defineOption = new Option<string[]>("d")
             {
-                Description = "#define"
+                Description = "#define",
+                Arity = ArgumentArity.OneOrMore
             };
-            var usingOption = new Option<string[]>("u", arity: ArgumentArity.ZeroOrMore)
+            var usingOption = new Option<string[]>("u")
             {
-                Description = "using directive"
+                Description = "using directive",
+                Arity = ArgumentArity.ZeroOrMore
             };
             var showOption = new Option<bool>("s")
             {
