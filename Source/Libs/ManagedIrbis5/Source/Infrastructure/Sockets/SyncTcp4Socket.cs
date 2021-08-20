@@ -21,6 +21,8 @@ using System.Net.Sockets;
 
 using AM;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -59,14 +61,21 @@ namespace ManagedIrbis.Infrastructure.Sockets
             var connection = Connection.ThrowIfNull(nameof(Connection));
             connection.ThrowIfCancelled();
 
+            var logger = connection.Logger;
+            logger?.LogTrace($"{nameof(SyncTcp4Socket)}::{nameof(TransactSync)}: enter");
+
+
             using var client = new TcpClient(AddressFamily.InterNetwork);
             try
             {
                 var host = connection.Host.ThrowIfNull(nameof(connection.Host));
+                logger?.LogTrace($"Connecting to {host}");
                 client.Connect(host, connection.Port);
+                logger?.LogTrace($"Connected to {host}");
             }
             catch (Exception exception)
             {
+                logger?.LogError(exception, "Error while connecting");
                 Magna.TraceException(nameof(SyncTcp4Socket), exception);
                 connection.SetLastError(-100_002);
 
@@ -85,12 +94,15 @@ namespace ManagedIrbis.Infrastructure.Sockets
 
             try
             {
+                logger?.LogTrace("Sending");
                 socket.Send(prefix, SocketFlags.None);
                 socket.Send(body.Span, SocketFlags.None);
                 socket.Shutdown(SocketShutdown.Send);
+                logger?.LogTrace("Send OK");
             }
             catch (Exception exception)
             {
+                logger?.LogError(exception, "Error while sending");
                 Magna.TraceException(nameof(SyncTcp4Socket), exception);
                 connection.SetLastError(-100_002);
 
@@ -98,6 +110,7 @@ namespace ManagedIrbis.Infrastructure.Sockets
             }
 
             var result = new Response(Connection.ThrowIfNull(nameof(Connection)));
+            logger?.LogTrace("Receiving");
             try
             {
                 while (true)
@@ -115,14 +128,19 @@ namespace ManagedIrbis.Infrastructure.Sockets
                     chunk = new ArraySegment<byte>(buffer, 0, read);
                     result.Add(chunk);
                 }
+
+                logger?.LogTrace("Receive OK");
             }
             catch (Exception exception)
             {
+                logger?.LogError(exception, "Error while receiving");
                 Magna.TraceException(nameof(SyncTcp4Socket), exception);
                 connection.SetLastError(-100_002);
 
                 return default;
             }
+
+            logger?.LogTrace($"{nameof(SyncTcp4Socket)}::{nameof(TransactSync)} OK");
 
             return result;
 

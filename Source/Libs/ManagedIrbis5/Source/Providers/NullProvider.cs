@@ -28,6 +28,8 @@ using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Records;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -115,6 +117,10 @@ namespace ManagedIrbis.Providers
 
         /// <inheritdoc cref="IIrbisProvider.GetWaitHandle"/>
         public WaitHandle GetWaitHandle() => Busy.WaitHandle;
+
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        // TODO implement
+        public ILogger? Logger => null;
 
         #endregion
 

@@ -105,6 +105,9 @@ namespace ManagedIrbis
         /// </summary>
         public int Interval { get; protected set; }
 
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        public ILogger? Logger => _logger;
+
         #endregion
 
         #region Construction
@@ -132,7 +135,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Логгер.
         /// </summary>
-        protected internal ILogger _logger;
+        protected internal ILogger? _logger;
 
         /// <summary>
         /// Провайдер сервисов.
@@ -265,7 +268,7 @@ namespace ManagedIrbis
         public BusyState Busy { get; protected internal set; }
 
         /// <inheritdoc cref="ICancellable.CancelOperation"/>
-        public void CancelOperation() => _cancellation!.Cancel();
+        public void CancelOperation() => _cancellation.Cancel();
 
         /// <inheritdoc cref="ICancellable.ThrowIfCancelled"/>
         public void ThrowIfCancelled() => Cancellation.ThrowIfCancellationRequested();

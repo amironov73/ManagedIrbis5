@@ -19,6 +19,7 @@
 
 using System;
 using System.Threading;
+
 using AM;
 using AM.PlatformAbstraction;
 using AM.Threading;
@@ -38,6 +39,7 @@ namespace ManagedIrbis
         IAsyncDisposable,
         IServiceProvider,
         IGetLastError,
+        ISupportLogging,
         ICancellable
     {
         #region Events

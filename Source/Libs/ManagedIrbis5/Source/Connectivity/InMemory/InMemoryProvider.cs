@@ -34,6 +34,8 @@ using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Records;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -76,6 +78,10 @@ namespace ManagedIrbis.InMemory
         /// Ресурсы.
         /// </summary>
         public IResourceProvider Resources { get; }
+
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        // TODO implement
+        public ILogger? Logger => null;
 
         #endregion
 

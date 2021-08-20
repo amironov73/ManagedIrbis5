@@ -34,6 +34,8 @@ using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -80,6 +82,10 @@ namespace ManagedIrbis.Direct
         /// Fall-forward path.
         /// </summary>
         public string? FallForwardPath { get; set;}
+
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        // TODO implement
+        public ILogger? Logger => null;
 
         #endregion
 

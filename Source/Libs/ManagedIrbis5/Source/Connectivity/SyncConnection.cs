@@ -78,6 +78,12 @@ namespace ManagedIrbis
             Socket = socket ?? new SyncTcp4Socket();
             Socket.Connection = this;
 
+            var logger = (ILogger?) serviceProvider?.GetService (typeof(ILogger<SyncConnection>));
+            if (logger is not null)
+            {
+                _logger = logger;
+            }
+
         } // constructor
 
         #endregion

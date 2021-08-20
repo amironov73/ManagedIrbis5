@@ -17,6 +17,7 @@
 #region Using directives
 
 using AM;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
