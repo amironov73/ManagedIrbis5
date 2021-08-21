@@ -29,6 +29,8 @@ using Microsoft.Extensions.Logging;
 
 namespace ManagedIrbis.Infrastructure.Sockets
 {
+    #region ISyncClientSocket members
+
     /// <summary>
     /// Сокет, реализующий синхронный режим для TCPv4-подключения.
     /// </summary>
@@ -50,20 +52,17 @@ namespace ManagedIrbis.Infrastructure.Sockets
 
         #endregion
 
-        #region ISyncClientSocket members
-
         /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
         public unsafe Response? TransactSync
-            (
-                SyncQuery query
-            )
+        (
+            SyncQuery query
+        )
         {
             var connection = Connection.ThrowIfNull(nameof(Connection));
             connection.ThrowIfCancelled();
 
             var logger = connection.Logger;
             logger?.LogTrace($"{nameof(SyncTcp4Socket)}::{nameof(TransactSync)}: enter");
-
 
             using var client = new TcpClient(AddressFamily.InterNetwork);
             try
@@ -76,7 +75,6 @@ namespace ManagedIrbis.Infrastructure.Sockets
             catch (Exception exception)
             {
                 logger?.LogError(exception, "Error while connecting");
-                Magna.TraceException(nameof(SyncTcp4Socket), exception);
                 connection.SetLastError(-100_002);
 
                 return default;
@@ -103,14 +101,13 @@ namespace ManagedIrbis.Infrastructure.Sockets
             catch (Exception exception)
             {
                 logger?.LogError(exception, "Error while sending");
-                Magna.TraceException(nameof(SyncTcp4Socket), exception);
                 connection.SetLastError(-100_002);
 
                 return default;
             }
 
-            var result = new Response(Connection.ThrowIfNull(nameof(Connection)));
             logger?.LogTrace("Receiving");
+            var result = new Response(Connection.ThrowIfNull(nameof(Connection)));
             try
             {
                 while (true)
@@ -134,7 +131,6 @@ namespace ManagedIrbis.Infrastructure.Sockets
             catch (Exception exception)
             {
                 logger?.LogError(exception, "Error while receiving");
-                Magna.TraceException(nameof(SyncTcp4Socket), exception);
                 connection.SetLastError(-100_002);
 
                 return default;

@@ -21,6 +21,7 @@ using System;
 using System.Threading;
 
 using AM;
+using AM.Logging;
 using AM.PlatformAbstraction;
 using AM.Threading;
 

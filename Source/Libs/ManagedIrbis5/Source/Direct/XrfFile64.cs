@@ -22,6 +22,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 using AM;
+using AM.Logging;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -54,7 +57,9 @@ namespace ManagedIrbis.Direct
     /// с номером 1, вторая – 2  и тд.
     /// </summary>
     public class XrfFile64
-        : IDisposable
+        : IDisposable,
+        ISupportLogging,
+        IServiceProvider
     {
         #region Properties
 
@@ -78,10 +83,15 @@ namespace ManagedIrbis.Direct
         public XrfFile64
             (
                 string fileName,
-                DirectAccessMode mode
+                DirectAccessMode mode = DirectAccessMode.Exclusive,
+                IServiceProvider? serviceProvider = null
             )
         {
             Sure.NotNullNorEmpty(fileName, nameof(fileName));
+
+            _serviceProvider = serviceProvider ?? Magna.Host.Services;
+            _logger = (ILogger?) _serviceProvider.GetService(typeof(ILogger<MstFile64>));
+            _logger?.LogTrace($"{nameof(MstFile64)}::Constructor ({fileName}, {mode})");
 
             FileName = Unix.FindFileOrThrow(fileName);
             Mode = mode;
@@ -89,12 +99,15 @@ namespace ManagedIrbis.Direct
             Magna.Trace(nameof(XrfFile64) + "::Constructor: " + FileName);
 
             _stream = DirectUtility.OpenFile(fileName, mode);
-        }
+
+        } // constructor
 
         #endregion
 
         #region Private members
 
+        private ILogger? _logger;
+        private readonly IServiceProvider _serviceProvider;
         private Stream _stream;
 
         private long _GetOffset
@@ -207,6 +220,26 @@ namespace ManagedIrbis.Direct
                 _stream.Flush();
             }
         }
+
+        #endregion
+
+        #region ISupportLogging members
+
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        // TODO implement
+        public ILogger? Logger => _logger;
+
+        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+        public void SetLogger(ILogger? logger)
+            => _logger = logger;
+
+        #endregion
+
+        #region IServiceProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService(Type serviceType)
+            => _serviceProvider.GetService(serviceType);
 
         #endregion
 

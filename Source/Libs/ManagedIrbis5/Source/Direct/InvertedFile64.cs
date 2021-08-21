@@ -27,6 +27,9 @@ using System.Text;
 using AM;
 using AM.Collections;
 using AM.IO;
+using AM.Logging;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -38,7 +41,9 @@ namespace ManagedIrbis.Direct
     /// Read inverted (index) file of IRBIS64 database.
     /// </summary>
     public class InvertedFile64
-        : IDisposable
+        : IDisposable,
+        ISupportLogging,
+        IServiceProvider
     {
         #region Constants
 
@@ -126,9 +131,16 @@ namespace ManagedIrbis.Direct
         public InvertedFile64
             (
                 string fileName,
-                DirectAccessMode mode
+                DirectAccessMode mode = DirectAccessMode.Exclusive,
+                IServiceProvider? serviceProvider = null
             )
         {
+            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+
+            _serviceProvider = serviceProvider ?? Magna.Host.Services;
+            _logger = (ILogger?) GetService(typeof(ILogger<MstFile64>));
+            _logger?.LogTrace($"{nameof(InvertedFile64)}::Constructor ({fileName}, {mode})");
+
             _lockObject = new object();
             _encoding = new UTF8Encoding(false, true);
 
@@ -149,8 +161,9 @@ namespace ManagedIrbis.Direct
 
         #region Private members
 
+        private ILogger? _logger;
+        private readonly IServiceProvider _serviceProvider;
         private readonly object _lockObject;
-
         private readonly Encoding _encoding;
 
         private long _NodeOffset
@@ -790,7 +803,7 @@ namespace ManagedIrbis.Direct
         {
             if (string.IsNullOrEmpty(key))
             {
-                return new int[0];
+                return Array.Empty<int>();
             }
 
             lock (_lockObject)
@@ -820,11 +833,33 @@ namespace ManagedIrbis.Direct
 
         #endregion
 
+        #region ISupportLogging members
+
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        // TODO implement
+        public ILogger? Logger => _logger;
+
+        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+        public void SetLogger(ILogger? logger)
+            => _logger = logger;
+
+        #endregion
+
+        #region IServiceProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService(Type serviceType)
+            => _serviceProvider.GetService(serviceType);
+
+        #endregion
+
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
+            _logger?.LogTrace($"{nameof(InvertedFile64)}::{nameof(Dispose)}");
+
             // TODO implement properly
 
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
@@ -853,6 +888,8 @@ namespace ManagedIrbis.Direct
         }
 
         #endregion
-    }
-}
+
+    } // class InvertedFile64
+
+} // namespace ManagedIrbis.Direct
 

@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 
-/* IDirectAccess64Strategy.cs -- стратегия прямого доступа к базам данных
+/* IDirectAccess64Strategy.cs -- интерфейс стратегии прямого доступа к базам данных
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ using System;
 namespace ManagedIrbis.Direct
 {
     /// <summary>
-    /// Стратегия прямого доступа к базам данных.
+    /// Интерфейс стратегии прямого доступа к базам данных.
     /// </summary>
     public interface IDirectAccess64Strategy
         : IDisposable
@@ -29,7 +29,7 @@ namespace ManagedIrbis.Direct
         /// <summary>
         /// Создание акцессора.
         /// </summary>
-        DirectAccessProxy64 CreateAccessor(DirectProvider provider, string? databaseName);
+        DirectAccessProxy64 CreateAccessor(DirectProvider provider, string? databaseName, IServiceProvider? serviceProvider);
 
         /// <summary>
         /// Временное освобождение акцессора.

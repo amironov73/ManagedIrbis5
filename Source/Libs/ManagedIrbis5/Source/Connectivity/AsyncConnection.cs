@@ -75,6 +75,8 @@ namespace ManagedIrbis
             Socket = socket ?? new AsyncTcp4Socket();
             Socket.Connection = this;
 
+            _logger = (ILogger?) serviceProvider?.GetService (typeof(ILogger<SyncConnection>));
+
         } // constructor
 
         #endregion

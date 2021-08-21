@@ -27,6 +27,7 @@ using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
+using AM.Logging;
 using AM.PlatformAbstraction;
 using AM.Threading;
 
@@ -78,10 +79,6 @@ namespace ManagedIrbis.InMemory
         /// Ресурсы.
         /// </summary>
         public IResourceProvider Resources { get; }
-
-        /// <inheritdoc cref="ISupportLogging.Logger"/>
-        // TODO implement
-        public ILogger? Logger => null;
 
         #endregion
 
@@ -193,6 +190,18 @@ namespace ManagedIrbis.InMemory
                 throw new OperationCanceledException();
             }
         }
+
+        #endregion
+
+        #region ISupportLogging members
+
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        // TODO implement
+        public ILogger? Logger => null;
+
+        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+        public void SetLogger(ILogger? logger)
+            => throw new NotImplementedException();
 
         #endregion
 

@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -21,7 +22,11 @@ using System.IO;
 
 using AM;
 using AM.Collections;
+using AM.Logging;
+
 using ManagedIrbis.Records;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -92,7 +97,9 @@ namespace ManagedIrbis.Direct
     /// Direct reading IRBIS64 databases.
     /// </summary>
     public sealed class DirectAccess64
-        : IDisposable
+        : IDisposable,
+        ISupportLogging,
+        IServiceProvider
     {
         #region Properties
 
@@ -125,40 +132,46 @@ namespace ManagedIrbis.Direct
         /// </summary>
         public DirectAccess64
             (
-                string masterFile
-            )
-            : this(masterFile, DirectAccessMode.Exclusive)
-        {
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DirectAccess64
-            (
                 string masterFile,
-                DirectAccessMode mode
+                DirectAccessMode mode = DirectAccessMode.Exclusive,
+                IServiceProvider? serviceProvider = null
             )
         {
+            Sure.NotNullNorEmpty(masterFile, nameof(masterFile));
+
+            _serviceProvider = serviceProvider ?? Magna.Host.Services;
+            _logger = (ILogger?) GetService(typeof(ILogger<MstFile64>));
+            _logger?.LogTrace($"{nameof(DirectAccess64)}::Constructor ({masterFile}, {mode})");
+
             Database = Path.GetFileNameWithoutExtension (masterFile)
                 .ThrowIfNullOrEmpty();
             Mst = new MstFile64
                 (
                     Path.ChangeExtension (masterFile, ".mst"),
-                    mode
+                    mode,
+                    _serviceProvider
                 );
             Xrf = new XrfFile64
                 (
                     Path.ChangeExtension(masterFile, ".xrf"),
-                    mode
+                    mode,
+                    _serviceProvider
                 );
             InvertedFile = new InvertedFile64
                 (
                     Path.ChangeExtension (masterFile, ".ifp"),
-                    mode
+                    mode,
+                    _serviceProvider
                 );
 
         } // constructor
+
+        #endregion
+
+        #region Private members
+
+        private ILogger? _logger;
+        private readonly IServiceProvider _serviceProvider;
 
         #endregion
 
@@ -486,11 +499,32 @@ namespace ManagedIrbis.Direct
 
         #endregion
 
+        #region ISupportLogging members
+
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        // TODO implement
+        public ILogger? Logger => _logger;
+
+        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+        public void SetLogger(ILogger? logger)
+            => _logger = logger;
+
+        #endregion
+
+        #region IServiceProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService(Type serviceType)
+            => _serviceProvider.GetService(serviceType);
+
+        #endregion
+
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
+            _logger?.LogTrace($"{nameof(DirectAccess64)}::{nameof(Dispose)}");
 
             Mst.Dispose();
             Xrf.Dispose();

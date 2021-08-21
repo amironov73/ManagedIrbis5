@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 
 using AM;
 using AM.IO;
+using AM.Logging;
 using AM.PlatformAbstraction;
 using AM.Threading;
 
@@ -105,8 +106,17 @@ namespace ManagedIrbis
         /// </summary>
         public int Interval { get; protected set; }
 
+        #endregion
+
+        #region ISupportLogging members
+
         /// <inheritdoc cref="ISupportLogging.Logger"/>
-        public ILogger? Logger => _logger;
+        // TODO implement
+        public virtual ILogger? Logger => _logger;
+
+        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+        public virtual void SetLogger(ILogger? logger)
+            => _logger = logger;
 
         #endregion
 

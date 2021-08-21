@@ -78,11 +78,7 @@ namespace ManagedIrbis
             Socket = socket ?? new SyncTcp4Socket();
             Socket.Connection = this;
 
-            var logger = (ILogger?) serviceProvider?.GetService (typeof(ILogger<SyncConnection>));
-            if (logger is not null)
-            {
-                _logger = logger;
-            }
+            _logger = (ILogger?) serviceProvider?.GetService (typeof(ILogger<SyncConnection>));
 
         } // constructor
 
@@ -280,11 +276,6 @@ namespace ManagedIrbis
             return Connect();
 
         } // method Reconnect
-
-        /// <summary>
-        /// Принудительная установка логгера.
-        /// </summary>
-        public void SetLogger(ILogger logger) => _logger = logger;
 
         /// <summary>
         /// Остановка сервера (расширенная команда).

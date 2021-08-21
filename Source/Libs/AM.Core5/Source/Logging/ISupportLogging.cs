@@ -1,4 +1,4 @@
-﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
@@ -17,7 +17,7 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace ManagedIrbis
+namespace AM.Logging
 {
     /// <summary>
     /// Интерфейс поддержки логирования.
@@ -28,6 +28,11 @@ namespace ManagedIrbis
         /// Логгер для текущего экземпляра.
         /// </summary>
         ILogger? Logger { get; }
+
+        /// <summary>
+        /// Установка нового логгера вместо текущего.
+        /// </summary>
+        void SetLogger(ILogger? logger);
 
     } // interface ISupportLogging
 

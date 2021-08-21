@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -21,8 +22,11 @@ using System.IO;
 
 using AM;
 using AM.IO;
+using AM.Logging;
 
 using ManagedIrbis.Infrastructure;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -59,7 +63,9 @@ namespace ManagedIrbis.Direct
     /// Direct reads MST file.
     /// </summary>
     public sealed class MstFile64
-        : IDisposable
+        : IDisposable,
+        ISupportLogging,
+        IServiceProvider
     {
         #region Properties
 
@@ -93,9 +99,16 @@ namespace ManagedIrbis.Direct
         public MstFile64
             (
                 string fileName,
-                DirectAccessMode mode
+                DirectAccessMode mode = DirectAccessMode.Exclusive,
+                IServiceProvider? serviceProvider = null
             )
         {
+            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+
+            _serviceProvider = serviceProvider ?? Magna.Host.Services;
+            _logger = (ILogger?) GetService(typeof(ILogger<MstFile64>));
+            _logger?.LogTrace($"{nameof(MstFile64)}::Constructor ({fileName}, {mode})");
+
             FileName = Unix.FindFileOrThrow(fileName);
             Mode = mode;
 
@@ -104,16 +117,17 @@ namespace ManagedIrbis.Direct
 
             ControlRecord = MstControlRecord64.Read(_stream);
             _lockFlag = ControlRecord.Blocked != 0;
-        }
+
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private object _lockObject;
-
+        private ILogger? _logger;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly object _lockObject;
         private bool _lockFlag;
-
         private Stream _stream;
 
         private static void _AppendStream
@@ -154,6 +168,8 @@ namespace ManagedIrbis.Direct
                 long position
             )
         {
+            _logger?.LogTrace($"{nameof(MstFile64)}::{nameof(ReadRecord)} ({position})");
+
             MemoryStream memory;
             MstRecordLeader64 leader;
 
@@ -353,11 +369,32 @@ namespace ManagedIrbis.Direct
 
         #endregion
 
+        #region ISupportLogging members
+
+        /// <inheritdoc cref="ISupportLogging.Logger"/>
+        // TODO implement
+        public ILogger? Logger => _logger;
+
+        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+        public void SetLogger(ILogger? logger)
+            => _logger = logger;
+
+        #endregion
+
+        #region IServiceProvider members
+
+        /// <inheritdoc cref="IServiceProvider.GetService"/>
+        public object? GetService(Type serviceType)
+            => _serviceProvider.GetService(serviceType);
+
+        #endregion
+
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose" />
         public void Dispose()
         {
+            _logger?.LogTrace($"{nameof(MstFile64)}::Dispose");
             lock (_lockObject)
             {
                 _stream.Dispose();

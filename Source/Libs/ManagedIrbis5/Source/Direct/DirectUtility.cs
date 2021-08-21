@@ -105,7 +105,8 @@ namespace ManagedIrbis.Direct
         public static DirectAccess64 CreateAccessor
             (
                 DirectProvider provider,
-                string? databaseName
+                string? databaseName,
+                IServiceProvider? serviceProvider
             )
         {
             databaseName ??= provider.Database;

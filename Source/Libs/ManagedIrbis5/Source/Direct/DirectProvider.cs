@@ -23,6 +23,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
+using AM.Logging;
 using AM.Parameters;
 using AM.PlatformAbstraction;
 using AM.Threading;
@@ -83,9 +84,17 @@ namespace ManagedIrbis.Direct
         /// </summary>
         public string? FallForwardPath { get; set;}
 
+        #endregion
+
+        #region ISupportLogging members
+
         /// <inheritdoc cref="ISupportLogging.Logger"/>
         // TODO implement
-        public ILogger? Logger => null;
+        public ILogger? Logger => _logger;
+
+        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+        public void SetLogger(ILogger? logger)
+            => _logger = logger;
 
         #endregion
 
@@ -99,7 +108,7 @@ namespace ManagedIrbis.Direct
         /// <param name="strategy">Стратегия создания акцессора.</param>
         /// <param name="caching">Стратегия кеширования.</param>
         /// <param name="locking">Стратегия блокировки базы данных.</param>
-        /// <param name="provider">Провайдер сервисов.</param>
+        /// <param name="serviceProvider">Провайдер сервисов.</param>
         public DirectProvider
             (
                 string rootPath,
@@ -107,13 +116,15 @@ namespace ManagedIrbis.Direct
                 IDirectAccess64Strategy? strategy = default,
                 IContextCachingStrategy? caching = default,
                 IDirectLockingStrategy? locking = default,
-                IServiceProvider? provider = default
+                IServiceProvider? serviceProvider = default
             )
         {
             _access = strategy ?? new TransientDirectAccess64();
             _caching = caching ?? new TransientCaching();
             _locking = locking ?? new NullLocking();
-            _provider = provider;
+            _serviceProvider = serviceProvider;
+            _logger = (ILogger?) GetService(typeof(ILogger<MstFile64>));
+            _logger?.LogTrace($"{nameof(DirectProvider)}::Constructor ({rootPath}, {mode})");
 
             var fullPath = Path.GetFullPath(rootPath);
             if (!Directory.Exists(fullPath))
@@ -126,7 +137,8 @@ namespace ManagedIrbis.Direct
             DataPath = Path.Combine(RootPath, "DataI");
             Busy = new BusyState();
             PlatformAbstraction = PlatformAbstractionLayer.Current;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -135,7 +147,8 @@ namespace ManagedIrbis.Direct
         private readonly IDirectAccess64Strategy _access;
         private readonly IContextCachingStrategy _caching;
         private readonly IDirectLockingStrategy _locking;
-        private readonly IServiceProvider? _provider;
+        private readonly IServiceProvider? _serviceProvider;
+        private ILogger? _logger;
 
         #endregion
 
@@ -149,6 +162,8 @@ namespace ManagedIrbis.Direct
                 string databaseName
             )
         {
+            _logger?.LogTrace($"{nameof(DirectProvider)}::{nameof(LockUp)} ({databaseName})");
+
             var success = _locking.LockDatabase(this, databaseName);
             var result = new LockMark(this, _locking, databaseName, success);
 
@@ -207,7 +222,7 @@ namespace ManagedIrbis.Direct
         /// Получение акцессора для доступа к файлам базы.
         /// </summary>
         public DirectAccessProxy64 GetAccessor (string? databaseName = null)
-            => _access.CreateAccessor(this, databaseName);
+            => _access.CreateAccessor(this, databaseName, _serviceProvider);
 
         /// <summary>
         /// Форматирование записи.
@@ -483,9 +498,12 @@ namespace ManagedIrbis.Direct
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
+            _logger?.LogTrace($"{nameof(DirectProvider)}::{nameof(Dispose)}");
+
             Disposing.Raise(this);
             _access.Dispose();
-        }
+
+        } // method Dispose
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
         public ValueTask DisposeAsync()
@@ -495,7 +513,8 @@ namespace ManagedIrbis.Direct
         }
 
         /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService ( Type serviceType ) => _provider?.GetService(serviceType);
+        public object? GetService ( Type serviceType ) =>
+            _serviceProvider?.GetService(serviceType);
 
         private void SetBusy(bool busy)
         {

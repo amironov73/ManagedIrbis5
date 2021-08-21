@@ -21,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AM;
+using AM.Logging;
 using AM.PlatformAbstraction;
 using AM.Threading;
 
@@ -118,9 +119,17 @@ namespace ManagedIrbis.Providers
         /// <inheritdoc cref="IIrbisProvider.GetWaitHandle"/>
         public WaitHandle GetWaitHandle() => Busy.WaitHandle;
 
+        #endregion
+
+        #region ISupportLogging members
+
         /// <inheritdoc cref="ISupportLogging.Logger"/>
         // TODO implement
         public ILogger? Logger => null;
+
+        /// <inheritdoc cref="ISupportLogging.SetLogger"/>
+        public void SetLogger(ILogger? logger)
+            => throw new NotImplementedException();
 
         #endregion
 

@@ -42,10 +42,11 @@ namespace ManagedIrbis.Direct
         public DirectAccessProxy64 CreateAccessor
             (
                 DirectProvider provider,
-                string? databaseName
+                string? databaseName,
+                IServiceProvider? serviceProvider
             )
         {
-            var result = DirectUtility.CreateAccessor(provider, databaseName);
+            var result = DirectUtility.CreateAccessor(provider, databaseName, serviceProvider);
             var pair = new Pair<DirectProvider, DirectAccess64>(provider, result);
             _active.Add(pair);
 
