@@ -13,7 +13,8 @@
 #region Using directives
 
 using System.Linq;
-using System.Text;
+
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -125,12 +126,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new ValueStringBuilder(stackalloc char[64]);
             result.Append("-(");
-            PftUtility.NodesToText(result, Children);
+            PftUtility.NodesToText(ref result, Children);
             result.Append(')');
 
             return result.ToString();
+
         } // method ToString
 
         #endregion

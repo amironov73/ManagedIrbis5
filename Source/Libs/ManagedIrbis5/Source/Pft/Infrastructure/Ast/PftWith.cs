@@ -78,7 +78,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 if (ReferenceEquals(_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
-                    List<PftNode> nodes = new List<PftNode>();
+                    var nodes = new List<PftNode>();
                     if (!ReferenceEquals(Variable, null))
                     {
                         nodes.Add(Variable);
@@ -148,13 +148,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             : this()
         {
             Variable = new PftVariableReference(variableName);
-            foreach (string field in fields)
+            foreach (var field in fields)
             {
-                FieldSpecification specification = new FieldSpecification(field);
+                var specification = new FieldSpecification(field);
                 Fields.Add(specification);
             }
 
-            foreach (PftNode node in body)
+            foreach (var node in body)
             {
                 Body.Add(node);
             }
@@ -173,7 +173,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftWith result = (PftWith)base.Clone();
+            var result = (PftWith)base.Clone();
 
             result._virtualChildren = null;
 
@@ -183,7 +183,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
 
             result.Fields = new NonNullCollection<FieldSpecification>();
-            foreach (FieldSpecification field in Fields)
+            foreach (var field in Fields)
             {
                 result.Fields.Add
                     (
@@ -207,7 +207,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             base.CompareNode(otherNode);
 
-            PftWith otherWith = (PftWith) otherNode;
+            var otherWith = (PftWith) otherNode;
             PftSerializationUtility.CompareNodes
                 (
                     Variable,
@@ -235,10 +235,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             Variable = (PftVariableReference?) PftSerializer
                 .DeserializeNullable(reader);
-            int count = reader.ReadPackedInt32();
-            for (int i = 0; i < count; i++)
+            var count = reader.ReadPackedInt32();
+            for (var i = 0; i < count; i++)
             {
-                FieldSpecification field = new FieldSpecification();
+                var field = new FieldSpecification();
                 field.Deserialize(reader);
                 Fields.Add(field);
             }
@@ -264,20 +264,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftException("Variable");
             }
 
-            string name = Variable.Name
+            var name = Variable.Name
                 .ThrowIfNull("Variable.Name");
 
-            using (PftContextGuard guard = new PftContextGuard(context))
+            using (var guard = new PftContextGuard(context))
             {
-                PftContext localContext = guard.ChildContext;
+                var localContext = guard.ChildContext;
                 localContext.Output = context.Output;
 
-                PftVariableManager localManager
+                var localManager
                     = new PftVariableManager(context.Variables);
 
                 localContext.SetVariables(localManager);
 
-                PftVariable variable = new PftVariable
+                var variable = new PftVariable
                     (
                         name,
                         false
@@ -289,10 +289,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         variable
                     );
 
-                foreach (FieldSpecification field in Fields)
+                foreach (var field in Fields)
                 {
-                    int tag = field.Tag;
-                    string[] lines = field.SubField == SubField.NoCode
+                    var tag = field.Tag;
+                    var lines = field.SubField == SubField.NoCode
                         ? PftUtility.GetFieldValue
                             (
                                 context,
@@ -308,24 +308,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                                 field.SubFieldRepeat
                             );
 
-                    List<string> lines2 = new List<string>();
-                    foreach (string line in lines)
+                    var lines2 = new List<string>();
+                    foreach (var line in lines)
                     {
                         variable.StringValue = line;
 
                         localContext.Execute(Body);
 
-                        string value = variable.StringValue;
+                        var value = variable.StringValue;
                         if (!string.IsNullOrEmpty(value))
                         {
                             lines2.Add(value);
                         }
                     }
 
-                    bool flag = lines2.Count != lines.Length;
+                    var flag = lines2.Count != lines.Length;
                     if (!flag)
                     {
-                        for (int i = 0; i < lines.Length; i++)
+                        for (var i = 0; i < lines.Length; i++)
                         {
                             if (lines[i] != lines2[i])
                             {
@@ -337,7 +337,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                     if (flag)
                     {
-                        string value = string.Join
+                        var value = string.Join
                             (
                                 Environment.NewLine,
                                 lines2.ToArray()
@@ -397,7 +397,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 Name = "Body"
             };
             result.Children.Add(body);
-            foreach (PftNode node in Body)
+            foreach (var node in Body)
             {
                 body.Children.Add(node.GetNodeInfo());
             }
@@ -423,8 +423,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             printer.SingleSpace();
             printer.Write("in ");
-            bool first = true;
-            foreach (FieldSpecification field in Fields)
+            var first = true;
+            foreach (var field in Fields)
             {
                 if (!first)
                 {
@@ -464,7 +464,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             PftSerializer.SerializeNullable(writer, Variable);
             writer.WritePackedInt32(Fields.Count);
-            foreach (FieldSpecification field in Fields)
+            foreach (var field in Fields)
             {
                 field.Serialize(writer);
             }
@@ -485,7 +485,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="Object.ToString" />
         public override string ToString()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             result.Append("with ");
             result.Append(Variable);
             result.Append(" in ");
@@ -495,8 +495,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result.Append(" end");
 
             return result.ToString();
-        }
+
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftWith
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

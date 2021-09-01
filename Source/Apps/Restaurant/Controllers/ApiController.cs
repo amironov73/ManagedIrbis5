@@ -16,15 +16,19 @@
 
 using System;
 using System.Linq;
+
 using AM;
 
 using ManagedIrbis;
 using ManagedIrbis.CommandLine;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
+using ManagedIrbis.Opt;
 using ManagedIrbis.Providers;
 
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -381,7 +385,36 @@ namespace Restaurant.Controllers
 
         } // method ReadRecord
 
-        private IActionResult ReadOpt(string? spec) => Ok();
+        /// <summary>
+        /// Чтение настроек оптимизации показа.
+        /// </summary>
+        /// <param name="fileName"></param>
+        private IActionResult ReadOpt
+            (
+                string? fileName
+            )
+        {
+            if (fileName.IsEmpty())
+            {
+                return BadRequest("File name not specified");
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var specification = FileSpecification.Parse(fileName);
+            var result = connection.ReadOptFile(specification);
+            if (result is null || connection.LastError < 0)
+            {
+                return Problem(IrbisException.GetErrorDescription(connection.LastError));
+            }
+
+            return Ok(result);
+
+        } // method ReadOpt
 
         /// <summary>
         /// Чтение терминов поискового словаря.
@@ -647,7 +680,7 @@ namespace Restaurant.Controllers
                 return Problem("Can't connect to IRBIS64");
             }
 
-            var result = connection.ListUsers();
+            var result = connection.GetServerStat();
             if (result is null || connection.LastError < 0)
             {
                 return Problem(IrbisException.GetErrorDescription(connection.LastError));
@@ -694,6 +727,8 @@ namespace Restaurant.Controllers
             {
                 return Problem(IrbisException.GetErrorDescription(connection.LastError));
             }
+
+            _logger.LogInformation($"Version: {result}");
 
             return Ok(result);
 

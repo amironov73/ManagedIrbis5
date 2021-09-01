@@ -70,6 +70,11 @@ namespace Restaurant
 
             app.UseHttpsRedirection();
 
+            app.UseCors(options =>
+            {
+                options.WithOrigins("http://localhost:5555").AllowAnyMethod();
+                options.WithOrigins("https://localhost:5555").AllowAnyMethod();
+            });
             app.UseRouting();
 
             app.UseAuthorization();

@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* IrbisUtility.cs --
+/* IrbisUtility.cs -- различные вспомогательные методы для подключения к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +20,9 @@ using System.IO;
 using System.Text;
 
 using AM;
+using AM.Collections;
 using AM.Security;
+using AM.Text;
 
 #endregion
 
@@ -29,7 +31,8 @@ using AM.Security;
 namespace ManagedIrbis
 {
     /// <summary>
-    ///
+    /// Различные вспомогательные методы, пригождающиеся
+    /// при работе к сервером ИРБИС64.
     /// </summary>
     public static class IrbisUtility
     {
@@ -77,24 +80,35 @@ namespace ManagedIrbis
             var result = SecurityUtility.Decrypt(encrypted, password);
 
             return result;
+
         } // method DecryptConnectionString
 
         /// <summary>
-        ///
+        /// Кодирование произвольного массива байт
+        /// в строку вида %01%23%45.
+        /// Такое кодирование позволяет хранить в записи,
+        /// например, небольшие JPEG-файлы.
         /// </summary>
         public static string EncodePercentString
             (
                 byte[]? array
             )
         {
-            if (ReferenceEquals(array, null)
-                || array.Length == 0)
+            if (array.IsNullOrEmpty())
             {
                 return string.Empty;
             }
 
-            var result = new StringBuilder();
+            var estimatedLength = array.Length;
+            foreach (var b in array)
+            {
+                if ((b < 'A' || b > 'Z') && (b < 'a' || b > 'z') && (b < '0' || b > '9'))
+                {
+                    estimatedLength += 2;
+                }
+            }
 
+            var result = new StringBuilder(estimatedLength);
             foreach (var b in array)
             {
                 if (b >= 'A' && b <= 'Z'
@@ -115,10 +129,14 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
+
         } // method EncodePercentString
 
         /// <summary>
-        ///
+        /// Декодирование строки вида %01%23%44.
+        /// Такие строки используются ИРБИС64 для хранения в записях,
+        /// например, обложек книг (по факту представляющих собой
+        /// небольшие JPEG-файлы).
         /// </summary>
         public static byte[] DecodePercentString
             (
@@ -127,7 +145,7 @@ namespace ManagedIrbis
         {
             if (string.IsNullOrEmpty(text))
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
 
             var predictedLength = text.Length / 2;
@@ -144,25 +162,28 @@ namespace ManagedIrbis
                     if (i >= text.Length - 2)
                     {
                         Magna.Error
-                        (
-                            "IrbisUtility::DecodePercentString: "
-                            + "unexpected end of stream"
-                        );
+                            (
+                                nameof(IrbisUtility) + "::" + nameof(DecodePercentString)
+                                + "unexpected end of stream"
+                            );
 
-                        throw new FormatException("text");
+                        throw new FormatException(nameof(text));
                     }
 
                     var b = byte.Parse
-                    (
-                        text.Substring(i + 1, 2),
-                        NumberStyles.HexNumber
-                    );
+                        (
+                            text.Substring(i + 1, 2),
+                            NumberStyles.HexNumber
+                        );
                     stream.WriteByte(b);
                     i += 2;
-                }
-            }
+
+                } // else
+
+            } // for
 
             return stream.ToArray();
+
         } // method DecodePercentString
 
         /// <summary>
@@ -250,10 +271,11 @@ namespace ManagedIrbis
             }
 
             return false;
-        }
+
+        } // method IsUrlSafeChar
 
         /// <summary>
-        /// Encode string.
+        /// Кодирование строки в форму, совместимую с URL.
         /// </summary>
         public static string? UrlEncode
             (
@@ -271,8 +293,16 @@ namespace ManagedIrbis
             }
 
             var bytes = encoding.GetBytes(text);
-            var result = new StringBuilder();
-
+            var estimatedLength = bytes.Length;
+            foreach (var b in bytes)
+            {
+                var c = (char)b;
+                if (!IsUrlSafeChar(c))
+                {
+                    estimatedLength += 2;
+                }
+            }
+            var result = new ValueStringBuilder(stackalloc char[estimatedLength]);
             foreach (var b in bytes)
             {
                 var c = (char)b;
@@ -294,10 +324,12 @@ namespace ManagedIrbis
             }
 
             return result.ToString();
+
         } // method UrlEncode
 
         /// <summary>
-        ///
+        /// Перевод даты из Юлианского календаря
+        /// в привычный нам григорианский.
         /// </summary>
         public static string FromJulianDate
             (
@@ -317,7 +349,8 @@ namespace ManagedIrbis
                 );
 
             return dateInJulian.ToString("yyyyMMdd");
-        }
+
+        } // method FromJulianDate
 
         /// <summary>
         /// Применение значения поля.
@@ -357,6 +390,7 @@ namespace ManagedIrbis
             }
 
             return fields;
+
         } // method ApplyFieldValue
 
         #endregion

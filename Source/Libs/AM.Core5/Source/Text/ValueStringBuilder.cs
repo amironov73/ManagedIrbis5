@@ -85,6 +85,7 @@ namespace AM.Text
             : this()
         {
             _characters = characters;
+
         } // constructor
 
         #endregion
@@ -132,7 +133,8 @@ namespace AM.Text
 
             _characters[_position] = c;
             ++_position;
-        }
+
+        } // method Append
 
         /// <summary>
         /// Добавление спана символов.
@@ -150,7 +152,8 @@ namespace AM.Text
 
             text.CopyTo(_characters.Slice(_position));
             _position = newPosition;
-        }
+
+        } // method Append
 
         /// <summary>
         /// Добавление пары спанов.
@@ -171,7 +174,8 @@ namespace AM.Text
             text1.CopyTo(_characters.Slice(_position));
             text2.CopyTo(_characters.Slice(_position + text1.Length));
             _position = newPosition;
-        }
+
+        } // method Append
 
         /// <summary>
         /// Добавление трех спанов.
@@ -195,7 +199,44 @@ namespace AM.Text
             text3.CopyTo(_characters.Slice(_position + text1.Length
                 + text2.Length));
             _position = newPosition;
-        }
+
+        } // method Append
+
+        /// <summary>
+        /// Добавление целого числа со знаком.
+        /// </summary>
+        public unsafe void Append
+            (
+                int value
+            )
+        {
+            var remaining = _characters.Length - _position;
+            if (remaining >= 10)
+            {
+                var buffer = _characters.Slice(_position);
+                var written = FastNumber.Int32ToChars(value, buffer);
+                _position += written;
+            }
+            else
+            {
+                Span<char> buffer = stackalloc char[10];
+                var written = FastNumber.Int32ToChars(value, buffer);
+                var newPosition = _position + written;
+                if (newPosition > _characters.Length)
+                {
+                    Grow(written);
+                }
+
+                buffer.Slice(0, written).CopyTo(_characters.Slice(_position));
+                _position = newPosition;
+            }
+
+        } // method Append
+
+        /// <summary>
+        /// Добавление перевода строки.
+        /// </summary>
+        public void AppendLine() => Append(Environment.NewLine);
 
         /// <summary>
         /// Освобождаем ресурсы, если были заняты.
@@ -208,7 +249,8 @@ namespace AM.Text
             {
                 ArrayPool<char>.Shared.Return(borrowed);
             }
-        }
+
+        } // method Dispose
 
         /// <summary>
         /// Увеличение емкости, если необходимо.
@@ -222,7 +264,7 @@ namespace AM.Text
             {
                 Grow(capacity - _position);
             }
-        }
+        } // method EnsureCapacity
 
         /// <summary>
         /// Увеличение емкости на указанное количество символов.
@@ -245,7 +287,8 @@ namespace AM.Text
             }
 
             _characters = _array = borrowed;
-        }
+
+        } // method Grow
 
         /// <summary>
         /// Получение перечислителя.
@@ -264,7 +307,8 @@ namespace AM.Text
             Dispose();
 
             return result;
-        }
+
+        } // method ToString
 
         #endregion
 

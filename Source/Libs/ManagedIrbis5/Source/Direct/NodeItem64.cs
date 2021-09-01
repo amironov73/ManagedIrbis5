@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* NodeItem64.cs -- record item for L01/N01
+/* NodeItem64.cs -- элемент записи в файле L01/N01
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -58,18 +58,12 @@ namespace ManagedIrbis.Direct
         /// <summary>
         /// Полное смещение
         /// </summary>
-        public long FullOffset
-        {
-            get { return unchecked(((long)HighOffset << 32) + LowOffset); }
-        }
+        public long FullOffset => unchecked(((long)HighOffset << 32) + LowOffset);
 
         /// <summary>
         /// Ссылается на лист?
         /// </summary>
-        public bool RefersToLeaf
-        {
-            get { return LowOffset < 0; }
-        }
+        public bool RefersToLeaf => LowOffset < 0;
 
         /// <summary>
         /// Текстовое значение ключа
@@ -93,7 +87,8 @@ namespace ManagedIrbis.Direct
             writer.WriteLine("HIGH: {0}", HighOffset);
             writer.WriteLine("LOW : {0}", LowOffset);
             writer.WriteLine("TEXT: {0}", Text);
-        }
+
+        } // method Dump
 
         #endregion
 
@@ -101,8 +96,7 @@ namespace ManagedIrbis.Direct
 
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
-        {
-            return string.Format
+            => string.Format
                 (
                     "Length: {0}, KeyOffset: {1}, "
                     + "LowOffset: {2}, HighOffset: {3}, "
@@ -116,8 +110,9 @@ namespace ManagedIrbis.Direct
                     RefersToLeaf,
                     Text
                 );
-        }
 
         #endregion
-    }
-}
+
+    } // class NodeItem64
+
+} // namespace ManagedIrbis.Direct

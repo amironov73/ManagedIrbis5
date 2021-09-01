@@ -7,25 +7,16 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* BiblioItem.cs --
+/* BiblioItem.cs -- элемент библиографического указателя
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Collections;
-using AM.IO;
-using AM.Runtime;
 using AM.Text;
 
 #endregion
@@ -35,7 +26,9 @@ using AM.Text;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    ///
+    /// Элемент библиографического указателя, например,
+    /// библиографическое описание книги или
+    /// строчка в алфавитном указателе.
     /// </summary>
     public sealed class BiblioItem
         : IVerifiable
@@ -43,37 +36,38 @@ namespace ManagedIrbis.Biblio
         #region Properties
 
         /// <summary>
-        /// Chapter the item belongs to.
+        /// Глава, которой принадлежит элемент.
         /// </summary>
         public BiblioChapter? Chapter { get; set; }
 
         /// <summary>
-        ///
+        /// Порядковый номер в главе.
         /// </summary>
         public int Number { get; set; }
 
         /// <summary>
-        /// Record.
+        /// Библиографическая запись (опционально).
         /// </summary>
         public Record? Record { get; set; }
 
         /// <summary>
-        /// Bibliographical description.
+        /// Библиографическое описание (опционально).
         /// </summary>
         public string? Description { get; set; }
 
         /// <summary>
-        ///
+        /// Используется для упорядочивания элементов в главе
+        /// (опционально).
         /// </summary>
         public string? Order { get; set; }
 
         /// <summary>
-        /// Terms.
+        /// Соответствующие термины поискового словаря.
         /// </summary>
         public NonNullCollection<BiblioTerm> Terms { get; private set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [JsonIgnore]
         public object? UserData { get; set; }
@@ -83,12 +77,13 @@ namespace ManagedIrbis.Biblio
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public BiblioItem()
         {
             Terms = new NonNullCollection<BiblioTerm>();
-        }
+
+        } // constructor
 
         #endregion
 
@@ -106,7 +101,8 @@ namespace ManagedIrbis.Biblio
             // TODO do something
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
@@ -115,14 +111,17 @@ namespace ManagedIrbis.Biblio
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
+            var result = new ValueStringBuilder();
             result.Append(Order);
             result.AppendLine();
             result.Append(Description);
 
             return result.ToString();
-        }
+
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class BiblioItem
+
+} // namespace ManagedIrbis.Biblio

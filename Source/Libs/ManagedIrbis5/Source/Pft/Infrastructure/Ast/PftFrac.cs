@@ -18,7 +18,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
+
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -144,17 +145,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
+            var result = new ValueStringBuilder();
             result.Append("frac(");
             var child = Children.FirstOrDefault();
             if (!ReferenceEquals(child, null))
             {
-                result.Append(child);
+                result.Append(child.ToString());
             }
             result.Append(')');
 
             return result.ToString();
-        }
+
+        } // method ToString
 
         #endregion
 

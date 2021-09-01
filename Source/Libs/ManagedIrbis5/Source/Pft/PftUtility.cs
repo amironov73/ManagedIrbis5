@@ -1366,7 +1366,7 @@ namespace ManagedIrbis.Pft
         //=================================================
 
         /// <summary>
-        /// Build text representation of <see cref="PftNode"/>'s.
+        /// Получает текстовое представление нескольких <see cref="PftNode"/>.
         /// </summary>
         public static void NodesToText
             (
@@ -1384,7 +1384,30 @@ namespace ManagedIrbis.Pft
                 builder.Append(node);
                 first = false;
             }
-        }
+
+        } // method NodesToText
+
+        /// <summary>
+        /// Получает текстовое представление нескольких <see cref="PftNode"/>.
+        /// </summary>
+        public static void NodesToText
+            (
+                ref ValueStringBuilder builder,
+                IEnumerable<PftNode> nodes
+            )
+        {
+            var first = true;
+            foreach (var node in nodes.NonNullItems())
+            {
+                if (!first)
+                {
+                    builder.Append(' ');
+                }
+                builder.Append(node.ToString());
+                first = false;
+            }
+
+        } // method NodesToText
 
         //=================================================
 

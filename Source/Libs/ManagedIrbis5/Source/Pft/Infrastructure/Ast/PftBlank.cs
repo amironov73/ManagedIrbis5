@@ -16,7 +16,8 @@
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
+
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -124,7 +125,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler.EndMethod(this);
             compiler.MarkReady(this);
-        }
+
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -139,7 +141,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             Value = IsBlank(text);
 
             OnAfterExecution(context);
-        }
+
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -152,7 +155,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 .Write("blank(");
             base.PrettyPrint(printer);
             printer.Write(')');
-        }
+
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         [DebuggerStepThrough]
@@ -166,7 +170,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
+            var result = new ValueStringBuilder();
             result.Append("blank(");
             var first = true;
             foreach (var child in Children)
@@ -175,13 +179,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
                     result.Append(' ');
                 }
-                result.Append(child);
+                result.Append(child.ToString());
                 first = false;
             }
             result.Append(')');
 
             return result.ToString();
-        }
+
+        } // method ToString
 
         #endregion
 

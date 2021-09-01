@@ -162,8 +162,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             result.Append(')');
 
             return result.ToString();
-        }
+
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftTrunc
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

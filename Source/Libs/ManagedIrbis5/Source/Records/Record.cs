@@ -144,7 +144,8 @@ namespace ManagedIrbis
         {
             Status = status;
             return this;
-        }
+
+        } // method Add
 
         /// <summary>
         /// Добавление поля в конец записи.
@@ -165,6 +166,7 @@ namespace ManagedIrbis
             Fields.Add(field);
 
             return this;
+
         } // method Add
 
         /// <summary>

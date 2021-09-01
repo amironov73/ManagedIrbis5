@@ -313,7 +313,8 @@ namespace AM
             }
 
             return new string(buffer, offset, Length - offset);
-        }
+
+        } // method Int64ToString
 
         // ==========================================================
 
@@ -365,7 +366,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         /// <summary>
         /// Fast number parsing.
@@ -390,7 +392,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         /// <summary>
         /// Fast number parsing.
@@ -415,7 +418,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         /// <summary>
         /// Разбор целого 32-битного числа со знаком.
@@ -456,7 +460,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         /// <summary>
         /// Разбор целого 32-битного числа со знаком.
@@ -497,7 +502,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         /// <summary>
         /// Fast number parsing.
@@ -519,7 +525,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         /// <summary>
         /// Fast number parsing.
@@ -543,7 +550,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         /// <summary>
         /// Fast number parsing.
@@ -582,7 +590,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt32
 
         // ==========================================================
 
@@ -617,7 +626,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt64
 
         /// <summary>
         /// Разбор целого 64-битного числа со знаком.
@@ -639,7 +649,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt64
 
         /// <summary>
         /// Разбор целого 64-битного числа со знаком.
@@ -661,7 +672,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt64
 
         /// <summary>
         /// Разбор целого 64-битного числа со знаком.
@@ -683,7 +695,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt64
 
         /// <summary>
         /// Разбор целого 64-битного числа со знаком.
@@ -704,7 +717,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt64
 
         /// <summary>
         /// Разбор целого 64-битного числа со знаком.
@@ -743,7 +757,8 @@ namespace AM
             }
 
             return result;
-        }
+
+        } // method ParseInt64
 
         // ==========================================================
 

@@ -19,7 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -130,7 +131,8 @@ namespace ManagedIrbis.Direct
         {
             Leader = new NodeLeader64();
             _items = new List<NodeItem64>();
-        }
+
+        } // constructor
 
         /// <summary>
         /// Конструктор
@@ -142,7 +144,8 @@ namespace ManagedIrbis.Direct
             : this()
         {
             IsLeaf = isLeaf;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -165,7 +168,8 @@ namespace ManagedIrbis.Direct
             )
         {
             writer.WriteLine(ToString());
-        }
+
+        } // method Dump
 
         #endregion
 
@@ -174,14 +178,24 @@ namespace ManagedIrbis.Direct
         /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
-            var items = new StringBuilder();
+            // TODO реализовать по-человечески
+
+            var estimatedSize = 0;
             foreach (var item in Items)
             {
-                items.AppendLine(item.ToString());
+                estimatedSize += Environment.NewLine.Length;
+                estimatedSize += item.Length;
+            }
+            var items = new ValueStringBuilder(stackalloc char[estimatedSize]);
+            foreach (var item in Items)
+            {
+                items.Append(item.ToString());
+                items.AppendLine();
             }
 
-            return $"{Leader}{Environment.NewLine}{items}";
-        }
+            return $"{Leader}{Environment.NewLine}{items.ToString()}";
+
+        } // method ToString
 
         #endregion
 

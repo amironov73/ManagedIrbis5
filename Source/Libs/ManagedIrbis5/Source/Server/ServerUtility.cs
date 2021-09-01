@@ -30,7 +30,7 @@ using ManagedIrbis.Menus;
 namespace ManagedIrbis.Server
 {
     /// <summary>
-    /// Полезные методы, применяемые в серверном движке
+    /// Полезные методы, применяемые в серверном движке.
     /// </summary>
     public static class ServerUtility
     {
