@@ -26,7 +26,6 @@ using ManagedIrbis.Menus;
 using ManagedIrbis.Opt;
 using ManagedIrbis.Providers;
 
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.Extensions.Configuration;
@@ -532,12 +531,16 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Поиск записей.
         /// </summary>
-        /// <param name="databaseName"></param>
-        /// <param name="expression"></param>
+        /// <param name="databaseName">Имя базы данных.</param>
+        /// <param name="expression">Выражение на поисковом языке ИРБИС64.</param>
+        /// <param name="start">Стартовое смещение (опционально).</param>
+        /// <param name="count">Максимальное количество записей (опционально).</param>
         private IActionResult Search
             (
                 string? databaseName,
-                string? expression
+                string? expression,
+                string? start,
+                string? count
             )
         {
             if (databaseName.IsEmpty())
@@ -556,11 +559,29 @@ namespace Restaurant.Controllers
                 return Problem("Can't connect to IRBIS64");
             }
 
-            var result = connection.Search(expression);
-            if (connection.LastError < 0)
+            var parameters = new SearchParameters
+            {
+                Database = databaseName,
+                Expression = expression
+            };
+
+            if (start is not null)
+            {
+                parameters.FirstRecord = start.SafeToInt32();
+            }
+
+            if (count is not null)
+            {
+                parameters.NumberOfRecords = count.SafeToInt32();
+            }
+
+            var found = connection.Search(parameters);
+            if (connection.LastError < 0 || found is null)
             {
                 return Problem(IrbisException.GetErrorDescription(connection.LastError));
             }
+
+            var result = FoundItem.ToMfn(found);
 
             return Ok(result);
 
@@ -622,11 +643,15 @@ namespace Restaurant.Controllers
         /// </summary>
         /// <param name="databaseName">Имя базы данных</param>
         /// <param name="expression">Поисковое выражение.</param>
+        /// <param name="start">Стартовое смещение (опционально).</param>
+        /// <param name="count">Максимальное количество найденных записей (опционально).</param>
         /// <param name="format">Формат.</param>
         private IActionResult SearchFormat
             (
                 string? databaseName,
                 string? expression,
+                string? start,
+                string? count,
                 string? format
             )
         {
@@ -657,6 +682,17 @@ namespace Restaurant.Controllers
                 Expression = expression,
                 Format = format
             };
+
+            if (start is not null)
+            {
+                parameters.FirstRecord = start.SafeToInt32();
+            }
+
+            if (count is not null)
+            {
+                parameters.NumberOfRecords = count.SafeToInt32();
+            }
+
             var found = connection.Search(parameters);
             if (found is null || connection.LastError < 0)
             {
@@ -816,13 +852,13 @@ namespace Restaurant.Controllers
                     return Scenarios();
 
                 case "search":
-                    return Search(db, expr);
+                    return Search(db, expr, start, count);
 
                 case "search_count":
                     return SearchCount(db, expr);
 
                 case "search_format":
-                    return SearchFormat(db, expr, format);
+                    return SearchFormat(db, expr, start, count, format);
 
                 case "server_stat":
                     return ServerStat();
