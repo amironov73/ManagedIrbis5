@@ -47,6 +47,3 @@ artifacts:
 
   - path: 'Publish\'
     name: 'Binaries'
-
-  - path: 'inspectcode-result.xml'
-    name: 'Inspection result'
