@@ -55,5 +55,14 @@ namespace Istu.OldModel
         public string? Barcode { get; set; }
 
         #endregion
-    }
-}
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"{ID}: {Name}";
+
+        #endregion
+
+    } // class Operator
+
+} // namespace Istu.OldModel

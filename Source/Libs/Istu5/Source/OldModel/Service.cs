@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
 /* Service.cs -- услуга, оказанная библиотекой
@@ -75,7 +76,7 @@ namespace Istu.OldModel
                         continue;
                     }
 
-                    Service service = new Service
+                    var service = new Service
                     {
                         Title = parts[0],
                         Price = int.Parse(parts[1]),
@@ -86,8 +87,11 @@ namespace Istu.OldModel
             }
 
             return result.ToArray();
-        }
+
+        } // method ReadFile
 
         #endregion
-    }
-}
+
+    } // class Service
+
+} // namespace Istu.OldModel

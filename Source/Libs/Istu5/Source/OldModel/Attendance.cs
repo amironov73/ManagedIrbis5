@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
 /* Attendance.cs -- посещение библиотеки
@@ -30,6 +31,50 @@ namespace Istu.OldModel
     [Table]
     public class Attendance
     {
+        #region Constants
+
+        /// <summary>
+        /// Посещение библиотеки.
+        /// </summary>
+        public const char Visit = 'a';
+
+        /// <summary>
+        /// Выдача книги/журнала/документа.
+        /// </summary>
+        public const char Issue = 'g';
+
+        /// <summary>
+        /// Возврат книги/журнала/документа.
+        /// </summary>
+        public const char Return = 'r';
+
+        /// <summary>
+        /// Продление пользования книгой/журналом/документом.
+        /// </summary>
+        public const char Prolongation = 'p';
+
+        /// <summary>
+        /// Привязка штрих-кодов к книге/журналу/документу.
+        /// </summary>
+        public const char Binding = 'w';
+
+        /// <summary>
+        /// Списание экземпляров книги/журнала/документа.
+        /// </summary>
+        public const char WriteOff = 'd';
+
+        /// <summary>
+        /// Регистрация читателя в библиотеке.
+        /// </summary>
+        public const char Registration = '1';
+
+        /// <summary>
+        /// Отсылка письма/СМС/уведомления через корпоративную систему.
+        /// </summary>
+        public const char SMS = 's';
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -85,5 +130,14 @@ namespace Istu.OldModel
         public string? Number { get; set; }
 
         #endregion
-    }
-}
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"{Moment}: {Ticket}: {Ticket}: {Number}";
+
+        #endregion
+
+    } // class Attendance
+
+} // namespace Istu.OldModel

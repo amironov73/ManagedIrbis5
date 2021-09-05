@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
 /* Translator.cs -- трансляция штрих-кодов в инвентарные номера
@@ -79,5 +80,7 @@ namespace Istu.OldModel
         public string? Rfid { get; set; }
 
         #endregion
-    }
-}
+
+    } // class Translator
+
+} // namespace Istu.OldModel

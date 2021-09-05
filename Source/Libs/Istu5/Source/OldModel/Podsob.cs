@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
 /* Podsob.cs -- подсобные фонды
@@ -99,5 +100,14 @@ namespace Istu.OldModel
         public string? Sigla { get; set; }
 
         #endregion
-    }
-}
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"{Inventory}: {Ticket}";
+
+        #endregion
+
+    } // class Posdob
+
+} // namespace Istu.OldModel

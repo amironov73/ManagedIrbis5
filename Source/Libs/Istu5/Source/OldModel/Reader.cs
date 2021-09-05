@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
 /* Reader.cs -- информация о читателе
@@ -269,6 +270,16 @@ namespace Istu.OldModel
         [Column, Nullable]
         public string? Agree { get; set; }
 
+        /// <summary>
+        /// Сертификат о прививке против COVID-19.
+        /// Студентам, имеющим сертификат,
+        /// прощаются долги перед библиотекой.
+        /// </summary>
+        [Column, Nullable]
+        public string? Certificate { get; set; }
+
         #endregion
-    }
-}
+
+    } // class Reader
+
+} // namespace Istu.OldModel
