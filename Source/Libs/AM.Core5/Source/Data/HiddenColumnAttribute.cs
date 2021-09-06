@@ -8,7 +8,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
-/* ReadOnlyColumnAttribute.cs -- помечает колонку как не подлежащую редактированию
+/* HiddenColumnAttribute.cs -- скрывает колонку в гриде
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,21 +20,21 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Data
 {
     /// <summary>
-    /// Помечает колонку как не подлежащую редактированию.
+    /// Скрывает колонку в гриде.
     /// </summary>
     [AttributeUsage (AttributeTargets.Property)]
-    public sealed class ReadOnlyColumnAttribute
+    public sealed class HiddenColumnAttribute
         : Attribute
     {
         #region Properties
 
-        /// <summary>
-        /// Признак колонки только для чтения.
-        /// </summary>
-        public bool ReadOnly { get; }
+        ///<summary>
+        /// Признак скрытой колонки.
+        ///</summary>
+        public bool Hidden { get; }
 
         #endregion
 
@@ -43,24 +43,24 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Конструктор по умолчанию.
         /// </summary>
-        public ReadOnlyColumnAttribute()
-            : this (true)
+        public HiddenColumnAttribute ()
+            : this ( true )
         {
         } // constructor
 
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public ReadOnlyColumnAttribute
+        public HiddenColumnAttribute
             (
-                bool readOnly
+                bool hidden
             )
         {
-            ReadOnly = readOnly;
+            Hidden = hidden;
         } // constructor
 
         #endregion
 
-    } // class ReadOnlyColumnAttribute
+    } // class HiddenColumnAttribute
 
 } // namespace AM.Windows.Forms

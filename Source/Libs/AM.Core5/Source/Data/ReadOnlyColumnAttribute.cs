@@ -8,7 +8,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
-/* ColumnHeaderAttribute.cs -- задает заголовок колонки в гриде
+/* ReadOnlyColumnAttribute.cs -- помечает колонку как не подлежащую редактированию
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,40 +20,47 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Data
 {
     /// <summary>
-    /// Задает заголовок колонки в гриде.
+    /// Помечает колонку как не подлежащую редактированию.
     /// </summary>
-    [Serializable]
     [AttributeUsage (AttributeTargets.Property)]
-    public sealed class ColumnHeaderAttribute
+    public sealed class ReadOnlyColumnAttribute
         : Attribute
     {
         #region Properties
 
         /// <summary>
-        /// Заголовок колонки.
+        /// Признак колонки только для чтения.
         /// </summary>
-        public string Header { get; }
+        public bool ReadOnly { get; }
 
         #endregion
 
         #region Construction
 
         /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
+        public ReadOnlyColumnAttribute()
+            : this (true)
+        {
+        } // constructor
+
+        /// <summary>
         /// Конструктор.
         /// </summary>
-        public ColumnHeaderAttribute
+        public ReadOnlyColumnAttribute
             (
-                string header
+                bool readOnly
             )
         {
-            Header = header;
+            ReadOnly = readOnly;
         } // constructor
 
         #endregion
 
-    } // class ColumnHeaderAttribute
+    } // class ReadOnlyColumnAttribute
 
 } // namespace AM.Windows.Forms

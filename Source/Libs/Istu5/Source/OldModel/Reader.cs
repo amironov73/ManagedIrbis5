@@ -275,7 +275,11 @@ namespace Istu.OldModel
         /// Студентам, имеющим сертификат,
         /// прощаются долги перед библиотекой.
         /// </summary>
-        [Column, Nullable]
+        /// <remarks>
+        /// Безграмотное название колонки в базе
+        /// придумано командой Копайгородского.
+        /// </remarks>
+        [Column ("sertif"), Nullable]
         public string? Certificate { get; set; }
 
         #endregion

@@ -8,7 +8,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
-/* ColumnIndexAttribute.cs -- задает порядок колонок в гриде
+/* ColumnWidthAttribute.cs -- задает ширину колонки в гриде
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,22 +20,22 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Data
 {
     /// <summary>
-    /// Задает порядок колонок в гриде.
+    /// Задает ширину колонки в гриде.
     /// </summary>
     [Serializable]
     [AttributeUsage (AttributeTargets.Property)]
-    public sealed class ColumnIndexAttribute
+    public sealed class ColumnWidthAttribute
         : Attribute
     {
         #region Properties
 
-        ///<summary>
-        /// Индекс колонки.
-        ///</summary>
-        public int Index { get; }
+        /// <summary>
+        /// Ширина колонки.
+        /// </summary>
+        public int Width { get; }
 
         #endregion
 
@@ -44,16 +44,16 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public ColumnIndexAttribute
+        public ColumnWidthAttribute
             (
-                int index
+                int width
             )
         {
-            Index = index;
+            Width = width;
         } // constructor
 
         #endregion
 
-    } // class ColumnIndexAttribute
+    } // class ColumnWidthAttribute
 
 } // namespace AM.Windows.Forms

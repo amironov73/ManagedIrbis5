@@ -8,7 +8,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
-/* ColumnWidthAttribute.cs -- задает ширину колонки в гриде
+/* ColumnHeaderAttribute.cs -- задает заголовок колонки в гриде
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,22 +20,22 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Data
 {
     /// <summary>
-    /// Задает ширину колонки в гриде.
+    /// Задает заголовок колонки в гриде.
     /// </summary>
     [Serializable]
     [AttributeUsage (AttributeTargets.Property)]
-    public sealed class ColumnWidthAttribute
+    public sealed class ColumnHeaderAttribute
         : Attribute
     {
         #region Properties
 
         /// <summary>
-        /// Ширина колонки.
+        /// Заголовок колонки.
         /// </summary>
-        public int Width { get; }
+        public string Header { get; }
 
         #endregion
 
@@ -44,16 +44,16 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public ColumnWidthAttribute
+        public ColumnHeaderAttribute
             (
-                int width
+                string header
             )
         {
-            Width = width;
+            Header = header;
         } // constructor
 
         #endregion
 
-    } // class ColumnWidthAttribute
+    } // class ColumnHeaderAttribute
 
 } // namespace AM.Windows.Forms

@@ -8,7 +8,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
-/* HiddenColumnAttribute.cs -- скрывает колонку в гриде
+/* ColumnIndexAttribute.cs -- задает порядок колонок в гриде
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,47 +20,40 @@ using System;
 
 #nullable enable
 
-namespace AM.Windows.Forms
+namespace AM.Data
 {
     /// <summary>
-    /// Скрывает колонку в гриде.
+    /// Задает порядок колонок в гриде.
     /// </summary>
+    [Serializable]
     [AttributeUsage (AttributeTargets.Property)]
-    public sealed class HiddenColumnAttribute
+    public sealed class ColumnIndexAttribute
         : Attribute
     {
         #region Properties
 
         ///<summary>
-        /// Признак скрытой колонки.
+        /// Индекс колонки.
         ///</summary>
-        public bool Hidden { get; }
+        public int Index { get; }
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public HiddenColumnAttribute ()
-            : this ( true )
-        {
-        } // constructor
-
-        /// <summary>
         /// Конструктор.
         /// </summary>
-        public HiddenColumnAttribute
+        public ColumnIndexAttribute
             (
-                bool hidden
+                int index
             )
         {
-            Hidden = hidden;
+            Index = index;
         } // constructor
 
         #endregion
 
-    } // class HiddenColumnAttribute
+    } // class ColumnIndexAttribute
 
 } // namespace AM.Windows.Forms
