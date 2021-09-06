@@ -17,8 +17,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
+using AM;
 
 using Istu.OldModel.Interfaces;
+
+using LinqToDB;
+using LinqToDB.Data;
 
 #endregion
 
@@ -32,37 +38,115 @@ namespace Istu.OldModel.Implementation
     public sealed class AttendanceManager
         : IAttendanceManager
     {
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public AttendanceManager
+            (
+                Storehouse storehouse
+            )
+        {
+            _storehouse = storehouse;
+
+        } // constructor
+
+        #endregion
+
+        #region Private members
+
+        private readonly Storehouse _storehouse;
+        private DataConnection? _dataConnection;
+
+        private DataConnection _GetDb() => _dataConnection ??= _storehouse.GetKladovka();
+
+        #endregion
+
         #region IAttendanceManager members
 
         /// <inheritdoc cref="IAttendanceManager.RegisterAttendance"/>
-        public void RegisterAttendance(Attendance info)
+        public void RegisterAttendance
+            (
+                Attendance info
+            )
         {
-            throw new NotImplementedException();
-        }
+            var db = _GetDb();
+            db.Insert (info);
+
+        } // method RegisterAttendance
 
         /// <inheritdoc cref="IAttendanceManager.RegisterAttendances"/>
-        public void RegisterAttendances(IEnumerable<Attendance> attendances)
+        public void RegisterAttendances
+            (
+                IEnumerable<Attendance> attendances
+            )
         {
-            throw new NotImplementedException();
-        }
+            var database = _GetDb();
+            database.BulkCopy (attendances);
+
+        } // method RegisterAttendances
 
         /// <inheritdoc cref="IAttendanceManager.GetAttendances"/>
-        public Attendance[] GetAttendances(string ticket)
+        public Attendance[] GetAttendances
+            (
+                string ticket
+            )
         {
-            throw new NotImplementedException();
-        }
+            var database = _GetDb();
+            var attendances = database.GetAttendances();
+            var result = attendances
+                .Where (attendance => attendance.Ticket == ticket)
+                .ToArray();
+
+            return result;
+
+        } // method GetAttendances
 
         /// <inheritdoc cref="IAttendanceManager.GetLastAttendance"/>
-        public Attendance GetLastAttendance(string ticket)
+        public Attendance? GetLastAttendance
+            (
+                string ticket
+            )
         {
-            throw new NotImplementedException();
-        }
+            var db = _GetDb();
+            var attendances = db.GetAttendances();
+            var result = attendances
+                .Where (attendance => attendance.Ticket == ticket)
+                .OrderByDescending (attendance => attendance.Moment)
+                .FirstOrDefault();
 
-        /// <inheritdoc cref="GetLatestReadersWithCellphone"/>
-        public Reader[] GetLatestReadersWithCellphone()
+            return result;
+
+        } // method GetLastAttendance
+
+        /// <inheritdoc cref="IAttendanceManager.GetLastReaders"/>
+        public Reader[] GetLastReaders
+            (
+                int howMany = 200
+            )
         {
-            throw new NotImplementedException();
-        }
+            Sure.Positive (howMany, nameof (howMany));
+
+            var db = _GetDb();
+            var attendances = db.GetAttendances();
+            var readers = db.GetReaders();
+            var result = readers.Join
+                (
+                    attendances.Where (attendance => attendance.Type == "a")
+                        .OrderByDescending (attendance => attendance.Moment),
+                    reader => reader.Ticket,
+                    attendance => attendance.Ticket,
+                    (reader, attendance) => reader
+                )
+                .Take(howMany)
+                .ToArray()
+                .Distinct(new ReaderComparer())
+                .ToArray();
+
+            return result;
+
+        } // method GetLatestReaders
 
         #endregion
 
@@ -71,8 +155,12 @@ namespace Istu.OldModel.Implementation
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            throw new NotImplementedException();
-        }
+            if (_dataConnection is not null)
+            {
+                _dataConnection.Dispose();
+                _dataConnection = null;
+            }
+        } // method Dispose
 
         #endregion
 

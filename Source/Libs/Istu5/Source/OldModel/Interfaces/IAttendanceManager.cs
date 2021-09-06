@@ -5,9 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UseNameofExpression
 
 /* IAttendanceManager.cs -- интерфейс менеджера регистрации событий книговыдачи
  * Ars Magna project, http://arsmagna.ru
@@ -49,13 +47,13 @@ namespace Istu.OldModel.Interfaces
         /// Получение последнего по времени посещения
         /// для указанного читательского билета.
         /// </summary>
-        Attendance GetLastAttendance(string ticket);
+        Attendance? GetLastAttendance(string ticket);
 
         /// <summary>
         /// Получение последних по времени читателей,
-        /// посещавших библиотеку (с сотовыми!).
+        /// посещавших библиотеку.
         /// </summary>
-        Reader[] GetLatestReadersWithCellphone();
+        Reader[] GetLastReaders(int howMany = 200);
 
     } // interface IAttendanceManager
 

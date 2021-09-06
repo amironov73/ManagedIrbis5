@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
 
 using LinqToDB.Mapping;
 
@@ -29,7 +30,8 @@ namespace Istu.OldModel
     /// Информация о читателе.
     /// </summary>
     [Table (Name = "readers")]
-    public class Reader
+    [DebuggerDisplay("{Ticket}: {Name}")]
+    public sealed class Reader
     {
         #region Properties
 
@@ -281,6 +283,13 @@ namespace Istu.OldModel
         /// </remarks>
         [Column ("sertif"), Nullable]
         public string? Certificate { get; set; }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"{Ticket}: {Name}";
 
         #endregion
 

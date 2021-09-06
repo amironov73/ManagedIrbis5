@@ -1,2 +1,2 @@
-﻿### SharpIrbis
+﻿### SharpIrbis.Istu
 

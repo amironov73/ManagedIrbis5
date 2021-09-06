@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics;
 
 using LinqToDB.Mapping;
 
@@ -29,6 +30,7 @@ namespace Istu.OldModel
     /// Посещение библиотеки.
     /// </summary>
     [Table]
+    [DebuggerDisplay("{Moment}: {Ticket}: {Ticket}: {Number}")]
     public class Attendance
     {
         #region Constants
@@ -120,7 +122,7 @@ namespace Istu.OldModel
         /// Тип посещения.
         /// </summary>
         [Column(Name = "typ")]
-        public char Type { get; set; }
+        public string? Type { get; set; }
 
         /// <summary>
         /// Инвентарный номер документа, выданного

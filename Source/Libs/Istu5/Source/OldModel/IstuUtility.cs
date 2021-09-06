@@ -17,7 +17,16 @@
 
 using System;
 
-using LinqToDB.Mapping;
+using AM;
+
+using Istu.OldModel.Implementation;
+using Istu.OldModel.Interfaces;
+
+using LinqToDB;
+using LinqToDB.Data;
+using LinqToDB.DataProvider.SqlServer;
+
+using Microsoft.Extensions.DependencyInjection;
 
 #endregion
 
@@ -31,6 +40,68 @@ namespace Istu.OldModel
     public static class IstuUtility
     {
         #region Public methods
+
+        /// <summary>
+        /// Добавление сервисов книговыдачи.
+        /// </summary>
+        public static IServiceCollection AddOldModel
+            (
+                this IServiceCollection services
+            )
+        {
+            services.AddTransient<IAttendanceManager, AttendanceManager>();
+            services.AddTransient<IOperatorManager, OperatorManager>();
+            services.AddTransient<IReaderManager, ReaderManager>();
+
+            return services;
+
+        } // method AddOldModel
+
+        /// <summary>
+        /// Подключается к MSSQL.
+        /// </summary>
+        public static DataConnection GetMsSqlConnection
+            (
+                string connectionString
+            )
+        {
+            try
+            {
+                var result = SqlServerTools.CreateDataConnection(connectionString);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                Magna.TraceException(nameof(IstuUtility) + "::" + (nameof(GetMsSqlConnection)), exception);
+                throw;
+            }
+
+        } // method GetDatabaseConnection
+
+        /// <summary>
+        /// Получает таблицу <c>attendance</c>.
+        /// </summary>
+        public static ITable<Attendance> GetAttendances (this DataConnection connection) =>
+            connection.GetTable<Attendance>();
+
+        /// <summary>
+        /// Получает таблицу <c>readers</c>.
+        /// </summary>
+        public static ITable<Reader> GetReaders (this DataConnection connection) =>
+            connection.GetTable<Reader>();
+
+        /// <summary>
+        /// Получает таблицу <c>podsob</c>.
+        /// </summary>
+        public static ITable<Podsob> GetPodsob (this DataConnection connection) =>
+            connection.GetTable<Podsob>();
+
+        /// <summary>
+        /// Получает таблицу <c>translator</c>.
+        /// </summary>
+        public static ITable<Translator> GetTranslator (this DataConnection connection) =>
+            connection.GetTable<Translator>();
 
         /// <summary>
         /// Перечень известных событий книговыдачи.

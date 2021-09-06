@@ -14,12 +14,16 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
 using System;
 using System.IO;
 using System.Linq;
 
 using ManagedIrbis.Direct;
 using ManagedIrbis.Pft.Infrastructure.Testing;
+
+#endregion
 
 #nullable enable
 

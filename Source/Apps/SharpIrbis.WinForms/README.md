@@ -1,1 +1,1 @@
-﻿### SharpIrbis
+﻿### SharpIrbis.WinForms

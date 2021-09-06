@@ -34,37 +34,37 @@ namespace Istu.OldModel.Interfaces
         /// <summary>
         /// Создание читателя.
         /// </summary>
-        int CreateReader(Reader info);
+        int CreateReader(Reader reader);
 
         /// <summary>
         /// Получение информации о читателе по читательскому билету.
         /// </summary>
-        Reader GetReaderByTicket(string ticket);
+        Reader? GetReaderByTicket(string ticket);
 
         /// <summary>
         /// Получение информации о читателе по читательскому билету и паролю.
         /// </summary>
-        Reader GetReaderByTicketAndPassword(string ticket, string password);
+        Reader? GetReaderByTicketAndPassword(string ticket, string password);
 
         /// <summary>
         /// Поиск читателя по штрих-коду.
         /// </summary>
-        Reader GetReaderByBarcode(string barcode);
+        Reader? GetReaderByBarcode(string barcode);
 
         /// <summary>
         /// Поиск читателя по идентификатору в MIRA.
         /// </summary>
-        Reader GetReaderByIstuID(int id);
+        Reader? GetReaderByIstuID(int id);
 
         /// <summary>
         /// Поиск читателя по RFID.
         /// </summary>
-        Reader GetReaderByRfid(string rfid);
+        Reader? GetReaderByRfid(string rfid);
 
         /// <summary>
         /// Обновление данных читателя.
         /// </summary>
-        void UpdateReaderInfo(Reader info);
+        void UpdateReaderInfo(Reader reader);
 
         /// <summary>
         /// Перерегистрация читателя в текущем году.
@@ -84,16 +84,12 @@ namespace Istu.OldModel.Interfaces
         /// <summary>
         /// Проверка, что строка имеет верный синтаксис.
         /// </summary>
-        /// <param name="ticket"></param>
-        /// <returns></returns>
         bool ValidateTicketString(string ticket);
 
         /// <summary>
         /// Проверка, что строка имеет верный синтаксис.
         /// </summary>
-        /// <param name="ticket"></param>
-        /// <returns></returns>
-        bool ValidateNameString(string ticket);
+        bool ValidateNameString(string name);
 
         /// <summary>
         /// Проверка пароля (правильно введен или нет?).
@@ -113,12 +109,12 @@ namespace Istu.OldModel.Interfaces
         /// <summary>
         /// Получение фотографии читателя.
         /// </summary>
-        object GetPhoto(string ticket);
+        byte[]? GetPhoto(string ticket);
 
         /// <summary>
         /// Установка фотографии для читателя.
         /// </summary>
-        void SetPhoto(string ticket, object photo);
+        void SetPhoto(string ticket, byte[]? photo);
 
         /// <summary>
         /// Экспорт всех фото в указанную папку.
