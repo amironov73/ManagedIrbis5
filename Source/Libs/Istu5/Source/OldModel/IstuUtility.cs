@@ -49,6 +49,8 @@ namespace Istu.OldModel
                 this IServiceCollection services
             )
         {
+            services.AddTransient<Storehouse>();
+
             services.AddTransient<IAttendanceManager, AttendanceManager>();
             services.AddTransient<IOperatorManager, OperatorManager>();
             services.AddTransient<IReaderManager, ReaderManager>();

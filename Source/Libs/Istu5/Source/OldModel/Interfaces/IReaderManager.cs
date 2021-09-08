@@ -107,6 +107,12 @@ namespace Istu.OldModel.Interfaces
             );
 
         /// <summary>
+        /// Произвольный поиск.
+        /// </summary>
+        /// <param name="expression">SQL-выражение.</param>
+        Reader[] Search (string expression);
+
+        /// <summary>
         /// Получение фотографии читателя.
         /// </summary>
         byte[]? GetPhoto(string ticket);

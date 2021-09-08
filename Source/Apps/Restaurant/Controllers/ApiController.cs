@@ -18,7 +18,7 @@ using System;
 using System.Linq;
 
 using AM;
-
+using AM.Collections;
 using ManagedIrbis;
 using ManagedIrbis.CommandLine;
 using ManagedIrbis.Infrastructure;
@@ -66,7 +66,7 @@ namespace Restaurant.Controllers
 
         #region Private members
 
-        private readonly ILogger<ApiController> _logger;
+        private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
 
         /// <summary>
@@ -139,13 +139,14 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение информации о базе данных.
         /// </summary>
-        /// <param name="databaseName">Имя базы данных.</param>
-        private IActionResult DbInfo
+        /// <param name="database">Имя базы данных.</param>
+        [HttpGet("db_info/{database}")]
+        public IActionResult DbInfo
             (
-                string? databaseName
+                string? database
             )
         {
-            if (databaseName.IsEmpty())
+            if (database.IsEmpty())
             {
                 return BadRequest("Database not specified");
             }
@@ -156,7 +157,7 @@ namespace Restaurant.Controllers
                 return Problem("Can't connect to IRBIS64");
             }
 
-            var result = connection.GetDatabaseInfo(databaseName);
+            var result = connection.GetDatabaseInfo(database);
             if (result is null || connection.LastError < 0)
             {
                 return Problem(IrbisException.GetErrorDescription(connection.LastError));
@@ -167,10 +168,153 @@ namespace Restaurant.Controllers
         } // method DbInfo
 
         /// <summary>
+        /// Форматирование записи.
+        /// </summary>
+        /// <param name="database">Имя базы данных.</param>
+        /// <param name="mfn">MFN записи.</param>
+        /// <param name="format">Спецификация формата.</param>
+        /// <returns>Результат расформатирования.</returns>
+        [HttpGet("format/{database}/{mfn}/{format?}")]
+        public IActionResult Format
+            (
+                string? database,
+                string? mfn,
+                string? format
+            )
+        {
+            if (string.IsNullOrEmpty(mfn))
+            {
+                return Problem("MFN not specified");
+            }
+
+            var mfnValue = mfn.SafeToInt32();
+            if (mfnValue <= 0)
+            {
+                return Problem("Bad MFN");
+            }
+
+            if (string.IsNullOrEmpty(database))
+            {
+                database = "IBIS";
+            }
+
+            if (string.IsNullOrEmpty(format))
+            {
+                format = "@brief";
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            connection.Database = database;
+
+            var result = connection.FormatRecord(format, mfnValue);
+
+            return Ok(result);
+
+        } // method Format
+
+        /// <summary>
+        /// Поиск книги по инвентарному номеру
+        /// с последующим расформатированием найденной записи.
+        /// </summary>
+        /// <param name="number">Искомый инвентарный номер.</param>
+        /// <param name="database">Имя базы данных.</param>
+        /// <returns>Библиографическое описание найденной книги либо
+        /// "Not found".</returns>
+        /// <remarks>
+        /// Сделано специально для Политеха.
+        /// </remarks>
+        [HttpGet("inventory/{number}/{database?}")]
+        public IActionResult Inventory
+            (
+                string? number,
+                string? database = null
+            )
+        {
+            if (number.IsEmpty())
+            {
+                return BadRequest("Number not specified");
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var parameters = new SearchParameters
+            {
+                Database = database ?? "ISTU",
+                Expression = $"\"IN={number}\"",
+                NumberOfRecords = 1,
+                Format = "@brief"
+            };
+            var found = connection.Search(parameters);
+            if (found.IsNullOrEmpty())
+            {
+                return Ok("Not found");
+            }
+
+            return Ok(found[0].Text);
+
+        } // method Inventory
+
+        /// <summary>
+        /// Поиск книги по номеру карточки безынвентарного учета
+        /// с последующим расформатированием найденной записи.
+        /// </summary>
+        /// <param name="number">Искомый номер карточки.</param>
+        /// <param name="database">Имя базы данных.</param>
+        /// <returns>Библиографическое описание найденной книги либо
+        /// "Not found".</returns>
+        /// <remarks>
+        /// Сделано специально для Политеха.
+        /// </remarks>
+        [HttpGet("kk/{number}/{database?}")]
+        public IActionResult Kk
+            (
+                string? number,
+                string? database = null
+            )
+        {
+            if (number.IsEmpty())
+            {
+                return BadRequest("Number not specified");
+            }
+
+            using var connection = GetConnection();
+            if (!connection.Connected)
+            {
+                return Problem("Can't connect to IRBIS64");
+            }
+
+            var parameters = new SearchParameters
+            {
+                Database = database ?? "ISTU",
+                Expression = $"\"NS={number}\"",
+                NumberOfRecords = 1,
+                Format = "@brief"
+            };
+            var found = connection.Search(parameters);
+            if (found.IsNullOrEmpty())
+            {
+                return Ok("Not found");
+            }
+
+            return Ok(found[0].Text);
+
+        } // method Inventory
+
+        /// <summary>
         /// Получение списка баз данных.
         /// </summary>
         /// <param name="spec">Спецификация MNU-файла со списком баз.</param>
-        private IActionResult ListDb
+        [HttpGet("list_db/{spec?}")]
+        public IActionResult ListDb
             (
                 string? spec
             )
@@ -193,7 +337,8 @@ namespace Restaurant.Controllers
         /// Получение списка файлов.
         /// </summary>
         /// <param name="pattern">Спецификация.</param>
-        private IActionResult ListFiles
+        [HttpGet("list_files/{pattern}")]
+        public IActionResult ListFiles
             (
                 string? pattern
             )
@@ -219,7 +364,8 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение списка серверных процессов.
         /// </summary>
-        private IActionResult ListProcesses()
+        [HttpGet("list_proc")]
+        public IActionResult ListProcesses()
         {
             using var connection = GetConnection();
             if (!connection.Connected)
@@ -240,15 +386,16 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение списка терминов поискового словаря.
         /// </summary>
-        /// <param name="databaseName">Имя базы данных</param>
+        /// <param name="database">Имя базы данных</param>
         /// <param name="prefix">Префикс</param>
-        private IActionResult ListTerms
+        [HttpGet("list_terms/{databaseName}/{prefix}")]
+        public IActionResult ListTerms
             (
-                string? databaseName,
+                string? database,
                 string? prefix
             )
         {
-            if (databaseName.IsEmpty())
+            if (database.IsEmpty())
             {
                 return BadRequest("Database not specified");
             }
@@ -264,7 +411,7 @@ namespace Restaurant.Controllers
                 return Problem("Can't connect to IRBIS64");
             }
 
-            connection.Database = databaseName;
+            connection.Database = database;
             var result = connection.ReadAllTerms(prefix);
             if (connection.LastError < 0)
             {
@@ -278,13 +425,14 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение максимального MFN для указанной базы данных.
         /// </summary>
-        /// <param name="databaseName">Имя базы данных.</param>
-        private IActionResult MaxMfn
+        /// <param name="database">Имя базы данных.</param>
+        [HttpGet("max_mfn/{database}")]
+        public IActionResult MaxMfn
             (
-                string? databaseName
+                string? database
             )
         {
-            if (databaseName.IsEmpty())
+            if (database.IsEmpty())
             {
                 return BadRequest("Database not specified");
             }
@@ -295,7 +443,7 @@ namespace Restaurant.Controllers
                 return Problem("Can't connect to IRBIS64");
             }
 
-            var result = connection.GetMaxMfn(databaseName);
+            var result = connection.GetMaxMfn(database);
             if (result < 0)
             {
                 return Problem(IrbisException.GetErrorDescription(result));
@@ -314,7 +462,8 @@ namespace Restaurant.Controllers
         /// Получение меню с сервера.
         /// </summary>
         /// <param name="fileName">Спецификация.</param>
-        private IActionResult ReadMenu
+        [HttpGet("read_menu/{fileName}")]
+        public IActionResult ReadMenu
             (
                 string? fileName
             )
@@ -344,15 +493,16 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Чтение записи с сервера.
         /// </summary>
-        /// <param name="databaseName">Имя базы данных.</param>
+        /// <param name="database">Имя базы данных.</param>
         /// <param name="mfn">MFN записи.</param>
-        private IActionResult ReadRecord
+        [HttpGet("read/{database}/{mfn}")]
+        public IActionResult ReadRecord
             (
-                string? databaseName,
+                string? database,
                 string? mfn
             )
         {
-            if (databaseName.IsEmpty())
+            if (database.IsEmpty())
             {
                 return BadRequest("Database not specified");
             }
@@ -387,8 +537,9 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Чтение настроек оптимизации показа.
         /// </summary>
-        /// <param name="fileName"></param>
-        private IActionResult ReadOpt
+        /// <param name="fileName">Спецификация файла</param>
+        [HttpGet("read_opt/{fileName}")]
+        public IActionResult ReadOpt
             (
                 string? fileName
             )
@@ -421,7 +572,7 @@ namespace Restaurant.Controllers
         /// <param name="databaseName">Имя базы данных.</param>
         /// <param name="startTerm">Начальный термин.</param>
         /// <param name="count">Количество считываемых терминов.</param>
-        private IActionResult ReadTerms
+        public IActionResult ReadTerms
             (
                 string? databaseName,
                 string? startTerm,
@@ -464,7 +615,8 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение текстового файла с сервера.
         /// </summary>
-        private IActionResult ReadTextFile
+        [HttpGet("read_text/{fileName}")]
+        public IActionResult ReadTextFile
             (
                 string? fileName
             )
@@ -494,7 +646,8 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Перезапуск сервиса.
         /// </summary>
-        private IActionResult Restart()
+        [HttpGet("restart")]
+        public IActionResult Restart()
         {
             using var connection = GetConnection();
             if (!connection.Connected)
@@ -514,7 +667,8 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение поисковых сценариев.
         /// </summary>
-        private IActionResult Scenarios()
+        [HttpGet("scenarios")]
+        public IActionResult Scenarios()
         {
             // TODO поддержать стандартный сценарий поиска
 
@@ -531,19 +685,20 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Поиск записей.
         /// </summary>
-        /// <param name="databaseName">Имя базы данных.</param>
+        /// <param name="database">Имя базы данных.</param>
         /// <param name="expression">Выражение на поисковом языке ИРБИС64.</param>
         /// <param name="start">Стартовое смещение (опционально).</param>
         /// <param name="count">Максимальное количество записей (опционально).</param>
-        private IActionResult Search
+        [HttpGet("search/{database}/{expression}/{count?}/{start?}")]
+        public IActionResult Search
             (
-                string? databaseName,
+                string? database,
                 string? expression,
                 string? start,
                 string? count
             )
         {
-            if (databaseName.IsEmpty())
+            if (database.IsEmpty())
             {
                 return BadRequest("Database not specified");
             }
@@ -561,7 +716,7 @@ namespace Restaurant.Controllers
 
             var parameters = new SearchParameters
             {
-                Database = databaseName,
+                Database = database,
                 Expression = expression
             };
 
@@ -590,15 +745,16 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение количества записей, удовлетворяющих запросу.
         /// </summary>
-        /// <param name="databaseName"></param>
-        /// <param name="expression"></param>
-        private IActionResult SearchCount
+        /// <param name="database">Имя базы данных</param>
+        /// <param name="expression">Поисковое выражение</param>
+        [HttpGet("search_count/{database}/{expression}")]
+        public IActionResult SearchCount
             (
-                string? databaseName,
+                string? database,
                 string? expression
             )
         {
-            if (databaseName.IsEmpty())
+            if (database.IsEmpty())
             {
                 return BadRequest("Database not specified");
             }
@@ -641,21 +797,22 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Поиск с форматированием.
         /// </summary>
-        /// <param name="databaseName">Имя базы данных</param>
+        /// <param name="database">Имя базы данных</param>
         /// <param name="expression">Поисковое выражение.</param>
         /// <param name="start">Стартовое смещение (опционально).</param>
         /// <param name="count">Максимальное количество найденных записей (опционально).</param>
         /// <param name="format">Формат.</param>
-        private IActionResult SearchFormat
+        [HttpGet("search_format/{database}/{expression}/{format}/{count?}/{start?}")]
+        public IActionResult SearchFormat
             (
-                string? databaseName,
+                string? database,
                 string? expression,
                 string? start,
                 string? count,
                 string? format
             )
         {
-            if (databaseName.IsEmpty())
+            if (database.IsEmpty())
             {
                 return BadRequest("Database not specified");
             }
@@ -678,7 +835,7 @@ namespace Restaurant.Controllers
 
             var parameters = new SearchParameters
             {
-                Database = databaseName,
+                Database = database,
                 Expression = expression,
                 Format = format
             };
@@ -708,7 +865,8 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение статистики работы сервера ИРБИС64.
         /// </summary>
-        private IActionResult ServerStat()
+        [HttpGet("server_stat")]
+        public IActionResult ServerStat()
         {
             using var connection = GetConnection();
             if (!connection.Connected)
@@ -729,7 +887,8 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение списка зарегистрированных в система пользователей.
         /// </summary>
-        private IActionResult UserList()
+        [HttpGet("user_list")]
+        public IActionResult UserList()
         {
             using var connection = GetConnection();
             if (!connection.Connected)
@@ -750,7 +909,8 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение версии сервера ИРБИС64.
         /// </summary>
-        private IActionResult Version()
+        [HttpGet("version")]
+        public IActionResult Version()
         {
             using var connection = GetConnection();
             if (!connection.Connected)
@@ -786,6 +946,7 @@ namespace Restaurant.Controllers
         /// <param name="format">Формат</param>
         /// <param name="start">Стартовый термин</param>
         /// <param name="count">Количество считываемых терминов</param>
+        /// <param name="number">Инвентарный номер или номер карточки комплектования</param>
         /// <returns>Результат выполнения.</returns>
         [HttpGet]
         public IActionResult Index
@@ -798,7 +959,8 @@ namespace Restaurant.Controllers
                 string? expr,
                 string? format,
                 string? start,
-                string? count
+                string? count,
+                string? number
             )
         {
             _logger.LogTrace(Request.Path);
@@ -814,6 +976,15 @@ namespace Restaurant.Controllers
             {
                 case "db_info":
                     return DbInfo(db);
+
+                case "format":
+                    return Format(db, mfn, format);
+
+                case "inventory":
+                    return Inventory(number, db);
+
+                case "kk":
+                    return Kk(number, db);
 
                 case "list_db":
                     return ListDb(spec);

@@ -29,36 +29,54 @@ https://host:port/api?op=operation&params
   }
   ```
 
-  * **list_db** - получение списка баз данных.
-    * Возвращает массив объектов, в которых имеют смысл только поля `name` и `description`.
-    * Опциональный параметр **spec** - спецификация файла со списком баз
-    * Пример запроса: `https://localhost:5001/api?op=list_db&spec=dbnam2.mnu`, ответ:
-    ```json
-    [
-      {
-        "name": "ISTU",
-        "description": "Монографии и учебники",
-        "maxMfn": 0,
-        "logicallyDeleted": null,
-        "physicallyDeleted": null,
-        "nonActualizedRecords": null,
-        "lockedRecords": null,
-        "databaseLocked": false,
-        "readOnly": false
-      },
-      {
-        "name": "PERIO",
-        "description": "Периодические издания",
-        "maxMfn": 0,
-        "logicallyDeleted": null,
-        "physicallyDeleted": null,
-        "nonActualizedRecords": null,
-        "lockedRecords": null,
-        "databaseLocked": false,
-        "readOnly": false
-      }
-    ]
-    ```
+* **inventory** - поиск по инвентарному номеру с последующим расформатированием.
+  * Возвращает строку с библиографическим описанием либо "Not found".
+  * Параметр **number** - собственно инвентарный номер.
+  * Опциональный параметр **db** - имя базы данных.
+  * Пример запроса: `https://localhost:5001/api?op=inventory&number=600000`
+  ```
+  Хрулев, Александр Эдуардович. Ремонт двигателей зарубежных автомобилей / А. Э. Хрулев, 1999. - 439 с. - Цена 84.00
+   ```
+
+* **kk** - поиск по номеру карточки безынвентарного учета.
+  * Возвращает строку с библиографическим описанием либо "Not found".
+  * Параметр **number** - собственно номер карточки.
+  * Опциональный параметр **db** - имя базы данных.
+  * Пример запроса: `https://localhost:5001/api?op=kk&number=10000`
+  ```
+  Гольман И. А. Рекламная деятельность: планирование, технологии, организация : учебник для вузов по специальности "Реклама" / Иосиф Гольман, 2002. - 389 с. - Цена 358.49.
+  ```
+
+* **list_db** - получение списка баз данных.
+  * Возвращает массив объектов, в которых имеют смысл только поля `name` и `description`.
+  * Опциональный параметр **spec** - спецификация файла со списком баз
+  * Пример запроса: `https://localhost:5001/api?op=list_db&spec=dbnam2.mnu`, ответ:
+  ```json
+  [
+    {
+      "name": "ISTU",
+      "description": "Монографии и учебники",
+      "maxMfn": 0,
+      "logicallyDeleted": null,
+      "physicallyDeleted": null,
+      "nonActualizedRecords": null,
+      "lockedRecords": null,
+      "databaseLocked": false,
+      "readOnly": false
+    },
+    {
+      "name": "PERIO",
+      "description": "Периодические издания",
+      "maxMfn": 0,
+      "logicallyDeleted": null,
+      "physicallyDeleted": null,
+      "nonActualizedRecords": null,
+      "lockedRecords": null,
+      "databaseLocked": false,
+      "readOnly": false
+    }
+  ]
+  ```
 
 * **list_files** - получение списка файлов.
   * Возвращает массив строк - имен файлов

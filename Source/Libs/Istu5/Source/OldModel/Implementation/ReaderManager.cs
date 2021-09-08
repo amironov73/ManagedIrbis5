@@ -258,19 +258,36 @@ namespace Istu.OldModel.Implementation
             )
         {
             var db = _GetDb();
-            // var readers = db.GetReaders();
+            var readers = db.GetReaders();
             var column = criteria switch
             {
                 ReaderSearchCriteria.Name => "name",
                 ReaderSearchCriteria.Ticket => "ticket",
                 ReaderSearchCriteria.Barcode => "barcode",
                 ReaderSearchCriteria.Rfid => "rfid",
+                ReaderSearchCriteria.Group => "group",
+                ReaderSearchCriteria.Category => "category",
+                ReaderSearchCriteria.Department => "department",
                 _ => throw new ArgumentException(nameof(criteria))
             };
-            var result = db.Execute<List<Reader>>
+            var result = db.Query<Reader>
                 (
-                    $"select top {max} * from readers where {column} like '{mask}'"
+                    $"select top {max} * from {readers.TableName} where [{column}] like @mask order by [name]",
+                    new DataParameter("mask", mask)
                 );
+
+            return result.ToArray();
+
+        } // method FindReaders
+
+        /// <inheritdoc cref="IReaderManager.Search"/>
+        public Reader[] Search
+            (
+                string expression
+            )
+        {
+            var db = _GetDb();
+            var result = db.Query<Reader>(expression);
 
             return result.ToArray();
 

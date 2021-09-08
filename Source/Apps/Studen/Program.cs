@@ -27,7 +27,7 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace Restaurant
+namespace Studen
 {
     public class Program
     {
@@ -39,5 +39,7 @@ namespace Restaurant
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
-    }
-}
+
+    } // class Program
+
+} // namsepace Studen
