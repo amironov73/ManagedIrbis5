@@ -8,7 +8,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* ApiController.cs -- контроллер API
+/* ReaderController.cs -- контроллер API для доступа к БД читателей
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,7 +17,7 @@
 using System;
 
 using AM;
-using AM.Globalization;
+
 using Istu.OldModel;
 using Istu.OldModel.Interfaces;
 
@@ -33,11 +33,10 @@ using Microsoft.Extensions.Logging;
 namespace Studen.Controllers
 {
     /// <summary>
-    /// Контроллер API.
+    /// Контроллер API для доступа к БД читателей.
     /// </summary>
     [ApiController]
-    [Route("/stud")]
-    public sealed class StudController
+    public sealed class ReaderController
         : ControllerBase
     {
         #region Construction
@@ -48,11 +47,11 @@ namespace Studen.Controllers
         /// <param name="serviceProvider">Провайдер сервисов</param>
         /// <param name="configuration">Конфигурация.</param>
         /// <param name="logger">Логгер.</param>
-        public StudController
+        public ReaderController
             (
                 IServiceProvider serviceProvider,
                 IConfiguration configuration,
-                ILogger<StudController> logger
+                ILogger<ReaderController> logger
             )
         {
             _logger = logger;
@@ -70,16 +69,26 @@ namespace Studen.Controllers
 
         private IReaderManager GetReaderManager() => _storehouse.GetRequiredService<IReaderManager>();
 
+        #endregion
+
+        #region Public methods
+
         /// <summary>
         /// Поиск читателя по номеру билета.
         /// </summary>
         /// <param name="ticket">Искомый номер</param>
         /// <returns>Найденный читатель.</returns>
-        private IActionResult FindByTicket
+        [HttpGet("ticket/{ticket}")]
+        public IActionResult FindByTicket
             (
                 string? ticket
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(FindByTicket)}:: {nameof(ticket)}={ticket}"
+                );
+
             if (string.IsNullOrEmpty(ticket))
             {
                 return Problem("Ticket not specified");
@@ -97,11 +106,17 @@ namespace Studen.Controllers
         /// </summary>
         /// <param name="barcode">Искомый штрих-код</param>
         /// <returns>Найденный читатель.</returns>
-        private IActionResult FindByBarcode
+        [HttpGet("barcode/{barcode}")]
+        public IActionResult FindByBarcode
             (
                 string? barcode
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(FindByBarcode)}:: {nameof(barcode)}={barcode}"
+                );
+
             if (string.IsNullOrEmpty(barcode))
             {
                 return Problem("Barcode not specified");
@@ -119,11 +134,17 @@ namespace Studen.Controllers
         /// </summary>
         /// <param name="rfid">Искомая метка</param>
         /// <returns>Найденный читатель.</returns>
-        private IActionResult FindByRfid
+        [HttpGet("rfid/{rfid}")]
+        public IActionResult FindByRfid
             (
                 string? rfid
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(FindByRfid)}:: {nameof(rfid)}={rfid}"
+                );
+
             if (string.IsNullOrEmpty(rfid))
             {
                 return Problem("Rfid not specified");
@@ -141,11 +162,17 @@ namespace Studen.Controllers
         /// </summary>
         /// <param name="id">Искомый идентификатор</param>
         /// <returns>Найденный читатель.</returns>
-        private IActionResult FindByIstu
+        [HttpGet("istu/{id}")]
+        public IActionResult FindByIstu
             (
                 string? id
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(FindByIstu)}:: {nameof(id)}={id}"
+                );
+
             if (string.IsNullOrEmpty(id))
             {
                 return Problem("ID not specified");
@@ -170,12 +197,18 @@ namespace Studen.Controllers
         /// <param name="ticket">Искомый номер</param>
         /// <param name="password">Пароль</param>
         /// <returns>Найденный читатель.</returns>
-        private IActionResult FindByTickedAndPassword
+        [HttpGet("password/{ticket}/{password}")]
+        public IActionResult FindByTicketAndPassword
             (
                 string? ticket,
                 string? password
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(FindByTicketAndPassword)}:: {nameof(ticket)}={ticket} {nameof(password)}={password}"
+                );
+
             if (string.IsNullOrEmpty(ticket))
             {
                 return Problem("Ticket not specified");
@@ -198,11 +231,17 @@ namespace Studen.Controllers
         /// </summary>
         /// <param name="name">Имя (возможно, маска).</param>
         /// <returns>Найденные читатели.</returns>
-        private IActionResult FindByName
+        [HttpGet("name/{name}")]
+        public IActionResult FindByName
             (
                 string? name
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(FindByName)}:: + {nameof(name)}={name}"
+                );
+
             if (string.IsNullOrEmpty(name))
             {
                 return Problem("Name not specified");
@@ -221,11 +260,17 @@ namespace Studen.Controllers
         /// </summary>
         /// <param name="group">Шифр группы (возможно, маска).</param>
         /// <returns>Найденные читатели.</returns>
-        private IActionResult FindByGroup
+        [HttpGet("group/{group}")]
+        public IActionResult FindByGroup
             (
                 string? group
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(FindByGroup)}:: + {nameof(group)}={group}"
+                );
+
             if (string.IsNullOrEmpty(group))
             {
                 return Problem("Group not specified");
@@ -244,11 +289,17 @@ namespace Studen.Controllers
         /// </summary>
         /// <param name="expression">SQL-выражение со всеми select, where и что там ещё</param>
         /// <returns>Найденные читатели</returns>
-        private IActionResult Search
+        [HttpGet("readers/{expression}")]
+        public IActionResult SearchReaders
             (
                 string? expression
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(SearchReaders)}:: + {nameof(expression)}={expression}"
+                );
+
             if (string.IsNullOrEmpty(expression))
             {
                 return Problem("Expression not specified");
@@ -265,11 +316,17 @@ namespace Studen.Controllers
         /// Удаление читателя по номеру билета.
         /// </summary>
         /// <param name="ticket">Номер билета</param>
-        private IActionResult DeleteByTicket
+        [HttpGet("delete_reader/{ticket}")]
+        public IActionResult DeleteByTicket
             (
                 string? ticket
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(DeleteByTicket)}:: + {nameof(ticket)}={ticket}"
+                );
+
             if (string.IsNullOrEmpty(ticket))
             {
                 return Problem("Ticket not specified");
@@ -282,19 +339,20 @@ namespace Studen.Controllers
 
         } // method Delete
 
-        #endregion
-
-        #region Public methods
-
         /// <summary>
         /// Создание читателя в базе.
         /// </summary>
-        [HttpPost("create")]
-        public IActionResult Create
+        [HttpPost("create_reader")]
+        public IActionResult CreateReader
             (
                 [FromBody] Reader reader
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(CreateReader)}:: + {nameof(reader)}={reader.Ticket}"
+                );
+
             // TODO верифицировать
 
             reader.Registered = DateTime.Now.ToString("dd.MM.yyyy");
@@ -306,17 +364,22 @@ namespace Studen.Controllers
 
             return Ok();
 
-        } // method Create
+        } // method CreateReader
 
         /// <summary>
         /// Обновление читателя в базе (по идентификатору, а не по номеру читательского!).
         /// </summary>
-        [HttpPost("update")]
-        public IActionResult Update
+        [HttpPost("update_reader")]
+        public IActionResult UpdateReader
             (
                 [FromBody] Reader reader
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(UpdateReader)}:: + {nameof(reader)}={reader.Ticket}"
+                );
+
             // TODO верифицировать
 
             using var readerManager = GetReaderManager();
@@ -324,51 +387,9 @@ namespace Studen.Controllers
 
             return Ok();
 
-        } // method Update
+        } // method UpdateReader
 
-        /// <summary>
-        /// Поиск читателя по номеру билета.
-        /// </summary>
-        [HttpGet("ticket/{ticket}")]
-        public IActionResult Ticket(string? ticket) => FindByTicket(ticket);
-
-        /// <summary>
-        /// Поиск читателя по штрих-коду.
-        /// </summary>
-        [HttpGet("barcode/{barcode}")]
-        public IActionResult Barcode(string? barcode) => FindByBarcode(barcode);
-
-        /// <summary>
-        /// Поиск читателя по радио-метке.
-        /// </summary>
-        [HttpGet("rfid/{rfid}")]
-        public IActionResult Rfid(string? rfid) => FindByRfid(rfid);
-
-        /// <summary>
-        /// Поиск читателя по идентификатору ИРНИТУ.
-        /// </summary>
-        [HttpGet("istu/{id}")]
-        public IActionResult Istu(string? id) => FindByIstu(id);
-
-        /// <summary>
-        /// Поиск читателя по номеру билета и паролю.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("password/{ticket}/{password}")]
-        public IActionResult Password(string? ticket, string? password) =>
-            FindByTickedAndPassword(ticket, password);
-
-        /// <summary>
-        /// Поиск читателей по шифру группы.
-        /// </summary>
-        [HttpGet("group/{group}")]
-        public IActionResult Group(string? group) => FindByGroup(group);
-
-        /// <summary>
-        /// Удаление читателя по номеру билета.
-        /// </summary>
-        [HttpGet("delete/{ticket}")]
-        public IActionResult Delete(string? ticket) => DeleteByTicket(ticket);
+/*
 
         /// <summary>
         /// Выполнение различных запросов к серверу MSSQL.
@@ -429,8 +450,10 @@ namespace Studen.Controllers
 
         } // method Index
 
+*/
+
         #endregion
 
-    } // class ApiController
+    } // class ReaderController
 
 } // namespace Restaurant

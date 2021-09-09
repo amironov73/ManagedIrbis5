@@ -8,7 +8,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* ApiController.cs -- контроллер API
+/* IrbisController.cs -- контроллер API для доступа к серверу ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,6 +19,7 @@ using System.Linq;
 
 using AM;
 using AM.Collections;
+
 using ManagedIrbis;
 using ManagedIrbis.CommandLine;
 using ManagedIrbis.Infrastructure;
@@ -27,7 +28,6 @@ using ManagedIrbis.Opt;
 using ManagedIrbis.Providers;
 
 using Microsoft.AspNetCore.Mvc;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -38,11 +38,10 @@ using Microsoft.Extensions.Logging;
 namespace Restaurant.Controllers
 {
     /// <summary>
-    /// Контроллер API.
+    /// Контроллер API для доступа к ИРБИС64.
     /// </summary>
     [ApiController]
-    [Route("/api")]
-    public sealed class ApiController
+    public sealed class IrbisController
         : ControllerBase
     {
         #region Construction
@@ -52,15 +51,19 @@ namespace Restaurant.Controllers
         /// </summary>
         /// <param name="configuration">Конфигурация.</param>
         /// <param name="logger">Логгер.</param>
-        public ApiController
+        public IrbisController
             (
                 IConfiguration configuration,
-                ILogger<ApiController> logger
+                ILogger<IrbisController> logger
             )
         {
             _configuration = configuration;
             _logger = logger;
-        }
+
+            _defaultDatabase = _configuration["default-irbis-database"];
+            _defaultFormat = configuration["default-format"];
+
+        } // constructor
 
         #endregion
 
@@ -68,6 +71,8 @@ namespace Restaurant.Controllers
 
         private readonly ILogger _logger;
         private readonly IConfiguration _configuration;
+        private readonly string _defaultDatabase;
+        private readonly string _defaultFormat;
 
         /// <summary>
         /// Построение настроек подключения.
@@ -136,6 +141,10 @@ namespace Restaurant.Controllers
 
         } // method GetConnection
 
+        #endregion
+
+        #region Public methods
+
         /// <summary>
         /// Получение информации о базе данных.
         /// </summary>
@@ -146,6 +155,11 @@ namespace Restaurant.Controllers
                 string? database
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(DbInfo)}:: {nameof(database)}={database}"
+                );
+
             if (database.IsEmpty())
             {
                 return BadRequest("Database not specified");
@@ -174,14 +188,19 @@ namespace Restaurant.Controllers
         /// <param name="mfn">MFN записи.</param>
         /// <param name="format">Спецификация формата.</param>
         /// <returns>Результат расформатирования.</returns>
-        [HttpGet("format/{database}/{mfn}/{format?}")]
+        [HttpGet("format/{mfn}/{database?}/{format?}")]
         public IActionResult Format
             (
-                string? database,
                 string? mfn,
-                string? format
+                string? database = null,
+                string? format = null
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(Format)}:: {nameof(mfn)}={mfn} {nameof(database)}={database} {nameof(format)}={format}"
+                );
+
             if (string.IsNullOrEmpty(mfn))
             {
                 return Problem("MFN not specified");
@@ -195,12 +214,12 @@ namespace Restaurant.Controllers
 
             if (string.IsNullOrEmpty(database))
             {
-                database = "IBIS";
+                database = _defaultDatabase;
             }
 
             if (string.IsNullOrEmpty(format))
             {
-                format = "@brief";
+                format = _defaultFormat;
             }
 
             using var connection = GetConnection();
@@ -222,19 +241,26 @@ namespace Restaurant.Controllers
         /// с последующим расформатированием найденной записи.
         /// </summary>
         /// <param name="number">Искомый инвентарный номер.</param>
-        /// <param name="database">Имя базы данных.</param>
+        /// <param name="database">Имя базы данных (опционально).</param>
+        /// <param name="format">Спецификация формата (опционально).</param>
         /// <returns>Библиографическое описание найденной книги либо
         /// "Not found".</returns>
         /// <remarks>
         /// Сделано специально для Политеха.
         /// </remarks>
-        [HttpGet("inventory/{number}/{database?}")]
+        [HttpGet("inventory/{number}/{database?}/{format?}")]
         public IActionResult Inventory
             (
                 string? number,
-                string? database = null
+                string? database = null,
+                string? format = null
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(Inventory)}:: {nameof(number)}={number} {nameof(database)}={database} {nameof(format)}={format}"
+                );
+
             if (number.IsEmpty())
             {
                 return BadRequest("Number not specified");
@@ -248,10 +274,10 @@ namespace Restaurant.Controllers
 
             var parameters = new SearchParameters
             {
-                Database = database ?? "ISTU",
+                Database = database ?? _defaultDatabase,
                 Expression = $"\"IN={number}\"",
                 NumberOfRecords = 1,
-                Format = "@brief"
+                Format = format ?? _defaultFormat
             };
             var found = connection.Search(parameters);
             if (found.IsNullOrEmpty())
@@ -268,19 +294,26 @@ namespace Restaurant.Controllers
         /// с последующим расформатированием найденной записи.
         /// </summary>
         /// <param name="number">Искомый номер карточки.</param>
-        /// <param name="database">Имя базы данных.</param>
+        /// <param name="database">Имя базы данных (опционально).</param>
+        /// <param name="format">Спецификация формата (опционально).</param>
         /// <returns>Библиографическое описание найденной книги либо
         /// "Not found".</returns>
         /// <remarks>
         /// Сделано специально для Политеха.
         /// </remarks>
-        [HttpGet("kk/{number}/{database?}")]
+        [HttpGet("kk/{number}/{database?}/{format?}")]
         public IActionResult Kk
             (
                 string? number,
-                string? database = null
+                string? database = null,
+                string? format = null
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(Kk)}:: {nameof(number)}={number} {nameof(database)}={database} {nameof(format)}={format}"
+                );
+
             if (number.IsEmpty())
             {
                 return BadRequest("Number not specified");
@@ -294,7 +327,7 @@ namespace Restaurant.Controllers
 
             var parameters = new SearchParameters
             {
-                Database = database ?? "ISTU",
+                Database = database ?? _defaultDatabase,
                 Expression = $"\"NS={number}\"",
                 NumberOfRecords = 1,
                 Format = "@brief"
@@ -316,9 +349,14 @@ namespace Restaurant.Controllers
         [HttpGet("list_db/{spec?}")]
         public IActionResult ListDb
             (
-                string? spec
+                string? spec = null
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(ListDb)}:: {nameof(spec)}={spec}"
+                );
+
             spec ??= "dbnam3.mnu";
 
             using var connection = GetConnection();
@@ -337,12 +375,17 @@ namespace Restaurant.Controllers
         /// Получение списка файлов.
         /// </summary>
         /// <param name="pattern">Спецификация.</param>
-        [HttpGet("list_files/{pattern}")]
+        [HttpGet("list_files/{pattern?}")]
         public IActionResult ListFiles
             (
-                string? pattern
+                string? pattern = null
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(ListFiles)}:: {nameof(pattern)}={pattern}"
+                );
+
             using var connection = GetConnection();
             if (!connection.Connected)
             {
@@ -367,6 +410,11 @@ namespace Restaurant.Controllers
         [HttpGet("list_proc")]
         public IActionResult ListProcesses()
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(ListProcesses)}"
+                );
+
             using var connection = GetConnection();
             if (!connection.Connected)
             {
@@ -388,17 +436,17 @@ namespace Restaurant.Controllers
         /// </summary>
         /// <param name="database">Имя базы данных</param>
         /// <param name="prefix">Префикс</param>
-        [HttpGet("list_terms/{databaseName}/{prefix}")]
+        [HttpGet("list_terms/{prefix}/{database?}")]
         public IActionResult ListTerms
             (
-                string? database,
-                string? prefix
+                string? prefix,
+                string? database = null
             )
         {
-            if (database.IsEmpty())
-            {
-                return BadRequest("Database not specified");
-            }
+            _logger.LogInformation
+                (
+                    $"{nameof(ListTerms)}:: {nameof(prefix)}={prefix} {nameof(database)}={database}"
+                );
 
             if (prefix.IsEmpty())
             {
@@ -411,7 +459,7 @@ namespace Restaurant.Controllers
                 return Problem("Can't connect to IRBIS64");
             }
 
-            connection.Database = database;
+            connection.Database = database ?? _defaultDatabase;
             var result = connection.ReadAllTerms(prefix);
             if (connection.LastError < 0)
             {
@@ -426,16 +474,16 @@ namespace Restaurant.Controllers
         /// Получение максимального MFN для указанной базы данных.
         /// </summary>
         /// <param name="database">Имя базы данных.</param>
-        [HttpGet("max_mfn/{database}")]
+        [HttpGet("max_mfn/{database?}")]
         public IActionResult MaxMfn
             (
-                string? database
+                string? database = null
             )
         {
-            if (database.IsEmpty())
-            {
-                return BadRequest("Database not specified");
-            }
+            _logger.LogInformation
+                (
+                    $"{nameof(MaxMfn)}:: {nameof(database)}={database}"
+                );
 
             using var connection = GetConnection();
             if (!connection.Connected)
@@ -443,7 +491,7 @@ namespace Restaurant.Controllers
                 return Problem("Can't connect to IRBIS64");
             }
 
-            var result = connection.GetMaxMfn(database);
+            var result = connection.GetMaxMfn(database ?? _defaultDatabase);
             if (result < 0)
             {
                 return Problem(IrbisException.GetErrorDescription(result));
@@ -468,6 +516,11 @@ namespace Restaurant.Controllers
                 string? fileName
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(ReadMenu)}:: {nameof(fileName)}={fileName}"
+                );
+
             if (fileName.IsEmpty())
             {
                 return BadRequest("File name not specified");
@@ -495,11 +548,11 @@ namespace Restaurant.Controllers
         /// </summary>
         /// <param name="database">Имя базы данных.</param>
         /// <param name="mfn">MFN записи.</param>
-        [HttpGet("read/{database}/{mfn}")]
+        [HttpGet("read/{mfn}/{database?}")]
         public IActionResult ReadRecord
             (
-                string? database,
-                string? mfn
+                string? mfn,
+                string? database = null
             )
         {
             if (database.IsEmpty())
@@ -569,20 +622,21 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Чтение терминов поискового словаря.
         /// </summary>
-        /// <param name="databaseName">Имя базы данных.</param>
+        /// <param name="database">Имя базы данных.</param>
         /// <param name="startTerm">Начальный термин.</param>
         /// <param name="count">Количество считываемых терминов.</param>
+        [HttpGet("read_terms/{startTerm}/{count?}/{database?}")]
         public IActionResult ReadTerms
             (
-                string? databaseName,
                 string? startTerm,
-                string? count
+                string? count = null,
+                string? database = null
             )
         {
-            if (databaseName.IsEmpty())
-            {
-                return BadRequest("Database not specified");
-            }
+            _logger.LogInformation
+                (
+                    $"{nameof(ReadTerms)}:: {nameof(startTerm)}={startTerm} {nameof(count)}={count} {nameof(database)}={database}"
+                );
 
             if (startTerm.IsEmpty())
             {
@@ -598,7 +652,7 @@ namespace Restaurant.Controllers
 
             var paremeters = new TermParameters()
             {
-                Database = databaseName,
+                Database = database ?? _defaultDatabase,
                 StartTerm = startTerm,
                 NumberOfTerms = number
             };
@@ -621,6 +675,11 @@ namespace Restaurant.Controllers
                 string? fileName
             )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(ReadTextFile)}:: {nameof(fileName)}={fileName}"
+                );
+
             if (fileName.IsEmpty())
             {
                 return BadRequest("File name not specified");
@@ -649,6 +708,11 @@ namespace Restaurant.Controllers
         [HttpGet("restart")]
         public IActionResult Restart()
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(Restart)}"
+                );
+
             using var connection = GetConnection();
             if (!connection.Connected)
             {
@@ -667,9 +731,17 @@ namespace Restaurant.Controllers
         /// <summary>
         /// Получение поисковых сценариев.
         /// </summary>
-        [HttpGet("scenarios")]
-        public IActionResult Scenarios()
+        [HttpGet("scenarios/{database?}")]
+        public IActionResult Scenarios
+            (
+                string? database = null
+            )
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(Scenarios)}:: {nameof(database)}={database}"
+                );
+
             // TODO поддержать стандартный сценарий поиска
 
             using var connection = GetConnection();
@@ -689,19 +761,19 @@ namespace Restaurant.Controllers
         /// <param name="expression">Выражение на поисковом языке ИРБИС64.</param>
         /// <param name="start">Стартовое смещение (опционально).</param>
         /// <param name="count">Максимальное количество записей (опционально).</param>
-        [HttpGet("search/{database}/{expression}/{count?}/{start?}")]
+        [HttpGet("search/{expression}/{database?}/{count?}/{start?}")]
         public IActionResult Search
             (
-                string? database,
                 string? expression,
-                string? start,
-                string? count
+                string? database = null,
+                string? count = null,
+                string? start = null
             )
         {
-            if (database.IsEmpty())
-            {
-                return BadRequest("Database not specified");
-            }
+            _logger.LogInformation
+                (
+                    $"{nameof(Search)}:: {nameof(expression)}={expression} {nameof(database)}={database} {nameof(count)}={count} {nameof(start)}={start}"
+                );
 
             if (expression.IsEmpty())
             {
@@ -716,7 +788,7 @@ namespace Restaurant.Controllers
 
             var parameters = new SearchParameters
             {
-                Database = database,
+                Database = database ?? _defaultDatabase,
                 Expression = expression
             };
 
@@ -747,17 +819,17 @@ namespace Restaurant.Controllers
         /// </summary>
         /// <param name="database">Имя базы данных</param>
         /// <param name="expression">Поисковое выражение</param>
-        [HttpGet("search_count/{database}/{expression}")]
+        [HttpGet("search_count/{expression}/{database?}")]
         public IActionResult SearchCount
             (
-                string? database,
-                string? expression
+                string? expression,
+                string? database = null
             )
         {
-            if (database.IsEmpty())
-            {
-                return BadRequest("Database not specified");
-            }
+            _logger.LogInformation
+                (
+                    $"{nameof(SearchCount)}:: {nameof(expression)}={expression} {nameof(database)}={database}"
+                );
 
             if (expression.IsEmpty())
             {
@@ -770,12 +842,7 @@ namespace Restaurant.Controllers
                 return Problem("Can't connect to IRBIS64");
             }
 
-            // var parameters = new SearchParameters
-            // {
-            //     Database = databaseName,
-            //     Expression = expression,
-            //     NumberOfRecords = 0
-            // };
+            connection.Database = database ?? _defaultDatabase;
             var result = connection switch
             {
                 ISyncConnection syncConnection => syncConnection.SearchCount(expression),
@@ -802,29 +869,24 @@ namespace Restaurant.Controllers
         /// <param name="start">Стартовое смещение (опционально).</param>
         /// <param name="count">Максимальное количество найденных записей (опционально).</param>
         /// <param name="format">Формат.</param>
-        [HttpGet("search_format/{database}/{expression}/{format}/{count?}/{start?}")]
+        [HttpGet("search_format/{expression}/{format?}/{database?}/{count?}/{start?}")]
         public IActionResult SearchFormat
             (
-                string? database,
                 string? expression,
-                string? start,
-                string? count,
-                string? format
+                string? format = null,
+                string? database = null,
+                string? count = null,
+                string? start = null
             )
         {
-            if (database.IsEmpty())
-            {
-                return BadRequest("Database not specified");
-            }
+            _logger.LogInformation
+                (
+                    $"{nameof(SearchFormat)}:: {nameof(expression)}={expression} {nameof(format)}={format} {nameof(database)}={database} {nameof(count)}={count} {nameof(start)}={start}"
+                );
 
             if (expression.IsEmpty())
             {
                 return BadRequest("Expression not specified");
-            }
-
-            if (format.IsEmpty())
-            {
-                return BadRequest("Format not specified");
             }
 
             using var connection = GetConnection();
@@ -835,18 +897,20 @@ namespace Restaurant.Controllers
 
             var parameters = new SearchParameters
             {
-                Database = database,
+                Database = database ?? _defaultDatabase,
                 Expression = expression,
-                Format = format
+                Format = format ?? _defaultFormat
             };
 
             if (start is not null)
             {
+                // TODO не надо SafeToInt32
                 parameters.FirstRecord = start.SafeToInt32();
             }
 
             if (count is not null)
             {
+                // TODO не надо SafeToInt32
                 parameters.NumberOfRecords = count.SafeToInt32();
             }
 
@@ -868,6 +932,11 @@ namespace Restaurant.Controllers
         [HttpGet("server_stat")]
         public IActionResult ServerStat()
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(ServerStat)}"
+                );
+
             using var connection = GetConnection();
             if (!connection.Connected)
             {
@@ -890,6 +959,11 @@ namespace Restaurant.Controllers
         [HttpGet("user_list")]
         public IActionResult UserList()
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(UserList)}"
+                );
+
             using var connection = GetConnection();
             if (!connection.Connected)
             {
@@ -912,6 +986,11 @@ namespace Restaurant.Controllers
         [HttpGet("version")]
         public IActionResult Version()
         {
+            _logger.LogInformation
+                (
+                    $"{nameof(Version)}"
+                );
+
             using var connection = GetConnection();
             if (!connection.Connected)
             {
@@ -930,9 +1009,7 @@ namespace Restaurant.Controllers
 
         } // method Version
 
-        #endregion
-
-        #region Public methods
+/*
 
         /// <summary>
         /// Выполнение различных запросов к серверу ИРБИС64.
@@ -1046,8 +1123,10 @@ namespace Restaurant.Controllers
 
         } // method Index
 
+*/
+
         #endregion
 
-    } // class ApiController
+    } // class IrbisController
 
 } // namespace Restaurant
