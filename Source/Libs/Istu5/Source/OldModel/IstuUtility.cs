@@ -54,6 +54,7 @@ namespace Istu.OldModel
             services.AddTransient<IAttendanceManager, AttendanceManager>();
             services.AddTransient<IOperatorManager, OperatorManager>();
             services.AddTransient<IReaderManager, ReaderManager>();
+            services.AddTransient<ILoanManager, LoanManager>();
 
             return services;
 

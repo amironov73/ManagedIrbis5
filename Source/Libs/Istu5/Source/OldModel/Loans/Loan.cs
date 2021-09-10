@@ -20,6 +20,8 @@ using System.ComponentModel;
 
 using AM.Data;
 
+using LinqToDB;
+
 #endregion
 
 #nullable enable
@@ -202,30 +204,188 @@ namespace Istu.OldModel.Loans
         [ColumnWidth(20)]
         public string? Place { get; set; }
 
+        /// <summary>
+        /// Документ свободен (доступен для выдачи)?
+        /// </summary>
+        /// <remarks>
+        /// Свойство должно быть переопределено в потомках.
+        /// </remarks>
+        public bool IsFree { get; protected set; } = false;
+
         #endregion
 
         #region Private members
 
-        // /// <summary>
-        // /// Registers the attendance.
-        // /// </summary>
-        // /// <param name="db">The db.</param>
-        // /// <param name="attendance">The attendance.</param>
-        // protected static void RegisterAttendance(DbManager db, Attendance attendance)
-        // {
-        //     bool disableCounting
-        //         = ConfigurationUtility.GetBoolean("disableCounting", false);
-        //     if (disableCounting)
-        //     {
-        //         return;
-        //     }
-        //
-        //     if (attendance != null)
-        //     {
-        //         db.Insert<Attendance>("attendance", new[] {attendance});
-        //     }
-        //
-        // } // method RegisterAttendance
+        /// <summary>
+        /// Регистрация события книговыдачи.
+        /// </summary>
+        protected static void RegisterAttendance
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            if (attendance is not null)
+            {
+                //     bool disableCounting
+                //         = ConfigurationUtility.GetBoolean("disableCounting", false);
+                //     if (disableCounting)
+                //     {
+                //         return;
+                //     }
+                //
+
+                using var kladovka = storehouse.GetKladovka();
+                kladovka.Insert(attendance);
+            }
+
+        } // method RegisterAttendance
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Можно ли выдавать документ при заданных условиях?
+        /// </summary>
+        public virtual bool CanGive
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            return attendance?.Ticket is not null;
+
+        } // method CanGive
+
+        /// <summary>
+        /// Проверка, чтобы возврат документа производился строго
+        /// на том же абонементе, что и выдача.
+        /// </summary>
+        public virtual void CheckAbonementOnReturn
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            if (attendance is not null)
+            {
+                // if (ConfigurationUtility.GetBoolean("check-abonement-on-return", true))
+                // {
+                //     using (IAttendanceManager am = new AttendanceManager())
+                //     {
+                //         Attendance oldAttendance = am.GetLatestAttendance(newAttendance.Number);
+                //         if ((oldAttendance != null)
+                //             && (string.Compare
+                //             (
+                //                 newAttendance.Abonement,
+                //                 oldAttendance.Abonement,
+                //                 StringComparison.OrdinalIgnoreCase
+                //             ) != 0))
+                //         {
+                //             throw new ApplicationException("Возврат на другом абонементе запрещен");
+                //         }
+                //     }
+                // }
+            }
+
+        } // method CheckAbonementOnReturn
+
+        /// <summary>
+        /// Выдача документа читателю.
+        /// </summary>
+        public virtual void Give
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            // Метод должен быть переопределен в наследнике
+
+        } // method Give
+
+        /// <summary>
+        /// Выдача документа читателю в режиме "только в читальном зале".
+        /// </summary>
+        public virtual void GiveToHands
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            // Метод должен быть переопределен в наследнике
+
+        } // method GiveToHand
+
+        /// <summary>
+        /// Возврат документа от читателя.
+        /// </summary>
+        public virtual void Return
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            // Метод должен быть переопределен в наследнике
+
+        } // method Return
+
+        /// <summary>
+        /// Возврат документа от читателя в режиме "только в читальном зале".
+        /// </summary>
+        public virtual void ReturnFromHands
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            // Метод должен быть переопределен в наследнике
+
+        } // method ReturnFromHands
+
+        /// <summary>
+        /// Обновление состояния выдачи в базе данных.
+        /// </summary>
+        public virtual void Update
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            // Метод должен быть переопределен в наследнике
+
+        } // method Update
+
+        /// <summary>
+        /// Списание экземпляра.
+        /// </summary>
+        public virtual void WriteOff
+            (
+                Storehouse storehouse,
+                Attendance? attendance
+            )
+        {
+            // Метод должен быть переопределен в наследнике
+
+        } // method WriteOff
+
+        /// <summary>
+        /// Запрос предпочитаемого срока возврата для указанного события.
+        /// </summary>
+        /// <returns>
+        /// <c>null</c> означает, что предпочтений по возврату нет,
+        /// документ можно выдавать на любой срок.
+        /// </returns>
+        public virtual DateTime? GetPreferredDeadline
+            (
+                Attendance attendance
+            )
+        {
+            return  null;
+
+        } // method GetPreferredDeadline
+
+
 
         #endregion
 

@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
 
-/* Attendance.cs -- посещение библиотеки
+/* Attendance.cs -- событие книговыдачи, в т. ч. посещение библиотеки
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +27,7 @@ using LinqToDB.Mapping;
 namespace Istu.OldModel
 {
     /// <summary>
-    /// Посещение библиотеки.
+    /// Событие книговыдачи, в т. ч. посещение библиотеки.
     /// </summary>
     [Table]
     [DebuggerDisplay("{Moment}: {Ticket}: {Ticket}: {Number}")]
