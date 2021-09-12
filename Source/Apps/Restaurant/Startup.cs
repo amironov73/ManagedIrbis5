@@ -7,11 +7,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* Startup.cs -- конфигурирование
+/* Startup.cs -- конфигурирование перед запуском приложения
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using AM.Web;
 
 using Istu.OldModel;
 
@@ -29,19 +31,29 @@ using Microsoft.OpenApi.Models;
 namespace Restaurant
 {
     /// <summary>
-    /// Конфигурирование.
+    /// Конфигурирование перед запуском приложения.
     /// </summary>
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public Startup
+            (
+                IConfiguration configuration
+            )
         {
             Configuration = configuration;
-        }
+
+        } // constructor
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices
+            (
+                IServiceCollection services
+            )
         {
             services.AddSingleton(Configuration);
 
@@ -52,10 +64,15 @@ namespace Restaurant
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Restaurant", Version = "v1" });
             });
-        }
+
+        } // method ConfigureServices
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure
+            (
+                IApplicationBuilder app,
+                IWebHostEnvironment env
+            )
         {
             if (env.IsDevelopment())
             {
@@ -74,7 +91,17 @@ namespace Restaurant
 
             app.UseAuthorization();
 
+            var allowedAddresses = Configuration["AllowedIP"];
+            if (!string.IsNullOrEmpty(allowedAddresses))
+            {
+                // пустая строка означает, что фильтрация по IP-адресам не нужна
+                app.UseMiddleware<SecureAccessMiddleware>(allowedAddresses);
+            }
+
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-        }
-    }
-}
+
+        } // method Configure
+
+    } // class Startup
+
+} // namespace Restaurant
