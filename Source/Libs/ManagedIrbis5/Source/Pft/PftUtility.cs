@@ -10,7 +10,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/* PftUtility.cs --
+/* PftUtility.cs -- полезные методы для работы с PFT-скриптами.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -42,7 +42,7 @@ using ManagedIrbis.Providers;
 namespace ManagedIrbis.Pft
 {
     /// <summary>
-    /// Utility routines for PFT scripting.
+    /// Полезные методы для работы с PFT-скриптами.
     /// </summary>
     public static class PftUtility
     {
@@ -252,7 +252,7 @@ namespace ManagedIrbis.Pft
                     }
                 }
             }
-        }
+        } // method AssignField
 
         //=================================================
 
@@ -365,7 +365,8 @@ namespace ManagedIrbis.Pft
                     }
                 }
             }
-        }
+
+        } // method AssignSubField
 
         //=================================================
 
@@ -400,7 +401,8 @@ namespace ManagedIrbis.Pft
             }
 
             return result;
-        }
+
+        } // method CloneNodes
 
         //=================================================
 
@@ -421,7 +423,8 @@ namespace ManagedIrbis.Pft
                 );
 
             return result;
-        }
+
+        } // method CompareStrings
 
         //=================================================
 
@@ -444,7 +447,8 @@ namespace ManagedIrbis.Pft
             }
 
             return result;
-        }
+
+        } // method CompileProgram
 
         //=================================================
 
@@ -484,7 +488,8 @@ namespace ManagedIrbis.Pft
             var result = outer.Contains(inner);
 
             return result;
-        }
+
+        } // method ContainsSubString
 
         //=================================================
 
@@ -1213,10 +1218,7 @@ namespace ManagedIrbis.Pft
         /// <summary>
         /// Get array of reserved words.
         /// </summary>
-        public static string[] GetReservedWords()
-        {
-            return _reservedWords;
-        }
+        public static string[] GetReservedWords() => _reservedWords;
 
         //=================================================
 
@@ -1490,7 +1492,8 @@ namespace ManagedIrbis.Pft
             var result = children.Any(item => item.RequiresConnection);
 
             return result;
-        }
+
+        } // method RequiresConnection
 
         //=================================================
 
@@ -1502,10 +1505,11 @@ namespace ManagedIrbis.Pft
                 IEnumerable<PftNode> nodes
             )
         {
-            var result = nodes.Any(item => RequiresConnection(item));
+            var result = nodes.Any(RequiresConnection);
 
             return result;
-        }
+
+        } // method RequiresConnection
 
         //=================================================
 
@@ -1590,7 +1594,8 @@ namespace ManagedIrbis.Pft
             }
 
             return result;
-        }
+
+        } // method SafeSubString
 
         //=================================================
 
@@ -1631,10 +1636,98 @@ namespace ManagedIrbis.Pft
             }
 
             return array;
-        }
+
+        } // method SetArrayItem
+
+        /// <summary>
+        /// Преобразование одной строки в текстовый литерал PFT.
+        /// </summary>
+        public static void TextToPft
+            (
+                ReadOnlySpan<char> line,
+                TextWriter output
+            )
+        {
+            const char QUOTATION_MARK = '\'';
+
+            if (line.IsEmpty)
+            {
+                return;
+            }
+
+            // флаг: выводим непосредственно символы
+            var inQuotation = false; // а не unifor
+
+            foreach (var chr in line)
+            {
+                if (chr >= ' ' && chr != QUOTATION_MARK)
+                {
+                    if (!inQuotation)
+                    {
+                        output.Write(QUOTATION_MARK);
+                        inQuotation = true;
+                    }
+
+                    output.Write (chr);
+                }
+                else
+                {
+                    // встретился символ, требующий специального представления в PFT
+
+                    if (inQuotation)
+                    {
+                        // при необходимости закрываем литерал
+
+                        output.Write(QUOTATION_MARK);
+                        output.Write(',');
+                        inQuotation = false;
+                    }
+
+                    output.Write ("&uf('+9F',");
+                    output.Write (((int) chr).ToInvariantString());
+                    output.Write (')');
+                    output.Write (',');
+
+                } // else
+
+            } // foreach
+
+            if (inQuotation)
+            {
+                output.Write (QUOTATION_MARK); // закрывающая кавычка
+            }
+
+        } // method TextToPft
+
+        /// <summary>
+        /// Преобразование текста в PFT-совместимое представление.
+        /// </summary>
+        public static void TextToPft
+            (
+                TextReader input,
+                TextWriter output
+            )
+        {
+            string? line;
+            bool first = true;
+            while ((line = input.ReadLine()) != null)
+            {
+                if (!first)
+                {
+                    output.WriteLine(",/");
+                }
+
+                TextToPft (line.AsSpan(), output);
+                first = false;
+
+            } // while
+
+        } // method TextToPft
 
         //=================================================
 
         #endregion
-    }
-}
+
+    } // class PftUtility
+
+} // namespace ManagedIrbis.Pft
