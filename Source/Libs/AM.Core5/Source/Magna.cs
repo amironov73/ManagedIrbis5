@@ -24,7 +24,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 using AM.AppServices;
-
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -92,9 +92,17 @@ namespace AM
         public static ILoggerFactory Factory { get; private set; } = new LoggerFactory();
 
         /// <summary>
-        /// Общий логгер.
+        /// Общий логгер для всего приложения.
         /// </summary>
         public static ILogger Logger { get; private set; } = new NullLogger<Magna>();
+
+        /// <summary>
+        /// Общая конфигурация для всего приложения.
+        /// </summary>
+        public static IConfiguration Configuration { get; set; } = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", true, true)
+            .Build();
 
         /// <summary>
         /// Глобальные опции программы.

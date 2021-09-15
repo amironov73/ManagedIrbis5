@@ -37,6 +37,7 @@ using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 #endregion
 
@@ -75,7 +76,8 @@ namespace ManagedIrbis
             Socket = socket ?? new AsyncTcp4Socket();
             Socket.Connection = this;
 
-            _logger = (ILogger?) serviceProvider?.GetService (typeof(ILogger<SyncConnection>));
+            _logger = (ILogger) (serviceProvider?.GetService (typeof(ILogger<SyncConnection>))
+                    ?? NullLogger.Instance);
 
         } // constructor
 

@@ -21,6 +21,8 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
+using AM.Text.Output;
+
 #endregion
 
 #nullable enable
@@ -203,16 +205,15 @@ namespace AM.Windows.Forms
             // ReSharper restore UseStringInterpolation
         }
 
-        /*
         /// <summary>
         /// Print system information in abstract output.
         /// </summary>
         public static void PrintSystemInformation
             (
-                this AbstractOutput output
+                this AbstractOutput? output
             )
         {
-            if (!ReferenceEquals(output, null))
+            if (output is not null)
             {
                 output.WriteLine
                     (
@@ -225,16 +226,17 @@ namespace AM.Windows.Forms
                         Environment.Version
                     );
                 var assembly = Assembly.GetEntryAssembly();
-                var vi = assembly.GetName().Version;
-                if (ReferenceEquals(assembly.Location, null))
+                var vi = assembly?.GetName().Version;
+                if (assembly?.Location is null)
                 {
                     return;
                 }
+
                 var fi = new FileInfo(assembly.Location);
                 output.WriteLine
                     (
                         "Application version: {0} ({1})",
-                        vi,
+                        vi.ToVisibleString(),
                         fi.LastWriteTime.ToShortDateString()
                     );
                 output.WriteLine
@@ -243,8 +245,8 @@ namespace AM.Windows.Forms
                         GC.GetTotalMemory(false)/1024
                     );
             }
-        }
-        */
+
+        } // method PrintSystemInformation
 
         #endregion
 
