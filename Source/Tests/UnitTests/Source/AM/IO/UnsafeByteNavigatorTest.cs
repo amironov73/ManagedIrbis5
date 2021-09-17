@@ -9,10 +9,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable RedundantCast
 
+#nullable enable
+
 namespace UnitTests.AM.IO
 {
     [TestClass]
-    public class UnsafeByteNavigatorTest
+    public sealed class UnsafeByteNavigatorTest
         : Common.CommonUnitTest
     {
         private byte[] _GetData()
