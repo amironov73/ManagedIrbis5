@@ -53,6 +53,49 @@ namespace AM.IO
         } // method OpenRead
 
         /// <summary>
+        /// Чтение строки непосредственно в <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <param name="builder">Куда помещать результат.</param>
+        /// <param name="reader">Поток, из которого считывается строка.</param>
+        /// <param name="appendNewLine">Добавлять перевод строки в конец?</param>
+        /// <returns><c>false</c>, если достигнут конец потока.</returns>
+        public static bool ReadLine
+            (
+                this StringBuilder builder,
+                TextReader reader,
+                bool appendNewLine = false
+            )
+        {
+            var first = true;
+            while (true)
+            {
+                var chr = reader.Read();
+                if (chr < 0)
+                {
+                    return !first;
+                }
+
+                if (chr == '\n')
+                {
+                    if (appendNewLine)
+                    {
+                        builder.Append ((char) chr);
+                    }
+
+                    return true;
+                }
+
+                if (chr != '\r')
+                {
+                    builder.Append ((char) chr);
+                }
+
+                first = false;
+            }
+
+        } // method ReadLine
+
+        /// <summary>
         /// Обязательное чтение строки.
         /// </summary>
         public static string RequireLine

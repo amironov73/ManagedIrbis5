@@ -16,6 +16,7 @@
 
 using System;
 using System.Buffers;
+using System.IO;
 using System.Text;
 
 #endregion
@@ -295,6 +296,47 @@ namespace AM.Text
         /// </summary>
         public ReadOnlySpan<char>.Enumerator GetEnumerator() =>
             AsSpan().GetEnumerator();
+
+        /// <summary>
+        /// Чтение строки непосредственно в <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <param name="reader">Поток, из которого считывается строка.</param>
+        /// <param name="appendNewLine">Добавлять перевод строки в конец?</param>
+        /// <returns><c>false</c>, если достигнут конец потока.</returns>
+        public bool ReadLine
+            (
+                TextReader reader,
+                bool appendNewLine = false
+            )
+        {
+            var first = true;
+            while (true)
+            {
+                var chr = reader.Read();
+                if (chr < 0)
+                {
+                    return !first;
+                }
+
+                if (chr == '\n')
+                {
+                    if (appendNewLine)
+                    {
+                        Append ((char)chr);
+                    }
+
+                    return true;
+                }
+
+                if (chr != '\r')
+                {
+                    Append ((char) chr);
+                }
+
+                first = false;
+            }
+
+        } // method ReadLine
 
         #endregion
 

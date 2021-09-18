@@ -29,17 +29,17 @@ namespace AM.Text
         #region Properties
 
         /// <summary>
-        /// Column number (starting from 1).
+        /// Номер колонки (столбца) (нумерация с 1).
         /// </summary>
         public int Column { get; private set; }
 
         /// <summary>
-        /// Length (number of characters stored).
+        /// Общая длина буфера (количество записанных символов).
         /// </summary>
         public int Length { get; private set; }
 
         /// <summary>
-        /// Line number (starting from 1).
+        /// Номер строки (нумерация с 1).
         /// </summary>
         public int Line { get; private set; }
 
@@ -48,14 +48,15 @@ namespace AM.Text
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public TextBuffer()
         {
             _array = new char[1024];
             Column = 1;
             Line = 1;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -67,14 +68,16 @@ namespace AM.Text
         {
             for (var i = Length - 1; i >= 0; i--)
             {
-                if (_array[i] == '\n')
+                if (_array [i] == '\n')
                 {
                     break;
                 }
 
                 Column++;
-            }
-        }
+
+            } // for
+
+        } // method _CalculateColumn
 
         private void _EnsureCapacity
             (
@@ -94,14 +97,15 @@ namespace AM.Text
             {
                 Array.Resize(ref _array, length);
             }
-        }
+
+        } // method EnsureCapacity
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Delete last char (if present).
+        /// Удаление последнего символа (при наличии).
         /// </summary>
         public bool Backspace()
         {
@@ -120,10 +124,11 @@ namespace AM.Text
             }
 
             return true;
-        }
+
+        } // method Backspace
 
         /// <summary>
-        /// Clear all text in the buffer.
+        /// Удаление всего текста из буфера.
         /// </summary>
         public TextBuffer Clear()
         {
@@ -132,10 +137,12 @@ namespace AM.Text
             Column = 1;
 
             return this;
-        }
+
+        } // method Clear
 
         /// <summary>
-        /// Get last char.
+        /// Получение последнего символа в буфере.
+        /// Если буфер пуст, возвращается <c>'\0'</c>.
         /// </summary>
         [Pure]
         public char GetLastChar()
@@ -145,10 +152,11 @@ namespace AM.Text
                 return '\0';
             }
 
-            var result = _array[Length - 1];
+            var result = _array [Length - 1];
 
             return result;
-        }
+
+        } // method GetLastChar
 
         /// <summary>
         /// Предваряется явным переводом строки?
@@ -173,10 +181,11 @@ namespace AM.Text
                 );
 
             return result;
-        }
+
+        } // method PrecededByNewLine
 
         /// <summary>
-        /// Remove last empty lines.
+        /// Удаление последних пустых строк.
         /// </summary>
         public TextBuffer RemoveEmptyLines()
         {
@@ -201,21 +210,23 @@ namespace AM.Text
                 Line--;
                 Column = 1;
                 _CalculateColumn();
-            }
+
+            } // while
 
             return this;
-        }
+
+        } // method RemoveEmptyLines
 
         /// <summary>
-        /// Write the character.
+        /// Добавление символа в конец буфера.
         /// </summary>
         public TextBuffer Write
             (
                 char c
             )
         {
-            _EnsureCapacity(Length + 1);
-            _array[Length] = c;
+            _EnsureCapacity (Length + 1);
+            _array [Length] = c;
             Length++;
 
             if (c == '\n')
@@ -229,23 +240,24 @@ namespace AM.Text
             }
 
             return this;
-        }
+
+        } // method Write
 
         /// <summary>
-        /// Write the text.
+        /// Добавление строки в конец буфера.
         /// </summary>
         public TextBuffer Write
             (
                 string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return this;
             }
 
             var characters = text.ToCharArray();
-            _EnsureCapacity(Length + characters.Length);
+            _EnsureCapacity (Length + characters.Length);
 
             foreach (var c in characters)
             {
@@ -258,15 +270,16 @@ namespace AM.Text
                 {
                     Column++;
                 }
-                _array[Length] = c;
+                _array [Length] = c;
                 Length++;
             }
 
             return this;
-        }
+
+        } // method Write
 
         /// <summary>
-        /// Write formatted text.
+        /// Добавление в буфер форматированного текста.
         /// </summary>
         public TextBuffer Write
             (
@@ -274,34 +287,38 @@ namespace AM.Text
                 params object[] arguments
             )
         {
-            var text = string.Format(format, arguments);
+            var text = string.Format (format, arguments);
 
             return Write(text);
-        }
+
+        } // method Write
 
         /// <summary>
-        /// Write new line symbol.
+        /// Добавление в буфер перевода строки
+        /// (в зависимости от платформы может
+        /// быть одним или двумя символами).
         /// </summary>
         public TextBuffer WriteLine()
         {
-            return Write(Environment.NewLine);
+            return Write (Environment.NewLine);
         }
 
         /// <summary>
-        /// Write text followed by new line symbol.
+        /// Добавление в буфер текста и перевода строки.
         /// </summary>
         public TextBuffer WriteLine
             (
                 string? text
             )
         {
-            Write(text);
+            Write (text);
 
             return WriteLine();
         }
 
         /// <summary>
-        /// Write formatted text followed by new line symbol.
+        /// Добавление в буфер форматированного текста
+        /// и перевода строки.
         /// </summary>
         public TextBuffer WriteLine
             (
@@ -309,23 +326,23 @@ namespace AM.Text
                 params object[] arguments
             )
         {
-            Sure.NotNull(format, nameof(format));
+            Sure.NotNull (format, nameof (format));
 
-            var text = string.Format(format, arguments);
+            var text = string.Format (format, arguments);
 
             return WriteLine(text);
-        }
+
+        } // method WriteLine
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return new string(_array, 0, Length);
-        }
+        public override string ToString() => new string(_array, 0, Length);
 
         #endregion
-    }
-}
+
+    } // class TextBuffer
+
+} // namespace AM.Text
