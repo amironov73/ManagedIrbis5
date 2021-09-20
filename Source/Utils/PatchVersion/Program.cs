@@ -3,14 +3,20 @@
  * Командная строка:
  *
  * PatchVersion <file-name> <new-version>
- * 
+ *
  */
+
+#region Using directives
 
 using System;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+
+#endregion
+
+#nullable enable
 
 namespace PatchVersion
 {
@@ -26,8 +32,8 @@ namespace PatchVersion
         /// <param name="value">Новое значение свойства</param>
         private static void SetValue
             (
-                XDocument document, 
-                string propertyName, 
+                XDocument document,
+                string propertyName,
                 string value
             )
         {
@@ -54,7 +60,7 @@ namespace PatchVersion
             sought.Value = value;
 
         } // method SetValue
-        
+
         static int Main(string[] args)
         {
             if (args.Length != 2)
@@ -67,7 +73,7 @@ namespace PatchVersion
             var versionText = args[1];
 
             var document = XDocument.Load(inputFile);
-            
+
             SetValue(document, "Version", versionText);
             SetValue(document, "AssemblyVersion", versionText);
             SetValue(document, "PackageVersion", versionText);
@@ -76,7 +82,7 @@ namespace PatchVersion
 
             var settings = new XmlWriterSettings()
             {
-                OmitXmlDeclaration = true, 
+                OmitXmlDeclaration = true,
                 Indent = true
             };
 
@@ -84,9 +90,9 @@ namespace PatchVersion
             document.Save(writer);
 
             return 0;
-            
+
         } // method Main
-        
+
     } // class Program
-    
+
 } // namespace PatchVersion
