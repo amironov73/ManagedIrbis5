@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatchVersion", "PatchVersio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniCall", "UniCall\UniCall.csproj", "{853C883A-B295-4ADF-9CCF-268C3DFB1CBC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bin2sharp", "Bin2sharp\Bin2sharp.csproj", "{9AC6E370-44A2-4638-90F0-CE6EA59CCA39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{853C883A-B295-4ADF-9CCF-268C3DFB1CBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{853C883A-B295-4ADF-9CCF-268C3DFB1CBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{853C883A-B295-4ADF-9CCF-268C3DFB1CBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AC6E370-44A2-4638-90F0-CE6EA59CCA39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AC6E370-44A2-4638-90F0-CE6EA59CCA39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AC6E370-44A2-4638-90F0-CE6EA59CCA39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AC6E370-44A2-4638-90F0-CE6EA59CCA39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
