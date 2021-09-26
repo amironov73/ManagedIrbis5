@@ -2,5 +2,6 @@
 
 * [**Bin2sharp**](Bin2sharp/README.md) - конвертирует бинарный файл в исходный код на C#;
 * [**MachineInfo**](MachineInfo/README.md) - базовая информация о пользовательской машине;
+* [**MsgBox**](MsgBox/README.md) - демонстрирует пользователю окно с сообщением;
 * [**PatchVersion**](PatchVersion/README.md) - патчит версию в файле проекта;
 * [**UniCall**](UniCall/README.md) - вызывает метод из .NET-сборки.
