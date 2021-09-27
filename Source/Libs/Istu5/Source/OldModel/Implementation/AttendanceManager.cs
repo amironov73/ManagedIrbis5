@@ -38,6 +38,15 @@ namespace Istu.OldModel.Implementation
     public sealed class AttendanceManager
         : IAttendanceManager
     {
+        #region Properties
+
+        /// <summary>
+        /// Кладовка.
+        /// </summary>
+        public Storehouse Storehouse { get; }
+
+        #endregion
+
         #region Construction
 
         /// <summary>
@@ -48,7 +57,7 @@ namespace Istu.OldModel.Implementation
                 Storehouse storehouse
             )
         {
-            _storehouse = storehouse;
+            Storehouse = storehouse;
 
         } // constructor
 
@@ -56,10 +65,9 @@ namespace Istu.OldModel.Implementation
 
         #region Private members
 
-        private readonly Storehouse _storehouse;
         private DataConnection? _dataConnection;
 
-        private DataConnection _GetDb() => _dataConnection ??= _storehouse.GetKladovka();
+        private DataConnection _GetDb() => _dataConnection ??= Storehouse.GetKladovka();
 
         #endregion
 
@@ -160,6 +168,7 @@ namespace Istu.OldModel.Implementation
                 _dataConnection.Dispose();
                 _dataConnection = null;
             }
+
         } // method Dispose
 
         #endregion

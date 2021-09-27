@@ -15,8 +15,10 @@
 #region Using directives
 
 using System;
-
+using System.Linq;
 using Istu.OldModel.Interfaces;
+using LinqToDB;
+using LinqToDB.Data;
 
 #endregion
 
@@ -30,31 +32,56 @@ namespace Istu.OldModel.Implementation
     public sealed class OperatorManager
         : IOperatorManager
     {
+        #region Properties
+
+        /// <summary>
+        /// Кладовка.
+        /// </summary>
+        public Storehouse Storehouse { get; }
+
+        /// <summary>
+        /// Таблица <c>operators</c>.
+        /// </summary>
+        public ITable<Operator> Operators => _GetDb().GetOperators();
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public OperatorManager
+            (
+                Storehouse storehouse
+            )
+        {
+            Storehouse = storehouse;
+
+        } // constructor
+
+        #endregion
+
+        #region Private members
+
+        private DataConnection? _dataConnection;
+
+        private DataConnection _GetDb() => _dataConnection ??= Storehouse.GetKladovka();
+
+        #endregion
+
         #region IOperatorManager members
 
-        /// <inheritdoc cref="IOperatorManager.GetOperatorCount"/>
-        public int GetOperatorCount()
-        {
-            throw new NotImplementedException();
-        }
-
         /// <inheritdoc cref="IOperatorManager.GetOperatorByBarcode"/>
-        public Operator GetOperatorByBarcode(string barcode)
-        {
-            throw new NotImplementedException();
-        }
+        public Operator? GetOperatorByBarcode (string barcode) =>
+            Operators.FirstOrDefault (op => op.Barcode == barcode);
 
         /// <inheritdoc cref="IOperatorManager.GetOperatorByID"/>
-        public Operator GetOperatorByID(int id)
-        {
-            throw new NotImplementedException();
-        }
+        public Operator? GetOperatorByID(int id) =>
+            Operators.FirstOrDefault (op => op.ID == id);
 
-        /// <inheritdoc cref="IOperatorManager.GetAllOperators"/>
-        public Operator[] GetAllOperators()
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc cref="IOperatorManager.ListAllOperators"/>
+        public Operator[] ListAllOperators() => Operators.ToArray();
 
         #endregion
 
@@ -63,8 +90,13 @@ namespace Istu.OldModel.Implementation
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            throw new NotImplementedException();
-        }
+            if (_dataConnection is not null)
+            {
+                _dataConnection.Dispose();
+                _dataConnection = null;
+            }
+
+        } // method Dispose
 
         #endregion
 

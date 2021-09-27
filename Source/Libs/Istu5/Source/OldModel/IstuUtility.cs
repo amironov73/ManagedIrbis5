@@ -55,6 +55,7 @@ namespace Istu.OldModel
             services.AddTransient<IOperatorManager, OperatorManager>();
             services.AddTransient<IReaderManager, ReaderManager>();
             services.AddTransient<ILoanManager, LoanManager>();
+            services.AddTransient<IOrderManager, OrderManager>();
 
             return services;
 
@@ -87,6 +88,18 @@ namespace Istu.OldModel
         /// </summary>
         public static ITable<Attendance> GetAttendances (this DataConnection connection) =>
             connection.GetTable<Attendance>();
+
+        /// <summary>
+        /// Получает таблицу <c>operators</c>.
+        /// </summary>
+        public static ITable<Operator> GetOperators (this DataConnection connection) =>
+            connection.GetTable<Operator>();
+
+        /// <summary>
+        /// Получает таблицу <c>orders</c>.
+        /// </summary>
+        public static ITable<Order> GetOrders (this DataConnection connection) =>
+            connection.GetTable<Order>();
 
         /// <summary>
         /// Получает таблицу <c>readers</c>.

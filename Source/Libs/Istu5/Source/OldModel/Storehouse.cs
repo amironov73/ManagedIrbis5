@@ -17,6 +17,9 @@
 
 using System;
 
+using Istu.OldModel.Implementation;
+using Istu.OldModel.Interfaces;
+
 using LinqToDB.Data;
 
 using Microsoft.Extensions.Configuration;
@@ -49,7 +52,7 @@ namespace Istu.OldModel
             _configuration = configuration;
             _logger = serviceProvider.GetRequiredService<ILogger<Storehouse>>();
 
-            _logger.LogTrace(nameof(Storehouse) + "::Constructor");
+            _logger.LogTrace (nameof (Storehouse) + "::Constructor");
 
             _kladovkaConnectionString = connectionString ?? _configuration["kladovka"];
         }
@@ -68,6 +71,28 @@ namespace Istu.OldModel
         #region Public methods
 
         /// <summary>
+        /// Создание менеджера посещений.
+        /// </summary>
+        public IAttendanceManager CreateAttendanceManager() => new AttendanceManager (this);
+
+        /// <summary>
+        /// Создание менеджера книговыдачи.
+        /// </summary>
+        public ILoanManager CreateLoanManager() => new LoanManager (this);
+
+        public IOperatorManager CreateOperatorManager() => new OperatorManager(this);
+
+        /// <summary>
+        /// Создание менеджера заказов.
+        /// </summary>
+        public IOrderManager CreateOrderManager() => new OrderManager (this);
+
+        /// <summary>
+        /// Создание менеджера читателей.
+        /// </summary>
+        public IReaderManager CreateReaderManager() => new ReaderManager (this);
+
+        /// <summary>
         /// Подключается к базе <c>kladovka</c>.
         /// </summary>
         public DataConnection GetKladovka() => IstuUtility.GetMsSqlConnection(_kladovkaConnectionString);
@@ -77,7 +102,7 @@ namespace Istu.OldModel
         #region IServiceProvider members
 
         /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) => _serviceProvider.GetService(serviceType);
+        public object? GetService (Type serviceType) => _serviceProvider.GetService(serviceType);
 
         #endregion
 

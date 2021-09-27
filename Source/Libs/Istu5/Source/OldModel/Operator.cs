@@ -14,6 +14,8 @@
 
 #region Using directives
 
+using AM;
+
 using LinqToDB.Mapping;
 
 #endregion
@@ -25,15 +27,16 @@ namespace Istu.OldModel
     /// <summary>
     /// Оператор системы книговыдачи.
     /// </summary>
-    [Table(Name = "operators")]
-    public class Operator
+    [Table ("operators")]
+    public sealed class Operator
+        : IVerifiable
     {
         #region Properties
 
         /// <summary>
         /// Идентификатор оператор.
         /// </summary>
-        [Column, Identity, PrimaryKey]
+        [Column (IsIdentity = true), PrimaryKey]
         public int ID { get; set; }
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace Istu.OldModel
         /// <summary>
         /// Комментарий в произвольной форме.
         /// </summary>
-        [Column, Nullable]
+        [Column (CanBeNull = true)]
         public string? Comment { get; set; }
 
         /// <summary>
@@ -53,6 +56,22 @@ namespace Istu.OldModel
         /// </summary>
         [Column]
         public string? Barcode { get; set; }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            // TODO: implement
+
+            return true;
+
+        } // method Verify
 
         #endregion
 
