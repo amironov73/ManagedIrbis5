@@ -76,7 +76,7 @@ namespace Istu.OldModel
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(IstuUtility) + "::" + (nameof(GetMsSqlConnection)), exception);
+                Magna.TraceException(nameof(IstuUtility) + "::" + nameof(GetMsSqlConnection), exception);
                 throw;
             }
 
@@ -118,7 +118,7 @@ namespace Istu.OldModel
             "Приписка штрих-кода",
             "Регистрация",
             "СМС",
-            "Списание",
+            "Списание"
         };
 
         /// <summary>

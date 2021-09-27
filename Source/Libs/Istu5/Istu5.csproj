@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+    <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
   </ItemGroup>
 
 </Project>

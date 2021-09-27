@@ -210,7 +210,7 @@ namespace Istu.OldModel.Loans
         /// <remarks>
         /// Свойство должно быть переопределено в потомках.
         /// </remarks>
-        public bool IsFree { get; protected set; } = false;
+        public virtual bool IsFree { get; protected set; }
 
         #endregion
 

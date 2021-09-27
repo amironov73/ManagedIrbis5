@@ -24,7 +24,7 @@ using AM;
 
 #nullable enable
 
-namespace Istu.OldModel.University
+namespace Istu.BookSupply
 {
     /// <summary>
     /// Конвертер типа для перечисления семестров.
@@ -86,4 +86,4 @@ namespace Istu.OldModel.University
 
     } // class SemesterConverter
 
-} // namespace Istu.OldModel.University
+} // namespace Istu.BookSupply

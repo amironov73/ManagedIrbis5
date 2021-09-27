@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using AM.Collections;
@@ -24,7 +25,7 @@ using AM.Collections;
 
 #nullable enable
 
-namespace Istu.OldModel.University
+namespace Istu.BookSupply
 {
     /// <summary>
     /// Сборник методов для работы с перечислением семестров.
@@ -80,8 +81,8 @@ namespace Istu.OldModel.University
         /// (например, в первом и во втором наборе одновремено есть четные семесты
         /// или же наоборот - одновременно есть нечетные).
         /// </summary>
-        public static bool IsOverlap(Semester first, Semester second) =>
-            (IsEven (first) == IsEven (second)) || (IsOdd (first) == IsOdd (second));
+        public static bool IsOverlap (Semester first, Semester second) =>
+            IsEven (first) == IsEven (second) || IsOdd (first) == IsOdd (second);
 
         /// <summary>
         /// Разбирает строковое представление перечисления семестров.
@@ -104,7 +105,7 @@ namespace Istu.OldModel.University
                 {
                     try
                     {
-                        result |= (Semester) (1 << (int.Parse (semester) - 1));
+                        result |= (Semester) (1 << (int.Parse (semester, CultureInfo.InvariantCulture) - 1));
                     }
                     catch
                     {
@@ -130,7 +131,7 @@ namespace Istu.OldModel.University
             var result = new LocalList <int> ();
             for (var i = 0; i < 32; i++)
             {
-                if ((((int) value) & (1 << i)) != 0)
+                if (((int) value & (1 << i)) != 0)
                 {
                     result.Add (i + 1);
                 }
@@ -173,4 +174,4 @@ namespace Istu.OldModel.University
 
     } // class SemesterUtility
 
-} // namespace Istu.OldModel.University
+} // namespace Istu.BookSupply
