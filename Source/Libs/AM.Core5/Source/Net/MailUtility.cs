@@ -2,12 +2,16 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* MailUtility.cs -- утилиты для работы с e-mail.
+/* MailUtility.cs -- работа с электронной почтой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +27,7 @@ using System.Text.RegularExpressions;
 namespace AM.Net
 {
     /// <summary>
-    /// Утилиты для работы с e-mail.
+    /// Работа с электронной почтой.
     /// </summary>
     public static class MailUtility
     {
@@ -157,14 +161,17 @@ namespace AM.Net
                     default:
                         if (c < 256)
                         {
-                            result.Append(char.ToUpper(c));
+                            result.Append(c);
                         }
                         break;
-                }
-            }
+
+                } // switch
+
+            } // foreach
 
             return result.ToString();
-        }
+
+        } // method CleanupEmail
 
         /// <summary>
         /// Верификация (приблизительная) e-mail.
@@ -182,7 +189,8 @@ namespace AM.Net
                 );
 
             return result;
-        }
+
+        } // method VerifyEmail
 
         #endregion
 

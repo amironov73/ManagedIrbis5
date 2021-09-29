@@ -80,6 +80,9 @@ namespace Istu.OldModel
         /// </summary>
         public ILoanManager CreateLoanManager() => new LoanManager (this);
 
+        /// <summary>
+        /// Создание менеджера операторов.
+        /// </summary>
         public IOperatorManager CreateOperatorManager() => new OperatorManager(this);
 
         /// <summary>

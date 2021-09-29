@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
@@ -47,13 +48,10 @@ namespace AM
 
         /// <inheritdoc cref="object.ToString" />
         [Pure]
-        public override string ToString()
-        {
-            string result = $"{Name.ToVisibleString()}: {Content?.Length} bytes";
-
-            return result;
-        }
+        public override string ToString() => $"{Name.ToVisibleString()}: {Content?.Length} bytes";
 
         #endregion
-    }
-}
+
+    } // class BinaryAttachment
+
+} // namespace AM

@@ -13,7 +13,7 @@
 
 #region Using directives
 
-using System.Text;
+using AM.Text;
 
 #endregion
 
@@ -80,49 +80,48 @@ namespace AM.Net
                 string number
             )
         {
-            var result = new StringBuilder(number.Length);
+            var builder = StringBuilderPool.Shared.Get();
             if (number.FirstChar() == '+')
             {
-                result.Append('+');
+                builder.Append('+');
             }
 
             if (number.FirstChar() == '8')
             {
-                result.Append('+');
-                result.Append('7');
-                number = number.Substring(1);
+                builder.Append ('+');
+                builder.Append ('7');
+                number = number.Substring (1);
             }
 
             foreach (var c in number)
             {
                 if (c.IsArabicDigit())
                 {
-                    result.Append(c);
+                    builder.Append (c);
                 }
             }
 
-            if (result.Length > 10 && result[0] == '7')
+            if (builder.Length > 10 && builder[0] == '7')
             {
-                result.Insert(0, '+');
+                builder.Insert (0, '+');
             }
 
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Верификация (приблизительная) номера телефона.
-        /// </summary>
-        public static bool VerifyNumber
-            (
-                string number
-            )
-        {
-            var result = number.StartsWith("8")
-                         || number.StartsWith("+7");
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return(builder);
 
             return result;
-        }
+
+        } // method CleanupNumber
+
+        /// <summary>
+        /// Верификация (весьма приблизительная) номера телефона.
+        /// </summary>
+        public static bool VerifyNumber (string number) =>
+            (number.StartsWith ("8") || number.StartsWith ("+7"))
+            &&  number.Length is >= 10 and <= 15;
 
         #endregion
-    }
-}
+
+    } // class PhoneUtility
+
+} // namespace AM

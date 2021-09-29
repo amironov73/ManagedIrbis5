@@ -2,23 +2,25 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
+// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* SocketUtility.cs --
+/* SocketUtility.cs -- работа с сокетами
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+
+using AM.Core.Properties;
 
 #endregion
 
@@ -27,7 +29,7 @@ using System.Net.Sockets;
 namespace AM.Net
 {
     /// <summary>
-    ///
+    /// Работа с сокетами.
     /// </summary>
     public static class SocketUtility
     {
@@ -36,7 +38,6 @@ namespace AM.Net
         /// <summary>
         /// Пытаемся разрешить IP-адрес.
         /// </summary>
-        /// <returns>Resolved IP address of the host.</returns>
         public static IPAddress ResolveAddress
             (
                 string address,
@@ -44,7 +45,7 @@ namespace AM.Net
                 IPAddress local
             )
         {
-            if (address.IsOneOf("localhost", "local", "(local)"))
+            if (address.IsOneOf ("localhost", "local", "(local)"))
             {
                 return local;
             }
@@ -53,42 +54,47 @@ namespace AM.Net
 
             try
             {
-                result = IPAddress.Parse(address);
+                result = IPAddress.Parse (address);
                 if (result.AddressFamily != expectedFamily)
                 {
                     Magna.Error
                         (
-                            nameof(SocketUtility) + "::" + nameof(ResolveAddress)
+                            nameof (SocketUtility) + "::" + nameof (ResolveAddress)
                             + ": expected=" + expectedFamily
                             + ", got=" + result.AddressFamily
                         );
 
-                    throw new Exception("Can't resolve IP address");
-                }
-            }
+                    throw new ArsMagnaException (Resources.CantResolveAddress);
+
+                } // if
+
+            } // try
+
             catch
             {
-                var entry  = Dns.GetHostEntry(address);
+                var entry  = Dns.GetHostEntry (address);
                 result = entry.AddressList.FirstOrDefault
                     (
                         item => item.AddressFamily == expectedFamily
                     );
-            }
 
-            if (ReferenceEquals(result, null))
+            } // catch
+
+            if (ReferenceEquals (result, null))
             {
                 Magna.Error
                     (
-                        nameof(SocketUtility) + "::" + nameof(ResolveAddress)
-                        + ": can't resolve address"
+                        nameof (SocketUtility) + "::" + nameof (ResolveAddress)
+                        + Resources.CantResolveAddress2
                     );
 
-                throw new ArsMagnaException("Can't resolve address");
-            }
+                throw new ArsMagnaException (Resources.CantResolveAddress);
+
+            } // if
 
             return result;
-        }
 
+        } // method ResolveAddress
 
         /// <summary>
         /// Пытаемся разрешить IPv4-адрес.
@@ -103,7 +109,7 @@ namespace AM.Net
             ResolveAddress (address, AddressFamily.InterNetworkV6, IPAddress.IPv6Loopback);
 
         /// <summary>
-        /// Receive specified amount of data from the socket.
+        /// Чтение из сокета строго указанного количества байтов.
         /// </summary>
         public static byte[] ReceiveExact
             (
@@ -111,37 +117,39 @@ namespace AM.Net
                 int dataLength
             )
         {
-            using var result = new MemoryStream(dataLength);
-            byte[] buffer = new byte[32 * 1024];
+            using var result = new MemoryStream (dataLength);
+            var buffer = new byte [32 * 1024];
 
             while (dataLength > 0)
             {
-                int readed = socket.Receive(buffer);
+                var readed = socket.Receive (buffer);
 
                 if (readed <= 0)
                 {
                     Magna.Error
-                    (
-                        "SocketUtility::ReceiveExact: "
-                        + "error reading socket"
-                    );
+                        (
+                            nameof(SocketUtility)
+                            + "::"
+                            + nameof(ReceiveExact)
+                            + Resources.ErrorReadingSocket
+                        );
 
-                    throw new ArsMagnaException
-                    (
-                        "Socket reading error"
-                    );
-                }
+                    throw new ArsMagnaException (Resources.SocketReadingError);
+
+                } // if
 
                 result.Write(buffer, 0, readed);
 
                 dataLength -= readed;
-            }
+
+            } // while
 
             return result.ToArray();
-        }
+
+        } // method ReceiveExact
 
         /// <summary>
-        /// Read from the socket as many data as possible.
+        /// Чтение данных из сокета вплоть до его закрытия.
         /// </summary>
         public static byte[] ReceiveToEnd
             (
@@ -149,11 +157,13 @@ namespace AM.Net
             )
         {
             using var stream = new MemoryStream();
+
             return socket.ReceiveToEnd (stream);
-        }
+
+        } // method ReceiveToEnd
 
         /// <summary>
-        /// Read from the socket as many data as possible.
+        /// Чтение данных из сокета вплоть до его закрытия.
         /// </summary>
         public static byte[] ReceiveToEnd
             (
@@ -161,25 +171,24 @@ namespace AM.Net
                 MemoryStream stream
             )
         {
-            byte[] buffer = new byte[32 * 1024];
+            var buffer = new byte[32 * 1024];
 
             while (true)
             {
-                int readed = socket.Receive(buffer);
-
+                var readed = socket.Receive(buffer);
                 if (readed < 0)
                 {
                     Magna.Error
                         (
-                            "SocketUtility::ReceiveToEnd: "
-                            + "error reading socket"
+                            nameof (SocketUtility)
+                            + "::"
+                            + nameof(ReceiveToEnd)
+                            + Resources.ErrorReadingSocket
                         );
 
-                    throw new ArsMagnaException
-                        (
-                            "Socket reading error"
-                        );
-                }
+                    throw new ArsMagnaException (Resources.SocketReadingError);
+
+                } // if
 
                 if (readed == 0)
                 {
@@ -187,13 +196,15 @@ namespace AM.Net
                 }
 
                 stream.Write(buffer, 0, readed);
-            }
+
+            } // while
 
             return stream.ToArray();
-        }
 
+        } // method ReceiveToEnd
 
         #endregion
-    }
 
-}
+    } // class SocketUtility
+
+} // namespace AM.Net

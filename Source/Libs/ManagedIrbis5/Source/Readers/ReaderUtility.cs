@@ -19,7 +19,7 @@ using System.Linq;
 using System.Text;
 
 using AM;
-using AM.Network;
+using AM.Net;
 
 using ManagedIrbis.Infrastructure;
 

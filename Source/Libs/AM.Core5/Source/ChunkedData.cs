@@ -6,10 +6,13 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedType.Global
 
-/* ChunkedData.cs -- данные как массив чанков
+/* ChunkedData.cs -- данные как список чанков
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,35 +29,28 @@ using System.Linq;
 namespace AM
 {
     /// <summary>
-    /// Data in chunks.
+    /// Данные как список чанков.
     /// </summary>
-    public class ChunkedData<T>
+    public sealed class ChunkedData<T>
     {
         #region Properties
 
         /// <summary>
-        /// List of chunks.
+        /// Список чанков.
         /// </summary>
-        public List<Memory<T>> Chunks { get; } = new List<Memory<T>>();
+        public List<Memory<T>> Chunks { get; } = new ();
 
         /// <summary>
-        /// Total size.
+        /// Общий размер данных (байты).
         /// </summary>
-        public int Size
-        {
-            get
-            {
-                int result = Chunks.Sum(chunk => chunk.Length);
-                return result;
-            }
-        }
+        public int Size => Chunks.Sum (chunk => chunk.Length);
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Append the chunk.
+        /// Добавление чанка.
         /// </summary>
         public ChunkedData<T> Append
             (
@@ -62,10 +58,13 @@ namespace AM
             )
         {
             Chunks.Add (chunk);
-            return this;
-        }
 
+            return this;
+
+        } // method Append
 
         #endregion
-    }
-}
+
+    } // class ChunkeData
+
+} // namespace AM

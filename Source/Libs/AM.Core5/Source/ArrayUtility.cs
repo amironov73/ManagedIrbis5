@@ -286,7 +286,7 @@ namespace AM
         }
 
         /// <summary>
-        /// Get span of the array.
+        /// Извлечение непрерывного диапазона элементов массива.
         /// </summary>
         public static T[] GetSpan<T>
             (
@@ -295,27 +295,30 @@ namespace AM
                 int count
             )
         {
-            Sure.NonNegative(offset, nameof(offset));
-            Sure.NonNegative(count, nameof(count));
+            Sure.NonNegative (offset, nameof (offset));
+            Sure.NonNegative (count, nameof (count));
 
             if (offset > array.Length)
             {
-                return new T[0];
+                return Array.Empty<T>();
             }
+
             if (offset + count > array.Length)
             {
                 count = array.Length - offset;
             }
+
             if (count <= 0)
             {
-                return new T[0];
+                return Array.Empty<T>();
             }
 
             var result = new T[count];
-            Array.Copy(array, offset, result, 0, count);
+            Array.Copy (array, offset, result, 0, count);
 
             return result;
-        }
+
+        } // method GetSpan
 
         /// <summary>
         /// Get span of the array.
@@ -330,7 +333,7 @@ namespace AM
 
             if (offset >= array.Length)
             {
-                return new T[0];
+                return Array.Empty<T>();
             }
 
             var count = array.Length - offset;
@@ -374,30 +377,30 @@ namespace AM
             for (var i = 0; i < arrays.Length; i++)
             {
                 var item = arrays[i];
-                if (ReferenceEquals(item, null))
+                if (ReferenceEquals (item, null))
                 {
                     Magna.Error
                         (
-                            nameof(ArrayUtility)
+                            nameof (ArrayUtility)
                             + "::"
-                            + nameof(Merge)
+                            + nameof (Merge)
                             + ": array["
                             + i
                             + "] is null"
                         );
 
-                    throw new ArgumentNullException(nameof(arrays));
+                    throw new ArgumentNullException (nameof (arrays));
                 }
 
                 resultLength += item.Length;
-            }
+
+            } // for
 
             var result = new T[resultLength];
             var offset = 0;
-            for (var i = 0; i < arrays.Length; i++)
+            foreach (var item in arrays)
             {
-                var item = arrays[i]!;
-                item.CopyTo(result, offset);
+                item!.CopyTo (result, offset);
                 offset += item.Length;
             }
 
@@ -408,13 +411,7 @@ namespace AM
         /// <summary>
         /// Безопасное вычисление длины массива.
         /// </summary>
-        public static int SafeLength<T>
-            (
-                this T[]? array
-            )
-        {
-            return array?.Length ?? 0;
-        }
+        public static int SafeLength<T> (this T[]? array) => array?.Length ?? 0;
 
         /// <summary>
         /// Разбиение массива на (почти) равные части.
