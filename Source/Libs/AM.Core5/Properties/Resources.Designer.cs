@@ -39,7 +39,7 @@ namespace AM.Core.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AM.Core.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AM.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -59,7 +59,7 @@ namespace AM.Core.Properties {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Address must be IPv4.
         /// </summary>
@@ -93,6 +93,33 @@ namespace AM.Core.Properties {
         internal static string AddressMustBeIPv6ButGiven {
             get {
                 return ResourceManager.GetString("AddressMustBeIPv6ButGiven", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t get property: {0}.
+        /// </summary>
+        internal static string Can_t_get_property {
+            get {
+                return ResourceManager.GetString("Can_t_get_property", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to : can&apos;t find field  .
+        /// </summary>
+        internal static string CantFindField {
+            get {
+                return ResourceManager.GetString("CantFindField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to : can&apos;t find property .
+        /// </summary>
+        internal static string CantFindProperty {
+            get {
+                return ResourceManager.GetString("CantFindProperty", resourceCulture);
             }
         }
         
@@ -156,6 +183,24 @@ namespace AM.Core.Properties {
         internal static string ErrorReadingSocket {
             get {
                 return ResourceManager.GetString("ErrorReadingSocket", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No method for {0}.
+        /// </summary>
+        internal static string No_method_for {
+            get {
+                return ResourceManager.GetString("No_method_for", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resource {0} doesn&apos;t exist..
+        /// </summary>
+        internal static string ResourceDoesntExist {
+            get {
+                return ResourceManager.GetString("ResourceDoesntExist", resourceCulture);
             }
         }
         

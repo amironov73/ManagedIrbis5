@@ -16,9 +16,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Resources;
+using AM.Core.Properties;
 
 #endregion
 
@@ -42,32 +45,34 @@ namespace AM.Reflection
             )
         {
             const BindingFlags bindingFlags = BindingFlags.Instance
-                                              | BindingFlags.Public | BindingFlags.NonPublic;
-            var propertyInfo = typeof(TObject).GetProperty(propertyName, bindingFlags);
+                | BindingFlags.Public | BindingFlags.NonPublic;
+            var propertyInfo = typeof (TObject).GetProperty (propertyName, bindingFlags);
             if (propertyInfo is null)
             {
-                throw new ArgumentException($"Can't get property: {propertyName}");
+                throw new ArgumentException (string.Format (Resources.Can_t_get_property, propertyName));
             }
 
             return CreateGetter<TObject, TValue>(propertyInfo);
-        }
+
+        } // method CreateGetter
 
         /// <summary>
         /// Создание типизированного геттера для указанного свойства объекта.
         /// </summary>
         public static Func<TObject, TValue> CreateGetter<TObject, TValue>
             (
-                PropertyInfo propertyInfo
+                this PropertyInfo propertyInfo
             )
         {
             var method = propertyInfo.GetMethod;
             if (method is null)
             {
-                throw new ArgumentException($"No method for {propertyInfo.Name}");
+                throw new ArgumentException (string.Format (Resources.No_method_for, propertyInfo.Name));
             }
 
             return method.CreateDelegate<Func<TObject, TValue>>();
-        }
+
+        } // method CreateGetter
 
         /// <summary>
         /// Создание типизированного сеттера для указанного свойства объекта.
@@ -82,7 +87,7 @@ namespace AM.Reflection
             var propertyInfo = typeof(TObject).GetProperty(propertyName, bindingFlags);
             if (propertyInfo is null)
             {
-                throw new ArgumentException($"Can't get property: {propertyName}");
+                throw new ArgumentException(string.Format(Resources.Can_t_get_property, propertyName));
             }
 
             return CreateSetter<TObject, TValue>(propertyInfo);
@@ -99,7 +104,7 @@ namespace AM.Reflection
             var method = propertyInfo.SetMethod;
             if (method is null)
             {
-                throw new ArgumentException($"No method for {propertyInfo.Name}");
+                throw new ArgumentException(string.Format(Resources.No_method_for, propertyInfo.Name));
             }
 
             return method.CreateDelegate<Action<TObject, TValue>>();
@@ -119,7 +124,7 @@ namespace AM.Reflection
             var propertyInfo = type.GetProperty(propertyName, bindingFlags);
             if (propertyInfo is null)
             {
-                throw new ArgumentException($"Can't get property: {propertyName}");
+                throw new ArgumentException(string.Format(Resources.Can_t_get_property, propertyName));
             }
 
             return CreateUntypedGetter(propertyInfo);
@@ -137,7 +142,7 @@ namespace AM.Reflection
             var method = propertyInfo.GetMethod;
             if (method is null)
             {
-                throw new ArgumentException($"No method for {propertyInfo.Name}");
+                throw new ArgumentException(string.Format(Resources.No_method_for, propertyInfo.Name));
             }
 
             // Конструируем лямбду
@@ -171,7 +176,7 @@ namespace AM.Reflection
             var propertyInfo = type.GetProperty(propertyName, bindingFlags);
             if (propertyInfo is null)
             {
-                throw new ArgumentException($"Can't get property: {propertyName}");
+                throw new ArgumentException(string.Format(Resources.Can_t_get_property, propertyName));
             }
 
             return CreateUntypedSetter(propertyInfo);
@@ -189,7 +194,7 @@ namespace AM.Reflection
             var method = propertyInfo.SetMethod;
             if (method is null)
             {
-                throw new ArgumentException($"No method for {propertyInfo.Name}");
+                throw new ArgumentException(string.Format(Resources.No_method_for, propertyInfo.Name));
             }
 
             // Конструируем лямбду
@@ -372,16 +377,43 @@ namespace AM.Reflection
             {
                 Magna.Error
                     (
-                        "ReflectionUtility::GeFieldValue: "
-                        + "can't find field="
+                        nameof (ReflectionUtility) + "::" + nameof (GetFieldValue)
+                        + Resources.CantFindField
                         + fieldName
                     );
 
-                throw new ArgumentException("fieldName");
+                throw new ArgumentException (nameof (fieldName));
             }
 
-            return fieldInfo.GetValue(target);
-        }
+            return fieldInfo.GetValue (target);
+
+        } // method GetFieldValue
+
+        /// <summary>
+        /// Чтение строки из ресурсов манифеста сборки.
+        /// </summary>
+        public static string GetManifestResourceString
+            (
+                this Assembly assembly,
+                string resourceName
+            )
+        {
+            var stream = assembly.GetManifestResourceStream (resourceName);
+            if (stream is null)
+            {
+                throw new MissingManifestResourceException
+                    (
+                        string.Format (Resources.ResourceDoesntExist, resourceName)
+                    );
+            }
+
+            using (stream)
+            using (var reader = new StreamReader (stream))
+            {
+                return reader.ReadToEnd();
+            }
+
+        } // method GetManifestResourceString
 
         /// <summary>
         /// Determines whether the specified type has the attribute.
@@ -405,7 +437,7 @@ namespace AM.Reflection
         /// </summary>
         public static bool HasAttribute<T>
             (
-                MemberInfo member
+                this MemberInfo member
             )
             where T : Attribute
         {
@@ -437,16 +469,18 @@ namespace AM.Reflection
             {
                 Magna.Error
                     (
-                        "ReflectionUtility::SetFieldValue: "
-                        + "can't find field="
+                        nameof (ReflectionUtility) + "::" + nameof (SetFieldValue)
+                        + Resources.CantFindField
                         + fieldName
                     );
 
-                throw new ArgumentException("fieldName");
-            }
+                throw new ArgumentException (nameof (fieldName));
 
-            fieldInfo.SetValue(target, value);
-        }
+            } // if
+
+            fieldInfo.SetValue (target, value);
+
+        } // method SetFieldValue
 
         /// <summary>
         /// Get property value either public or private.
@@ -463,46 +497,49 @@ namespace AM.Reflection
                     BindingFlags.Public | BindingFlags.NonPublic
                     | BindingFlags.Instance | BindingFlags.Static
                 );
-            if (ReferenceEquals(propertyInfo, null))
+            if (ReferenceEquals (propertyInfo, null))
             {
                 Magna.Error
                     (
-                        "ReflectionUtility::GetPropertyValue: "
-                        + "can't find property="
+                        nameof (ReflectionUtility) + "::" + nameof (GetPropertyValue)
+                        + Resources.CantFindProperty
                         + propertyName
                     );
 
-                throw new ArgumentException("propertyName");
-            }
+                throw new ArgumentException (nameof(propertyName));
 
-            return propertyInfo.GetValue(target, null);
-        }
+            } // if
+
+            return propertyInfo.GetValue (target, null);
+
+        } // method GetPropertyValue
 
         /// <summary>
-        /// Gets the properties and fields.
+        /// Получение массива свойств и полей для указанного типа.
         /// </summary>
         public static PropertyOrField[] GetPropertiesAndFields
             (
                 Type type,
-                BindingFlags bindingFlags
+                BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance
             )
         {
             var result = new List<PropertyOrField>();
-            foreach (PropertyInfo property in type.GetProperties(bindingFlags))
+            foreach (var property in type.GetProperties (bindingFlags))
             {
-                result.Add(new PropertyOrField(property));
+                result.Add (new PropertyOrField(property));
             }
 
-            foreach (FieldInfo field in type.GetFields(bindingFlags))
+            foreach (var field in type.GetFields(bindingFlags))
             {
-                result.Add(new PropertyOrField(field));
+                result.Add (new PropertyOrField(field));
             }
 
             return result.ToArray();
-        }
+
+        } // method GetPropertiesAndFields
 
         /// <summary>
-        /// Set property value either public or private.
+        /// Установка значения свойства (неважно, публичного или приватного).
         /// </summary>
         public static void SetPropertyValue<TTarget, TValue>
             (
@@ -517,20 +554,22 @@ namespace AM.Reflection
                     BindingFlags.Public | BindingFlags.NonPublic
                     | BindingFlags.Instance | BindingFlags.Static
                 );
-            if (ReferenceEquals(propertyInfo, null))
+            if (ReferenceEquals (propertyInfo, null))
             {
                 Magna.Error
                     (
-                        "ReflectionUtility::SetPropertyValue: "
-                        + "can't find property="
+                        nameof (ReflectionUtility) + "::" + nameof (SetPropertyValue)
+                        + Resources.CantFindProperty
                         + propertyName
                     );
 
-                throw new ArgumentException("propertyName");
-            }
+                throw new ArgumentException (nameof (propertyName));
 
-            propertyInfo.SetValue(target, value, null);
-        }
+            } // if
+
+            propertyInfo.SetValue (target, value, null);
+
+        } // method SetPropertyValue
 
         #endregion
 

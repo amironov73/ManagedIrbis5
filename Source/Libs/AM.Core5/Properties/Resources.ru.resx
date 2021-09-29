@@ -133,4 +133,19 @@
   <data name="ErrorReadingSocket" xml:space="preserve">
     <value>: ошибка чтения из сокета</value>
   </data>
+  <data name="CantFindProperty" xml:space="preserve">
+      <value>: невозможно найти свойство </value>
+  </data>
+  <data name="Can_t_get_property" xml:space="preserve">
+      <value>Невозможно получить значение свойства {0}</value>
+  </data>
+  <data name="No_method_for" xml:space="preserve">
+      <value>Нет метода для {0}</value>
+  </data>
+  <data name="CantFindField" xml:space="preserve">
+      <value>: невозможно найти поле </value>
+  </data>
+  <data name="ResourceDoesntExist" xml:space="preserve">
+      <value>Ресурс {0} не существует</value>
+  </data>
 </root>
