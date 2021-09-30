@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System;
 using System.Diagnostics;
 using System.IO;
 
@@ -93,7 +94,7 @@ namespace ManagedIrbis.Direct
                 Stream stream
             )
         {
-            MstRecordLeader64 result = new MstRecordLeader64
+            var result = new MstRecordLeader64
             {
                 Mfn = stream.ReadInt32Network(),
                 Length = stream.ReadInt32Network(),
@@ -108,7 +109,32 @@ namespace ManagedIrbis.Direct
             //    (LeaderSize + result.Nvf * MstDictionaryEntry64.EntrySize));
 
             return result;
-        }
+
+        } // method Read
+
+        /// <summary>
+        /// Read the record leader.
+        /// </summary>
+        public static MstRecordLeader64 Parse
+            (
+                ReadOnlySpan<byte> bytes
+            )
+        {
+            // var navigator = new ValueByteNavigator (bytes);
+            var result = new MstRecordLeader64
+            {
+                // Mfn = stream.ReadInt32Network(),
+                // Length = stream.ReadInt32Network(),
+                // Previous = stream.ReadInt64Network(),
+                // Base = stream.ReadInt32Network(),
+                // Nvf = stream.ReadInt32Network(),
+                // Version = stream.ReadInt32Network(),
+                // Status = stream.ReadInt32Network()
+            };
+
+            return result;
+
+        } // method Parse
 
         /// <summary>
         /// Write the record leader.

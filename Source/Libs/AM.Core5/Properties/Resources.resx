@@ -149,4 +149,10 @@
     <data name="ResourceDoesntExist" xml:space="preserve">
         <value>Resource {0} doesn't exist.</value>
     </data>
+    <data name="BadSymbol" xml:space="preserve">
+        <value>Bad symbol</value>
+    </data>
+    <data name="UnexpectedMode" xml:space="preserve">
+        <value>unexpected mode=</value>
+    </data>
 </root>

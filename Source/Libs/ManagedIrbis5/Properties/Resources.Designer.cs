@@ -39,7 +39,7 @@ namespace ManagedIrbis.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ManagedIrbis5.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ManagedIrbis.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -59,7 +59,7 @@ namespace ManagedIrbis.Properties {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Not connected.
         /// </summary>
@@ -849,6 +849,15 @@ namespace ManagedIrbis.Properties {
         internal static string SmartRead_Readed {
             get {
                 return ResourceManager.GetString("SmartRead_Readed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to unexpected mode=.
+        /// </summary>
+        internal static string UnexpectedMode {
+            get {
+                return ResourceManager.GetString("UnexpectedMode", resourceCulture);
             }
         }
         

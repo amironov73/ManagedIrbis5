@@ -24,6 +24,8 @@ using System.Runtime.InteropServices;
 using AM;
 using AM.IO;
 
+using ManagedIrbis.Properties;
+
 #endregion
 
 #nullable enable
@@ -37,20 +39,20 @@ namespace ManagedIrbis.Direct
     {
         #region Private members
 
-        private static readonly byte[] _l01Content32 = { };
-        private static readonly byte[] _l02Content32 = { };
-        private static readonly byte[] _n01Content32 = { };
-        private static readonly byte[] _n02Content32 = { };
-        private static readonly byte[] _cntContent32 = { };
-        private static readonly byte[] _ifpContent32 = { };
-        private static readonly byte[] _mstContent32 = { };
-        private static readonly byte[] _xrfContent32 = { };
+        private static readonly byte[] _l01Content32 = Array.Empty<byte>();
+        private static readonly byte[] _l02Content32 = Array.Empty<byte>();
+        private static readonly byte[] _n01Content32 = Array.Empty<byte>();
+        private static readonly byte[] _n02Content32 = Array.Empty<byte>();
+        private static readonly byte[] _cntContent32 = Array.Empty<byte>();
+        private static readonly byte[] _ifpContent32 = Array.Empty<byte>();
+        private static readonly byte[] _mstContent32 = Array.Empty<byte>();
+        private static readonly byte[] _xrfContent32 = Array.Empty<byte>();
 
-        private static readonly byte[] _ifpContent64 = { };
-        private static readonly byte[] _l01Content64 = { };
-        private static readonly byte[] _n01Content64 = { };
-        private static readonly byte[] _xrfContent64 = { };
-        private static readonly byte[] _mstContent64 = { };
+        private static readonly byte[] _ifpContent64 = Array.Empty<byte>();
+        private static readonly byte[] _l01Content64 = Array.Empty<byte>();
+        private static readonly byte[] _n01Content64 = Array.Empty<byte>();
+        private static readonly byte[] _xrfContent64 = Array.Empty<byte>();
+        private static readonly byte[] _mstContent64 = Array.Empty<byte>();
 
         #endregion
 
@@ -66,13 +68,14 @@ namespace ManagedIrbis.Direct
             )
         {
             second = second.ConvertSlashes();
-            if (Path.IsPathRooted(second) || Path.IsPathFullyQualified(second))
+            if (Path.IsPathRooted (second) || Path.IsPathFullyQualified (second))
             {
                 return second;
             }
 
-            return Path.Combine(first.ConvertSlashes(), second);
-        }
+            return Path.Combine (first.ConvertSlashes(), second);
+
+        } // method CombinePath
 
         /// <summary>
         /// Сборка пути к файлу из компонентов.
@@ -85,19 +88,20 @@ namespace ManagedIrbis.Direct
             )
         {
             third = third.ConvertSlashes();
-            if (Path.IsPathRooted(third) || Path.IsPathFullyQualified(third))
+            if (Path.IsPathRooted (third) || Path.IsPathFullyQualified (third))
             {
                 return third;
             }
 
             second = second.ConvertSlashes();
-            if (Path.IsPathRooted(second) || Path.IsPathFullyQualified(second))
+            if (Path.IsPathRooted (second) || Path.IsPathFullyQualified (second))
             {
-                return Path.Combine(second, third);
+                return Path.Combine (second, third);
             }
 
-            return Path.Combine(first.ConvertSlashes(), second, third);
-        }
+            return Path.Combine (first.ConvertSlashes(), second, third);
+
+        } // method CombinePath
 
         /// <summary>
         /// Создание акцессора.
@@ -111,92 +115,94 @@ namespace ManagedIrbis.Direct
         {
             databaseName ??= provider.Database;
 
-            var fileName = provider.MapDatabase(databaseName);
+            var fileName = provider.MapDatabase (databaseName);
             if (fileName is null)
             {
                 // TODO: выставлять код ошибки
-                throw new FileNotFoundException(databaseName);
+                throw new FileNotFoundException (databaseName);
             }
 
-            fileName = Path.Combine(fileName, (databaseName ?? provider.Database) + ".mst");
-            fileName = Unix.FindFileOrThrow(fileName);
+            fileName = Path.Combine (fileName, (databaseName ?? provider.Database) + ".mst");
+            fileName = Unix.FindFileOrThrow (fileName);
 
-            return new DirectAccess64(fileName, provider.Mode);
+            return new DirectAccess64 (fileName, provider.Mode);
 
         } // method CreateAccessor
 
         /// <summary>
-        /// Create 8 database files for IRBIS32.
+        /// Создание 8 файлов, необходимых для базы данных ИРБИС32.
         /// </summary>
         public static void CreateDatabase32
             (
                 string path
             )
         {
-            Sure.NotNullNorEmpty(path, nameof(path));
+            Sure.NotNullNorEmpty (path, nameof (path));
 
             var cntFile = path + ".cnt";
-            FileUtility.DeleteIfExists(cntFile);
-            File.WriteAllBytes(cntFile, _cntContent32);
+            FileUtility.DeleteIfExists (cntFile);
+            File.WriteAllBytes (cntFile, _cntContent32);
 
             var ifpFile = path + ".ifp";
-            FileUtility.DeleteIfExists(ifpFile);
-            File.WriteAllBytes(ifpFile, _ifpContent32);
+            FileUtility.DeleteIfExists (ifpFile);
+            File.WriteAllBytes (ifpFile, _ifpContent32);
 
             var l01File = path + ".l01";
-            FileUtility.DeleteIfExists(l01File);
-            File.WriteAllBytes(l01File, _l01Content32);
+            FileUtility.DeleteIfExists (l01File);
+            File.WriteAllBytes (l01File, _l01Content32);
 
             var l02File = path + ".l02";
-            FileUtility.DeleteIfExists(l02File);
-            File.WriteAllBytes(l02File, _l02Content32);
+            FileUtility.DeleteIfExists (l02File);
+            File.WriteAllBytes (l02File, _l02Content32);
 
             var mstFile = path + ".mst";
-            FileUtility.DeleteIfExists(mstFile);
-            File.WriteAllBytes(mstFile, _mstContent32);
+            FileUtility.DeleteIfExists (mstFile);
+            File.WriteAllBytes (mstFile, _mstContent32);
 
             var n01File = path + ".n01";
-            FileUtility.DeleteIfExists(n01File);
-            File.WriteAllBytes(n01File, _n01Content32);
+            FileUtility.DeleteIfExists (n01File);
+            File.WriteAllBytes (n01File, _n01Content32);
 
             var n02File = path + ".n02";
-            FileUtility.DeleteIfExists(n02File);
-            File.WriteAllBytes(n02File, _n02Content32);
+            FileUtility.DeleteIfExists (n02File);
+            File.WriteAllBytes (n02File, _n02Content32);
 
             var xrfFile = path + ".xrf";
-            FileUtility.DeleteIfExists(xrfFile);
-            File.WriteAllBytes(xrfFile, _xrfContent32);
+            FileUtility.DeleteIfExists (xrfFile);
+            File.WriteAllBytes (xrfFile, _xrfContent32);
+
         } // method CreateDatabase32
 
         /// <summary>
-        /// Create 5 database files for IRBIS64.
+        /// Создание 5 файлов, необходимых для базы данных ИРБИС64.
         /// </summary>
         public static void CreateDatabase64
             (
                 string path
             )
         {
-            Sure.NotNullNorEmpty(path, nameof(path));
+            Sure.NotNullNorEmpty (path, nameof (path));
 
             var ifpFile = path + ".ifp";
-            FileUtility.DeleteIfExists(ifpFile);
-            File.WriteAllBytes(ifpFile, _ifpContent64);
+            FileUtility.DeleteIfExists (ifpFile);
+            File.WriteAllBytes (ifpFile, _ifpContent64);
 
             var l01File = path + ".l01";
-            FileUtility.DeleteIfExists(l01File);
-            File.WriteAllBytes(l01File, _l01Content64);
+            FileUtility.DeleteIfExists (l01File);
+            File.WriteAllBytes (l01File, _l01Content64);
 
             var mstFile = path + ".mst";
-            FileUtility.DeleteIfExists(mstFile);
-            File.WriteAllBytes(mstFile, _mstContent64);
+            FileUtility.DeleteIfExists (mstFile);
+            File.WriteAllBytes (mstFile, _mstContent64);
 
             var n01File = path + ".n01";
-            FileUtility.DeleteIfExists(n01File);
-            File.WriteAllBytes(n01File, _n01Content64);
+            FileUtility.DeleteIfExists (n01File);
+            File.WriteAllBytes (n01File, _n01Content64);
 
             var xrfFile = path + ".xrf";
-            FileUtility.DeleteIfExists(xrfFile);
-            File.WriteAllBytes(xrfFile, _xrfContent64);
+            FileUtility.DeleteIfExists (xrfFile);
+            File.WriteAllBytes (xrfFile, _xrfContent64);
+
         } // method CreateDatabase64
 
         /// <summary>
@@ -209,15 +215,19 @@ namespace ManagedIrbis.Direct
         {
             if (BitConverter.IsLittleEndian)
             {
-                var span = MemoryMarshal.Cast<long, int>(MemoryMarshal.CreateSpan(ref offset, 1));
-                span[0] = BinaryPrimitives.ReverseEndianness(span[0]);
-                span[1] = BinaryPrimitives.ReverseEndianness(span[1]);
-            }
+                var span = MemoryMarshal.Cast<long, int>
+                    (
+                        MemoryMarshal.CreateSpan (ref offset, 1)
+                    );
+                span[0] = BinaryPrimitives.ReverseEndianness (span[0]);
+                span[1] = BinaryPrimitives.ReverseEndianness (span[1]);
+
+            } // if
 
         } // method FixNetwork64
 
         /// <summary>
-        /// Open specified file.
+        /// Открытие указанного файла в указанном режиме.
         /// </summary>
         public static Stream OpenFile
             (
@@ -225,33 +235,34 @@ namespace ManagedIrbis.Direct
                 DirectAccessMode mode
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName, nameof (fileName));
 
             Stream result;
             switch (mode)
             {
                 case DirectAccessMode.Exclusive:
-                    result = InsistentFile.OpenForExclusiveWrite(fileName);
+                    result = InsistentFile.OpenForExclusiveWrite (fileName);
                     break;
 
                 case DirectAccessMode.Shared:
-                    result = InsistentFile.OpenForSharedWrite(fileName);
+                    result = InsistentFile.OpenForSharedWrite (fileName);
                     break;
 
                 case DirectAccessMode.ReadOnly:
-                    result = InsistentFile.OpenForSharedRead(fileName);
+                    result = InsistentFile.OpenForSharedRead (fileName);
                     break;
 
                 default:
                     Magna.Error
                         (
                             nameof(DirectoryUtility) + "::" + nameof(OpenFile)
-                            + "unexpected mode="
+                            + Resources.UnexpectedMode
                             + mode
                         );
 
                     throw new IrbisException($"Unexpected mode={mode}");
-            }
+
+            } // switch
 
             result = new NonBufferedStream(result);
 
@@ -268,12 +279,13 @@ namespace ManagedIrbis.Direct
                 long position
             )
         {
-            var result = accessor.ReadInt32(position);
-            var buffer = BitConverter.GetBytes(result);
-            StreamUtility.NetworkToHost32(buffer, 0);
-            result = BitConverter.ToInt32(buffer, 0);
+            var result = accessor.ReadInt32 (position);
+            var buffer = BitConverter.GetBytes (result);
+            StreamUtility.NetworkToHost32 (buffer, 0);
+            result = BitConverter.ToInt32 (buffer, 0);
 
             return result;
+
         } // method ReadNetworkInt32
 
         /// <summary>
@@ -284,14 +296,16 @@ namespace ManagedIrbis.Direct
                 this MemoryMappedViewStream stream
             )
         {
-            var bytes = stackalloc byte[4];
+            var bytes = stackalloc byte [4];
             var buffer = new Span<byte> (bytes, 4);
-            stream.Read(buffer);
-            return BinaryPrimitives.ReadInt32BigEndian(buffer);
+            stream.Read (buffer);
+
+            return BinaryPrimitives.ReadInt32BigEndian (buffer);
+
         } // method ReadNetworkInt32
 
         /// <summary>
-        ///
+        /// Чтение 64-битного целого в формате ИРБИС64.
         /// </summary>
         public static long ReadNetworkInt64
             (
@@ -299,33 +313,35 @@ namespace ManagedIrbis.Direct
                 long position
             )
         {
-            var result = accessor.ReadInt64(position);
-            var buffer = BitConverter.GetBytes(result);
-            StreamUtility.NetworkToHost64(buffer, 0);
-            result = BitConverter.ToInt64(buffer, 0);
+            var result = accessor.ReadInt64 (position);
+            var buffer = BitConverter.GetBytes (result);
+            StreamUtility.NetworkToHost64 (buffer, 0);
+            result = BitConverter.ToInt64 (buffer, 0);
 
             return result;
-        }
+
+        } // method ReadNetworkInt64
 
         /// <summary>
-        ///
+        /// Чтение 64-битного целого в формате ИРБИС64.
         /// </summary>
         public static unsafe long ReadNetworkInt64
             (
                 this MemoryMappedViewStream stream
             )
         {
-            var bytes = stackalloc byte[8];
-            var buffer = new Span<byte>(bytes, 8);
-            stream.Read(buffer);
-            StreamUtility.NetworkToHost64(buffer);
-            var result = BitConverter.ToInt64(buffer);
+            var bytes = stackalloc byte [8];
+            var buffer = new Span<byte> (bytes, 8);
+            stream.Read (buffer);
+            StreamUtility.NetworkToHost64 (buffer);
+            var result = BitConverter.ToInt64 (buffer);
 
             return result;
+
         } // method ReadNetworkInt64
 
         /// <summary>
-        /// Open the <see cref="MemoryMappedFile"/> for read only.
+        /// Открытие <see cref="MemoryMappedFile"/> только для чтения.
         /// </summary>
         public static MemoryMappedFile OpenMemoryMappedFile
             (
@@ -351,7 +367,8 @@ namespace ManagedIrbis.Direct
                 );
 
             return result;
-        }
+
+        } // method OpenMemoryMappedFile
 
         #endregion
 

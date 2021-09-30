@@ -361,4 +361,7 @@
   <data name="RecordTooLong" xml:space="preserve">
     <value>Запись слишком длинная</value>
   </data>
+  <data name="UnexpectedMode" xml:space="preserve">
+      <value>неожиданный режим=</value>
+  </data>
 </root>

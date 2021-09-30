@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Utf8Utility.cs -- работа с кодировкой UTF-8
@@ -17,6 +18,8 @@
 
 using System;
 using System.IO;
+
+using AM.Core.Properties;
 
 #endregion
 
@@ -72,8 +75,10 @@ namespace AM.Text
                     {
                         ++result;
                     }
-                }
-            }
+
+                } // while
+
+            } // unchecked
 
             return result;
 
@@ -143,7 +148,8 @@ namespace AM.Text
 
                 length -= delta;
                 ++result;
-            }
+
+            } // while
 
             return result;
 
@@ -237,11 +243,12 @@ namespace AM.Text
                 }
                 else
                 {
-                    throw new ArsMagnaException("Bad symbol");
+                    throw new ArsMagnaException (Resources.BadSymbol);
                 }
 
                 return (char) result;
-            }
+
+            } // unchecked
 
         } // method ReadChar
 
@@ -323,7 +330,8 @@ namespace AM.Text
                         }
 
                         continue;
-                    }
+
+                    } // if
 
                     if (length == 0)
                     {
@@ -341,7 +349,8 @@ namespace AM.Text
                         }
 
                         continue;
-                    }
+
+                    } // if
 
                     if (b1 <= 0xEC)
                     {
@@ -351,7 +360,8 @@ namespace AM.Text
                         }
 
                         continue;
-                    }
+
+                    } // if
 
                     if (b1 == 0xED)
                     {
@@ -361,7 +371,8 @@ namespace AM.Text
                         }
 
                         continue;
-                    }
+
+                    } // if
 
                     if (b1 <= 0xEF)
                     {
@@ -371,7 +382,8 @@ namespace AM.Text
                         }
 
                         continue;
-                    }
+
+                    } // if
 
                     --length;
                     var b4 = *data++;
@@ -384,7 +396,8 @@ namespace AM.Text
                         }
 
                         continue;
-                    }
+
+                    } // if
 
                     if (b1 <= 0xF4)
                     {
@@ -394,12 +407,14 @@ namespace AM.Text
                         }
 
                         continue;
-                    }
+
+                    } // if
 
                     return false;
 
-                }
-            }
+                } // while
+
+            } // unchecked
 
             return true;
 
@@ -415,7 +430,7 @@ namespace AM.Text
         {
             fixed (byte* ptr = text) unchecked
             {
-                return Validate(ptr, (uint) text.Length);
+                return Validate (ptr, (uint) text.Length);
             }
 
         } // method Validate
@@ -437,7 +452,6 @@ namespace AM.Text
 
                     return true;
                 }
-
 
                 if (b1 < 0x80)
                 {
@@ -464,7 +478,8 @@ namespace AM.Text
                     }
 
                     continue;
-                }
+
+                } // if
 
                 // должен быть следующий байт
                 var b3 = stream.ReadByte();
@@ -481,7 +496,8 @@ namespace AM.Text
                     }
 
                     continue;
-                }
+
+                } // if
 
                 if (b1 <= 0xEC)
                 {
@@ -491,7 +507,8 @@ namespace AM.Text
                     }
 
                     continue;
-                }
+
+                } // if
 
                 if (b1 == 0xED)
                 {
@@ -501,7 +518,8 @@ namespace AM.Text
                     }
 
                     continue;
-                }
+
+                } // if
 
                 if (b1 <= 0xEF)
                 {
@@ -511,7 +529,8 @@ namespace AM.Text
                     }
 
                     continue;
-                }
+
+                } // if
 
                 // должен быть следующий байт
                 var b4 = stream.ReadByte();
@@ -528,7 +547,8 @@ namespace AM.Text
                     }
 
                     continue;
-                }
+
+                } // if
 
                 if (b1 <= 0xF4)
                 {
@@ -538,7 +558,8 @@ namespace AM.Text
                     }
 
                     continue;
-                }
+
+                } // if
 
                 return false;
 
@@ -563,30 +584,34 @@ namespace AM.Text
 
                 if (uchr < 1u << 7)
                 {
-                    stream.WriteByte((byte) chr);
+                    stream.WriteByte ((byte) chr);
                 }
 
                 if (uchr < 1u << 11)
                 {
-                    stream.WriteByte((byte) ((uchr >> 6) | 0xC0u));
-                    stream.WriteByte((byte) ((uchr & 0x3Fu) | 0xC8u));
-                }
+                    stream.WriteByte ((byte) ((uchr >> 6) | 0xC0u));
+                    stream.WriteByte ((byte) ((uchr & 0x3Fu) | 0xC8u));
+
+                } // if
 
                 if (uchr < 1u << 16)
                 {
-                    stream.WriteByte((byte) ((uchr >> 12) | 0xE0u));
-                    stream.WriteByte((byte) (((uchr >> 6) & 0x3Fu) | 0x80u));
-                    stream.WriteByte((byte) ((uchr & 0x3Fu) | 0x80u));
-                }
+                    stream.WriteByte ((byte) ((uchr >> 12) | 0xE0u));
+                    stream.WriteByte ((byte) (((uchr >> 6) & 0x3Fu) | 0x80u));
+                    stream.WriteByte ((byte) ((uchr & 0x3Fu) | 0x80u));
+
+                } // if
 
                 if (uchr < 1u << 21)
                 {
-                    stream.WriteByte((byte) ((uchr >> 18) | 0xF0u));
-                    stream.WriteByte((byte) (((uchr >> 12) & 0x3Fu) | 0x80u));
-                    stream.WriteByte((byte) (((uchr >> 6) & 0x3Fu) | 0x80u));
-                    stream.WriteByte((byte) ((uchr & 0x3Fu) | 0x80u));
-                }
-            }
+                    stream.WriteByte ((byte) ((uchr >> 18) | 0xF0u));
+                    stream.WriteByte ((byte) (((uchr >> 12) & 0x3Fu) | 0x80u));
+                    stream.WriteByte ((byte) (((uchr >> 6) & 0x3Fu) | 0x80u));
+                    stream.WriteByte ((byte) ((uchr & 0x3Fu) | 0x80u));
+
+                } // if
+
+            } // unchecked
 
         } // method WriteChar
 

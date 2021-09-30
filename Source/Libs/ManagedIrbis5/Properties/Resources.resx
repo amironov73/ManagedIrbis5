@@ -386,4 +386,7 @@
   <data name="RecordTooLong" xml:space="preserve">
     <value>Record too long</value>
   </data>
+    <data name="UnexpectedMode" xml:space="preserve">
+        <value>unexpected mode=</value>
+    </data>
 </root>

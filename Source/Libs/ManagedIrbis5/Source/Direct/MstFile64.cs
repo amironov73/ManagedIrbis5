@@ -213,7 +213,46 @@ namespace ManagedIrbis.Direct
             };
 
             return result;
-        }
+
+        } // method ReadRecord
+
+        /// <summary>
+        /// Чтение записи в виде массива байтов.
+        /// </summary>
+        public unsafe byte[]? ReadRecordBytes
+            (
+                long position
+            )
+        {
+            const int LeaderSize = MstRecordLeader64.LeaderSize;
+
+            _logger?.LogTrace ($"{nameof(MstFile64)}::{nameof(ReadRecordBytes)} ({position})");
+
+            byte[]? result = null;
+            lock (_lockObject)
+            {
+                _stream.Seek (position, SeekOrigin.Begin);
+
+                Span<byte> leaderBytes = stackalloc byte [LeaderSize];
+                if (_stream.Read (leaderBytes) != LeaderSize)
+                {
+                    return null;
+                }
+
+                var leader = MstRecordLeader64.Parse (leaderBytes);
+                result = new byte [leader.Length];
+                leaderBytes.CopyTo (result);
+
+                var remaining = leader.Length - LeaderSize;
+                if (_stream.Read (result, LeaderSize, remaining) != remaining)
+                {
+                    return null;
+                }
+            }
+
+            return result;
+
+        } // method ReadRecord
 
         /// <summary>
         /// Блокировка базы данных в целом.

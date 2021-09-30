@@ -148,4 +148,10 @@
   <data name="ResourceDoesntExist" xml:space="preserve">
       <value>Ресурс {0} не существует</value>
   </data>
+  <data name="BadSymbol" xml:space="preserve">
+      <value>Плохой символ</value>
+  </data>
+  <data name="UnexpectedMode" xml:space="preserve">
+      <value>неожиданный режим=</value>
+  </data>
 </root>

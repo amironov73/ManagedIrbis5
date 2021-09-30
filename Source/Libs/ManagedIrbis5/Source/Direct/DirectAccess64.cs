@@ -8,6 +8,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* DirectAccess64.cs -- direct reading IRBIS64 databases
@@ -137,11 +138,11 @@ namespace ManagedIrbis.Direct
                 IServiceProvider? serviceProvider = null
             )
         {
-            Sure.NotNullNorEmpty(masterFile, nameof(masterFile));
+            Sure.NotNullNorEmpty (masterFile, nameof(masterFile));
 
             _serviceProvider = serviceProvider ?? Magna.Host.Services;
-            _logger = (ILogger?) GetService(typeof(ILogger<MstFile64>));
-            _logger?.LogTrace($"{nameof(DirectAccess64)}::Constructor ({masterFile}, {mode})");
+            _logger = (ILogger?) GetService (typeof(ILogger<MstFile64>));
+            _logger?.LogTrace ($"{nameof(DirectAccess64)}::Constructor ({masterFile}, {mode})");
 
             Database = Path.GetFileNameWithoutExtension (masterFile)
                 .ThrowIfNullOrEmpty();
@@ -159,7 +160,7 @@ namespace ManagedIrbis.Direct
                 );
             InvertedFile = new InvertedFile64
                 (
-                    Path.ChangeExtension (masterFile, ".ifp"),
+                    Path.ChangeExtension(masterFile, ".ifp"),
                     mode,
                     _serviceProvider
                 );
@@ -230,7 +231,7 @@ namespace ManagedIrbis.Direct
         public int GetMaxMfn() => Mst.ControlRecord.NextMfn - 1;
 
         /// <summary>
-        /// Read raw record.
+        /// Чтение записи в сыром формате мастер-файла.
         /// </summary>
         public MstRecord64? ReadMstRecord
             (
@@ -252,10 +253,11 @@ namespace ManagedIrbis.Direct
                 return null;
             }
 
-            var result = Mst.ReadRecord(xrfRecord.Offset);
+            var result = Mst.ReadRecord (xrfRecord.Offset);
 
             return result;
-        }
+
+        } // method ReadMstRecord
 
         /// <summary>
         /// Read record with given MFN.
@@ -433,7 +435,8 @@ namespace ManagedIrbis.Direct
                 }
             }
             return result.ToArray();
-        }
+
+        } // method SearchReadSimple
 
         /// <summary>
         /// Write the record.
@@ -473,7 +476,8 @@ namespace ManagedIrbis.Direct
             Xrf.WriteRecord(mfn, xrfRecord);
 
             Mst.UpdateControlRecord(false);
-        }
+
+        } // method WriteRawRecord
 
         /// <summary>
         /// Write the record.
@@ -495,7 +499,8 @@ namespace ManagedIrbis.Direct
             record.Database = Database;
             record.Mfn = mstRecord64.Leader.Mfn;
             // record.PreviousOffset = mstRecord64.Leader.Previous;
-        }
+
+        } // method WriteRecord
 
         #endregion
 

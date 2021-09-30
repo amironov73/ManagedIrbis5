@@ -97,6 +97,15 @@ namespace AM.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bad symbol.
+        /// </summary>
+        internal static string BadSymbol {
+            get {
+                return ResourceManager.GetString("BadSymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t get property: {0}.
         /// </summary>
         internal static string Can_t_get_property {
@@ -210,6 +219,15 @@ namespace AM.Core.Properties {
         internal static string SocketReadingError {
             get {
                 return ResourceManager.GetString("SocketReadingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to unexpected mode=.
+        /// </summary>
+        internal static string UnexpectedMode {
+            get {
+                return ResourceManager.GetString("UnexpectedMode", resourceCulture);
             }
         }
     }
