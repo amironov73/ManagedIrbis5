@@ -100,8 +100,8 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
-            foreach (Field field in fields)
+            var fields = GetFields();
+            foreach (var field in fields)
             {
                 CheckField(field);
             }

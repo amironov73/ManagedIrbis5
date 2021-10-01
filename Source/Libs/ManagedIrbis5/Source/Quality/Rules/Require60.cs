@@ -50,7 +50,7 @@ namespace ManagedIrbis.Quality.Rules
 
             if (IsBook())
             {
-                Field[] fields = GetFields();
+                var fields = GetFields();
 
                 if (fields.Length == 0)
                 {

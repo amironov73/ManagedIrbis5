@@ -9,6 +9,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 
 /* RuleSet.cs -- набор правил
  * Ars Magna project, http://arsmagna.ru
@@ -49,37 +50,14 @@ namespace ManagedIrbis.Quality
 
         #region Private members
 
-        private static readonly Dictionary<string,Type> _registeredRules
-            = new ();
+        private static readonly Dictionary<string,Type> _registeredRules = new ();
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Merge two reports.
-        /// </summary>
-        public static RecordReport MergeReport
-            (
-                RecordReport first,
-                RecordReport second
-            )
-        {
-            var result = new RecordReport
-            {
-                Defects = new DefectList (first.Defects.Concat(second.Defects)),
-                Description = first.Description,
-                Quality = first.Quality + second.Quality - 1000,
-                Mfn = first.Mfn,
-                Index = first.Index
-            };
-
-            return result;
-        }
-
-
-        /// <summary>
-        /// Проверка одной записи
+        /// Проверка одной записи.
         /// </summary>
         public RecordReport CheckRecord
             (
@@ -119,10 +97,11 @@ namespace ManagedIrbis.Quality
             }
 
             return result;
-        }
+
+        } // method CheckRecord
 
         /// <summary>
-        /// Получаем правило по его имени.
+        /// Получение правила по его имени.
         /// </summary>
         public static QualityRule? GetRule
             (
@@ -146,7 +125,8 @@ namespace ManagedIrbis.Quality
                 );
 
             return result;
-        }
+
+        } // method GetRule
 
         /// <summary>
         /// Load set of rules from the specified file.
@@ -180,11 +160,12 @@ namespace ManagedIrbis.Quality
 
             */
 
-            return new RuleSet();
-        }
+            throw new NotImplementedException();
+
+        } // method LoadJson
 
         /// <summary>
-        /// Регистрируем все правила из указанной сборки.
+        /// Регистрация все правил из указанной сборки.
         /// </summary>
         public static void RegisterAssembly
             (
@@ -201,37 +182,27 @@ namespace ManagedIrbis.Quality
             {
                 RegisterRule(ruleType);
             }
-        }
+
+        } // method RegisterAssembly
 
         /// <summary>
         /// Регистрация встроенных правил.
         /// </summary>
-        public static void RegisterBuiltinRules ()
-        {
+        public static void RegisterBuiltinRules () =>
             RegisterAssembly(Assembly.GetExecutingAssembly());
-        }
 
         /// <summary>
-        /// Register rule from type.
+        /// Регистрация правила по его типу.
         /// </summary>
-        public static void RegisterRule
+        public static void RegisterRule (Type ruleType) => _registeredRules.Add
             (
-                Type ruleType
-            )
-        {
-            var ruleName = ruleType.Name;
-
-            _registeredRules.Add
-                (
-                    ruleName,
-                    ruleType
-                );
-        }
+                ruleType.Name,
+                ruleType
+            );
 
         /// <summary>
-        /// Отменяем регистрацию правила с указанным именем.
+        /// Отменяет регистрацию правила с указанным именем.
         /// </summary>
-        /// <param name="name"></param>
         public static void UnregisterRule
             (
                 string name
@@ -241,7 +212,8 @@ namespace ManagedIrbis.Quality
             {
                 _registeredRules.Remove(name);
             }
-        }
+
+        } // method UnregisterRule
 
         #endregion
 

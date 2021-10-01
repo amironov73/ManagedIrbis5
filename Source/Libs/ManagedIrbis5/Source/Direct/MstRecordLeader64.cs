@@ -19,6 +19,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
+using AM;
 using AM.IO;
 
 #endregion
@@ -36,7 +37,7 @@ namespace ManagedIrbis.Direct
         #region Constants
 
         /// <summary>
-        /// Фиксированный размер лидера записи.
+        /// Фиксированный размер лидера записи (всегда 8 чисел по 32 бита каждое).
         /// </summary>
         public const int LeaderSize = 32;
 
@@ -50,7 +51,7 @@ namespace ManagedIrbis.Direct
         public int Mfn { get; set; }
 
         /// <summary>
-        /// Длина записи (всегда четное число).
+        /// Общая длина записи (всегда четное число).
         /// </summary>
         public int Length { get; set; }
 
@@ -113,31 +114,22 @@ namespace ManagedIrbis.Direct
         } // method Read
 
         /// <summary>
-        /// Read the record leader.
+        /// Разбор заголовка MST-записи в оперативной памяти.
         /// </summary>
-        public static MstRecordLeader64 Parse
-            (
-                ReadOnlySpan<byte> bytes
-            )
-        {
-            // var navigator = new ValueByteNavigator (bytes);
-            var result = new MstRecordLeader64
+        public static MstRecordLeader64 Parse (ReadOnlySpan<byte> bytes) =>
+            new ()
             {
-                // Mfn = stream.ReadInt32Network(),
-                // Length = stream.ReadInt32Network(),
-                // Previous = stream.ReadInt64Network(),
-                // Base = stream.ReadInt32Network(),
-                // Nvf = stream.ReadInt32Network(),
-                // Version = stream.ReadInt32Network(),
-                // Status = stream.ReadInt32Network()
+                Mfn = bytes.ReadNetworkInt32 (0),
+                Length = bytes.ReadNetworkInt32 (4),
+                Previous = bytes.ReadNetworkInt32 (8),
+                Base = bytes.ReadNetworkInt32 (16),
+                Nvf = bytes.ReadNetworkInt32 (20),
+                Version = bytes.ReadNetworkInt32 (24),
+                Status = bytes.ReadNetworkInt32 (28)
             };
 
-            return result;
-
-        } // method Parse
-
         /// <summary>
-        /// Write the record leader.
+        /// Вывод лидера в поток.
         /// </summary>
         public void Write
             (
@@ -151,7 +143,32 @@ namespace ManagedIrbis.Direct
             stream.WriteInt32Network(Nvf);
             stream.WriteInt32Network(Version);
             stream.WriteInt32Network(Status);
-        }
+
+        } // method Write
+
+        /// <summary>
+        /// Вывод лидера в структуру в оперативной памяти.
+        /// </summary>
+        public void Pack
+            (
+                Span<byte> span
+            )
+        {
+            span.WriteNetworkInt32 (0, Mfn);
+            span.WriteNetworkInt32 (4, Length);
+            span.WriteNetworkInt64 (8, Previous);
+            span.WriteNetworkInt32 (16, Base);
+            span.WriteNetworkInt32 (20, Nvf);
+            span.WriteNetworkInt32 (24, Version);
+            span.WriteNetworkInt32 (28, Status);
+
+        } // method Pack
+
+        /// <summary>
+        /// Выбирает данные из указанной области памяти, хранящей запись.
+        /// </summary>
+        public ReadOnlySpan<byte> GetData (ReadOnlySpan<byte> record) =>
+            record.Slice (Base, Length - Base);
 
         #endregion
 

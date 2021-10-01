@@ -17,6 +17,7 @@
 
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -92,28 +93,32 @@ namespace ManagedIrbis.Quality
         #region Public methods
 
         /// <summary>
+        /// Слияние двух отчетов.
+        /// </summary>
+        public static RecordReport MergeReport (RecordReport first, RecordReport second) => new ()
+            {
+                Defects = new DefectList (first.Defects.Concat (second.Defects)),
+                Description = first.Description,
+                Quality = first.Quality + second.Quality - 1000,
+                Mfn = first.Mfn,
+                Index = first.Index
+
+            }; // method MergeReport
+
+        /// <summary>
         /// Should serialize <see cref="Defects"/> property?
         /// </summary>
-        public bool ShouldSerializeDefects()
-        {
-            return Defects.Count != 0;
-        }
+        public bool ShouldSerializeDefects() => Defects.Count != 0;
 
         /// <summary>
         /// Should serialize <see cref="Description"/> property?
         /// </summary>
-        public bool ShouldSerializeDescription()
-        {
-            return !string.IsNullOrEmpty(Description);
-        }
+        public bool ShouldSerializeDescription() => !string.IsNullOrEmpty(Description);
 
         /// <summary>
         /// Should serialize <see cref="Index"/> property?
         /// </summary>
-        public bool ShouldSerializeIndex()
-        {
-            return !string.IsNullOrEmpty(Index);
-        }
+        public bool ShouldSerializeIndex() => !string.IsNullOrEmpty(Index);
 
         #endregion
 
@@ -130,7 +135,8 @@ namespace ManagedIrbis.Quality
             Description = reader.ReadNullableString();
             Quality = reader.ReadPackedInt32();
             Defects.RestoreFromStream(reader);
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -143,25 +149,18 @@ namespace ManagedIrbis.Quality
                 .WriteNullable(Index)
                 .WriteNullable(Description)
                 .WritePackedInt32(Quality);
+
             Defects.SaveToStream(writer);
-        }
+
+        } // method SaveToStream
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "MFN: {0}, Defects: {1}, Quality: {2}, Description: {3}",
-                    Mfn,
-                    Defects.Count,
-                    Quality,
-                    Description.ToVisibleString()
-                );
-        }
+        public override string ToString() =>
+            $"MFN: {Mfn}, Defects: {Defects.Count}, Quality: {Quality}, Description: {Description.ToVisibleString()}";
 
         #endregion
 

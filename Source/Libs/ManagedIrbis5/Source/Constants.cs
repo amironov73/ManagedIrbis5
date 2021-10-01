@@ -55,6 +55,57 @@ namespace ManagedIrbis
         /// </summary>
         public const string ReaderDatabaseList = "dbnam3.mnu";
 
+        /// <summary>
+        /// Рабочий лист "ASP" для статей из сборников и журналов/газет.
+        /// </summary>
+        public const string Asp = "ASP";
+
+        /// <summary>
+        /// Рабочий лист "AUNTD" для аналилическго описания юридического документа или НТД.
+        /// </summary>
+        public const string Auntd = "AUNTD";
+
+        /// <summary>
+        /// Рабочий лист "IBIS" для упрощенного библиографического описания книги.
+        /// </summary>
+        public const string Ibis = "IBIS";
+
+        /// <summary>
+        /// Рабочий лист "MUSP" для описания музейного предмета.
+        /// </summary>
+        public const string Musp = "MUSP";
+
+        /// <summary>
+        /// Рабочий лист "NJ" для описания отдельного выпуска журнала/газеты.
+        /// </summary>
+        public const string Nj = "NJ";
+
+        /// <summary>
+        /// Рабочий лист "OJ" для сводного описания журнала/газеты.
+        /// </summary>
+        public const string Oj = "OJ";
+
+        /// <summary>
+        /// Рабочий лист "PAZK" для описания книги под автором, заглавием или коллективом.
+        /// </summary>
+        public const string Pazk = "PAZK";
+
+        /// <summary>
+        /// Рабочий лист "PRF" для проверки фонда.
+        /// </summary>
+        public const string Prf = "PRF";
+
+        /// <summary>
+        /// Рабочий лист "PVK" для описания под временным коллективом
+        /// (труды конференций и т. п.).
+        /// </summary>
+        public const string Pvk = "PVK";
+
+        /// <summary>
+        /// Рабочий лист "SPEC" для описания спецификации многотомника.
+        /// </summary>
+        public const string Spec = "SPEC";
+
         #endregion
 
     } // class Constants

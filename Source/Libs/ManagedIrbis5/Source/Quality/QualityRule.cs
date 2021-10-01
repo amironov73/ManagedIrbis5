@@ -9,8 +9,9 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
-/* QualityRule.cs -- abstract base class for all the quality rules
+/* QualityRule.cs -- базовый абстрактный класс для правил проверки качества
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,14 +34,14 @@ using ManagedIrbis.Menus;
 namespace ManagedIrbis.Quality
 {
     /// <summary>
-    /// Abstract base class for all the quality rules.
+    /// Базовый абстрактный класс для правил проверки качества.
     /// </summary>
     public abstract class QualityRule
     {
         #region Properties
 
         /// <summary>
-        /// Specification of the fields to check.
+        /// Спецификация полей, подлежащих провеке.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
@@ -48,13 +49,12 @@ namespace ManagedIrbis.Quality
         public abstract string FieldSpec { get; }
 
         /// <summary>
-        /// Клиент.
+        /// Провайдер.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
         [Browsable(false)]
-        public ISyncProvider? Connection =>
-            Context?.Connection;
+        public ISyncProvider? Provider => Context?.Connection;
 
         /// <summary>
         /// Текущий контекст.
@@ -89,7 +89,7 @@ namespace ManagedIrbis.Quality
         public string? Worksheet => Record?.FM(920);
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
@@ -101,7 +101,7 @@ namespace ManagedIrbis.Quality
         #region Private members
 
         /// <summary>
-        /// Add detected defect.
+        /// Добавление обнаруженного дефекта в список.
         /// </summary>
         protected void AddDefect
             (
@@ -115,13 +115,15 @@ namespace ManagedIrbis.Quality
             {
                 Field = tag,
                 Damage = damage,
-                Message = string.Format(format, args)
+                Message = string.Format (format, args)
             };
-            Report.ThrowIfNull("Report").Defects.Add(defect);
-        }
+
+            Report.ThrowIfNull (nameof (Report)).Defects.Add (defect);
+
+        } // method AddDefect
 
         /// <summary>
-        /// Add detected defect.
+        /// Добавление обнаруженного дефекта в список.
         /// </summary>
         protected void AddDefect
             (
@@ -139,11 +141,12 @@ namespace ManagedIrbis.Quality
                 Damage = damage,
                 Message = string.Format(format, args)
             };
-            Report.ThrowIfNull("Report").Defects.Add(defect);
+
+            Report.ThrowIfNull (nameof (Report)).Defects.Add (defect);
         }
 
         /// <summary>
-        /// Add detected defect.
+        /// Добавление обнаруженного дефекта в список.
         /// </summary>
         protected void AddDefect
             (
@@ -163,7 +166,8 @@ namespace ManagedIrbis.Quality
                 Damage = damage,
                 Message = string.Format(format, args)
             };
-            Report.ThrowIfNull("Report").Defects.Add(defect);
+
+            Report.ThrowIfNull (nameof (Report)).Defects.Add (defect);
         }
 
         /// <summary>
@@ -435,53 +439,34 @@ namespace ManagedIrbis.Quality
         }
 
         /// <summary>
-        /// Whether the current working list is ASP?
+        /// Текущий рабочий лист ASP?
         /// </summary>
-        protected bool IsAsp()
-        {
-            return Worksheet.SameString("ASP");
-        }
+        protected bool IsAsp() => IrbisUtility.IsAsp (Worksheet);
 
         /// <summary>
-        /// Whether the current working list is book-specific:
-        /// PAZK, SPEC or PVK?
+        /// Текущий рабочий лист относится к книжным: PAZK, SPEC или PVK?
         /// </summary>
-        protected bool IsBook()
-        {
-            var worksheet = Worksheet;
-            return worksheet.SameString("PAZK")
-                   || worksheet.SameString("SPEC")
-                   || worksheet.SameString("PVK");
-        }
+        protected bool IsBook() => IrbisUtility.IsBook (Worksheet);
 
         /// <summary>
-        /// Whether the current working list is PAZK?
+        /// Текущий рабочий лист PAZK?
         /// </summary>
-        protected bool IsPazk()
-        {
-            return Worksheet.SameString("PAZK");
-        }
+        protected bool IsPazk() => IrbisUtility.IsPazk (Worksheet);
 
         /// <summary>
-        /// Whether the current working list is SPEC?
+        /// Текущий рабочий лист SPEC?
         /// </summary>
-        protected bool IsSpec()
-        {
-            return Worksheet.SameString("SPEC");
-        }
+        protected bool IsSpec() => IrbisUtility.IsSpec (Worksheet);
 
         /// <summary>
-        /// Get fields of the current record for the rule
-        /// according the <see cref="FieldSpec"/>.
+        /// Фильтрация полей записи согласно спецификации <see cref="FieldSpec"/>
+        /// для текущего правила.
         /// </summary>
-        protected Field[] GetFields()
-        {
-            return Record.ThrowIfNull("Record").Fields
-                .GetFieldBySpec(FieldSpec);
-        }
+        protected Field[] GetFields() => Record.ThrowIfNull (nameof (Record)).Fields
+                .GetFieldBySpec (FieldSpec);
 
         /// <summary>
-        /// Must not contain subfields.
+        /// Поле не должно содержать подполей.
         /// </summary>
         protected void MustNotContainSubfields
             (
@@ -498,7 +483,8 @@ namespace ManagedIrbis.Quality
                         field.Tag
                     );
             }
-        }
+
+        } // method MustNotContainSubfields
 
         /// <summary>
         /// Asserts that the field must not contain plain text value.
@@ -766,14 +752,15 @@ namespace ManagedIrbis.Quality
                             field,
                             3,
                             "Поле {0} содержит запрещённые символы: {1}",
-                            GetTextAtPosition(text, position)
+                            GetTextAtPosition (text, position)
                         );
                 }
             }
-        }
+
+        } // method MustNotContainBadCharacters
 
         /// <summary>
-        /// Asserts that the subfield must not contain bad characters.
+        /// Подполе не должно содержать запрещенных символов.
         /// </summary>
         protected void MustNotContainBadCharacters
             (
@@ -784,7 +771,7 @@ namespace ManagedIrbis.Quality
             var text = subField.Value;
             if (!text.IsEmpty())
             {
-                var position = RuleUtility.BadCharacterPosition(text.ToString());
+                var position = RuleUtility.BadCharacterPosition (text);
                 if (position >= 0)
                 {
                     AddDefect
@@ -796,18 +783,19 @@ namespace ManagedIrbis.Quality
                             + "запрещённые символы: {2}",
                             field.Tag,
                             subField.Code,
-                            GetTextAtPosition(text, position)
+                            GetTextAtPosition (text, position)
                         );
-                }
-            }
-        }
+                } // if
+            } // if
+
+        } // method MustNotContainBadCharacters
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Check the record.
+        /// Проверка записи.
         /// </summary>
         public abstract RuleReport CheckRecord
             (

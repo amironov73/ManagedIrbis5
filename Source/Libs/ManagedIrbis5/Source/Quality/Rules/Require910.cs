@@ -40,7 +40,7 @@ namespace ManagedIrbis.Quality.Rules
                 Field field
             )
         {
-            ExemplarInfo exemplar = ExemplarInfo.Parse(field);
+            var exemplar = ExemplarInfo.Parse(field);
 
             if (!CheckForMenu(_statusMenu, exemplar.Status))
             {
@@ -91,7 +91,7 @@ namespace ManagedIrbis.Quality.Rules
                 goto DONE;
             }
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (fields.Length == 0)
             {
                 AddDefect
@@ -105,7 +105,7 @@ namespace ManagedIrbis.Quality.Rules
             _statusMenu = CacheMenu("ste.mnu", _statusMenu);
             _placeMenu = CacheMenu("mhr.mnu", _placeMenu);
 
-            foreach (Field field in fields)
+            foreach (var field in fields)
             {
                 CheckField(field);
             }

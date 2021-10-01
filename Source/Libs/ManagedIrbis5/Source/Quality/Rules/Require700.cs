@@ -78,9 +78,9 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Record record = Record.ThrowIfNull("Record");
+            var record = Record.ThrowIfNull("Record");
 
-            foreach (Field field
+            foreach (var field
                 in record.Fields.GetFieldBySpec(FieldSpec))
             {
                 _CheckField(context, field);
@@ -88,7 +88,7 @@ namespace ManagedIrbis.Quality.Rules
 
             if (IsPazk())
             {
-                Field[] fields = record.Fields
+                var fields = record.Fields
                     .GetFieldBySpec("7[01][012]");
                 if (fields.Length == 0)
                 {

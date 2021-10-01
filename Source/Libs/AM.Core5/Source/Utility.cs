@@ -27,11 +27,14 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 using AM.Collections;
+using AM.IO;
 using AM.PlatformAbstraction;
 
 #endregion
@@ -4151,20 +4154,21 @@ namespace AM
         /// <summary>
         /// Содержит ли данная строка одну из перечисленных подстрок?
         /// </summary>
+        [Pure]
         public static bool SafeContains
             (
                 this string? text,
                 params string?[] subtexts
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return false;
             }
 
             foreach (var subtext in subtexts)
             {
-                if (!string.IsNullOrEmpty(subtext) && text.Contains(subtext))
+                if (!string.IsNullOrEmpty (subtext) && text.Contains (subtext))
                 {
                     return true;
                 }
@@ -4173,6 +4177,14 @@ namespace AM
             return false;
 
         } // method SafeContains
+
+        /// <summary>
+        /// Содержит ли данная строка заданную подстроку (без учета регистра символов)?
+        /// </summary>
+        [Pure]
+        public static bool SafeContainsNoCase(this string? text, string? subtext) =>
+            !string.IsNullOrEmpty (text) && !string.IsNullOrEmpty (subtext) &&
+            text.ToUpperInvariant().Contains (subtext.ToUpperInvariant());
 
         /// <summary>
         /// Безопасный триминг строки.
@@ -4603,7 +4615,121 @@ namespace AM
             }
 
             return result;
+
         } // method LastIndexOfAny
+
+        /// <summary>
+        /// Чтение структуры по указанному смещению.
+        /// </summary>
+        [Pure]
+        public static T Read<T> (this ReadOnlySpan<byte> span, int offset) where T: struct
+            => MemoryMarshal.Read<T> (span [offset..]);
+
+        /// <summary>
+        /// Чтение 16-битного целого в хостовой раскладке по указанному смещению.
+        /// </summary>
+        [Pure]
+        public static short ReadHostInt16 (this ReadOnlySpan<byte> span, int offset)
+            => MemoryMarshal.Read<short> (span [offset..]);
+
+        /// <summary>
+        /// Чтение 32-битного целого в сетевой раскладке по указанному смещению.
+        /// </summary>
+        [Pure]
+        public static short ReadNetworkInt16 (this ReadOnlySpan<byte> span, int offset)
+            => IPAddress.NetworkToHostOrder (MemoryMarshal.Read<short> (span [offset..]));
+
+        /// <summary>
+        /// Чтение 32-битного целого в хостовой раскладке по указанному смещению.
+        /// </summary>
+        [Pure]
+        public static int ReadHostInt32 (this ReadOnlySpan<byte> span, int offset)
+            => MemoryMarshal.Read<int> (span [offset..]);
+
+        /// <summary>
+        /// Чтение 32-битного целого в сетевой раскладке по указанному смещению.
+        /// </summary>
+        [Pure]
+        public static int ReadNetworkInt32 (this ReadOnlySpan<byte> span, int offset)
+            => IPAddress.NetworkToHostOrder (MemoryMarshal.Read<int> (span [offset..]));
+
+        /// <summary>
+        /// Чтение 64-битного целого в хостовой раскладке по указанному смещению.
+        /// </summary>
+        [Pure]
+        public static long ReadHostInt64 (this ReadOnlySpan<byte> span, int offset)
+            => MemoryMarshal.Read<long> (span [offset..]);
+
+        /// <summary>
+        /// Чтение 64-битного целого в сетевой раскладке по указанному смещению.
+        /// </summary>
+        [Pure]
+        public static unsafe long ReadNetworkInt64
+            (
+                this ReadOnlySpan<byte> span,
+                int offset
+            )
+        {
+            var buffer = stackalloc byte [sizeof(long)];
+            *(long*)buffer = MemoryMarshal.Read<long> (span[offset..]);
+            StreamUtility.NetworkToHost64 (buffer);
+
+            return *(long*)buffer;
+
+        } // method ReadNetwokInt64
+
+        /// <summary>
+        /// Запись структуры по указанному смещению.
+        /// Метод предназначен для мелких структур, например, System.Int32.
+        /// </summary>
+        public static void Write<T> (this Span<byte> span, int offset, T value) where T : struct
+            => MemoryMarshal.Write (span[offset..], ref value);
+
+        /// <summary>
+        /// Запись 16-битного целого по указанному адресу в хостовой раскладке.
+        /// </summary>
+        public static void WriteHostInt16 (this Span<byte> span, int offset, short value)
+            => Write (span, offset, value);
+
+        /// <summary>
+        /// Запись 16-битного целого по указанному адресу в сетевой раскладке.
+        /// </summary>
+        public static void WriteNetworkInt16 (this Span<byte> span, int offset, short value)
+            => Write (span, offset, IPAddress.HostToNetworkOrder (value));
+
+        /// <summary>
+        /// Запись 32-битного целого по указанному адресу в хостовой раскладке.
+        /// </summary>
+        public static void WriteHostInt32 (this Span<byte> span, int offset, int value)
+            => Write (span, offset, value);
+
+        /// <summary>
+        /// Запись 32-битного целого по указанному адресу в сетевой раскладке.
+        /// </summary>
+        public static void WriteNetworkInt32 (this Span<byte> span, int offset, int value)
+            => Write (span, offset, IPAddress.HostToNetworkOrder (value));
+
+        /// <summary>
+        /// Запись 64-битного целого по указанному адресу в хостовой раскладке.
+        /// </summary>
+        public static void WriteHostInt64 (this Span<byte> span, int offset, long value)
+            => Write (span, offset, value);
+
+        /// <summary>
+        /// Запись 64-битного целого по указанному адресу в сетевой раскладке.
+        /// </summary>
+        public static unsafe void WriteNetworkInt64
+            (
+                this Span<byte> span,
+                int offset,
+                long value
+            )
+        {
+            var ptr = (byte*) &value;
+            StreamUtility.HostToNetwork64 (ptr);
+            Write (span, offset, value);
+
+        } // method WriteNetworkInt64
 
         /// <summary>
         /// Упрощенное получение информации о методе.

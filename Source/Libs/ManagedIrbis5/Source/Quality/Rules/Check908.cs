@@ -65,7 +65,7 @@ namespace ManagedIrbis.Quality.Rules
                 }
                 else
                 {
-                    string regex = @"[А-Я]\s\d{2}";
+                    var regex = @"[А-Я]\s\d{2}";
 
                     if (firstLetter is >= 'A' and <= 'Z')
                     {
@@ -104,7 +104,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (fields.Length > 1)
             {
 
@@ -115,7 +115,7 @@ namespace ManagedIrbis.Quality.Rules
                         "Повторяется поле 908: Авторский знак"
                     );
             }
-            foreach (Field field in fields)
+            foreach (var field in fields)
             {
                 CheckField(field);
             }

@@ -43,7 +43,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (IsPazk())
             {
                 if (fields.Length != 0)
@@ -71,7 +71,7 @@ namespace ManagedIrbis.Quality.Rules
                 }
                 else
                 {
-                    Field field = fields[0];
+                    var field = fields[0];
                     if (field.HaveNotSubField('c'))
                     {
                         AddDefect

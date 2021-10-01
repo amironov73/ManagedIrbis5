@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
@@ -15,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -36,6 +38,26 @@ namespace ManagedIrbis
     /// </summary>
     public static class IrbisUtility
     {
+        #region Properties
+
+        /// <summary>
+        /// Общеупотребимые рабочие листы.
+        /// </summary>
+        public static string[] WellKnownWorksheets =
+        {
+            "ASP",   // описание статьи из сборника/журнала/газеты
+            "AUNTD", // аналитическое описание юридического документа или НТД
+            "IBIS",  // упрощенное библиографическое описание книги
+            "MUSP",  // описание музейного предмета
+            "OJ",    // сводное описание журнала
+            "PAZK",  // описание книги под автором, заглавием или коллективом
+            "PRF",   // проверка фонда
+            "PVK",   // описание книги под временным коллективом (труды конференций и т. п.)
+            "SPEC"   // описание спецификации тома
+        };
+
+        #endregion
+
         #region Public methods
 
         /// <summary>
@@ -239,7 +261,38 @@ namespace ManagedIrbis
             var result = encoding.GetString(bytes.ToArray());
 
             return result;
+
         } // method UrlDecode
+
+        /// <summary>
+        /// Текущий рабочий лист ASP?
+        /// </summary>
+        [Pure]
+        public static bool IsAsp (string? worksheet) =>
+            worksheet.SameString ("ASP");
+
+        /// <summary>
+        /// Текущий рабочий лист относится к книжным: PAZK, SPEC или PVK?
+        /// </summary>
+        [Pure]
+        public static bool IsBook (string? worksheet) =>
+            worksheet.SameString (Constants.Pazk)
+            || worksheet.SameString (Constants.Spec)
+            || worksheet.SameString (Constants.Pvk);
+
+        /// <summary>
+        /// Текущий рабочий лист PAZK?
+        /// </summary>
+        [Pure]
+        public static bool IsPazk (string? worksheet) =>
+            worksheet.SameString (Constants.Pazk);
+
+        /// <summary>
+        /// Текущий рабочий лист SPEC?
+        /// </summary>
+        [Pure]
+        public static bool IsSpec (string? worksheet) =>
+            worksheet.SafeContainsNoCase (Constants.Spec);
 
         /// <summary>
         /// Проверка, безопасен ли символ для включения его в URL "как есть".

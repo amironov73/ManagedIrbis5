@@ -68,7 +68,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (fields.Length == 0)
             {
                 AddDefect
@@ -85,7 +85,7 @@ namespace ManagedIrbis.Quality.Rules
                 );
 
             _menu = CacheMenu("str.mnu", _menu);
-            foreach (Field field in fields)
+            foreach (var field in fields)
             {
                 CheckField(field);
             }

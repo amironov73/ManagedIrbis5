@@ -9,7 +9,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* DefectList.cs -- defect list for the field of the record
+/* DefectList.cs -- список дефектов для поля записи
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +29,7 @@ using AM.Runtime;
 namespace ManagedIrbis.Quality
 {
     /// <summary>
-    /// Defect list for the field of the record.
+    /// Список дефектов для поля записи..
     /// </summary>
     public sealed class DefectList
         : NonNullCollection<FieldDefect>,
@@ -38,22 +38,14 @@ namespace ManagedIrbis.Quality
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
-        public DefectList()
-        {
-        }
+        public DefectList() {}
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
-        public DefectList
-            (
-                IEnumerable<FieldDefect> defects
-            )
-        {
-            AddRange(defects);
-        }
+        public DefectList (IEnumerable<FieldDefect> defects) => AddRange (defects);
 
         #endregion
 
@@ -66,18 +58,14 @@ namespace ManagedIrbis.Quality
             )
         {
             ClearItems();
-            FieldDefect[] array = reader.ReadArray<FieldDefect>();
-            AddRange(array);
-        }
+
+            var array = reader.ReadArray<FieldDefect>();
+            AddRange (array);
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WriteArray(ToArray());
-        }
+        public void SaveToStream (BinaryWriter writer) => writer.WriteArray (ToArray());
 
         #endregion
 

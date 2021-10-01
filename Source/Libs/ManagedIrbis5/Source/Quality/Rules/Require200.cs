@@ -48,7 +48,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (fields.Length == 0)
             {
                 AddDefect
@@ -69,7 +69,7 @@ namespace ManagedIrbis.Quality.Rules
             }
             else
             {
-                Field field = fields[0];
+                var field = fields[0];
                 if (IsSpec())
                 {
                     if (field.HaveNotSubField('v'))

@@ -154,7 +154,8 @@ namespace ManagedIrbis.Direct
 
             target.Write(buffer, 0, readed);
             target.Position = savedPosition;
-        }
+
+        } // method AppendStream
 
         #endregion
 
@@ -228,7 +229,7 @@ namespace ManagedIrbis.Direct
 
             _logger?.LogTrace ($"{nameof(MstFile64)}::{nameof(ReadRecordBytes)} ({position})");
 
-            byte[]? result = null;
+            byte[]? result;
             lock (_lockObject)
             {
                 _stream.Seek (position, SeekOrigin.Begin);
@@ -281,7 +282,8 @@ namespace ManagedIrbis.Direct
 
                 _lockFlag = flag;
             }
-        }
+
+        } // method LockDatabase
 
         /// <summary>
         /// Чтение флага блокировки базы данных в целом.
@@ -303,7 +305,8 @@ namespace ManagedIrbis.Direct
 
                 return result;
             }
-        }
+
+        } // method ReadDatabaseLockedFlag
 
         /// <summary>
         /// Read record leader only.
@@ -320,7 +323,8 @@ namespace ManagedIrbis.Direct
 
                 return result;
             }
-        }
+
+        } // method ReadLeader
 
         /// <summary>
         /// Reopen file.
@@ -340,7 +344,8 @@ namespace ManagedIrbis.Direct
                     _stream = DirectUtility.OpenFile(FileName, mode);
                 }
             }
-        }
+
+        } // method ReopenFile
 
         /// <summary>
         /// Update control record.
@@ -366,7 +371,8 @@ namespace ManagedIrbis.Direct
                 _lockFlag = ControlRecord.Blocked != 0;
                 _stream.Flush();
             }
-        }
+
+        } // method UpdateControlRecord
 
         /// <summary>
         /// Update therecord leader.
@@ -383,7 +389,8 @@ namespace ManagedIrbis.Direct
                 leader.Write(_stream);
                 _stream.Flush();
             }
-        }
+
+        } // method UpdateLeader
 
         /// <summary>
         /// Write the record.
@@ -404,7 +411,8 @@ namespace ManagedIrbis.Direct
 
                 return position;
             }
-        }
+
+        } // method WriteRecord
 
         #endregion
 
@@ -415,7 +423,7 @@ namespace ManagedIrbis.Direct
         public ILogger? Logger => _logger;
 
         /// <inheritdoc cref="ISupportLogging.SetLogger"/>
-        public void SetLogger(ILogger? logger)
+        public void SetLogger (ILogger? logger)
             => _logger = logger;
 
         #endregion
@@ -438,7 +446,8 @@ namespace ManagedIrbis.Direct
             {
                 _stream.Dispose();
             }
-        }
+
+        } // method Dispose
 
         #endregion
 

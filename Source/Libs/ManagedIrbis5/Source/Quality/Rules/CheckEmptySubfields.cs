@@ -36,7 +36,7 @@ namespace ManagedIrbis.Quality.Rules
                 Field field
             )
         {
-            foreach (SubField subField in field.Subfields)
+            foreach (var subField in field.Subfields)
             {
                 if (subField.Value.IsEmpty())
                 {
@@ -68,8 +68,8 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
-            foreach (Field field in fields)
+            var fields = GetFields();
+            foreach (var field in fields)
             {
                 _CheckField
                     (

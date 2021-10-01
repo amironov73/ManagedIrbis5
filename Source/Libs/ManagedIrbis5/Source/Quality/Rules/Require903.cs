@@ -39,7 +39,7 @@ namespace ManagedIrbis.Quality.Rules
         {
             BeginCheck(context);
 
-            Field[] fields = GetFields();
+            var fields = GetFields();
             if (fields.Length == 0)
             {
                 AddDefect
@@ -58,7 +58,7 @@ namespace ManagedIrbis.Quality.Rules
                         "Повторяется поле 903: Шифр документа"
                     );
             }
-            foreach (Field field in fields)
+            foreach (var field in fields)
             {
                 MustNotContainSubfields
                     (

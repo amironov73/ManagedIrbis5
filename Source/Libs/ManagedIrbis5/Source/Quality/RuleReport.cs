@@ -79,18 +79,12 @@ namespace ManagedIrbis.Quality
         /// <summary>
         /// Should serialize the <see cref="Bonus"/> property?
         /// </summary>
-        public bool ShouldSerializeBonus()
-        {
-            return Bonus != 0;
-        }
+        public bool ShouldSerializeBonus() => Bonus != 0;
 
         /// <summary>
         /// Should serialize the <see cref="Damage"/> property?
         /// </summary>
-        public bool ShouldSerializeDamage()
-        {
-            return Damage != 0;
-        }
+        public bool ShouldSerializeDamage() => Damage != 0;
 
         /// <summary>
         /// Should serialize the <see cref="Defects"/> property?
@@ -113,19 +107,14 @@ namespace ManagedIrbis.Quality
             Defects = reader.ReadNonNullCollection<FieldDefect>();
             Damage = reader.ReadPackedInt32();
             Bonus = reader.ReadPackedInt32();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteCollection(Defects)
-                .WritePackedInt32(Damage)
-                .WritePackedInt32(Bonus);
-        }
+        public void SaveToStream (BinaryWriter writer) => writer
+                .WriteCollection (Defects)
+                .WritePackedInt32 (Damage)
+                .WritePackedInt32 (Bonus);
 
         #endregion
 
@@ -137,20 +126,20 @@ namespace ManagedIrbis.Quality
                 bool throwOnError
             )
         {
-            Verifier<RuleReport> verifier
-                = new Verifier<RuleReport>(this, throwOnError);
+            var verifier = new Verifier<RuleReport>(this, throwOnError);
 
             verifier
                 .Assert(Damage >= 0, "Damage >= 0")
                 .Assert(Bonus >= 0, "Bonus >= 0");
 
-            foreach (FieldDefect defect in Defects)
+            foreach (var defect in Defects)
             {
                 verifier.VerifySubObject(defect, "defect");
             }
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 

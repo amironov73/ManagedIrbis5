@@ -148,15 +148,15 @@ namespace ManagedIrbis.Quality
                 string allSpec
             )
         {
-            List<Field> result = new List<Field>();
+            var result = new List<Field>();
 
-            string[] parts = allSpec.Split
+            var parts = allSpec.Split
                 (
                     _delimiters,
                     StringSplitOptions.RemoveEmptyEntries
                 );
 
-            foreach (string oneSpec in parts)
+            foreach (var oneSpec in parts)
             {
                 result.AddRange(_GetField1(fields, oneSpec));
             }
@@ -182,9 +182,9 @@ namespace ManagedIrbis.Quality
                 return new Field[0];
             }
 
-            List<Field> result = new List<Field>();
+            var result = new List<Field>();
 
-            string[] parts = allSpec.Split('!');
+            var parts = allSpec.Split('!');
             if (parts.Length > 2)
             {
                 Magna.Error
@@ -197,8 +197,8 @@ namespace ManagedIrbis.Quality
                 throw new FormatException("allSpec");
             }
 
-            string include = parts[0].Trim(_delimiters);
-            string exclude = parts.Length == 2
+            var include = parts[0].Trim(_delimiters);
+            var exclude = parts.Length == 2
                 ? parts[1].Trim(_delimiters)
                 : string.Empty;
             if (string.IsNullOrEmpty(include))
@@ -249,9 +249,9 @@ namespace ManagedIrbis.Quality
                 string text
             )
         {
-            for (int i = 0; i < text.Length; i++)
+            for (var i = 0; i < text.Length; i++)
             {
-                char c = text[i];
+                var c = text[i];
                 if (IsBadCharacter(c))
                 {
                     return i;
@@ -286,13 +286,13 @@ namespace ManagedIrbis.Quality
                 IEnumerable<Field> fields
             )
         {
-            List<int> seen = new List<int>();
+            var seen = new List<int>();
 
-            foreach (Field field in fields)
+            foreach (var field in fields)
             {
                 field.Record = record;
-                int count = 1;
-                foreach (int s in seen)
+                var count = 1;
+                foreach (var s in seen)
                 {
                     if (s == field.Tag)
                     {
@@ -301,7 +301,7 @@ namespace ManagedIrbis.Quality
                 }
                 seen.Add(field.Tag);
                 field.Repeat = count;
-                foreach (SubField subField in field.Subfields)
+                foreach (var subField in field.Subfields)
                 {
                     subField.Field = field;
                 }
