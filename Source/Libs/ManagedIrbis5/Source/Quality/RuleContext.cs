@@ -2,16 +2,14 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 
 /* RuleContext.cs -- контекст, в котором работают правила качества
  * Ars Magna project, http://arsmagna.ru
  */
+
+using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
@@ -27,7 +25,7 @@ namespace ManagedIrbis.Quality
         /// <summary>
         /// Клиент.
         /// </summary>
-        public ISyncProvider? Connection { get; set; }
+        public ISyncProvider? Provider { get; set; }
 
         /// <summary>
         /// Обрабатываемая запись.
@@ -44,12 +42,9 @@ namespace ManagedIrbis.Quality
         #region Public methods
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
-        public RuleContext()
-        {
-            BriefFormat = "@brief";
-        }
+        public RuleContext() => BriefFormat = IrbisFormat.Brief;
 
         #endregion
 

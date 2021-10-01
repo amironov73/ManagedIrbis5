@@ -67,7 +67,7 @@ namespace ManagedIrbis.Quality
             var record = context.Record.ThrowIfNull("context.Record");
             var result = new RecordReport
             {
-                Description = context.Connection.ThrowIfNull("context.Connection").FormatRecord
+                Description = context.Provider.ThrowIfNull("context.Connection").FormatRecord
                     (
                         context.BriefFormat.ThrowIfNull("context.BriefFormat"),
                         record.Mfn

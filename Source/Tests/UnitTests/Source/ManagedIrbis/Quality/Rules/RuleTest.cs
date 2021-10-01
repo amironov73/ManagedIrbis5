@@ -21,7 +21,7 @@ namespace UnitTests.ManagedIrbis.Quality.Rules
             var record = new Record();
             var result = new RuleContext
             {
-                Connection = connection,
+                Provider = connection,
                 BriefFormat = "@brief",
                 Record = record
             };

@@ -25,7 +25,10 @@ using System.Xml.Serialization;
 
 using AM;
 
+using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
+
+using Microsoft.Extensions.Caching.Memory;
 
 #endregion
 
@@ -54,7 +57,7 @@ namespace ManagedIrbis.Quality
         [XmlIgnore]
         [JsonIgnore]
         [Browsable(false)]
-        public ISyncProvider? Provider => Context?.Connection;
+        public ISyncProvider? Provider => Context?.Provider;
 
         /// <summary>
         /// Текущий контекст.
@@ -100,6 +103,8 @@ namespace ManagedIrbis.Quality
 
         #region Private members
 
+        private IMemoryCache? _cache;
+
         /// <summary>
         /// Добавление обнаруженного дефекта в список.
         /// </summary>
@@ -143,7 +148,8 @@ namespace ManagedIrbis.Quality
             };
 
             Report.ThrowIfNull (nameof (Report)).Defects.Add (defect);
-        }
+
+        } // method AddDefect
 
         /// <summary>
         /// Добавление обнаруженного дефекта в список.
@@ -168,10 +174,11 @@ namespace ManagedIrbis.Quality
             };
 
             Report.ThrowIfNull (nameof (Report)).Defects.Add (defect);
-        }
+
+        } // method AddDefect
 
         /// <summary>
-        /// Begin the record checking.
+        /// Начало проверки записи.
         /// </summary>
         protected void BeginCheck
             (
@@ -183,7 +190,7 @@ namespace ManagedIrbis.Quality
         }
 
         /// <summary>
-        /// Cache the menu.
+        /// Кеширование меню.
         /// </summary>
         protected MenuFile CacheMenu
             (
@@ -191,21 +198,30 @@ namespace ManagedIrbis.Quality
                 MenuFile? menu
             )
         {
-            /*
+            if (menu is null)
+            {
+                if (_cache is null)
+                {
+                    var options = new MemoryCacheOptions();
+                    _cache = new MemoryCache (options);
+                }
 
-            menu = menu ??
-                MenuFile.ReadFromServer
-                (
-                    Connection,
-                    new FileSpecification(IrbisPath.MasterFile, name)
-                );
+                var specification = new FileSpecification
+                {
+                    Path = IrbisPath.MasterFile,
+                    FileName = name
+                };
+                var key = specification.ToString().ToUpperInvariant();
+                if (!_cache.TryGetValue (key, out menu))
+                {
+                    menu = Provider.ThrowIfNull (nameof(Provider)).ReadMenu (specification);
+                    _cache.Set (key, menu);
+                }
+            }
 
-            return menu;
+            return menu.ThrowIfNull (nameof (menu));
 
-            */
-
-            return new MenuFile();
-        }
+        } // CacheMenu
 
         /// <summary>
         /// Check the value against the menu.
@@ -220,6 +236,7 @@ namespace ManagedIrbis.Quality
             {
                 return true;
             }
+
             if (string.IsNullOrEmpty(value))
             {
                 return true;
@@ -276,7 +293,7 @@ namespace ManagedIrbis.Quality
         }
 
         /// <summary>
-        /// Show double whitespace in the text.
+        /// Вывод места в строке, где пробел удвоился.
         /// </summary>
         protected static ReadOnlyMemory<char> ShowDoubleWhiteSpace
             (
@@ -294,10 +311,11 @@ namespace ManagedIrbis.Quality
                     text.ToString(),
                     position
                 );
-        }
+
+        } // method ShowDoubleWhiteSpace
 
         /// <summary>
-        /// Check the subfield for whitespace.
+        /// Проверка наличия пробелов в строке.
         /// </summary>
         protected void CheckWhitespace
             (
@@ -318,8 +336,10 @@ namespace ManagedIrbis.Quality
                         field.Tag,
                         subfield.Code
                     );
+
                 return;
-            }
+
+            } // if
 
             if (text.StartsWith(" "))
             {
@@ -332,7 +352,7 @@ namespace ManagedIrbis.Quality
                         field.Tag,
                         subfield.Code
                     );
-            }
+            } // if
 
             if (text.EndsWith(" "))
             {
@@ -345,7 +365,8 @@ namespace ManagedIrbis.Quality
                         field.Tag,
                         subfield.Code
                     );
-            }
+
+            } // if
 
             // TODO: реализовать эффективно
 
@@ -361,11 +382,13 @@ namespace ManagedIrbis.Quality
                         subfield.Code,
                         ShowDoubleWhiteSpace(text.AsMemory())
                     );
-            }
-        }
+
+            } // if
+
+        } // method CheckWhitespace
 
         /// <summary>
-        /// Check for whitespace.
+        /// Проверка наличия пробелов в строке.
         /// </summary>
         protected void CheckWhitespace
             (
@@ -384,7 +407,8 @@ namespace ManagedIrbis.Quality
                             "Поле {0} начинается с пробела",
                             field.Tag
                         );
-                }
+                } // if
+
                 if (text.EndsWith(" "))
                 {
                     AddDefect
@@ -394,7 +418,7 @@ namespace ManagedIrbis.Quality
                             "Поле {0} оканчивается пробелом",
                             field.Tag
                         );
-                }
+                } // if
 
                 // TODO: implement
 
@@ -415,7 +439,7 @@ namespace ManagedIrbis.Quality
                 }
 
                 */
-            }
+            } // if
 
             foreach (var subfield in field.Subfields)
             {
@@ -424,19 +448,21 @@ namespace ManagedIrbis.Quality
                         field,
                         subfield
                     );
-            }
-        }
+            } // foreach
+
+        } // method CheckWhitespace
 
         /// <summary>
-        /// End the record checking.
+        /// Окончание проверки записи.
         /// </summary>
         protected RuleReport EndCheck()
         {
-            var result = Report.ThrowIfNull("Report");
-            result.Damage = result.Defects.Sum(defect => defect.Damage);
+            var result = Report.ThrowIfNull (nameof(Report));
+            result.Damage = result.Defects.Sum (defect => defect.Damage);
 
             return result;
-        }
+
+        } // method EndCheck
 
         /// <summary>
         /// Текущий рабочий лист ASP?
@@ -649,7 +675,8 @@ namespace ManagedIrbis.Quality
                         code
                     );
             }
-        }
+
+        } // method MustBeUniqueSubfield
 
         /// <summary>
         /// Asserts that the field must not contain whitespace.
@@ -659,10 +686,8 @@ namespace ManagedIrbis.Quality
                 Field field
             )
         {
-            /*
-
-            string text = field.Value;
-            if (!string.IsNullOrEmpty(text)
+            var text = field.Value;
+            if (!string.IsNullOrEmpty (text)
                 && text.ContainsWhitespace())
             {
                 AddDefect
@@ -674,8 +699,7 @@ namespace ManagedIrbis.Quality
                     );
             }
 
-            */
-        }
+        } // method MustNotContainWhitespace
 
         /// <summary>
         /// Asserts that the subfield must not contain whitespace.
@@ -707,7 +731,7 @@ namespace ManagedIrbis.Quality
         }
 
         /// <summary>
-        /// Asserts that subfields of the field must not contain whitespace.
+        /// Подполя с указанными кодами не должны содержать пробелов.
         /// </summary>
         protected void MustNotContainWhitespace
             (
@@ -715,26 +739,23 @@ namespace ManagedIrbis.Quality
                 params char[] codes
             )
         {
-            /*
-
-            foreach (char code in codes)
+            foreach (var code in codes)
             {
-                SubField[] subFields = field.GetSubField(code);
-                foreach (SubField subField in subFields)
+                var subFields = field.GetSubFields (code);
+                foreach (var subField in subFields)
                 {
                     MustNotContainWhitespace
                         (
                             field,
                             subField
                         );
-                }
-            }
+                } // foreach
+            } // foreach
 
-            */
-        }
+        } // method MustoNotContainWhitespace
 
         /// <summary>
-        /// Asserts that the field must not contain bad characters.
+        /// Поле не должно содержать запрещенных символов.
         /// </summary>
         protected void MustNotContainBadCharacters
             (
@@ -754,8 +775,8 @@ namespace ManagedIrbis.Quality
                             "Поле {0} содержит запрещённые символы: {1}",
                             GetTextAtPosition (text, position)
                         );
-                }
-            }
+                } // if
+            } // if
 
         } // method MustNotContainBadCharacters
 
