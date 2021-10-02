@@ -37,5 +37,15 @@ namespace UnitTests.ManagedIrbis.Quality.Rules
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
+
+        [TestMethod]
+        public void Require215_CheckRecord_2()
+        {
+            var context = GetContext();
+            context.Record!.Add(215, "^a135^ca-табл.^d20,5 см^3в пер.^x500");
+            var check = new Require215();
+            var report = check.CheckRecord(context);
+            Assert.IsNotNull(report);
+        }
     }
 }

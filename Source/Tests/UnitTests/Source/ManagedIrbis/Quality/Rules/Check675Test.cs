@@ -12,40 +12,41 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Quality.Rules
 {
     [TestClass]
-    public sealed class Check610Test
+    public sealed class Check675Test
         : RuleTest
     {
         [TestMethod]
-        public void Check610_Construction_1()
+        public void Check675_Construction_1()
         {
-            var check = new Check610();
+            var check = new Check675();
             Assert.IsNotNull(check);
         }
 
         [TestMethod]
-        public void Check610_FieldSpec_1()
+        public void Check675_FieldSpec_1()
         {
-            var check = new Check610();
-            Assert.AreEqual("610", check.FieldSpec);
+            var check = new Check675();
+            Assert.AreEqual("675", check.FieldSpec);
         }
 
         [TestMethod]
-        public void Check610_CheckRecord_1()
+        public void Check675_CheckRecord_1()
         {
             var context = GetContext();
-            var check = new Check610();
+            var check = new Check675();
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
 
         [TestMethod]
-        public void Check610_CheckRecord_2()
+        public void Check675_CheckRecord_2()
         {
             var context = GetContext();
-            context.Record!.Add(610, "развитие медицины");
-            var check = new Check610();
+            context.Record!.Add(675, "614(571.53)");
+            var check = new Check675();
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
+
     }
 }

@@ -192,7 +192,7 @@ namespace ManagedIrbis.Quality
         /// <summary>
         /// Кеширование меню.
         /// </summary>
-        protected MenuFile CacheMenu
+        protected MenuFile? CacheMenu
             (
                 string name,
                 MenuFile? menu
@@ -209,6 +209,7 @@ namespace ManagedIrbis.Quality
                 var specification = new FileSpecification
                 {
                     Path = IrbisPath.MasterFile,
+                    Database = Provider.ThrowIfNull (nameof (Provider)).Database,
                     FileName = name
                 };
                 var key = specification.ToString().ToUpperInvariant();
@@ -219,7 +220,7 @@ namespace ManagedIrbis.Quality
                 }
             }
 
-            return menu.ThrowIfNull (nameof (menu));
+            return menu;
 
         } // CacheMenu
 

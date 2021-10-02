@@ -37,5 +37,15 @@ namespace UnitTests.ManagedIrbis.Quality.Rules
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
+
+        [TestMethod]
+        public void Require900_CheckRecord_2()
+        {
+            var context = GetContext();
+            context.Record!.Add(903, "51.1(2Рос-4Ирк)/О-64-304341458");
+            var check = new Require900();
+            var report = check.CheckRecord(context);
+            Assert.IsNotNull(report);
+        }
     }
 }

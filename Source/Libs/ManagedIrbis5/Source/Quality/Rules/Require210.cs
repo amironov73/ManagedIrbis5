@@ -15,7 +15,6 @@
 
 #region Using directives
 
-using System;
 using AM;
 
 #endregion
@@ -42,10 +41,6 @@ namespace ManagedIrbis.Quality.Rules
             var city = field.GetFirstSubField('a');
             var publisher = field.GetFirstSubField('c');
             var year = field.GetFirstSubField('d');
-
-            throw new NotImplementedException();
-
-            /*
 
             if (city != null)
             {
@@ -140,8 +135,6 @@ namespace ManagedIrbis.Quality.Rules
                         "Город введен в подполе 200^4: Город на издании"
                     );
             }
-
-            */
         }
 
         #endregion

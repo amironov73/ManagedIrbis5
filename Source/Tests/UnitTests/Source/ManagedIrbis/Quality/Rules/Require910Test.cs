@@ -37,5 +37,16 @@ namespace UnitTests.ManagedIrbis.Quality.Rules
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
+
+        [TestMethod]
+        public void Require910_CheckRecord_2()
+        {
+            var context = GetContext();
+            context.Record!.Add(920, "PAZK");
+            context.Record!.Add(910, "^A0^B1^HE00401004DD08FF2^FП26^C20170327^DФП^E1.00");
+            var check = new Require910();
+            var report = check.CheckRecord(context);
+            Assert.IsNotNull(report);
+        }
     }
 }

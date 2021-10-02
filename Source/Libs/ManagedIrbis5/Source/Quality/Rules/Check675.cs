@@ -9,7 +9,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* Check610.cs -- ключевые слова
+/* Check675.cs -- УДК
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,9 +24,9 @@ using AM;
 namespace ManagedIrbis.Quality.Rules
 {
     /// <summary>
-    /// Ключевые слова.
+    /// УДК
     /// </summary>
-    public sealed class Check610
+    public sealed class Check675
         : QualityRule
     {
         #region Private members
@@ -38,27 +38,16 @@ namespace ManagedIrbis.Quality.Rules
         {
             MustNotContainSubfields(field);
 
-            var text = field.Value;
-            if (text.SafeContains('.'))
-            {
-                AddDefect
-                    (
-                        field,
-                        1,
-                        "Ключевые слова с сокращениями"
-                    );
-            }
-
         } // method CheckField
 
         #endregion
 
-        #region QualityRule members
+        #region QualityRules members
 
-        /// <inheritdoc cref="QualityRule.FieldSpec" />
-        public override string FieldSpec => "610";
+        /// <inheritdoc cref="QualityRule.FieldSpec"/>
+        public override string FieldSpec => "675";
 
-        /// <inheritdoc cref="QualityRule.CheckRecord" />
+        /// <inheritdoc cref="QualityRule.CheckRecord"/>
         public override RuleReport CheckRecord
             (
                 RuleContext context
@@ -70,17 +59,12 @@ namespace ManagedIrbis.Quality.Rules
             if (fields.Length == 0)
             {
                 AddDefect
-                    (
-                        610,
-                        5,
-                        "Отсутствуют ключевые слова: поле 610"
-                    );
-            }
-
-            MustBeUniqueField
                 (
-                    fields
+                    675,
+                    5,
+                    "Отсутствует УДК: поле 675"
                 );
+            }
 
             foreach (var field in fields)
             {
@@ -94,6 +78,6 @@ namespace ManagedIrbis.Quality.Rules
 
         #endregion
 
-    } // class Check610
+    } // class Check675
 
 } // namespace ManagedIrbis.Quality.Rules

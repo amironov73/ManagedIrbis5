@@ -37,5 +37,15 @@ namespace UnitTests.ManagedIrbis.Quality.Rules
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
+
+        [TestMethod]
+        public void Require200_CheckRecord_2()
+        {
+            var context = GetContext();
+            context.Record!.Add(200, "^aЛитература на оперной сцене^fТатьяна Рыбакина");
+            var check = new Require200();
+            var report = check.CheckRecord(context);
+            Assert.IsNotNull(report);
+        }
     }
 }

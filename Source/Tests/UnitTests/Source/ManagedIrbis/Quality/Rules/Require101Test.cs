@@ -38,5 +38,15 @@ namespace UnitTests.ManagedIrbis.Quality.Rules
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
+
+        [TestMethod]
+        public void Require101_CheckRecord_2()
+        {
+            var context = GetContext();
+            context.Record!.Add(101, "rus");
+            var check = new Require101();
+            var report = check.CheckRecord(context);
+            Assert.IsNotNull(report);
+        }
     }
 }

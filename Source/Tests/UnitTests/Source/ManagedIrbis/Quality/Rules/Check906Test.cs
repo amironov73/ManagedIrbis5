@@ -12,40 +12,44 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Quality.Rules
 {
     [TestClass]
-    public sealed class Check610Test
+    public sealed class Check906Test
         : RuleTest
     {
         [TestMethod]
-        public void Check610_Construction_1()
+        public void Check906_Construction_1()
         {
-            var check = new Check610();
+            var check = new Check906();
             Assert.IsNotNull(check);
         }
 
         [TestMethod]
-        public void Check610_FieldSpec_1()
+        public void Check906_FieldSpec_1()
         {
-            var check = new Check610();
-            Assert.AreEqual("610", check.FieldSpec);
+            var check = new Check906();
+            Assert.AreEqual("906", check.FieldSpec);
         }
 
         [TestMethod]
-        public void Check610_CheckRecord_1()
+        public void Check906_CheckRecord_1()
         {
             var context = GetContext();
-            var check = new Check610();
+            var check = new Check906();
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
 
         [TestMethod]
-        public void Check610_CheckRecord_2()
+        public void Check906_CheckRecord_2()
         {
             var context = GetContext();
-            context.Record!.Add(610, "развитие медицины");
-            var check = new Check610();
+            context.Record!.Add(621, "51.1(2Рос-4Ирк)я431");
+            context.Record!.Add(908, "О-64");
+            context.Record!.Add(903, "51.1(2Рос-4Ирк)/О-64-304341458");
+            context.Record!.Add(906, "51.1(2Рос-4Ирк)");
+            var check = new Check906();
             var report = check.CheckRecord(context);
             Assert.IsNotNull(report);
         }
+
     }
 }

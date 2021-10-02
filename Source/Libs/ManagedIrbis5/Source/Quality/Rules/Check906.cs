@@ -9,7 +9,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* Check610.cs -- ключевые слова
+/* Check906.cs -- систематический шифр
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,9 +24,9 @@ using AM;
 namespace ManagedIrbis.Quality.Rules
 {
     /// <summary>
-    /// Ключевые слова.
+    /// Систематический шифр
     /// </summary>
-    public sealed class Check610
+    public sealed class Check906
         : QualityRule
     {
         #region Private members
@@ -38,27 +38,16 @@ namespace ManagedIrbis.Quality.Rules
         {
             MustNotContainSubfields(field);
 
-            var text = field.Value;
-            if (text.SafeContains('.'))
-            {
-                AddDefect
-                    (
-                        field,
-                        1,
-                        "Ключевые слова с сокращениями"
-                    );
-            }
-
         } // method CheckField
 
         #endregion
 
-        #region QualityRule members
+        #region QualityRules members
 
-        /// <inheritdoc cref="QualityRule.FieldSpec" />
-        public override string FieldSpec => "610";
+        /// <inheritdoc cref="QualityRule.FieldSpec"/>
+        public override string FieldSpec => "906";
 
-        /// <inheritdoc cref="QualityRule.CheckRecord" />
+        /// <inheritdoc cref="QualityRule.CheckRecord"/>
         public override RuleReport CheckRecord
             (
                 RuleContext context
@@ -70,23 +59,17 @@ namespace ManagedIrbis.Quality.Rules
             if (fields.Length == 0)
             {
                 AddDefect
-                    (
-                        610,
-                        5,
-                        "Отсутствуют ключевые слова: поле 610"
-                    );
-            }
-
-            MustBeUniqueField
                 (
-                    fields
+                    906,
+                    5,
+                    "Отсутствует систематический шифр: поле 906"
                 );
+            }
 
             foreach (var field in fields)
             {
                 CheckField(field);
             }
-
 
             return EndCheck();
 
@@ -94,6 +77,6 @@ namespace ManagedIrbis.Quality.Rules
 
         #endregion
 
-    } // class Check610
+    } // class Check906
 
 } // namespace ManagedIrbis.Quality.Rules

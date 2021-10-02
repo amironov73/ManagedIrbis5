@@ -14,20 +14,11 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using AM;
-using AM.Collections;
-using AM.Linq;
 
-using ManagedIrbis;
-using ManagedIrbis.Direct;
-using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Pft;
-using ManagedIrbis.Pft.Infrastructure;
+using ManagedIrbis.Server;
 
 #endregion
 
@@ -40,21 +31,51 @@ namespace IrbisCoreServer
     /// </summary>
     static class Program
     {
+        public static ServerEngine Engine { get; private set; } = null!;
 
         /// <summary>
-        /// Точка входа в сервис.
+        /// Запуск и эксплуатация сервера.
         /// </summary>
-        public static int Main
+        private static async Task RunServer
             (
                 string[] args
             )
         {
-            Magna.Initialize (args, builder =>
+            try
+            {
+                Magna.Info ("START");
+
+                await using (Engine = ServerUtility.CreateEngine (args))
+                {
+                    ServerUtility.DumpEngineSettings (Engine);
+                    Magna.Info ("Entering server main loop");
+                    await Engine.MainLoop();
+                    Magna.Info ("Leave server main loop");
+                }
+
+                Magna.Info ("STOP");
+            }
+            catch (Exception exception)
+            {
+                Magna.TraceException(nameof(Program) + "::" + nameof(RunServer), exception);
+            }
+
+        } // method RunServer
+
+        /// <summary>
+        /// Точка входа в сервис.
+        /// </summary>
+        public static async Task<int> Main
+            (
+                string[] args
+            )
+        {
+            Magna.Initialize (args, _ =>
             {
                 Console.Out.WriteLine ("Initialized");
             });
 
-            Magna.Info("Ready to run");
+            await RunServer (args);
 
             return 0;
 
