@@ -9,7 +9,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* Check923.cs -- номер и заглавие части
+/* Check205.cs -- сведения об издании
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,9 +24,9 @@ using AM;
 namespace ManagedIrbis.Quality.Rules
 {
     /// <summary>
-    /// Номер и заглавие части.
+    /// Сведения об издании.
     /// </summary>
-    public sealed class Check923
+    public sealed class Check205
         : QualityRule
     {
         #region Private members
@@ -43,7 +43,7 @@ namespace ManagedIrbis.Quality.Rules
         #region QualityRule members
 
         /// <inheritdoc cref="QualityRule.FieldSpec"/>
-        public override string FieldSpec => "923";
+        public override string FieldSpec => "205";
 
         /// <inheritdoc cref="QualityRule.CheckRecord"/>
         public override RuleReport CheckRecord
@@ -65,6 +65,6 @@ namespace ManagedIrbis.Quality.Rules
 
         #endregion
 
-    } // class Check923
+    } // class Check205
 
 } // namespace ManagedIrbis.Quality.Rules

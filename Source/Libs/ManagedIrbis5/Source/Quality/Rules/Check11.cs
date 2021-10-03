@@ -9,7 +9,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* Check923.cs -- номер и заглавие части
+/* Check11.cs -- ISSN журнала
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,9 +24,9 @@ using AM;
 namespace ManagedIrbis.Quality.Rules
 {
     /// <summary>
-    /// Номер и заглавие части.
+    /// ISSN журнала/газеты.
     /// </summary>
-    public sealed class Check923
+    public sealed class Check11
         : QualityRule
     {
         #region Private members
@@ -43,7 +43,7 @@ namespace ManagedIrbis.Quality.Rules
         #region QualityRule members
 
         /// <inheritdoc cref="QualityRule.FieldSpec"/>
-        public override string FieldSpec => "923";
+        public override string FieldSpec => "11";
 
         /// <inheritdoc cref="QualityRule.CheckRecord"/>
         public override RuleReport CheckRecord
@@ -54,6 +54,16 @@ namespace ManagedIrbis.Quality.Rules
             BeginCheck(context);
 
             var fields = GetFields();
+            if (fields.Length == 0)
+            {
+                AddDefect
+                (
+                    11,
+                    5,
+                    "Отсутствует ISSN журнала: поле 11"
+                );
+            }
+
             foreach (var field in fields)
             {
                 CheckField(field);
@@ -65,6 +75,6 @@ namespace ManagedIrbis.Quality.Rules
 
         #endregion
 
-    } // class Check923
+    } // class Check11
 
 } // namespace ManagedIrbis.Quality.Rules
