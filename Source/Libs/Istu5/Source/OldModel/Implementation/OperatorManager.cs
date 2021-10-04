@@ -77,7 +77,7 @@ namespace Istu.OldModel.Implementation
             Operators.FirstOrDefault (op => op.Barcode == barcode);
 
         /// <inheritdoc cref="IOperatorManager.GetOperatorByID"/>
-        public Operator? GetOperatorByID(int id) =>
+        public Operator? GetOperatorByID (int id) =>
             Operators.FirstOrDefault (op => op.ID == id);
 
         /// <inheritdoc cref="IOperatorManager.ListAllOperators"/>

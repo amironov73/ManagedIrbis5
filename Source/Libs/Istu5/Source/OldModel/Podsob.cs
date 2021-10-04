@@ -26,7 +26,7 @@ using LinqToDB.Mapping;
 namespace Istu.OldModel
 {
     /// <summary>
-    /// Подсобные фонды
+    /// Книги из подсобных фондов.
     /// </summary>
     [Table]
     public class Podsob
@@ -34,7 +34,7 @@ namespace Istu.OldModel
         #region Properties
 
         /// <summary>
-        /// Инвента
+        /// Инвентарный номер.
         /// </summary>
         [Column (Name = "invent"), PrimaryKey]
         public long Inventory { get; set; }
