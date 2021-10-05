@@ -7,8 +7,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable VirtualMemberCallInConstructor
 
-/* PlainTextForm.cs --
+/* PlainTextForm.cs -- форма для демонстрации простого текста
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,7 +25,9 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///
+    /// Форма для демонстрации пользователю
+    /// некоторого простого текста, например,
+    /// лицензионного соглашения или простейшего отчета.
     /// </summary>
     public partial class PlainTextForm
         : Form
@@ -31,7 +35,7 @@ namespace AM.Windows.Forms
         #region Properties
 
         /// <summary>
-        /// Text editor.
+        /// Текстовый редактор.
         /// </summary>
         public PlainTextEditor Editor => _textControl;
 
@@ -45,15 +49,17 @@ namespace AM.Windows.Forms
                 {
                     _textControl.Text = value ?? string.Empty;
                 }
-            }
-        }
+
+            } // method set
+
+        } // property Text
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PlainTextForm()
         {
@@ -61,7 +67,7 @@ namespace AM.Windows.Forms
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PlainTextForm
             (
@@ -77,29 +83,39 @@ namespace AM.Windows.Forms
         #region Public methods
 
         /// <summary>
-        /// Add button to the toolbox.
+        /// Добавление кнопки на тулбар.
         /// </summary>
         public void AddButton
             (
                 ToolStripButton button
             )
         {
-            Editor.AddButton(button);
-        }
+            Editor.AddButton (button);
+
+        } // method AddButton
 
         /// <summary>
-        /// Show the windows with the text.
+        /// Демонстрация диалога с указанным текстом.
         /// </summary>
         public static DialogResult ShowDialog
             (
                 IWin32Window? owner,
-                string? text
+                string? text,
+                bool maximized = false
             )
         {
-            using var form = new PlainTextForm(text);
-            return form.ShowDialog(owner);
-        }
+            using var form = new PlainTextForm (text);
+            if (maximized)
+            {
+                form.WindowState = FormWindowState.Maximized;
+            }
+
+            return form.ShowDialog (owner);
+
+        } // method ShowDialog
 
         #endregion
-    }
-}
+
+    } // method PlainTextForm
+
+} // namespace AM.Windows.Forms

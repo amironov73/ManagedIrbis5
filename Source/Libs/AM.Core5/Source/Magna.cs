@@ -218,17 +218,18 @@ namespace AM
         public static void Initialize
             (
                 string[] args,
-                Action<IHostBuilder> configurationAction
+                Action<IHostBuilder>? configurationAction = null
             )
         {
             var builder = Microsoft.Extensions.Hosting.Host
-                .CreateDefaultBuilder(args);
-            configurationAction(builder);
+                .CreateDefaultBuilder (args);
+            configurationAction?.Invoke (builder);
 
             Host = builder.Build();
             Factory = Host.Services.GetRequiredService<ILoggerFactory>();
             Logger = Factory.CreateLogger<Magna>();
-        }
+
+        } // method Initialize
 
         /// <summary>
         /// Трассировочное логирование.

@@ -16,7 +16,7 @@
 #region Using directives
 
 using System;
-
+using System.Diagnostics;
 using LinqToDB.Mapping;
 
 #endregion
@@ -29,6 +29,8 @@ namespace Istu.OldModel
     /// Книги из подсобных фондов.
     /// </summary>
     [Table]
+    [Serializable]
+    [DebuggerDisplay ("{Inventory}: {Ticket}: {Moment}")]
     public class Podsob
     {
         #region Properties
@@ -36,13 +38,13 @@ namespace Istu.OldModel
         /// <summary>
         /// Инвентарный номер.
         /// </summary>
-        [Column (Name = "invent"), PrimaryKey]
+        [Column ("invent"), PrimaryKey]
         public long Inventory { get; set; }
 
         /// <summary>
-        /// Номер читательского билета, кому выдана книга.
+        /// Номер читательского билета, на который выдана книга.
         /// </summary>
-        [Column (Name = "chb"), Nullable]
+        [Column ("chb"), Nullable]
         public string? Ticket { get; set; }
 
         /// <summary>

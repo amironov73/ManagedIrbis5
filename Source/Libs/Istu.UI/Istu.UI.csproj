@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>WinForms-based controls and dialogs for Ars Magna project</Description>
-    <Title>WinForms-based controls and dialogs for Ars Magna project</Title>
+    <Description>WinForms-based controls and dialogs for ISTU-related stuff</Description>
+    <Title>WinForms-based controls and dialogs for ISTU-related stuff</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -26,21 +26,7 @@
     <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
     <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
     <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
+    <ProjectReference Include="..\Istu5\Istu5.csproj" />
   </ItemGroup>
 
 </Project>
