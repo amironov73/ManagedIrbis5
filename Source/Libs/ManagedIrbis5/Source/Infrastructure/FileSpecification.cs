@@ -123,6 +123,11 @@ namespace ManagedIrbis.Infrastructure
 
          } // method Build
 
+         /// <summary>
+         /// Клонирование спецификации.
+         /// </summary>
+         public FileSpecification Clone() => (FileSpecification) MemberwiseClone();
+
         /// <summary>
         /// Parse the text specification.
         /// </summary>
