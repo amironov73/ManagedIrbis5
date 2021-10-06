@@ -112,7 +112,7 @@ namespace ManagedIrbis.Scripting
         public string[] FMA (int tag) => Record?.FMA (tag) ?? Array.Empty<string>();
 
         /// <summary>
-        /// Текст всех подполей с указанным тегом и кодом.
+        /// Текст всех подполей с указанной меткой и кодом.
         /// </summary>
         public string[] FMA (int tag, char code) => Record?.FMA(tag, code) ?? Array.Empty<string>();
 
@@ -132,7 +132,7 @@ namespace ManagedIrbis.Scripting
         /// <summary>
         /// Вывод текста.
         /// </summary>
-        public void Write (string text) => Output.Write (text);
+        public void Write (string? text) => Output.Write (text);
 
         /// <summary>
         /// Переход на новую строку.
@@ -140,9 +140,9 @@ namespace ManagedIrbis.Scripting
         public void WriteLine() => Output.WriteLine();
 
         /// <summary>
-        /// Вывод текста.
+        /// Вывод текста с последующим переходом на новую строку.
         /// </summary>
-        public void WriteLine (string text) => Output.WriteLine (text);
+        public void WriteLine (string? text) => Output.WriteLine (text);
 
         #endregion
 

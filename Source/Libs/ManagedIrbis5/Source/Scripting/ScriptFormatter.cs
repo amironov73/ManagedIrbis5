@@ -115,18 +115,18 @@ namespace ManagedIrbis.Scripting
             /// <summary>
             /// Добавление ссылки на указанную сборку.
             /// </summary>
-            private void AddReference (string assemblyRef) => AddReference(Assembly.Load(assemblyRef));
+            public void AddReference (string assemblyRef) => AddReference (Assembly.Load (assemblyRef));
 
             /// <summary>
             /// Добавление ссылки на указанную сборку.
             /// </summary>
             private void AddReference (Assembly assembly) =>
-                References.Add(MetadataReference.CreateFromFile(assembly.Location));
+                References.Add(MetadataReference.CreateFromFile (assembly.Location));
 
             /// <summary>
             /// Добавление ссылки на сборку, содержащую указанный тип.
             /// </summary>
-            private void AddReference (Type type) => AddReference(type.Assembly);
+            private void AddReference (Type type) => AddReference (type.Assembly);
 
         } // class ScriptOptions
 
@@ -141,7 +141,14 @@ namespace ManagedIrbis.Scripting
             var localOptions = new LocalOptions();
             localOptions.AddDefaultReferences();
 
-            var syntaxTree = CSharpSyntaxTree.ParseText (sourceCode);
+            var transformer = new ScriptTransformer();
+            var fullScript = transformer.TransformScript (sourceCode);
+            foreach (var additionalReference in transformer.References)
+            {
+                localOptions.AddReference (additionalReference);
+            }
+
+            var syntaxTree = CSharpSyntaxTree.ParseText (fullScript);
             var compilationOptions = new CSharpCompilationOptions (OutputKind.DynamicallyLinkedLibrary);
             var compilation = CSharpCompilation.Create
                 (

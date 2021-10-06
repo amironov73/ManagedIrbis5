@@ -10,6 +10,10 @@
       <Content Include="HelloWorld.is">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="HelloShort.is" />
+      <Content Include="HelloShort.is">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
