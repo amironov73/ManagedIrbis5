@@ -1,0 +1,26 @@
+﻿using System;
+using System.IO;
+
+using ManagedIrbis;
+using ManagedIrbis.Scripting;
+
+sealed class HelloScript : ScriptContext
+{
+    public HelloScript (ISyncProvider provider, TextWriter output)
+       : base (provider, output) {}
+
+    public override void AfterAll()
+    {
+        WriteLine ("В конце");
+    }
+
+    public override void BeforeAll()
+    {
+        WriteLine ("В начале");
+    }
+
+    public override void FormatRecord()
+    {
+        WriteLine (FM (200, 'a'));
+    }
+}

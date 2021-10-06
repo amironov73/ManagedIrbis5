@@ -574,7 +574,7 @@ namespace ManagedIrbis
         } // method Encode
 
         /// <summary>
-        /// Получить текст поля до разделителей подполей
+        /// Получение текста поля до разделителей подполей
         /// первого повторения поля с указанной меткой.
         /// </summary>
         /// <param name="tag">Метка поля.</param>
@@ -786,7 +786,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Формирует плоское текстовое представление записи.
         /// </summary>
-        public string ToPlainText() => PlainText.ToPlainText(this);
+        public string ToPlainText() => PlainText.ToPlainText (this);
 
         #endregion
 
