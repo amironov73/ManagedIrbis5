@@ -96,15 +96,32 @@ namespace ManagedIrbis.Scripting
         }
 
         /// <summary>
+        /// Число повторений поля с указанной меткой.
+        /// </summary>
+        public int Count (int tag) => Record?.Count (tag) ?? 0;
+
+        /// <summary>
         /// Получение текста поля до разделителей подполей
         /// первого повторения поля с указанной меткой.
         /// </summary>
         public string? FM (int tag) => Record?.FM (tag);
 
         /// <summary>
+        /// Получение текста поля до разделителей подполей
+        /// указанного повторения поля.
+        /// </summary>
+        public string? FM (int tag, int occurrence) => Record?.GetField (tag, occurrence)?.Value;
+
+        /// <summary>
         /// Текст первого подполя с указанным тегом и кодом.
         /// </summary>
         public string? FM (int tag, char code) => Record?.FM (tag, code);
+
+        /// <summary>
+        /// Текст первого подполя с указанным тегом и кодом у зданного повторения поля.
+        /// </summary>
+        public string? FM (int tag, int occurrence, char code) =>
+            Record?.GetField (tag, occurrence)?.GetFirstSubFieldValue (code);
 
         /// <summary>
         /// Текст всех полей с указанным тегом.
@@ -128,6 +145,23 @@ namespace ManagedIrbis.Scripting
         {
             // метод нужно переопределить в потомке
         }
+
+        /// <summary>
+        /// Вывод значения поля до первого разделителя
+        /// или подполя с заданным кодом (с учетом повторяющихся групп).
+        /// </summary>
+        public bool V
+            (
+                int tag,
+                char? code = null,
+                string? prefix = null,
+                string? before = null,
+                string? after = null,
+                string? suffix = null,
+                bool skipFirst = false,
+                bool skipLast = false
+            )
+            => RepeatingGroup.V (Output, Record, tag, code, prefix, before, after, suffix, skipFirst, skipLast);
 
         /// <summary>
         /// Вывод текста.

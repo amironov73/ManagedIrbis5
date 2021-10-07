@@ -1,5 +1,11 @@
-﻿using System.IO;
+﻿// ReSharper disable IdentifierTypo
+// ReSharper disable CheckNamespace
+// ReSharper disable StringLiteralTypo
+
+using System.IO;
+
 using AM;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using ManagedIrbis;
@@ -8,14 +14,10 @@ using ManagedIrbis.Records;
 
 #nullable enable
 
-// ReSharper disable IdentifierTypo
-// ReSharper disable CheckNamespace
-// ReSharper disable StringLiteralTypo
-
 namespace UnitTests.ManagedIrbis
 {
     [TestClass]
-    public class RawRecordTest
+    public sealed class RawRecordTest
         : Common.CommonUnitTest
     {
         [TestMethod]

@@ -416,6 +416,27 @@ namespace ManagedIrbis
 
         } // method Clone
 
+        /// <summary>
+        /// Вычисление числа повторений поля с указанной меткой.
+        /// </summary>
+        public int Count
+            (
+                int tag
+            )
+        {
+            var result = 0;
+            foreach (var field in Fields)
+            {
+                if (field.Tag == tag)
+                {
+                    ++result;
+                }
+            }
+
+            return result;
+
+        } // return Count
+
         /// <inheritdoc cref="IRecord.Decode(Response)"/>
         public void Decode
             (
