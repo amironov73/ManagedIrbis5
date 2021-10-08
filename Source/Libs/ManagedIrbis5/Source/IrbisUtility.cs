@@ -73,7 +73,7 @@ namespace ManagedIrbis
             )
         {
             // Пустая строка зашифрованной быть не может.
-            if (string.IsNullOrEmpty(possiblyEncrypted))
+            if (string.IsNullOrEmpty (possiblyEncrypted))
             {
                 return possiblyEncrypted;
             }
@@ -82,8 +82,9 @@ namespace ManagedIrbis
             // закодированная в банальный Base64.
             if (possiblyEncrypted[0] == '!')
             {
-                var enc = possiblyEncrypted.Substring(1);
-                var res = SecurityUtility.DecryptFromBase64(enc);
+                var enc = possiblyEncrypted.Substring (1);
+                var res = SecurityUtility.DecryptFromBase64 (enc);
+
                 return res;
             }
 
@@ -93,13 +94,13 @@ namespace ManagedIrbis
                 return possiblyEncrypted;
             }
 
-            var encrypted = possiblyEncrypted.Substring(1);
-            if (string.IsNullOrEmpty(password))
+            var encrypted = possiblyEncrypted.Substring (1);
+            if (string.IsNullOrEmpty (password))
             {
                 password = "irbis";
             }
 
-            var result = SecurityUtility.Decrypt(encrypted, password);
+            var result = SecurityUtility.Decrypt (encrypted, password);
 
             return result;
 

@@ -16,13 +16,8 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.CommandLine.Builder;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -134,17 +129,28 @@ namespace ManagedIrbis.Scripting
         public string[] FMA (int tag, char code) => Record?.FMA(tag, code) ?? Array.Empty<string>();
 
         /// <summary>
-        /// Проверка, есть ли в записи поле с указанной меткой.
-        /// </summary>
-        public bool HaveField (int tag) => Record?.HaveField (tag) ?? false;
-
-        /// <summary>
         /// Форматирование записи.
         /// </summary>
         public virtual void FormatRecord()
         {
             // метод нужно переопределить в потомке
         }
+
+        /// <summary>
+        /// Проверка, есть ли в записи поле с указанной меткой.
+        /// </summary>
+        public bool HaveField (int tag) => Record?.HaveField (tag) ?? false;
+
+        /// <summary>
+        /// Проверка, есть ли в записи подполе с указанной меткой.
+        /// </summary>
+        public bool HaveSubfield (int tag, char code) =>
+            Record?.GetField (tag)?.HaveSubField (code) ?? false;
+
+        /// <summary>
+        /// Простейшее расформатирование на уровне "v910^b + |, |".
+        /// </summary>
+        public void S (string? format) => Record.SimpleFormat (format);
 
         /// <summary>
         /// Вывод значения поля до первого разделителя

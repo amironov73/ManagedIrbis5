@@ -635,19 +635,20 @@ namespace ManagedIrbis
         #region IVerifiable members
 
         /// <inheritdoc cref="IVerifiable.Verify"/>
-        public bool Verify(bool throwOnError)
+        public bool Verify (bool throwOnError)
         {
-            var verifier = new Verifier<ConnectionSettings>(this, throwOnError);
+            var verifier = new Verifier<ConnectionSettings> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Host, "Host")
-                .Assert(Port > 0, "Port")
-                .NotNullNorEmpty(Username, "Username")
-                .NotNullNorEmpty(Password, "Password")
-                .NotNullNorEmpty(Workstation)
-                .NotNullNorEmpty(Database);
+                .NotNullNorEmpty (Host, "Host")
+                .Assert (Port > 0, "Port")
+                .NotNullNorEmpty (Username, "Username")
+                .NotNullNorEmpty (Password, "Password")
+                .NotNullNorEmpty (Workstation)
+                .NotNullNorEmpty (Database);
 
             return verifier.Result;
+
         } // method Verify
 
         #endregion

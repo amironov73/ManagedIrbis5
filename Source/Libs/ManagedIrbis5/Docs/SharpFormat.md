@@ -74,6 +74,8 @@ WriteLine (FM (200, 'a'));
 * **string[] FMA (int tag)** - текст до разделителя всех повторений поля (пустые строки исключаются).
 * **string[] FMA (int tag, char code)** - текст всех подполей с указанной меткой и полем.
 * **bool HaveField (int tag)** - проверка, есть ли в записи поле с указанной меткой.
+* **bool HaveSubfield (int tag, char code)** - проверка, есть ли в записи подполе с указанным кодом.
+* **void S (string? format)** - простейшее расформатирование на уровне "v910^b + |, |".
 * **bool V (int tag, char? code = null, string? prefix = null, string? before = null, string? after = null, string? suffix = null, bool skipFirst = false, bool skipLast = false)** - вывод значения поля до первого разделителя или подполя с заданным кодом (с учетом повторяющихся групп).
 * **void Write (string text)** - вывод текста.
 * **void WriteLine()** - переход на новую строку.

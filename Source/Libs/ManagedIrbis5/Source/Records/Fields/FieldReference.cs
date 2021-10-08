@@ -313,10 +313,12 @@ namespace ManagedIrbis
                     );
 
                 throw;
-            }
+
+            } // catch
 
             return result;
-        }
+
+        } // method Parse
 
         #endregion
 
@@ -338,7 +340,8 @@ namespace ManagedIrbis
             SubField = reader.ReadChar();
             Tag = reader.ReadPackedInt32();
             TagSpecification = reader.ReadNullableString();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -357,7 +360,8 @@ namespace ManagedIrbis
                 .Write(SubField);
             writer.WritePackedInt32(Tag);
             writer.WriteNullable(TagSpecification);
-        }
+
+        } // method SaveToString
 
         #endregion
 
@@ -376,11 +380,14 @@ namespace ManagedIrbis
                 );
 
             verifier
-                .Positive(Tag, "Tag");
+                .Positive (Tag, nameof (Tag));
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
-    }
-}
+
+    } // class FieldReference
+
+} // namespace ManagedIrbis

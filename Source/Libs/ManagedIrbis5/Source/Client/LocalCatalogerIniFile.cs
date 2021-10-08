@@ -13,7 +13,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* LocalCatalogerIniFile.cs -- локальный INI-файл для АРМ Каталогизатор.
+/* LocalCatalogerIniFile.cs -- локальный INI-файл для АРМ Каталогизатор (cirbisc.ini)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,43 +33,43 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis.Client
 {
     /// <summary>
-    /// Локальный INI-файл для АРМ Каталогизатор.
+    /// Локальный INI-файл для АРМ Каталогизатор (cirbisc.ini).
     /// </summary>
-    public class LocalCatalogerIniFile
+    public sealed class LocalCatalogerIniFile
     {
         #region Properties
 
         /// <summary>
-        /// INI-file.
+        /// INI-файл.
         /// </summary>
         public IniFile Ini { get; private set; }
 
         /// <summary>
-        /// Context section.
+        /// Секция <c>[Context]</c>.
         /// </summary>
         public ContextIniSection Context => _contextIniSection;
 
         /// <summary>
-        /// Desktop section.
+        /// Секция <c>[Desktop]</c>.
         /// </summary>
         private DesktopIniSection Desktop => _desktopIniSection;
 
         /// <summary>
-        /// Magna section.
+        /// Секция <c>[Magna]</c> (наша).
         /// </summary>
         public IniFile.Section MagnaSection
         {
             get
             {
                 var ini = Ini;
-                var result = ini.GetOrCreateSection("Magna");
+                var result = ini.GetOrCreateSection ("Magna");
 
                 return result;
             }
         }
 
         /// <summary>
-        /// Main section.
+        /// Секция <c>[Main]</c>.
         /// </summary>
         public IniFile.Section Main
         {
@@ -85,41 +85,55 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Организация, на которую куплен ИРБИС.
         /// </summary>
-        public string? Organization => Main["User"];
+        public string? Organization => Main ["User"];
 
         /// <summary>
-        /// IP адрес ИРБИС сервера.
+        /// IP-адрес ИРБИС-сервера.
         /// </summary>
-        public string ServerIP => Main["ServerIP"] ?? "127.0.0.1";
+        public string ServerIP => Main ["ServerIP"] ?? "127.0.0.1";
 
         /// <summary>
-        /// Port number of the IRBIS server.
+        /// Номер порта, на котором ИРБИС-сервер ожидает подключения.
         /// </summary>
-        public ushort ServerPort => Convert.ToUInt16(Main["ServerPort"] ?? "6666");
+        public ushort ServerPort => Convert.ToUInt16 (Main["ServerPort"] ?? "6666");
 
         /// <summary>
-        /// User login.
+        /// Логин, используемый пользователем.
         /// </summary>
         public string? UserName
         {
             get
             {
-                const string Login = "UserName";
-                return Context.UserName ?? MagnaSection[Login];
-            }
-        }
+                var result = Context.UserName ?? MagnaSection [nameof (UserName)];
+                if (!string.IsNullOrEmpty (result))
+                {
+                    result = IrbisUtility.DecryptConnectionString (result, null);
+                }
+
+                return result;
+
+            } // get
+
+        } // property UseeName
 
         /// <summary>
-        /// User password.
+        /// Пароль для автоматического входа на сервер.
         /// </summary>
         public string? UserPassword
         {
             get
             {
-                const string Password = "UserPassword";
-                return Context.Password ?? MagnaSection[Password];
-            }
-        }
+                var result = Context.Password ?? MagnaSection [nameof (UserPassword)];
+                if (!string.IsNullOrEmpty (result))
+                {
+                    result = IrbisUtility.DecryptConnectionString (result, null);
+                }
+
+                return result;
+
+            } // get
+
+        } // property UserPassword
 
         #endregion
 
@@ -150,7 +164,8 @@ namespace ManagedIrbis.Client
         #region Public methods
 
         /// <summary>
-        /// Build connection string.
+        /// Построение строки подключения по хранящимся
+        /// в INI-файле настройкам.
         /// </summary>
         public string BuildConnectionString()
         {
@@ -163,16 +178,17 @@ namespace ManagedIrbis.Client
             };
 
             return settings.ToString();
-        }
+
+        } // method BuildConnectionString
 
         /// <summary>
-        /// Get value.
+        /// Получение значения из указанных секции и ключа.
         /// </summary>
         public string? GetValue
             (
                 string sectionName,
                 string keyName,
-                string? defaultValue
+                string? defaultValue = null
             )
         {
             Sure.NotNullNorEmpty(sectionName, nameof(sectionName));
@@ -186,26 +202,29 @@ namespace ManagedIrbis.Client
                 );
 
             return result;
-        }
 
+        } // method GetValue
 
         /// <summary>
-        /// Load from specified file.
+        /// Загрузка из указанного локального файла.
         /// </summary>
         public static LocalCatalogerIniFile Load
             (
                 string fileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, "fileName");
+            Sure.NotNullNorEmpty (fileName, nameof (fileName));
 
             var iniFile = new IniFile();
-            iniFile.Read(fileName, IrbisEncoding.Ansi);
-            var result = new LocalCatalogerIniFile(iniFile);
+            iniFile.Read (fileName, IrbisEncoding.Ansi);
+            var result = new LocalCatalogerIniFile (iniFile);
 
             return result;
-        }
+
+        } // method Load
 
         #endregion
-    }
-}
+
+    } // class LocalCatalogerIniFile
+
+} // namespace ManagedIrbis.Client

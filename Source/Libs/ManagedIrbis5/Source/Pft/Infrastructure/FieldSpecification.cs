@@ -716,7 +716,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             RawText = navigator.Substring(start, length).ToString();
 
             return true;
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Parse short specification from text.
@@ -726,10 +727,11 @@ namespace ManagedIrbis.Pft.Infrastructure
                 string text
             )
         {
-            var navigator = new TextNavigator(text);
+            var navigator = new TextNavigator (text);
 
-            return ParseShort(navigator);
-        }
+            return ParseShort (navigator);
+
+        } // method ParseShort
 
         /// <summary>
         /// Parse short specification from navigator.
@@ -819,7 +821,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             RawText = navigator.Substring(start, length).ToString();
 
             return true;
-        }
+
+        } // method ParseShort
 
         /// <summary>
         /// Parse specification for Unifor.
@@ -1045,7 +1048,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             RawText = navigator.Substring(start, length).ToString();
 
             return true;
-        }
+
+        } // method ParseUnifor
 
         /// <summary>
         /// Serialize the specification.
@@ -1069,7 +1073,8 @@ namespace ManagedIrbis.Pft.Infrastructure
             writer.WriteNullable(SubFieldSpecification);
             writer.WriteNullable(RawText);
             writer.Write(ParseSubFieldSpecification);
-        }
+
+        } // method Serialize
 
         #endregion
 
@@ -1084,6 +1089,7 @@ namespace ManagedIrbis.Pft.Infrastructure
             result.SubFieldRepeat = (IndexSpecification) SubFieldRepeat.Clone();
 
             return result;
+
         } // method Clone
 
         #endregion

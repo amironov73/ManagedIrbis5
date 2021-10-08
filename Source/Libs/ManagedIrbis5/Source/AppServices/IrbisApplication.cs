@@ -20,10 +20,13 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 using AM;
 using AM.AppServices;
+using AM.IO;
 
+using ManagedIrbis.Client;
 using ManagedIrbis.CommandLine;
 using ManagedIrbis.Providers;
 
@@ -62,6 +65,11 @@ namespace ManagedIrbis.AppServices
         /// </summary>
         public virtual ConnectionFactory Factory => ConnectionFactory.Shared;
 
+        /// <summary>
+        /// INI-файл.
+        /// </summary>
+        public LocalCatalogerIniFile IniFile { get; protected set; }
+
         #endregion
 
         #region Construction
@@ -76,6 +84,8 @@ namespace ManagedIrbis.AppServices
             )
             : base(args)
         {
+            IniFile = new LocalCatalogerIniFile (new IniFile());
+
         } // constructor
 
         #endregion
@@ -91,12 +101,24 @@ namespace ManagedIrbis.AppServices
         /// </remarks>
         protected virtual void BuildConnectionSettings()
         {
+            Settings = new ConnectionSettings();
+
+            // сначала берем настройки из INI-файла, если он есть
+            var connectionString = IniFile.BuildConnectionString();
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                Settings.ParseConnectionString (connectionString);
+                if (Settings.Verify (false))
+                {
+                    return;
+                }
+            }
+
             // сначала берем настройки из стандартного JSON-файла конфигурации
-            var connectionString = ConnectionUtility.GetConfiguredConnectionString(Configuration)
+            connectionString = ConnectionUtility.GetConfiguredConnectionString (Configuration)
                 ?? ConnectionUtility.GetStandardConnectionString();
 
-            Settings = new ConnectionSettings();
-            if (!string.IsNullOrEmpty(connectionString))
+            if (!string.IsNullOrEmpty (connectionString))
             {
                 Settings.ParseConnectionString(connectionString);
             }
@@ -137,11 +159,40 @@ namespace ManagedIrbis.AppServices
                 IServiceCollection services
             )
         {
+            LoadIniFile();
             BuildConnectionSettings();
             Connection = Factory.CreateSyncConnection();
-            Settings.ThrowIfNull(nameof(Settings)).Apply(Connection);
+            Settings.ThrowIfNull (nameof (Settings)).Apply (Connection);
 
         } // method ConfigureConnection
+
+        /// <summary>
+        /// Получение имени INI-файла.
+        /// </summary>
+        protected virtual string? GetIniFileName() => "cirbisc.ini";
+
+        /// <summary>
+        /// Загрузка INI-файла.
+        /// </summary>
+        protected virtual bool LoadIniFile()
+        {
+            var iniName = GetIniFileName();
+            if (string.IsNullOrEmpty(iniName))
+            {
+                return false;
+            }
+
+            var iniPath = Path.Combine (AppContext.BaseDirectory, iniName);
+            if (File.Exists (iniPath))
+            {
+                IniFile = LocalCatalogerIniFile.Load (iniPath);
+
+                return true;
+            }
+
+            return false;
+
+        } // method LoadIniFile
 
         #endregion
 
@@ -169,23 +220,23 @@ namespace ManagedIrbis.AppServices
                 PreRun();
 
                 using var host = Magna.Host;
-                using var connection = Connection.ThrowIfNull(nameof(Connection));
+                using var connection = Connection.ThrowIfNull (nameof (Connection));
                 connection.Connect();
                 if (!connection.Connected)
                 {
-                    Logger.LogError("Can't connect");
-                    Logger.LogInformation(IrbisException.GetErrorDescription(connection.LastError));
+                    Logger.LogError ("Can't connect");
+                    Logger.LogInformation (IrbisException.GetErrorDescription(connection.LastError));
 
                     return 1;
                 }
 
-                Logger.LogInformation("Successfully connected");
+                Logger.LogInformation ("Successfully connected");
 
                 Magna.Host.Start();
 
                 var result = ActualRun();
 
-                Logger.LogInformation("Disconnecting");
+                Logger.LogInformation ("Disconnecting");
 
                 return result;
 

@@ -437,6 +437,32 @@ namespace ManagedIrbis
 
         } // return Count
 
+        /// <summary>
+        /// Вычисление числа повторений поля с указанными меткой и кодом подполя.
+        /// </summary>
+        public int Count
+            (
+                int tag,
+                char code
+            )
+        {
+            var result = 0;
+            foreach (var field in Fields)
+            {
+                if (field.Tag == tag)
+                {
+                    if (field.HaveSubField (code))
+                    {
+                        ++result;
+                    }
+                }
+
+            } // foreach
+
+            return result;
+
+        } // return Count
+
         /// <inheritdoc cref="IRecord.Decode(Response)"/>
         public void Decode
             (
@@ -600,7 +626,13 @@ namespace ManagedIrbis
         /// </summary>
         /// <param name="tag">Метка поля.</param>
         /// <returns>Значение поля или <c>null</c>.</returns>
-        public string? FM ( int tag ) => GetField(tag)?.Value;
+        public string? FM (int tag) => GetField (tag)?.Value;
+
+        /// <summary>
+        /// Получение текста поля до разделителей.
+        /// </summary>
+        public string? FM (int tag, int occurrence) =>
+            GetField (tag, occurrence)?.Value;
 
         /// <summary>
         /// Текст первого подполя с указанным тегом и кодом.
@@ -611,9 +643,9 @@ namespace ManagedIrbis
                 char code
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag, nameof(tag));
 
-            var field = GetField(tag);
+            var field = GetField (tag);
 
             if (!ReferenceEquals(field, null))
             {
@@ -623,6 +655,49 @@ namespace ManagedIrbis
             }
 
             return default;
+
+        } // method FM
+
+        /// <summary>
+        /// Текст заданного подполя с указанным тегом и кодом.
+        /// </summary>
+        public string? FM
+            (
+                int tag,
+                int occurrence,
+                char code
+            )
+        {
+            Sure.Positive (tag, nameof (tag));
+
+            var index = 0;
+            while (true)
+            {
+                var field = GetField (tag, index);
+                if (field is null)
+                {
+                    break;
+                }
+
+                var value = code == '*'
+                    ? field.GetValueOrFirstSubField()
+                    : field.GetSubFieldValue(code);
+
+                if (!string.IsNullOrEmpty(value))
+                {
+                    if (occurrence == 0)
+                    {
+                        return value;
+                    }
+
+                    --occurrence;
+                }
+
+                ++index;
+
+            } // while
+
+            return null;
 
         } // method FM
 
