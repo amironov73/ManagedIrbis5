@@ -57,10 +57,10 @@ namespace ManagedIrbis.Quality.Rules
 
         #region QualityRule members
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="QualityRule.FieldSpec" />
         public override string FieldSpec => "101";
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="QualityRule.CheckRecord" />
         public override RuleReport CheckRecord
             (
                 RuleContext context
@@ -91,7 +91,8 @@ namespace ManagedIrbis.Quality.Rules
             }
 
             return EndCheck();
-        }
+
+        } // method CheckRecord
 
         #endregion
 

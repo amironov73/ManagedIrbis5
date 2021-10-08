@@ -15,6 +15,7 @@
 
 #region Using directives
 
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
@@ -297,7 +298,7 @@ namespace ManagedIrbis
 
             #region IEnumeator members
 
-            /// <inheritdoc cref="IEnumerator{T}.MoveNext"/>
+            /// <inheritdoc cref="IEnumerator.MoveNext"/>
             public bool MoveNext() => ++_index < _group.Count;
 
             /// <inheritdoc cref="IEnumerator{T}.Current"/>

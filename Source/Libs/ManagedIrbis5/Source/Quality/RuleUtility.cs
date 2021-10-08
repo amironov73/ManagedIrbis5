@@ -9,7 +9,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* RuleUtility.cs -- utility routines for quality rules
+/* RuleUtility.cs -- вспомогательные методы для работы с правилами.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -28,7 +28,7 @@ using AM;
 namespace ManagedIrbis.Quality
 {
     /// <summary>
-    /// Utility routines for quality rules.
+    /// Вспомогательные методы для работы с правилами.
     /// </summary>
     public static class RuleUtility
     {
@@ -37,16 +37,7 @@ namespace ManagedIrbis.Quality
         /// <summary>
         /// Плохие символы, которые не должны встречаться в записях.
         /// </summary>
-        public static char[] BadCharacters
-        {
-            get { return _badCharacters; }
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static readonly char[] _badCharacters =
+        public static char[] BadCharacters { get; } =
         {
             // Управляющие символы
             '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06',
@@ -113,8 +104,16 @@ namespace ManagedIrbis.Quality
             '\u3000', // Ideographic space
 
             '\uFEFF'  // Zero width no-break space
-        };
 
+        }; // property BadCharacters
+
+        #endregion
+
+        #region Private members
+
+        /// <summary>
+        /// Разделители в спецификации полей
+        /// </summary>
         private static readonly char[] _delimiters = {';', ',', ' ', '\t'};
 
         // ReSharper disable PossibleMultipleEnumeration
@@ -125,22 +124,26 @@ namespace ManagedIrbis.Quality
                 string oneSpec
             )
         {
-            if (string.IsNullOrEmpty(oneSpec))
+            if (string.IsNullOrEmpty (oneSpec))
             {
                 return Array.Empty<Field>();
             }
+
             if (oneSpec.Contains("x"))
             {
                 oneSpec = oneSpec.Replace("x", "[0-9]");
             }
+
             if (oneSpec.Contains("X"))
             {
                 oneSpec = oneSpec.Replace("X", "[0-9]");
             }
+
             return oneSpec.Contains("[")
                 ? fields.GetFieldRegex(oneSpec)
                 : fields.GetField(FastNumber.ParseInt32(oneSpec));
-        }
+
+        } // method _GetField1
 
         private static IEnumerable<Field> _GetField2
             (
@@ -162,14 +165,15 @@ namespace ManagedIrbis.Quality
             }
 
             return result.ToArray();
-        }
+
+        } // method _GetField2
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Get field by specification.
+        /// Отбор полей записи согласно заданной спецификации.
         /// </summary>
         public static Field[] GetFieldBySpec
             (
@@ -177,27 +181,37 @@ namespace ManagedIrbis.Quality
                 string? allSpec
             )
         {
-            if (string.IsNullOrEmpty(allSpec))
+            /*
+
+               Спецификация состоит из двух частей,
+               разделенных восклицательным знаком:
+
+               1. Обязательная часть: поля, включаемые в результат.
+               2. Необязательная часть: поля, исключаемые из результата.
+
+             */
+
+            if (string.IsNullOrEmpty (allSpec))
             {
-                return new Field[0];
+                return Array.Empty<Field>();
             }
 
             var result = new List<Field>();
 
-            var parts = allSpec.Split('!');
+            var parts = allSpec.Split ('!');
             if (parts.Length > 2)
             {
                 Magna.Error
                     (
-                        "RuleUtility::GetFieldBySpec: "
+                        nameof (RuleUtility) + "::" + nameof (GetFieldBySpec)
                         + "bad spec format="
                         + allSpec.ToVisibleString()
                     );
 
-                throw new FormatException("allSpec");
+                throw new FormatException (nameof (allSpec));
             }
 
-            var include = parts[0].Trim(_delimiters);
+            var include = parts[0].Trim (_delimiters);
             var exclude = parts.Length == 2
                 ? parts[1].Trim(_delimiters)
                 : string.Empty;
@@ -224,25 +238,16 @@ namespace ManagedIrbis.Quality
             }
 
             return result.ToArray();
-        }
+
+        } // method GetFieldBySpec
 
         /// <summary>
-        /// Whether the character is bad?
+        /// Проверка: плохой символ?
         /// </summary>
-        public static bool IsBadCharacter
-            (
-                char c
-            )
-        {
-            return Array.IndexOf
-                (
-                    BadCharacters,
-                    c
-                ) >= 0;
-        }
+        public static bool IsBadCharacter (char c) => Array.IndexOf (BadCharacters, c) >= 0;
 
         /// <summary>
-        /// Индекс первого найденного плохого символа в строке
+        /// Индекс первого найденного плохого символа в строке.
         /// </summary>
         public static int BadCharacterPosition
             (
@@ -257,11 +262,13 @@ namespace ManagedIrbis.Quality
                     return i;
                 }
             }
+
             return -1;
-        }
+
+        } // method BadCharacterPosition
 
         /// <summary>
-        /// Renumber fields.
+        /// Перенумерация полей.
         /// </summary>
         public static Record RenumberFields
             (
@@ -275,10 +282,11 @@ namespace ManagedIrbis.Quality
                 );
 
             return record;
-        }
+
+        } // method RenumberFields
 
         /// <summary>
-        /// Renumber fields.
+        /// Перенумерация полей (точнее, повторов).
         /// </summary>
         public static void RenumberFields
             (
@@ -299,7 +307,7 @@ namespace ManagedIrbis.Quality
                         count++;
                     }
                 }
-                seen.Add(field.Tag);
+                seen.Add (field.Tag);
                 field.Repeat = count;
                 foreach (var subField in field.Subfields)
                 {
@@ -307,7 +315,7 @@ namespace ManagedIrbis.Quality
                 }
             }
 
-        }
+        } // method RenumberFields
 
         #endregion
 

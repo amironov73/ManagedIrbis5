@@ -29,13 +29,12 @@ namespace ManagedIrbis.Quality.Rules
 
         #region QualityRule members
 
-        /// <inheritdoc />
-        public override string FieldSpec
-        {
-            get { return "461"; }
-        }
+        // TODO проверять также поле 46
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="QualityRule.FieldSpec"/>
+        public override string FieldSpec => "461";
+
+        /// <inheritdoc cref="QualityRule.CheckRecord"/>
         public override RuleReport CheckRecord
             (
                 RuleContext context

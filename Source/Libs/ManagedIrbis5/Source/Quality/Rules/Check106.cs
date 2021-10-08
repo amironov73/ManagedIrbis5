@@ -9,13 +9,13 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* Require102.cs -- страна
+/* Check106.cs -- физическая форма: бумажный носитель
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using ManagedIrbis.Menus;
+using AM;
 
 #endregion
 
@@ -24,41 +24,26 @@ using ManagedIrbis.Menus;
 namespace ManagedIrbis.Quality.Rules
 {
     /// <summary>
-    /// Страна.
+    /// Физическая форма: бумажный носитель.
     /// </summary>
-    public sealed class Require102
+    public sealed class Check106
         : QualityRule
     {
         #region Private members
-
-        private MenuFile? _menu;
 
         private void CheckField
             (
                 Field field
             )
         {
-            MustNotContainSubfields
-                (
-                    field
-                );
-            if (!CheckForMenu(_menu, field.Value))
-            {
-                AddDefect
-                    (
-                        field,
-                        10,
-                        "Поле 102 (страна) не из словаря"
-                    );
-            }
         } // method CheckField
 
         #endregion
 
-        #region QualityRule members
+        #region QualityRules members
 
         /// <inheritdoc cref="QualityRule.FieldSpec"/>
-        public override string FieldSpec => "102";
+        public override string FieldSpec => "106";
 
         /// <inheritdoc cref="QualityRule.CheckRecord"/>
         public override RuleReport CheckRecord
@@ -69,22 +54,6 @@ namespace ManagedIrbis.Quality.Rules
             BeginCheck(context);
 
             var fields = GetFields();
-            if (fields.Length == 0)
-            {
-                AddDefect
-                    (
-                        102,
-                        10,
-                        "Не заполнено поле 102: Страна"
-                    );
-            }
-
-            MustBeUniqueField
-                (
-                    fields
-                );
-
-            _menu = CacheMenu("str.mnu", _menu);
             foreach (var field in fields)
             {
                 CheckField(field);
@@ -96,6 +65,6 @@ namespace ManagedIrbis.Quality.Rules
 
         #endregion
 
-    } // class Require102
+    } // class Check106
 
 } // namespace ManagedIrbis.Quality.Rules
