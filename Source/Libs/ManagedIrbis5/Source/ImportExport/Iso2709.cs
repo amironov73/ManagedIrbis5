@@ -62,7 +62,13 @@ namespace ManagedIrbis.ImportExport
 
         #region Private members
 
-        private static void _Encode(byte[] bytes, int pos, int len, int val)
+        private static void _Encode
+            (
+                byte[] bytes,
+                int pos,
+                int len,
+                int val
+            )
         {
             unchecked
             {
@@ -74,7 +80,8 @@ namespace ManagedIrbis.ImportExport
                     pos--;
                 }
             }
-        }
+
+        } // method _Encode
 
         private static int _Encode
             (
@@ -95,7 +102,8 @@ namespace ManagedIrbis.ImportExport
             }
 
             return pos;
-        }
+
+        } // method _Encode
 
         #endregion
 
@@ -244,7 +252,8 @@ namespace ManagedIrbis.ImportExport
             }
 
             return result;
-        }
+
+        } // method ReadRecord
 
         /// <summary>
         /// Выводит запись в ISO-поток.
@@ -415,8 +424,11 @@ namespace ManagedIrbis.ImportExport
 
             // Собственно записываем
             stream.Write(bytes, 0, bytes.Length);
-        }
+
+        } // method WriteRecord
 
         #endregion
-    }
-}
+
+    } // class Iso2709
+
+} // namespace ManagedIrbis.ImportExport
