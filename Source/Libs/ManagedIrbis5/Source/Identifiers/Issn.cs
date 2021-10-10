@@ -106,6 +106,7 @@ namespace ManagedIrbis.Identifiers
             var result = ConvertDigit(11 - sum % 11);
 
             return result;
+
         } // method ComputeCheckDigit
 
         /// <summary>
@@ -131,6 +132,7 @@ namespace ManagedIrbis.Identifiers
             var result = sum % 11 == 0;
 
             return result;
+
         } // method CheckControlDigit
 
         #endregion

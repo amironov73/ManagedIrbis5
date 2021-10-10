@@ -311,6 +311,7 @@ namespace ManagedIrbis.Identifiers
             }
 
             return result;
+
         } // method Verify
 
         #endregion
