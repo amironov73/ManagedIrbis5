@@ -36,6 +36,7 @@ using AM.IO;
 using ManagedIrbis.Gbl;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Infrastructure.Sockets;
+using ManagedIrbis.Performance;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Records;
 
@@ -79,6 +80,7 @@ namespace ManagedIrbis
             Socket = socket ?? new SyncTcp4Socket();
             Socket.Connection = this;
 
+            _performanceCollector = (IPerformanceCollector?) serviceProvider?.GetService (typeof (IPerformanceCollector));
             _logger = (ILogger?) (serviceProvider?.GetService (typeof(ILogger<SyncConnection>))
                 ?? NullLogger.Instance);
 
@@ -181,7 +183,23 @@ namespace ManagedIrbis
                 SyncQuery query
             )
         {
-            SetBusy(true);
+            PerfRecord? perfRecord = null;
+            Stopwatch? stopwatch = null;
+            if (_performanceCollector is not null)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+                perfRecord = new PerfRecord
+                {
+                   Moment = DateTime.Now,
+                   Host = Host,
+                   Code = "none", // TODO: нужно где-то прикопать код операции
+                   OutgoingSize = query.GetLength()
+                };
+
+            } // if
+
+            SetBusy (true);
 
             try
             {
@@ -200,16 +218,30 @@ namespace ManagedIrbis
                     }
                     */
 
-                    result = Socket.TransactSync(query);
+                    result = Socket.TransactSync (query);
                 }
                 catch (Exception exception)
                 {
-                    Debug.WriteLine(exception.Message);
+                    Debug.WriteLine (exception.Message);
+                    if (perfRecord is not null)
+                    {
+                        perfRecord.ElapsedTime = stopwatch!.ElapsedMilliseconds;
+                        perfRecord.ErrorMessage = exception.Message;
+                        _performanceCollector!.Collect (perfRecord);
+                    }
+
                     return null;
                 }
 
                 if (result is null)
                 {
+                    if (perfRecord is not null)
+                    {
+                        perfRecord.ElapsedTime = stopwatch!.ElapsedMilliseconds;
+                        perfRecord.ErrorMessage = "No response";
+                        _performanceCollector!.Collect (perfRecord);
+                    }
+
                     return null;
                 }
 
@@ -221,7 +253,14 @@ namespace ManagedIrbis
                 */
 
                 result.Parse();
-                Interlocked.Increment(ref _queryId);
+                if (perfRecord is not null)
+                {
+                    perfRecord.ElapsedTime = stopwatch!.ElapsedMilliseconds;
+                    perfRecord.IncomingSize = result.AnswerSize;
+                    _performanceCollector!.Collect (perfRecord);
+                }
+
+                Interlocked.Increment (ref _queryId);
 
                 return result;
             }

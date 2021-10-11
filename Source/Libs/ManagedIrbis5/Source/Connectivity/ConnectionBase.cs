@@ -23,7 +23,7 @@ using AM.IO;
 using AM.Logging;
 using AM.PlatformAbstraction;
 using AM.Threading;
-
+using ManagedIrbis.Performance;
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -146,6 +146,11 @@ namespace ManagedIrbis
         /// Логгер.
         /// </summary>
         protected internal ILogger? _logger;
+
+        /// <summary>
+        /// Сборщик сведений о производительности.
+        /// </summary>
+        protected internal IPerformanceCollector? _performanceCollector;
 
         /// <summary>
         /// Провайдер сервисов.
