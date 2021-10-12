@@ -5,34 +5,34 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* RepeatKind.cs -- различные варианты повторения
+/* RepeatKind.cs -- различные варианты повторения поля в записи
  * Ars Magna project, http://arsmagna.ru
  */
 
 namespace ManagedIrbis.Gbl.Infrastructure
 {
     /// <summary>
-    /// Различные варианты повторения.
+    /// Различные варианты повторения поля в записи.
     /// </summary>
     public enum RepeatKind
     {
         /// <summary>
-        /// All the repeats.
+        /// Все повторения, какие есть в записи.
         /// </summary>
         All,
 
         /// <summary>
-        /// By format.
+        /// Повторения согласно формату.
         /// </summary>
         ByFormat,
 
         /// <summary>
-        /// Last repeat.
+        /// Последнее повторение.
         /// </summary>
         Last,
 
         /// <summary>
-        /// Explicit specified repeat.
+        /// Явно заданное повтоение.
         /// </summary>
         Explicit
 

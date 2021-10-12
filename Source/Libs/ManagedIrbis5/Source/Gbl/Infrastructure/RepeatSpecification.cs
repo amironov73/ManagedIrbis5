@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* RepeatSpecification.cs -- спецификация повторения
+/* RepeatSpecification.cs -- спецификация повторения поля в записи
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -39,7 +39,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
     //
 
     /// <summary>
-    /// Спецификация повторения поля.
+    /// Спецификация повторения поля в записи.
     /// </summary>
     public struct RepeatSpecification
         : IHandmadeSerializable,
@@ -48,16 +48,16 @@ namespace ManagedIrbis.Gbl.Infrastructure
         #region Properties
 
         /// <summary>
-        /// Repeat kind.
+        /// Вид повторения.
         /// </summary>
-        [JsonPropertyName("kind")]
+        [JsonPropertyName ("kind")]
         public RepeatKind Kind { get; set; }
 
         /// <summary>
         /// Number of the repeat.
         /// </summary>
-        [JsonPropertyName("index")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        [JsonPropertyName ("index")]
+        [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingDefault)]
         public int Index { get; set; }
 
         #endregion
@@ -65,7 +65,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public RepeatSpecification
             (
@@ -76,10 +76,11 @@ namespace ManagedIrbis.Gbl.Infrastructure
             Sure.Defined(kind, nameof(kind));
 
             Kind = kind;
-        }
+
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public RepeatSpecification
             (
@@ -91,7 +92,8 @@ namespace ManagedIrbis.Gbl.Infrastructure
 
             Kind = RepeatKind.Explicit;
             Index = index;
-        }
+
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -286,14 +288,10 @@ namespace ManagedIrbis.Gbl.Infrastructure
                     return Index.ToInvariantString();
 
                 default:
-                    return string.Format
-                        (
-                            "Kind={0}, Index={1}",
-                            Kind,
-                            Index
-                        );
+                    return $"Kind={Kind}, Index={Index}";
             }
-        }
+
+        } // method ToString
 
         #endregion
 

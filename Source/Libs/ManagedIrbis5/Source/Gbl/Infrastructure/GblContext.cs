@@ -17,29 +17,34 @@
 namespace ManagedIrbis.Gbl.Infrastructure
 {
     /// <summary>
-    /// Контекст исполнения GBL-программы
+    /// Контекст исполнения программы глобальной корректировки записей.
     /// </summary>
     public sealed class GblContext
     {
         #region Properties
 
         /// <summary>
-        /// Current record.
+        /// Текущая запись (может отсутствовать).
         /// </summary>
         public Record? CurrentRecord { get; set; }
 
         /// <summary>
-        /// Provider.
+        /// Синхронный ИРБИС-провайдер.
         /// </summary>
         public ISyncProvider? Provider { get; set; }
 
         /// <summary>
-        /// Record source.
+        /// Источник записей.
         /// </summary>
-        public IRecordSource? RecordSource { get; set; }
+        public ISyncRecordSource? RecordSource { get; set; }
 
         /// <summary>
-        /// Logger.
+        /// Приемник записей.
+        /// </summary>
+        public ISyncRecordSink? RecordSink { get; set; }
+
+        /// <summary>
+        /// Логгер.
         /// </summary>
         public GblLogger? Logger { get; set; }
 

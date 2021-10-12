@@ -6,23 +6,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* DelrNode.cs --
+/* DelrNode.cs -- удаление записей, поданных на глобальную корректировку
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using AM;
-using AM.Collections;
-using AM.IO;
 
 #endregion
 
@@ -30,13 +20,10 @@ using AM.IO;
 
 namespace ManagedIrbis.Gbl.Infrastructure.Ast
 {
-    //
-    // Удаляет записи, поданные на корректировку.
-    // Не требует никаких дополнительных данных.
-    //
 
     /// <summary>
-    /// Удаляет записи, поданные на корректировку.
+    /// Удаление записей, поданных на глобальную корректировку.
+    /// Дополнительных данных не требуется.
     /// </summary>
     public sealed class GblDelr
         : GblNode
@@ -50,51 +37,47 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
 
         #endregion
 
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
         #region GblNode members
 
-        /// <summary>
-        /// Execute the node.
-        /// </summary>
+        /// <inheritdoc cref="GblNode.Execute"/>
         public override void Execute
             (
                 GblContext context
             )
         {
-            Sure.NotNull(context, nameof(context));
+            Sure.NotNull (context, nameof (context));
 
-            OnBeforeExecution(context);
+            OnBeforeExecution (context);
 
-            // Nothing to do here
+            if (context.CurrentRecord is { } record)
+            {
+                var newStatus = record.Status |= RecordStatus.LogicallyDeleted;
+                if (record.Status != newStatus)
+                {
+                    record.Status = newStatus;
+                    context.RecordSink?.PostRecord
+                        (
+                            record,
+                            "Record was deleted"
+                        );
 
-            OnAfterExecution(context);
-        }
+                } // if
+
+            } // if
+
+            OnAfterExecution (context);
+
+        } // method Execute
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Mnemonic;
-        }
+        public override string ToString() => Mnemonic;
 
         #endregion
-    }
-}
+
+    } // class GblDelr
+
+} // namespace ManagedIrbis.Gbl.Infrastructure.Ast
