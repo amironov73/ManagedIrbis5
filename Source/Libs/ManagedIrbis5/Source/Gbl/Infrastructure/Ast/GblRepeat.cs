@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* GblRepeat.cs --
+/* GblRepeat.cs -- пара операторов REPEAT-UNTIL
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -63,7 +63,7 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
         /// <summary>
         /// Children nodes.
         /// </summary>
-        public GblNodeCollection Children { get; private set; }
+        public GblNodeCollection Children { get; }
 
         #endregion
 
@@ -104,18 +104,18 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
             // Nothing to do here
 
             OnAfterExecution(context);
-        }
+
+        } // method Execute
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Mnemonic;
-        }
+        public override string ToString() => Mnemonic;
 
         #endregion
-    }
-}
+
+    } // class GblRepeat
+
+} // ManagedIrbis.Gbl.Infrastructure.Ast

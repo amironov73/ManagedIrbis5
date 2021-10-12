@@ -14,9 +14,11 @@ before_build:
 - '"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"'
 - python -m pip install --upgrade pip
 - pip install --upgrade pygount sphinx sphinx_rtd_theme
-- pygount -f summary Source/Libs  -s cs -N "*.Designer.cs" -F "obj"
-- pygount -f summary Source/Tests -s cs -N "*.Designer.cs" -F "obj"
-- pygount -f summary Source/Apps  -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Libs                       -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Libs/AM.Core5/Source       -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Libs/ManagedIrbis5/Source  -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Tests                      -s cs -N "*.Designer.cs" -F "obj"
+- pygount -f summary Source/Apps                       -s cs -N "*.Designer.cs" -F "obj"
 - pwsh: |
     Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
     ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-rc.1.21458.32"

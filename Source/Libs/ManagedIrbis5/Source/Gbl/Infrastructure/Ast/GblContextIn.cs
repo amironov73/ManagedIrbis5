@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* GblEmpty.cs -- очистка (опустошение) текущей библиографической записи
+/* GblContextIn.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,9 +21,9 @@ using AM;
 namespace ManagedIrbis.Gbl.Infrastructure.Ast
 {
     /// <summary>
-    /// Очистка (опустошение) текущей библиографической записи.
+    ///
     /// </summary>
-    public sealed class GblEmpty
+    public sealed class GblContextIn
         : GblNode
     {
         #region Constants
@@ -31,7 +31,23 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
         /// <summary>
         /// Command mnemonic.
         /// </summary>
-        public const string Mnemonic = "EMPTY";
+        public const string Mnemonic = "CONTEXTIN";
+
+        #endregion
+
+        #region Properties
+
+        #endregion
+
+        #region Construction
+
+        #endregion
+
+        #region Private members
+
+        #endregion
+
+        #region Public methods
 
         #endregion
 
@@ -49,11 +65,11 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
 
             OnBeforeExecution (context);
 
-            context.CurrentRecord?.Clear();
+            // Nothing to do here
 
             OnAfterExecution (context);
 
-        } // method Execute
+        } // method Excute
 
         #endregion
 
@@ -64,6 +80,6 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
 
         #endregion
 
-    } // method GblEmpty
+    } // class GblContextIn
 
 } // namespace ManagedIrbis.Gbl.Infrastructure.Ast

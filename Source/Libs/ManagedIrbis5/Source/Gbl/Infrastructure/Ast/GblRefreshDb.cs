@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* GblEmpty.cs -- очистка (опустошение) текущей библиографической записи
+/* GblRefreshDb.cs -- обновление контекста работы
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,10 +20,21 @@ using AM;
 
 namespace ManagedIrbis.Gbl.Infrastructure.Ast
 {
+    //
+    // Official documentation
+    //
+    // Начиная с 2016.1
+    //
+    // Добавлена новая команда для пакетных заданий
+    // (только для АРМа Каталогизатор):
+    // REFRESHDB - обновить контекст работы (команда не имеет операндов).
+    //
+    //
+
     /// <summary>
-    /// Очистка (опустошение) текущей библиографической записи.
+    /// Обновление контекста работы.
     /// </summary>
-    public sealed class GblEmpty
+    public sealed class GblRefreshDb
         : GblNode
     {
         #region Constants
@@ -31,7 +42,7 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
         /// <summary>
         /// Command mnemonic.
         /// </summary>
-        public const string Mnemonic = "EMPTY";
+        public const string Mnemonic = "REFRESHDB";
 
         #endregion
 
@@ -49,7 +60,7 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
 
             OnBeforeExecution (context);
 
-            context.CurrentRecord?.Clear();
+            // Nothing to do here
 
             OnAfterExecution (context);
 
@@ -64,6 +75,6 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
 
         #endregion
 
-    } // method GblEmpty
+    } // class GblRefreshDb
 
-} // namespace ManagedIrbis.Gbl.Infrastructure.Ast
+} // ManagedIrbis.Gbl.Infrastructure.Ast
