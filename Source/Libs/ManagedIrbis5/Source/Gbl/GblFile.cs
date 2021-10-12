@@ -28,6 +28,8 @@ using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
+using ManagedIrbis.Infrastructure;
+
 #endregion
 
 #nullable enable
@@ -37,7 +39,7 @@ namespace ManagedIrbis.Gbl
     /// <summary>
     /// Файл GBL.
     /// </summary>
-    [XmlRoot("gbl")]
+    [XmlRoot ("gbl")]
     public sealed class GblFile
         : IHandmadeSerializable,
         IVerifiable
@@ -45,24 +47,24 @@ namespace ManagedIrbis.Gbl
         #region Properties
 
         /// <summary>
-        /// File name.
+        /// Имя файла.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
         public string? FileName { get; set; }
 
         /// <summary>
-        /// Items.
+        /// Операторы глобальной корректировки.
         /// </summary>
-        [XmlElement("item")]
-        [JsonPropertyName("items")]
+        [XmlElement ("item")]
+        [JsonPropertyName ("items")]
         public NonNullCollection<GblStatement> Statements { get; } = new();
 
         /// <summary>
-        /// Signature.
+        /// Параметры глобальной корректировки.
         /// </summary>
-        [XmlElement("parameter")]
-        [JsonPropertyName("parameters")]
+        [XmlElement ("parameter")]
+        [JsonPropertyName ("parameters")]
         public NonNullCollection<GblParameter> Parameters { get; } = new ();
 
         #endregion
@@ -70,22 +72,38 @@ namespace ManagedIrbis.Gbl
         #region Public methods
 
         /// <summary>
-        /// Parse local file.
+        /// Выполнение всех операторов глобальной корректировки.
+        /// </summary>
+        public void Execute
+            (
+                Record record,
+                ISyncProvider provider
+            )
+        {
+            // TODO: implement
+
+        } // method Execute
+
+        /// <summary>
+        /// Чтение локального файла.
         /// </summary>
         public static GblFile ParseLocalFile
             (
                 string fileName,
-                Encoding encoding
+                Encoding? encoding = null
             )
         {
+            encoding ??= IrbisEncoding.Ansi;
+
             using var reader = new StreamReader(fileName, encoding);
             var result = Decode(reader);
 
             return result;
-        }
+
+        } // method ParseLocalFile
 
         /// <summary>
-        /// Parse specified stream.
+        /// Разбор текстового потока.
         /// </summary>
         public static GblFile Decode
             (
@@ -95,25 +113,26 @@ namespace ManagedIrbis.Gbl
             var result = new GblFile();
 
             var line = reader.RequireLine();
-            var count = int.Parse(line);
+            var count = line.ParseInt32();
             for (var i = 0; i < count; i++)
             {
-                var parameter = GblParameter.Decode(reader);
-                result.Parameters.Add(parameter);
+                var parameter = GblParameter.Decode (reader);
+                result.Parameters.Add (parameter);
             }
 
             while (true)
             {
-                var statement = GblStatement.ParseStream(reader);
+                var statement = GblStatement.ParseStream (reader);
                 if (statement is null)
                 {
                     break;
                 }
 
-                result.Statements.Add(statement);
+                result.Statements.Add (statement);
             }
 
             return result;
+
         } // method Decode
 
         #endregion
@@ -129,6 +148,7 @@ namespace ManagedIrbis.Gbl
             FileName = reader.ReadNullableString();
             reader.ReadCollection(Parameters);
             reader.ReadCollection(Statements);
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
@@ -140,6 +160,7 @@ namespace ManagedIrbis.Gbl
             writer.WriteNullable(FileName);
             writer.Write(Parameters);
             writer.Write(Statements);
+
         } // methodSaveToStream
 
         #endregion
@@ -186,6 +207,7 @@ namespace ManagedIrbis.Gbl
             }
 
             return result;
+
         } // method Verify
 
         #endregion

@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* GblUtility.cs -- utility routines for GBL handling
+/* GblUtility.cs -- вспомогательные методы для работы с глобальной корректировкой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,6 +19,7 @@ using System.Xml.Serialization;
 
 using AM;
 using AM.Linq;
+using AM.Text;
 
 using ManagedIrbis.Gbl.Infrastructure;
 using ManagedIrbis.Infrastructure;
@@ -30,14 +31,15 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis.Gbl
 {
     /// <summary>
-    /// Utility routines for GBL file handling.
+    /// Вспомогательные методы для работы с глобальной корректировкой.
     /// </summary>
     public static class GblUtility
     {
         #region Public methods
 
         /// <summary>
-        /// Encode statements for IRBIS64 protocol.
+        /// Кодирование операторов глобальной корректировки
+        /// для протокола ИРБИС64.
         /// </summary>
         public static string EncodeStatements
             (
@@ -46,18 +48,23 @@ namespace ManagedIrbis.Gbl
         {
             Sure.NotNull(statements, nameof(statements));
 
-            StringBuilder result = new StringBuilder();
-            result.Append("!0");
-            result.Append(GblStatement.Delimiter);
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append ("!0"); // похоже, поддержка параметров выброшена
+            builder.Append (GblStatement.Delimiter);
 
-            foreach (GblStatement item in statements)
+            foreach (var statement in statements)
             {
-                result.Append(item.EncodeForProtocol());
+                builder.Append (statement.EncodeForProtocol());
             }
-            result.Append(GblStatement.Delimiter);
 
-            return result.ToString();
-        }
+            builder.Append (GblStatement.Delimiter);
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method EncodeStatements
 
         /*
 
@@ -79,7 +86,7 @@ namespace ManagedIrbis.Gbl
         */
 
         /// <summary>
-        /// Restore <see cref="GblFile"/> from JSON.
+        /// Десериализация <see cref="GblFile"/> из формата XML.
         /// </summary>
         public static GblFile FromXml
             (
@@ -88,17 +95,18 @@ namespace ManagedIrbis.Gbl
         {
             Sure.NotNull(text, nameof(text));
 
-            XmlSerializer serializer = new XmlSerializer(typeof(GblFile));
-            using StringReader reader = new StringReader(text);
-            var result = (GblFile?) serializer.Deserialize(reader);
+            var serializer = new XmlSerializer (typeof (GblFile));
+            using var reader = new StringReader (text);
+            var result = (GblFile?) serializer.Deserialize (reader);
 
-            return result.ThrowIfNull("result");
-        }
+            return result.ThrowIfNull (nameof (result));
+
+        } // method FromXml
 
         //=================================================
 
         /// <summary>
-        /// Build text representation of <see cref="GblNode"/>'s.
+        /// Построение текстового представления операторов глобальной корректировки.
         /// </summary>
         public static void NodesToText
             (
@@ -106,8 +114,8 @@ namespace ManagedIrbis.Gbl
                 IEnumerable<GblNode> nodes
             )
         {
-            bool first = true;
-            foreach (GblNode node in nodes.NonNullItems())
+            var first = true;
+            foreach (var node in nodes.NonNullItems())
             {
                 if (!first)
                 {
@@ -116,7 +124,8 @@ namespace ManagedIrbis.Gbl
                 builder.Append(node);
                 first = false;
             }
-        }
+
+        } // method NodesToText
 
         //=================================================
 
@@ -153,12 +162,12 @@ namespace ManagedIrbis.Gbl
         {
             Sure.NotNullNorEmpty(fileName, nameof(fileName));
 
-            string text = File.ReadAllText
+            var text = File.ReadAllText
                 (
                     fileName,
                     IrbisEncoding.Utf8
                 );
-            GblFile result = FromXml(text);
+            var result = FromXml(text);
 
             return result;
         }
@@ -214,14 +223,15 @@ namespace ManagedIrbis.Gbl
                 this GblFile gbl
             )
         {
-            Sure.NotNull(gbl, nameof(gbl));
+            Sure.NotNull (gbl, nameof (gbl));
 
-            XmlSerializer serializer = new XmlSerializer(typeof(GblFile));
-            StringWriter writer = new StringWriter();
+            var serializer = new XmlSerializer(typeof(GblFile));
+            var writer = new StringWriter();
             serializer.Serialize(writer, gbl);
 
             return writer.ToString();
-        }
+
+        } // method ToXml
 
         #endregion
 

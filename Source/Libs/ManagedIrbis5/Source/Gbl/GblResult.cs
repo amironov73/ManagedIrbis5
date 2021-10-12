@@ -98,6 +98,7 @@ namespace ManagedIrbis.Gbl
             };
 
             return result;
+
         } // method GetEmptyResult
 
         /// <summary>
@@ -129,6 +130,7 @@ namespace ManagedIrbis.Gbl
                     Protocol,
                     otherLines
                 );
+
         } // method MergeResult
 
         /// <summary>
@@ -142,17 +144,16 @@ namespace ManagedIrbis.Gbl
             Protocol = GblProtocolLine.Decode(response);
             RecordsProcessed = Protocol.Length;
             RecordsSucceeded = Protocol.Count(line => line.Success);
-        }
+
+        } // method Parse
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return $"Records processed: {RecordsProcessed}, Canceled: {Canceled}";
-        } // method ToString
+        public override string ToString() =>
+            $"Records processed: {RecordsProcessed}, Canceled: {Canceled}";  // method ToString
 
         #endregion
 

@@ -51,7 +51,8 @@ namespace ManagedIrbis.Gbl
     /// <summary>
     /// Параметр для глобальной корректировки.
     /// </summary>
-    [DebuggerDisplay("{Name}: {Value}")]
+    [XmlRoot ("parameter")]
+    [DebuggerDisplay ("{Name}: {Value}")]
     public sealed class GblParameter
         : IHandmadeSerializable,
         IVerifiable
@@ -61,15 +62,15 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Parameter name.
         /// </summary>
-        [JsonPropertyName("name")]
-        [XmlAttribute("name")]
+        [JsonPropertyName ("name")]
+        [XmlAttribute ("name")]
         public string? Name { get; set; }
 
         /// <summary>
         /// Parameter value.
         /// </summary>
-        [JsonPropertyName("value")]
-        [XmlAttribute("value")]
+        [JsonPropertyName ("value")]
+        [XmlAttribute ("value")]
         public string? Value { get; set; }
 
         #endregion
@@ -91,6 +92,7 @@ namespace ManagedIrbis.Gbl
             };
 
             return result;
+
         } // method Decode
 
         #endregion
@@ -105,7 +107,8 @@ namespace ManagedIrbis.Gbl
         {
             Name = reader.ReadNullableString();
             Value = reader.ReadNullableString();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -113,9 +116,10 @@ namespace ManagedIrbis.Gbl
                 BinaryWriter writer
             )
         {
-            writer.WriteNullable(Name);
-            writer.WriteNullable(Value);
-        }
+            writer.WriteNullable (Name);
+            writer.WriteNullable (Value);
+
+        } // method SaveToStream
 
         #endregion
 
@@ -130,22 +134,22 @@ namespace ManagedIrbis.Gbl
             var verifier = new Verifier<GblParameter>(this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Name, nameof(Name))
-                .NotNullNorEmpty(Value, nameof(Value));
+                .NotNullNorEmpty (Name, nameof (Name))
+                .NotNullNorEmpty (Value, nameof (Value));
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return $"Name: {Name}, Value: {Value}";
-        }
+        public override string ToString() => $"Name: {Name}, Value: {Value}";
 
         #endregion
-    }
-}
+
+    } // class GblParameter
+
+} // namespace ManagedIrbis.Gbl

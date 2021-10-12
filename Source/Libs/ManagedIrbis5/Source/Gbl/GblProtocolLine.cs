@@ -100,7 +100,7 @@ namespace ManagedIrbis.Gbl
                 string line
             )
         {
-            Sure.NotNullNorEmpty(line, line);
+            Sure.NotNullNorEmpty (line, nameof (line));
 
             Text = line;
             Success = true;
@@ -147,9 +147,13 @@ namespace ManagedIrbis.Gbl
                             Error = value;
                             Success = false;
                             break;
+
                     } // switch
+
                 } // if
+
             } // foreach
+
         } // method Decode
 
         /// <summary>
@@ -176,18 +180,15 @@ namespace ManagedIrbis.Gbl
             } // while
 
             return result.ToArray();
+
         } // method Decode
 
         #endregion
 
         #region Object members
 
-
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Text.ToVisibleString();
-        } // method ToString
+        public override string ToString() => Text.ToVisibleString();  // method ToString
 
         #endregion
 

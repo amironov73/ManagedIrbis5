@@ -6,25 +6,9 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* GblNop.cs --
+/* GblNop.cs -- комментарий (пустой оператор)
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using AM;
-using AM.Collections;
-using AM.IO;
-
-#endregion
 
 #nullable enable
 
@@ -38,7 +22,10 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
     //
 
     /// <summary>
-    /// Комментарий.
+    /// Комментарий (пустой оператор).
+    /// Данная команда не несет никакой полезной нагрузки,
+    /// и предназначена для человека
+    /// либо для временного отключения некоторых операторов
     /// </summary>
     public sealed class GblNop
         : GblNode
@@ -46,57 +33,19 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
         #region Constants
 
         /// <summary>
-        /// Command mnemonic.
+        /// Мнемоническое обозначение команды.
         /// </summary>
         public const string Mnemonic = "//";
-
-        #endregion
-
-        #region Properties
-
-        #endregion
-
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region GblNode members
-
-        /// <summary>
-        /// Execute the node.
-        /// </summary>
-        public override void Execute
-            (
-                GblContext context
-            )
-        {
-            Sure.NotNull(context, nameof(context));
-
-            OnBeforeExecution(context);
-
-            // Nothing to do here
-
-            OnAfterExecution(context);
-        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return Mnemonic;
-        }
+        public override string ToString() => Mnemonic;
 
         #endregion
-    }
-}
+
+    } // class GblNop
+
+} // namespace ManagedIrbis.Gbl.Infrastructure.Ast

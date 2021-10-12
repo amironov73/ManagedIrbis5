@@ -18,6 +18,7 @@ namespace UnitTests.ManagedIrbis.Records
     public sealed class RecordUtilityTest
     {
         [TestMethod]
+        [Description ("Пустой формат")]
         public void RecordUtility_SimpleFormat_1()
         {
             var record = new Record()
@@ -198,6 +199,7 @@ namespace UnitTests.ManagedIrbis.Records
         }
 
         [TestMethod]
+        [Description ("Суффикс у команды N")]
         public void RecordUtility_SimpleFormat_17()
         {
             var record = new Record()
@@ -208,6 +210,7 @@ namespace UnitTests.ManagedIrbis.Records
         }
 
         [TestMethod]
+        [Description ("Префикс у команды D")]
         public void RecordUtility_SimpleFormat_18()
         {
             var record = new Record()
@@ -241,6 +244,125 @@ namespace UnitTests.ManagedIrbis.Records
             var format = "v910^b + |,|   ";
             var actual = record.SimpleFormat (format);
             Assert.AreEqual ("N001,N002,N003", actual);
+        }
+
+        [TestMethod]
+        [Description ("Простой литерал")]
+        public void RecordUtility_SimpleFormat_21()
+        {
+            var record = new Record()
+                .Add (910, 'b', "N001")
+                .Add (910, 'b', "N002")
+                .Add (910, 'b', "N003");
+            var format = " 'Hello' ";
+            var actual = record.SimpleFormat (format);
+            Assert.AreEqual ("Hello", actual);
+        }
+
+        [TestMethod]
+        [Description ("Формат из одной запятой")]
+        public void RecordUtility_SimpleFormat_22()
+        {
+            var record = new Record()
+                .Add (910, 'b', "N001")
+                .Add (910, 'b', "N002")
+                .Add (910, 'b', "N003");
+            var format = ",";
+            var actual = record.SimpleFormat (format);
+            Assert.IsNull (actual);
+        }
+
+        [TestMethod]
+        [Description("Составной формат")]
+        public void RecordUtility_SimpleFormat_23()
+        {
+            var record = new Record()
+                .Add (910, 'b', "N001")
+                .Add (910, 'b', "N002")
+                .Add (910, 'b', "N003");
+            var format = " 'Hello' ' ' 'World' ";
+            var actual = record.SimpleFormat (format);
+            Assert.AreEqual ("Hello World", actual);
+        }
+
+        [TestMethod]
+        [Description("Составной формат")]
+        public void RecordUtility_SimpleFormat_24()
+        {
+            var record = new Record()
+                .Add (100, 'a', "Hello")
+                .Add (200, 'b', ", ")
+                .Add (300, "World");
+            var format = " v100^a, v200^b, v300 ";
+            var actual = record.SimpleFormat (format);
+            Assert.AreEqual ("Hello, World", actual);
+        }
+
+        [TestMethod]
+        [Description("Составной формат")]
+        public void RecordUtility_SimpleFormat_25()
+        {
+            var record = new Record()
+                .Add (100, 'a', "Hello")
+                .Add (200, 'b', "World")
+                .Add (300, "World");
+            var format = " v100^a\", \", v200^b";
+            var actual = record.SimpleFormat (format);
+            Assert.AreEqual ("Hello, World", actual);
+        }
+
+        [TestMethod]
+        [Description("Составной формат")]
+        public void RecordUtility_SimpleFormat_26()
+        {
+            var record = new Record()
+                .Add (200, 'a', "Ruslan and Ludmila",
+                    'e', "poem", 'f', "A. Pushkin");
+            var format = " v200^a, \" : \"v200^e, \" / \"v200^f, \" ; \"v200^g ";
+            var actual = record.SimpleFormat (format);
+            Assert.AreEqual ("Ruslan and Ludmila : poem / A. Pushkin", actual);
+        }
+
+        [TestMethod]
+        [Description ("Метка поля - не число")]
+        [ExpectedException (typeof (FormatException))]
+        public void RecordUtility_SimpleFormat_27()
+        {
+            var record = new Record();
+            var format = "vabc^d";
+            record.SimpleFormat (format);
+        }
+
+        [TestMethod]
+        [Description ("Запятая после повторяющегося литерала")]
+        public void RecordUtility_SimpleFormat_28()
+        {
+            var record = new Record()
+                .Add (100, 'a', "Hello")
+                .Add (200, 'b', "World");
+            var format = "v100^a| |, v200^b";
+            var actual = record.SimpleFormat (format);
+            Assert.AreEqual ("Hello World", actual);
+        }
+
+        [TestMethod]
+        [Description ("Плюсик без повторяющегося литерала")]
+        [ExpectedException (typeof (FormatException))]
+        public void RecordUtility_SimpleFormat_29()
+        {
+            var record = new Record();
+            var format = "+ v200^a";
+            record.SimpleFormat (format);
+        }
+
+        [TestMethod]
+        [Description ("Плюсик без повторяющегося литерала")]
+        [ExpectedException (typeof (FormatException))]
+        public void RecordUtility_SimpleFormat_30()
+        {
+            var record = new Record();
+            var format = "v200^a +";
+            record.SimpleFormat (format);
         }
 
     }

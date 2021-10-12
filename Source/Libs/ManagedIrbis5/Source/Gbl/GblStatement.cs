@@ -18,13 +18,13 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 #endregion
 
@@ -98,8 +98,8 @@ namespace ManagedIrbis.Gbl
     /// Оператор глобальной корректировки со всеми относящимися
     /// к нему данными.
     /// </summary>
-    [XmlRoot("statement")]
-    [DebuggerDisplay("{Command} {Parameter1} {Parameter2}")]
+    [XmlRoot ("statement")]
+    [DebuggerDisplay ("{Command} {Parameter1} {Parameter2}")]
     public sealed class GblStatement
         : IHandmadeSerializable,
         IVerifiable
@@ -107,7 +107,7 @@ namespace ManagedIrbis.Gbl
         #region Constants
 
         /// <summary>
-        /// Разделитель элементов
+        /// Разделитель элементов в протоколе ИРБИС64.
         /// </summary>
         public const string Delimiter = "\x1F\x1E";
 
@@ -118,36 +118,36 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Команда (оператор), например, ADD или DEL.
         /// </summary>
-        [XmlElement("command")]
-        [JsonPropertyName("command")]
+        [XmlElement ("command")]
+        [JsonPropertyName ("command")]
         public string? Command { get; set; }
 
         /// <summary>
         /// Первый параметр, как правило, спецификация поля/подполя.
         /// </summary>
-        [XmlElement("parameter1")]
-        [JsonPropertyName("parameter1")]
+        [XmlElement ("parameter1")]
+        [JsonPropertyName ("parameter1")]
         public string? Parameter1 { get; set; }
 
         /// <summary>
         /// Второй параметр, как правило, спецификация повторения.
         /// </summary>
-        [XmlElement("parameter2")]
-        [JsonPropertyName("parameter2")]
+        [XmlElement ("parameter2")]
+        [JsonPropertyName ("parameter2")]
         public string? Parameter2 { get; set; }
 
         /// <summary>
         /// Первый формат, например, выражение для замены.
         /// </summary>
-        [XmlElement("format1")]
-        [JsonPropertyName("format1")]
+        [XmlElement ("format1")]
+        [JsonPropertyName ("format1")]
         public string? Format1 { get; set; }
 
         /// <summary>
         /// Второй формат, например, заменяющее выражение.
         /// </summary>
-        [XmlElement("format2")]
-        [JsonPropertyName("format2")]
+        [XmlElement ("format2")]
+        [JsonPropertyName ("format2")]
         public string? Format2 { get; set; }
 
         #endregion
@@ -155,24 +155,28 @@ namespace ManagedIrbis.Gbl
         #region Public methods
 
         /// <summary>
-        /// Encode for protocol.
+        /// Кодирование оператора глобальной корректировки
+        /// для протокола обмена с сервером ИРБИС64.
         /// </summary>
         public string EncodeForProtocol()
         {
-            var result = new StringBuilder();
+            var builder = StringBuilderPool.Shared.Get();
 
-            result.Append(Command);
-            result.Append(Delimiter);
-            result.Append(Parameter1);
-            result.Append(Delimiter);
-            result.Append(Parameter2);
-            result.Append(Delimiter);
-            result.Append(Format1);
-            result.Append(Delimiter);
-            result.Append(Format2);
-            result.Append(Delimiter);
+            builder.Append (Command);
+            builder.Append (Delimiter);
+            builder.Append (Parameter1);
+            builder.Append (Delimiter);
+            builder.Append (Parameter2);
+            builder.Append (Delimiter);
+            builder.Append (Format1);
+            builder.Append (Delimiter);
+            builder.Append (Format2);
+            builder.Append (Delimiter);
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
 
         } // method EncodeForProtocol
 
@@ -185,7 +189,7 @@ namespace ManagedIrbis.Gbl
             )
         {
             var command = reader.ReadLine();
-            if (string.IsNullOrEmpty(command))
+            if (string.IsNullOrEmpty (command))
             {
                 return null;
             }
@@ -227,11 +231,11 @@ namespace ManagedIrbis.Gbl
                 BinaryWriter writer
             )
         {
-            writer.WriteNullable(Command);
-            writer.WriteNullable(Parameter1);
-            writer.WriteNullable(Parameter2);
-            writer.WriteNullable(Format1);
-            writer.WriteNullable(Format2);
+            writer.WriteNullable (Command);
+            writer.WriteNullable (Parameter1);
+            writer.WriteNullable (Parameter2);
+            writer.WriteNullable (Format1);
+            writer.WriteNullable (Format2);
 
         } // method SaveToStream
 
@@ -252,9 +256,10 @@ namespace ManagedIrbis.Gbl
                 );
 
             verifier
-                .NotNullNorEmpty(Command, "Command");
+                .NotNullNorEmpty(Command, nameof (Command));
 
             return verifier.Result;
+
         } // method Verify
 
         #endregion
@@ -262,23 +267,10 @@ namespace ManagedIrbis.Gbl
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "Command: {0},{5}"
-                    + "Parameter1: {1},{5}"
-                    + "Parameter2: {2},{5}"
-                    + "Format1: {3},{5}"
-                    + "Format2: {4}",
-                    Command,
-                    Parameter1,
-                    Parameter2,
-                    Format1,
-                    Format2,
-                    Environment.NewLine
-                );
-        } // method ToString
+        public override string ToString() =>
+            $"Command: {Command},{Environment.NewLine}" + $"Parameter1: {Parameter1},{Environment.NewLine}" +
+            $"Parameter2: {Parameter2},{Environment.NewLine}" + $"Format1: {Format1},{Environment.NewLine}" +
+            $"Format2: {Format2}";  // method ToString
 
         #endregion
 

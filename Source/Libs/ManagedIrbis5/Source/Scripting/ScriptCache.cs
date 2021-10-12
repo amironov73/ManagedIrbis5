@@ -16,15 +16,8 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.CommandLine.Builder;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-
-using AM.Collections;
 
 using Microsoft.Extensions.Caching.Memory;
 

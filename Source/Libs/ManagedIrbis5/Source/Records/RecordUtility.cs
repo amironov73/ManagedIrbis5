@@ -49,208 +49,168 @@ namespace ManagedIrbis.Records
                 return false;
             }
 
+            var result = false; // флаг: был ли вывод?
             var navigator = new ValueTextNavigator (format); // нафигатор по тексту формата
-            ReadOnlySpan<char> prefix = default, // префикс-литерал
-                before = default, // ведущий условный литерал
-                after = default, // замыкающий условный литерал
-                suffix = default; // суффикс-литерал
-            var skipFirst = false; // флаг: подавление вывода первого повторения
-            var skipLast = false;  // флаг: подавление вывода последнего повторения
-            var tag = 0; // метка поля
-            var code = '\0'; // код подполя (опциональный)
-
-            navigator.SkipWhitespace();
-            var chr = navigator.ReadChar();
-            if (chr == '"')
+            while (!navigator.IsEOF)
             {
-                // префикс-литерал
+                ReadOnlySpan<char> prefix = default, // префикс-литерал
+                    before = default,                // ведущий условный литерал
+                    after = default,                 // замыкающий условный литерал
+                    suffix = default;                // суффикс-литерал
+                var skipFirst = false;               // флаг: подавление вывода первого повторения
+                var skipLast = false;                // флаг: подавление вывода последнего повторения
+                var tag = 0;                         // метка поля
+                var code = '\0';                    // код подполя (опциональный)
 
-                prefix = navigator.ReadUntil ('"');
-                navigator.ReadChar();
-                navigator.SkipWhitespace();
-                chr = navigator.ReadChar();
-            }
-
-            if (chr == '|')
-            {
-                // ведущий условный литерал
-
-                before = navigator.ReadUntil ('|');
-                navigator.ReadChar();
-                navigator.SkipWhitespace();
-                chr = navigator.ReadChar();
-                if (chr == '+')
+                if (!navigator.SkipWhitespace())
                 {
-                    // подавление вывода ведущего условного литерала при первом повторении поля
+                    // достигнут конец текста
+                    break;
+                }
 
-                    skipFirst = true;
+                var chr = navigator.ReadChar();
+                if (chr == '\'')
+                {
+                    // простой литерал
+                    var text = navigator.ReadUntil ('\'');
+                    output.Write (text);
+                    result = true;
+                    navigator.ReadChar();
+
+                    // продолжаем с начала
+                    continue;
+                }
+
+                if (chr == ',')
+                {
+                    continue;
+                }
+
+                if (chr == '"')
+                {
+                    // префикс-литерал
+
+                    prefix = navigator.ReadUntil ('"');
+                    navigator.ReadChar();
                     navigator.SkipWhitespace();
                     chr = navigator.ReadChar();
                 }
-            }
 
-            if (chr != 'v' && chr != 'V' && chr != 'n' && chr != 'N'
-                && chr != 'd' && chr != 'D')
-            {
-                // неизвестная команда
-                throw new FormatException (nameof (format));
-            }
-
-            var command = char.ToUpperInvariant (chr);
-
-            chr = navigator.ReadChar();
-            if (!chr.IsArabicDigit())
-            {
-                // метка поля - не число
-                throw new FormatException (nameof (format));
-            }
-
-            // разбор метки кода
-            while (chr.IsArabicDigit())
-            {
-                tag = tag * 10 + chr - '0';
-                chr = navigator.ReadChar();
-            }
-
-            if (chr != ValueTextNavigator.EOF && char.IsWhiteSpace (chr))
-            {
-                // между меткой и подполем могут быть пробелы
-
-                navigator.SkipWhitespace();
-                chr = navigator.ReadChar();
-            }
-
-            if (chr == '^')
-            {
-                // код подполя
-
-                code = navigator.ReadChar();
-                navigator.SkipWhitespace();
-                chr = navigator.ReadChar();
-            }
-
-            if (chr == '+')
-            {
-                // подавление вывода замыкающего условного литерала при последнем повторении поля
-
-                skipLast = true;
-                navigator.SkipWhitespace();
-                chr = navigator.ReadChar();
-            }
-
-            if (chr == '|')
-            {
-                // замыкающий условный литерал
-
-                after = navigator.ReadUntil ('|');
-                navigator.ReadChar();
-                navigator.SkipWhitespace();
-                chr = navigator.ReadChar();
-            }
-
-            if (chr == '"')
-            {
-                // суффикс-литерал
-
-                suffix = navigator.ReadUntil ('"');
-                navigator.ReadChar();
-                navigator.SkipWhitespace();
-                chr = navigator.ReadChar();
-            }
-
-            if (chr != ValueTextNavigator.EOF && !char.IsWhiteSpace (chr))
-            {
-                // какие-то команды после суффикс-литерала
-                throw new FormatException (nameof (format));
-            }
-
-            var result = false; // флаг: был ли вывод?
-            var count = code == '\0' ? record.Count (tag) : record.Count (tag, code);
-            if (command == 'N')
-            {
-                // префикс или суффикс выводятся только при отсутсвии
-
-                if (count == 0)
+                if (chr == '|')
                 {
-                    if (!prefix.IsEmpty)
-                    {
-                        output.Write (prefix);
-                        result = true;
-                    }
+                    // ведущий условный литерал
 
-                    if (!suffix.IsEmpty)
+                    before = navigator.ReadUntil ('|');
+                    navigator.ReadChar();
+                    navigator.SkipWhitespace();
+                    chr = navigator.ReadChar();
+                    if (chr == '+')
                     {
-                        output.Write (suffix);
-                        result = true;
+                        // подавление вывода ведущего условного литерала при первом повторении поля
+
+                        skipFirst = true;
+                        navigator.SkipWhitespace();
+                        chr = navigator.ReadChar();
                     }
                 }
-            }
-            else if (command == 'D')
-            {
-                // префикс или суффикс выводятся только при наличии
 
-                if (count != 0)
+                if (chr != 'v' && chr != 'V' && chr != 'n' && chr != 'N'
+                    && chr != 'd' && chr != 'D')
                 {
-                    if (!prefix.IsEmpty)
-                    {
-                        output.Write (prefix);
-                        result = true;
-                    }
-
-                    if (!suffix.IsEmpty)
-                    {
-                        output.Write (suffix);
-                        result = true;
-                    }
+                    // неизвестная команда
+                    throw new FormatException (nameof (format));
                 }
-            }
-            else
-            {
-                // команда 'V' -- крутим цикл
 
-                for (var index = 0; index < count; index++)
+                var command = char.ToUpperInvariant (chr); // команда вывода
+
+                chr = navigator.ReadChar();
+                if (!chr.IsArabicDigit())
                 {
-                    if (index == 0)
-                    {
-                        // первое повторение поля
+                    // метка поля - не число
+                    throw new FormatException (nameof (format));
+                }
 
+                // разбор метки кода
+                while (chr.IsArabicDigit())
+                {
+                    tag = tag * 10 + chr - '0';
+                    chr = navigator.ReadChar();
+                }
+
+                if (chr != ValueTextNavigator.EOF && char.IsWhiteSpace (chr))
+                {
+                    // между меткой и подполем могут быть пробелы
+
+                    navigator.SkipWhitespace();
+                    chr = navigator.ReadChar();
+                }
+
+                if (chr == '^')
+                {
+                    // код подполя
+
+                    code = navigator.ReadChar();
+                    navigator.SkipWhitespace();
+                    chr = navigator.ReadChar();
+                }
+
+                if (chr == '+')
+                {
+                    // подавление вывода замыкающего условного литерала при последнем повторении поля
+
+                    skipLast = true;
+                    navigator.SkipWhitespace();
+                    chr = navigator.ReadChar();
+                }
+
+                if (chr == ',')
+                {
+                    goto DoFormat;
+                }
+
+                if (chr == '|')
+                {
+                    // замыкающий условный литерал
+
+                    after = navigator.ReadUntil ('|');
+                    navigator.ReadChar();
+                    navigator.SkipWhitespace();
+                    chr = navigator.ReadChar();
+                }
+
+                if (chr == ',')
+                {
+                    goto DoFormat;
+                }
+
+                if (chr == '"')
+                {
+                    // суффикс-литерал
+
+                    suffix = navigator.ReadUntil ('"');
+                    navigator.ReadChar();
+                    navigator.SkipWhitespace();
+                }
+
+                DoFormat: // переходим к собственно форматированию
+
+                // простые проверки перед началом форматирования
+                if (skipFirst && before.IsEmpty || skipLast && after.IsEmpty)
+                {
+                    // имеем плюсик при отсутствии соответствующего повторяющегося литерала
+                    throw new FormatException (nameof (format));
+                }
+
+                var count = code == '\0' ? record.Count (tag) : record.Count (tag, code);
+                if (command == 'N')
+                {
+                    // префикс или суффикс выводятся только при отсутсвии
+
+                    if (count == 0)
+                    {
                         if (!prefix.IsEmpty)
                         {
                             output.Write (prefix);
-                            result = true;
-                        }
-
-                        if (!skipFirst && !before.IsEmpty)
-                        {
-                            output.Write (before);
-                            result = true;
-                        }
-                    }
-                    else
-                    {
-                        if (!before.IsEmpty)
-                        {
-                            output.Write (before);
-                            result = true;
-                        }
-                    }
-
-                    var value = code == '\0'
-                        ? record.FM (tag, index)
-                        : record.FM (tag, index, code);
-                    if (!string.IsNullOrEmpty (value))
-                    {
-                        output.Write (value);
-                        result = true;
-                    }
-
-                    if (index == count - 1)
-                    {
-                        // последнее повторение поля
-
-                        if (!skipLast && !after.IsEmpty)
-                        {
-                            output.Write (after);
                             result = true;
                         }
 
@@ -260,16 +220,93 @@ namespace ManagedIrbis.Records
                             result = true;
                         }
                     }
-                    else
+                }
+                else if (command == 'D')
+                {
+                    // префикс или суффикс выводятся только при наличии
+
+                    if (count != 0)
                     {
-                        if (!after.IsEmpty)
+                        if (!prefix.IsEmpty)
                         {
-                            output.Write (after);
+                            output.Write (prefix);
+                            result = true;
+                        }
+
+                        if (!suffix.IsEmpty)
+                        {
+                            output.Write (suffix);
                             result = true;
                         }
                     }
+                }
+                else
+                {
+                    // команда 'V' -- крутим цикл
 
-                } // for
+                    for (var index = 0; index < count; index++)
+                    {
+                        if (index == 0)
+                        {
+                            // первое повторение поля
+
+                            if (!prefix.IsEmpty)
+                            {
+                                output.Write (prefix);
+                                result = true;
+                            }
+
+                            if (!skipFirst && !before.IsEmpty)
+                            {
+                                output.Write (before);
+                                result = true;
+                            }
+                        }
+                        else
+                        {
+                            if (!before.IsEmpty)
+                            {
+                                output.Write (before);
+                                result = true;
+                            }
+                        }
+
+                        var value = code == '\0'
+                            ? record.FM (tag, index)
+                            : record.FM (tag, index, code);
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            output.Write (value);
+                            result = true;
+                        }
+
+                        if (index == count - 1)
+                        {
+                            // последнее повторение поля
+
+                            if (!skipLast && !after.IsEmpty)
+                            {
+                                output.Write (after);
+                                result = true;
+                            }
+
+                            if (!suffix.IsEmpty)
+                            {
+                                output.Write (suffix);
+                                result = true;
+                            }
+                        }
+                        else
+                        {
+                            if (!after.IsEmpty)
+                            {
+                                output.Write (after);
+                                result = true;
+                            }
+                        }
+
+                    } // for
+                }
             }
 
             return result;
