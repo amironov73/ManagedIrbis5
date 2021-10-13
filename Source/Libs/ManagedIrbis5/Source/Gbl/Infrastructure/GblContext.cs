@@ -12,6 +12,14 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using ManagedIrbis.Providers;
+
+using Microsoft.Extensions.Logging;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.Gbl.Infrastructure
@@ -31,22 +39,37 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// <summary>
         /// Синхронный ИРБИС-провайдер.
         /// </summary>
-        public ISyncProvider? Provider { get; set; }
+        public ISyncProvider? SyncProvider { get; set; }
 
         /// <summary>
-        /// Источник записей.
+        /// Синхронный ИРБИС-провайдер.
         /// </summary>
-        public ISyncRecordSource? RecordSource { get; set; }
+        public IAsyncProvider? AsyncProvider { get; set; }
 
         /// <summary>
-        /// Приемник записей.
+        /// Синхронный источник записей.
         /// </summary>
-        public ISyncRecordSink? RecordSink { get; set; }
+        public ISyncRecordSource? SyncRecordSource { get; set; }
+
+        /// <summary>
+        /// Синхронный приемник записей.
+        /// </summary>
+        public ISyncRecordSink? SyncRecordSink { get; set; }
+
+        /// <summary>
+        /// Асинхронный источник записей.
+        /// </summary>
+        public IAsyncRecordSource? AsyncRecordSource { get; set; }
+
+        /// <summary>
+        /// Асинхронный приемник записей.
+        /// </summary>
+        public IAsyncRecordSink? AsyncRecordSink { get; set; }
 
         /// <summary>
         /// Логгер.
         /// </summary>
-        public GblLogger? Logger { get; set; }
+        public ILogger? Logger { get; set; }
 
         #endregion
 

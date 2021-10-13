@@ -13,6 +13,7 @@
 #region Using directives
 
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 using AM;
@@ -120,6 +121,26 @@ namespace ManagedIrbis.Gbl.Infrastructure
             OnAfterExecution (context);
 
         } // method Execute
+
+        /// <summary>
+        /// Исполнение действий, закрепленных за данным узлом.
+        /// </summary>
+        public virtual Task ExecuteAsync
+            (
+                GblContext context
+            )
+        {
+            Sure.NotNull (context, nameof (context));
+
+            OnBeforeExecution (context);
+
+            // Nothing to do here
+
+            OnAfterExecution (context);
+
+            return Task.CompletedTask;
+
+        } // method ExecuteAsync
 
         #endregion
 

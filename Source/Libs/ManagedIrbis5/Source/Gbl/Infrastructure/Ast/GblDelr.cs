@@ -55,7 +55,7 @@ namespace ManagedIrbis.Gbl.Infrastructure.Ast
                 if (record.Status != newStatus)
                 {
                     record.Status = newStatus;
-                    context.RecordSink?.PostRecord
+                    context.SyncRecordSink?.PostRecord
                         (
                             record,
                             "Record was deleted"

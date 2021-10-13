@@ -13,6 +13,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 #endregion
@@ -36,6 +37,12 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// <inheritdoc cref="ISyncRecordSink.Complete"/>
         public void Complete() {}
 
+        /// <inheritdoc cref="ISyncRecordSink.GetProtocol"/>
+        public IReadOnlyList<GblProtocolLine> GetProtocol() => Array.Empty<GblProtocolLine>();
+
+        /// <inheritdoc cref="ISyncRecordSink.GetProtocol"/>
+        GblProtocolLine[] ISyncRecordSink.GetProtocol() => Array.Empty<GblProtocolLine>();
+
         #endregion
 
         #region IAsyncRecordSink members
@@ -45,6 +52,9 @@ namespace ManagedIrbis.Gbl.Infrastructure
 
         /// <inheritdoc cref="IAsyncRecordSink.CompleteAsync"/>
         public Task CompleteAsync() => Task.CompletedTask;
+
+        /// <inheritdoc cref="IAsyncRecordSink.GetProtocolAsync"/>
+        public Task<GblProtocolLine[]> GetProtocolAsync() => Task.FromResult(Array.Empty<GblProtocolLine>());
 
         #endregion
 

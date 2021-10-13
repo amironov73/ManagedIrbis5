@@ -21,7 +21,7 @@ before_build:
 - pygount -f summary Source/Apps                       -s cs -N "*.Designer.cs" -F "obj"
 - pwsh: |
     Invoke-WebRequest "https://dot.net/v1/dotnet-install.ps1" -OutFile "./dotnet-install.ps1"
-    ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-rc.1.21458.32"
+    ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Version "6.0.100-rc.2.21505.57"
 - dotnet --info
 - dotnet restore Source\Utils\Utils.sln
 - dotnet build --no-restore --configuration Release -p:Version=%APPVEYOR_BUILD_VERSION% Source\Utils\Utils.sln

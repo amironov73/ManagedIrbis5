@@ -44,6 +44,11 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// </summary>
         void Complete();
 
+        /// <summary>
+        /// Получение протокола.
+        /// </summary>
+        GblProtocolLine[] GetProtocol();
+
     } // interface ISyncRecordSink
 
 } // namespace ManagedIrbis.Gbl.Infrastructure

@@ -45,6 +45,11 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// </summary>
         Task CompleteAsync();
 
+        /// <summary>
+        /// Получение протокола.
+        /// </summary>
+        Task<GblProtocolLine[]> GetProtocolAsync();
+
     } // interface IAsyncRecordSink
 
 } // namespace ManagedIrbis.Gbl.Infrastructure
