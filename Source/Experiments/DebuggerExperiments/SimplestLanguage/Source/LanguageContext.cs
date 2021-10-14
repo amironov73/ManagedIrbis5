@@ -38,6 +38,45 @@ namespace SimplestLanguage
 
         #endregion
 
+        #region Public methods
+
+        /// <summary>
+        /// Найти или создать (если не найдено) переменную с указанным именем.
+        /// </summary>
+        public Variable FindOrCreateVariable
+            (
+                string name
+            )
+        {
+            if (!Variables.TryGetValue (name, out var result))
+            {
+                result = new Variable (name);
+                Variables.Add (name, result);
+            }
+
+            return result;
+
+        } // method FindOrCreateVariable
+
+        /// <summary>
+        /// Требование существования переменной.
+        /// </summary>
+        public Variable RequireVariable
+            (
+                string name
+            )
+        {
+            if (!Variables.TryGetValue (name, out var result))
+            {
+                throw new LanguageException ($"Variable {name} doesn't exist");
+            }
+
+            return result;
+
+        } // method RequireVariable
+
+        #endregion
+
     } // class LanguageContext
 
 } // namespace SimplestLanguage

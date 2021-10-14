@@ -16,6 +16,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 #endregion
@@ -28,10 +29,31 @@ namespace SimplestLanguage
     /// Программа на языке.
     /// </summary>
     public sealed class LanguageProgram
+        : AstNode
     {
         #region Properties
 
+        /// <summary>
+        /// Последовательность операторов, которые необходимо выполнить.
+        /// </summary>
+        public List<AstNode> Statements { get; } = new ();
 
+        #endregion
+
+        #region AstNode members
+
+        /// <inheritdoc cref="AstNode.Execute"/>
+        public override void Execute
+            (
+                LanguageContext context
+            )
+        {
+            foreach (var statement in Statements)
+            {
+                statement.Execute (context);
+            }
+
+        } // method Execute
 
         #endregion
 

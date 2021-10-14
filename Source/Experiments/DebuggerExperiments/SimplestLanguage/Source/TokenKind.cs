@@ -31,6 +31,11 @@ namespace SimplestLanguage
         NumericLiteral,
 
         /// <summary>
+        /// Строковый литерал.
+        /// </summary>
+        StringLiteral,
+
+        /// <summary>
         /// Знак "плюс".
         /// </summary>
         Plus,
@@ -58,7 +63,12 @@ namespace SimplestLanguage
         /// <summary>
         /// Закрывающая правая скобка.
         /// </summary>
-        RightParenthesis
+        RightParenthesis,
+
+        /// <summary>
+        /// Точка с запятой.
+        /// </summary>
+        Semicolon,
 
     } // enum TokenKind
 

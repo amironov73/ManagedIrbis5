@@ -48,7 +48,7 @@ namespace SimplestLanguage
                 Token result;
                 try
                 {
-                    result = _tokens[_position];
+                    result = _tokens [_position];
                 }
                 catch (Exception exception)
                 {
@@ -97,7 +97,8 @@ namespace SimplestLanguage
         #region Public methods
 
         /// <summary>
-        /// Add a token.
+        /// Добавление токена в конец списка.
+        /// Операция дорогая, сделана на крайний случай.
         /// </summary>
         public void Add
             (
@@ -110,43 +111,32 @@ namespace SimplestLanguage
                 token
             };
             _tokens = tokens.ToArray();
-        }
+
+        } // method Add
 
         /// <summary>
-        /// Return number of remaining tokens.
+        /// Вычисление количества еще не просмотренных токенов.
         /// </summary>
-        public int CountRemainingTokens()
-        {
-            var length = _tokens.Length;
-            if (_position >= length)
-            {
-                return 0;
-            }
-
-            return _tokens.Length - _position - 1;
-        }
+        public int CountRemainingTokens() => _position >= _tokens.Length ? 0 : _tokens.Length - _position - 1;
 
         /// <summary>
-        /// Dump token list.
+        /// Дамп токенов в указанный поток.
         /// </summary>
         public void Dump
             (
                 TextWriter writer
             )
         {
-            writer.WriteLine
-                (
-                    "Total tokens: {0}",
-                    _tokens.Length
-                );
+            writer.WriteLine ("Total tokens: {0}", _tokens.Length);
             foreach (var token in _tokens)
             {
                 writer.WriteLine(token);
             }
-        }
+
+        } // method Dump
 
         /// <summary>
-        /// Move to next token.
+        /// Переход к следующему токену.
         /// </summary>
         public bool MoveNext()
         {
@@ -164,30 +154,32 @@ namespace SimplestLanguage
             }
 
             return result;
-        }
+
+        } // method MoveNext
 
         /// <summary>
-        /// Peek next token.
+        /// Подглядывание следующего токена.
         /// </summary>
         public TokenKind Peek()
         {
             var newPosition = _position + 1;
-            if (newPosition >= _tokens.Length)
+            if (newPosition < 0 || newPosition >= _tokens.Length)
             {
                 Magna.Trace
                     (
-                        "PftTokenList::Peek: "
-                        + "end of list"
+                        nameof (TokenList) + "::" + nameof (Peek)
+                        + ": end of list"
                     );
 
                 return TokenKind.None;
             }
 
-            return _tokens[newPosition].Kind;
-        }
+            return _tokens [newPosition].Kind;
+
+        } // method Peek
 
         /// <summary>
-        /// Peek token at arbitrary position.
+        /// Подглядывание следующего токена.
         /// </summary>
         public TokenKind Peek
             (
@@ -195,23 +187,23 @@ namespace SimplestLanguage
             )
         {
             var newPosition = _position + delta;
-            if (newPosition < 0
-                || newPosition >= _tokens.Length)
+            if (newPosition < 0 || newPosition >= _tokens.Length)
             {
                 Magna.Trace
                     (
-                        "PftTokenList::Peek: "
-                        + "end of list"
+                        nameof (TokenList) + "::" + nameof (Peek)
+                        + ": end of list"
                     );
 
                 return TokenKind.None;
             }
 
-            return _tokens[newPosition].Kind;
-        }
+            return _tokens [newPosition].Kind;
+
+        } // method Peek
 
         /// <summary>
-        /// Require next token.
+        /// Требование следующего токена.
         /// </summary>
         public TokenList RequireNext()
         {
@@ -219,18 +211,19 @@ namespace SimplestLanguage
             {
                 Magna.Error
                     (
-                        "PftTokenList::RequireNext: "
-                        + "no next token"
+                        nameof (TokenList) + "::" + nameof (RequireNext)
+                        + ": no next token"
                     );
 
-                throw new SyntaxException(Current.ToString());
+                throw new SyntaxException (Current.ToString());
             }
 
             return this;
-        }
+
+        } // method RequireNext
 
         /// <summary>
-        /// Require next token.
+        /// Требование следующего токена.
         /// </summary>
         public TokenList RequireNext
             (
@@ -242,31 +235,33 @@ namespace SimplestLanguage
             {
                 Magna.Error
                     (
-                        "PftTokenList::RequireNext: "
-                        + "expected="
+                        nameof (TokenList) + "::" + nameof (RequireNext)
+                        + ": expected="
                         + kind
                         + ", got="
                         + Current.Kind
                     );
 
-                throw new SyntaxException(Current.ToString());
+                throw new SyntaxException (Current.ToString());
             }
 
             return this;
-        }
+
+        } // method RequireNext
 
         /// <summary>
-        /// Move to begin of the list.
+        /// Возврат к началу списка.
         /// </summary>
         public TokenList Reset()
         {
             _position = 0;
 
             return this;
-        }
+
+        } // method Reset
 
         /// <summary>
-        /// Restore position.
+        /// Восстановление ранее сохраненной .
         /// </summary>
         public TokenList RestorePosition
             (
@@ -276,18 +271,16 @@ namespace SimplestLanguage
             _position = position;
 
             return this;
-        }
+
+        } // method RestorePosition
 
         /// <summary>
-        /// Save position.
+        /// Сохранение текущей позиции.
         /// </summary>
-        public int SavePosition()
-        {
-            return _position;
-        }
+        public int SavePosition() => _position;
 
         /// <summary>
-        /// Get segment (span) of the token list.
+        /// Получение сегмента из текущего списка токенов.
         /// </summary>
         public TokenList? Segment
             (
@@ -330,10 +323,11 @@ namespace SimplestLanguage
             var result = new TokenList(tokens);
 
             return result;
-        }
+
+        } // method Segment
 
         /// <summary>
-        /// Get segment (span) of the token list.
+        /// Получение сегмента текущего списка токенов.
         /// </summary>
         internal TokenList? Segment
             (
@@ -406,10 +400,11 @@ namespace SimplestLanguage
             var result = new TokenList(tokens);
 
             return result;
-        }
+
+        } // method Segment
 
         /// <summary>
-        /// Get segment (span) of the token list.
+        /// Получение сегмента текущего списка токенов.
         /// </summary>
         public TokenList? Segment
             (
@@ -491,10 +486,11 @@ namespace SimplestLanguage
             var result = new TokenList(tokens);
 
             return result;
-        }
+
+        } // method Segment
 
         /// <summary>
-        /// Show last tokens.
+        /// Текстовое представление "хвоста" списка токенов (начиная с текущей позиции).
         /// </summary>
         public string ShowLastTokens
             (
@@ -507,6 +503,7 @@ namespace SimplestLanguage
             {
                 index = 0;
             }
+
             var first = true;
             while (index < Length)
             {
@@ -521,18 +518,16 @@ namespace SimplestLanguage
             }
 
             return result.ToString();
-        }
+
+        } // method ShowLastTokens
 
         /// <summary>
-        /// Get array of tokens.
+        /// Выдача токенов в виде массива.
         /// </summary>
-        public Token[] ToArray()
-        {
-            return _tokens;
-        }
+        public Token[] ToArray() => _tokens;
 
         /// <summary>
-        /// Convert token list to text.
+        /// Преобразование списка токенов в текст.
         /// </summary>
         public string ToText()
         {
@@ -544,7 +539,8 @@ namespace SimplestLanguage
             }
 
             return builder.ToString();
-        }
+
+        } // method ToText
 
         #endregion
 
