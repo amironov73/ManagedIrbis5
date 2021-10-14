@@ -4,10 +4,12 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* PftTokenList.cs --
+/* TokenList.cs -- список токенов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,38 +19,40 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 using System.Text;
 
 using AM;
+using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure
+namespace SimplestLanguage
 {
     /// <summary>
-    /// List of tokens.
+    /// Список токенов.
     /// </summary>
-    public sealed class PftTokenList
+    public sealed class TokenList
     {
         #region Properties
 
         /// <summary>
-        /// Current token.
+        /// Текущий токен.
         /// </summary>
-        public PftToken Current
+        public Token Current
         {
             get
             {
-                PftToken result;
+                Token result;
                 try
                 {
                     result = _tokens[_position];
                 }
                 catch (Exception exception)
                 {
-                    throw new PftSyntaxException(this, exception);
+                    throw new SyntaxException ("Syntax error", exception);
                 }
 
                 return result;
@@ -56,25 +60,25 @@ namespace ManagedIrbis.Pft.Infrastructure
         }
 
         /// <summary>
-        /// EOF reached?
+        /// Достигнут конец списка?
         /// </summary>
-        public bool IsEof { get { return _position >= _tokens.Length; } }
+        public bool IsEof => _position >= _tokens.Length;
 
         /// <summary>
-        /// How many tokens?
+        /// Количество токенов в списке.
         /// </summary>
-        public int Length { get { return _tokens.Length; } }
+        public int Length => _tokens.Length;
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
-        public PftTokenList
+        public TokenList
             (
-                IEnumerable<PftToken> tokens
+                IEnumerable<Token> tokens
             )
         {
             _tokens = tokens.ToArray();
@@ -86,7 +90,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Private members
 
         private int _position;
-        private PftToken[] _tokens;
+        private Token[] _tokens;
 
         #endregion
 
@@ -97,14 +101,11 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public void Add
             (
-                PftTokenKind kind
+                TokenKind kind
             )
         {
-            PftToken token = new PftToken
-            {
-                Kind = kind
-            };
-            List<PftToken> tokens = new List<PftToken>(_tokens)
+            var token = new Token (kind);
+            var tokens = new List<Token> (_tokens)
             {
                 token
             };
@@ -116,7 +117,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public int CountRemainingTokens()
         {
-            int length = _tokens.Length;
+            var length = _tokens.Length;
             if (_position >= length)
             {
                 return 0;
@@ -138,7 +139,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     "Total tokens: {0}",
                     _tokens.Length
                 );
-            foreach (PftToken token in _tokens)
+            foreach (var token in _tokens)
             {
                 writer.WriteLine(token);
             }
@@ -151,7 +152,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         {
             _position++;
 
-            bool result = _position < _tokens.Length;
+            var result = _position < _tokens.Length;
 
             if (!result)
             {
@@ -168,9 +169,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Peek next token.
         /// </summary>
-        public PftTokenKind Peek()
+        public TokenKind Peek()
         {
-            int newPosition = _position + 1;
+            var newPosition = _position + 1;
             if (newPosition >= _tokens.Length)
             {
                 Magna.Trace
@@ -179,7 +180,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         + "end of list"
                     );
 
-                return PftTokenKind.None;
+                return TokenKind.None;
             }
 
             return _tokens[newPosition].Kind;
@@ -188,12 +189,12 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Peek token at arbitrary position.
         /// </summary>
-        public PftTokenKind Peek
+        public TokenKind Peek
             (
                 int delta
             )
         {
-            int newPosition = _position + delta;
+            var newPosition = _position + delta;
             if (newPosition < 0
                 || newPosition >= _tokens.Length)
             {
@@ -203,7 +204,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         + "end of list"
                     );
 
-                return PftTokenKind.None;
+                return TokenKind.None;
             }
 
             return _tokens[newPosition].Kind;
@@ -212,7 +213,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Require next token.
         /// </summary>
-        public PftTokenList RequireNext()
+        public TokenList RequireNext()
         {
             if (!MoveNext())
             {
@@ -222,7 +223,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         + "no next token"
                     );
 
-                throw new PftSyntaxException(Current);
+                throw new SyntaxException(Current.ToString());
             }
 
             return this;
@@ -231,9 +232,9 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Require next token.
         /// </summary>
-        public PftTokenList RequireNext
+        public TokenList RequireNext
             (
-                PftTokenKind kind
+                TokenKind kind
             )
         {
             RequireNext();
@@ -248,7 +249,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                         + Current.Kind
                     );
 
-                throw new PftSyntaxException(Current);
+                throw new SyntaxException(Current.ToString());
             }
 
             return this;
@@ -257,7 +258,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Move to begin of the list.
         /// </summary>
-        public PftTokenList Reset()
+        public TokenList Reset()
         {
             _position = 0;
 
@@ -267,7 +268,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Restore position.
         /// </summary>
-        public PftTokenList RestorePosition
+        public TokenList RestorePosition
             (
                 int position
             )
@@ -288,17 +289,17 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get segment (span) of the token list.
         /// </summary>
-        public PftTokenList? Segment
+        public TokenList? Segment
             (
-                PftTokenKind[] stop
+                TokenKind[] stop
             )
         {
-            int savePosition = _position;
-            int foundPosition = -1;
+            var savePosition = _position;
+            var foundPosition = -1;
 
             while (!IsEof)
             {
-                PftTokenKind current = Current.Kind;
+                var current = Current.Kind;
 
                 if (stop.Contains(current))
                 {
@@ -316,9 +317,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return null;
             }
 
-            List<PftToken> tokens = new List<PftToken>();
+            var tokens = new List<Token>();
             for (
-                    int position = savePosition;
+                    var position = savePosition;
                     position < _position;
                     position++
                 )
@@ -326,7 +327,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 tokens.Add(_tokens[position]);
             }
 
-            PftTokenList result = new PftTokenList(tokens);
+            var result = new TokenList(tokens);
 
             return result;
         }
@@ -334,21 +335,21 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get segment (span) of the token list.
         /// </summary>
-        internal PftTokenList? Segment
+        internal TokenList? Segment
             (
                 TokenPair[] pairs,
-                PftTokenKind[] open,
-                PftTokenKind[] close,
-                PftTokenKind[] stop
+                TokenKind[] open,
+                TokenKind[] close,
+                TokenKind[] stop
             )
         {
-            int savePosition = _position;
-            int foundPosition = -1;
+            var savePosition = _position;
+            var foundPosition = -1;
 
-            TokenStack stack = new TokenStack(this, pairs);
+            var stack = new TokenStack(this, pairs);
             while (!IsEof)
             {
-                PftTokenKind current = Current.Kind;
+                var current = Current.Kind;
 
                 if (open.Contains(current))
                 {
@@ -392,9 +393,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return null;
             }
 
-            List<PftToken> tokens = new List<PftToken>();
+            var tokens = new List<Token>();
             for (
-                    int position = savePosition;
+                    var position = savePosition;
                     position < _position;
                     position++
                 )
@@ -402,7 +403,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 tokens.Add(_tokens[position]);
             }
 
-            PftTokenList result = new PftTokenList(tokens);
+            var result = new TokenList(tokens);
 
             return result;
         }
@@ -410,20 +411,20 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get segment (span) of the token list.
         /// </summary>
-        public PftTokenList? Segment
+        public TokenList? Segment
             (
-                PftTokenKind[] open,
-                PftTokenKind[] close,
-                PftTokenKind[] stop
+                TokenKind[] open,
+                TokenKind[] close,
+                TokenKind[] stop
             )
         {
-            int savePosition = _position;
-            int foundPosition = -1;
+            var savePosition = _position;
+            var foundPosition = -1;
 
-            int level = 0;
+            var level = 0;
             while (!IsEof)
             {
-                PftTokenKind current = Current.Kind;
+                var current = Current.Kind;
 
                 if (open.Contains(current))
                 {
@@ -462,7 +463,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                     + level
                 );
 
-                throw new PftSyntaxException(this);
+                throw new SyntaxException();
             }
             if (foundPosition < 0)
             {
@@ -477,9 +478,9 @@ namespace ManagedIrbis.Pft.Infrastructure
                 return null;
             }
 
-            List<PftToken> tokens = new List<PftToken>();
+            var tokens = new List<Token>();
             for (
-                    int position = savePosition;
+                    var position = savePosition;
                     position < _position;
                     position++
                 )
@@ -487,7 +488,7 @@ namespace ManagedIrbis.Pft.Infrastructure
                 tokens.Add(_tokens[position]);
             }
 
-            PftTokenList result = new PftTokenList(tokens);
+            var result = new TokenList(tokens);
 
             return result;
         }
@@ -501,12 +502,12 @@ namespace ManagedIrbis.Pft.Infrastructure
             )
         {
             var result = new StringBuilder();
-            int index = _position - howMany;
+            var index = _position - howMany;
             if (index < 0)
             {
                 index = 0;
             }
-            bool first = true;
+            var first = true;
             while (index < Length)
             {
                 if (!first)
@@ -525,7 +526,7 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// <summary>
         /// Get array of tokens.
         /// </summary>
-        public PftToken[] ToArray()
+        public Token[] ToArray()
         {
             return _tokens;
         }
@@ -535,14 +536,14 @@ namespace ManagedIrbis.Pft.Infrastructure
         /// </summary>
         public string ToText()
         {
-            StringBuilder result = new StringBuilder();
+            var builder = StringBuilderPool.Shared.Get();
 
-            foreach (PftToken token in _tokens)
+            foreach (var token in _tokens)
             {
-                result.Append(token.Text);
+                builder.Append (token.Text);
             }
 
-            return result.ToString();
+            return builder.ToString();
         }
 
         #endregion
@@ -550,22 +551,10 @@ namespace ManagedIrbis.Pft.Infrastructure
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            if (IsEof)
-            {
-                return "(EOF)";
-            }
-
-            return string.Format
-                (
-                    "{0} of {1}: {2}",
-                    _position,
-                    _tokens.Length,
-                    Current
-                );
-        }
+        public override string ToString() => IsEof ? "(EOF)" : $"{_position} of {_tokens.Length}: {Current}";
 
         #endregion
-    }
-}
+
+    } // class TokenList
+
+} // namespace SimplestLanguage

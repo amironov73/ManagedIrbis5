@@ -54,7 +54,7 @@ namespace SimplestLanguage
         public Token
             (
                 TokenKind kind,
-                string? text
+                string? text = null
             )
         {
             Kind = kind;
