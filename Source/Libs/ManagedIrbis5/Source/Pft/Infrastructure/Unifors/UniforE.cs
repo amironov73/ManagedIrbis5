@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforE.cs --
+/* UniforE.cs -- вернуть заданное количество слов с начала строки
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -37,6 +37,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // &unifor("E3"v200^a)
     //
 
+    /// <summary>
+    /// Вернуть заданное количество слов с начала строки.
+    /// </summary>
     static class UniforE
     {
         #region Private members
@@ -53,23 +56,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 return string.Empty;
             }
 
-            wordCount--;
+            --wordCount;
 
             // ibatrak через ISISACW.TAB делать смысла нет
             // irbis64 ищет одиночные пробелы
 
-            var positions = GetPositions(text, ' ');
+            var positions = GetPositions (text, ' ');
 
             if (wordCount >= positions.Length)
             {
                 return text;
             }
 
-            var end = positions[wordCount];
-            var result = text.Substring(0, end);
+            var end = positions [wordCount];
+            var result = text.Substring (0, end);
 
             return result;
-        }
+
+        } // method GetFirstWords
 
         /// <summary>
         /// Get positions of the symbol.
@@ -100,7 +104,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             }
 
             return result.ToArray();
-        }
+
+        } // method GetPositions
 
         #endregion
 
@@ -116,24 +121,28 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
-            if (!string.IsNullOrEmpty(expression))
+            if (!string.IsNullOrEmpty (expression))
             {
-                var navigator = new TextNavigator(expression);
+                var navigator = new ValueTextNavigator (expression);
                 var countText = navigator.ReadChar().ToString();
                 if (countText == "0")
                 {
                     countText = "10";
                 }
 
-                if (Utility.TryParseInt32(countText, out var wordCount))
+                if (Utility.TryParseInt32 (countText, out var wordCount))
                 {
                     var text = navigator.GetRemainingText().ToString();
-                    var output = GetFirstWords(text, wordCount);
-                    context.WriteAndSetFlag(node, output);
+                    var output = GetFirstWords (text, wordCount);
+                    context.WriteAndSetFlag (node, output);
                 }
-            }
-        }
+
+            } // if
+
+        } // method GetFirstWords
 
         #endregion
-    }
-}
+
+    } // class UniforE
+
+} // ManagedIrbis.Pft.Infrastructure.Unifors

@@ -7,13 +7,11 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforF.cs --
+/* UniforF.cs -- вернуть часть строки, пропустив указанное количество слов с начала
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using System.Text.RegularExpressions;
 
 using AM;
 using AM.Text;
@@ -39,37 +37,40 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // &unifor("F3"v200^a)
     //
 
+    /// <summary>
+    /// Вернуть часть строки, пропустив указанное количество слов с начала.
+    /// </summary>
     static class UniforF
     {
         #region Private members
 
-        static string GetLastWords
+        public static string GetLastWords
             (
                 string? text,
                 int wordCount
             )
         {
-            if (string.IsNullOrEmpty(text)
+            if (string.IsNullOrEmpty (text)
                 || wordCount <= 0)
             {
                 return string.Empty;
             }
 
-            wordCount--;
+            --wordCount;
 
             // TODO Use IrbisAlphabetTable?
 
             // ibatrak через ISISACW.TAB делать смысла нет
             // irbis64 ищет одиночные пробелы
 
-            var positions = UniforE.GetPositions(text, ' ');
+            var positions = UniforE.GetPositions (text, ' ');
 
             if (wordCount >= positions.Length)
             {
                 return text;
             }
 
-            var end = positions[wordCount];
+            var end = positions [wordCount];
             var result = text.Substring
                 (
                     end,
@@ -77,8 +78,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 );
 
             return result;
-        }
 
+        } // method GetLastWords
 
         #endregion
 
@@ -94,20 +95,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
-            if (!string.IsNullOrEmpty(expression))
+            if (!string.IsNullOrEmpty (expression))
             {
-                var navigator = new TextNavigator(expression);
+                var navigator = new ValueTextNavigator (expression);
                 var countText = navigator.ReadChar().ToString();
 
-                if (Utility.TryParseInt32(countText, out var wordCount))
+                if (Utility.TryParseInt32 (countText, out var wordCount))
                 {
                     var text = navigator.GetRemainingText().ToString();
-                    var output = GetLastWords(text, wordCount);
-                    context.WriteAndSetFlag(node, output);
+                    var output = GetLastWords (text, wordCount);
+                    context.WriteAndSetFlag (node, output);
                 }
-            }
-        }
+
+            } // if
+
+        } // method GetLastWords
 
         #endregion
-    }
-}
+
+    } // class UniforE
+
+} // namespace

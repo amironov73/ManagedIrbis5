@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* Unifor3.cs --
+/* Unifor3.cs -- функции, связанные с датой и временем
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -76,6 +76,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // &uf('3С',&uf('3'),'/19000101')
     //
 
+    /// <summary>
+    /// Функции, связанные с датой и временем.
+    /// </summary>
     static class Unifor3
     {
         #region Private members
@@ -250,21 +253,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         #region Public methods
 
         /// <summary>
-        /// Print current date.
+        /// Форматирование даты.
         /// </summary>
-        public static void PrintDate
+        public static string FormatDate
             (
-                PftContext context,
-                PftNode? node,
+                DateTime now,
                 string? expression
             )
         {
             expression ??= string.Empty;
-
-            var secondChar = expression.FirstChar();
+            var firstChar = expression.FirstChar();
             string? format;
-            var now = context.Provider.PlatformAbstraction.Now();
-            switch (secondChar)
+            switch (firstChar)
             {
                 case '\0':
                     format = "{0:yyyyMMdd}";
@@ -295,15 +295,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     break;
 
                 case '6':
-                    format = _GetMonthName(expression, _russianNominative);
+                    format = _GetMonthName (expression, _russianNominative);
                     break;
 
                 case '7':
-                    format = _GetMonthName(expression, _russianGenitive);
+                    format = _GetMonthName (expression, _russianGenitive);
                     break;
 
                 case '8':
-                    format = _GetMonthName(expression, _englishMonthNames);
+                    format = _GetMonthName (expression, _englishMonthNames);
                     break;
 
                 case '9':
@@ -317,17 +317,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                 case 'b':
                 case 'B':
-                    format = _AddDate(expression, false);
+                    format = _AddDate (expression, false);
                     break;
 
                 case 'c':
                 case 'C':
-                    format = _AddDate(expression, true);
+                    format = _AddDate (expression, true);
                     break;
 
                 case 'j':
                 case 'J':
-                    format = _ToJulianDate(expression);
+                    format = _ToJulianDate (expression);
                     break;
 
                 case 'm':
@@ -335,20 +335,40 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                     // ibatrak
                     // неописанная функция, дата из числа
                     // в днях от базовой даты 30.12.1899
-                    format = _FromDelphiDate(expression);
+                    format = _FromDelphiDate (expression);
                     break;
 
                 default:
-                    return;
+                    return string.Empty;
             }
 
-            if (!string.IsNullOrEmpty(format))
+            if (!string.IsNullOrEmpty (format))
             {
-                var output = string.Format(format, now);
-                context.WriteAndSetFlag(node, output);
+                return string.Format (CultureInfo.InvariantCulture, format, now);
             }
-        }
+
+            return string.Empty;
+
+        } // method FormatDate
+
+        /// <summary>
+        /// Print current date.
+        /// </summary>
+        public static void PrintDate
+            (
+                PftContext context,
+                PftNode? node,
+                string? expression
+            )
+        {
+            var now = context.Provider.PlatformAbstraction.Now();
+            var output = FormatDate (now, expression);
+            context.WriteAndSetFlag (node, output);
+
+        } // method PrindDate
 
         #endregion
-    }
-}
+
+    } // class Unifor3
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Unifors

@@ -13,8 +13,6 @@
 
 #region Using directives
 
-using System.Text;
-
 using AM.Text;
 
 #endregion
@@ -57,33 +55,47 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
 
                 if (expression.Contains("<"))
                 {
-                    var builder = new StringBuilder(expression.Length);
-                    var navigator = new TextNavigator(expression);
-                    while (!navigator.IsEOF)
+                    var builder = StringBuilderPool.Shared.Get();
+                    try
                     {
-                        var text = navigator.ReadUntil('<').ToString();
-                        builder.Append(text);
-                        var c = navigator.ReadChar();
-                        if (c != '<')
+                        builder.EnsureCapacity (expression.Length);
+                        var navigator = new ValueTextNavigator (expression);
+                        while (!navigator.IsEOF)
                         {
-                            break;
+                            var text = navigator.ReadUntil ('<').ToString();
+                            builder.Append (text);
+                            var c = navigator.ReadChar();
+                            if (c != '<')
+                            {
+                                break;
+                            }
+
+                            text = navigator.ReadUntil ('>').ToString();
+                            c = navigator.ReadChar();
+                            if (c != '>')
+                            {
+                                builder.Append ('<');
+                                builder.Append (text);
+                            }
                         }
-                        text = navigator.ReadUntil('>').ToString();
-                        c = navigator.ReadChar();
-                        if (c != '>')
-                        {
-                            builder.Append('<');
-                            builder.Append(text);
-                        }
+
+                        builder.Append (navigator.GetRemainingText());
+                        result = builder.ToString();
                     }
-                    builder.Append(navigator.GetRemainingText());
-                    result = builder.ToString();
+                    finally
+                    {
+                        StringBuilderPool.Shared.Return (builder);
+                    }
                 }
 
-                context.WriteAndSetFlag(node, result);
-            }
-        }
+                context.WriteAndSetFlag (node, result);
+
+            } // if
+
+        } // methodRemoveAngleBrackets
 
         #endregion
-    }
-}
+
+    } // class UniforX
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Unifors

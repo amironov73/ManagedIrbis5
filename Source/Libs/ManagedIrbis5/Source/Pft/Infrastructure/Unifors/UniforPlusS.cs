@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforPlusS.cs --
+/* UniforPlusS.cs -- декодирование заголовков
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -78,6 +78,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
     // 1 апреля
     //
 
+    /// <summary>
+    /// Декодирование заголовков.
+    /// </summary>
     static class UniforPlusS
     {
         #region Private members
@@ -97,16 +100,41 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         /// </summary>
         public static string DecodeTitle
             (
+                string? title,
+                bool before
+            )
+        {
+            if (string.IsNullOrEmpty (title))
+            {
+                return string.Empty;
+            }
+
+            MatchEvaluator evaluator = before? _FirstEvaluator : _SecondEvaluator;
+
+            return Regex.Replace
+                (
+                    title,
+                    "[<](?<first>.+?)(?:[=](?<second>.+?))?[>]",
+                    evaluator
+                );
+
+        } // method Decodetitle
+
+        /// <summary>
+        /// Декодирование конструкции &lt;=&gt;.
+        /// </summary>
+        public static string DecodeTitle
+            (
                 string? expression
             )
         {
             var result = string.Empty;
-            if (!string.IsNullOrEmpty(expression))
+            if (!string.IsNullOrEmpty (expression))
             {
-                var navigator = new TextNavigator(expression);
+                var navigator = new ValueTextNavigator (expression);
                 var index = navigator.ReadChar();
                 var input = navigator.GetRemainingText().ToString();
-                if (!string.IsNullOrEmpty(input))
+                if (!string.IsNullOrEmpty (input))
                 {
                     MatchEvaluator evaluator = _SecondEvaluator;
                     if (index != '0')
@@ -120,11 +148,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                             "[<](?<first>.+?)(?:[=](?<second>.+?))?[>]",
                             evaluator
                         );
-                }
-            }
+
+                } // if
+
+            } // if
 
             return result;
-        }
+
+        } // method DecodeTitle
 
         /// <summary>
         /// Decode title.
@@ -136,13 +167,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string? expression
             )
         {
-            if (!string.IsNullOrEmpty(expression))
+            if (!string.IsNullOrEmpty (expression))
             {
-                var output = DecodeTitle(expression);
-                context.WriteAndSetFlag(node, output);
+                var output = DecodeTitle (expression);
+                context.WriteAndSetFlag (node, output);
             }
-        }
+
+        } // method DecodeTitle
 
         #endregion
-    }
-}
+
+    } // class UniforPlusS
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Unifors

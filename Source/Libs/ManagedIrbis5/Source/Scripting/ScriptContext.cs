@@ -17,6 +17,8 @@
 
 using System;
 using System.IO;
+
+using ManagedIrbis.Pft.Infrastructure.Unifors;
 using ManagedIrbis.Records;
 
 #endregion
@@ -80,7 +82,8 @@ namespace ManagedIrbis.Scripting
         public virtual void AfterAll()
         {
             // метод необходимо перегрузить в потомке
-        }
+
+        } // method AfterAll
 
         /// <summary>
         /// Вызывается перед форматированием всех записей.
@@ -88,12 +91,25 @@ namespace ManagedIrbis.Scripting
         public virtual void BeforeAll()
         {
             // метод необходимо перегрузить в потомке
-        }
+
+        } // method BeforeAll
 
         /// <summary>
         /// Число повторений поля с указанной меткой.
         /// </summary>
         public int Count (int tag) => Record?.Count (tag) ?? 0;
+
+        /// <summary>
+        /// Декодирование конструкции &lt;=&gt;.
+        /// </summary>
+        public string DecodeTitle (string? title, bool before) =>
+            UniforPlusS.DecodeTitle (title, before);
+
+        /// <summary>
+        /// Заданное количество слов с начала строки.
+        /// </summary>
+        public string? FirstWords (string? text, int words) =>
+            UniforE.GetFirstWords (text, words);
 
         /// <summary>
         /// Получение текста поля до разделителей подполей
@@ -129,6 +145,11 @@ namespace ManagedIrbis.Scripting
         public string[] FMA (int tag, char code) => Record?.FMA(tag, code) ?? Array.Empty<string>();
 
         /// <summary>
+        /// Форматирование даты как в unifor('3')
+        /// </summary>
+        public string FormatDate (string format) => Unifor3.FormatDate (DateTime.Now, format);
+
+        /// <summary>
         /// Форматирование записи.
         /// </summary>
         public virtual void FormatRecord()
@@ -151,6 +172,17 @@ namespace ManagedIrbis.Scripting
         /// Простейшее расформатирование на уровне "v910^b + |, |".
         /// </summary>
         public void S (string? format) => Record.SimpleFormat (format);
+
+        /// <summary>
+        /// Пропуск заданного количества слов с начала строки.
+        /// </summary>
+        public string? LastWords (string? text, int words) =>
+            UniforF.GetLastWords (text, words);
+
+        /// <summary>
+        /// Простейшее расформатирование на уровне "v910^b + |, |".
+        /// </summary>
+        public void V (string? format) => Record.SimpleFormat (format);
 
         /// <summary>
         /// Вывод значения поля до первого разделителя
