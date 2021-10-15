@@ -16,7 +16,9 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
+using AM;
 
 #endregion
 
@@ -57,7 +59,19 @@ namespace SimplestLanguage
 
         private AstVariableReference ParseVariable()
         {
-            return new AstVariableReference(new Token(TokenKind.None));
+            return new AstVariableReference (new Token (TokenKind.None));
+        }
+
+        private AstValue ParseValue()
+        {
+            Tokens.RequireNext();
+
+            return Tokens.Current.Kind switch
+            {
+                TokenKind.Identifier => ParseVariable(),
+                TokenKind.NumericLiteral => new AstNumber(Tokens.Current),
+                _ => throw new SyntaxException()
+            };
         }
 
         private AstOperation ParseExpression()
@@ -83,17 +97,37 @@ namespace SimplestLanguage
 
         } // method ParseAssignment
 
-        private AstNode ParseStatement()
-        {
-            return ParseAssignment();
-
-        } // method ParseStatement
-
+        /// <summary>
+        /// Разбор вызова процедуры.
+        /// </summary>
         private AstNode ParseCall()
         {
-            return new AstCall("print", ArraySegment<AstValue>.Empty)
-                ;
+            Tokens.RequireNext (TokenKind.Identifier);
+            var arguments = new List<AstValue>();
+            var procedureName = Tokens.Current.Text.ThrowIfNullOrEmpty();
+            Tokens.RequireNext (TokenKind.LeftParenthesis);
+            while (Tokens.Peek() != TokenKind.RightParenthesis)
+            {
+                Tokens.RequireNext();
+            }
+            Tokens.RequireNext (TokenKind.RightParenthesis);
+            Tokens.RequireNext (TokenKind.Semicolon);
+
+            return new AstCall (procedureName, arguments);
+
         } // method ParseCall
+
+        /// <summary>
+        /// Разбор выражения верхнего уровня.
+        /// </summary>
+        private AstNode ParseStatement() =>
+            Tokens.CheckThat (t => t.Length >= 2).Peek (1)
+                switch
+                {
+                    TokenKind.Equals => ParseAssignment(),
+                    _ => ParseCall()
+                };
+
 
         #endregion
 
