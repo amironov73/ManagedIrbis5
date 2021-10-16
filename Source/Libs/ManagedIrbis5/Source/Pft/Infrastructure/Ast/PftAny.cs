@@ -18,9 +18,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 using AM;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 using ManagedIrbis.Pft.Infrastructure.Serialization;
@@ -50,31 +50,32 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             get
             {
-                if (ReferenceEquals(_virtualChildren, null))
+                if (ReferenceEquals (_virtualChildren, null))
                 {
-
                     _virtualChildren = new VirtualChildren();
-                    if (!ReferenceEquals(InnerCondition, null))
+                    if (!ReferenceEquals (InnerCondition, null))
                     {
-                        List<PftNode> nodes = new List<PftNode>
+                        var nodes = new List<PftNode>
                         {
                             InnerCondition
                         };
-                        _virtualChildren.SetChildren(nodes);
+                        _virtualChildren.SetChildren (nodes);
                     }
                 }
 
                 return _virtualChildren;
-            }
+
+            } // get
 
             [ExcludeFromCodeCoverage]
             protected set => Magna.Error
                 (
-                    nameof(PftAny) + "::" + nameof(Children)
+                    nameof (PftAny) + "::" + nameof (Children)
                     + ": set value="
                     + value.ToVisibleString()
                 );
-        }
+
+        } // property Children
 
         /// <inheritdoc cref="PftNode.ExtendedSyntax" />
         public override bool ExtendedSyntax => true;
@@ -84,34 +85,36 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftAny()
         {
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftAny
             (
-                [NotNull] PftToken token
+                PftToken token
             )
-            : base(token)
+            : base (token)
         {
-            token.MustBe(PftTokenKind.Any);
-        }
+            token.MustBe (PftTokenKind.Any);
+
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftAny
             (
-                [NotNull] PftCondition condition
+                PftCondition condition
             )
         {
             InnerCondition = condition;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -130,15 +133,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftAny result = (PftAny)base.Clone();
+            var result = (PftAny)base.Clone();
 
-            if (!ReferenceEquals(InnerCondition, null))
+            if (!ReferenceEquals (InnerCondition, null))
             {
                 result.InnerCondition = (PftCondition)InnerCondition.Clone();
             }
 
             return result;
-        }
+
+        } // method Clone
 
         #endregion
 
@@ -150,14 +154,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftNode otherNode
             )
         {
-            base.CompareNode(otherNode);
+            base.CompareNode (otherNode);
 
             PftSerializationUtility.CompareNodes
                 (
                     InnerCondition,
                     ((PftAny)otherNode).InnerCondition
                 );
-        }
+
+        } // method CompareNode
 
         /// <inheritdoc cref="PftNode.Deserialize" />
         protected internal override void Deserialize
@@ -165,11 +170,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryReader reader
             )
         {
-            base.Deserialize(reader);
+            base.Deserialize (reader);
 
-            InnerCondition
-                = (PftCondition?) PftSerializer.DeserializeNullable(reader);
-        }
+            InnerCondition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+
+        } // method Deserialize
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -185,22 +190,22 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         + "nested group detected"
                     );
 
-                throw new PftSemanticException("Nested group");
+                throw new PftSemanticException ("Nested group");
             }
 
-            PftCondition condition = InnerCondition
-                .ThrowIfNull("Condition");
+            var condition = InnerCondition
+                .ThrowIfNull ("Condition");
 
-            PftGroup group = new PftGroup();
+            var group = new PftGroup();
 
             try
             {
                 context.CurrentGroup = group;
                 context.VMonitor = false;
 
-                OnBeforeExecution(context);
+                OnBeforeExecution (context);
 
-                bool value = false;
+                var value = false;
 
                 for (
                         context.Index = 0;
@@ -210,7 +215,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 {
                     context.VMonitor = false;
 
-                    condition.Execute(context);
+                    condition.Execute (context);
 
                     if (!context.VMonitor || context.BreakFlag)
                     {
@@ -226,30 +231,32 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 Value = value;
 
-                OnAfterExecution(context);
+                OnAfterExecution (context);
             }
             finally
             {
                 context.CurrentGroup = null;
             }
-        }
+
+        } // method Executute
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
         public override PftNodeInfo GetNodeInfo()
         {
-            PftNodeInfo result = new PftNodeInfo
+            var result = new PftNodeInfo
             {
                 Node = this,
-                Name = SimplifyTypeName(GetType().Name)
+                Name = SimplifyTypeName (GetType().Name)
             };
 
-            if (!ReferenceEquals(InnerCondition, null))
+            if (!ReferenceEquals (InnerCondition, null))
             {
-                result.Children.Add(InnerCondition.GetNodeInfo());
+                result.Children.Add (InnerCondition.GetNodeInfo());
             }
 
             return result;
-        }
+
+        } // method GetNodeInfo
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -259,10 +266,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             printer
                 .SingleSpace()
-                .Write("any(");
-            InnerCondition?.PrettyPrint(printer);
-            printer.Write(')');
-        }
+                .Write ("any(");
+            InnerCondition?.PrettyPrint (printer);
+            printer.Write (')');
+
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.Serialize" />
         protected internal override void Serialize
@@ -270,17 +278,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryWriter writer
             )
         {
-            base.Serialize(writer);
+            base.Serialize (writer);
 
-            PftSerializer.SerializeNullable(writer, InnerCondition);
-        }
+            PftSerializer.SerializeNullable (writer, InnerCondition);
+
+        } // method Serialize
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         [DebuggerStepThrough]
-        protected internal override bool ShouldSerializeText()
-        {
-            return false;
-        }
+        protected internal override bool ShouldSerializeText() => false;
 
         #endregion
 
@@ -289,13 +295,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
-            result.Append("any(");
-            PftUtility.NodesToText(result, Children);
-            result.Append(')');
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append ("any(");
+            PftUtility.NodesToText (builder, Children);
+            builder.Append (')');
 
-            return result.ToString();
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method ToString
 
         #endregion
 
