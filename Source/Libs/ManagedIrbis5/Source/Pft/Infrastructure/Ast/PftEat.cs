@@ -7,13 +7,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftEat.cs --
+/* PftEat.cs -- съедает результат выполнения операторов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Text;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Text;
 
@@ -24,7 +24,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// Eat the output.
+    /// Съедает результат выполнения операторов.
     /// </summary>
     /// <example>
     /// <code>
@@ -44,34 +44,35 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftEat()
         {
-        }
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftEat
             (
                 PftToken token
             )
-            : base(token)
+            : base (token)
         {
-            token.MustBe(PftTokenKind.EatOpen);
-        }
+            token.MustBe (PftTokenKind.EatOpen);
+
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftEat
             (
                 params PftNode[] children
             )
-            : base(children)
+            : base (children)
         {
-        }
+        } // constructor
 
         #endregion
 
@@ -83,13 +84,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            OnBeforeExecution(context);
+            OnBeforeExecution (context);
 
             // Eat the output
-            context.Evaluate(Children);
+            context.Evaluate (Children);
 
-            OnAfterExecution(context);
-        }
+            OnAfterExecution (context);
+
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -97,10 +99,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftPrettyPrinter printer
             )
         {
-            printer.Write("[[[");
-            base.PrettyPrint(printer);
-            printer.Write("]]] ");
-        }
+            printer.Write ("[[[");
+            base.PrettyPrint (printer);
+            printer.Write ("]]] ");
+
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         protected internal override bool ShouldSerializeText() => false;
@@ -112,14 +115,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
-            result.Append("[[[");
-            PftUtility.NodesToText(result, Children);
-            result.Append("]]]");
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append ("[[[");
+            PftUtility.NodesToText (builder, Children);
+            builder.Append ("]]]");
 
-            return result.ToString();
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftEat
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

@@ -64,7 +64,8 @@ namespace ManagedIrbis.Scripting
         {
             References = new List<MetadataReference>();
             ErrorWriter = Console.Error;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -103,7 +104,7 @@ internal class Program : IrbisApplication
             var builder = new StringBuilder();
             foreach (var line in lines)
             {
-                builder.AppendLine($"{prefix}{line}");
+                builder.AppendLine ($"{prefix}{line}");
             }
 
             // пустая строка для красоты
@@ -120,8 +121,8 @@ internal class Program : IrbisApplication
             )
         {
             // синтаксическое дерево
-            var outerTree = CSharpSyntaxTree.ParseText(outerCode);
-            var innerTree = CSharpSyntaxTree.ParseText(innerCode);
+            var outerTree = CSharpSyntaxTree.ParseText (outerCode);
+            var innerTree = CSharpSyntaxTree.ParseText (innerCode);
 
             // корневой узел
             var outerRoot = outerTree.GetRoot();
@@ -141,7 +142,7 @@ internal class Program : IrbisApplication
             var newActualRun = actualRun;
             foreach (var node in statements)
             {
-                newActualRun = newActualRun.AddBodyStatements(((GlobalStatementSyntax)node).Statement);
+                newActualRun = newActualRun.AddBodyStatements (((GlobalStatementSyntax)node).Statement);
             }
 
             // return 0;
@@ -150,14 +151,14 @@ internal class Program : IrbisApplication
                     SyntaxFactory.ReturnStatement
                         (
                             SyntaxFactory.LiteralExpression
-                            (
-                                SyntaxKind.NumericLiteralExpression,
-                                SyntaxFactory.Literal(0)
-                            )
+                                (
+                                    SyntaxKind.NumericLiteralExpression,
+                                    SyntaxFactory.Literal (0)
+                                )
                         )
                 );
 
-            var resultRoot = outerRoot.ReplaceNode(actualRun, newActualRun)
+            var resultRoot = outerRoot.ReplaceNode (actualRun, newActualRun)
                 .NormalizeWhitespace();
 
             return resultRoot.ToFullString();
@@ -173,40 +174,40 @@ internal class Program : IrbisApplication
         /// </summary>
         public void AddDefaultReferences()
         {
-            AddReference("System.Runtime");
-            AddReference(typeof(object));
-            AddReference(typeof(Console));
-            AddReference(typeof(System.Collections.IEnumerable));
-            AddReference(typeof(List<>));
-            AddReference(typeof(Encoding));
-            AddReference(typeof(File));
-            AddReference(typeof(Enumerable));
-            AddReference("System.ComponentModel");
-            AddReference("System.Data.Common");
-            AddReference("System.Linq.Expressions");
+            AddReference ("System.Runtime");
+            AddReference (typeof (object));
+            AddReference (typeof (Console));
+            AddReference (typeof (System.Collections.IEnumerable));
+            AddReference (typeof (List<>));
+            AddReference (typeof (Encoding));
+            AddReference (typeof (File));
+            AddReference (typeof (Enumerable));
+            AddReference ("System.ComponentModel");
+            AddReference ("System.Data.Common");
+            AddReference ("System.Linq.Expressions");
 
-            AddReference(typeof(AM.Utility));
-            AddReference(typeof(ISyncProvider));
+            AddReference (typeof (AM.Utility));
+            AddReference (typeof (ISyncProvider));
 
-            AddReference(typeof(Microsoft.Extensions.Logging.Abstractions.NullLogger));
-            AddReference(typeof(Microsoft.Extensions.Logging.Logger<>));
+            AddReference (typeof (Microsoft.Extensions.Logging.Abstractions.NullLogger));
+            AddReference (typeof (Microsoft.Extensions.Logging.Logger<>));
         }
 
         /// <summary>
         /// Добавление ссылки на указанную сборку.
         /// </summary>
-        public void AddReference (string assemblyRef) => AddReference(Assembly.Load(assemblyRef));
+        public void AddReference (string assemblyRef) => AddReference (Assembly.Load (assemblyRef));
 
         /// <summary>
         /// Добавление ссылки на указанную сборку.
         /// </summary>
         public void AddReference (Assembly assembly) =>
-            References.Add(MetadataReference.CreateFromFile(assembly.Location));
+            References.Add (MetadataReference.CreateFromFile (assembly.Location));
 
         /// <summary>
         /// Добавление ссылки на сборку, содержащую указанный тип.
         /// </summary>
-        public void AddReference (Type type) => AddReference(type.Assembly);
+        public void AddReference (Type type) => AddReference (type.Assembly);
 
         /// <summary>
         /// Компиляция текста скрипта в соответствии с опциями.
@@ -223,32 +224,32 @@ internal class Program : IrbisApplication
 
             foreach (var reference in options.References)
             {
-                AddReference(reference);
+                AddReference (reference);
             }
 
             var forest = new List<SyntaxTree>();
             foreach (var inputFileName in options.InputFiles)
             {
-                var sourceCode = File.ReadAllText(inputFileName);
+                var sourceCode = File.ReadAllText (inputFileName);
                 if (options.ApplicationMode)
                 {
-                    sourceCode = _MergeCode(_applicationSourceCode, sourceCode);
+                    sourceCode = _MergeCode (_applicationSourceCode, sourceCode);
                 }
 
-                sourceCode = _AddLines(sourceCode, "using ", options.Usings);
-                sourceCode = _AddLines(sourceCode, "#define ", options.Defines);
+                sourceCode = _AddLines (sourceCode, "using ", options.Usings);
+                sourceCode = _AddLines (sourceCode, "#define ", options.Defines);
 
                 if (options.ShowApplicationCode)
                 {
-                    Console.WriteLine(sourceCode);
+                    Console.WriteLine (sourceCode);
                 }
 
-                var syntaxTree = CSharpSyntaxTree.ParseText(sourceCode);
-                forest.Add(syntaxTree);
+                var syntaxTree = CSharpSyntaxTree.ParseText (sourceCode);
+                forest.Add (syntaxTree);
             }
 
             var compilationOptions = options.CompilationOptions
-                ?? new CSharpCompilationOptions(OutputKind.ConsoleApplication);
+                                     ?? new CSharpCompilationOptions (OutputKind.ConsoleApplication);
 
             var result = CSharpCompilation.Create
                 (
@@ -271,13 +272,12 @@ internal class Program : IrbisApplication
                 string scriptText
             )
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(scriptText);
+            var syntaxTree = CSharpSyntaxTree.ParseText (scriptText);
             var result = CSharpCompilation.Create
                 (
                     fileName,
-                    new [] { syntaxTree },
+                    new[] { syntaxTree },
                     References
-
                 );
 
             return result;
@@ -297,12 +297,12 @@ internal class Program : IrbisApplication
             EmitResult emitResult;
             if (pdbStream is null)
             {
-                emitResult = compilation.Emit(exeStream);
+                emitResult = compilation.Emit (exeStream);
             }
             else
             {
-                var emitOptions = new EmitOptions(debugInformationFormat: DebugInformationFormat.Pdb);
-                emitResult = compilation.Emit(exeStream, pdbStream, options: emitOptions);
+                var emitOptions = new EmitOptions (debugInformationFormat: DebugInformationFormat.Pdb);
+                emitResult = compilation.Emit (exeStream, pdbStream, options: emitOptions);
             }
 
             if (!emitResult.Success)
@@ -310,14 +310,13 @@ internal class Program : IrbisApplication
                 var failures = emitResult.Diagnostics.Where
                     (
                         diagnostic => diagnostic.IsWarningAsError
-                            || diagnostic.Severity == DiagnosticSeverity.Error
+                                      || diagnostic.Severity == DiagnosticSeverity.Error
                     );
 
                 foreach (var failure in failures)
                 {
-                    ErrorWriter.WriteLine($"{failure.Id}: {failure.GetMessage()}");
+                    ErrorWriter.WriteLine ($"{failure.Id}: {failure.GetMessage()}");
                 }
-
             }
 
             return emitResult.Success;
@@ -334,10 +333,10 @@ internal class Program : IrbisApplication
                 string? pdbName = null
             )
         {
-            using Stream? pdbStream = pdbName is null ? null : File.Create(pdbName);
-            using var exeStream = File.Create(exeName);
+            using Stream? pdbStream = pdbName is null ? null : File.Create (pdbName);
+            using var exeStream = File.Create (exeName);
 
-            return EmitAssemblyToStream(compilation, exeStream);
+            return EmitAssemblyToStream (compilation, exeStream);
 
         } // method EmitAssemblyToFile
 
@@ -350,14 +349,14 @@ internal class Program : IrbisApplication
             )
         {
             using var stream = new MemoryStream();
-            if (!EmitAssemblyToStream(compilation, stream))
+            if (!EmitAssemblyToStream (compilation, stream))
             {
                 return null;
             }
 
-            stream.Seek(0, SeekOrigin.Begin);
+            stream.Seek (0, SeekOrigin.Begin);
             var memory = stream.ToArray();
-            var result = Assembly.Load(memory);
+            var result = Assembly.Load (memory);
 
             return result;
 
@@ -371,47 +370,47 @@ internal class Program : IrbisApplication
                 string[] args
             )
         {
-            var refOption = new Option<string[]>("r")
+            var refOption = new Option<string[]> ("r")
             {
                 Description = "reference to assembly",
                 Arity = ArgumentArity.ZeroOrMore
             };
-            var compileOption = new Option<bool>("c")
+            var compileOption = new Option<bool> ("c")
             {
                 Description = "compile only"
             };
-            var outputOption = new Option<string>("o")
+            var outputOption = new Option<string> ("o")
             {
                 Description = "output file name"
             };
-            var executeOption = new Option<bool>("e")
+            var executeOption = new Option<bool> ("e")
             {
                 Description = "execute only"
             };
-            var applicationOption = new Option<bool>("a")
+            var applicationOption = new Option<bool> ("a")
             {
                 Description = "application mode"
             };
-            var defineOption = new Option<string[]>("d")
+            var defineOption = new Option<string[]> ("d")
             {
                 Description = "#define",
                 Arity = ArgumentArity.OneOrMore
             };
-            var usingOption = new Option<string[]>("u")
+            var usingOption = new Option<string[]> ("u")
             {
                 Description = "using directive",
                 Arity = ArgumentArity.ZeroOrMore
             };
-            var showOption = new Option<bool>("s")
+            var showOption = new Option<bool> ("s")
             {
                 Description = "show resulting application code"
             };
-            var inputArg = new Argument<string[]>("input")
+            var inputArg = new Argument<string[]> ("input")
             {
                 Arity = ArgumentArity.ZeroOrMore,
                 Description = "input files"
             };
-            var rootCommand = new RootCommand("SharpIrbis")
+            var rootCommand = new RootCommand ("SharpIrbis")
             {
                 refOption,
                 compileOption,
@@ -424,47 +423,47 @@ internal class Program : IrbisApplication
                 inputArg
             };
 
-            var parseResult = new CommandLineBuilder(rootCommand)
+            var parseResult = new CommandLineBuilder (rootCommand)
                 .UseDefaults()
                 .Build()
-                .Parse(args);
+                .Parse (args);
 
             var result = new ScriptOptions();
 
-            var references = parseResult.ValueForOption(refOption);
+            var references = parseResult.ValueForOption (refOption);
             if (references is not null)
             {
-                result.References.AddRange(references);
+                result.References.AddRange (references);
             }
 
-            var defines = parseResult.ValueForOption(defineOption);
+            var defines = parseResult.ValueForOption (defineOption);
             if (defines is not null)
             {
-                result.Defines.AddRange(defines);
+                result.Defines.AddRange (defines);
             }
 
-            var usings = parseResult.ValueForOption(usingOption);
+            var usings = parseResult.ValueForOption (usingOption);
             if (usings is not null)
             {
-                result.Usings.AddRange(usings);
+                result.Usings.AddRange (usings);
             }
 
-            var inputs = parseResult.ValueForArgument(inputArg);
+            var inputs = parseResult.ValueForArgument (inputArg);
             if (inputs is not null)
             {
-                result.InputFiles.AddRange(inputs);
+                result.InputFiles.AddRange (inputs);
             }
 
-            var outputName = parseResult.ValueForOption(outputOption);
-            if (!string.IsNullOrEmpty(outputName))
+            var outputName = parseResult.ValueForOption (outputOption);
+            if (!string.IsNullOrEmpty (outputName))
             {
                 result.OutputName = outputName;
             }
 
-            result.ApplicationMode = parseResult.ValueForOption(applicationOption);
-            result.CompileOnly = parseResult.ValueForOption(compileOption);
-            result.ExecuteOnly = parseResult.ValueForOption(executeOption);
-            result.ShowApplicationCode = parseResult.ValueForOption(showOption);
+            result.ApplicationMode = parseResult.ValueForOption (applicationOption);
+            result.CompileOnly = parseResult.ValueForOption (compileOption);
+            result.ExecuteOnly = parseResult.ValueForOption (executeOption);
+            result.ShowApplicationCode = parseResult.ValueForOption (showOption);
 
             return result;
 
@@ -484,7 +483,7 @@ internal class Program : IrbisApplication
                 var entryPoint = assembly.EntryPoint;
                 if (entryPoint is not null)
                 {
-                    entryPoint.Invoke(null, new object?[] { args });
+                    entryPoint.Invoke (null, new object?[] { args });
                 }
             }
 
@@ -503,6 +502,7 @@ internal class Program : IrbisApplication
             var scriptArgs = new List<string>();
 
             int index;
+
             // сначала отбираем аргументы компилятора
             for (index = 0; index < args.Length; index++)
             {
@@ -512,13 +512,13 @@ internal class Program : IrbisApplication
                     break;
                 }
 
-                compilerArgs.Add(args[index]);
+                compilerArgs.Add (args[index]);
             }
 
             // все, что осталось -- аргументы скрипта
             for (; index < args.Length; index++)
             {
-                scriptArgs.Add(args[index]);
+                scriptArgs.Add (args[index]);
             }
 
             return new[] { compilerArgs.ToArray(), scriptArgs.ToArray() };

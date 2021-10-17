@@ -84,9 +84,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             get
             {
-                if (ReferenceEquals(_virtualChildren, null))
+                if (ReferenceEquals (_virtualChildren, null))
                 {
-
                     _virtualChildren = new VirtualChildren();
                     var operationNode = new PftNode
                     {
@@ -98,7 +97,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         operationNode,
                         RightOperand! // TODO: исправить логику
                     };
-                    _virtualChildren.SetChildren(nodes);
+                    _virtualChildren.SetChildren (nodes);
                 }
 
                 return _virtualChildren;
@@ -128,7 +127,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             (
                 PftToken token
             )
-            : base(token)
+            : base (token)
         {
         }
 
@@ -262,7 +261,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     break;
 
                 case "=":
-                    result = leftValue.SameString(rightValue);
+                    result = leftValue.SameString (rightValue);
                     break;
 
                 case "==":
@@ -289,38 +288,38 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
                 case "<":
                     result = PftUtility.CompareStrings
-                        (
-                            leftValue,
-                            rightValue
-                        )
-                        < 0;
+                                 (
+                                     leftValue,
+                                     rightValue
+                                 )
+                             < 0;
                     break;
 
                 case "<=":
                     result = PftUtility.CompareStrings
-                        (
-                            leftValue,
-                            rightValue
-                        )
-                        <= 0;
+                                 (
+                                     leftValue,
+                                     rightValue
+                                 )
+                             <= 0;
                     break;
 
                 case ">":
                     result = PftUtility.CompareStrings
-                        (
-                            leftValue,
-                            rightValue
-                        )
-                        > 0;
+                                 (
+                                     leftValue,
+                                     rightValue
+                                 )
+                             > 0;
                     break;
 
                 case ">=":
                     result = PftUtility.CompareStrings
-                        (
-                            leftValue,
-                            rightValue
-                        )
-                        >= 0;
+                                 (
+                                     leftValue,
+                                     rightValue
+                                 )
+                             >= 0;
                     break;
 
                 case "~":
@@ -389,12 +388,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftNode node
             )
         {
-            var stringValue = context.Evaluate(node);
+            var stringValue = context.Evaluate (node);
 
             var numeric = node as PftNumeric;
-            if (ReferenceEquals(numeric, null))
+            if (ReferenceEquals (numeric, null))
             {
-                double.TryParse(stringValue, out var result);
+                double.TryParse (stringValue, out var result);
 
                 return result;
             }
@@ -413,14 +412,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             result._virtualChildren = null;
 
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
-                result.LeftOperand = (PftNode) LeftOperand.Clone();
+                result.LeftOperand = (PftNode)LeftOperand.Clone();
             }
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (!ReferenceEquals (RightOperand, null))
             {
-                result.RightOperand = (PftNode) RightOperand.Clone();
+                result.RightOperand = (PftNode)RightOperand.Clone();
             }
 
             return result;
@@ -436,9 +435,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftNode otherNode
             )
         {
-            base.CompareNode(otherNode);
+            base.CompareNode (otherNode);
 
-            var otherComparison = (PftComparison) otherNode;
+            var otherComparison = (PftComparison)otherNode;
             PftSerializationUtility.CompareNodes
                 (
                     LeftOperand,
@@ -448,6 +447,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 throw new IrbisException();
             }
+
             PftSerializationUtility.CompareNodes
                 (
                     RightOperand,
@@ -461,32 +461,32 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            if (ReferenceEquals(LeftOperand, null)
-                || ReferenceEquals(RightOperand, null)
-                || string.IsNullOrEmpty(Operation))
+            if (ReferenceEquals (LeftOperand, null)
+                || ReferenceEquals (RightOperand, null)
+                || string.IsNullOrEmpty (Operation))
             {
                 throw new PftCompilerException();
             }
 
-            LeftOperand.Compile(compiler);
-            RightOperand.Compile(compiler);
+            LeftOperand.Compile (compiler);
+            RightOperand.Compile (compiler);
 
-            compiler.StartMethod(this);
+            compiler.StartMethod (this);
 
-            var context = new PftContext(null);
-            if (PftUtility.IsNumeric(context, LeftOperand))
+            var context = new PftContext (null);
+            if (PftUtility.IsNumeric (context, LeftOperand))
             {
                 compiler
                     .WriteIndent()
-                    .Write("double left = ")
-                    .CallNodeMethod(LeftOperand);
+                    .Write ("double left = ")
+                    .CallNodeMethod (LeftOperand);
                 compiler
                     .WriteIndent()
-                    .Write("double right = ")
-                    .CallNodeMethod(RightOperand);
+                    .Write ("double right = ")
+                    .CallNodeMethod (RightOperand);
                 compiler
                     .WriteIndent()
-                    .WriteLine("string operation = \"{0}\";", Operation);
+                    .WriteLine ("string operation = \"{0}\";", Operation);
 
                 // TODO implement properly
                 compiler
@@ -501,17 +501,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 compiler
                     .WriteIndent()
-                    .Write("string left = Evaluate(")
-                    .RefNodeMethod(LeftOperand)
-                    .WriteLine(");");
+                    .Write ("string left = Evaluate(")
+                    .RefNodeMethod (LeftOperand)
+                    .WriteLine (");");
                 compiler
                     .WriteIndent()
-                    .Write("string right = Evaluate(")
-                    .RefNodeMethod(RightOperand)
-                    .WriteLine(");");
+                    .Write ("string right = Evaluate(")
+                    .RefNodeMethod (RightOperand)
+                    .WriteLine (");");
                 compiler
                     .WriteIndent()
-                    .WriteLine("string operation = \"{0}\";", Operation);
+                    .WriteLine ("string operation = \"{0}\";", Operation);
 
                 // TODO implement properly
                 compiler
@@ -525,10 +525,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             compiler
                 .WriteIndent()
-                .WriteLine("return result;");
+                .WriteLine ("return result;");
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
+            compiler.EndMethod (this);
+            compiler.MarkReady (this);
         }
 
         /// <inheritdoc cref="PftNode.Deserialize" />
@@ -537,11 +537,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryReader reader
             )
         {
-            base.Deserialize(reader);
+            base.Deserialize (reader);
 
-            LeftOperand = PftSerializer.DeserializeNullable(reader);
+            LeftOperand = PftSerializer.DeserializeNullable (reader);
             Operation = reader.ReadNullableString();
-            RightOperand = PftSerializer.DeserializeNullable(reader);
+            RightOperand = PftSerializer.DeserializeNullable (reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -550,11 +550,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            OnBeforeExecution(context);
+            OnBeforeExecution (context);
 
             var operation = Operation.ThrowIfNull();
 
-            if (ReferenceEquals(LeftOperand, null))
+            if (ReferenceEquals (LeftOperand, null))
             {
                 Magna.Error
                     (
@@ -562,9 +562,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         + "LeftOperand not set"
                     );
 
-                throw new PftSyntaxException(this);
+                throw new PftSyntaxException (this);
             }
-            if (ReferenceEquals(RightOperand, null))
+
+            if (ReferenceEquals (RightOperand, null))
             {
                 Magna.Error
                     (
@@ -572,7 +573,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         + "RightOperand not set"
                     );
 
-                throw new PftSyntaxException(this);
+                throw new PftSyntaxException (this);
             }
 
             var leftNumeric = PftUtility.IsNumeric
@@ -588,11 +589,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (leftNumeric || rightNumeric)
             {
-                var leftValue = GetValue(context, LeftOperand);
+                var leftValue = GetValue (context, LeftOperand);
                 var rightValue = GetValue
                     (
                         context,
-                        RightOperand.ThrowIfNull("RightOperand")
+                        RightOperand.ThrowIfNull ("RightOperand")
                     );
                 Value = DoNumericOperation
                     (
@@ -604,8 +605,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else
             {
-                var leftValue = context.Evaluate(LeftOperand);
-                var rightValue = context.Evaluate(RightOperand);
+                var leftValue = context.Evaluate (LeftOperand);
+                var rightValue = context.Evaluate (RightOperand);
                 Value = DoStringOperation
                     (
                         context,
@@ -615,7 +616,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     );
             }
 
-            OnAfterExecution(context);
+            OnAfterExecution (context);
         }
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
@@ -624,39 +625,39 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             var result = new PftNodeInfo
             {
                 Node = this,
-                Name = SimplifyTypeName(GetType().Name)
+                Name = SimplifyTypeName (GetType().Name)
             };
 
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
                 var leftNode = new PftNodeInfo
                 {
                     Node = LeftOperand,
                     Name = "Left"
                 };
-                result.Children.Add(leftNode);
-                leftNode.Children.Add(LeftOperand.GetNodeInfo());
+                result.Children.Add (leftNode);
+                leftNode.Children.Add (LeftOperand.GetNodeInfo());
             }
 
-            if (!string.IsNullOrEmpty(Operation))
+            if (!string.IsNullOrEmpty (Operation))
             {
                 var operationNode = new PftNodeInfo
                 {
-                    Name="Operation",
+                    Name = "Operation",
                     Value = Operation
                 };
-                result.Children.Add(operationNode);
+                result.Children.Add (operationNode);
             }
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (!ReferenceEquals (RightOperand, null))
             {
                 var rightNode = new PftNodeInfo
                 {
                     Node = RightOperand,
                     Name = "Right"
                 };
-                result.Children.Add(rightNode);
-                rightNode.Children.Add(RightOperand.GetNodeInfo());
+                result.Children.Add (rightNode);
+                rightNode.Children.Add (RightOperand.GetNodeInfo());
             }
 
             return result;
@@ -665,9 +666,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Optimize" />
         public override PftNode Optimize()
         {
-            if (ReferenceEquals(LeftOperand, null)
-                || ReferenceEquals(RightOperand, null)
-                || string.IsNullOrEmpty(Operation))
+            if (ReferenceEquals (LeftOperand, null)
+                || ReferenceEquals (RightOperand, null)
+                || string.IsNullOrEmpty (Operation))
             {
                 throw new PftCompilerException();
             }
@@ -684,16 +685,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftPrettyPrinter printer
             )
         {
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
-                LeftOperand.PrettyPrint(printer);
+                LeftOperand.PrettyPrint (printer);
             }
 
-            printer.Write(Operation);
+            printer.Write (Operation);
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (!ReferenceEquals (RightOperand, null))
             {
-                RightOperand.PrettyPrint(printer);
+                RightOperand.PrettyPrint (printer);
             }
         }
 
@@ -703,11 +704,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryWriter writer
             )
         {
-            base.Serialize(writer);
+            base.Serialize (writer);
 
-            PftSerializer.SerializeNullable(writer, LeftOperand);
-            writer.WriteNullable(Operation);
-            PftSerializer.SerializeNullable(writer, RightOperand);
+            PftSerializer.SerializeNullable (writer, LeftOperand);
+            writer.WriteNullable (Operation);
+            PftSerializer.SerializeNullable (writer, RightOperand);
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
@@ -722,21 +723,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             var result = new StringBuilder();
 
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
-                result.Append(LeftOperand);
+                result.Append (LeftOperand);
             }
 
-            result.Append(Operation);
+            result.Append (Operation);
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (!ReferenceEquals (RightOperand, null))
             {
-                result.Append(RightOperand);
+                result.Append (RightOperand);
             }
 
             return result.ToString();
         }
 
         #endregion
-    }
-}
+
+    } // class PftComparison
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

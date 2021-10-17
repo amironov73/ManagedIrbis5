@@ -63,17 +63,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             get
             {
-                if (ReferenceEquals(_virtualChildren, null))
+                if (ReferenceEquals (_virtualChildren, null))
                 {
                     _virtualChildren = new VirtualChildren();
                     List<PftNode> nodes = new List<PftNode>();
-                    if (!ReferenceEquals(Condition, null))
+                    if (!ReferenceEquals (Condition, null))
                     {
-                        nodes.Add(Condition);
+                        nodes.Add (Condition);
                     }
-                    nodes.AddRange(ThenBranch);
-                    nodes.AddRange(ElseBranch);
-                    _virtualChildren.SetChildren(nodes);
+
+                    nodes.AddRange (ThenBranch);
+                    nodes.AddRange (ElseBranch);
+                    _virtualChildren.SetChildren (nodes);
                 }
 
                 return _virtualChildren;
@@ -107,8 +108,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// </summary>
         public PftConditionalStatement()
         {
-            ElseBranch = new PftNodeCollection(this);
-            ThenBranch = new PftNodeCollection(this);
+            ElseBranch = new PftNodeCollection (this);
+            ThenBranch = new PftNodeCollection (this);
         }
 
         /// <summary>
@@ -118,12 +119,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             (
                 PftToken token
             )
-            : base(token)
+            : base (token)
         {
-            token.MustBe(PftTokenKind.If);
+            token.MustBe (PftTokenKind.If);
 
-            ElseBranch = new PftNodeCollection(this);
-            ThenBranch = new PftNodeCollection(this);
+            ElseBranch = new PftNodeCollection (this);
+            ThenBranch = new PftNodeCollection (this);
         }
 
         /// <summary>
@@ -139,7 +140,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             Condition = condition;
             foreach (PftNode node in thenBranch)
             {
-                ThenBranch.Add(node);
+                ThenBranch.Add (node);
             }
         }
 
@@ -160,14 +161,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             result._virtualChildren = null;
 
-            if (!ReferenceEquals(Condition, null))
+            if (!ReferenceEquals (Condition, null))
             {
                 result.Condition = (PftCondition)Condition.Clone();
             }
 
-            result.ElseBranch = ElseBranch.CloneNodes(result)
+            result.ElseBranch = ElseBranch.CloneNodes (result)
                 .ThrowIfNull();
-            result.ThenBranch = ThenBranch.CloneNodes(result)
+            result.ThenBranch = ThenBranch.CloneNodes (result)
                 .ThrowIfNull();
 
             return result;
@@ -183,7 +184,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftNode otherNode
             )
         {
-            base.CompareNode(otherNode);
+            base.CompareNode (otherNode);
 
             PftConditionalStatement otherStatement
                 = (PftConditionalStatement)otherNode;
@@ -210,46 +211,46 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            if (ReferenceEquals(Condition, null))
+            if (ReferenceEquals (Condition, null))
             {
                 throw new PftCompilerException();
             }
 
-            Condition.Compile(compiler);
-            compiler.CompileNodes(ThenBranch);
-            compiler.CompileNodes(ElseBranch);
+            Condition.Compile (compiler);
+            compiler.CompileNodes (ThenBranch);
+            compiler.CompileNodes (ElseBranch);
 
-            compiler.StartMethod(this);
+            compiler.StartMethod (this);
 
             compiler
                 .WriteIndent()
-                .Write("bool flag = ")
-                .CallNodeMethod(Condition)
+                .Write ("bool flag = ")
+                .CallNodeMethod (Condition)
                 .WriteIndent()
-                .WriteLine("if (flag)")
+                .WriteLine ("if (flag)")
                 .WriteIndent()
-                .WriteLine("{")
+                .WriteLine ("{")
                 .IncreaseIndent()
-                .CallNodes(ThenBranch)
+                .CallNodes (ThenBranch)
                 .DecreaseIndent()
                 .WriteIndent()
-                .WriteLine("}");
+                .WriteLine ("}");
             if (ElseBranch.Count != 0)
             {
                 compiler
                     .WriteIndent()
-                    .WriteLine("else")
+                    .WriteLine ("else")
                     .WriteIndent()
-                    .WriteLine("{")
+                    .WriteLine ("{")
                     .IncreaseIndent()
-                    .CallNodes(ElseBranch)
+                    .CallNodes (ElseBranch)
                     .DecreaseIndent()
                     .WriteIndent()
-                    .WriteLine("}");
+                    .WriteLine ("}");
             }
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
+            compiler.EndMethod (this);
+            compiler.MarkReady (this);
         }
 
         /// <inheritdoc cref="PftNode.Deserialize" />
@@ -258,10 +259,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryReader reader
             )
         {
-            base.Deserialize(reader);
-            Condition = (PftCondition?)PftSerializer.DeserializeNullable(reader);
-            PftSerializer.Deserialize(reader, ThenBranch);
-            PftSerializer.Deserialize(reader, ElseBranch);
+            base.Deserialize (reader);
+            Condition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
+            PftSerializer.Deserialize (reader, ThenBranch);
+            PftSerializer.Deserialize (reader, ElseBranch);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -270,9 +271,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            OnBeforeExecution(context);
+            OnBeforeExecution (context);
 
-            if (ReferenceEquals(Condition, null))
+            if (ReferenceEquals (Condition, null))
             {
                 Magna.Error
                     (
@@ -293,24 +294,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     );
             }
 
-            Condition.Execute(context);
+            Condition.Execute (context);
 
             if (Condition.Value)
             {
                 foreach (PftNode child in ThenBranch)
                 {
-                    child.Execute(context);
+                    child.Execute (context);
                 }
             }
             else
             {
                 foreach (PftNode child in ElseBranch)
                 {
-                    child.Execute(context);
+                    child.Execute (context);
                 }
             }
 
-            OnAfterExecution(context);
+            OnAfterExecution (context);
         }
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
@@ -319,18 +320,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             PftNodeInfo result = new PftNodeInfo
             {
                 Node = this,
-                Name = SimplifyTypeName(GetType().Name)
+                Name = SimplifyTypeName (GetType().Name)
             };
 
-            if (!ReferenceEquals(Condition, null))
+            if (!ReferenceEquals (Condition, null))
             {
                 PftNodeInfo conditionNode = new PftNodeInfo
                 {
                     Node = Condition,
                     Name = "Condition"
                 };
-                result.Children.Add(conditionNode);
-                conditionNode.Children.Add(Condition.GetNodeInfo());
+                result.Children.Add (conditionNode);
+                conditionNode.Children.Add (Condition.GetNodeInfo());
             }
 
             PftNodeInfo thenNode = new PftNodeInfo
@@ -339,9 +340,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             };
             foreach (PftNode node in ThenBranch)
             {
-                thenNode.Children.Add(node.GetNodeInfo());
+                thenNode.Children.Add (node.GetNodeInfo());
             }
-            result.Children.Add(thenNode);
+
+            result.Children.Add (thenNode);
 
             if (ElseBranch.Count != 0)
             {
@@ -351,9 +353,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 };
                 foreach (PftNode node in ElseBranch)
                 {
-                    elseNode.Children.Add(node.GetNodeInfo());
+                    elseNode.Children.Add (node.GetNodeInfo());
                 }
-                result.Children.Add(elseNode);
+
+                result.Children.Add (elseNode);
             }
 
             return result;
@@ -362,10 +365,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Optimize"/>
         public override PftNode? Optimize()
         {
-            if (!ReferenceEquals(Condition, null))
+            if (!ReferenceEquals (Condition, null))
             {
-                Condition = (PftCondition?) Condition.Optimize();
+                Condition = (PftCondition?)Condition.Optimize();
             }
+
             ThenBranch.Optimize();
             ElseBranch.Optimize();
 
@@ -392,18 +396,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             printer
                 .WriteLine()
                 .WriteIndent()
-                .Write("if ");
-            if (!ReferenceEquals(Condition, null))
+                .Write ("if ");
+            if (!ReferenceEquals (Condition, null))
             {
-                Condition.PrettyPrint(printer);
+                Condition.PrettyPrint (printer);
             }
 
             printer
                 .WriteLine()
                 .WriteIndent()
-                .Write("then ");
+                .Write ("then ");
 
-            bool isComplex = PftUtility.IsComplexExpression(ThenBranch);
+            bool isComplex = PftUtility.IsComplexExpression (ThenBranch);
             if (isComplex)
             {
                 //needComment = true;
@@ -413,7 +417,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 printer.WriteLine();
                 printer.WriteIndent();
             }
-            printer.WriteNodes(ThenBranch);
+
+            printer.WriteNodes (ThenBranch);
             if (isComplex)
             {
                 printer.DecreaseLevel();
@@ -422,7 +427,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             if (ElseBranch.Count != 0)
             {
-                isComplex = PftUtility.IsComplexExpression(ElseBranch);
+                isComplex = PftUtility.IsComplexExpression (ElseBranch);
                 printer.EatNewLine();
                 if (ThenBranch.Count != 0)
                 {
@@ -430,7 +435,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                         .WriteLine()
                         .WriteIndent();
                 }
-                printer.Write("else ");
+
+                printer.Write ("else ");
                 if (isComplex)
                 {
                     //needComment = true;
@@ -440,7 +446,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     printer.WriteLine();
                     printer.WriteIndent();
                 }
-                printer.WriteNodes(ElseBranch);
+
+                printer.WriteNodes (ElseBranch);
                 if (isComplex)
                 {
                     printer.DecreaseLevel();
@@ -454,7 +461,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             printer
                 .WriteIndentIfNeeded()
-                .Write("fi,");
+                .Write ("fi,");
 
             //if (needComment
             //    && !ReferenceEquals(Condition, null))
@@ -472,10 +479,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryWriter writer
             )
         {
-            base.Serialize(writer);
-            PftSerializer.SerializeNullable(writer, Condition);
-            PftSerializer.Serialize(writer, ThenBranch);
-            PftSerializer.Serialize(writer, ElseBranch);
+            base.Serialize (writer);
+            PftSerializer.SerializeNullable (writer, Condition);
+            PftSerializer.Serialize (writer, ThenBranch);
+            PftSerializer.Serialize (writer, ElseBranch);
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
@@ -493,31 +500,36 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public override string ToString()
         {
             StringBuilder result = new StringBuilder();
-            result.Append("if ");
-            if (!ReferenceEquals(Condition, null))
+            result.Append ("if ");
+            if (!ReferenceEquals (Condition, null))
             {
-                result.Append(Condition);
+                result.Append (Condition);
             }
-            result.Append(" then");
+
+            result.Append (" then");
             foreach (PftNode node in ThenBranch)
             {
-                result.Append(' ');
-                result.Append(node);
+                result.Append (' ');
+                result.Append (node);
             }
+
             if (ElseBranch.Count != 0)
             {
-                result.Append(" else");
+                result.Append (" else");
                 foreach (PftNode node in ElseBranch)
                 {
-                    result.Append(' ');
-                    result.Append(node);
+                    result.Append (' ');
+                    result.Append (node);
                 }
             }
-            result.Append(" fi");
+
+            result.Append (" fi");
 
             return result.ToString();
         }
 
         #endregion
-    }
-}
+
+    } // class PftConditionalStatement
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

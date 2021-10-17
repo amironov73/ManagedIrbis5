@@ -16,7 +16,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
+
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -43,34 +44,36 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftCeil()
         {
-        }
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftCeil
             (
                 PftToken token
             )
-            : base(token)
+            : base (token)
         {
-            token.MustBe(PftTokenKind.Ceil);
-        }
+            token.MustBe (PftTokenKind.Ceil);
+
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftCeil
             (
                 PftNumeric value
             )
         {
-            Children.Add(value);
-        }
+            Children.Add (value);
+
+        } // constructor
 
         #endregion
 
@@ -83,28 +86,29 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             )
         {
             var child = Children.FirstOrDefault() as PftNumeric
-                               ?? throw new PftCompilerException();
+                        ?? throw new PftCompilerException();
 
-            child.Compile(compiler);
+            child.Compile (compiler);
 
-            compiler.StartMethod(this);
-
-            compiler
-                .WriteIndent()
-                .WriteLine("double value = ")
-                .CallNodeMethod(child);
+            compiler.StartMethod (this);
 
             compiler
                 .WriteIndent()
-                .WriteLine("double result = Math.Ceiling(value);"); //-V3010
+                .WriteLine ("double value = ")
+                .CallNodeMethod (child);
 
             compiler
                 .WriteIndent()
-                .WriteLine("return result;");
+                .WriteLine ("double result = Math.Ceiling (value);"); //-V3010
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        }
+            compiler
+                .WriteIndent()
+                .WriteLine ("return result;");
+
+            compiler.EndMethod (this);
+            compiler.MarkReady (this);
+
+        } // method Compile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -112,16 +116,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            OnBeforeExecution(context);
+            OnBeforeExecution (context);
 
             if (Children.FirstOrDefault() is PftNumeric child)
             {
-                child.Execute(context);
-                Value = Math.Ceiling(child.Value);
+                child.Execute (context);
+                Value = Math.Ceiling (child.Value);
             }
 
-            OnAfterExecution(context);
-        }
+            OnAfterExecution (context);
+
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -131,10 +136,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             printer
                 .SingleSpace()
-                .Write("ceil(");
-            base.PrettyPrint(printer);
-            printer.Write(')');
-        }
+                .Write ("ceil(");
+            base.PrettyPrint (printer);
+            printer.Write (')');
+
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         [ExcludeFromCodeCoverage]
@@ -147,20 +153,26 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
-            result.Append("ceil(");
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append ("ceil(");
             var child = Children.FirstOrDefault();
-            if (!ReferenceEquals(child, null))
+            if (!ReferenceEquals (child, null))
             {
-                result.Append(child);
+                builder.Append (child);
             }
-            result.Append(')');
 
-            return result.ToString();
-        }
+            builder.Append (')');
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method ToString
 
         #endregion
 
     } // class PftCeil
 
 } // namespace ManagedIrbis.Pft.Infrastructure.Ast
+

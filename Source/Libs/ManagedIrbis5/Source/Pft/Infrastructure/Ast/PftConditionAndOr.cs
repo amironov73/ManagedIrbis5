@@ -61,20 +61,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             get
             {
-                if (ReferenceEquals(_virtualChildren, null))
+                if (ReferenceEquals (_virtualChildren, null))
                 {
-
                     _virtualChildren = new VirtualChildren();
                     List<PftNode> nodes = new List<PftNode>();
-                    if (!ReferenceEquals(LeftOperand, null))
+                    if (!ReferenceEquals (LeftOperand, null))
                     {
-                        nodes.Add(LeftOperand);
+                        nodes.Add (LeftOperand);
                     }
-                    if (!ReferenceEquals(RightOperand, null))
+
+                    if (!ReferenceEquals (RightOperand, null))
                     {
-                        nodes.Add(RightOperand);
+                        nodes.Add (RightOperand);
                     }
-                    _virtualChildren.SetChildren(nodes);
+
+                    _virtualChildren.SetChildren (nodes);
                 }
 
                 return _virtualChildren;
@@ -107,7 +108,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             (
                 [NotNull] PftToken token
             )
-            : base(token)
+            : base (token)
         {
         }
 
@@ -124,18 +125,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="ICloneable.Clone" />
         public override object Clone()
         {
-            PftConditionAndOr result = (PftConditionAndOr) base.Clone();
+            PftConditionAndOr result = (PftConditionAndOr)base.Clone();
 
             result._virtualChildren = null;
 
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
-                result.LeftOperand = (PftCondition) LeftOperand.Clone();
+                result.LeftOperand = (PftCondition)LeftOperand.Clone();
             }
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (!ReferenceEquals (RightOperand, null))
             {
-                result.RightOperand = (PftCondition) RightOperand.Clone();
+                result.RightOperand = (PftCondition)RightOperand.Clone();
             }
 
             return result;
@@ -151,10 +152,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftNode otherNode
             )
         {
-            base.CompareNode(otherNode);
+            base.CompareNode (otherNode);
 
             PftConditionAndOr otherCondition
-                = (PftConditionAndOr) otherNode;
+                = (PftConditionAndOr)otherNode;
             PftSerializationUtility.CompareNodes
                 (
                     LeftOperand,
@@ -164,6 +165,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 throw new IrbisException();
             }
+
             PftSerializationUtility.CompareNodes
                 (
                     RightOperand,
@@ -177,44 +179,45 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            if (ReferenceEquals(LeftOperand, null)
-                || ReferenceEquals(RightOperand, null)
-                || string.IsNullOrEmpty(Operation))
+            if (ReferenceEquals (LeftOperand, null)
+                || ReferenceEquals (RightOperand, null)
+                || string.IsNullOrEmpty (Operation))
             {
                 throw new PftCompilerException();
             }
 
-            LeftOperand.Compile(compiler);
-            RightOperand.Compile(compiler);
+            LeftOperand.Compile (compiler);
+            RightOperand.Compile (compiler);
 
-            compiler.StartMethod(this);
+            compiler.StartMethod (this);
 
             compiler
                 .WriteIndent()
-                .Write("bool result = ")
-                .RefNodeMethod(LeftOperand)
-                .Write("() ");
-            if (Operation.SameString("and"))
+                .Write ("bool result = ")
+                .RefNodeMethod (LeftOperand)
+                .Write ("() ");
+            if (Operation.SameString ("and"))
             {
-                compiler.Write("&&");
+                compiler.Write ("&&");
             }
-            else if (Operation.SameString("or"))
+            else if (Operation.SameString ("or"))
             {
-                compiler.Write("||");
+                compiler.Write ("||");
             }
             else
             {
                 throw new PftCompilerException();
             }
-            compiler
-                .Write(' ')
-                .RefNodeMethod(RightOperand)
-                .WriteLine("();")
-                .WriteIndent()
-                .WriteLine("return result;");
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
+            compiler
+                .Write (' ')
+                .RefNodeMethod (RightOperand)
+                .WriteLine ("();")
+                .WriteIndent()
+                .WriteLine ("return result;");
+
+            compiler.EndMethod (this);
+            compiler.MarkReady (this);
         }
 
         /// <inheritdoc cref="PftNode.Deserialize" />
@@ -223,11 +226,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryReader reader
             )
         {
-            base.Deserialize(reader);
+            base.Deserialize (reader);
 
-            LeftOperand = (PftCondition?) PftSerializer.DeserializeNullable(reader);
+            LeftOperand = (PftCondition?)PftSerializer.DeserializeNullable (reader);
             Operation = reader.ReadNullableString();
-            RightOperand = (PftCondition?) PftSerializer.DeserializeNullable(reader);
+            RightOperand = (PftCondition?)PftSerializer.DeserializeNullable (reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -236,9 +239,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            OnBeforeExecution(context);
+            OnBeforeExecution (context);
 
-            if (ReferenceEquals(LeftOperand, null))
+            if (ReferenceEquals (LeftOperand, null))
             {
                 Magna.Error
                     (
@@ -249,12 +252,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftSyntaxException();
             }
 
-            LeftOperand.Execute(context);
+            LeftOperand.Execute (context);
             bool left = LeftOperand.Value;
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (!ReferenceEquals (RightOperand, null))
             {
-                if (string.IsNullOrEmpty(Operation))
+                if (string.IsNullOrEmpty (Operation))
                 {
                     Magna.Error
                         (
@@ -265,14 +268,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     throw new PftSyntaxException();
                 }
 
-                RightOperand.Execute(context);
+                RightOperand.Execute (context);
                 bool right = RightOperand.Value;
 
-                if (Operation.SameString("and"))
+                if (Operation.SameString ("and"))
                 {
                     left = left && right;
                 }
-                else if (Operation.SameString("or"))
+                else if (Operation.SameString ("or"))
                 {
                     left = left || right;
                 }
@@ -291,7 +294,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             Value = left;
 
-            OnAfterExecution(context);
+            OnAfterExecution (context);
         }
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
@@ -303,15 +306,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 Name = "ConditionAndOr"
             };
 
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
                 PftNodeInfo left = new PftNodeInfo
                 {
                     Node = LeftOperand,
                     Name = "LeftOperand"
                 };
-                result.Children.Add(left);
-                left.Children.Add(LeftOperand.GetNodeInfo());
+                result.Children.Add (left);
+                left.Children.Add (LeftOperand.GetNodeInfo());
             }
 
             PftNodeInfo operation = new PftNodeInfo
@@ -319,17 +322,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 Name = "Operation",
                 Value = Operation
             };
-            result.Children.Add(operation);
+            result.Children.Add (operation);
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (!ReferenceEquals (RightOperand, null))
             {
                 PftNodeInfo right = new PftNodeInfo
                 {
                     Node = RightOperand,
                     Name = "RightOperand"
                 };
-                result.Children.Add(right);
-                right.Children.Add(RightOperand.GetNodeInfo());
+                result.Children.Add (right);
+                right.Children.Add (RightOperand.GetNodeInfo());
             }
 
             return result;
@@ -338,13 +341,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Optimize" />
         public override PftNode Optimize()
         {
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
-                LeftOperand = (PftCondition?) LeftOperand.Optimize();
+                LeftOperand = (PftCondition?)LeftOperand.Optimize();
             }
-            if (!ReferenceEquals(RightOperand, null))
+
+            if (!ReferenceEquals (RightOperand, null))
             {
-                RightOperand = (PftCondition?) RightOperand.Optimize();
+                RightOperand = (PftCondition?)RightOperand.Optimize();
             }
 
             return this;
@@ -356,19 +360,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftPrettyPrinter printer
             )
         {
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
-                LeftOperand.PrettyPrint(printer);
+                LeftOperand.PrettyPrint (printer);
             }
 
             printer
                 .SingleSpace()
-                .Write(Operation)
+                .Write (Operation)
                 .SingleSpace();
 
-            if (!ReferenceEquals(RightOperand, null))
+            if (!ReferenceEquals (RightOperand, null))
             {
-                RightOperand.PrettyPrint(printer);
+                RightOperand.PrettyPrint (printer);
             }
         }
 
@@ -378,11 +382,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryWriter writer
             )
         {
-            base.Serialize(writer);
+            base.Serialize (writer);
 
-            PftSerializer.SerializeNullable(writer, LeftOperand);
-            writer.WriteNullable(Operation);
-            PftSerializer.SerializeNullable(writer, RightOperand);
+            PftSerializer.SerializeNullable (writer, LeftOperand);
+            writer.WriteNullable (Operation);
+            PftSerializer.SerializeNullable (writer, RightOperand);
         }
 
         #endregion
@@ -393,21 +397,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public override string ToString()
         {
             StringBuilder result = new StringBuilder();
-            if (!ReferenceEquals(LeftOperand, null))
+            if (!ReferenceEquals (LeftOperand, null))
             {
-                result.Append(LeftOperand);
+                result.Append (LeftOperand);
             }
-            result.Append(' ');
-            result.Append(Operation);
-            result.Append(' ');
-            if (!ReferenceEquals(RightOperand, null))
+
+            result.Append (' ');
+            result.Append (Operation);
+            result.Append (' ');
+            if (!ReferenceEquals (RightOperand, null))
             {
-                result.Append(RightOperand);
+                result.Append (RightOperand);
             }
 
             return result.ToString();
         }
 
         #endregion
-    }
-}
+
+    } // method PftConditionAndOr
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

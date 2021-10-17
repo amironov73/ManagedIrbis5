@@ -7,13 +7,13 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PftEmpty.cs --
+/* PftEmpty.cs -- проверка на пустую строку
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Text;
+using AM.Text;
 
 using ManagedIrbis.Pft.Infrastructure.Compiler;
 using ManagedIrbis.Pft.Infrastructure.Text;
@@ -25,7 +25,7 @@ using ManagedIrbis.Pft.Infrastructure.Text;
 namespace ManagedIrbis.Pft.Infrastructure.Ast
 {
     /// <summary>
-    /// Whether the string is empty?
+    /// Проверка, не пустая ли строка.
     /// </summary>
     /// <example>
     /// <code>
@@ -46,34 +46,35 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftEmpty()
         {
-        }
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftEmpty
             (
                 PftToken token
             )
-            : base(token)
+            : base (token)
         {
-            token.MustBe(PftTokenKind.Empty);
-        }
+            token.MustBe (PftTokenKind.Empty);
+
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftEmpty
             (
                 params PftNode[] children
             )
-            : base(children)
+            : base (children)
         {
-        }
+        } // constructor
 
         #endregion
 
@@ -85,37 +86,37 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            compiler.CompileNodes(Children);
+            compiler.CompileNodes (Children);
 
-            var actionName = compiler.CompileAction(Children);
+            var actionName = compiler.CompileAction (Children);
 
-            compiler.StartMethod(this);
+            compiler.StartMethod (this);
 
-            if (string.IsNullOrEmpty(actionName))
+            if (string.IsNullOrEmpty (actionName))
             {
                 compiler
                     .WriteIndent()
-                    .WriteLine("bool result = true;");
+                    .WriteLine ("bool result = true;");
             }
             else
             {
                 compiler
                     .WriteIndent()
-                    .WriteLine("string text = Evaluate({0});", actionName);
+                    .WriteLine ("string text = Evaluate({0});", actionName);
 
                 compiler
                     .WriteIndent()
-                    .WriteLine("bool result = string.IsNullOrEmpty(text);");
-
+                    .WriteLine ("bool result = string.IsNullOrEmpty (text);");
             }
 
             compiler
                 .WriteIndent()
-                .WriteLine("return result;");
+                .WriteLine ("return result;");
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
-        }
+            compiler.EndMethod (this);
+            compiler.MarkReady (this);
+
+        } // method COmpile
 
         /// <inheritdoc cref="PftNode.Execute" />
         public override void Execute
@@ -123,14 +124,15 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            OnBeforeExecution(context);
+            OnBeforeExecution (context);
 
-            var text = context.Evaluate(Children);
+            var text = context.Evaluate (Children);
 
-            Value = string.IsNullOrEmpty(text);
+            Value = string.IsNullOrEmpty (text);
 
-            OnAfterExecution(context);
-        }
+            OnAfterExecution (context);
+
+        } // method Execute
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -140,10 +142,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             printer
                 .SingleSpace()
-                .Write("empty(");
-            base.PrettyPrint(printer);
-            printer.Write(')');
-        }
+                .Write ("empty(");
+            base.PrettyPrint (printer);
+            printer.Write (')');
+
+        } // method PrettyPrint
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
         protected internal override bool ShouldSerializeText() => false;
@@ -155,23 +158,31 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            var result = new StringBuilder();
-            result.Append("empty(");
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append ("empty(");
             var first = true;
             foreach (var child in Children)
             {
                 if (!first)
                 {
-                    result.Append(' ');
+                    builder.Append (' ');
                 }
-                result.Append(child);
+
+                builder.Append (child);
                 first = false;
             }
-            result.Append(')');
 
-            return result.ToString();
-        }
+            builder.Append (')');
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class PftEmpty
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast

@@ -50,16 +50,16 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         {
             get
             {
-                if (ReferenceEquals(_virtualChildren, null))
+                if (ReferenceEquals (_virtualChildren, null))
                 {
-
                     _virtualChildren = new VirtualChildren();
                     var nodes = new List<PftNode>();
-                    if (!ReferenceEquals(InnerCondition, null))
+                    if (!ReferenceEquals (InnerCondition, null))
                     {
-                        nodes.Add(InnerCondition);
+                        nodes.Add (InnerCondition);
                     }
-                    _virtualChildren.SetChildren(nodes);
+
+                    _virtualChildren.SetChildren (nodes);
                 }
 
                 return _virtualChildren;
@@ -92,7 +92,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             (
                 [NotNull] PftToken token
             )
-            : base(token)
+            : base (token)
         {
         }
 
@@ -113,7 +113,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
 
             result._virtualChildren = null;
 
-            if (!ReferenceEquals(InnerCondition, null))
+            if (!ReferenceEquals (InnerCondition, null))
             {
                 result.InnerCondition
                     = (PftCondition)InnerCondition.Clone();
@@ -132,7 +132,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftNode otherNode
             )
         {
-            base.CompareNode(otherNode);
+            base.CompareNode (otherNode);
 
             PftSerializationUtility.CompareNodes
                 (
@@ -147,25 +147,25 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            if (ReferenceEquals(InnerCondition, null))
+            if (ReferenceEquals (InnerCondition, null))
             {
                 throw new PftCompilerException();
             }
 
-            InnerCondition.Compile(compiler);
+            InnerCondition.Compile (compiler);
 
-            compiler.StartMethod(this);
+            compiler.StartMethod (this);
 
             compiler
                 .WriteIndent()
-                .Write("bool result = ")
-                .CallNodeMethod(InnerCondition)
-                .WriteLine(";")
+                .Write ("bool result = ")
+                .CallNodeMethod (InnerCondition)
+                .WriteLine (";")
                 .WriteIndent()
-                .WriteLine("return result;");
+                .WriteLine ("return result;");
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
+            compiler.EndMethod (this);
+            compiler.MarkReady (this);
         }
 
         /// <inheritdoc cref="PftNode.Deserialize" />
@@ -174,9 +174,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryReader reader
             )
         {
-            base.Deserialize(reader);
+            base.Deserialize (reader);
 
-            InnerCondition = (PftCondition?) PftSerializer.DeserializeNullable(reader);
+            InnerCondition = (PftCondition?)PftSerializer.DeserializeNullable (reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -185,9 +185,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            OnBeforeExecution(context);
+            OnBeforeExecution (context);
 
-            if (ReferenceEquals(InnerCondition, null))
+            if (ReferenceEquals (InnerCondition, null))
             {
                 Magna.Error
                     (
@@ -198,10 +198,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 throw new PftSyntaxException();
             }
 
-            InnerCondition.Execute(context);
+            InnerCondition.Execute (context);
             Value = InnerCondition.Value;
 
-            OnAfterExecution(context);
+            OnAfterExecution (context);
         }
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
@@ -210,12 +210,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             var result = new PftNodeInfo
             {
                 Node = this,
-                Name = SimplifyTypeName(GetType().Name)
+                Name = SimplifyTypeName (GetType().Name)
             };
 
-            if (!ReferenceEquals(InnerCondition, null))
+            if (!ReferenceEquals (InnerCondition, null))
             {
-                result.Children.Add(InnerCondition.GetNodeInfo());
+                result.Children.Add (InnerCondition.GetNodeInfo());
             }
 
             return result;
@@ -224,7 +224,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Optimize" />
         public override PftNode Optimize()
         {
-            if (!ReferenceEquals(InnerCondition, null))
+            if (!ReferenceEquals (InnerCondition, null))
             {
                 // TODO is it correct?
 
@@ -240,13 +240,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftPrettyPrinter printer
             )
         {
-            printer.Write('(');
-            if (!ReferenceEquals(InnerCondition, null))
+            printer.Write ('(');
+            if (!ReferenceEquals (InnerCondition, null))
             {
-                InnerCondition.PrettyPrint(printer);
+                InnerCondition.PrettyPrint (printer);
             }
+
             printer.EatWhitespace();
-            printer.Write(')');
+            printer.Write (')');
         }
 
         /// <inheritdoc cref="PftNode.Serialize" />
@@ -255,9 +256,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryWriter writer
             )
         {
-            base.Serialize(writer);
+            base.Serialize (writer);
 
-            PftSerializer.SerializeNullable(writer, InnerCondition);
+            PftSerializer.SerializeNullable (writer, InnerCondition);
         }
 
         #endregion
@@ -268,16 +269,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         public override string ToString()
         {
             var result = new StringBuilder();
-            result.Append('(');
-            if (!ReferenceEquals(InnerCondition, null))
+            result.Append ('(');
+            if (!ReferenceEquals (InnerCondition, null))
             {
-                result.Append(InnerCondition);
+                result.Append (InnerCondition);
             }
-            result.Append(')');
+
+            result.Append (')');
 
             return result.ToString();
         }
 
         #endregion
-    }
-}
+
+    } // class PftConditionParenthesis
+
+} // namespace ManagedIrbis.Pft.Infrastructure.Ast
