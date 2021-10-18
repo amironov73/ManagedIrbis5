@@ -24,6 +24,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AM;
 
 #endregion
@@ -50,9 +51,9 @@ namespace ManagedIrbis.Server.Sockets
             )
         {
             _endPoint = endPoint;
-            _listener = new TcpListener(endPoint);
+            _listener = new TcpListener (endPoint);
             _cancellationToken = cancellationToken;
-            _cancellationToken.Register(_StopListener);
+            _cancellationToken.Register (_StopListener);
 
         } // constructor
 
@@ -83,10 +84,10 @@ namespace ManagedIrbis.Server.Sockets
                 CancellationToken token
             )
         {
-            Sure.InRange(1, 1, 65535, nameof(portNumber));
+            Sure.InRange (portNumber, 1, 65535);
 
             var endPoint = new IPEndPoint (IPAddress.Any, portNumber);
-            var result = new Tcp4ServerListener(endPoint, token);
+            var result = new Tcp4ServerListener (endPoint, token);
 
             return result;
 
@@ -104,8 +105,8 @@ namespace ManagedIrbis.Server.Sockets
                 return null;
             }
 
-            var client = await _listener.AcceptTcpClientAsync().ConfigureAwait(false);
-            var result = new Tcp4ServerSocket(client, _cancellationToken);
+            var client = await _listener.AcceptTcpClientAsync().ConfigureAwait (false);
+            var result = new Tcp4ServerSocket (client, _cancellationToken);
 
             return result;
 
@@ -145,11 +146,7 @@ namespace ManagedIrbis.Server.Sockets
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public async ValueTask DisposeAsync()
-        {
-            await StopAsync();
-
-        } // method DisposeAsync
+        public async ValueTask DisposeAsync() => await StopAsync();
 
         #endregion
 

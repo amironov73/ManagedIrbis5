@@ -51,15 +51,12 @@ namespace AM.Text
             get => _position;
             set
             {
-                Sure.NonNegative(value, nameof(value));
-                Sure.AssertState
-                    (
-                        value <= _characters.Length,
-                        nameof(value)
-                    );
+                Sure.NonNegative (value, nameof (value));
+                Sure.AssertState (value <= _characters.Length);
                 _position = value;
             }
-        }
+
+        } // property Length
 
         /// <summary>
         /// Сырой буфер.
@@ -67,16 +64,16 @@ namespace AM.Text
         public ReadOnlySpan<char> RawCharacters => _characters;
 
         /// <summary>
-        /// Достпу по индексу.
+        /// Доступ по индексу.
         /// </summary>
-        public ref char this[int index] => ref _characters[index];
+        public ref char this [int index] => ref _characters[index];
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Конструктор/
+        /// Конструктор.
         /// </summary>
         /// <param name="characters">Начальный буфер.</param>
         public ValueStringBuilder
@@ -105,19 +102,19 @@ namespace AM.Text
         /// Выдача построенного на данный момент значения как спана.
         /// </summary>
         public ReadOnlySpan<char> AsSpan() =>
-            _characters.Slice(0, _position);
+            _characters.Slice (0, _position);
 
         /// <summary>
         /// Выдача построенного на данный момент значения как спана.
         /// </summary>
-        public ReadOnlySpan<char> AsSpan(int start) =>
-            _characters.Slice(start, _position - start);
+        public ReadOnlySpan<char> AsSpan (int start) =>
+            _characters.Slice (start, _position - start);
 
         /// <summary>
         /// Выдача построенного на данный момент значения как спана.
         /// </summary>
-        public ReadOnlySpan<char> AsSpan(int start, int length) =>
-            _characters.Slice(start, length);
+        public ReadOnlySpan<char> AsSpan (int start, int length) =>
+            _characters.Slice (start, length);
 
         /// <summary>
         /// Добавление одного символа.
@@ -129,7 +126,7 @@ namespace AM.Text
         {
             if (_position == _characters.Length)
             {
-                Grow(1);
+                Grow (1);
             }
 
             _characters[_position] = c;
@@ -148,10 +145,10 @@ namespace AM.Text
             var newPosition = _position + text.Length;
             if (newPosition > _characters.Length)
             {
-                Grow(text.Length);
+                Grow (text.Length);
             }
 
-            text.CopyTo(_characters.Slice(_position));
+            text.CopyTo (_characters.Slice (_position));
             _position = newPosition;
 
         } // method Append
@@ -169,11 +166,11 @@ namespace AM.Text
             var newPosition = _position + delta;
             if (newPosition > _characters.Length)
             {
-                Grow(delta);
+                Grow (delta);
             }
 
-            text1.CopyTo(_characters.Slice(_position));
-            text2.CopyTo(_characters.Slice(_position + text1.Length));
+            text1.CopyTo (_characters.Slice (_position));
+            text2.CopyTo (_characters.Slice (_position + text1.Length));
             _position = newPosition;
 
         } // method Append
@@ -192,13 +189,12 @@ namespace AM.Text
             var newPosition = _position + delta;
             if (newPosition > _characters.Length)
             {
-                Grow(delta);
+                Grow (delta);
             }
 
-            text1.CopyTo(_characters.Slice(_position));
-            text2.CopyTo(_characters.Slice(_position + text1.Length));
-            text3.CopyTo(_characters.Slice(_position + text1.Length
-                + text2.Length));
+            text1.CopyTo (_characters.Slice (_position));
+            text2.CopyTo (_characters.Slice (_position + text1.Length));
+            text3.CopyTo (_characters.Slice (_position + text1.Length + text2.Length));
             _position = newPosition;
 
         } // method Append
@@ -214,21 +210,21 @@ namespace AM.Text
             var remaining = _characters.Length - _position;
             if (remaining >= 10)
             {
-                var buffer = _characters.Slice(_position);
-                var written = FastNumber.Int32ToChars(value, buffer);
+                var buffer = _characters.Slice (_position);
+                var written = FastNumber.Int32ToChars (value, buffer);
                 _position += written;
             }
             else
             {
                 Span<char> buffer = stackalloc char[10];
-                var written = FastNumber.Int32ToChars(value, buffer);
+                var written = FastNumber.Int32ToChars (value, buffer);
                 var newPosition = _position + written;
                 if (newPosition > _characters.Length)
                 {
-                    Grow(written);
+                    Grow (written);
                 }
 
-                buffer.Slice(0, written).CopyTo(_characters.Slice(_position));
+                buffer.Slice (0, written).CopyTo (_characters.Slice (_position));
                 _position = newPosition;
             }
 
@@ -237,7 +233,7 @@ namespace AM.Text
         /// <summary>
         /// Добавление перевода строки.
         /// </summary>
-        public void AppendLine() => Append(Environment.NewLine);
+        public void AppendLine() => Append (Environment.NewLine);
 
         /// <summary>
         /// Освобождаем ресурсы, если были заняты.
@@ -248,7 +244,7 @@ namespace AM.Text
             this = default; // для спокойствия
             if (borrowed is not null)
             {
-                ArrayPool<char>.Shared.Return(borrowed);
+                ArrayPool<char>.Shared.Return (borrowed);
             }
 
         } // method Dispose
@@ -263,8 +259,9 @@ namespace AM.Text
         {
             if (capacity > _characters.Length)
             {
-                Grow(capacity - _position);
+                Grow (capacity - _position);
             }
+
         } // method EnsureCapacity
 
         /// <summary>
@@ -275,16 +272,16 @@ namespace AM.Text
                 int additional
             )
         {
-            var newCapacity = (int) Math.Max
+            var newCapacity = (int)Math.Max
                 (
                     (uint)(_position + additional),
                     (uint)(Capacity * 2)
                 );
-            var borrowed = ArrayPool<char>.Shared.Rent(newCapacity);
-            _characters.Slice(0, _position).CopyTo(borrowed);
+            var borrowed = ArrayPool<char>.Shared.Rent (newCapacity);
+            _characters.Slice (0, _position).CopyTo (borrowed);
             if (_array is not null)
             {
-                ArrayPool<char>.Shared.Return(_array);
+                ArrayPool<char>.Shared.Return (_array);
             }
 
             _characters = _array = borrowed;
@@ -330,7 +327,7 @@ namespace AM.Text
 
                 if (chr != '\r')
                 {
-                    Append ((char) chr);
+                    Append ((char)chr);
                 }
 
                 first = false;

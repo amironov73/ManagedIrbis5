@@ -44,12 +44,8 @@ namespace AM.Collections
             get => _position;
             set
             {
-                Sure.NonNegative(value, nameof(value));
-                Sure.AssertState
-                    (
-                        value <= _values.Length,
-                        nameof(value)
-                    );
+                Sure.NonNegative (value, nameof (value));
+                Sure.AssertState (value <= _values.Length);
                 _position = value;
             }
         }
@@ -62,7 +58,7 @@ namespace AM.Collections
         /// <summary>
         /// Доступ по индексу.
         /// </summary>
-        public ref T this[int index] => ref _values[index];
+        public ref T this [int index] => ref _values[index];
 
         #endregion
 
@@ -96,20 +92,19 @@ namespace AM.Collections
         /// <summary>
         /// Выдача списка как спана.
         /// </summary>
-        public ReadOnlySpan<T> AsSpan() =>
-            _values.Slice(0, _position);
+        public ReadOnlySpan<T> AsSpan() => _values.Slice (0, _position);
 
         /// <summary>
         /// Выдача списка как спана.
         /// </summary>
-        public ReadOnlySpan<T> AsSpan(int start) =>
-            _values.Slice(start, _position - start);
+        public ReadOnlySpan<T> AsSpan (int start) =>
+            _values.Slice (start, _position - start);
 
         /// <summary>
         /// Выдача списка как спана.
         /// </summary>
-        public ReadOnlySpan<T> AsSpan(int start, int length) =>
-            _values.Slice(start, length);
+        public ReadOnlySpan<T> AsSpan (int start, int length) =>
+            _values.Slice (start, length);
 
         /// <summary>
         /// Добавление одного символа.
@@ -121,11 +116,12 @@ namespace AM.Collections
         {
             if (_position == _values.Length)
             {
-                Grow(1);
+                Grow (1);
             }
 
             _values[_position] = one;
             ++_position;
+
         } // method Append
 
         /// <summary>
@@ -139,11 +135,12 @@ namespace AM.Collections
             var newPosition = _position + values.Length;
             if (newPosition > _values.Length)
             {
-                Grow(values.Length);
+                Grow (values.Length);
             }
 
-            values.CopyTo(_values.Slice(_position));
+            values.CopyTo (_values.Slice (_position));
             _position = newPosition;
+
         } // method Append
 
         /// <summary>
@@ -159,13 +156,14 @@ namespace AM.Collections
             var newPosition = _position + delta;
             if (newPosition > _values.Length)
             {
-                Grow(delta);
+                Grow (delta);
             }
 
-            one.CopyTo(_values.Slice(_position));
-            two.CopyTo(_values.Slice(_position + one.Length));
+            one.CopyTo (_values.Slice (_position));
+            two.CopyTo (_values.Slice (_position + one.Length));
             _position = newPosition;
-        }
+
+        } // method Append
 
         /// <summary>
         /// Добавление трех спанов.
@@ -181,15 +179,15 @@ namespace AM.Collections
             int newPosition = _position + delta;
             if (newPosition > _values.Length)
             {
-                Grow(delta);
+                Grow (delta);
             }
 
-            one.CopyTo(_values.Slice(_position));
-            two.CopyTo(_values.Slice(_position + one.Length));
-            three.CopyTo(_values.Slice(_position + one.Length
-                + two.Length));
+            one.CopyTo (_values.Slice (_position));
+            two.CopyTo (_values.Slice (_position + one.Length));
+            three.CopyTo (_values.Slice (_position + one.Length + two.Length));
             _position = newPosition;
-        }
+
+        } // method Append
 
         /// <summary>
         /// Освобождаем ресурсы, если были заняты.
@@ -200,9 +198,10 @@ namespace AM.Collections
             this = default; // для спокойствия
             if (borrowed is not null)
             {
-                ArrayPool<T>.Shared.Return(borrowed);
+                ArrayPool<T>.Shared.Return (borrowed);
             }
-        }
+
+        } // method Dispose
 
         /// <summary>
         /// Увеличение емкости, если необходимо.
@@ -214,9 +213,10 @@ namespace AM.Collections
         {
             if (capacity > _values.Length)
             {
-                Grow(capacity - _position);
+                Grow (capacity - _position);
             }
-        }
+
+        } // method EnsureCapacity
 
         /// <summary>
         /// Увеличение емкости на указанное количество символов.
@@ -226,20 +226,21 @@ namespace AM.Collections
                 int additional
             )
         {
-            var newCapacity = (int) Math.Max
+            var newCapacity = (int)Math.Max
                 (
                     (uint)(_position + additional),
                     (uint)(Capacity * 2)
                 );
-            var borrowed = ArrayPool<T>.Shared.Rent(newCapacity);
-            _values.Slice(0, _position).CopyTo(borrowed);
+            var borrowed = ArrayPool<T>.Shared.Rent (newCapacity);
+            _values.Slice (0, _position).CopyTo (borrowed);
             if (_array is not null)
             {
-                ArrayPool<T>.Shared.Return(_array);
+                ArrayPool<T>.Shared.Return (_array);
             }
 
             _values = _array = borrowed;
-        }
+
+        } // method Grow
 
         /// <summary>
         /// Превращение в массив.
@@ -250,7 +251,8 @@ namespace AM.Collections
             Dispose();
 
             return result;
-        }
+
+        } // method ToArray
 
         /// <summary>
         /// Получение перечислителя.

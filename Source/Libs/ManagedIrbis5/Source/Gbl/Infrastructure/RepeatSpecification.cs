@@ -43,7 +43,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
     /// </summary>
     public struct RepeatSpecification
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Properties
 
@@ -73,7 +73,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
             )
             : this()
         {
-            Sure.Defined(kind, nameof(kind));
+            Sure.Defined (kind);
 
             Kind = kind;
 
@@ -88,7 +88,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
             )
             : this()
         {
-            Sure.Positive(index, nameof(index));
+            Sure.Positive (index);
 
             Kind = RepeatKind.Explicit;
             Index = index;
@@ -96,7 +96,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
         } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public RepeatSpecification
             (
@@ -105,28 +105,29 @@ namespace ManagedIrbis.Gbl.Infrastructure
             )
             : this()
         {
-            Sure.Defined(kind, nameof(kind));
-            Sure.NonNegative(index, nameof(index));
+            Sure.Defined (kind);
+            Sure.NonNegative (index);
 
             Kind = kind;
             Index = index;
-        }
+
+        } // constructor
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Parse the text.
+        /// Разбор текстового представления.
         /// </summary>
         public static RepeatSpecification Parse
             (
                 string text
             )
         {
-            Sure.NotNullNorEmpty(text, nameof(text));
+            Sure.NotNullNorEmpty (text);
 
-            RepeatSpecification result = new RepeatSpecification();
+            var result = new RepeatSpecification();
             switch (text)
             {
                 case "*":
@@ -134,15 +135,17 @@ namespace ManagedIrbis.Gbl.Infrastructure
                     break;
 
                 case "F":
+                case "f":
                     result.Kind = RepeatKind.ByFormat;
                     break;
 
                 case "L":
+                case "l":
                     result.Kind = RepeatKind.Last;
                     break;
 
                 default:
-                    if (uint.TryParse(text, out var index))
+                    if (uint.TryParse (text, out var index))
                     {
                         if (index == 0)
                         {
@@ -154,25 +157,25 @@ namespace ManagedIrbis.Gbl.Infrastructure
                         }
 
                         result.Kind = RepeatKind.Explicit;
-                        result.Index = (int) index;
+                        result.Index = (int)index;
                     }
                     else if (text[0] == 'L'
-                        && uint.TryParse
-                            (
-                                text.Substring(2),
-                                out index
-                            ))
+                             && uint.TryParse
+                                 (
+                                     text.Substring (2),
+                                     out index
+                                 ))
                     {
                         result.Kind = RepeatKind.Last;
-                        result.Index = (int) index;
+                        result.Index = (int)index;
                     }
                     else
                     {
                         Magna.Error
                             (
-                                "RepeatSpecification::Parse: "
-                               + "invalid repeat specification="
-                               + text
+                                nameof (RepeatSpecification) + "::" + nameof (Parse)
+                                + ": invalid repeat specification="
+                                + text
                             );
 
 
@@ -182,19 +185,19 @@ namespace ManagedIrbis.Gbl.Infrastructure
                                 + text
                             );
                     }
+
                     break;
-            }
+
+            } // switch
 
             return result;
-        }
+
+        } // method Parse
 
         /// <summary>
-        /// Should serialize <see cref="Index"/> field?
+        /// Нужно ли сериализовать поле <see cref="Index"/>?
         /// </summary>
-        public bool ShouldSerializeIndex()
-        {
-            return Index != 0;
-        }
+        public bool ShouldSerializeIndex() => Index != 0;
 
         #endregion
 
@@ -206,11 +209,12 @@ namespace ManagedIrbis.Gbl.Infrastructure
                 BinaryReader reader
             )
         {
-            Sure.NotNull(reader, nameof(reader));
+            Sure.NotNull (reader);
 
-            Kind = (RepeatKind) reader.ReadPackedInt32();
+            Kind = (RepeatKind)reader.ReadPackedInt32();
             Index = reader.ReadPackedInt32();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -218,12 +222,13 @@ namespace ManagedIrbis.Gbl.Infrastructure
                 BinaryWriter writer
             )
         {
-            Sure.NotNull(writer, nameof(writer));
+            Sure.NotNull (writer);
 
             writer
-                .WritePackedInt32((int) Kind)
-                .WritePackedInt32(Index);
-        }
+                .WritePackedInt32 ((int)Kind)
+                .WritePackedInt32 (Index);
+
+        } // method SaveToStream
 
         #endregion
 
@@ -235,25 +240,24 @@ namespace ManagedIrbis.Gbl.Infrastructure
                 bool throwOnError
             )
         {
-            Verifier<RepeatSpecification> verifier
-                = new Verifier<RepeatSpecification>(this, throwOnError);
+            var verifier = new Verifier<RepeatSpecification> (this, throwOnError);
 
             switch (Kind)
             {
                 case RepeatKind.All:
-                    verifier.Assert(Index == 0);
+                    verifier.Assert (Index == 0);
                     break;
 
                 case RepeatKind.ByFormat:
-                    verifier.Assert(Index == 0);
+                    verifier.Assert (Index == 0);
                     break;
 
                 case RepeatKind.Last:
-                    verifier.Assert(Index >= 0);
+                    verifier.Assert (Index >= 0);
                     break;
 
                 case RepeatKind.Explicit:
-                    verifier.Assert(Index > 0);
+                    verifier.Assert (Index > 0);
                     break;
 
                 default:
@@ -262,36 +266,27 @@ namespace ManagedIrbis.Gbl.Infrastructure
             }
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="ValueType.ToString" />
-        public override string ToString()
-        {
-            switch (Kind)
+        public override string ToString() => Kind switch
             {
-                case RepeatKind.All:
-                    return "*";
+                RepeatKind.All => "*",
 
-                case RepeatKind.ByFormat:
-                    return "F";
+                RepeatKind.ByFormat => "F",
 
-                case RepeatKind.Last:
-                    return Index == 0
-                        ? "L"
-                        : "L-" + Index.ToInvariantString();
+                RepeatKind.Last => Index == 0 ? "L" : "L-" + Index.ToInvariantString(),
 
-                case RepeatKind.Explicit:
-                    return Index.ToInvariantString();
+                RepeatKind.Explicit => Index.ToInvariantString(),
 
-                default:
-                    return $"Kind={Kind}, Index={Index}";
-            }
+                _ => $"Kind={Kind}, Index={Index}"
 
-        } // method ToString
+            };  // method ToString
 
         #endregion
 

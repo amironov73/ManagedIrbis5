@@ -7,16 +7,16 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
-/* FileUtility.cs -- работа с файлами
+/* FileUtility.cs -- утилиты для работы с файлами
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 #endregion
@@ -26,14 +26,14 @@ using System.IO;
 namespace AM.IO
 {
     /// <summary>
-    /// Работа с файлами.
+    /// Утилиты для работы с файлами.
     /// </summary>
     public static class FileUtility
     {
         #region Public methods
 
         /// <summary>
-        /// Byte-by-byte comparison of two files.
+        /// Побайтовое сравнение двух файлов.
         /// </summary>
         public static int Compare
             (
@@ -41,21 +41,21 @@ namespace AM.IO
                 string second
             )
         {
-            Sure.FileExists(first, nameof(first));
-            Sure.FileExists(second, nameof(second));
+            Sure.FileExists (first);
+            Sure.FileExists (second);
 
-            using FileStream firstStream = File.OpenRead(first),
-                secondStream = File.OpenRead(second);
+            using FileStream firstStream = File.OpenRead (first),
+                secondStream = File.OpenRead (second);
             return StreamUtility.CompareTo
                 (
                     firstStream,
                     secondStream
                 );
-        }
+
+        } // method Compare
 
         /// <summary>
-        /// Copies the specified source file to the specified
-        /// destination.
+        /// Копирование указанного исходного файла поверх указанного файла назначения.
         /// </summary>
         public static void Copy
             (
@@ -64,15 +64,17 @@ namespace AM.IO
                 bool overwrite
             )
         {
-            File.Copy(sourceName, targetName, overwrite);
-            DateTime creationTime = File.GetCreationTime(sourceName);
-            File.SetCreationTime(targetName, creationTime);
-            DateTime lastAccessTime = File.GetLastAccessTime(sourceName);
-            File.SetLastAccessTime(targetName, lastAccessTime);
-            DateTime lastWriteTime = File.GetLastWriteTime(sourceName);
-            File.SetLastWriteTime(targetName, lastWriteTime);
-            FileAttributes attributes = File.GetAttributes(sourceName);
-            File.SetAttributes(targetName, attributes);
+            File.Copy (sourceName, targetName, overwrite);
+
+            // переносим времена с исходного файла
+            var creationTime = File.GetCreationTime (sourceName);
+            File.SetCreationTime (targetName, creationTime);
+            var lastAccessTime = File.GetLastAccessTime (sourceName);
+            File.SetLastAccessTime (targetName, lastAccessTime);
+            var lastWriteTime = File.GetLastWriteTime (sourceName);
+            File.SetLastWriteTime (targetName, lastWriteTime);
+            var attributes = File.GetAttributes (sourceName);
+            File.SetAttributes (targetName, attributes);
         }
 
         /// <summary>
@@ -91,27 +93,29 @@ namespace AM.IO
                 bool backup
             )
         {
-            Sure.FileExists(sourcePath, nameof(sourcePath));
-            Sure.NotNullNorEmpty(targetPath, nameof(targetPath));
+            Sure.FileExists (sourcePath);
+            Sure.NotNullNorEmpty (targetPath);
 
-            if (File.Exists(targetPath))
+            if (File.Exists (targetPath))
             {
-                FileInfo sourceInfo = new FileInfo(sourcePath);
-                FileInfo targetInfo = new FileInfo(targetPath);
+                var sourceInfo = new FileInfo (sourcePath);
+                var targetInfo = new FileInfo (targetPath);
                 if (sourceInfo.LastWriteTime < targetInfo.LastWriteTime)
                 {
                     return false;
                 }
+
                 if (backup)
                 {
-                    CreateBackup(targetPath, true);
+                    CreateBackup (targetPath, true);
                 }
             }
 
-            File.Copy(sourcePath, targetPath, true);
+            File.Copy (sourcePath, targetPath, true);
 
             return true;
-        }
+
+        } // method CopyNewer
 
         /// <summary>
         /// Copies given file and creates backup copy of target file.
@@ -126,18 +130,20 @@ namespace AM.IO
                 string targetPath
             )
         {
-            Sure.FileExists(sourcePath, nameof(sourcePath));
-            Sure.NotNullNorEmpty(targetPath, nameof(targetPath));
+            Sure.FileExists (sourcePath);
+            Sure.NotNullNorEmpty (targetPath);
 
             string? result = null;
-            if (File.Exists(targetPath))
+            if (File.Exists (targetPath))
             {
-                result = CreateBackup(targetPath, true);
+                result = CreateBackup (targetPath, true);
             }
-            File.Copy(sourcePath, targetPath, false);
+
+            File.Copy (sourcePath, targetPath, false);
 
             return result;
-        }
+
+        } // method CopyWithBackup
 
         /// <summary>
         /// Creates backup copy for given file.
@@ -152,24 +158,25 @@ namespace AM.IO
                 bool rename
             )
         {
-            Sure.FileExists(path, nameof(path));
+            Sure.FileExists (path);
 
-            string result = GetNotExistentFileName
+            var result = GetNotExistentFileName
                 (
                     path,
                     "_backup_"
                 );
             if (rename)
             {
-                File.Move(path, result);
+                File.Move (path, result);
             }
             else
             {
-                File.Copy(path, result, false);
+                File.Copy (path, result, false);
             }
 
             return result;
-        }
+
+        } // method CreateBackup
 
         /// <summary>
         /// Deletes specified file if it exists.
@@ -180,13 +187,14 @@ namespace AM.IO
                 string fileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
-            if (File.Exists(fileName))
+            if (File.Exists (fileName))
             {
-                File.Delete(fileName);
+                File.Delete (fileName);
             }
-        }
+
+        } // method DeleteIfExists
 
         /// <summary>
         /// Find file in path.
@@ -198,29 +206,30 @@ namespace AM.IO
                 char elementDelimiter
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName, nameof (fileName));
 
-            if (ReferenceEquals(path, null) || path.Length == 0)
+            if (ReferenceEquals (path, null) || path.Length == 0)
             {
                 return null;
             }
 
-            string[] elements = path.Split(elementDelimiter);
-            foreach (string element in elements)
+            var elements = path.Split (elementDelimiter);
+            foreach (var element in elements)
             {
-                string fullPath = Path.Combine
+                var fullPath = Path.Combine
                     (
                         element,
                         fileName
                     );
-                if (File.Exists(fullPath))
+                if (File.Exists (fullPath))
                 {
                     return fullPath;
                 }
             }
 
             return null;
-        }
+
+        } // method FindFileInPath
 
         /// <summary>
         /// Gets the name of the not existent file.
@@ -234,21 +243,21 @@ namespace AM.IO
                 string suffix
             )
         {
-            Sure.NotNullNorEmpty(original, nameof(original));
-            Sure.NotNullNorEmpty(suffix, nameof(suffix));
+            Sure.NotNullNorEmpty (original);
+            Sure.NotNullNorEmpty (suffix);
 
-            string path = Path.GetDirectoryName(original) ?? string.Empty;
-            string name = Path.GetFileNameWithoutExtension(original);
-            string ext = Path.GetExtension(original);
+            var path = Path.GetDirectoryName (original) ?? string.Empty;
+            var name = Path.GetFileNameWithoutExtension (original);
+            var ext = Path.GetExtension (original);
 
-            for (int i = 1; i < 10000; i++)
+            for (var i = 1; i < 10000; i++)
             {
-                string result = Path.Combine
+                var result = Path.Combine
                     (
                         path,
                         name + suffix + i + ext
                     );
-                if (!File.Exists(result) && !Directory.Exists(result))
+                if (!File.Exists (result) && !Directory.Exists (result))
                 {
                     return result;
                 }
@@ -258,12 +267,13 @@ namespace AM.IO
 
             Magna.Error
                 (
-                    nameof(FileUtility) + "::" + nameof(GetNotExistentFileName)
+                    nameof (FileUtility) + "::" + nameof (GetNotExistentFileName)
                     + ": giving up"
                 );
 
             throw new ArsMagnaException();
-        }
+
+        } // method GetNotExistentFile
 
         /// <summary>
         /// Sets file modification date to current date.
@@ -275,18 +285,21 @@ namespace AM.IO
                 string fileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
-            if (File.Exists(fileName))
+            if (File.Exists (fileName))
             {
-                File.SetLastWriteTime(fileName, DateTime.Now);
+                File.SetLastWriteTime (fileName, DateTime.Now);
             }
             else
             {
-                File.WriteAllBytes(fileName, new byte[0]);
+                File.WriteAllBytes (fileName, Array.Empty<byte>());
             }
-        }
+
+        } // method Touch
 
         #endregion
-    }
-}
+
+    } // class FileUtility
+
+} // namespace AM.IO

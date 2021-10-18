@@ -13,6 +13,7 @@
 #region Using directives
 
 using System.IO;
+using System.Runtime.CompilerServices;
 
 #endregion
 
@@ -24,27 +25,27 @@ namespace AM
     /// Работа с интерфейсом <see cref="IVerifiable"/>.
     /// </summary>
     public sealed class Verifier<T>
-        where T: IVerifiable
+        where T : IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Prefix.
+        /// Префикс.
         /// </summary>
         public string? Prefix { get; set; }
 
         /// <summary>
-        /// Result.
+        /// Результат верификации.
         /// </summary>
         public bool Result { get; set; }
 
         /// <summary>
-        /// Target.
+        /// Проверяемый объект.
         /// </summary>
         public T Target { get; }
 
         /// <summary>
-        /// Throw on error.
+        /// Выбрасывать ли исключение при верификации?
         /// </summary>
         public bool ThrowOnError { get; }
 
@@ -53,37 +54,25 @@ namespace AM
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public Verifier
             (
                 T target,
-                bool throwOnError
+                bool throwOnError = true
             )
         {
             Target = target;
             ThrowOnError = throwOnError;
             Result = true;
-        }
+
+        } // constructor
 
         #endregion
 
         #region Private members
 
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-        private void _Throw()
-        {
-            if (!Result && ThrowOnError)
-            {
-                if (!string.IsNullOrEmpty(Prefix))
-                {
-                    Throw(Prefix);
-                }
-                Throw();
-            }
-        }
-
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void _Throw
             (
                 string message
@@ -91,13 +80,15 @@ namespace AM
         {
             if (!Result && ThrowOnError)
             {
-                if (!string.IsNullOrEmpty(Prefix))
+                if (!string.IsNullOrEmpty (Prefix))
                 {
-                    Throw(Prefix + ": " + message);
+                    Throw (Prefix + ": " + message);
                 }
-                Throw(message);
+
+                Throw (message);
             }
-        }
+
+        } // method _Throw
 
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private void _Throw
@@ -108,51 +99,39 @@ namespace AM
         {
             if (!Result && ThrowOnError)
             {
-                if (!string.IsNullOrEmpty(Prefix))
+                if (!string.IsNullOrEmpty (Prefix))
                 {
-                    string message = Prefix + ": " + string.Format(format, arguments);
-                    Throw(message);
+                    string message = Prefix + ": " + string.Format (format, arguments);
+                    Throw (message);
                 }
-                Throw(format, arguments);
-            }
-        }
 
+                Throw (format, arguments);
+            }
+
+        } // method _Throw
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Assert.
-        /// </summary>
-        public Verifier<T> Assert
-            (
-                bool condition
-            )
-        {
-            Result = Result && condition;
-            _Throw();
-
-            return this;
-        }
-
-        /// <summary>
-        /// Assert.
+        /// Проверка заданного условия.
         /// </summary>
         public Verifier<T> Assert
             (
                 bool condition,
-                string message
+                [CallerArgumentExpression("condition")] string? message = null
             )
         {
             Result = Result && condition;
-            _Throw(message);
+            _Throw (message!);
 
             return this;
-        }
+
+        } // method Assert
 
         /// <summary>
-        /// Assert.
+        /// Проверка условия.
         /// </summary>
         public Verifier<T> Assert
             (
@@ -162,145 +141,105 @@ namespace AM
             )
         {
             Result = Result && condition;
-            _Throw(format, arguments);
+            _Throw (format, arguments);
 
             return this;
-        }
+
+        } // method Assert
 
         /// <summary>
-        /// Specified directory must exist.
+        /// Проверка существования указанной директории.
         /// </summary>
         public Verifier<T> DirectoryExist
             (
                 string path,
-                string name
+                [CallerArgumentExpression("path")] string? name = null
             )
         {
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty (path))
             {
                 Result = false;
-                _Throw
-                    (
-                        "Directory '{0}': path not specified",
-                        name
-                    );
+                _Throw ($"Directory '{name}': path not specified");
             }
-
-            if (!Directory.Exists(path))
+            else if (!Directory.Exists (path))
             {
                 Result = false;
-                _Throw
-                    (
-                        "Directory '{0}' is set to '{1}': path not exist",
-                        name,
-                        path
-                    );
+                _Throw ($"Directory '{name}' is set to '{path}': path not exist");
             }
 
             return this;
-        }
+
+        } // method DirectoryExist
 
         /// <summary>
-        /// Specified file must exist.
+        /// Проверка существования указанного файла.
         /// </summary>
         public Verifier<T> FileExist
             (
                 string path,
-                string name
+                [CallerArgumentExpression("path")] string? name = null
             )
         {
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty (path))
             {
                 Result = false;
-                _Throw
-                    (
-                        "File '{0}': path not specified",
-                        name
-                    );
+                _Throw ($"File '{name}': path not specified");
             }
-
-            if (!File.Exists(path))
+            else if (!File.Exists (path))
             {
                 Result = false;
-                _Throw
-                    (
-                        "File '{0}' is set to '{1}': path not exist",
-                        name,
-                        path
-                    );
+                _Throw ("File '{name}' is set to '{path}': path not exist");
             }
 
             return this;
-        }
+
+        } // method FileExist
 
         /// <summary>
-        /// Not null?
-        /// </summary>
-        public Verifier<T> NotNull
-            (
-                object? value
-            )
-        {
-            return Assert(!ReferenceEquals(value, null));
-        }
-
-        /// <summary>
-        /// Not null?
+        /// Проверка указателя на объект на равенство <c>null</c>.
         /// </summary>
         public Verifier<T> NotNull
             (
                 object? value,
-                string name
+                [CallerArgumentExpression("value")] string? name = null
             )
         {
             return Assert
                 (
-                    !ReferenceEquals(value, null),
+                    !object.ReferenceEquals (value, null),
                     name
                 );
-        }
+
+        } // method NotNull
 
         /// <summary>
-        /// Not null?
-        /// </summary>
-        public Verifier<T> NotNullNorEmpty
-            (
-                string? value
-            )
-        {
-            return Assert(!string.IsNullOrEmpty(value));
-        }
-
-        /// <summary>
-        /// Not null?
+        /// Проверка, что заданная строка не <c>null</c> и не пустая.
         /// </summary>
         public Verifier<T> NotNullNorEmpty
             (
                 string? value,
-                string name
+                [CallerArgumentExpression("value")] string? name = null
             )
         {
-            return Assert
-                (
-                    !string.IsNullOrEmpty(value),
-                    name
-                );
-        }
+            return Assert (!string.IsNullOrEmpty (value), name);
+
+        } // method NotNullNorEmpty
 
         /// <summary>
-        /// Not null?
+        /// Проверка, что указанное число положительное.
         /// </summary>
         public Verifier<T> Positive
             (
                 int value,
-                string name
+                [CallerArgumentExpression("value")] string? name = null
             )
         {
-            return Assert(value > 0, name);
-        }
+            return Assert (value > 0, name!);
+
+        } // method Positive
 
         /// <summary>
-        /// Reference equals?
+        /// Проверка, что указатели на объекты совпадают.
         /// </summary>
         public Verifier<T> ReferenceEquals
             (
@@ -311,23 +250,25 @@ namespace AM
         {
             return Assert
                 (
-                    ReferenceEquals(first, second),
+                    object.ReferenceEquals (first, second),
                     message
                 );
-        }
+
+        } // method ReferenceEquals
 
         /// <summary>
-        /// Throw exception.
+        /// Выброс исключения.
         /// </summary>
         public void Throw()
         {
-            Magna.Error(nameof(Verifier<T>) + "::" + nameof(Throw));
+            Magna.Error (nameof (Verifier<T>) + "::" + nameof (Throw));
 
             throw new VerificationException();
-        }
+
+        } // method Throw
 
         /// <summary>
-        /// Throw exception.
+        /// Выброс исключения.
         /// </summary>
         public void Throw
             (
@@ -336,15 +277,16 @@ namespace AM
         {
             Magna.Error
                 (
-                    nameof(Verifier<T>) + "::" + nameof(Throw)
+                    nameof (Verifier<T>) + "::" + nameof (Throw)
                     + ": " + message
                 );
 
-            throw new VerificationException(message);
-        }
+            throw new VerificationException (message);
+
+        } // method Throw
 
         /// <summary>
-        /// Throw exception.
+        /// Выброс исключения.
         /// </summary>
         public void Throw
             (
@@ -352,44 +294,30 @@ namespace AM
                 params object[] arguments
             )
         {
-            string message = string.Format
-                (
-                    format,
-                    arguments
-                );
+            var message = string.Format (format, arguments);
+            Throw (message);
 
-            Throw(message);
-        }
+        } // method Throw
 
         /// <summary>
-        /// Verify sub-object.
-        /// </summary>
-        public Verifier<T> VerifySubObject
-            (
-                IVerifiable verifiable
-            )
-        {
-            Assert(verifiable.Verify(ThrowOnError));
-
-            return this;
-        }
-
-        /// <summary>
-        /// Verify sub-object.
+        /// Верификация под-объекта.
         /// </summary>
         public Verifier<T> VerifySubObject
             (
                 IVerifiable verifiable,
-                string name
+                [CallerArgumentExpression("verifiable")] string? name = null
             )
         {
-            Sure.NotNullNorEmpty(name, nameof(name));
+            Sure.NotNullNorEmpty (name);
 
-            Assert(verifiable.Verify(ThrowOnError), name);
+            Assert (verifiable.Verify (ThrowOnError), name);
 
             return this;
-        }
+
+        } // method VerifySubObject
 
         #endregion
-    }
-}
+
+    } // class Verifier
+
+} // namespace AM

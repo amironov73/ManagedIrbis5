@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* Sure.cs -- ассерты на все случаи жизни
@@ -35,58 +36,60 @@ namespace AM
         #region Public methods
 
         /// <summary>
-        /// State assertion
+        /// Проверка состояния объекта.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void AssertState
             (
                 bool condition,
-                string message
+                [CallerArgumentExpression("condition")] string? message = null
             )
         {
             if (!condition)
             {
-                throw new InvalidOleVariantTypeException(message);
+                throw new InvalidOleVariantTypeException (message);
             }
-        }
+
+        } // method AssertState
 
         /// <summary>
-        /// Check whether <paramref name="value"/> is not defined.
+        /// Проверка, определено ли значение <paramref name="value"/> в перечислении.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void Defined<T>
             (
                 T value,
-                string argumentName
+                [CallerArgumentExpression("value")] string? argumentName = null
             )
             where T : struct
         {
-            if (!Enum.IsDefined(typeof(T), value))
+            if (!Enum.IsDefined (typeof (T), value))
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method Defined
 
         /// <summary>
-        /// Checks whether specified files exists.
+        /// Проверка существования файла с указанным именем.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [Conditional ("DEBUG")]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
         public static void FileExists
             (
                 string? path,
-                string argumentName
+                [CallerArgumentExpression("path")] string? argumentName = null
             )
         {
-            if (string.IsNullOrEmpty(path))
+            if (string.IsNullOrEmpty (path))
             {
-                throw new ArgumentNullException(argumentName);
+                throw new ArgumentNullException (argumentName);
             }
 
-            if (!File.Exists(path))
+            if (!File.Exists (path))
             {
                 throw new FileNotFoundException
                     (
@@ -95,231 +98,246 @@ namespace AM
                         + path
                     );
             }
-        }
+
+        } // method FileExists
 
         /// <summary>
-        /// Checks whether <paramref name="argument"/> fits into
-        /// specified range <paramref name="fromValue"/>
-        /// to <paramref name="toValue"/>.
+        /// Проверка, попадает ли  <paramref name="argument"/> в указанный
+        /// диапазон от <paramref name="fromValue"/>
+        /// до <paramref name="toValue"/> (включительно).
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void InRange
             (
                 int argument,
                 int fromValue,
                 int toValue,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument < fromValue
                 || argument > toValue)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method InRange
 
         /// <summary>
-        /// Checks whether <paramref name="argument"/> fits into
-        /// specified range <paramref name="fromValue"/>
-        /// to <paramref name="toValue"/>.
+        /// Проверка, попадает ли <paramref name="argument"/> в указанный
+        /// диапазон от <paramref name="fromValue"/>
+        /// до <paramref name="toValue"/> (включительно).
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void InRange
             (
                 long argument,
                 long fromValue,
                 long toValue,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument < fromValue
                 || argument > toValue)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method InRange
 
         /// <summary>
-        /// Checks whether <paramref name="argument"/> fits into
-        /// specified range <paramref name="fromValue"/>
-        /// to <paramref name="toValue"/>.
+        /// Проврека, попадает ли <paramref name="argument"/> в указанный
+        /// диапазон от <paramref name="fromValue"/>
+        /// до <paramref name="toValue"/> (включительно).
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [Conditional ("DEBUG")]
+        [MethodImpl (MethodImplOptions.AggressiveInlining)]
         public static void InRange
             (
                 double argument,
                 double fromValue,
                 double toValue,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument < fromValue
                 || argument > toValue)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method InRange
 
         /// <summary>
-        /// Check whether <paramref name="argument"/> is not negative.
+        /// Проверка, что <paramref name="argument"/> не является отрицательным числом.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void NonNegative
             (
                 int argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument < 0)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method NonNegative
 
         /// <summary>
-        /// Check whether <paramref name="argument"/> is not negative.
+        /// Проверка, что <paramref name="argument"/> не является отрицательным числом.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void NonNegative
             (
                 long argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument < 0)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method NonNegative
 
         /// <summary>
-        /// Check whether <paramref name="argument"/> is not negative.
+        /// Проверка, что <paramref name="argument"/> не является отрицательным числом.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void NonNegative
             (
                 double argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument < 0.0)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method NonNegative
 
         /// <summary>
-        /// Ensures that <paramref name="argument" /> != <c>null</c>.
+        /// Проверка, что указатель <paramref name="argument" /> не <c>null</c>.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void NotNull<T>
             (
                 T? argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
             where T : class
         {
-            if (ReferenceEquals(argument, null))
+            if (ReferenceEquals (argument, null))
             {
-                throw new ArgumentException(argumentName);
+                throw new ArgumentException (argumentName);
             }
-        }
+
+        } // method NotNull
 
         /// <summary>
-        /// Ensures that <paramref name="argument" /> != <c>null</c>.
+        /// Проверка, что указатель <paramref name="argument" /> не <c>null</c>.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void NotNull<T>
             (
                 T? argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
             where T : struct
         {
             if (!argument.HasValue)
             {
-                throw new ArgumentException(argumentName);
+                throw new ArgumentException (argumentName);
             }
-        }
+
+        } // method NotNull
 
         /// <summary>
-        /// Ensures that <paramref name="argument" />
-        /// is not null nor empty.
+        /// Проверка, что строка <paramref name="argument" />
+        /// не <c>null</c> и не пустая.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void NotNullNorEmpty
             (
                 string? argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
-            if (string.IsNullOrEmpty(argument))
+            if (string.IsNullOrEmpty (argument))
             {
-                throw new ArgumentNullException(argumentName);
+                throw new ArgumentNullException (argumentName);
             }
-        }
+
+        } // method NotNullNorEmpty
 
         /// <summary>
-        /// Check whether <paramref name="argument"/> is positive.
+        /// Проверка, что число <paramref name="argument"/> положительное.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void Positive
             (
                 int argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument <= 0)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method Positive
 
         /// <summary>
-        /// Check whether <paramref name="argument"/> is positive.
+        /// Проверка, что число <paramref name="argument"/> положительное.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void Positive
             (
                 long argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument <= 0.0)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method Positive
 
         /// <summary>
-        /// Check whether <paramref name="argument"/> is positive.
+        /// Проверка, что число <paramref name="argument"/> положительное.
         /// </summary>
         [DebuggerHidden]
-        [Conditional("DEBUG")]
+        [Conditional ("DEBUG")]
         public static void Positive
             (
                 double argument,
-                string argumentName
+                [CallerArgumentExpression("argument")] string? argumentName = null
             )
         {
             if (argument <= 0.0)
             {
-                throw new ArgumentOutOfRangeException(argumentName);
+                throw new ArgumentOutOfRangeException (argumentName);
             }
-        }
+
+        } // method Positive
 
         #endregion
-    }
-}
+
+    } // class Sure
+
+} // namespace AM
