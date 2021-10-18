@@ -12,6 +12,8 @@
 
 #region Using directives
 
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Runtime.CompilerServices;
 
@@ -72,7 +74,7 @@ namespace AM
 
         #region Private members
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        [ExcludeFromCodeCoverage]
         private void _Throw
             (
                 string message
@@ -90,7 +92,7 @@ namespace AM
 
         } // method _Throw
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        [ExcludeFromCodeCoverage]
         private void _Throw
             (
                 string format,
@@ -117,6 +119,7 @@ namespace AM
         /// <summary>
         /// Проверка заданного условия.
         /// </summary>
+        [Pure]
         public Verifier<T> Assert
             (
                 bool condition,
@@ -133,6 +136,7 @@ namespace AM
         /// <summary>
         /// Проверка условия.
         /// </summary>
+        [Pure]
         public Verifier<T> Assert
             (
                 bool condition,
@@ -198,6 +202,7 @@ namespace AM
         /// <summary>
         /// Проверка указателя на объект на равенство <c>null</c>.
         /// </summary>
+        [Pure]
         public Verifier<T> NotNull
             (
                 object? value,
@@ -206,7 +211,7 @@ namespace AM
         {
             return Assert
                 (
-                    !object.ReferenceEquals (value, null),
+                    value is not null,
                     name
                 );
 
@@ -215,6 +220,7 @@ namespace AM
         /// <summary>
         /// Проверка, что заданная строка не <c>null</c> и не пустая.
         /// </summary>
+        [Pure]
         public Verifier<T> NotNullNorEmpty
             (
                 string? value,
@@ -228,6 +234,7 @@ namespace AM
         /// <summary>
         /// Проверка, что указанное число положительное.
         /// </summary>
+        [Pure]
         public Verifier<T> Positive
             (
                 int value,
@@ -241,6 +248,7 @@ namespace AM
         /// <summary>
         /// Проверка, что указатели на объекты совпадают.
         /// </summary>
+        [Pure]
         public Verifier<T> ReferenceEquals
             (
                 object? first,
@@ -250,7 +258,7 @@ namespace AM
         {
             return Assert
                 (
-                    object.ReferenceEquals (first, second),
+                    ReferenceEquals (first, second),
                     message
                 );
 
@@ -310,9 +318,7 @@ namespace AM
         {
             Sure.NotNullNorEmpty (name);
 
-            Assert (verifiable.Verify (ThrowOnError), name);
-
-            return this;
+            return Assert (verifiable.Verify (ThrowOnError), name);
 
         } // method VerifySubObject
 

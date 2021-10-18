@@ -138,7 +138,7 @@ namespace AM.Text
                 Encoding encoding
             )
         {
-            Sure.FileExists(fileName, nameof(fileName));
+            Sure.FileExists(fileName);
 
             var reader = TextReaderUtility.OpenRead
                 (

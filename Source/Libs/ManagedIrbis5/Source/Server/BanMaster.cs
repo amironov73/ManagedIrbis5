@@ -55,7 +55,7 @@ namespace ManagedIrbis.Server
                 string? address
             )
         {
-            if (!string.IsNullOrEmpty(address))
+            if (!string.IsNullOrEmpty (address))
             {
                 _dictionary[address] = null;
             }
@@ -65,22 +65,11 @@ namespace ManagedIrbis.Server
         /// <summary>
         /// Проверка, содержится ли указанный адрес в бан-листе.
         /// </summary>
-        public bool IsAddressBanned
-            (
-                string? address
-            )
-        {
-            if (string.IsNullOrEmpty(address))
-            {
-                return false;
-            }
-
-            return _dictionary.ContainsKey(address);
-
-        } // method IsAddressBanned
+        public bool IsAddressBanned (string? address) =>
+            !string.IsNullOrEmpty (address) && _dictionary.ContainsKey (address);
 
         /// <summary>
-        /// Whether the address is banned.
+        /// Проверка, забанен ли адрес.
         /// </summary>
         public bool IsAddressBanned
             (
@@ -89,7 +78,7 @@ namespace ManagedIrbis.Server
         {
             var address = socket.GetRemoteAddress();
 
-            return IsAddressBanned(address);
+            return IsAddressBanned (address);
 
         } // method IsAddressBanned
 
@@ -101,9 +90,9 @@ namespace ManagedIrbis.Server
                 string fileName
             )
         {
-            Sure.FileExists(fileName, "fileName");
+            Sure.FileExists (fileName);
 
-            foreach (var line in File.ReadLines(fileName, IrbisEncoding.Utf8))
+            foreach (var line in File.ReadLines (fileName, IrbisEncoding.Utf8))
             {
                 _dictionary[line] = null;
             }
@@ -118,30 +107,30 @@ namespace ManagedIrbis.Server
                 string fileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, "fileName");
+            Sure.NotNullNorEmpty (fileName);
 
             var lines = _dictionary.Keys.ToArray();
+            File.WriteAllLines (fileName, lines, IrbisEncoding.Utf8);
 
-            File.WriteAllLines(fileName, lines, IrbisEncoding.Utf8);
-        }
+        } // method SaveBanList
 
         /// <summary>
-        /// Разбанить раскаявшийся адрес.
+        /// Разбан раскаявшегося адреса.
         /// </summary>
         public void UnbanTheAddress
             (
                 string? address
             )
         {
-            if (!string.IsNullOrEmpty(address))
+            if (!string.IsNullOrEmpty (address))
             {
-                _dictionary.TryRemove(address, out _);
+                _dictionary.TryRemove (address, out _);
             }
 
         } // method UnbanTheAddress
 
         /// <summary>
-        /// Разбанить всех в честь праздника.
+        /// Разбан всех в честь праздника.
         /// </summary>
         public void UnbanAll()
         {
@@ -149,6 +138,7 @@ namespace ManagedIrbis.Server
             {
                 _dictionary.Clear();
             }
+
         } // method UnbanAll
 
         #endregion

@@ -179,7 +179,7 @@ namespace AM.Text
                 Encoding? encoding = default
             )
         {
-            Sure.FileExists(fileName, nameof(fileName));
+            Sure.FileExists(fileName);
 
             encoding ??= Encoding.UTF8;
             var text = File.ReadAllText(fileName, encoding);

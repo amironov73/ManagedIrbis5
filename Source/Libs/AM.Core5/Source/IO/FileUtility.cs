@@ -75,7 +75,8 @@ namespace AM.IO
             File.SetLastWriteTime (targetName, lastWriteTime);
             var attributes = File.GetAttributes (sourceName);
             File.SetAttributes (targetName, attributes);
-        }
+
+        } // method Copy
 
         /// <summary>
         /// Copies given file only if source is newer than destination.

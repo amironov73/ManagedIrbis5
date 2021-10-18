@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* SerializationUtility.cs -- возня вокруг сериализации
@@ -28,14 +29,14 @@ using AM.IO;
 namespace AM.Runtime
 {
     /// <summary>
-    /// Возня вокруг сериализации
+    /// Возня вокруг сериализации.
     /// </summary>
     public static class SerializationUtility
     {
         #region Public methods
 
         /// <summary>
-        /// Reads array from the stream.
+        /// Чтение массива сериализованных объектов из потока.
         /// </summary>
         public static T[] RestoreArray<T>
             (
@@ -48,15 +49,16 @@ namespace AM.Runtime
             for (var i = 0; i < count; i++)
             {
                 var item = new T();
-                item.RestoreFromStream(reader);
+                item.RestoreFromStream (reader);
                 result[i] = item;
             }
 
             return result;
-        }
+
+        } // method RestoreArray
 
         /// <summary>
-        /// Read array from the file.
+        /// Чтение массива сериализованных объектов из потока.
         /// </summary>
         public static T[] RestoreArrayFromFile<T>
             (
@@ -64,16 +66,17 @@ namespace AM.Runtime
             )
             where T : IHandmadeSerializable, new()
         {
-            Sure.FileExists(fileName, nameof(fileName));
+            Sure.FileExists (fileName);
 
-            using var stream = File.OpenRead(fileName);
-            using var reader = new BinaryReader(stream);
+            using var stream = File.OpenRead (fileName);
+            using var reader = new BinaryReader (stream);
 
             return reader.RestoreArray<T>();
-        }
+
+        } // method RestoreArrayFromFile
 
         /// <summary>
-        /// Read array from the file.
+        /// Чтение массива сериализованных объектов из сжатого файла.
         /// </summary>
         public static T[] RestoreArrayFromZipFile<T>
             (
@@ -81,20 +84,21 @@ namespace AM.Runtime
             )
             where T : IHandmadeSerializable, new()
         {
-            Sure.FileExists(fileName, nameof(fileName));
+            Sure.FileExists (fileName);
 
-            using Stream stream = File.OpenRead(fileName);
+            using Stream stream = File.OpenRead (fileName);
             using var deflate = new DeflateStream
                 (
                     stream,
                     CompressionMode.Decompress
                 );
-            using var reader = new BinaryReader(deflate);
+            using var reader = new BinaryReader (deflate);
             return reader.RestoreArray<T>();
-        }
+
+        } // method RestoreArrayFromZipFile
 
         /// <summary>
-        /// Считывание массива из памяти.
+        /// Считывание массива сериализованных объектов из памяти.
         /// </summary>
         public static T[] RestoreArrayFromMemory<T>
             (
@@ -102,14 +106,15 @@ namespace AM.Runtime
             )
             where T : IHandmadeSerializable, new()
         {
-            using Stream stream = new MemoryStream(array);
-            using var reader = new BinaryReader(stream);
+            using Stream stream = new MemoryStream (array);
+            using var reader = new BinaryReader (stream);
 
             return reader.ReadArray<T>();
-        }
+
+        } // method RestoreArrayFromMemory
 
         /// <summary>
-        /// Считывание массива из памяти.
+        /// Считывание массива сериализованных объектов из сжатой памяти.
         /// </summary>
         public static T[] RestoreArrayFromZipMemory<T>
             (
@@ -117,18 +122,19 @@ namespace AM.Runtime
             )
             where T : IHandmadeSerializable, new()
         {
-            using Stream stream = new MemoryStream(array);
+            using Stream stream = new MemoryStream (array);
             using var deflate = new DeflateStream
                 (
                     stream,
                     CompressionMode.Decompress
                 );
-            using var reader = new BinaryReader(deflate);
+            using var reader = new BinaryReader (deflate);
             return reader.ReadArray<T>();
-        }
+
+        } // method RestoreArrayFromZipMemory
 
         /// <summary>
-        /// Read nullable object from the stream.
+        /// Считывание сериализованного nullable-объекта из потока.
         /// </summary>
         public static T? RestoreNullable<T>
             (
@@ -143,10 +149,11 @@ namespace AM.Runtime
             }
 
             var result = new T();
-            result.RestoreFromStream(reader);
+            result.RestoreFromStream (reader);
 
             return result;
-        }
+
+        } // method RestoreNullable
 
         /// <summary>
         /// Read non-nullable object from the file.
@@ -157,38 +164,39 @@ namespace AM.Runtime
             )
             where T : IHandmadeSerializable, new()
         {
-            using var stream = File.OpenRead(fileName);
-            using var reader = new BinaryReader(stream);
+            using var stream = File.OpenRead (fileName);
+            using var reader = new BinaryReader (stream);
             var result = new T();
-            result.RestoreFromStream(reader);
+            result.RestoreFromStream (reader);
 
             return result;
-        }
 
+        } // method RestoreObjectFromFile
 
         /// <summary>
         /// Считывание объекта из файла.
         /// </summary>
         public static T RestoreObjectFromZipFile<T>
             (
-                 string fileName
+                string fileName
             )
             where T : IHandmadeSerializable, new()
         {
-            Sure.FileExists(fileName, nameof(fileName));
+            Sure.FileExists (fileName);
 
-            using Stream stream = File.OpenRead(fileName);
+            using Stream stream = File.OpenRead (fileName);
             using var deflate = new DeflateStream
                 (
                     stream,
                     CompressionMode.Decompress
                 );
-            using var reader = new BinaryReader(deflate);
+            using var reader = new BinaryReader (deflate);
             var result = new T();
-            result.RestoreFromStream(reader);
+            result.RestoreFromStream (reader);
 
             return result;
-        }
+
+        } // method RestoreObjectFromZipFile
 
         /// <summary>
         /// Read nullable object from the memory.
@@ -199,11 +207,12 @@ namespace AM.Runtime
             )
             where T : class, IHandmadeSerializable, new()
         {
-            using var stream = new MemoryStream(array);
-            using var reader = new BinaryReader(stream);
+            using var stream = new MemoryStream (array);
+            using var reader = new BinaryReader (stream);
 
             return reader.RestoreNullable<T>();
-        }
+
+        } // method RestoreObjectFromMemory
 
         /// <summary>
         /// Считывание объекта из строки.
@@ -214,7 +223,7 @@ namespace AM.Runtime
             )
             where T : class, IHandmadeSerializable, new()
         {
-            var bytes = Convert.FromBase64String(text);
+            var bytes = Convert.FromBase64String (text);
             var result = bytes.RestoreObjectFromZipMemory<T>();
 
             return result;
@@ -229,15 +238,15 @@ namespace AM.Runtime
             )
             where T : class, IHandmadeSerializable, new()
         {
-            using Stream stream = new MemoryStream(array);
+            using Stream stream = new MemoryStream (array);
             using var deflate = new DeflateStream
                 (
                     stream,
                     CompressionMode.Decompress
                 );
-            using var reader = new BinaryReader(deflate);
+            using var reader = new BinaryReader (deflate);
             var result = new T();
-            result.RestoreFromStream(reader);
+            result.RestoreFromStream (reader);
 
             return result;
         }
@@ -252,10 +261,10 @@ namespace AM.Runtime
             )
             where T : IHandmadeSerializable
         {
-            writer.WritePackedInt32(array.Length);
+            writer.WritePackedInt32 (array.Length);
             foreach (var item in array)
             {
-                item.SaveToStream(writer);
+                item.SaveToStream (writer);
             }
         }
 
@@ -268,9 +277,10 @@ namespace AM.Runtime
                 BinaryWriter writer
             )
         {
-            writer.WritePackedInt32(span.Length);
-            writer.Write(span);
-        }
+            writer.WritePackedInt32 (span.Length);
+            writer.Write (span);
+
+        } // method SaveToStream
 
         /// <summary>
         /// Сохранение в поток массива элементов.
@@ -281,9 +291,10 @@ namespace AM.Runtime
                 BinaryWriter writer
             )
         {
-            writer.WritePackedInt32(memory.Length);
-            writer.Write(memory.Span);
-        }
+            writer.WritePackedInt32 (memory.Length);
+            writer.Write (memory.Span);
+
+        } // method SaveToStream
 
         /// <summary>
         /// Сохранение в поток массива элементов.
@@ -294,9 +305,10 @@ namespace AM.Runtime
                 BinaryWriter writer
             )
         {
-            writer.WritePackedInt32(span.Length);
-            writer.Write(span);
-        }
+            writer.WritePackedInt32 (span.Length);
+            writer.Write (span);
+
+        } // method SaveToStream
 
         /// <summary>
         /// Сохранение в файл объекта,
@@ -309,12 +321,13 @@ namespace AM.Runtime
             )
             where T : class, IHandmadeSerializable, new()
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
-            using Stream stream = File.Create(fileName);
-            using var writer = new BinaryWriter(stream);
-            obj.SaveToStream(writer);
-        }
+            using Stream stream = File.Create (fileName);
+            using var writer = new BinaryWriter (stream);
+            obj.SaveToStream (writer);
+
+        } // method SaveToFile
 
         /// <summary>
         /// Сохранение в файл объекта,
@@ -327,17 +340,18 @@ namespace AM.Runtime
             )
             where T : class, IHandmadeSerializable, new()
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
-            using Stream stream = File.Create(fileName);
+            using Stream stream = File.Create (fileName);
             using var deflate = new DeflateStream
                 (
                     stream,
                     CompressionMode.Compress
                 );
-            using var writer = new BinaryWriter(deflate);
-            obj.SaveToStream(writer);
-        }
+            using var writer = new BinaryWriter (deflate);
+            obj.SaveToStream (writer);
+
+        } // method SaveToZipFile
 
         /// <summary>
         /// Сохранение в файл массива объектов,
@@ -350,15 +364,16 @@ namespace AM.Runtime
             )
             where T : IHandmadeSerializable
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
-            using Stream stream = File.Create(fileName);
-            using var writer = new BinaryWriter(stream);
-            array.SaveToStream(writer);
-        }
+            using var stream = File.Create (fileName);
+            using var writer = new BinaryWriter (stream);
+            array.SaveToStream (writer);
+
+        } // method SaveToFile
 
         /// <summary>
-        /// Сохранение объекта.
+        /// Сериализация единичного объекта.
         /// </summary>
         public static byte[] SaveToMemory<T>
             (
@@ -367,15 +382,17 @@ namespace AM.Runtime
             where T : class, IHandmadeSerializable, new()
         {
             using var stream = new MemoryStream();
-            using (var writer = new BinaryWriter(stream))
+            using (var writer = new BinaryWriter (stream))
             {
-                writer.WriteNullable(obj);
+                writer.WriteNullable (obj);
             }
+
             return stream.ToArray();
-        }
+
+        } // method SaveToMemory
 
         /// <summary>
-        /// Сохранение массива объектов.
+        /// Сериализация массива объектов.
         /// </summary>
         public static byte[] SaveToMemory<T>
             (
@@ -384,12 +401,14 @@ namespace AM.Runtime
             where T : IHandmadeSerializable, new()
         {
             using var stream = new MemoryStream();
-            using (var writer = new BinaryWriter(stream))
+            using (var writer = new BinaryWriter (stream))
             {
-                writer.WriteArray(array);
+                writer.WriteArray (array);
             }
+
             return stream.ToArray();
-        }
+
+        } // method SaveToMemory
 
         /// <summary>
         /// Сохранение объекта в строке.
@@ -401,10 +420,11 @@ namespace AM.Runtime
             where T : class, IHandmadeSerializable, new()
         {
             var bytes = obj.SaveToZipMemory();
-            var result = Convert.ToBase64String(bytes);
+            var result = Convert.ToBase64String (bytes);
 
             return result;
-        }
+
+        } // method SaveToString
 
         /// <summary>
         /// Сохранение в файл массива объектов
@@ -417,17 +437,18 @@ namespace AM.Runtime
             )
             where T : IHandmadeSerializable, new()
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
-            using Stream stream = File.Create(fileName);
+            using Stream stream = File.Create (fileName);
             using var deflate = new DeflateStream
                 (
                     stream,
                     CompressionMode.Compress
                 );
-            using var writer = new BinaryWriter(deflate);
-            writer.WriteArray(array);
-        }
+            using var writer = new BinaryWriter (deflate);
+            writer.WriteArray (array);
+
+        } // method SaveToZipFile
 
         /// <summary>
         /// Сохранение массива объектов.
@@ -444,13 +465,14 @@ namespace AM.Runtime
                     stream,
                     CompressionMode.Compress
                 );
-            using (var writer = new BinaryWriter(deflate))
+            using (var writer = new BinaryWriter (deflate))
             {
-                obj.SaveToStream(writer);
+                obj.SaveToStream (writer);
             }
 
             return stream.ToArray();
-        }
+
+        } // method SaveToZipMemory
 
         /// <summary>
         /// Сохранение массива объектов.
@@ -467,13 +489,14 @@ namespace AM.Runtime
                     stream,
                     CompressionMode.Compress
                 );
-            using (var writer = new BinaryWriter(deflate))
+            using (var writer = new BinaryWriter (deflate))
             {
-                writer.WriteArray(array);
+                writer.WriteArray (array);
             }
 
             return stream.ToArray();
-        }
+
+        } // method SaveToZipMemory
 
         /// <summary>
         /// Сохранение в поток обнуляемого объекта.
@@ -485,19 +508,22 @@ namespace AM.Runtime
             )
             where T : class, IHandmadeSerializable, new()
         {
-            if (ReferenceEquals(obj, null))
+            if (ReferenceEquals (obj, null))
             {
-                writer.Write(false);
+                writer.Write (false);
             }
             else
             {
-                writer.Write(true);
-                obj.SaveToStream(writer);
+                writer.Write (true);
+                obj.SaveToStream (writer);
             }
 
             return writer;
-        }
+
+        } // method WriteNullable
 
         #endregion
-    }
-}
+
+    } // class SerializationUtility
+
+} // namespace AM.Runtime

@@ -29,11 +29,8 @@ namespace AM.Text
     /// <example>
     /// Пример разбиения текста на слова.
     /// <code>
-    /// <remarks>
-    /// Все методы класса не потокобезопасные.
-    /// </remarks>
     /// var text = "У попа была собака, он её любил.";
-    /// var navigator = new ValueTextNavigator(text);
+    /// var navigator = new ValueTextNavigator (text);
     ///
     /// while (true)
     /// {
@@ -43,7 +40,7 @@ namespace AM.Text
     ///      break;
     ///   }
     ///
-    ///   Console.WriteLine(word.ToString());
+    ///   Console.WriteLine (word.ToString());
     ///
     ///   if (!navigator.SkipNonWord())
     ///   {
@@ -52,6 +49,9 @@ namespace AM.Text
     /// }
     /// </code>
     /// </example>
+    /// <remarks>
+    /// Все методы класса не потокобезопасные.
+    /// </remarks>
     public ref struct ValueTextNavigator
     {
         #region Constants
@@ -124,7 +124,7 @@ namespace AM.Text
         [Pure]
         public ValueTextNavigator Clone()
         {
-            var result = new ValueTextNavigator(_text)
+            var result = new ValueTextNavigator (_text)
             {
                 _position = _position
             };
@@ -142,11 +142,11 @@ namespace AM.Text
                 Encoding? encoding = default
             )
         {
-            Sure.FileExists(fileName, nameof(fileName));
+            Sure.FileExists (fileName);
 
             encoding ??= Encoding.UTF8;
-            var text = File.ReadAllText(fileName, encoding);
-            var result = new ValueTextNavigator(text);
+            var text = File.ReadAllText (fileName, encoding);
+            var result = new ValueTextNavigator (text);
 
             return result;
 
@@ -160,49 +160,49 @@ namespace AM.Text
         [Pure]
         public ReadOnlySpan<char> GetRemainingText() => IsEOF
             ? new ReadOnlySpan<char>()
-            : _text.Slice(_position);
+            : _text.Slice (_position);
 
         /// <summary>
         /// Текущий символ - управляющий?
         /// </summary>
         [Pure]
-        public bool IsControl() => char.IsControl(PeekChar());
+        public bool IsControl() => char.IsControl (PeekChar());
 
         /// <summary>
         /// Текущий символ - цифра?
         /// </summary>
         [Pure]
-        public bool IsDigit() => char.IsDigit(PeekChar());
+        public bool IsDigit() => char.IsDigit (PeekChar());
 
         /// <summary>
         /// Текущий символ - буква?
         /// </summary>
         [Pure]
-        public bool IsLetter() => char.IsLetter(PeekChar());
+        public bool IsLetter() => char.IsLetter (PeekChar());
 
         /// <summary>
         /// Текущий символ - буква или цифра?
         /// </summary>
         [Pure]
-        public bool IsLetterOrDigit() => char.IsLetterOrDigit(PeekChar());
+        public bool IsLetterOrDigit() => char.IsLetterOrDigit (PeekChar());
 
         /// <summary>
         /// Текущий символ - часть числа?
         /// </summary>
         [Pure]
-        public bool IsNumber() => char.IsNumber(PeekChar());
+        public bool IsNumber() => char.IsNumber (PeekChar());
 
         /// <summary>
         /// Текущий символ - знак пунктуации?
         /// </summary>
         [Pure]
-        public bool IsPunctuation() => char.IsPunctuation(PeekChar());
+        public bool IsPunctuation() => char.IsPunctuation (PeekChar());
 
         /// <summary>
         /// Текущий символ - разделитель?
         /// </summary>
         [Pure]
-        public bool IsSeparator() => char.IsSeparator(PeekChar());
+        public bool IsSeparator() => char.IsSeparator (PeekChar());
 
         /// <summary>
         /// Текущий символ принадлежит одной
@@ -210,13 +210,13 @@ namespace AM.Text
         /// CurrencySymbol, ModifierSymbol либо OtherSymbol?
         /// </summary>
         [Pure]
-        public bool IsSymbol() => char.IsSymbol(PeekChar());
+        public bool IsSymbol() => char.IsSymbol (PeekChar());
 
         /// <summary>
         /// Текущий символ - пробельный?
         /// </summary>
         [Pure]
-        public bool IsWhiteSpace() => char.IsWhiteSpace(PeekChar());
+        public bool IsWhiteSpace() => char.IsWhiteSpace (PeekChar());
 
         /// <summary>
         /// Заглядывание вперёд на одну позицию.
@@ -232,7 +232,6 @@ namespace AM.Text
             return ahead >= _text.Length
                 ? EOF
                 : _text[ahead];
-
         } // method LookAhead
 
         /// <summary>
@@ -245,13 +244,12 @@ namespace AM.Text
                 int distance
             )
         {
-            Sure.NonNegative(distance, nameof(distance));
+            Sure.NonNegative (distance, nameof (distance));
 
             var ahead = _position + distance;
             return ahead >= _text.Length
                 ? EOF
                 : _text[ahead];
-
         } // method LookAhead
 
         /// <summary>
@@ -275,12 +273,11 @@ namespace AM.Text
                 int distance
             )
         {
-            Sure.Positive(distance, nameof(distance));
+            Sure.Positive (distance, nameof (distance));
 
             return _position < distance
                 ? EOF
                 : _text[_position - distance];
-
         } // method LookBehind
 
         /// <summary>
@@ -291,15 +288,15 @@ namespace AM.Text
         /// он остановится в крайней (начальной или конечной) позиции.
         /// </remarks>
         public void Move (int distance) =>
-            _position = Math.Max (0, Math.Min(_position + distance, _text.Length));
+            _position = Math.Max (0, Math.Min (_position + distance, _text.Length));
 
         /// <summary>
         /// Подглядывание текущего символа (т. е. символа в текущей позиции).
         /// </summary>
         [Pure]
         public char PeekChar() => _position >= _text.Length
-                ? EOF
-                : _text[_position];
+            ? EOF
+            : _text[_position];
 
         /// <summary>
         /// Подглядывание строки вплоть до указанной длины.
@@ -315,7 +312,7 @@ namespace AM.Text
                 int length
             )
         {
-            Sure.Positive(length, nameof(length));
+            Sure.Positive (length, nameof (length));
 
             if (IsEOF)
             {
@@ -332,11 +329,10 @@ namespace AM.Text
                 }
             }
 
-            var result = _text.Slice(start, _position - start);
+            var result = _text.Slice (start, _position - start);
             _position = start;
 
             return result;
-
         } // method PeekString
 
         /// <summary>
@@ -351,11 +347,10 @@ namespace AM.Text
             )
         {
             var position = _position;
-            var result = ReadTo(stopChar);
+            var result = ReadTo (stopChar);
             _position = position;
 
             return result;
-
         } // method PeekTo
 
         /// <summary>
@@ -370,11 +365,10 @@ namespace AM.Text
             )
         {
             var position = _position;
-            var result = ReadTo(stopChars);
+            var result = ReadTo (stopChars);
             _position = position;
 
             return result;
-
         } // method PeekTo
 
         /// <summary>
@@ -389,11 +383,10 @@ namespace AM.Text
             )
         {
             var position = _position;
-            var result = ReadUntil(stopChar);
+            var result = ReadUntil (stopChar);
             _position = position;
 
             return result;
-
         } // method PeekUntil
 
         /// <summary>
@@ -408,11 +401,10 @@ namespace AM.Text
             )
         {
             var position = _position;
-            var result = ReadUntil(stopChars);
+            var result = ReadUntil (stopChars);
             _position = position;
 
             return result;
-
         } // metdho PeekUntil
 
         /// <summary>
@@ -428,7 +420,6 @@ namespace AM.Text
             }
 
             return _text[_position++];
-
         } // method ReadChar
 
         /// <summary>
@@ -470,16 +461,17 @@ namespace AM.Text
                     {
                         Magna.Error
                             (
-                                nameof(ValueTextNavigator)
+                                nameof (ValueTextNavigator)
                                 + "::"
-                                + nameof(ReadEscapedUntil)
+                                + nameof (ReadEscapedUntil)
                                 + ": "
                                 + "unexpected end of stream"
                             );
 
                         throw new FormatException();
                     }
-                    result.Append(c);
+
+                    result.Append (c);
                 }
                 else if (c == stopChar)
                 {
@@ -487,12 +479,11 @@ namespace AM.Text
                 }
                 else
                 {
-                    result.Append(c);
+                    result.Append (c);
                 }
             }
 
             return result.ToString();
-
         } // method ReadEscapedUntil
 
         /// <summary>
@@ -518,6 +509,7 @@ namespace AM.Text
             {
                 return ReadOnlySpan<char>.Empty;
             }
+
             ReadChar();
 
             while (true)
@@ -540,7 +532,6 @@ namespace AM.Text
                     start,
                     _position - start
                 );
-
         } // method ReadFrom
 
         /// <summary>
@@ -562,10 +553,11 @@ namespace AM.Text
             }
 
             var start = _position;
-            if (!openChars.Contains(PeekChar()))
+            if (!openChars.Contains (PeekChar()))
             {
                 return ReadOnlySpan<char>.Empty;
             }
+
             ReadChar();
 
             while (true)
@@ -576,7 +568,8 @@ namespace AM.Text
                     _position = start;
                     return ReadOnlySpan<char>.Empty;
                 }
-                if (closeChars.Contains(c))
+
+                if (closeChars.Contains (c))
                 {
                     break;
                 }
@@ -587,7 +580,6 @@ namespace AM.Text
                     start,
                     _position - start
                 );
-
         } // metdhod ReadFrom
 
         /// <summary>
@@ -613,7 +605,6 @@ namespace AM.Text
                     startPosition,
                     _position - startPosition
                 );
-
         } // method ReadInteger
 
         /// <summary>
@@ -629,6 +620,7 @@ namespace AM.Text
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -653,7 +645,6 @@ namespace AM.Text
                     startPosition,
                     stopPosition - startPosition
                 );
-
         } // method ReadLine
 
         /// <summary>
@@ -666,7 +657,7 @@ namespace AM.Text
                 int length
             )
         {
-            Sure.Positive(length, nameof(length));
+            Sure.Positive (length, nameof (length));
 
             var startPosition = _position;
             for (var i = 0; i < length; i++)
@@ -683,7 +674,6 @@ namespace AM.Text
                     startPosition,
                     _position - startPosition
                 );
-
         } // method ReadString
 
         /// <summary>
@@ -712,7 +702,6 @@ namespace AM.Text
                     startPosition,
                     length: _position - startPosition
                 );
-
         } // method ReadTo
 
         /// <summary>
@@ -752,6 +741,7 @@ namespace AM.Text
                             goto AGAIN;
                         }
                     }
+
                     break;
                 }
             }
@@ -761,7 +751,6 @@ namespace AM.Text
                     savePosition,
                     _position - savePosition - stopString.Length
                 );
-
         } // method ReadTo
 
         /// <summary>
@@ -780,7 +769,7 @@ namespace AM.Text
             {
                 var c = ReadChar();
                 if (c == EOF
-                    || Array.IndexOf(stopChars, c) >= 0)
+                    || Array.IndexOf (stopChars, c) >= 0)
                 {
                     break;
                 }
@@ -792,7 +781,6 @@ namespace AM.Text
                     length: _position - start
                 );
             return result;
-
         } // method ReadTo
 
         /// <summary>
@@ -814,6 +802,7 @@ namespace AM.Text
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -822,7 +811,6 @@ namespace AM.Text
                     start,
                     _position - start
                 );
-
         } // method ReadUntil
 
         /// <summary>
@@ -862,6 +850,7 @@ namespace AM.Text
                             goto AGAIN;
                         }
                     }
+
                     break;
                 }
             }
@@ -874,7 +863,6 @@ namespace AM.Text
             _position -= stopString.Length;
 
             return result;
-
         } // method ReadUntil
 
         /// <summary>
@@ -893,10 +881,11 @@ namespace AM.Text
             {
                 var c = PeekChar();
                 if (c == EOF
-                    || Array.IndexOf(stopChars, c) >= 0)
+                    || Array.IndexOf (stopChars, c) >= 0)
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -905,7 +894,6 @@ namespace AM.Text
                     savePosition,
                     _position - savePosition
                 );
-
         } // method ReadUntil
 
         /// <summary>
@@ -933,26 +921,28 @@ namespace AM.Text
                     return ReadOnlySpan<char>.Empty;
                 }
 
-                if (openChars.Contains(c))
+                if (openChars.Contains (c))
                 {
                     level++;
                 }
-                else if (closeChars.Contains(c))
+                else if (closeChars.Contains (c))
                 {
                     if (level == 0
-                        && stopChars.Contains(c))
+                        && stopChars.Contains (c))
                     {
                         break;
                     }
+
                     level--;
                 }
-                else if (stopChars.Contains(c))
+                else if (stopChars.Contains (c))
                 {
                     if (level == 0)
                     {
                         break;
                     }
                 }
+
                 ReadChar();
             }
 
@@ -961,7 +951,6 @@ namespace AM.Text
                     start,
                     _position - start
                 );
-
         } // method ReadUntil
 
         /// <summary>
@@ -983,6 +972,7 @@ namespace AM.Text
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -991,7 +981,6 @@ namespace AM.Text
                     startPosition,
                     _position - startPosition
                 );
-
         } // method ReadWhile
 
         /// <summary>
@@ -1010,10 +999,11 @@ namespace AM.Text
             {
                 var c = PeekChar();
                 if (c == EOF
-                    || Array.IndexOf(goodChars, c) < 0)
+                    || Array.IndexOf (goodChars, c) < 0)
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -1022,7 +1012,6 @@ namespace AM.Text
                     start,
                     _position - start
                 );
-
         } // method ReadWhile
 
         /// <summary>
@@ -1038,10 +1027,11 @@ namespace AM.Text
             {
                 var c = PeekChar();
                 if (c == EOF
-                    || !char.IsLetterOrDigit(c))
+                    || !char.IsLetterOrDigit (c))
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -1050,7 +1040,6 @@ namespace AM.Text
                     startPosition,
                     _position - startPosition
                 );
-
         } // metdhod ReadWord
 
         /// <summary>
@@ -1071,11 +1060,12 @@ namespace AM.Text
             {
                 var c = PeekChar();
                 if (c == EOF
-                    || !char.IsLetterOrDigit(c)
-                        && Array.IndexOf(additionalWordCharacters, c) < 0)
+                    || !char.IsLetterOrDigit (c)
+                    && Array.IndexOf (additionalWordCharacters, c) < 0)
                 {
                     break;
                 }
+
                 ReadChar();
             }
 
@@ -1084,7 +1074,6 @@ namespace AM.Text
                     savePosition,
                     _position - savePosition
                 );
-
         } // method ReadWord
 
         /// <summary>
@@ -1117,7 +1106,6 @@ namespace AM.Text
             }
 
             return Substring (start, length);
-
         } // method RecentText
 
         /// <summary>
@@ -1138,7 +1126,6 @@ namespace AM.Text
             }
 
             return false;
-
         } // method SkipChar
 
         /// <summary>
@@ -1157,7 +1144,6 @@ namespace AM.Text
             }
 
             return !IsEOF;
-
         } // method SkipChar
 
         /// <summary>
@@ -1171,14 +1157,13 @@ namespace AM.Text
                 params char[] allowed
             )
         {
-            if (Array.IndexOf(allowed, PeekChar()) >= 0)
+            if (Array.IndexOf (allowed, PeekChar()) >= 0)
             {
                 ReadChar();
                 return true;
             }
 
             return false;
-
         } // method SkipChar
 
         /// <summary>
@@ -1204,7 +1189,6 @@ namespace AM.Text
                     return true;
                 }
             }
-
         } // method SkipControl
 
         /// <summary>
@@ -1248,7 +1232,7 @@ namespace AM.Text
                 }
 
                 var c = PeekChar();
-                if (!char.IsLetterOrDigit(c))
+                if (!char.IsLetterOrDigit (c))
                 {
                     ReadChar();
                 }
@@ -1278,8 +1262,8 @@ namespace AM.Text
                 }
 
                 var c = PeekChar();
-                if (!char.IsLetterOrDigit(c)
-                    && Array.LastIndexOf(additionalWordCharacters, c) < 0)
+                if (!char.IsLetterOrDigit (c)
+                    && Array.LastIndexOf (additionalWordCharacters, c) < 0)
                 {
                     ReadChar();
                 }
@@ -1371,7 +1355,7 @@ namespace AM.Text
                 }
 
                 var c = PeekChar();
-                if (Array.IndexOf(skipChars, c) >= 0)
+                if (Array.IndexOf (skipChars, c) >= 0)
                 {
                     ReadChar();
                 }
@@ -1430,7 +1414,7 @@ namespace AM.Text
                 }
 
                 var c = PeekChar();
-                if (Array.IndexOf(goodChars, c) < 0)
+                if (Array.IndexOf (goodChars, c) < 0)
                 {
                     ReadChar();
                 }
@@ -1494,17 +1478,10 @@ namespace AM.Text
         /// Извлечение подстроки, начиная с указанного смещения.
         /// </summary>
         [Pure]
-        public ReadOnlySpan<char> Substring
-            (
-                int offset
-            )
-        {
-            return offset < 0
-                || offset >= _text.Length
+        public ReadOnlySpan<char> Substring (int offset) =>
+            offset < 0 || offset >= _text.Length
                 ? ReadOnlySpan<char>.Empty
-                : _text.Slice(offset);
-
-        } // method Substring
+                : _text.Slice (offset);
 
         /// <summary>
         /// Извлечение подстроки.
@@ -1515,19 +1492,10 @@ namespace AM.Text
         /// <param name="offset">Смещение до начала подстроки в символах.</param>
         /// <param name="length">Длина подстроки в символах.</param>
         [Pure]
-        public ReadOnlySpan<char> Substring
-            (
-                int offset,
-                int length
-            )
-        {
-            return offset < 0
-                || offset >= _text.Length
-                || length <= 0
+        public ReadOnlySpan<char> Substring (int offset,int length) =>
+            offset < 0 || offset >= _text.Length || length <= 0
                 ? ReadOnlySpan<char>.Empty
-                : _text.Slice(offset, length);
-
-        } // method Substring
+                : _text.Slice (offset, length);
 
         #endregion
 
