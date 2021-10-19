@@ -83,10 +83,13 @@ namespace Istu.NewModel
                         Unit = parts[2]
                     };
                     result.Add (service);
-                }
-            }
+
+                } // while
+
+            } // using
 
             return result.ToArray();
+
         } // method ReadFile
 
         #endregion

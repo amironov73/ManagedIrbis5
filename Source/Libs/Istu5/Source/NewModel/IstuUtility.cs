@@ -58,6 +58,7 @@ namespace Istu.NewModel
             services.AddTransient<IOrderManager, OrderManager>();
 
             return services;
+
         } // method AddOldModel
 
         /// <summary>
@@ -79,6 +80,7 @@ namespace Istu.NewModel
                 Magna.TraceException (nameof (IstuUtility) + "::" + nameof (GetMsSqlConnection), exception);
                 throw;
             }
+
         } // method GetDatabaseConnection
 
         /// <summary>
@@ -147,6 +149,7 @@ namespace Istu.NewModel
             '1' => "Регистрация",
             's' or 'S' => "СМС",
             _ => code.ToString()
+
         }; // switch
 
         #endregion

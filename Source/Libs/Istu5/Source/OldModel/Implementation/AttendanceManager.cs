@@ -80,6 +80,7 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             db.Insert (info);
+
         } // method RegisterAttendance
 
         /// <inheritdoc cref="IAttendanceManager.RegisterAttendances"/>
@@ -90,6 +91,7 @@ namespace Istu.OldModel.Implementation
         {
             var database = _GetDb();
             database.BulkCopy (attendances);
+
         } // method RegisterAttendances
 
         /// <inheritdoc cref="IAttendanceManager.GetAttendances"/>
@@ -105,6 +107,7 @@ namespace Istu.OldModel.Implementation
                 .ToArray();
 
             return result;
+
         } // method GetAttendances
 
         /// <inheritdoc cref="IAttendanceManager.GetLastAttendance"/>
@@ -121,6 +124,7 @@ namespace Istu.OldModel.Implementation
                 .FirstOrDefault();
 
             return result;
+
         } // method GetLastAttendance
 
         /// <inheritdoc cref="IAttendanceManager.GetLastReaders"/>

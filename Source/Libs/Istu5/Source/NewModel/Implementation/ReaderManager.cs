@@ -16,10 +16,11 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+
+using AM.Linq;
 
 using Istu.NewModel.Interfaces;
 
@@ -76,6 +77,7 @@ namespace Istu.NewModel.Implementation
             var result = db.Insert (reader);
 
             return result;
+
         } // method CreateReader
 
         /// <inheritdoc cref="IReaderManager.GetReaderByTicket"/>
@@ -89,6 +91,7 @@ namespace Istu.NewModel.Implementation
             var result = readers.FirstOrDefault (reader => reader.Ticket == ticket);
 
             return result;
+
         } // method GetReaderByTicket
 
         /// <inheritdoc cref="IReaderManager.GetReaderByTicketAndPassword"/>
@@ -111,6 +114,7 @@ namespace Istu.NewModel.Implementation
             }
 
             return result;
+
         } // method GetReaderByTicketAndPassword
 
         /// <inheritdoc cref="IReaderManager.GetReaderByBarcode"/>
@@ -124,6 +128,7 @@ namespace Istu.NewModel.Implementation
             var result = readers.FirstOrDefault (reader => reader.Barcode == barcode);
 
             return result;
+
         } // method GetReaderByBarcode
 
         /// <inheritdoc cref="IReaderManager.GetReaderByIstuID"/>
@@ -137,6 +142,7 @@ namespace Istu.NewModel.Implementation
             var result = readers.FirstOrDefault (reader => reader.IstuID == id);
 
             return result;
+
         } // method GetReaderByIstuId
 
         /// <inheritdoc cref="IReaderManager.GetReaderByRfid"/>
@@ -150,6 +156,7 @@ namespace Istu.NewModel.Implementation
             var result = readers.FirstOrDefault (reader => reader.Rfid == rfid);
 
             return result;
+
         } // method GetReaderByRfid
 
         /// <inheritdoc cref="IReaderManager.UpdateReaderInfo"/>
@@ -160,6 +167,7 @@ namespace Istu.NewModel.Implementation
         {
             var db = _GetDb();
             db.Update (reader);
+
         } // method UpdateReaderInfo
 
         /// <inheritdoc cref="IReaderManager.Reregister"/>
@@ -174,6 +182,7 @@ namespace Istu.NewModel.Implementation
             readers.Where (reader => reader.Ticket == ticket)
                 .Set (reader => reader.Reregistered, year)
                 .Update();
+
         } // method Reregister
 
         /// <inheritdoc cref="IReaderManager.DeleteReader"/>
@@ -185,6 +194,7 @@ namespace Istu.NewModel.Implementation
             var db = _GetDb();
             var readers = db.GetReaders();
             readers.Delete (reader => reader.Ticket == ticket);
+
         } // method DeleteReader
 
         /// <inheritdoc cref="IReaderManager.CheckExistence"/>
@@ -198,6 +208,7 @@ namespace Istu.NewModel.Implementation
             var result = readers.Count (reader => reader.Ticket == ticket) != 0;
 
             return result;
+
         } // method CheckExistence
 
         /// <inheritdoc cref="IReaderManager.ValidateTicketString"/>
@@ -209,6 +220,7 @@ namespace Istu.NewModel.Implementation
             var result = Regex.IsMatch (@"[0-9A-Za-zа-яА-Я\-]+", ticket);
 
             return result;
+
         } // method ValidateTicketString
 
         /// <inheritdoc cref="IReaderManager.ValidateNameString"/>
@@ -218,6 +230,7 @@ namespace Istu.NewModel.Implementation
             )
         {
             throw new NotImplementedException();
+
         } // method ValidateNameString
 
         /// <inheritdoc cref="IReaderManager.VerifyPassword"/>
@@ -233,6 +246,7 @@ namespace Istu.NewModel.Implementation
             var result = reader is not null && string.CompareOrdinal (reader.Ticket, password) == 0;
 
             return result;
+
         } // method VerifyPassword
 
         /// <inheritdoc cref="IReaderManager.FindReaders"/>
@@ -263,6 +277,7 @@ namespace Istu.NewModel.Implementation
                 );
 
             return result.ToArray();
+
         } // method FindReaders
 
         /// <inheritdoc cref="IReaderManager.Search"/>
@@ -275,6 +290,7 @@ namespace Istu.NewModel.Implementation
             var result = db.Query<Reader> (expression);
 
             return result.ToArray();
+
         } // method FindReaders
 
         /// <inheritdoc cref="IReaderManager.GetPhoto"/>
@@ -290,6 +306,7 @@ namespace Istu.NewModel.Implementation
                 .FirstOrDefault();
 
             return result;
+
         } // method GetPhoto
 
         /// <inheritdoc cref="IReaderManager.SetPhoto"/>
@@ -304,6 +321,7 @@ namespace Istu.NewModel.Implementation
             readers.Where (reader => reader.Ticket == ticket)
                 .Set (reader => reader.Photo, photo)
                 .Update();
+
         } // method SetPhoto
 
         /// <inheritdoc cref="IReaderManager.ExportPhoto"/>
@@ -325,6 +343,7 @@ namespace Istu.NewModel.Implementation
                 var fileName = Path.Combine (path, reader.Ticket + ".jpg");
                 File.WriteAllBytes (fileName, reader.Photo!);
             }
+
         } // method ExportPhoto
 
         /// <inheritdoc cref="IReaderManager.GetDopplers"/>
@@ -333,11 +352,14 @@ namespace Istu.NewModel.Implementation
             var db = _GetDb();
             var readers = db.GetReaders();
             var result = readers.GroupBy (reader => reader.Name)
-                .Where (group => group.Count() > 1)
-                .Select (group => group.Key)
+                .Where (group => @group.Count() > 1)
+                .Select (group => @group.Key)
+                .AsEnumerable()
+                .NonEmptyLines()
                 .ToArray();
 
-            return result!;
+            return result;
+
         } // method GetDopplers
 
         #endregion
@@ -352,6 +374,7 @@ namespace Istu.NewModel.Implementation
                 _dataConnection.Dispose();
                 _dataConnection = null;
             }
+
         } // method Dispose
 
         #endregion

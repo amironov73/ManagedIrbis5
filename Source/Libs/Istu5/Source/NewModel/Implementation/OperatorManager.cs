@@ -59,6 +59,7 @@ namespace Istu.NewModel.Implementation
             )
         {
             Storehouse = storehouse;
+
         } // constructor
 
         #endregion
@@ -96,6 +97,7 @@ namespace Istu.NewModel.Implementation
                 _dataConnection.Dispose();
                 _dataConnection = null;
             }
+
         } // method Dispose
 
         #endregion

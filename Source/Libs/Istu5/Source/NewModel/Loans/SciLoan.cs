@@ -45,6 +45,7 @@ namespace Istu.NewModel.Loans
             )
         {
             // TODO implement
+
         } // method FromPodsob
 
         /// <summary>
@@ -56,6 +57,7 @@ namespace Istu.NewModel.Loans
             )
         {
             // TODO implement
+
         } // method ToPodsob
 
         #endregion

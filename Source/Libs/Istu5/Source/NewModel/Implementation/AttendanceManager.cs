@@ -58,6 +58,7 @@ namespace Istu.NewModel.Implementation
             )
         {
             Storehouse = storehouse;
+
         } // constructor
 
         #endregion
@@ -80,6 +81,7 @@ namespace Istu.NewModel.Implementation
         {
             var db = _GetDb();
             db.Insert (info);
+
         } // method RegisterAttendance
 
         /// <inheritdoc cref="IAttendanceManager.RegisterAttendances"/>
@@ -90,6 +92,7 @@ namespace Istu.NewModel.Implementation
         {
             var database = _GetDb();
             database.BulkCopy (attendances);
+
         } // method RegisterAttendances
 
         /// <inheritdoc cref="IAttendanceManager.GetAttendances"/>
@@ -105,6 +108,7 @@ namespace Istu.NewModel.Implementation
                 .ToArray();
 
             return result;
+
         } // method GetAttendances
 
         /// <inheritdoc cref="IAttendanceManager.GetLastAttendance"/>
@@ -121,6 +125,7 @@ namespace Istu.NewModel.Implementation
                 .FirstOrDefault();
 
             return result;
+
         } // method GetLastAttendance
 
         /// <inheritdoc cref="IAttendanceManager.GetLastReaders"/>
@@ -148,6 +153,7 @@ namespace Istu.NewModel.Implementation
                 .ToArray();
 
             return result;
+
         } // method GetLatestReaders
 
         #endregion

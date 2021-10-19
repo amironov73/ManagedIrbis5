@@ -50,6 +50,7 @@ namespace Istu.NewModel.Implementation
             )
         {
             _storehouse = storehouse;
+
         } // constructor
 
         #endregion

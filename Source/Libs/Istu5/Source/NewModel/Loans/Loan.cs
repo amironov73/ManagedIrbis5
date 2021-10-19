@@ -237,7 +237,9 @@ namespace Istu.NewModel.Loans
 
                 using var kladovka = storehouse.GetKladovka();
                 kladovka.Insert (attendance);
-            }
+
+            } // if
+
         } // method RegisterAttendance
 
         #endregion
@@ -247,14 +249,8 @@ namespace Istu.NewModel.Loans
         /// <summary>
         /// Можно ли выдавать документ при заданных условиях?
         /// </summary>
-        public virtual bool CanGive
-            (
-                Storehouse storehouse,
-                Attendance? attendance
-            )
-        {
-            return attendance?.Ticket is not null;
-        } // method CanGive
+        public virtual bool CanGive (Storehouse storehouse, Attendance? attendance) =>
+            attendance?.Ticket is not null;
 
         /// <summary>
         /// Проверка, чтобы возврат документа производился строго
@@ -286,6 +282,7 @@ namespace Istu.NewModel.Loans
                 //     }
                 // }
             }
+
         } // method CheckAbonementOnReturn
 
         /// <summary>
@@ -298,6 +295,7 @@ namespace Istu.NewModel.Loans
             )
         {
             // Метод должен быть переопределен в наследнике
+
         } // method Give
 
         /// <summary>
@@ -310,6 +308,7 @@ namespace Istu.NewModel.Loans
             )
         {
             // Метод должен быть переопределен в наследнике
+
         } // method GiveToHand
 
         /// <summary>
@@ -322,6 +321,7 @@ namespace Istu.NewModel.Loans
             )
         {
             // Метод должен быть переопределен в наследнике
+
         } // method Return
 
         /// <summary>
@@ -334,6 +334,7 @@ namespace Istu.NewModel.Loans
             )
         {
             // Метод должен быть переопределен в наследнике
+
         } // method ReturnFromHands
 
         /// <summary>
@@ -346,6 +347,7 @@ namespace Istu.NewModel.Loans
             )
         {
             // Метод должен быть переопределен в наследнике
+
         } // method Update
 
         /// <summary>
@@ -358,6 +360,7 @@ namespace Istu.NewModel.Loans
             )
         {
             // Метод должен быть переопределен в наследнике
+
         } // method WriteOff
 
         /// <summary>
@@ -367,13 +370,7 @@ namespace Istu.NewModel.Loans
         /// <c>null</c> означает, что предпочтений по возврату нет,
         /// документ можно выдавать на любой срок.
         /// </returns>
-        public virtual DateTime? GetPreferredDeadline
-            (
-                Attendance attendance
-            )
-        {
-            return null;
-        } // method GetPreferredDeadline
+        public virtual DateTime? GetPreferredDeadline (Attendance attendance) => null;
 
         #endregion
 

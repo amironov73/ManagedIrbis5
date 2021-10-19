@@ -104,6 +104,7 @@ namespace Istu.NewModel.Implementation
             }
 
             return false;
+
         } // method CreateOrder
 
         /// <inheritdoc cref="IOrderManager.DeleteOrder"/>
@@ -129,23 +130,12 @@ namespace Istu.NewModel.Implementation
                 );
 
             return result;
+
         } // method SetOrderStatus
 
         /// <inheritdoc cref="IOrderManager.UpdateOrder"/>
-        public int UpdateOrder
-            (
-                Order order,
-                bool throwOnVerify = true
-            )
-        {
-            if (order.Verify (throwOnVerify))
-            {
-                var db = _GetDb();
-                return db.Update (order);
-            }
-
-            return -1;
-        } // method UpdateOrder
+        public int UpdateOrder (Order order, bool throwOnVerify = true) =>
+            order.Verify (throwOnVerify) ? _GetDb().Update (order) : -1;
 
         #endregion
 
@@ -159,6 +149,7 @@ namespace Istu.NewModel.Implementation
                 _dataConnection.Dispose();
                 _dataConnection = null;
             }
+
         } // method Dispose
 
         #endregion

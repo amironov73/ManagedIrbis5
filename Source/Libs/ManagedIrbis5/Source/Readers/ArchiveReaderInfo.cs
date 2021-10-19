@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* ArchiveReaderInfo.cs -- архивная информация о читателе.
+/* ArchiveReaderInfo.cs -- архивная информация о читателе
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -33,7 +33,7 @@ namespace ManagedIrbis.Readers
     /// <summary>
     /// Информация о читателе.
     /// </summary>
-    [XmlRoot("reader")]
+    [XmlRoot ("reader")]
     public sealed class ArchiveReaderInfo
         : IHandmadeSerializable
     {
@@ -49,16 +49,16 @@ namespace ManagedIrbis.Readers
         /// <summary>
         /// Номер читательского. Поле 30.
         /// </summary>
-        [Field(30)]
-        [XmlAttribute("ticket")]
-        [JsonPropertyName("ticket")]
+        [Field (30)]
+        [XmlAttribute ("ticket")]
+        [JsonPropertyName ("ticket")]
         public string? Ticket { get; set; }
 
         /// <summary>
         /// Информация о посещениях.
         /// </summary>
-        [XmlArray("visits")]
-        [JsonPropertyName("visits")]
+        [XmlArray ("visits")]
+        [JsonPropertyName ("visits")]
         public VisitInfo[]? Visits { get; set; }
 
         /// <summary>
@@ -101,15 +101,15 @@ namespace ManagedIrbis.Readers
         /// <summary>
         /// MFN записи.
         /// </summary>
-        [XmlAttribute("mfn")]
-        [JsonPropertyName("mfn")]
+        [XmlAttribute ("mfn")]
+        [JsonPropertyName ("mfn")]
         public int Mfn { get; set; }
 
         /// <summary>
         /// Flag for the reader info.
         /// </summary>
-        [XmlAttribute("marked")]
-        [JsonPropertyName("marked")]
+        [XmlAttribute ("marked")]
+        [JsonPropertyName ("marked")]
         public bool Marked { get; set; }
 
         #endregion
@@ -128,15 +128,16 @@ namespace ManagedIrbis.Readers
 
             var result = new ArchiveReaderInfo
             {
-                Ticket = record.FM(30),
+                Ticket = record.FM (30),
                 Visits = record.Fields
-                    .GetField(40)
-                    .Select(VisitInfo.Parse)
+                    .GetField (40)
+                    .Select (VisitInfo.Parse)
                     .ToArray(),
                 Mfn = record.Mfn,
             };
 
             return result;
+
         } // method Parse
 
         /// <summary>
@@ -148,9 +149,10 @@ namespace ManagedIrbis.Readers
             )
         {
             var result = SerializationUtility
-                .RestoreArrayFromFile<ArchiveReaderInfo>(fileName);
+                .RestoreArrayFromFile<ArchiveReaderInfo> (fileName);
 
             return result;
+
         } // method ReadFromFile
 
         /// <summary>
@@ -162,7 +164,8 @@ namespace ManagedIrbis.Readers
                 ArchiveReaderInfo[] readers
             )
         {
-            readers.SaveToFile(fileName);
+            readers.SaveToFile (fileName);
+
         } // method SaveToFile
 
         #endregion
@@ -175,10 +178,11 @@ namespace ManagedIrbis.Readers
                 BinaryWriter writer
             )
         {
-            writer.WritePackedInt32(Id);
-            writer.WriteNullable(Ticket);
-            writer.WriteNullableArray(Visits);
-            writer.WritePackedInt32(Mfn);
+            writer.WritePackedInt32 (Id);
+            writer.WriteNullable (Ticket);
+            writer.WriteNullableArray (Visits);
+            writer.WritePackedInt32 (Mfn);
+
         } // method SaveToStream
 
         /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
@@ -191,6 +195,7 @@ namespace ManagedIrbis.Readers
             Ticket = reader.ReadNullableString();
             Visits = reader.ReadNullableArray<VisitInfo>();
             Mfn = reader.ReadPackedInt32();
+
         } // method RestoreFromStream
 
         /// <summary>
@@ -203,16 +208,17 @@ namespace ManagedIrbis.Readers
                 Mfn = Mfn
             };
 
-            result.AddNonEmptyField(30, Ticket);
+            result.AddNonEmptyField (30, Ticket);
             if (Visits is not null)
             {
-                foreach (VisitInfo visit in Visits)
+                foreach (var visit in Visits)
                 {
-                    result.Fields.Add(visit.ToField());
+                    result.Fields.Add (visit.ToField());
                 }
             }
 
             return result;
+
         } // method ToRecord
 
         #endregion
