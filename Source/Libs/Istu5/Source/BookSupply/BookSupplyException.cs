@@ -35,7 +35,9 @@ namespace Istu.BookSupply
         /// <summary>
         /// Конструктор по умолчани.
         /// </summary>
-        public BookSupplyException() {}
+        public BookSupplyException()
+        {
+        } // constructor
 
         /// <summary>
         /// Конструктор с текстом сообщения.
@@ -44,7 +46,9 @@ namespace Istu.BookSupply
             (
                 string message
             )
-            : base (message) {}
+            : base (message)
+        {
+        } // constructor
 
         /// <summary>
         /// Конструктор с вложенным исключением.
@@ -54,7 +58,9 @@ namespace Istu.BookSupply
                 string message,
                 Exception innerException
             )
-            : base (message, innerException) {}
+            : base (message, innerException)
+        {
+        } // constructor
 
         /// <summary>
         /// Конструктор, применяемый при десериализации.
@@ -64,7 +70,9 @@ namespace Istu.BookSupply
                 SerializationInfo info,
                 StreamingContext context
             )
-            : base(info, context) {}
+            : base (info, context)
+        {
+        } // constructor
 
         #endregion
 

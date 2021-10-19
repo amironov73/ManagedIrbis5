@@ -54,39 +54,39 @@ namespace ManagedIrbis.Menus
     /// <summary>
     /// Спецификация ввода данных с помощью ИРБИС-меню.
     /// </summary>
-    [XmlRoot("menu")]
+    [XmlRoot ("menu")]
     public sealed class MenuSpecification
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Properties
 
         /// <summary>
         /// Имя файла (с расширением). Обязательно.
         /// </summary>
-        [XmlAttribute("file")]
-        [JsonPropertyName("file")]
+        [XmlAttribute ("file")]
+        [JsonPropertyName ("file")]
         public string? FileName { get; set; }
 
         /// <summary>
         /// Имя базы данных. Обязательно.
         /// </summary>
-        [XmlAttribute("db")]
-        [JsonPropertyName("db")]
+        [XmlAttribute ("db")]
+        [JsonPropertyName ("db")]
         public string? Database { get; set; }
 
         /// <summary>
         /// Код пути.
         /// </summary>
-        [XmlAttribute("path")]
-        [JsonPropertyName("path")]
+        [XmlAttribute ("path")]
+        [JsonPropertyName ("path")]
         public IrbisPath Path { get; set; }
 
         /// <summary>
         /// Метод сортировки.
         /// </summary>
-        [XmlAttribute("sort")]
-        [JsonPropertyName("sort")]
+        [XmlAttribute ("sort")]
+        [JsonPropertyName ("sort")]
         public int SortMode { get; set; }
 
         #endregion
@@ -94,13 +94,9 @@ namespace ManagedIrbis.Menus
         #region Public methods
 
         /// <summary>
-        /// Convert <see cref="FileSpecification"/> to menu specification.
+        /// Преобразование <see cref="FileSpecification"/> в спецификацию меню.
         /// </summary>
-        public static MenuSpecification FromFileSpecification
-            (
-                FileSpecification specification
-            )
-            => new ()
+        public static MenuSpecification FromFileSpecification (FileSpecification specification) => new ()
             {
                 Database = specification.Database,
                 Path = specification.Path,
@@ -108,7 +104,7 @@ namespace ManagedIrbis.Menus
             };
 
         /// <summary>
-        /// Parse the text.
+        /// Разбор текстового представления спецификации.
         /// </summary>
         public static MenuSpecification Parse
             (
@@ -120,17 +116,18 @@ namespace ManagedIrbis.Menus
                 Path = IrbisPath.MasterFile
             };
 
-            if (!string.IsNullOrEmpty(text))
+            if (!string.IsNullOrEmpty (text))
             {
-                var navigator = new TextNavigator(text);
-                result.FileName = navigator.ReadUntil('\\').ToString();
+                var navigator = new ValueTextNavigator (text);
+                result.FileName = navigator.ReadUntil ('\\').ToString();
                 if (navigator.PeekChar() == '\\')
                 {
                     navigator.ReadChar();
                 }
+
                 if (!navigator.IsEOF)
                 {
-                    var db = navigator.ReadUntil('\\').ToString();
+                    var db = navigator.ReadUntil ('\\').ToString();
                     if (navigator.PeekChar() == '\\')
                     {
                         navigator.ReadChar();
@@ -141,45 +138,37 @@ namespace ManagedIrbis.Menus
                     if (!navigator.IsEOF)
                     {
                         var sortText = navigator.GetRemainingText().ToString();
-                        int.TryParse(sortText, out var sortMode);
+                        int.TryParse (sortText, out var sortMode);
                         result.SortMode = sortMode;
                     }
-                }
-            }
+
+                } // if
+
+            } // if
 
             return result;
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Should serialize <see cref="Database"/> field?
         /// </summary>
-        public bool ShouldSerializeDatabase()
-        {
-            return !string.IsNullOrEmpty(Database);
-        }
+        public bool ShouldSerializeDatabase() => !string.IsNullOrEmpty (Database);
 
         /// <summary>
         /// Should serialize <see cref="SortMode"/> field?
         /// </summary>
-        public bool ShouldSerializeSortMode()
-        {
-            return SortMode != 0;
-        }
+        public bool ShouldSerializeSortMode() => SortMode != 0;
 
         /// <summary>
         /// Convert menu specification to <see cref="FileSpecification"/>.
         /// </summary>
-        public FileSpecification ToFileSpecification()
-        {
-            var result = new FileSpecification
-                {
-                    Path = Path,
-                    Database = Database,
-                    FileName = FileName.ThrowIfNull("FileName")
-                };
-
-            return result;
-        }
+        public FileSpecification ToFileSpecification() => new ()
+            {
+                Path = Path,
+                Database = Database,
+                FileName = FileName.ThrowIfNull()
+            };
 
         #endregion
 
@@ -191,13 +180,14 @@ namespace ManagedIrbis.Menus
                 BinaryReader reader
             )
         {
-            Sure.NotNull(reader, nameof(reader));
+            Sure.NotNull (reader);
 
             FileName = reader.ReadNullableString();
             Database = reader.ReadNullableString();
             Path = (IrbisPath) reader.ReadPackedInt32();
             SortMode = reader.ReadPackedInt32();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -205,14 +195,15 @@ namespace ManagedIrbis.Menus
                 BinaryWriter writer
             )
         {
-            Sure.NotNull(writer, nameof(writer));
+            Sure.NotNull (writer);
 
             writer
-                .WriteNullable(FileName)
-                .WriteNullable(Database)
-                .WritePackedInt32((int)Path)
-                .WritePackedInt32(SortMode);
-        }
+                .WriteNullable (FileName)
+                .WriteNullable (Database)
+                .WritePackedInt32 ((int)Path)
+                .WritePackedInt32 (SortMode);
+
+        } // method SaveToStream
 
         #endregion
 
@@ -224,18 +215,12 @@ namespace ManagedIrbis.Menus
                 bool throwOnError
             )
         {
-            var verifier
-                = new Verifier<MenuSpecification>
-                    (
-                        this,
-                        throwOnError
-                    );
-
-            verifier
-                .NotNullNorEmpty(FileName, "FileName");
+            var verifier = new Verifier<MenuSpecification> (this, throwOnError);
+            verifier.NotNullNorEmpty (FileName);
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 

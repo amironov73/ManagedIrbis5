@@ -56,12 +56,11 @@ namespace Istu.BookSupply
             {
                 foreach (var semester in array)
                 {
-                    result |= (Semester) (1 << (semester - 1));
+                    result |= (Semester)(1 << (semester - 1));
                 }
             }
 
             return result;
-
         } // method FromArray
 
         /// <summary>
@@ -97,7 +96,7 @@ namespace Istu.BookSupply
             {
                 var parts = value.Split
                     (
-                        new [] { ' ', ';', ',' },
+                        new[] { ' ', ';', ',' },
                         StringSplitOptions.RemoveEmptyEntries
                     );
 
@@ -105,19 +104,16 @@ namespace Istu.BookSupply
                 {
                     try
                     {
-                        result |= (Semester) (1 << (int.Parse (semester, CultureInfo.InvariantCulture) - 1));
+                        result |= (Semester)(1 << (int.Parse (semester, CultureInfo.InvariantCulture) - 1));
                     }
                     catch
                     {
-                        result |= (Semester) Enum.Parse (typeof (Semester), semester);
+                        result |= (Semester)Enum.Parse (typeof (Semester), semester);
                     }
-
                 } // foreach
-
             } // if
 
             return result;
-
         } // method Parse
 
         /// <summary>
@@ -128,18 +124,16 @@ namespace Istu.BookSupply
                 Semester value
             )
         {
-            var result = new LocalList <int> ();
+            var result = new LocalList<int>();
             for (var i = 0; i < 32; i++)
             {
-                if (((int) value & (1 << i)) != 0)
+                if (((int)value & (1 << i)) != 0)
                 {
                     result.Add (i + 1);
                 }
-
             } // for
 
-            return result.ToArray ();
-
+            return result.ToArray();
         } // method ToArray
 
         /// <summary>
@@ -158,17 +152,16 @@ namespace Istu.BookSupply
                 result.Add ((semester + 1) / 2);
             }
 
-            return result.ToArray ();
-
+            return result.ToArray();
         } // method ToCourses
 
         /// <summary>
         /// Преобразует перечисление семестров в строку.
         /// </summary>
-        public static string ToString(Semester value)
+        public static string ToString (Semester value)
             => value == Semester.None
                 ? NoneString
-                : string.Join (";", ToArray(value));
+                : string.Join (";", ToArray (value));
 
         #endregion
 

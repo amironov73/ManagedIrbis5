@@ -58,7 +58,6 @@ namespace Istu.OldModel.Implementation
             )
         {
             Storehouse = storehouse;
-
         } // constructor
 
         #endregion
@@ -81,7 +80,6 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             db.Insert (info);
-
         } // method RegisterAttendance
 
         /// <inheritdoc cref="IAttendanceManager.RegisterAttendances"/>
@@ -92,7 +90,6 @@ namespace Istu.OldModel.Implementation
         {
             var database = _GetDb();
             database.BulkCopy (attendances);
-
         } // method RegisterAttendances
 
         /// <inheritdoc cref="IAttendanceManager.GetAttendances"/>
@@ -108,7 +105,6 @@ namespace Istu.OldModel.Implementation
                 .ToArray();
 
             return result;
-
         } // method GetAttendances
 
         /// <inheritdoc cref="IAttendanceManager.GetLastAttendance"/>
@@ -125,7 +121,6 @@ namespace Istu.OldModel.Implementation
                 .FirstOrDefault();
 
             return result;
-
         } // method GetLastAttendance
 
         /// <inheritdoc cref="IAttendanceManager.GetLastReaders"/>
@@ -140,16 +135,16 @@ namespace Istu.OldModel.Implementation
             var attendances = db.GetAttendances();
             var readers = db.GetReaders();
             var result = readers.Join
-                (
-                    attendances.Where (attendance => attendance.Type == "a")
-                        .OrderByDescending (attendance => attendance.Moment),
-                    reader => reader.Ticket,
-                    attendance => attendance.Ticket,
-                    (reader, attendance) => reader
-                )
-                .Take(howMany)
+                    (
+                        attendances.Where (attendance => attendance.Type == "a")
+                            .OrderByDescending (attendance => attendance.Moment),
+                        reader => reader.Ticket,
+                        attendance => attendance.Ticket,
+                        (reader, attendance) => reader
+                    )
+                .Take (howMany)
                 .ToArray()
-                .Distinct(new ReaderComparer())
+                .Distinct (new ReaderComparer())
                 .ToArray();
 
             return result;

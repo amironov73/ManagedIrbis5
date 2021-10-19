@@ -36,7 +36,6 @@ namespace Istu.OldModel.Loans
     {
         #region Loan members
 
-
         #endregion
 
     } // class MagLoan

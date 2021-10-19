@@ -50,7 +50,6 @@ namespace Istu.OldModel.Implementation
             )
         {
             _storehouse = storehouse;
-
         } // constructor
 
         #endregion
@@ -58,6 +57,7 @@ namespace Istu.OldModel.Implementation
         #region Private members
 
         private readonly Storehouse _storehouse;
+
         // private DataConnection? _dataConnection;
 
         // private DataConnection _GetPodsob() => _dataConnection ??= _storehouse.GetKladovka();
@@ -67,103 +67,103 @@ namespace Istu.OldModel.Implementation
         #region ILoanManager members
 
         /// <inheritdoc cref="ILoanManager.GetLoans"/>
-        public Loan[] GetLoans(string ticket)
+        public Loan[] GetLoans (string ticket)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.GetSciLoan"/>
-        public Loan GetSciLoan(string inventory)
+        public Loan GetSciLoan (string inventory)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.GetUchLoan"/>
-        public Loan GetUchLoan(string barcode)
+        public Loan GetUchLoan (string barcode)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.GetUchLoanByRfid"/>
-        public Loan GetUchLoanByRfid(string rfid)
+        public Loan GetUchLoanByRfid (string rfid)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.GiveBooks"/>
-        public void GiveBooks(Attendance attendance, IEnumerable<Loan> loans)
+        public void GiveBooks (Attendance attendance, IEnumerable<Loan> loans)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.ReturnBooks"/>
-        public void ReturnBooks(Attendance attendance, IEnumerable<Loan> loans)
+        public void ReturnBooks (Attendance attendance, IEnumerable<Loan> loans)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.WriteOffBooks"/>
-        public void WriteOffBooks(IEnumerable<Loan> loans)
+        public void WriteOffBooks (IEnumerable<Loan> loans)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.Update"/>
-        public void Update(Loan loan)
+        public void Update (Loan loan)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.GetLongestLoan"/>
-        public DateTime GetLongestLoan(string abonement, Reader reader, DateTime proposed)
+        public DateTime GetLongestLoan (string abonement, Reader reader, DateTime proposed)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.GetMaximumLoans"/>
-        public int GetMaximumLoans(string abonement, Reader reader, int proposed)
+        public int GetMaximumLoans (string abonement, Reader reader, int proposed)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.GetLoanedInventories"/>
-        public int[] GetLoanedInventories(int @from, int to)
+        public int[] GetLoanedInventories (int @from, int to)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.GiveToHands"/>
-        public void GiveToHands(Attendance attendance, IEnumerable<Loan> loans)
+        public void GiveToHands (Attendance attendance, IEnumerable<Loan> loans)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.ReturnFromHands"/>
-        public void ReturnFromHands(Attendance attendance, IEnumerable<Loan> loans)
+        public void ReturnFromHands (Attendance attendance, IEnumerable<Loan> loans)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.SetAlert"/>
-        public void SetAlert(Loan loan, string text)
+        public void SetAlert (Loan loan, string text)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.ListUchLoans"/>
-        public Loan[] ListUchLoans(string cardNumber)
+        public Loan[] ListUchLoans (string cardNumber)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.WriteOffByCard"/>
-        public void WriteOffByCard(string cardNumber)
+        public void WriteOffByCard (string cardNumber)
         {
             throw new NotImplementedException();
         }
 
         /// <inheritdoc cref="ILoanManager.SetSeen"/>
-        public void SetSeen(IEnumerable<Loan> loans, DateTime when, int operatorID)
+        public void SetSeen (IEnumerable<Loan> loans, DateTime when, int operatorID)
         {
             throw new NotImplementedException();
         }

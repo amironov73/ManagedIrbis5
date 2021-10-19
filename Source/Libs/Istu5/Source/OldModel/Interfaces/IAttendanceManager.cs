@@ -31,29 +31,29 @@ namespace Istu.OldModel.Interfaces
         /// <summary>
         /// Регистрация посещения.
         /// </summary>
-        void RegisterAttendance(Attendance info);
+        void RegisterAttendance (Attendance info);
 
         /// <summary>
         /// Регистрация нескольких посещений сразу.
         /// </summary>
-        void RegisterAttendances(IEnumerable<Attendance> attendances);
+        void RegisterAttendances (IEnumerable<Attendance> attendances);
 
         /// <summary>
         /// Получение всех посещений для указанного читательского билета.
         /// </summary>
-        Attendance[] GetAttendances(string ticket);
+        Attendance[] GetAttendances (string ticket);
 
         /// <summary>
         /// Получение последнего по времени посещения
         /// для указанного читательского билета.
         /// </summary>
-        Attendance? GetLastAttendance(string ticket);
+        Attendance? GetLastAttendance (string ticket);
 
         /// <summary>
         /// Получение последних по времени читателей,
         /// посещавших библиотеку.
         /// </summary>
-        Reader[] GetLastReaders(int howMany = 200);
+        Reader[] GetLastReaders (int howMany = 200);
 
     } // interface IAttendanceManager
 

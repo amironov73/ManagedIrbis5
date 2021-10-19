@@ -37,7 +37,7 @@ namespace RqstShrink
 {
     internal class Program
     {
-        private static int Main(string[] args)
+        private static int Main (string[] args)
         {
             try
             {
@@ -46,83 +46,83 @@ namespace RqstShrink
 
                 // Включаем конфигурирование в appsettings.json
                 var config = new ConfigurationBuilder()
-                    .SetBasePath(AppContext.BaseDirectory)
-                    .AddJsonFile("appsettings.json", true)
+                    .SetBasePath (AppContext.BaseDirectory)
+                    .AddJsonFile ("appsettings.json", true)
                     .Build();
 
-                var connectionString = config.GetValue<string>("ConnectionString");
-                if (string.IsNullOrEmpty(connectionString))
+                var connectionString = config.GetValue<string> ("ConnectionString");
+                if (string.IsNullOrEmpty (connectionString))
                 {
-                    Error.WriteLine("Connection string not specified");
+                    Error.WriteLine ("Connection string not specified");
 
                     return 1;
                 }
 
-                var rootCommand = new RootCommand("RqstShrink");
-                var csArgument = new Argument("cs")
+                var rootCommand = new RootCommand ("RqstShrink");
+                var csArgument = new Argument ("cs")
                 {
-                    ArgumentType = typeof(string),
+                    ArgumentType = typeof (string),
                     Arity = ArgumentArity.ZeroOrOne,
                     Description = "Connection string"
                 };
-                var exprOption = new Option("-e", "Search expression", typeof(string));
-                rootCommand.AddArgument(csArgument);
-                rootCommand.AddOption(exprOption);
-                var builder = new CommandLineBuilder(rootCommand).Build();
-                var parseResult = builder.Parse(args);
-                var csValue = parseResult.ValueForArgument<string>(csArgument);
-                if (!string.IsNullOrEmpty(csValue))
+                var exprOption = new Option ("-e", "Search expression", typeof (string));
+                rootCommand.AddArgument (csArgument);
+                rootCommand.AddOption (exprOption);
+                var builder = new CommandLineBuilder (rootCommand).Build();
+                var parseResult = builder.Parse (args);
+                var csValue = parseResult.ValueForArgument<string> (csArgument);
+                if (!string.IsNullOrEmpty (csValue))
                 {
                     connectionString = csValue;
                 }
 
                 using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
                 {
-                    connection.ParseConnectionString(connectionString);
+                    connection.ParseConnectionString (connectionString);
                     if (!connection.Connect())
                     {
-                        Error.WriteLine("Can't connect");
-                        Error.WriteLine(IrbisException.GetErrorDescription(connection.LastError));
+                        Error.WriteLine ("Can't connect");
+                        Error.WriteLine (IrbisException.GetErrorDescription (connection.LastError));
 
                         return 1;
                     }
 
                     var maxMfn = connection.GetMaxMfn();
 
-                    var expression = config.GetValue<string>("Expression");
-                    var expressionValue = parseResult.ValueForOption<string>(exprOption);
-                    if (!string.IsNullOrEmpty(expressionValue))
+                    var expression = config.GetValue<string> ("Expression");
+                    var expressionValue = parseResult.ValueForOption<string> (exprOption);
+                    if (!string.IsNullOrEmpty (expressionValue))
                     {
                         expression = expressionValue;
                     }
 
                     expression = expression.ThrowIfNull();
 
-                    Write("Reading good records ");
+                    Write ("Reading good records ");
 
                     var goodRecords = BatchRecordReader.Search
-                        (
-                            connection,
-                            connection.Database!,
-                            expression,
-                            1000,
-                            batch => Write(".")
-                        )
+                            (
+                                connection,
+                                connection.Database!,
+                                expression,
+                                1000,
+                                batch => Write (".")
+                            )
                         .ToArray();
 
                     WriteLine();
-                    WriteLine ( $"Good records loaded: {goodRecords.Length}" );
+                    WriteLine ($"Good records loaded: {goodRecords.Length}");
 
                     if (goodRecords.Length == maxMfn)
                     {
-                        WriteLine("No truncation needed, exiting");
+                        WriteLine ("No truncation needed, exiting");
 
                         return 0;
                     }
 
-                    connection.TruncateDatabase(connection.Database);
+                    connection.TruncateDatabase (connection.Database);
 
-                    WriteLine("Database truncated");
+                    WriteLine ("Database truncated");
 
                     using (var writer = new BatchRecordWriter
                         (
@@ -135,19 +135,19 @@ namespace RqstShrink
                         {
                             record.Version = 0;
                             record.Mfn = 0;
-                            writer.Append(record);
+                            writer.Append (record);
                         }
                     }
                 }
 
-                WriteLine("Good records restored");
+                WriteLine ("Good records restored");
 
                 stopwatch.Stop();
-                WriteLine ( $"Elapsed: {stopwatch.Elapsed.ToAutoString()}" );
+                WriteLine ($"Elapsed: {stopwatch.Elapsed.ToAutoString()}");
             }
             catch (Exception ex)
             {
-                Error.WriteLine(ex);
+                Error.WriteLine (ex);
 
                 return 1;
             }

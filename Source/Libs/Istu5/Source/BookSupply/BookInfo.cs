@@ -37,31 +37,31 @@ namespace Istu.BookSupply
         /// <summary>
         /// Количество экземпляров.
         /// </summary>
-        [JsonPropertyName("amount")]
+        [JsonPropertyName ("amount")]
         public int Amount { get; set; }
 
         /// <summary>
         /// Автор(ы).
         /// </summary>
-        [JsonPropertyName("author")]
+        [JsonPropertyName ("author")]
         public string? Author { get; set; }
 
         /// <summary>
         /// Номер карточки комлектования.
         /// </summary>
-        [JsonPropertyName("card")]
+        [JsonPropertyName ("card")]
         public string? CardNumber { get; set; }
 
         /// <summary>
         /// Библиографическое описание.
         /// </summary>
-        [JsonPropertyName("description")]
+        [JsonPropertyName ("description")]
         public string? Description { get; set; }
 
         /// <summary>
         /// Электронный учебник?
         /// </summary>
-        [JsonPropertyName("electronic")]
+        [JsonPropertyName ("electronic")]
         public bool IsElectronic { get; set; }
 
         /// <summary>
@@ -85,49 +85,50 @@ namespace Istu.BookSupply
         /// <summary>
         /// Гриф УМО.
         /// </summary>
-        [JsonPropertyName("stamp")]
+        [JsonPropertyName ("stamp")]
         public string? Stamp { get; set; }
 
         /// <summary>
         /// Год издания.
         /// </summary>
-        [JsonPropertyName("year")]
+        [JsonPropertyName ("year")]
         public string? Year { get; set; }
 
         /// <summary>
-        /// Книжная серия (например, "Науки о Земле" или "Из истории мировой культуры").
+        /// Книжная серия (например, "Науки о Земле" или
+        /// "Из истории мировой культуры").
         /// </summary>
-        [JsonPropertyName("series")]
+        [JsonPropertyName ("series")]
         public string? Series { get; set; }
 
         /// <summary>
         /// Издающая организация (издательство).
         /// </summary>
-        [JsonPropertyName("publisher")]
+        [JsonPropertyName ("publisher")]
         public string? Publisher { get; set; }
 
         /// <summary>
         /// Место издания (город).
         /// </summary>
-        [JsonPropertyName("city")]
+        [JsonPropertyName ("city")]
         public string? City { get; set; }
 
         /// <summary>
         /// Номер тома (если есть).
         /// </summary>
-        [JsonPropertyName("volume")]
+        [JsonPropertyName ("volume")]
         public string? Volume { get; set; }
 
         /// <summary>
         /// Авторский знак (упорядчение на полке).
         /// </summary>
-        [JsonPropertyName("sign")]
+        [JsonPropertyName ("sign")]
         public string? AuthorSign { get; set; }
 
         /// <summary>
         /// Полочный индекс (расстановочный шифр).
         /// </summary>
-        [JsonPropertyName("shelf")]
+        [JsonPropertyName ("shelf")]
         public string? ShelfCode { get; set; }
 
         #endregion

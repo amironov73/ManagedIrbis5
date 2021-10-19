@@ -46,7 +46,6 @@ namespace Istu.BookSupply
             };
 
             return result;
-
         } // method DecodeRecord
 
         #endregion

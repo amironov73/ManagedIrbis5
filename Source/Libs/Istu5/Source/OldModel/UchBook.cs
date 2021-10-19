@@ -29,7 +29,7 @@ namespace Istu.OldModel
     /// <summary>
     /// Книга учебного фонда.
     /// </summary>
-    [Table("uchtrans")]
+    [Table ("uchtrans")]
     public sealed class UchBook
     {
         #region Properties
@@ -109,7 +109,7 @@ namespace Istu.OldModel
         /// <summary>
         /// Находится на руках у читателя, номер билета.
         /// </summary>
-        [Column("onhand")]
+        [Column ("onhand")]
         public string? OnHand { get; set; }
 
         /// <summary>

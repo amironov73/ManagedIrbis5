@@ -35,9 +35,8 @@ namespace Istu.OldModel.Loans
     {
         #region Loan members
 
-
         #endregion
 
     } // class HudLoan
 
-} // class HudLoan
+} // namespace Istu.OldModel.Loans

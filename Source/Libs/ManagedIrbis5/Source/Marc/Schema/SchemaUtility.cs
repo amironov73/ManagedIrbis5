@@ -43,12 +43,12 @@ namespace ManagedIrbis.Marc.Schema
                 string attributeName
             )
         {
-            string value = element
-                .Attribute(attributeName)
-                .ThrowIfNull("element.Attribute")
+            var value = element
+                .Attribute (attributeName)
+                .ThrowIfNull()
                 .Value;
 
-            return value.SameString("y");
+            return value.SameString ("y");
         }
 
         /// <summary>
@@ -61,13 +61,13 @@ namespace ManagedIrbis.Marc.Schema
                 bool defaultValue
             )
         {
-            var attribute = element.Attribute(attributeName);
-            if (ReferenceEquals(attribute, null))
+            var attribute = element.Attribute (attributeName);
+            if (ReferenceEquals (attribute, null))
             {
                 return defaultValue;
             }
 
-            return attribute.Value.SameString("y");
+            return attribute.Value.SameString ("y");
         }
 
         /// <summary>
@@ -80,15 +80,15 @@ namespace ManagedIrbis.Marc.Schema
                 string attributeName
             )
         {
-            var attribute = element.Attribute(attributeName);
-            if (ReferenceEquals(attribute, null))
+            var attribute = element.Attribute (attributeName);
+            if (ReferenceEquals (attribute, null))
             {
                 return '\0';
             }
 
-            string value = attribute.Value;
+            var value = attribute.Value;
 
-            return string.IsNullOrEmpty(value)
+            return string.IsNullOrEmpty (value)
                 ? '\0'
                 : value[0];
         }
@@ -103,13 +103,13 @@ namespace ManagedIrbis.Marc.Schema
                 int defaultValue
             )
         {
-            var attribute = element.Attribute(attributeName);
-            if (ReferenceEquals(attribute, null))
+            var attribute = element.Attribute (attributeName);
+            if (ReferenceEquals (attribute, null))
             {
                 return defaultValue;
             }
 
-            if (!int.TryParse(attribute.Value, out var result))
+            if (!int.TryParse (attribute.Value, out var result))
             {
                 result = defaultValue;
             }
@@ -120,15 +120,8 @@ namespace ManagedIrbis.Marc.Schema
         /// <summary>
         /// Get attribute text for element.
         /// </summary>
-        public static string? GetAttributeText
-            (
-                this XElement element,
-                string attributeName
-            )
-            =>
-            element.Attribute(attributeName)
-                .ThrowIfNull("attribute")
-                .Value;
+        public static string? GetAttributeText (this XElement element, string attributeName) =>
+            element.Attribute (attributeName).ThrowIfNull().Value;
 
         /// <summary>
         /// Get attribute text for element.
@@ -139,8 +132,7 @@ namespace ManagedIrbis.Marc.Schema
                 string attributeName,
                 string? defaultValue
             )
-            =>
-            element.Attribute(attributeName)?.Value ?? defaultValue;
+            => element.Attribute (attributeName)?.Value ?? defaultValue;
 
         /// <summary>
         /// Get attribute text for element.
@@ -151,9 +143,7 @@ namespace ManagedIrbis.Marc.Schema
                 string elementName,
                 string? defaultValue
             )
-        {
-            return element.Element(elementName)?.Value ?? defaultValue;
-        }
+            => element.Element (elementName)?.Value ?? defaultValue;
 
         /// <summary>
         /// Get inner XML for the element.
@@ -163,12 +153,12 @@ namespace ManagedIrbis.Marc.Schema
                 this XElement element
             )
         {
-            XmlReader reader = element.CreateReader();
+            var reader = element.CreateReader();
             reader.MoveToContent();
 
             return reader.ReadInnerXml();
-        }
 
+        } // method GetInnerXml
 
         /// <summary>
         /// Get inner XML for child element.
@@ -179,13 +169,13 @@ namespace ManagedIrbis.Marc.Schema
                 string elementName
             )
         {
-            var subElement = element.Element(elementName);
-            if (ReferenceEquals(subElement, null))
+            var subElement = element.Element (elementName);
+            if (ReferenceEquals (subElement, null))
             {
                 return null;
             }
 
-            XmlReader reader = subElement.CreateReader();
+            var reader = subElement.CreateReader();
             reader.MoveToContent();
 
             return reader.ReadInnerXml();
@@ -199,13 +189,13 @@ namespace ManagedIrbis.Marc.Schema
                 this XAttribute attribute
             )
         {
-            string value = attribute.Value;
+            var value = attribute.Value;
 
-            return value.SameString("y");
+            return value.SameString ("y");
         }
 
         /// <summary>
-        /// Convert schema to JSON.
+        /// Преобразование схемы в JSON.
         /// </summary>
         public static string ToJson
             (
@@ -226,11 +216,11 @@ namespace ManagedIrbis.Marc.Schema
             // return result;
 
             throw new NotImplementedException();
-        }
+
+        } // method ToJson
 
         #endregion
 
     } // class SchemaUtility
 
 } // namespace ManagedIrbis.Marc.Schema
-

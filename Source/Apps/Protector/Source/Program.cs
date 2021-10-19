@@ -34,11 +34,11 @@ namespace Protector
 
     class Program
     {
-        static void Main(string[] args)
+        static void Main (string[] args)
         {
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: protector <string-to-protect>");
+                Console.WriteLine ("Usage: protector <string-to-protect>");
             }
             else
             {
@@ -56,16 +56,17 @@ namespace Protector
                         source = Console.ReadLine().ThrowIfNull();
                     }
 
-                    var decrypted = ConfigurationUtility.Unprotect(source);
-                    Console.WriteLine(decrypted);
+                    var decrypted = ConfigurationUtility.Unprotect (source);
+                    Console.WriteLine (decrypted);
                 }
                 else
                 {
-                    var encrypted = ConfigurationUtility.Protect(source);
-                    Console.WriteLine(encrypted);
+                    var encrypted = ConfigurationUtility.Protect (source);
+                    Console.WriteLine (encrypted);
                 }
             }
         }
+
     } // class Program
 
 } // namespace Protector

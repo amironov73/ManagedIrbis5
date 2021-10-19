@@ -30,8 +30,8 @@ namespace Istu.OldModel
     /// <summary>
     /// Книга художественного фонда.
     /// </summary>
-    [Table("hudtrans")]
-    [DebuggerDisplay("{Inventory}: {Ticket}")]
+    [Table ("hudtrans")]
+    [DebuggerDisplay ("{Inventory}: {Ticket}")]
     public sealed class HudBook
     {
         #region Properties

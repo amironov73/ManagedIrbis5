@@ -83,7 +83,7 @@ namespace Istu.OldModel
         /// <summary>
         /// Создание менеджера операторов.
         /// </summary>
-        public IOperatorManager CreateOperatorManager() => new OperatorManager(this);
+        public IOperatorManager CreateOperatorManager() => new OperatorManager (this);
 
         /// <summary>
         /// Создание менеджера заказов.
@@ -98,14 +98,14 @@ namespace Istu.OldModel
         /// <summary>
         /// Подключается к базе <c>kladovka</c>.
         /// </summary>
-        public DataConnection GetKladovka() => IstuUtility.GetMsSqlConnection(_kladovkaConnectionString);
+        public DataConnection GetKladovka() => IstuUtility.GetMsSqlConnection (_kladovkaConnectionString);
 
         #endregion
 
         #region IServiceProvider members
 
         /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService (Type serviceType) => _serviceProvider.GetService(serviceType);
+        public object? GetService (Type serviceType) => _serviceProvider.GetService (serviceType);
 
         #endregion
 

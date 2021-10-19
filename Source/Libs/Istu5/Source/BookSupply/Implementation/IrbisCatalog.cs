@@ -40,7 +40,7 @@ namespace Istu.BookSupply.Implementation
         #region Properties
 
         /// <summary>
-        /// Провайдер.
+        /// Синхронный провайдер.
         /// </summary>
         public ISyncProvider Provider => _provider;
 
@@ -54,7 +54,8 @@ namespace Istu.BookSupply.Implementation
         public IrbisCatalog()
         {
             _provider = ConnectionUtility.GetConnectionFromConfig();
-        }
+
+        } // constructor
 
         /// <summary>
         /// Конструктор для служебных целей.
@@ -65,7 +66,8 @@ namespace Istu.BookSupply.Implementation
             )
         {
             _provider = provider;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -88,7 +90,7 @@ namespace Istu.BookSupply.Implementation
         #region ICatalog members
 
         /// <inheritdoc cref="ICatalog.FormatRecord"/>
-        public string? FormatRecord(int mfn, string? format = null) =>
+        public string? FormatRecord (int mfn, string? format = null) =>
             _provider.FormatRecord (format ?? IrbisFormat.Brief, mfn);
 
         /// <inheritdoc cref="ICatalog.ListTerms"/>

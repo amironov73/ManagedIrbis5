@@ -60,7 +60,6 @@ namespace Istu.OldModel.Implementation
             )
         {
             Storehouse = storehouse;
-
         } // constructor
 
         #endregion
@@ -105,7 +104,6 @@ namespace Istu.OldModel.Implementation
             }
 
             return false;
-
         } // method CreateOrder
 
         /// <inheritdoc cref="IOrderManager.DeleteOrder"/>
@@ -131,7 +129,6 @@ namespace Istu.OldModel.Implementation
                 );
 
             return result;
-
         } // method SetOrderStatus
 
         /// <inheritdoc cref="IOrderManager.UpdateOrder"/>
@@ -144,11 +141,10 @@ namespace Istu.OldModel.Implementation
             if (order.Verify (throwOnVerify))
             {
                 var db = _GetDb();
-                return db.Update(order);
+                return db.Update (order);
             }
 
             return -1;
-
         } // method UpdateOrder
 
         #endregion
@@ -163,7 +159,6 @@ namespace Istu.OldModel.Implementation
                 _dataConnection.Dispose();
                 _dataConnection = null;
             }
-
         } // method Dispose
 
         #endregion

@@ -49,7 +49,6 @@ namespace Istu.OldModel.Implementation
             )
         {
             _storehouse = storehouse;
-
         } // constructor
 
         #endregion
@@ -74,10 +73,9 @@ namespace Istu.OldModel.Implementation
             // TODO верифицировать читателя
 
             var db = _GetDb();
-            var result = db.Insert(reader);
+            var result = db.Insert (reader);
 
             return result;
-
         } // method CreateReader
 
         /// <inheritdoc cref="IReaderManager.GetReaderByTicket"/>
@@ -88,10 +86,9 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             var readers = db.GetReaders();
-            var result = readers.FirstOrDefault(reader => reader.Ticket == ticket);
+            var result = readers.FirstOrDefault (reader => reader.Ticket == ticket);
 
             return result;
-
         } // method GetReaderByTicket
 
         /// <inheritdoc cref="IReaderManager.GetReaderByTicketAndPassword"/>
@@ -103,18 +100,17 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             var readers = db.GetReaders();
-            var result = readers.FirstOrDefault(reader => reader.Ticket == ticket);
+            var result = readers.FirstOrDefault (reader => reader.Ticket == ticket);
             if (result is not null)
             {
                 // если пароль не совпадает, считаем, что читатель не найден
-                if (string.CompareOrdinal(result.Password, password) != 0)
+                if (string.CompareOrdinal (result.Password, password) != 0)
                 {
                     result = null;
                 }
             }
 
             return result;
-
         } // method GetReaderByTicketAndPassword
 
         /// <inheritdoc cref="IReaderManager.GetReaderByBarcode"/>
@@ -125,10 +121,9 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             var readers = db.GetReaders();
-            var result = readers.FirstOrDefault(reader => reader.Barcode == barcode);
+            var result = readers.FirstOrDefault (reader => reader.Barcode == barcode);
 
             return result;
-
         } // method GetReaderByBarcode
 
         /// <inheritdoc cref="IReaderManager.GetReaderByIstuID"/>
@@ -139,10 +134,9 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             var readers = db.GetReaders();
-            var result = readers.FirstOrDefault(reader => reader.IstuID == id);
+            var result = readers.FirstOrDefault (reader => reader.IstuID == id);
 
             return result;
-
         } // method GetReaderByIstuId
 
         /// <inheritdoc cref="IReaderManager.GetReaderByRfid"/>
@@ -156,7 +150,6 @@ namespace Istu.OldModel.Implementation
             var result = readers.FirstOrDefault (reader => reader.Rfid == rfid);
 
             return result;
-
         } // method GetReaderByRfid
 
         /// <inheritdoc cref="IReaderManager.UpdateReaderInfo"/>
@@ -167,7 +160,6 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             db.Update (reader);
-
         } // method UpdateReaderInfo
 
         /// <inheritdoc cref="IReaderManager.Reregister"/>
@@ -178,11 +170,10 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             var readers = db.GetReaders();
-            var year = (short) DateTime.Today.Year;
+            var year = (short)DateTime.Today.Year;
             readers.Where (reader => reader.Ticket == ticket)
                 .Set (reader => reader.Reregistered, year)
                 .Update();
-
         } // method Reregister
 
         /// <inheritdoc cref="IReaderManager.DeleteReader"/>
@@ -194,7 +185,6 @@ namespace Istu.OldModel.Implementation
             var db = _GetDb();
             var readers = db.GetReaders();
             readers.Delete (reader => reader.Ticket == ticket);
-
         } // method DeleteReader
 
         /// <inheritdoc cref="IReaderManager.CheckExistence"/>
@@ -208,7 +198,6 @@ namespace Istu.OldModel.Implementation
             var result = readers.Count (reader => reader.Ticket == ticket) != 0;
 
             return result;
-
         } // method CheckExistence
 
         /// <inheritdoc cref="IReaderManager.ValidateTicketString"/>
@@ -217,10 +206,9 @@ namespace Istu.OldModel.Implementation
                 string ticket
             )
         {
-            var result = Regex.IsMatch(@"[0-9A-Za-zа-яА-Я\-]+", ticket);
+            var result = Regex.IsMatch (@"[0-9A-Za-zа-яА-Я\-]+", ticket);
 
             return result;
-
         } // method ValidateTicketString
 
         /// <inheritdoc cref="IReaderManager.ValidateNameString"/>
@@ -230,7 +218,6 @@ namespace Istu.OldModel.Implementation
             )
         {
             throw new NotImplementedException();
-
         } // method ValidateNameString
 
         /// <inheritdoc cref="IReaderManager.VerifyPassword"/>
@@ -242,11 +229,10 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             var readers = db.GetReaders();
-            var reader = readers.FirstOrDefault(reader => reader.Ticket == ticket);
-            var result = reader is not null && string.CompareOrdinal(reader.Ticket, password) == 0;
+            var reader = readers.FirstOrDefault (reader => reader.Ticket == ticket);
+            var result = reader is not null && string.CompareOrdinal (reader.Ticket, password) == 0;
 
             return result;
-
         } // method VerifyPassword
 
         /// <inheritdoc cref="IReaderManager.FindReaders"/>
@@ -268,16 +254,15 @@ namespace Istu.OldModel.Implementation
                 ReaderSearchCriteria.Group => "group",
                 ReaderSearchCriteria.Category => "category",
                 ReaderSearchCriteria.Department => "department",
-                _ => throw new ArgumentException(nameof(criteria))
+                _ => throw new ArgumentException (nameof (criteria))
             };
             var result = db.Query<Reader>
                 (
                     $"select top {max} * from {readers.TableName} where [{column}] like @mask order by [name]",
-                    new DataParameter("mask", mask)
+                    new DataParameter ("mask", mask)
                 );
 
             return result.ToArray();
-
         } // method FindReaders
 
         /// <inheritdoc cref="IReaderManager.Search"/>
@@ -287,10 +272,9 @@ namespace Istu.OldModel.Implementation
             )
         {
             var db = _GetDb();
-            var result = db.Query<Reader>(expression);
+            var result = db.Query<Reader> (expression);
 
             return result.ToArray();
-
         } // method FindReaders
 
         /// <inheritdoc cref="IReaderManager.GetPhoto"/>
@@ -306,7 +290,6 @@ namespace Istu.OldModel.Implementation
                 .FirstOrDefault();
 
             return result;
-
         } // method GetPhoto
 
         /// <inheritdoc cref="IReaderManager.SetPhoto"/>
@@ -321,7 +304,6 @@ namespace Istu.OldModel.Implementation
             readers.Where (reader => reader.Ticket == ticket)
                 .Set (reader => reader.Photo, photo)
                 .Update();
-
         } // method SetPhoto
 
         /// <inheritdoc cref="IReaderManager.ExportPhoto"/>
@@ -330,9 +312,9 @@ namespace Istu.OldModel.Implementation
                 string path
             )
         {
-            if (!Directory.Exists(path))
+            if (!Directory.Exists (path))
             {
-                Directory.CreateDirectory(path);
+                Directory.CreateDirectory (path);
             }
 
             var db = _GetDb();
@@ -340,10 +322,9 @@ namespace Istu.OldModel.Implementation
             var havePhoto = readers.Where (reader => reader.Photo != null);
             foreach (var reader in havePhoto)
             {
-                var fileName = Path.Combine(path, reader.Ticket + ".jpg");
+                var fileName = Path.Combine (path, reader.Ticket + ".jpg");
                 File.WriteAllBytes (fileName, reader.Photo!);
             }
-
         } // method ExportPhoto
 
         /// <inheritdoc cref="IReaderManager.GetDopplers"/>
@@ -351,13 +332,12 @@ namespace Istu.OldModel.Implementation
         {
             var db = _GetDb();
             var readers = db.GetReaders();
-            var result = readers.GroupBy(reader => reader.Name)
-                .Where(group => group.Count() > 1)
-                .Select(group => group.Key)
+            var result = readers.GroupBy (reader => reader.Name)
+                .Where (group => group.Count() > 1)
+                .Select (group => group.Key)
                 .ToArray();
 
             return result!;
-
         } // method GetDopplers
 
         #endregion

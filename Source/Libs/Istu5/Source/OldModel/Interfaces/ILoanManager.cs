@@ -35,67 +35,67 @@ namespace Istu.OldModel.Interfaces
         /// <summary>
         ///
         /// </summary>
-        Loan[] GetLoans(string ticket);
+        Loan[] GetLoans (string ticket);
 
         /// <summary>
         ///
         /// </summary>
-        Loan GetSciLoan(string inventory);
+        Loan GetSciLoan (string inventory);
 
         /// <summary>
         ///
         /// </summary>
-        Loan GetUchLoan(string barcode);
+        Loan GetUchLoan (string barcode);
 
         /// <summary>
         ///
         /// </summary>
-        Loan GetUchLoanByRfid(string rfid);
+        Loan GetUchLoanByRfid (string rfid);
 
         /// <summary>
         ///
         /// </summary>
-        void GiveBooks(Attendance attendance, IEnumerable<Loan> loans);
+        void GiveBooks (Attendance attendance, IEnumerable<Loan> loans);
 
         /// <summary>
         ///
         /// </summary>
-        void ReturnBooks(Attendance attendance, IEnumerable<Loan> loans);
+        void ReturnBooks (Attendance attendance, IEnumerable<Loan> loans);
 
         /// <summary>
         ///
         /// </summary>
-        void WriteOffBooks(IEnumerable<Loan> loans);
+        void WriteOffBooks (IEnumerable<Loan> loans);
 
         /// <summary>
         ///
         /// </summary>
-        void Update(Loan loan);
+        void Update (Loan loan);
 
         /// <summary>
         ///
         /// </summary>
-        DateTime GetLongestLoan(string abonement, Reader reader, DateTime proposed);
+        DateTime GetLongestLoan (string abonement, Reader reader, DateTime proposed);
 
         /// <summary>
         ///
         /// </summary>
-        int GetMaximumLoans(string abonement, Reader reader, int proposed);
+        int GetMaximumLoans (string abonement, Reader reader, int proposed);
 
         /// <summary>
         ///
         /// </summary>
-        int[] GetLoanedInventories(int from, int to);
+        int[] GetLoanedInventories (int from, int to);
 
         /// <summary>
         ///
         /// </summary>
-        void GiveToHands(Attendance attendance, IEnumerable<Loan> loans);
+        void GiveToHands (Attendance attendance, IEnumerable<Loan> loans);
 
         /// <summary>
         ///
         /// </summary>
-        void ReturnFromHands(Attendance attendance, IEnumerable<Loan> loans);
+        void ReturnFromHands (Attendance attendance, IEnumerable<Loan> loans);
 
         // /// <summary>
         // ///
@@ -105,7 +105,7 @@ namespace Istu.OldModel.Interfaces
         /// <summary>
         ///
         /// </summary>
-        void SetAlert(Loan loan, string text);
+        void SetAlert (Loan loan, string text);
 
         // /// <summary>
         // ///
@@ -124,12 +124,12 @@ namespace Istu.OldModel.Interfaces
         /// <summary>
         /// Lists the loans for given card number.
         /// </summary>
-        Loan[] ListUchLoans(string cardNumber);
+        Loan[] ListUchLoans (string cardNumber);
 
         /// <summary>
         ///
         /// </summary>
-        void WriteOffByCard(string cardNumber);
+        void WriteOffByCard (string cardNumber);
 
         // /// <summary>
         // /// Получаем список просроченных экземпляров
@@ -147,7 +147,5 @@ namespace Istu.OldModel.Interfaces
                 DateTime when,
                 int operatorID
             );
-
     } // interface ILoanManager
-
 } // namespace Istu.OldModel.Interfaces

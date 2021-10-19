@@ -17,6 +17,7 @@
 
 using System;
 using System.Linq;
+
 using AM;
 
 using Istu.BookSupply.Implementation;
@@ -54,7 +55,6 @@ namespace Istu.BookSupply
             services.AddTransient<ICatalog, IrbisCatalog>();
 
             return services;
-
         } // method AddBookSupply
 
         /// <summary>
@@ -67,16 +67,15 @@ namespace Istu.BookSupply
         {
             try
             {
-                var result = SqlServerTools.CreateDataConnection(connectionString);
+                var result = SqlServerTools.CreateDataConnection (connectionString);
 
                 return result;
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof (SupplyUtility) + "::" + nameof(GetMsSqlConnection), exception);
+                Magna.TraceException (nameof (SupplyUtility) + "::" + nameof (GetMsSqlConnection), exception);
                 throw;
             }
-
         } // method GetDatabaseConnection
 
         /// <summary>

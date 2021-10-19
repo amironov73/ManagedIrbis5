@@ -30,7 +30,7 @@ namespace Istu.OldModel
     /// Событие книговыдачи, в т. ч. посещение библиотеки.
     /// </summary>
     [Table]
-    [DebuggerDisplay("{Moment}: {Ticket}: {Ticket}: {Number}")]
+    [DebuggerDisplay ("{Moment}: {Ticket}: {Ticket}: {Number}")]
     public class Attendance
     {
         #region Constants
@@ -121,7 +121,7 @@ namespace Istu.OldModel
         /// <summary>
         /// Тип посещения.
         /// </summary>
-        [Column(Name = "typ")]
+        [Column (Name = "typ")]
         public string? Type { get; set; }
 
         /// <summary>

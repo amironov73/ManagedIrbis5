@@ -16,7 +16,9 @@
 
 using System;
 using System.Linq;
+
 using Istu.OldModel.Interfaces;
+
 using LinqToDB;
 using LinqToDB.Data;
 
@@ -57,7 +59,6 @@ namespace Istu.OldModel.Implementation
             )
         {
             Storehouse = storehouse;
-
         } // constructor
 
         #endregion
@@ -95,7 +96,6 @@ namespace Istu.OldModel.Implementation
                 _dataConnection.Dispose();
                 _dataConnection = null;
             }
-
         } // method Dispose
 
         #endregion

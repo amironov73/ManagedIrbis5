@@ -40,7 +40,6 @@ namespace Istu.BookSupply
                 ITypeDescriptorContext context,
                 Type sourceType
             )
-
             => sourceType == typeof (string) || base.CanConvertFrom (context, sourceType);
 
 
@@ -50,7 +49,6 @@ namespace Istu.BookSupply
                 ITypeDescriptorContext context,
                 Type destinationType
             )
-
             => destinationType == typeof (string) || base.CanConvertTo (context, destinationType);
 
         /// <inheritdoc cref="TypeConverter.ConvertFrom(ITypeDescriptorContext,CultureInfo,object)"/>
@@ -60,27 +58,25 @@ namespace Istu.BookSupply
                 CultureInfo culture,
                 object? value
             )
-
             => value switch
             {
                 string text => SemesterUtility.Parse (text),
-                _ => base.ConvertFrom (context, culture, value)
-                    .ThrowIfNull (nameof (ConvertFrom))
+
+                _ => base.ConvertFrom (context, culture, value).ThrowIfNull()
             };
 
         /// <inheritdoc cref="TypeConverter.ConvertTo(ITypeDescriptorContext,CultureInfo,object,Type)"/>
         public override object ConvertTo
-        (
-            ITypeDescriptorContext context,
-            CultureInfo culture,
-            object? value,
-            Type destinationType
-        )
-
+            (
+                ITypeDescriptorContext context,
+                CultureInfo culture,
+                object? value,
+                Type destinationType
+            )
             => value is Semester semester
                 ? SemesterUtility.ToString (semester)
                 : base.ConvertTo (context, culture, value, destinationType)
-                    .ThrowIfNull (nameof (ConvertTo));
+                    .ThrowIfNull();
 
         #endregion
 

@@ -32,14 +32,14 @@ namespace Istu.OldModel
         #region IEqualityComparer<T> members
 
         /// <inheritdoc cref="IEqualityComparer{T}.Equals(T,T)"/>
-        public bool Equals(Reader? x, Reader? y) =>
-            string.CompareOrdinal(x?.Ticket, y?.Ticket) == 0;
+        public bool Equals (Reader? x, Reader? y) =>
+            string.CompareOrdinal (x?.Ticket, y?.Ticket) == 0;
 
         /// <inheritdoc cref="IEqualityComparer{T}.GetHashCode(T)"/>
-        public int GetHashCode(Reader obj) => obj.Ticket?.GetHashCode() ?? 0;
+        public int GetHashCode (Reader obj) => obj.Ticket?.GetHashCode() ?? 0;
 
         #endregion
 
     } // class ReaderComparer
 
-} // namespace IstuOldModel
+} // namespace Istu.OldModel

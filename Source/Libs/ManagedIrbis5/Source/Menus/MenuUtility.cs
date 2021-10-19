@@ -52,19 +52,20 @@ namespace ManagedIrbis.Menus
             )
         {
             var value = $"{parent.Code}{TreeLine.Delimiter}{parent.Comment}";
-            var result = new TreeLine(value);
+            var result = new TreeLine (value);
             var children = menu.Entries
-                .Where(v => ReferenceEquals(v.OtherEntry, parent))
-                .OrderBy(v => v.Code)
+                .Where (v => ReferenceEquals (v.OtherEntry, parent))
+                .OrderBy (v => v.Code)
                 .ToArray();
 
             foreach (var child in children)
             {
-                var subItem = _BuildLine(child, menu);
-                result.Children.Add(subItem);
+                var subItem = _BuildLine (child, menu);
+                result.Children.Add (subItem);
             }
 
             return result;
+
         } // method _BuildLine
 
         #endregion
@@ -81,17 +82,18 @@ namespace ManagedIrbis.Menus
                 T? value
             )
         {
-            if (ReferenceEquals(value, null))
+            if (ReferenceEquals (value, null))
             {
-                menu.Add(code, string.Empty);
+                menu.Add (code, string.Empty);
             }
             else
             {
-                var textValue = Utility.ConvertTo<string>(value);
-                menu.Add(code, textValue);
+                var textValue = Utility.ConvertTo<string> (value);
+                menu.Add (code, textValue);
             }
 
             return menu;
+
         } // method Add
 
         /// <summary>
@@ -106,12 +108,13 @@ namespace ManagedIrbis.Menus
             return menu.Entries
                 .Where
                     (
-                        entry => entry.Code.SameString(code)
-                                 || MenuFile.TrimCode(entry.Code.ThrowIfNull("entry.Code"))
-                                     .SameString(code)
+                        entry => entry.Code.SameString (code)
+                                 || MenuFile.TrimCode (entry.Code.ThrowIfNull())
+                                     .SameString (code)
                     )
-                .Select(entry => entry.Comment)
+                .Select (entry => entry.Comment)
                 .ToArray();
+
         } // method CollectStrings
 
         /// <summary>
@@ -127,11 +130,12 @@ namespace ManagedIrbis.Menus
                 T? defaultValue = default
             )
         {
-            var found = menu.FindEntry(code);
+            var found = menu.FindEntry (code);
 
             return found is null
                 ? defaultValue
-                : Utility.ConvertTo<T>(found.Comment);
+                : Utility.ConvertTo<T> (found.Comment);
+
         } // method GetValue
 
         /// <summary>
@@ -147,11 +151,11 @@ namespace ManagedIrbis.Menus
                 T? defaultValue = default
             )
         {
-            var found = menu.FindEntrySensitive(code);
+            var found = menu.FindEntrySensitive (code);
 
             return found is null
                 ? defaultValue
-                : Utility.ConvertTo<T>(found.Comment);
+                : Utility.ConvertTo<T> (found.Comment);
         } // method GetValueSensitive
 
         /// <summary>
@@ -166,9 +170,10 @@ namespace ManagedIrbis.Menus
             {
                 WriteIndented = true
             };
-            var result = JsonSerializer.Serialize(menu.Entries, options);
+            var result = JsonSerializer.Serialize (menu.Entries, options);
 
             return result;
+
         } // method ToJson
 
         /// <summary>
@@ -180,11 +185,12 @@ namespace ManagedIrbis.Menus
             )
         {
             var entries = JsonSerializer
-                .Deserialize<NonNullCollection<MenuEntry>>(text)
+                .Deserialize<NonNullCollection<MenuEntry>> (text)
                 .ThrowIfNull();
-            var result = new MenuFile(entries);
+            var result = new MenuFile (entries);
 
             return result;
+
         } // method FromJson
 
         /// <summary>
@@ -196,7 +202,7 @@ namespace ManagedIrbis.Menus
                 string fileName
             )
         {
-            var contents = JsonSerializer.Serialize(menu.Entries);
+            var contents = JsonSerializer.Serialize (menu.Entries);
 
             File.WriteAllText
                 (
@@ -204,6 +210,7 @@ namespace ManagedIrbis.Menus
                     contents,
                     IrbisEncoding.Utf8
                 );
+
         } // method SaveLocalJsonFile
 
         /// <summary>
@@ -219,9 +226,10 @@ namespace ManagedIrbis.Menus
                     fileName,
                     IrbisEncoding.Utf8
                 );
-            var result = FromJson(text);
+            var result = FromJson (text);
 
             return result;
+
         } // method ParseLocalJsonFile
 
         /// <summary>
@@ -240,76 +248,74 @@ namespace ManagedIrbis.Menus
 
             foreach (var entry in menu.Entries)
             {
-                entry.Code = entry.Code.ThrowIfNull("entryCode").Trim();
+                entry.Code = entry.Code.ThrowIfNull().Trim();
             }
 
             foreach (var first in menu.Entries)
             {
-                if (first is not null)
+                var firstCode = first.Code;
+                if (string.IsNullOrEmpty (firstCode))
                 {
-                    var firstCode = first.Code;
-                    if (string.IsNullOrEmpty(firstCode))
+                    continue;
+                }
+
+                foreach (var second in menu.Entries)
+                {
+                    var secondCode = second.Code;
+                    if (string.IsNullOrEmpty (secondCode))
                     {
                         continue;
                     }
 
-                    foreach (var second in menu.Entries)
+                    if (ReferenceEquals (first, second))
                     {
-                        if (second is not null)
+                        continue;
+                    }
+
+                    if (firstCode.SameString (secondCode))
+                    {
+                        continue;
+                    }
+
+                    if (firstCode.StartsWith (secondCode))
+                    {
+                        var otherEntry = first.OtherEntry;
+                        if (otherEntry is null)
                         {
-                            var secondCode = second.Code;
-                            if (string.IsNullOrEmpty(secondCode))
+                            first.OtherEntry = second;
+                        }
+                        else
+                        {
+                            var otherCode = otherEntry.Code;
+                            if (!string.IsNullOrEmpty (otherCode))
                             {
-                                continue;
-                            }
-
-                            if (ReferenceEquals(first, second))
-                            {
-                                continue;
-                            }
-
-                            if (firstCode.SameString(secondCode))
-                            {
-                                continue;
-                            }
-
-                            if (firstCode.StartsWith(secondCode))
-                            {
-                                var otherEntry = first.OtherEntry;
-                                if (otherEntry is null)
+                                if (secondCode.Length > otherCode.Length)
                                 {
                                     first.OtherEntry = second;
                                 }
-                                else
-                                {
-                                    var otherCode = otherEntry.Code;
-                                    if (!string.IsNullOrEmpty(otherCode))
-                                    {
-                                        if (secondCode.Length > otherCode.Length)
-                                        {
-                                            first.OtherEntry = second;
-                                        }
-                                    }
-                                }
                             }
                         }
-                    }
-                }
-            }
+
+                    } // if
+
+                } // foreach
+
+            } // foreach
 
             var roots = menu.Entries
-                .Where(entry => ReferenceEquals(entry.OtherEntry, null))
-                .OrderBy(entry => entry.Code)
+                .Where (entry => ReferenceEquals (entry.OtherEntry, null))
+                .OrderBy (entry => entry.Code)
                 .ToArray();
 
             var result = new TreeFile();
             foreach (var root in roots)
             {
-                var item = _BuildLine(root, menu);
-                result.Roots.Add(item);
+                var item = _BuildLine (root, menu);
+                result.Roots.Add (item);
             }
 
             return result;
+
         } // method ToTree
 
         /// <summary>
@@ -328,13 +334,14 @@ namespace ManagedIrbis.Menus
             };
             var output = new StringBuilder();
             var namespaces = new XmlSerializerNamespaces();
-            namespaces.Add(string.Empty, string.Empty);
+            namespaces.Add (string.Empty, string.Empty);
 
-            using var writer = XmlWriter.Create(output, settings);
-            var serializer = new XmlSerializer(typeof(MenuFile));
-            serializer.Serialize(writer, menu, namespaces);
+            using var writer = XmlWriter.Create (output, settings);
+            var serializer = new XmlSerializer (typeof (MenuFile));
+            serializer.Serialize (writer, menu, namespaces);
 
             return output.ToString();
+
         } // method ToXml
 
         /// <summary>
@@ -349,16 +356,17 @@ namespace ManagedIrbis.Menus
                 FileSpecification specification
             )
         {
-            var content = connection.ReadTextFile(specification);
-            if (string.IsNullOrEmpty(content))
+            var content = connection.ReadTextFile (specification);
+            if (string.IsNullOrEmpty (content))
             {
                 return null;
             }
 
-            using var reader = new StringReader(content);
-            var result = MenuFile.ParseStream(reader);
+            using var reader = new StringReader (content);
+            var result = MenuFile.ParseStream (reader);
 
             return result;
+
         } // method ReadMenu
 
         /// <summary>
@@ -373,16 +381,17 @@ namespace ManagedIrbis.Menus
                 FileSpecification specification
             )
         {
-            var content = await connection.ReadTextFileAsync(specification);
-            if (string.IsNullOrEmpty(content))
+            var content = await connection.ReadTextFileAsync (specification);
+            if (string.IsNullOrEmpty (content))
             {
                 return null;
             }
 
-            using var reader = new StringReader(content);
-            var result = MenuFile.ParseStream(reader);
+            using var reader = new StringReader (content);
+            var result = MenuFile.ParseStream (reader);
 
             return result;
+
         } // method ReadMenuAsync
 
         /// <summary>
@@ -391,12 +400,8 @@ namespace ManagedIrbis.Menus
         /// <param name="connection">Подключение к ИРБИС-серверу.</param>
         /// <param name="specification">Спецификация файла.</param>
         /// <returns>Прочитанное меню (либо выбрасывает исключение).</returns>
-        public static MenuFile RequireMenu
-            (
-                this ISyncProvider connection,
-                FileSpecification specification
-            )
-            => connection.ReadMenu(specification).ThrowIfNull("RequireMenu");
+        public static MenuFile RequireMenu (this ISyncProvider connection, FileSpecification specification) =>
+            connection.ReadMenu (specification).ThrowIfNull();
 
         /// <summary>
         /// Чтение меню с ИРБИС-сервера в асинхронном режиме.
@@ -410,8 +415,9 @@ namespace ManagedIrbis.Menus
                 FileSpecification specification
             )
         {
-            var result = await connection.ReadMenuAsync(specification);
-            return result.ThrowIfNull("RequireMenuAsync");
+            var result = await connection.ReadMenuAsync (specification);
+
+            return result.ThrowIfNull();
 
         } // method RequireMenuAsync
 

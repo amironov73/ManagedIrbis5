@@ -70,7 +70,6 @@ namespace Istu.OldModel
             // TODO: implement
 
             return true;
-
         } // method Verify
 
         #endregion

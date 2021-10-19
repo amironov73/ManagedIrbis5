@@ -115,15 +115,15 @@ namespace Istu.OldModel
         {
             string? line;
             var result = new List<UslugaDescription>();
-            using var reader = new StreamReader(fileName);
+            using var reader = new StreamReader (fileName);
             while ((line = reader.ReadLine()) != null)
             {
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     continue;
                 }
 
-                var parts = line.Split(';');
+                var parts = line.Split (';');
                 if (parts.Length != 3)
                 {
                     continue;
@@ -132,11 +132,10 @@ namespace Istu.OldModel
                 var usluga = new UslugaDescription
                 {
                     Title = parts[0],
-                    Price = decimal.Parse(parts[1], CultureInfo.InvariantCulture),
+                    Price = decimal.Parse (parts[1], CultureInfo.InvariantCulture),
                     Unit = parts[2]
                 };
-                result.Add(usluga);
-
+                result.Add (usluga);
             } // while
 
             return result.ToArray();

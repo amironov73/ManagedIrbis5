@@ -30,71 +30,70 @@ namespace Istu.OldModel.Interfaces
     public interface IReaderManager
         : IDisposable
     {
-
         /// <summary>
         /// Создание читателя.
         /// </summary>
-        int CreateReader(Reader reader);
+        int CreateReader (Reader reader);
 
         /// <summary>
         /// Получение информации о читателе по читательскому билету.
         /// </summary>
-        Reader? GetReaderByTicket(string ticket);
+        Reader? GetReaderByTicket (string ticket);
 
         /// <summary>
         /// Получение информации о читателе по читательскому билету и паролю.
         /// </summary>
-        Reader? GetReaderByTicketAndPassword(string ticket, string password);
+        Reader? GetReaderByTicketAndPassword (string ticket, string password);
 
         /// <summary>
         /// Поиск читателя по штрих-коду.
         /// </summary>
-        Reader? GetReaderByBarcode(string barcode);
+        Reader? GetReaderByBarcode (string barcode);
 
         /// <summary>
         /// Поиск читателя по идентификатору в MIRA.
         /// </summary>
-        Reader? GetReaderByIstuID(int id);
+        Reader? GetReaderByIstuID (int id);
 
         /// <summary>
         /// Поиск читателя по RFID.
         /// </summary>
-        Reader? GetReaderByRfid(string rfid);
+        Reader? GetReaderByRfid (string rfid);
 
         /// <summary>
         /// Обновление данных читателя.
         /// </summary>
-        void UpdateReaderInfo(Reader reader);
+        void UpdateReaderInfo (Reader reader);
 
         /// <summary>
         /// Перерегистрация читателя в текущем году.
         /// </summary>
-        void Reregister(string ticket);
+        void Reregister (string ticket);
 
         /// <summary>
         /// Удаление читателя из базы.
         /// </summary>
-        void DeleteReader(string ticket);
+        void DeleteReader (string ticket);
 
         /// <summary>
         /// Проверка существования читателя с указанным номером билета.
         /// </summary>
-        bool CheckExistence(string ticket);
+        bool CheckExistence (string ticket);
 
         /// <summary>
         /// Проверка, что строка имеет верный синтаксис.
         /// </summary>
-        bool ValidateTicketString(string ticket);
+        bool ValidateTicketString (string ticket);
 
         /// <summary>
         /// Проверка, что строка имеет верный синтаксис.
         /// </summary>
-        bool ValidateNameString(string name);
+        bool ValidateNameString (string name);
 
         /// <summary>
         /// Проверка пароля (правильно введен или нет?).
         /// </summary>
-        bool VerifyPassword(string ticket, string password);
+        bool VerifyPassword (string ticket, string password);
 
         /// <summary>
         /// Поиск читателей с похожими фамилиями.
@@ -115,17 +114,17 @@ namespace Istu.OldModel.Interfaces
         /// <summary>
         /// Получение фотографии читателя.
         /// </summary>
-        byte[]? GetPhoto(string ticket);
+        byte[]? GetPhoto (string ticket);
 
         /// <summary>
         /// Установка фотографии для читателя.
         /// </summary>
-        void SetPhoto(string ticket, byte[]? photo);
+        void SetPhoto (string ticket, byte[]? photo);
 
         /// <summary>
         /// Экспорт всех фото в указанную папку.
         /// </summary>
-        void ExportPhoto(string path);
+        void ExportPhoto (string path);
 
         /// <summary>
         /// Получение списка двойников.

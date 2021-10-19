@@ -53,6 +53,7 @@ namespace Istu.BookSupply
         /// <summary>
         /// Назначение числа студентов.
         /// </summary>
+
         // float?
         public int Students { get; set; }
 

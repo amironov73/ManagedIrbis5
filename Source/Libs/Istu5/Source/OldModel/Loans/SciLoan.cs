@@ -45,7 +45,6 @@ namespace Istu.OldModel.Loans
             )
         {
             // TODO implement
-
         } // method FromPodsob
 
         /// <summary>
@@ -57,7 +56,6 @@ namespace Istu.OldModel.Loans
             )
         {
             // TODO implement
-
         } // method ToPodsob
 
         #endregion
@@ -82,12 +80,11 @@ namespace Istu.OldModel.Loans
             }
 
             var podsob = new Podsob();
-            ToPodsob(podsob);
+            ToPodsob (podsob);
 
             using var kladovka = storehouse.GetKladovka();
-            kladovka.Insert(podsob);
-            RegisterAttendance(storehouse, attendance);
-
+            kladovka.Insert (podsob);
+            RegisterAttendance (storehouse, attendance);
         } // method Give
 
         /// <inheritdoc cref="Loan.Return"/>
@@ -101,7 +98,6 @@ namespace Istu.OldModel.Loans
             {
                 throw new InvalidOperationException();
             }
-
         } // method Return
 
         /// <inheritdoc cref="Loan.CanGive"/>
@@ -112,7 +108,6 @@ namespace Istu.OldModel.Loans
             )
         {
             return IsFree;
-
         } // method CanGive
 
         #endregion

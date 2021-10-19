@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ReturnMnu.cs -- обертка над файлом RETURN.MNU
@@ -18,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Threading.Tasks;
 
 using AM;
 
@@ -38,7 +38,7 @@ namespace ManagedIrbis.Menus
         #region Constants
 
         /// <summary>
-        /// Default file name.
+        /// Имя файла меню по умолчанию.
         /// </summary>
         public const string DefaultFileName = "return.mnu";
 
@@ -47,19 +47,19 @@ namespace ManagedIrbis.Menus
         #region Nested classes
 
         /// <summary>
-        /// Item.
+        /// Отдельный элемент меню. Содержит дату и комментарий.
         /// </summary>
         public sealed class Item
         {
             #region Properties
 
             /// <summary>
-            /// Date.
+            /// Дата.
             /// </summary>
             public DateTime Date { get; set; }
 
             /// <summary>
-            /// Comment.
+            /// Комментарий в произвольной форме. Чаще всего пустой.
             /// </summary>
             public string? Comment { get; set; }
 
@@ -68,58 +68,58 @@ namespace ManagedIrbis.Menus
             #region Construction
 
             /// <summary>
-            /// Constructor.
+            /// Конструктор.
             /// </summary>
             public Item()
             {
-            }
+            } // constructor
 
             /// <summary>
-            /// Constructor.
+            /// Конструктор.
             /// </summary>
             public Item
                 (
                     MenuEntry entry
                 )
             {
-                Sure.NotNull(entry, nameof(entry));
+                Sure.NotNull (entry);
 
-                string code = entry.Code.ThrowIfNull(nameof(entry.Code));
+                var code = entry.Code.ThrowIfNull();
                 Comment = entry.Comment;
-                if (code.StartsWith("@"))
+                if (code.StartsWith ("@"))
                 {
                     Date = DateTime.ParseExact
                         (
-                            code.Substring(1),
+                            code [1..],
                             "dd.MM.yyyy",
                             CultureInfo.InvariantCulture
                         );
                 }
                 else
                 {
-                    Date = DateTime.Today.AddDays(int.Parse(code));
+                    Date = DateTime.Today.AddDays (int.Parse (code));
                 }
-            }
+
+            } // constructor
 
             #endregion
 
             #region Object members
 
             /// <inheritdoc cref="object.ToString" />
-            public override string ToString()
-            {
-                return $"{Date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture)} {Comment}";
-            }
+            public override string ToString() =>
+                $"{Date.ToString ("dd.MM.yyyy", CultureInfo.InvariantCulture)} {Comment}";
 
             #endregion
-        }
+
+        } // class Item
 
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// Items.
+        /// Элементы меню.
         /// </summary>
         public List<Item> Items { get; }
 
@@ -128,28 +128,29 @@ namespace ManagedIrbis.Menus
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public ReturnMnu
             (
                 MenuFile menu
             )
         {
-            Sure.NotNull(menu, nameof(menu));
+            Sure.NotNull (menu);
 
             Items = new List<Item>();
-            foreach (MenuEntry entry in menu.Entries)
+            foreach (var entry in menu.Entries)
             {
-                Items.Add(new Item(entry));
+                Items.Add (new Item (entry));
             }
-        }
+
+        } // cosnstructor
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Read RETURN.MNU from server connection.
+        /// Чтение RETURN.MNU с сервера.
         /// </summary>
         public static ReturnMnu FromConnection
             (
@@ -157,62 +158,41 @@ namespace ManagedIrbis.Menus
                 string fileName = DefaultFileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
             var specification = new FileSpecification
-                {
-                    Path = IrbisPath.MasterFile,
-                    Database = StandardDatabases.Readers,
-                    FileName = DefaultFileName
-                };
-            var menu = MenuFile.ReadFromServer(connection, specification);
-            menu = menu.ThrowIfNull(nameof(menu));
-            var result = new ReturnMnu(menu!);
+            {
+                Path = IrbisPath.MasterFile,
+                Database = StandardDatabases.Readers,
+                FileName = DefaultFileName
+            };
+            var menu = MenuFile.ReadFromServer (connection, specification);
+            menu = menu.ThrowIfNull();
+            var result = new ReturnMnu (menu);
 
             return result;
-        }
+
+        } // method FromConnection
 
         /// <summary>
-        /// Read RETURN.MNU from the local file.
+        /// Чтение RETURN.MNU из локального файла.
         /// </summary>
         public static ReturnMnu FromFile
             (
                 string fileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
-            var menu = MenuFile.ParseLocalFile(fileName);
-            var result = new ReturnMnu(menu);
+            var menu = MenuFile.ParseLocalFile (fileName);
+            var result = new ReturnMnu (menu);
 
             return result;
-        }
 
-//        /// <summary>
-//        /// Read RETURN.MNU from the provider.
-//        /// </summary>
-////        public static ReturnMnu FromProvider
-//            (
-//                IrbisProvider provider,
-//                string fileName = DefaultFileName
-//            )
-//        {
-//            Sure.NotNull(provider, nameof(provider));
-//            Sure.NotNullNorEmpty(fileName, nameof(fileName));
-//
-//            FileSpecification specification = new FileSpecification
-//                (
-//                    IrbisPath.MasterFile,
-//                    StandardDatabases.Readers,
-//                    fileName
-//                );
-//            MenuFile menu = provider.ReadMenuFile(specification)
-//                .ThrowIfNull(nameof(menu));
-//            ReturnMnu result = new ReturnMnu(menu);
-//
-//            return result;
-//        }
+        } // method FromFile
 
         #endregion
-    }
-}
+
+    } // class ReturnMnu
+
+} // namespace ManagedIrbis.Menus

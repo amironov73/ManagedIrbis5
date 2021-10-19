@@ -60,17 +60,17 @@ namespace Istu.OldModel
         {
             var result = new List<Service>();
 
-            using (var reader = new StreamReader(fileName))
+            using (var reader = new StreamReader (fileName))
             {
                 string? line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (string.IsNullOrEmpty(line))
+                    if (string.IsNullOrEmpty (line))
                     {
                         continue;
                     }
 
-                    var parts = line.Split(';');
+                    var parts = line.Split (';');
                     if (parts.Length != 3)
                     {
                         continue;
@@ -79,10 +79,10 @@ namespace Istu.OldModel
                     var service = new Service
                     {
                         Title = parts[0],
-                        Price = int.Parse(parts[1]),
+                        Price = int.Parse (parts[1]),
                         Unit = parts[2]
                     };
-                    result.Add(service);
+                    result.Add (service);
                 }
             }
 

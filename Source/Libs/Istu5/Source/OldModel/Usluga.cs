@@ -32,7 +32,7 @@ namespace Istu.OldModel
     /// </summary>
     [Serializable]
     [Table ("uslugi")]
-    [DebuggerDisplay("{Moment} {Ticket}")]
+    [DebuggerDisplay ("{Moment} {Ticket}")]
     public sealed class Usluga
     {
         #region Properties
@@ -112,7 +112,6 @@ namespace Istu.OldModel
         #endregion
 
         #region Public methods
-
 
         #endregion
 

@@ -58,7 +58,6 @@ namespace Istu.OldModel
             services.AddTransient<IOrderManager, OrderManager>();
 
             return services;
-
         } // method AddOldModel
 
         /// <summary>
@@ -71,16 +70,15 @@ namespace Istu.OldModel
         {
             try
             {
-                var result = SqlServerTools.CreateDataConnection(connectionString);
+                var result = SqlServerTools.CreateDataConnection (connectionString);
 
                 return result;
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(IstuUtility) + "::" + nameof(GetMsSqlConnection), exception);
+                Magna.TraceException (nameof (IstuUtility) + "::" + nameof (GetMsSqlConnection), exception);
                 throw;
             }
-
         } // method GetDatabaseConnection
 
         /// <summary>
@@ -139,18 +137,17 @@ namespace Istu.OldModel
         /// См. поле <c>type</c> в таблице <c>Attendance</c>.
         /// </summary>
         public static string TranslateAttendanceCode (char code) => code switch
-            {
-                'a' or 'A' => "Посещение",
-                'g' or 'G' => "Выдача",
-                'r' or 'R' => "Возврат",
-                'p' or 'P' => "Продление",
-                'w' or 'W' => "Приписка штрих-кода",
-                'd' or 'D' => "Списание",
-                '1' => "Регистрация",
-                's' or 'S' => "СМС",
-                _ => code.ToString()
-
-            }; // switch
+        {
+            'a' or 'A' => "Посещение",
+            'g' or 'G' => "Выдача",
+            'r' or 'R' => "Возврат",
+            'p' or 'P' => "Продление",
+            'w' or 'W' => "Приписка штрих-кода",
+            'd' or 'D' => "Списание",
+            '1' => "Регистрация",
+            's' or 'S' => "СМС",
+            _ => code.ToString()
+        }; // switch
 
         #endregion
 

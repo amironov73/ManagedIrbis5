@@ -17,7 +17,9 @@
 #region Using directives
 
 using System;
+
 using Istu.BookSupply.Interfaces;
+
 using LinqToDB.Data;
 
 using ManagedIrbis;
@@ -69,10 +71,9 @@ namespace Istu.BookSupply
             _configuration = configuration;
             _logger = serviceProvider.GetRequiredService<ILogger<University>>();
 
-            _logger.LogTrace(nameof(University) + "::Constructor");
+            _logger.LogTrace (nameof (University) + "::Constructor");
 
-            _booksupplyConnectionString = connectionString ?? _configuration ["booksupply"];
-
+            _booksupplyConnectionString = connectionString ?? _configuration["booksupply"];
         } // constructor
 
         #endregion
@@ -110,7 +111,6 @@ namespace Istu.BookSupply
             using var catalog = GetCatalog();
 
             return catalog.FormatRecord (mfn, format);
-
         } // method FormatRecord
 
         /// <summary>
@@ -124,7 +124,6 @@ namespace Istu.BookSupply
             using var catalog = GetCatalog();
 
             return catalog.ListTerms (prefix);
-
         } // method ListTerms
 
         /// <summary>
@@ -138,7 +137,6 @@ namespace Istu.BookSupply
             using var catalog = GetCatalog();
 
             return catalog.ReadRecord (mfn);
-
         } // method ReadRecord
 
         /// <summary>
@@ -152,7 +150,6 @@ namespace Istu.BookSupply
             using var catalog = GetCatalog();
 
             return catalog.SearchRecords (expression);
-
         } // method SearchRecords
 
         #endregion

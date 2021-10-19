@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* OsmiUtility.cs --
+/* OsmiUtility.cs -- полезные методы для работы с системой OSMI Cards
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@ using AM.IO;
 using ManagedIrbis;
 using ManagedIrbis.Readers;
 
-using CM=System.Configuration.ConfigurationManager;
+using CM = System.Configuration.ConfigurationManager;
 
 #endregion
 
@@ -31,19 +31,21 @@ using CM=System.Configuration.ConfigurationManager;
 namespace RestfulIrbis.OsmiCards
 {
     /// <summary>
-    ///
+    /// Полезные методы для работы с системой OSMI Cards.
     /// </summary>
     public static class OsmiUtility
     {
         #region Private members
 
         /// <summary>
-        /// Ищем метку в карточке.
+        /// Поиск указанной метки в карточке.
         /// </summary>
         private static /* JObject? */ object? FindLabel
             (
+
                 // TODO: implement
                 object obj,
+
                 // JObject obj,
                 string label
             )
@@ -65,19 +67,22 @@ namespace RestfulIrbis.OsmiCards
             */
 
             throw new NotImplementedException();
-        }
+
+        } // method FindLabel
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Build card for reader.
+        /// Построение карточки для указанного читателя.
         /// </summary>
         public static /* JObject */ object BuildCardForReader
             (
+
                 // TODO: implement
                 object templateObject,
+
                 // JObject templateObject,
                 ReaderInfo reader,
                 string ticket,
@@ -165,32 +170,24 @@ namespace RestfulIrbis.OsmiCards
             */
 
             throw new NotImplementedException();
-        }
+
+        } // method BuildCardForReader
 
         /// <summary>
         /// Убираем '-empty-'.
         /// </summary>
-        public static string? NullForEmpty
-            (
-                this string? value
-            )
-        {
-            return value.SameString("-empty-")
-                ? null
-                : value;
-        }
+        public static string? NullForEmpty (this string? value) => value.SameString ("-empty-") ? null : value;
 
         /// <summary>
         /// Полный путь до <c>dicards.json</c>.
         /// </summary>
-        public static string DicardsJson() => PathUtility.MapPath("dicards.json")
-            .ThrowIfNull("MapPath (\"dicards.json\")");
+        public static string DicardsJson() => PathUtility.MapPath ("dicards.json").ThrowIfNull ();
 
         /// <summary>
         /// Кодирование URL в UTF-8.
         /// </summary>
         public static string UrlEncode (string text) =>
-            HttpUtility.UrlEncode(text, Encoding.UTF8);
+            HttpUtility.UrlEncode (text, Encoding.UTF8);
 
         /// <summary>
         /// Получение идентификатора читателя.
@@ -201,11 +198,12 @@ namespace RestfulIrbis.OsmiCards
                 DicardsConfiguration config
             )
         {
-            var idTag = config.ReaderId.SafeToInt32(30);
-            var result = record.FM(idTag).ThrowIfNullOrEmpty("reader.Ticket");
+            var idTag = config.ReaderId.SafeToInt32 (30);
+            var result = record.FM (idTag).ThrowIfNullOrEmpty ();
 
             return result;
-        }
+
+        } // method GetReaderId
 
         /// <summary>
         /// Получение идентификатора читателя.
@@ -216,12 +214,15 @@ namespace RestfulIrbis.OsmiCards
                 DicardsConfiguration config
             )
         {
-            var record = reader.Record.ThrowIfNull("reader.Record");
-            var result = GetReaderId(record, config);
+            var record = reader.Record.ThrowIfNull ();
+            var result = GetReaderId (record, config);
 
             return result;
-        }
+
+        } // method GetReaderId
 
         #endregion
-    }
-}
+
+    } // class OsmiUtility
+
+} // namespace RestfulIrbis.OsmiCards

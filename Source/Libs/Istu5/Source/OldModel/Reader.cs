@@ -30,7 +30,7 @@ namespace Istu.OldModel
     /// Информация о читателе.
     /// </summary>
     [Table (Name = "readers")]
-    [DebuggerDisplay("{Ticket}: {Name}")]
+    [DebuggerDisplay ("{Ticket}: {Name}")]
     public sealed class Reader
     {
         #region Properties
