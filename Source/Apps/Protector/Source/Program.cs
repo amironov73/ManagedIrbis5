@@ -45,7 +45,7 @@ namespace Protector
                 var source = args[0];
                 if (source == "-")
                 {
-                    source = Console.ReadLine().ThrowIfNull("Console.ReadLine");
+                    source = Console.ReadLine().ThrowIfNull();
                 }
 
                 if (source == "-u")
@@ -53,7 +53,7 @@ namespace Protector
                     source = args[1];
                     if (source == "-")
                     {
-                        source = Console.ReadLine().ThrowIfNull("Console.ReadLine");
+                        source = Console.ReadLine().ThrowIfNull();
                     }
 
                     var decrypted = ConfigurationUtility.Unprotect(source);

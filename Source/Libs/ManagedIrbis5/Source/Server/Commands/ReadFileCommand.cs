@@ -23,6 +23,7 @@ using System;
 
 using AM;
 using AM.Collections;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -60,7 +61,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -71,31 +72,31 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireContext(Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
-                var request = Data.Request.ThrowIfNull(nameof(Data.Request));
-                var response = Data.Response.ThrowIfNull(nameof(Data.Response));
+                var request = Data.Request.ThrowIfNull();
+                var response = Data.Response.ThrowIfNull();
                 var lines = request.RemainingAnsiStrings();
                 foreach (var line in lines)
                 {
                     try
                     {
-                        var specification = FileSpecification.Parse(line);
-                        var filename = engine.ResolveFile(specification);
-                        if (string.IsNullOrEmpty(filename))
+                        var specification = FileSpecification.Parse (line);
+                        var filename = engine.ResolveFile (specification);
+                        if (string.IsNullOrEmpty (filename))
                         {
                             response.NewLine();
                         }
                         else
                         {
-                            var content = engine.Cache.GetFile(filename);
+                            var content = engine.Cache.GetFile (filename);
                             if (content.IsNullOrEmpty())
                             {
                                 content = Array.Empty<byte>();
@@ -103,37 +104,39 @@ namespace ManagedIrbis.Server.Commands
 
                             if (specification.BinaryFile)
                             {
-                                response.Memory.Write(Preamble, 0, Preamble.Length);
-                                response.Memory.Write(content, 0, content.Length);
+                                response.Memory.Write (Preamble, 0, Preamble.Length);
+                                response.Memory.Write (content, 0, content.Length);
                             }
                             else
                             {
-                                IrbisText.WindowsToIrbis(content);
-                                response.Memory.Write(content, 0, content.Length);
+                                IrbisText.WindowsToIrbis (content);
+                                response.Memory.Write (content, 0, content.Length);
                                 response.NewLine();
                             }
-                        }
+
+                        } // else
                     }
                     catch (Exception exception)
                     {
-                        Magna.TraceException(nameof(ReadFileCommand) + "::" + nameof(Execute), exception);
+                        Magna.TraceException (nameof (ReadFileCommand) + "::" + nameof (Execute), exception);
                         response.NewLine();
                     }
-                }
+
+                } // foreach
 
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(ReadFileCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException (nameof (ReadFileCommand) + "::" + nameof (Execute), exception);
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

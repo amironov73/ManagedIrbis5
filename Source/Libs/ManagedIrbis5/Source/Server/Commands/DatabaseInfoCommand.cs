@@ -77,7 +77,7 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
+            var engine = Data.Engine.ThrowIfNull();
             engine.OnBeforeExecute(Data);
 
             try

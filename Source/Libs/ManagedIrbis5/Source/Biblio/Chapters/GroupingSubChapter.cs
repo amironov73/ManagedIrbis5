@@ -34,7 +34,6 @@ namespace ManagedIrbis.Biblio
     /// <summary>
     /// Группировка документов, например, в авторские комплексы.
     /// </summary>
-
     public class GroupingSubChapter
         : MenuSubChapter
     {
@@ -97,36 +96,37 @@ namespace ManagedIrbis.Biblio
             if (!bookGroup.OtherGroup)
             {
                 var settings = Settings;
-                if (ReferenceEquals(settings, null))
-                {
-                    return;
-                }
-                var orderFormat = settings.GetSetting("groupedOrder");
-                if (string.IsNullOrEmpty(orderFormat))
+                if (ReferenceEquals (settings, null))
                 {
                     return;
                 }
 
-                var processor = context.Processor.ThrowIfNull("context.Processor");
-                using var formatter = processor.AcquireFormatter(context);
-                orderFormat = processor.GetText(context, orderFormat).ThrowIfNull("orderFormat");
-                formatter.ParseProgram(orderFormat);
+                var orderFormat = settings.GetSetting ("groupedOrder");
+                if (string.IsNullOrEmpty (orderFormat))
+                {
+                    return;
+                }
+
+                var processor = context.Processor.ThrowIfNull();
+                using var formatter = processor.AcquireFormatter (context);
+                orderFormat = processor.GetText (context, orderFormat).ThrowIfNull();
+                formatter.ParseProgram (orderFormat);
 
                 foreach (var item in bookGroup)
                 {
-                    var record = item.Record
-                        .ThrowIfNull("item.Record");
-                    var order = formatter.FormatRecord(record.Mfn);
+                    var record = item.Record.ThrowIfNull();
+                    var order = formatter.FormatRecord (record.Mfn);
+
                     //item.Order = RichText.Decode(order);
                     item.Order = order;
                 }
             }
 
             var items = bookGroup
-                .OrderBy(item => item.Order)
+                .OrderBy (item => item.Order)
                 .ToArray();
             bookGroup.Clear();
-            bookGroup.AddRange(items);
+            bookGroup.AddRange (items);
         }
 
         #endregion
@@ -143,7 +143,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            base.BuildItems(context);
+            base.BuildItems (context);
 
             var items = Items;
             if (items is null)
@@ -152,57 +152,56 @@ namespace ManagedIrbis.Biblio
             }
 
             var settings = Settings;
-            if (ReferenceEquals(settings, null))
+            if (ReferenceEquals (settings, null))
             {
                 return;
             }
 
-            var allValues = settings.GetSetting("values");
-            if (string.IsNullOrEmpty(allValues))
+            var allValues = settings.GetSetting ("values");
+            if (string.IsNullOrEmpty (allValues))
             {
                 return;
             }
 
-            var values = allValues.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            var values = allValues.Split (';', StringSplitOptions.RemoveEmptyEntries);
             if (values.Length == 0)
             {
                 return;
             }
 
-            var groupBy = settings.GetSetting("groupBy");
-            if (string.IsNullOrEmpty(groupBy))
+            var groupBy = settings.GetSetting ("groupBy");
+            if (string.IsNullOrEmpty (groupBy))
             {
                 return;
             }
 
             var log = context.Log;
-            log.WriteLine("Begin grouping {0}", this);
+            log.WriteLine ($"Begin grouping {this}");
 
-            var otherName = settings.GetSetting("others");
+            var otherName = settings.GetSetting ("others");
             var others = new BookGroup
             {
                 Name = otherName,
                 OtherGroup = true
             };
 
-            var processor = context.Processor.ThrowIfNull("context.Processor");
-            using (var formatter = processor.AcquireFormatter(context))
+            var processor = context.Processor.ThrowIfNull();
+            using (var formatter = processor.AcquireFormatter (context))
             {
-                groupBy = processor.GetText(context, groupBy)
-                    .ThrowIfNull("groupBy");
-                formatter.ParseProgram(groupBy);
+                groupBy = processor.GetText (context, groupBy).ThrowIfNull();
+                formatter.ParseProgram (groupBy);
 
                 foreach (var item in items)
                 {
-                    var record = item.Record.ThrowIfNull("item.Record");
-                    var text = formatter.FormatRecord(record.Mfn);
-                    if (string.IsNullOrEmpty(text))
+                    var record = item.Record.ThrowIfNull();
+                    var text = formatter.FormatRecord (record.Mfn);
+                    if (string.IsNullOrEmpty (text))
                     {
                         continue;
                     }
 
                     var keys = text.Trim()
-                        .Split(_lineDelimiters)
+                        .Split (_lineDelimiters)
                         .TrimLines()
                         .NonEmptyLines()
                         .Distinct()
@@ -211,44 +210,48 @@ namespace ManagedIrbis.Biblio
                     foreach (var key in keys)
                     {
                         var theKey = key;
-                        if (theKey.IsOneOf(values))
+                        if (theKey.IsOneOf (values))
                         {
                             var bookGroup = Groups.FirstOrDefault
                                 (
                                     g => g.Name == theKey
                                 );
-                            if (ReferenceEquals(bookGroup, null))
+                            if (ReferenceEquals (bookGroup, null))
                             {
                                 bookGroup = new BookGroup
                                 {
                                     Name = theKey
                                 };
-                                Groups.Add(bookGroup);
+                                Groups.Add (bookGroup);
                             }
-                            bookGroup.Add(item);
+
+                            bookGroup.Add (item);
                             found = true;
                             break;
                         }
                     }
+
                     if (!found)
                     {
-                        others.Add(item);
+                        others.Add (item);
                     }
                 }
 
-                processor.ReleaseFormatter(context, formatter);
+                processor.ReleaseFormatter (context, formatter);
             }
 
-            Groups = Groups.OrderBy(x => x.Name).ToList();
+            Groups = Groups.OrderBy (x => x.Name).ToList();
             foreach (var bookGroup in Groups)
             {
-                _OrderGroup(context, bookGroup);
+                _OrderGroup (context, bookGroup);
             }
-            _OrderGroup(context, others);
-            Groups.Add(others);
 
-            log.WriteLine("End grouping {0}", this);
-        }
+            _OrderGroup (context, others);
+            Groups.Add (others);
+
+            log.WriteLine ($"End grouping {this}");
+
+        } // method BuildItems
 
         /// <inheritdoc cref="BiblioChapter.NumberItems" />
         public override void NumberItems
@@ -263,7 +266,8 @@ namespace ManagedIrbis.Biblio
                     item.Number = ++context.ItemCount;
                 }
             }
-        }
+
+        } // method NumberItems
 
         /// <inheritdoc cref="MenuSubChapter.Render" />
         public override void Render
@@ -272,24 +276,22 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            log.WriteLine("Begin render {0}", this);
+            log.WriteLine ($"Begin render {this}");
 
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            var report = processor.Report
-                .ThrowIfNull("processor.Report");
+            var processor = context.Processor.ThrowIfNull();
+            var report = processor.Report.ThrowIfNull();
 
-            RenderTitle(context);
+            RenderTitle (context);
 
             foreach (var bookGroup in Groups)
             {
                 var name = bookGroup.Name;
-                if (!string.IsNullOrEmpty(name))
+                if (!string.IsNullOrEmpty (name))
                 {
-                    log.WriteLine(name);
+                    log.WriteLine (name);
                 }
 
-                report.Body.Add(new ParagraphBand());
+                report.Body.Add (new ParagraphBand());
                 var groupTitle =
                     "{\\b "
                     + name
@@ -298,37 +300,38 @@ namespace ManagedIrbis.Biblio
                 {
                     groupTitle += " (автор, редактор, составитель)";
                 }
-                ReportBand band = new ParagraphBand(groupTitle);
-                report.Body.Add(band);
-                report.Body.Add(new ParagraphBand());
+
+                ReportBand band = new ParagraphBand (groupTitle);
+                report.Body.Add (band);
+                report.Body.Add (new ParagraphBand());
 
                 for (var i = 0; i < bookGroup.Count; i++)
                 {
-                    log.Write(".");
+                    log.Write (".");
                     var item = bookGroup[i];
                     var number = item.Number;
-                    var description = item.Description
-                        .ThrowIfNull("item.Description");
+                    var description = item.Description.ThrowIfNull ();
 
                     band = new ParagraphBand
                         (
                             number.ToInvariantString() + ") "
                         );
-                    report.Body.Add(band);
-                    band.Cells.Add(new SimpleTextCell(description));
+                    report.Body.Add (band);
+                    band.Cells.Add (new SimpleTextCell (description));
                 }
-                log.WriteLine(" done");
-            }
 
-            RenderDuplicates(context);
+                log.WriteLine (" done");
 
-            log.WriteLine("End render {0}", this);
-        }
+            } // foreach
+
+            RenderDuplicates (context);
+
+            log.WriteLine ($"End render {this}");
+
+        } // method Render
 
         #endregion
 
-        #region Object members
+    } // class GroupingSubChapter
 
-        #endregion
-    }
-}
+} // namespace ManagedIrbis.Biblio

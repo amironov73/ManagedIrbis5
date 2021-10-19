@@ -79,7 +79,7 @@ namespace ManagedIrbis.Batch
                 (
                     parallelism,
                     ConnectionUtility.GetStandardConnectionString()
-                        .ThrowIfNull("ConnectionUtility.GetStandardConnectionString")
+                        .ThrowIfNull()
                 )
         {
         }
@@ -253,8 +253,8 @@ namespace ManagedIrbis.Batch
 
         private bool _AllDone()
         {
-            return _queue.ThrowIfNull("_queue").IsEmpty
-                   && _tasks.ThrowIfNull("_tasks").All(t => t.IsCompleted);
+            return _queue.ThrowIfNull().IsEmpty
+                   && _tasks.ThrowIfNull().All(t => t.IsCompleted);
         }
 
         #endregion

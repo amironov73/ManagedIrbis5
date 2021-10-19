@@ -176,9 +176,9 @@ namespace ManagedIrbis.Biblio
             )
         {
             var processor = context.Processor
-                .ThrowIfNull("context.Processor");
+                .ThrowIfNull();
             var report = processor.Report
-                .ThrowIfNull("processor.Report");
+                .ThrowIfNull();
 
             if (!string.IsNullOrEmpty(Title))
             {

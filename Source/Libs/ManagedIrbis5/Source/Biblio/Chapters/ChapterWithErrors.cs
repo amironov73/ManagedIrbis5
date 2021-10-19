@@ -41,10 +41,8 @@ namespace ManagedIrbis.Biblio
             log.WriteLine("Begin render {0}", this);
 
             var badRecords = context.BadRecords;
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            var report = processor.Report
-                .ThrowIfNull("processor.Report");
+            var processor = context.Processor.ThrowIfNull();
+            var report = processor.Report.ThrowIfNull();
 
             RenderTitle(context);
 

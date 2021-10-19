@@ -100,15 +100,14 @@ namespace ManagedIrbis.Server
         } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public ClientRequest
             (
                 WorkData data
             )
         {
-
-            var socket = data.Socket.ThrowIfNull(nameof(data.Socket));
+            var socket = data.Socket.ThrowIfNull (nameof (data.Socket));
             Memory = socket.ReceiveAllAsync().Result;
             RequestLength = GetInt32();
             CommandCode1 = RequireAnsiString();
@@ -134,7 +133,8 @@ namespace ManagedIrbis.Server
         public bool IsEot() => Memory!.Position >= Memory.Length;
 
         /// <summary>
-        /// Get string without encoding.
+        /// Чтение из клиентского запроса строки в виде последовательности байтов.
+        /// Строка может отсутствовать или быть пустой.
         /// </summary>
         public byte[]? GetString()
         {
@@ -152,7 +152,7 @@ namespace ManagedIrbis.Server
                     break;
                 }
 
-                result.WriteByte((byte) next);
+                result.WriteByte ((byte)next);
             }
 
             return result.ToArray();
@@ -160,7 +160,8 @@ namespace ManagedIrbis.Server
         } // method GetString
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса строки с автоматическим определением кодировки
+        /// (строка может отсутствовать или быть пустой).
         /// </summary>
         public string? GetAutoString()
         {
@@ -176,7 +177,7 @@ namespace ManagedIrbis.Server
 
             if (count != 0)
             {
-                if (bytes[0] == (byte) '!')
+                if (bytes[0] == (byte)'!')
                 {
                     encoding = IrbisEncoding.Utf8;
                     index = 1;
@@ -184,17 +185,18 @@ namespace ManagedIrbis.Server
                 }
             }
 
-            return encoding.GetString(bytes, index, count);
+            return encoding.GetString (bytes, index, count);
 
         } // method GetAutoString
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса строки с автоматическим определением кодировки
+        /// (строка не может быть пустой).
         /// </summary>
         public string RequireAutoString()
         {
             var result = GetAutoString();
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
                 throw new IrbisException();
             }
@@ -204,7 +206,8 @@ namespace ManagedIrbis.Server
         } // method RequireAutoString
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса строки в кодировке ANSI
+        /// (строка может отсутствовать или быть пустой).
         /// </summary>
         public string? GetAnsiString()
         {
@@ -214,17 +217,18 @@ namespace ManagedIrbis.Server
                 return null;
             }
 
-            return IrbisEncoding.Ansi.GetString(bytes);
+            return IrbisEncoding.Ansi.GetString (bytes);
 
         } // method GetAnsiString
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запрсоа строки в кодировке ANSI
+        /// (строка должна быть непустой).
         /// </summary>
         public string RequireAnsiString()
         {
             var result = GetAnsiString();
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
                 throw new IrbisException();
             }
@@ -234,7 +238,8 @@ namespace ManagedIrbis.Server
         } // method RequireAnsiString
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса массива строк в кодировке ANSI
+        /// (до конца запроса).
         /// </summary>
         public string[] RemainingAnsiStrings()
         {
@@ -245,29 +250,30 @@ namespace ManagedIrbis.Server
                 var line = GetAnsiString();
                 if (line is not null)
                 {
-                    result.Add(line);
+                    result.Add (line);
                 }
             }
 
             return result.ToArray();
-
         } // method RemainingAnsiStrings
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса текста в кодировке ANSI
+        /// (до конца запроса).
         /// </summary>
         public string RemainingAnsiText()
         {
-            var remaining = (int) (Memory!.Length - Memory.Position);
+            var remaining = (int)(Memory!.Length - Memory.Position);
             var bytes = new byte[remaining];
-            Memory.Read(bytes, 0, remaining);
+            Memory.Read (bytes, 0, remaining);
 
-            return IrbisEncoding.Ansi.GetString(bytes);
+            return IrbisEncoding.Ansi.GetString (bytes);
 
         } // method RemainingAnsiText
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса строки в кодировке UTF-8
+        /// (строка может отсутствовать или быть пустой).
         /// </summary>
         public string? GetUtfString()
         {
@@ -277,26 +283,29 @@ namespace ManagedIrbis.Server
                 return null;
             }
 
-            return IrbisEncoding.Utf8.GetString(bytes);
+            return IrbisEncoding.Utf8.GetString (bytes);
 
         } // method GetUtfString
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса строки в кодировке UTF-8
+        /// (строка должна быть непустой).
         /// </summary>
         public string RequireUtfString()
         {
             var result = GetUtfString();
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
                 throw new IrbisException();
             }
 
             return result;
-        }
+
+        } // method RequireUtfString
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса массива строк в кодировке UTF-8
+        /// (до конца запроса).
         /// </summary>
         public string[] RemainingUtfStrings()
         {
@@ -307,7 +316,7 @@ namespace ManagedIrbis.Server
                 var line = GetUtfString();
                 if (line is not null)
                 {
-                    result.Add(line);
+                    result.Add (line);
                 }
             }
 
@@ -316,30 +325,30 @@ namespace ManagedIrbis.Server
         } // method RemainingUtfStrings
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса текста в кодировке UTF-8
+        /// (до конца запроса).
         /// </summary>
         public string RemainingUtfText()
         {
-            var remaining = (int) (Memory!.Length - Memory.Position);
+            var remaining = (int)(Memory!.Length - Memory.Position);
             var bytes = new byte[remaining];
-            Memory.Read(bytes, 0, remaining);
+            Memory.Read (bytes, 0, remaining);
 
-            return IrbisEncoding.Utf8.GetString(bytes);
+            return IrbisEncoding.Utf8.GetString (bytes);
 
         } // method RemainingUtfText
 
         /// <summary>
-        ///
+        /// Чтение из клиентского запроса 32-битного целого со знаком.
         /// </summary>
         public int GetInt32()
         {
             var line = GetString();
             var result = line.IsNullOrEmpty()
                 ? 0
-                : FastNumber.ParseInt32(line, 0, line.Length);
+                : FastNumber.ParseInt32 (line, 0, line.Length);
 
             return result;
-
         } // method GetInt32
 
         #endregion

@@ -148,7 +148,7 @@ namespace AM.Reflection
             // Конструируем лямбду
             // (object instance) => (object) method ((T) instance)
 
-            var declaringType = propertyInfo.DeclaringType.ThrowIfNull (nameof (propertyInfo.DeclaringType));
+            var declaringType = propertyInfo.DeclaringType.ThrowIfNull ();
             var instance = Expression.Parameter (typeof(object));
             var argument = Expression.Convert (instance, declaringType);
             var call = Expression.Convert
@@ -200,7 +200,7 @@ namespace AM.Reflection
             // Конструируем лямбду
             // method ((T1) instance, (T2) value)
 
-            var declaringType = propertyInfo.DeclaringType.ThrowIfNull (nameof (propertyInfo.DeclaringType));
+            var declaringType = propertyInfo.DeclaringType.ThrowIfNull ();
             var instance = Expression.Parameter(typeof(object), "instance");
             var value = Expression.Parameter(typeof(object), "value");
             var convert1 = Expression.Convert(instance, declaringType);

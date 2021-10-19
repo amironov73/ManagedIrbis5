@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* XmlUtility.cs -- возня с XML
@@ -41,14 +42,15 @@ namespace AM.Xml
                 string fileName
             )
         {
-            Sure.FileExists(fileName, nameof(fileName));
+            Sure.FileExists (fileName);
 
-            var serializer = new XmlSerializer(typeof(T));
-            using Stream stream = File.OpenRead(fileName);
+            var serializer = new XmlSerializer (typeof (T));
+            using Stream stream = File.OpenRead (fileName);
 
-            return (T) serializer.Deserialize(stream)
-                .ThrowIfNull("deserialize");
-        }
+            return (T)serializer.Deserialize (stream)
+                .ThrowIfNull ("deserialize");
+
+        } // method DeserializeFile
 
         /// <summary>
         /// Deserialize the string.
@@ -58,14 +60,15 @@ namespace AM.Xml
                 string xmlText
             )
         {
-            Sure.NotNullNorEmpty(xmlText, nameof(xmlText));
+            Sure.NotNullNorEmpty (xmlText, nameof (xmlText));
 
-            var reader = new StringReader(xmlText);
-            var serializer = new XmlSerializer(typeof(T));
+            var reader = new StringReader (xmlText);
+            var serializer = new XmlSerializer (typeof (T));
 
-            return (T)serializer.Deserialize(reader)
-                .ThrowIfNull("DeserializeString");
-        }
+            return (T)serializer.Deserialize (reader)
+                .ThrowIfNull ();
+
+        } // method DeserializeString
 
         /// <summary>
         /// Serialize object to file.
@@ -75,9 +78,9 @@ namespace AM.Xml
                 string fileName,
                 T obj
             )
-            where T: class
+            where T : class
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
             var settings = new XmlWriterSettings
             {
@@ -85,13 +88,14 @@ namespace AM.Xml
                 Indent = true
             };
             var namespaces = new XmlSerializerNamespaces();
-            namespaces.Add(string.Empty, string.Empty);
-            using var output = new StreamWriter(fileName);
-            using var writer = XmlWriter.Create(output, settings);
+            namespaces.Add (string.Empty, string.Empty);
+            using var output = new StreamWriter (fileName);
+            using var writer = XmlWriter.Create (output, settings);
             var objType = obj.GetType();
-            var serializer = new XmlSerializer(objType);
-            serializer.Serialize(writer, obj, namespaces);
-        }
+            var serializer = new XmlSerializer (objType);
+            serializer.Serialize (writer, obj, namespaces);
+
+        } // method SerializeToFile
 
         /// <summary>
         /// Serialize to string without standard
@@ -102,6 +106,8 @@ namespace AM.Xml
                 object obj
             )
         {
+            Sure.NotNull (obj);
+
             var settings = new XmlWriterSettings
             {
                 OmitXmlDeclaration = true,
@@ -110,16 +116,19 @@ namespace AM.Xml
             };
             var output = new StringBuilder();
             var namespaces = new XmlSerializerNamespaces();
-            namespaces.Add(string.Empty, string.Empty);
-            using (var writer = XmlWriter.Create(output, settings))
+            namespaces.Add (string.Empty, string.Empty);
+            using (var writer = XmlWriter.Create (output, settings))
             {
-                var serializer = new XmlSerializer(obj.GetType());
-                serializer.Serialize(writer, obj, namespaces);
+                var serializer = new XmlSerializer (obj.GetType());
+                serializer.Serialize (writer, obj, namespaces);
             }
 
             return output.ToString();
-        }
+
+        } // method SerializeShort
 
         #endregion
-    }
-}
+
+    } // class XmlUtility
+
+} // nameof AM.Xml

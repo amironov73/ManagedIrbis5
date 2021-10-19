@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -55,16 +55,16 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireContext(Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
-                var request = Data.Request.ThrowIfNull(nameof(Data.Request));
+                var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
                 var table = request.RequireAnsiString();
                 var headers = request.GetUtfString();
@@ -73,25 +73,25 @@ namespace ManagedIrbis.Server.Commands
                 var minMfn = request.GetInt32();
                 var maxMfn = request.GetInt32();
                 var sequentialQuery = request.GetUtfString();
-                var mfnList = new int[0]; // TODO get mfnList
+                var mfnList = Array.Empty<int>(); // TODO get mfnList
 
                 // TODO implement
 
-                var response = Data.Response.ThrowIfNull(nameof(Data.Response));
-                response.WriteAnsiString(string.Empty).NewLine();
+                var response = Data.Response.ThrowIfNull (nameof (Data.Response));
+                response.WriteAnsiString (string.Empty).NewLine();
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(PrintTableCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException (nameof (PrintTableCommand) + "::" + nameof (Execute), exception);
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

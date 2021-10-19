@@ -82,7 +82,7 @@ namespace ManagedIrbis.Server
             )
         {
             ServerCommand result;
-            var request = data.Request.ThrowIfNull(nameof(data.Request));
+            var request = data.Request.ThrowIfNull();
 
             if (ReferenceEquals(request.CommandCode1, null)
                 || request.CommandCode1 != request.CommandCode2)

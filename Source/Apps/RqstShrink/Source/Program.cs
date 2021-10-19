@@ -96,7 +96,7 @@ namespace RqstShrink
                         expression = expressionValue;
                     }
 
-                    expression = expression.ThrowIfNull("expression");
+                    expression = expression.ThrowIfNull();
 
                     Write("Reading good records ");
 

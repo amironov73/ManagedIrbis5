@@ -201,7 +201,7 @@ namespace ManagedIrbis.Batch
                 IEnumerable<int> mfnList
             )
         {
-            (database ??= Connection.Database).ThrowIfNull(nameof(database));
+            (database ??= Connection.Database).ThrowIfNull();
 
             int[] array = mfnList.ToArray();
 
@@ -293,7 +293,7 @@ namespace ManagedIrbis.Batch
                 Func<Record, T> func
             )
         {
-            (database ??= Connection.Database).ThrowIfNull(nameof(database));
+            (database ??= Connection.Database).ThrowIfNull();
 
             int[] array = mfnList.ToArray();
 

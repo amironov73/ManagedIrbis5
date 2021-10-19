@@ -145,16 +145,15 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin grouping {0}", this);
 
-            var processor = context.Processor.ThrowIfNull("context.Processor");
+            var processor = context.Processor.ThrowIfNull();
             using (var formatter = processor.AcquireFormatter(context))
             {
-                generalFormat = processor.GetText(context, generalFormat)
-                    .ThrowIfNull("generalFormat");
+                generalFormat = processor.GetText(context, generalFormat).ThrowIfNull();
                 formatter.ParseProgram(generalFormat);
 
                 foreach (var item in items)
                 {
-                    var record = item.Record.ThrowIfNull("item.Record");
+                    var record = item.Record.ThrowIfNull();
                     var header = formatter.FormatRecord(record.Mfn);
                     if (!string.IsNullOrEmpty(header))
                     {
@@ -175,14 +174,12 @@ namespace ManagedIrbis.Biblio
                     bookGroup.Add(item);
                 }
 
-                orderFormat = processor.GetText(context, orderFormat)
-                    .ThrowIfNull("orderFormat");
+                orderFormat = processor.GetText(context, orderFormat).ThrowIfNull();
                 formatter.ParseProgram(orderFormat);
 
                 foreach (var bookGroup in Groups)
                 {
-                    var record = bookGroup.First().Record
-                        .ThrowIfNull("bookGroup.Record");
+                    var record = bookGroup.First().Record.ThrowIfNull();
                     var order = formatter.FormatRecord(record.Mfn);
                     if (!string.IsNullOrEmpty(order))
                     {
@@ -221,12 +218,10 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            log.WriteLine("Begin render {0}", this);
+            log.WriteLine($"Begin render {this}");
 
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            var report = processor.Report
-                .ThrowIfNull("processor.Report");
+            var processor = context.Processor.ThrowIfNull();
+            var report = processor.Report.ThrowIfNull();
 
             var showOrder = false;
                 // TODO: implement
@@ -245,8 +240,7 @@ namespace ManagedIrbis.Biblio
                 header = RichText.Encode3(header, UnicodeRange.Russian, "\\f2");
 
                 report.Body.Add(new ParagraphBand());
-                var item = bookGroup.Item
-                    .ThrowIfNull("bookGroup.Item");
+                var item = bookGroup.Item.ThrowIfNull();
                 var number = item.Number;
                 ReportBand band = new ParagraphBand
                     (
@@ -272,9 +266,9 @@ namespace ManagedIrbis.Biblio
                     {
                         log.Write(".");
                         item = bookGroup[i];
-                        var description = item.Description.ThrowIfNull("item.Description");
+                        var description = item.Description.ThrowIfNull();
                         description = RichText.Encode3 ( description, UnicodeRange.Russian, "\\f2" )
-                            .ThrowIfNull("item.Description");
+                            .ThrowIfNull();
                         band = new ParagraphBand(description);
                         report.Body.Add(band);
                     }
@@ -285,9 +279,12 @@ namespace ManagedIrbis.Biblio
 
             RenderDuplicates(context);
 
-            log.WriteLine("End render {0}", this);
-        }
+            log.WriteLine($"End render {this}");
+
+        } // method Render
 
         #endregion
-    }
-}
+
+    } // class CumulatingSubChapter
+
+} // namespace ManagedIrbis.Biblio

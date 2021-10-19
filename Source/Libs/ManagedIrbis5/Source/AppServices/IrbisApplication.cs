@@ -162,7 +162,7 @@ namespace ManagedIrbis.AppServices
             LoadIniFile();
             BuildConnectionSettings();
             Connection = Factory.CreateSyncConnection();
-            Settings.ThrowIfNull (nameof (Settings)).Apply (Connection);
+            Settings.ThrowIfNull ().Apply (Connection);
 
         } // method ConfigureConnection
 
@@ -220,7 +220,7 @@ namespace ManagedIrbis.AppServices
                 PreRun();
 
                 using var host = Magna.Host;
-                using var connection = Connection.ThrowIfNull (nameof (Connection));
+                using var connection = Connection.ThrowIfNull ();
                 connection.Connect();
                 if (!connection.Connected)
                 {

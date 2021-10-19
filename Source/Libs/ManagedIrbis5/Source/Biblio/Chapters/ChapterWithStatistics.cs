@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* ChapterWithStatistics.cs --
+/* ChapterWithStatistics.cs -- глава со статистикой
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,7 +24,7 @@ using ManagedIrbis.Reports;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    ///
+    /// Глава со статистикой.
     /// </summary>
     public sealed class ChapterWithStatistics
         : BiblioChapter
@@ -47,32 +47,24 @@ namespace ManagedIrbis.Biblio
             )
         {
             var items = chapter.Items;
-            if (!ReferenceEquals(items, null))
+            if (!ReferenceEquals (items, null))
             {
                 var count = items.Count;
                 if (!chapter.IsServiceChapter)
                 {
-                    var text = string.Format
-                    (
-                        "{0}\\tab\\~ {{\\b {1}}}",
-                        chapter.Title,
-                        count
-                    );
-                    var band = new ParagraphBand(text);
-                    report.Body.Add(band);
+                    var text = $"{chapter.Title}\\tab\\~ {{\\b {count}}}";
+                    var band = new ParagraphBand (text);
+                    report.Body.Add (band);
                     _total += count;
                 }
             }
 
             foreach (var child in chapter.Children)
             {
-                _ProcessChapter(report, child);
+                _ProcessChapter (report, child);
             }
-        }
 
-        #endregion
-
-        #region Public methods
+        } // method ProcessChapter
 
         #endregion
 
@@ -85,45 +77,39 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            log.WriteLine("Begin render {0}", this);
+            log.WriteLine ($"Begin render {this}");
             var document = context.Document;
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            var report = processor.Report
-                .ThrowIfNull("processor.Report");
+            var processor = context.Processor.ThrowIfNull();
+            var report = processor.Report.ThrowIfNull();
             var badRecords = context.BadRecords;
 
-            RenderTitle(context);
+            RenderTitle (context);
 
             _total = 0;
             string text;
             if (badRecords.Count != 0)
             {
-                text = string.Format
-                    (
-                        "ВНЕ РАЗДЕЛОВ:\\tab\\~ {{\\b {0}}}",
-                        badRecords.Count.ToInvariantString()
-                    );
-                report.Body.Add(new ParagraphBand(text));
+                text = $"ВНЕ РАЗДЕЛОВ:\\tab\\~ {{\\b {badRecords.Count.ToInvariantString()}}}";
+                report.Body.Add (new ParagraphBand (text));
             }
+
             foreach (var chapter in document.Chapters)
             {
-                _ProcessChapter(report, chapter);
+                _ProcessChapter (report, chapter);
             }
-            report.Body.Add(new ParagraphBand());
-            text = string.Format
-                (
-                    "ВСЕГО:\\tab\\~ {{\\b {0}}}",
-                    _total.ToInvariantString()
-                );
-            report.Body.Add(new ParagraphBand(text));
 
-            RenderChildren(context);
+            report.Body.Add (new ParagraphBand());
+            text = $"ВСЕГО:\\tab\\~ {{\\b {_total.ToInvariantString()}}}";
+            report.Body.Add (new ParagraphBand (text));
 
-            log.WriteLine("End render {0}", this);
-        }
+            RenderChildren (context);
+
+            log.WriteLine ("End render {0}", this);
+
+        } // method Render
 
         #endregion
 
-    }
-}
+    } // class ChapterWithStatistics
+
+} // namespace ManagedIrbis.Biblio

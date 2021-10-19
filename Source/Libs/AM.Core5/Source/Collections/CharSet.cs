@@ -838,7 +838,7 @@ namespace AM.Collections
         {
             Sure.NotNull(other, nameof(other));
 
-            other = other.ThrowIfNull(nameof(other));
+            other = other.ThrowIfNull();
 
             return BitArrayUtility.AreEqual
                 (

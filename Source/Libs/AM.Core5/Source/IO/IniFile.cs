@@ -991,7 +991,7 @@ namespace AM.IO
 
             var encoding = Encoding ?? Encoding.Default;
 
-            Read(FileName.ThrowIfNull(nameof(FileName)), encoding);
+            Read(FileName.ThrowIfNull(), encoding);
         }
 
         /// <summary>
@@ -1285,7 +1285,7 @@ namespace AM.IO
                 && Modified
                 && !string.IsNullOrEmpty(FileName))
             {
-                Save(FileName.ThrowIfNull(nameof(FileName)));
+                Save(FileName.ThrowIfNull());
             }
         }
 

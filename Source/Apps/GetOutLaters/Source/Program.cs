@@ -150,7 +150,7 @@ namespace GetOutLaters
         {
             Logger.LogInformation("Прогоняем ночующих");
 
-            var connection = Connection.ThrowIfNull(nameof(Connection));
+            var connection = Connection.ThrowIfNull();
             var database = connection.EnsureDatabase();
 
             var searchExpression = Configuration["search"];

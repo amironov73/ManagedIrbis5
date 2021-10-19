@@ -32,12 +32,12 @@ namespace AM.Text.Ranges
     /// <summary>
     /// Range of numbers containing non-numeric fragments.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Start) + "} - {" + nameof(Stop) +"}")]
+    [DebuggerDisplay ("{" + nameof (Start) + "} - {" + nameof (Stop) + "}")]
     public sealed class NumberRange
         : IEnumerable<NumberText>,
-        IHandmadeSerializable,
-        IEquatable<NumberRange>,
-        IVerifiable
+            IHandmadeSerializable,
+            IEquatable<NumberRange>,
+            IVerifiable
     {
         #region Properties
 
@@ -117,31 +117,13 @@ namespace AM.Text.Ranges
                 NumberText number
             )
         {
-            if (ReferenceEquals(Start, null))
-            {
-                Magna.Error
-                    (
-                        "NumberRange::Contains: "
-                        + "start is null"
-                    );
+            Start = Start.ThrowIfNull();
+            Stop = Stop.ThrowIfNull();
 
-                throw new ArsMagnaException("Start is null");
-            }
+            return Start.CompareTo (number) <= 0
+                   && number.CompareTo (Stop) <= 0;
 
-            if (ReferenceEquals(Stop, null))
-            {
-                Magna.Error
-                    (
-                        "NumberRange::Contains: "
-                        + "stop is null"
-                    );
-
-                throw new ArsMagnaException("Stop is null");
-            }
-
-            return Start.CompareTo(number) <= 0
-                   && number.CompareTo(Stop) <= 0;
-        }
+        } // method Contains
 
         /// <summary>
         /// Parse text representation.
@@ -151,71 +133,78 @@ namespace AM.Text.Ranges
                 string text
             )
         {
-            var navigator = new TextNavigator(text);
+            var navigator = new ValueTextNavigator (text);
 
-            navigator.SkipWhile(Delimiters);
+            navigator.SkipWhile (Delimiters);
             if (navigator.IsEOF)
             {
                 Magna.Error
                     (
-                        "NumberRange::Parse: "
-                        + "unexpected end of text"
+                        nameof (NumberRange) + "::" + nameof (Parse)
+                        + ": unexpected end of text"
                     );
 
                 throw new FormatException();
-            }
+
+            } // if
 
             NumberRange result;
-            string start = navigator.ReadUntil(DelimitersOrMinus).ToString();
-            if (string.IsNullOrEmpty(start))
+            var start = navigator.ReadUntil (DelimitersOrMinus).ToString();
+            if (string.IsNullOrEmpty (start))
             {
                 Magna.Error
                     (
-                        "NumberRange::Parse: "
-                        + "start sequence not found"
+                        nameof (NumberRange) + "::" + nameof (Parse)
+                        + ": start sequence not found"
                     );
 
                 throw new FormatException();
-            }
+
+            } // if
 
             navigator.SkipWhitespace();
             if (navigator.PeekChar() == '-')
             {
                 navigator.ReadChar();
                 navigator.SkipWhitespace();
-                string stop = navigator.ReadUntil(DelimitersOrMinus).ToString();
-                if (string.IsNullOrEmpty(stop))
+                string stop = navigator.ReadUntil (DelimitersOrMinus).ToString();
+                if (string.IsNullOrEmpty (stop))
                 {
                     Magna.Error
                         (
-                            "NumberRange::Parse: "
-                            + "stop sequence not found"
+                            nameof (NumberRange) + "::" + nameof (Parse)
+                            + ": stop sequence not found"
                         );
 
                     throw new FormatException();
                 }
 
-                result = new NumberRange(start, stop);
-            }
+                result = new NumberRange (start, stop);
+
+            } // if
+
             else
             {
-                result = new NumberRange(start);
+                result = new NumberRange (start);
             }
-            navigator.SkipWhile(Delimiters);
+
+            navigator.SkipWhile (Delimiters);
 
             if (!navigator.IsEOF)
             {
                 Magna.Error
                     (
-                        "NumberRange::Parse: "
-                        + "garbage behind range"
+                        nameof (NumberRange) + "::" + nameof (Parse)
+                        + ": garbage behind the range"
                     );
 
                 throw new FormatException();
-            }
+
+            } // if
 
             return result;
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Выполнение указанного действия на всём диапазоне.
@@ -225,33 +214,12 @@ namespace AM.Text.Ranges
                 Action<NumberText> action
             )
         {
-            // ReSharper disable NotResolvedInText
-            if (ReferenceEquals(Start, null))
-            {
-                Magna.Error
-                    (
-                        "NumberRange::Parse: "
-                        + "start is null"
-                    );
-
-                throw new ArgumentNullException("Start");
-            }
-
-            if (ReferenceEquals(Stop, null))
-            {
-                Magna.Error
-                    (
-                        "NumberRange::Parse: "
-                        + "stop is null"
-                    );
-
-                throw new ArgumentNullException("Stop");
-            }
-            // ReSharper restore NotResolvedInText
+            Start = Start.ThrowIfNull();
+            Stop = Stop.ThrowIfNull();
 
             for (
                     NumberText current = Start;
-                    current.CompareTo(Stop) <= 0;
+                    current.CompareTo (Stop) <= 0;
                     current = current.Increment()
                 )
             {
@@ -260,7 +228,8 @@ namespace AM.Text.Ranges
                         current
                     );
             }
-        }
+
+        } // method For
 
         /// <summary>
         /// Пересечение двух диапазонов.
@@ -273,18 +242,16 @@ namespace AM.Text.Ranges
             // coverity[SWAPPED_ARGUMENTS]
             return new NumberRange
                 (
-                    Stop.ThrowIfNull(nameof(Stop)),
-                    other.Start.ThrowIfNull(nameof(other.Start))
+                    Stop.ThrowIfNull(),
+                    other.Start.ThrowIfNull()
                 );
-        }
+
+        } // method Intersect
 
         /// <summary>
         /// Проверка, не пустой ли диапазон.
         /// </summary>
-        public bool IsEmpty ()
-        {
-            return Start > Stop;
-        }
+        public bool IsEmpty() => Start > Stop;
 
         /// <summary>
         /// Объединение двух диапазонов.
@@ -298,16 +265,17 @@ namespace AM.Text.Ranges
                 (
                     NumberText.Min
                         (
-                            Start.ThrowIfNull(nameof(Start)),
-                            other.Start.ThrowIfNull(nameof(other.Start))
+                            Start.ThrowIfNull (nameof (Start)),
+                            other.Start.ThrowIfNull (nameof (other.Start))
                         ),
                     NumberText.Max
                         (
-                            Stop.ThrowIfNull(nameof(Stop)),
-                            other.Stop.ThrowIfNull(nameof(other.Stop))
+                            Stop.ThrowIfNull (nameof (Stop)),
+                            other.Stop.ThrowIfNull (nameof (other.Stop))
                         )
                 );
-        }
+
+        } // method Union
 
         #endregion
 
@@ -321,24 +289,19 @@ namespace AM.Text.Ranges
         /// </summary>
         public IEnumerator<NumberText> GetEnumerator()
         {
-            if (ReferenceEquals(Start, null))
-            {
-                throw new ArsMagnaException("Start is null");
-            }
-            if (ReferenceEquals(Stop, null))
-            {
-                throw new ArsMagnaException("Stop is null");
-            }
+            Start = Start.ThrowIfNull();
+            Stop = Stop.ThrowIfNull();
+
             for (
-                    NumberText current = Start;
-                    current.CompareTo(Stop) <= 0;
+                    NumberText current = Start!;
+                    current.CompareTo (Stop) <= 0;
                     current = current.Clone().Increment()
                 )
             {
                 yield return current;
             }
 
-        }
+        } // method GetEnumerator
 
         #endregion
 
@@ -361,9 +324,10 @@ namespace AM.Text.Ranges
             )
         {
             writer
-                .WriteNullable(Start)
-                .WriteNullable(Stop);
-        }
+                .WriteNullable (Start)
+                .WriteNullable (Stop);
+
+        } // method SaveToStream
 
         #endregion
 
@@ -375,19 +339,20 @@ namespace AM.Text.Ranges
                 NumberRange? other
             )
         {
-            if (ReferenceEquals(Start, null)
-                || ReferenceEquals(Stop, null))
+            if (ReferenceEquals (Start, null)
+                || ReferenceEquals (Stop, null))
             {
                 return false;
             }
 
-            other = other.ThrowIfNull("other");
+            other = other.ThrowIfNull ();
 
-            bool result = Start.Equals(other.Start)
-                   && Stop.Equals(other.Stop);
+            bool result = Start.Equals (other.Start)
+                          && Stop.Equals (other.Stop);
 
             return result;
-        }
+
+        } // method Equals
 
         #endregion
 
@@ -399,31 +364,23 @@ namespace AM.Text.Ranges
                 bool throwOnError
             )
         {
-            Verifier<NumberRange> verifier
-                = new Verifier<NumberRange>
-                    (
-                        this,
-                        throwOnError
-                    );
+            var verifier = new Verifier<NumberRange> (this, throwOnError);
 
             verifier
-                .NotNull(Start, "Start")
-                .NotNull(Stop, "Stop");
+                .NotNull (Start)
+                .NotNull (Stop);
 
             if (verifier.Result)
             {
                 verifier
-                    .VerifySubObject(Start!, "Start")
-                    .VerifySubObject(Stop!, "Stop")
-                    .Assert
-                        (
-                            Start!.CompareTo(Stop) <= 0,
-                            "Start <= Stop"
-                        );
+                    .VerifySubObject (Start!)
+                    .VerifySubObject (Stop!)
+                    .Assert (Start!.CompareTo (Stop) <= 0);
             }
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
@@ -432,18 +389,19 @@ namespace AM.Text.Ranges
         /// <inheritdoc cref="object.GetHashCode" />
         public override int GetHashCode()
         {
-            int result = 0;
+            var result = 0;
 
             // ReSharper disable NonReadonlyMemberInGetHashCode
-            if (!ReferenceEquals(Start, null))
+            if (!ReferenceEquals (Start, null))
             {
                 result = Start.GetHashCode();
             }
 
-            if (!ReferenceEquals(Stop, null))
+            if (!ReferenceEquals (Stop, null))
             {
                 result = result * 137 + Stop.GetHashCode();
             }
+
             // ReSharper restore NonReadonlyMemberInGetHashCode
 
             return result;
@@ -452,30 +410,32 @@ namespace AM.Text.Ranges
         /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
-            if (ReferenceEquals(Start, null)
-                && ReferenceEquals(Stop, null))
+            if (Start is null && Stop is null)
             {
                 return string.Empty;
             }
 
-            if (ReferenceEquals(Start, null))
+            if (Start is null)
             {
                 return Stop!.ToString();
             }
 
-            if (ReferenceEquals(Stop, null))
+            if (Stop is null)
             {
                 return Start!.ToString();
             }
 
-            if (Start.CompareTo(Stop) == 0)
+            if (Start.CompareTo (Stop) == 0)
             {
                 return Start.ToString();
             }
 
             return $"{Start}-{Stop}";
-        }
+
+        } // method ToString
 
         #endregion
-    }
-}
+
+    } // class NumberRange
+
+} // namespace AM.Text.Ranges

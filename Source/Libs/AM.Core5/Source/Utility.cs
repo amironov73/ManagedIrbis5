@@ -726,7 +726,7 @@ namespace AM
         /// Определение среды исполнения: Github actions.
         /// </summary>
         [Pure]
-        public static bool DetecGithubActions() =>
+        public static bool DetectGithubActions() =>
             Environment.GetEnvironmentVariable ("GITHUB_ACTIONS").SameString ("True");
 
         /// <summary>
@@ -845,15 +845,7 @@ namespace AM
                 this string? value,
                 [CallerArgumentExpression("value")] string? argumentName = null
             )
-        {
-            if (string.IsNullOrEmpty (value))
-            {
-                throw new ArgumentException (argumentName);
-            }
-
-            return value;
-
-        } // method ThrowIfNullOrEmpty
+            => string.IsNullOrEmpty (value) ? throw new ArgumentException (argumentName) : value;
 
         /// <summary>
         /// Бросает исключение, если переданная строка пустая
@@ -866,15 +858,7 @@ namespace AM
                 this ReadOnlySpan<char> value,
                 [CallerArgumentExpression("value")] string? argumentName = null
             )
-        {
-            if (value.IsEmpty)
-            {
-                throw new ArgumentException (argumentName);
-            }
-
-            return value;
-
-        } // method ThrowIfNullOrEmpty
+            => value.IsEmpty ? throw new ArgumentException (argumentName) : value;
 
         /// <summary>
         /// Бросает исключение, если переданная строка пробельная
@@ -887,15 +871,7 @@ namespace AM
                 this string? value,
                 [CallerArgumentExpression ("value")] string? name = null
             )
-        {
-            if (string.IsNullOrWhiteSpace (value))
-            {
-                throw new ArgumentException (name);
-            }
-
-            return value;
-
-        } // method ThrowIfNullOrWhiteSpace
+            => string.IsNullOrWhiteSpace (value) ? throw new ArgumentException (name) : value;
 
         /// <summary>
         /// Бросает исключение, если переданная строка пробельная
@@ -908,15 +884,7 @@ namespace AM
                 this ReadOnlySpan<char> value,
                 [CallerArgumentExpression("value")] string? name = null
             )
-        {
-            if (value.IsEmpty || value.IsWhiteSpace())
-            {
-                throw new ArgumentException (name);
-            }
-
-            return value;
-
-        } // method ThrowIfNullOrWhiteSpace
+            => value.IsEmpty || value.IsWhiteSpace() ? throw new ArgumentException (name) : value;
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -928,15 +896,7 @@ namespace AM
                 this int value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value == 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfZero
+            => value == 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -948,15 +908,7 @@ namespace AM
                 this uint value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value == 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfZero
+            => value == 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -968,15 +920,7 @@ namespace AM
                 this short value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value == 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfZero
+            => value == 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -988,15 +932,7 @@ namespace AM
                 this ushort value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value == 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfZero
+            => value == 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -1008,15 +944,7 @@ namespace AM
                 this long value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value == 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfZero
+            => value == 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -1028,15 +956,7 @@ namespace AM
                 this ulong value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value == 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfZero
+            => value == 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -1048,15 +968,7 @@ namespace AM
                 this double value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value == 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfZero
+            => value == 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -1068,15 +980,7 @@ namespace AM
                 this decimal value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value == 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfZero
+            => value == 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1088,15 +992,7 @@ namespace AM
                 this int value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfNegative
+            => value < 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1108,15 +1004,7 @@ namespace AM
                 this short value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfNegative
+            => value < 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1128,15 +1016,7 @@ namespace AM
                 this long value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfNegative
+            => value < 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1148,15 +1028,7 @@ namespace AM
                 this double value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfNegative
+            => value < 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1168,15 +1040,7 @@ namespace AM
                 this decimal value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < 0)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfNegative
+            => value < 0 ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1190,15 +1054,7 @@ namespace AM
                 int maximum,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < minimum || value > maximum)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method TrhowIfOutOfTheRange
+            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1212,15 +1068,7 @@ namespace AM
                 uint maximum,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < minimum || value > maximum)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfOutOfTheRange
+            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1234,15 +1082,7 @@ namespace AM
                 short maximum,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < minimum || value > maximum)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfOutOfTheRange
+            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1256,15 +1096,7 @@ namespace AM
                 ushort maximum,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < minimum || value > maximum)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfOutOfTheRange
+            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1278,14 +1110,7 @@ namespace AM
                 long maximum,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < minimum || value > maximum)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-        } // method ThrowIfOutOfTheRange
+            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1299,15 +1124,7 @@ namespace AM
                 ulong maximum,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < minimum || value > maximum)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfOutOfTheRange
+            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1321,15 +1138,7 @@ namespace AM
                 double maximum,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < minimum || value > maximum)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfOutOfTheRange
+            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1343,15 +1152,7 @@ namespace AM
                 decimal maximum,
                 [CallerArgumentExpression("value")] string? message = null
             )
-        {
-            if (value < minimum || value > maximum)
-            {
-                throw new ArgumentException (message);
-            }
-
-            return value;
-
-        } // method ThrowIfOutOfTheRange
+            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
 
         /// <summary>
         /// Сравнение двух блоков памяти
@@ -1381,7 +1182,8 @@ namespace AM
                 {
                     return result;
                 }
-            }
+
+            } // for
 
         } // method CompareOrdinal
 
@@ -1413,7 +1215,8 @@ namespace AM
                 {
                     return result;
                 }
-            }
+
+            } // for
 
         } // method CompareOrdinal
 
@@ -1607,7 +1410,8 @@ namespace AM
                 {
                     return true;
                 }
-            }
+
+            } // foreach
 
             return false;
 
@@ -1634,7 +1438,8 @@ namespace AM
                 {
                     return true;
                 }
-            }
+
+            } // foreach
 
             return false;
 
@@ -1661,7 +1466,8 @@ namespace AM
                 {
                     return true;
                 }
-            }
+
+            } // foreach
 
             return false;
 
@@ -1887,27 +1693,24 @@ namespace AM
                 string? three,
                 string? four
             )
-        {
-            return string.Compare
-                       (
-                           one,
-                           two,
-                           StringComparison.OrdinalIgnoreCase
-                       ) == 0
-                   || string.Compare
-                       (
-                           one,
-                           three,
-                           StringComparison.Ordinal
-                       ) == 0
-                   || string.Compare
-                       (
-                           one,
-                           four,
-                           StringComparison.Ordinal
-                       ) == 0;
-
-        } // method SameStringSensitive
+            => string.Compare
+                (
+                    one,
+                    two,
+                    StringComparison.OrdinalIgnoreCase
+                ) == 0
+            || string.Compare
+                (
+                    one,
+                    three,
+                    StringComparison.Ordinal
+                ) == 0
+            || string.Compare
+                (
+                    one,
+                    four,
+                    StringComparison.Ordinal
+                ) == 0;
 
         /// <summary>
         /// Сравнивает строки с учетом регистра символов,
@@ -1934,7 +1737,8 @@ namespace AM
                 {
                     return true;
                 }
-            }
+
+            } // foreach
 
             return false;
 
@@ -1965,7 +1769,8 @@ namespace AM
                 {
                     return true;
                 }
-            }
+
+            } // foreach
 
             return false;
 
@@ -3152,7 +2957,7 @@ namespace AM
                     )!;
             }
 
-            TypeConverter converterTo = TypeDescriptor.GetConverter (targetType);
+            var converterTo = TypeDescriptor.GetConverter (targetType);
             if (converterTo.CanConvertFrom (sourceType))
             {
                 return (T)converterTo.ConvertFrom (value)!;
@@ -3248,6 +3053,7 @@ namespace AM
                 (
                     "Bad value: " + value
                 );
+
         } // method ToBoolean
 
         /// <summary>
@@ -3337,7 +3143,8 @@ namespace AM
             }
 
             return span.ToSecondString();
-        }
+
+        } // method ToAutoString
 
         /// <summary>
         /// Converts time span using format 'dd:hh:mm:ss'
@@ -3400,17 +3207,8 @@ namespace AM
         /// Converts time span using format 's'
         /// </summary>
         [Pure]
-        public static string ToWholeSecondsString
-            (
-                this TimeSpan span
-            )
-        {
-            return span.TotalSeconds.ToString
-                (
-                    "F0",
-                    CultureInfo.InvariantCulture
-                );
-        }
+        public static string ToWholeSecondsString (this TimeSpan span) =>
+            span.TotalSeconds.ToString ("F0", CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Mangle given text with the escape character.
@@ -3819,8 +3617,7 @@ namespace AM
                 ReadOnlySpan<T> third,
                 ReadOnlySpan<T> fourth
             )
-            =>
-                !first.IsEmpty ? first
+            => !first.IsEmpty ? first
                 : !second.IsEmpty ? second
                 : !third.IsEmpty ? third
                 : !fourth.IsEmpty ? fourth
@@ -3862,8 +3659,7 @@ namespace AM
                 ReadOnlyMemory<T> third,
                 ReadOnlyMemory<T> fourth
             )
-            =>
-                !first.IsEmpty ? first
+            => !first.IsEmpty ? first
                 : !second.IsEmpty ? second
                 : !third.IsEmpty ? third
                 : !fourth.IsEmpty ? fourth
@@ -3924,14 +3720,15 @@ namespace AM
                 {
                     text = text.Substring (1, length - 2);
                 }
-            }
+
+            } // if
 
             return text;
 
         } // method Unquote
 
         /// <summary>
-        /// Имя исполняемого процесса (с путями).
+        /// Получение имени исполняемого процесса (с путями).
         /// </summary>
         public static string ExecutableFileName
         {
@@ -3951,7 +3748,7 @@ namespace AM
         private const string RandomSymbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_";
 
         /// <summary>
-        /// Creates random string with given length.
+        /// Создание случайной строки указанной длины
         /// </summary>
         public static string RandomIdentifier
             (
@@ -3979,8 +3776,8 @@ namespace AM
         } // method RandomIdentifier
 
         /// <summary>
-        /// Unwrap the <see cref="AggregateException"/>
-        /// (or do nothing if not aggregate).
+        /// Извлечение внутреннего исключения из <see cref="AggregateException"/>
+        /// (если таковое имеется, иначе ничего не происходит).
         /// </summary>
         public static Exception Unwrap
             (
@@ -3990,14 +3787,13 @@ namespace AM
             if (exception is AggregateException aggregate)
             {
                 aggregate = aggregate.Flatten();
-
                 aggregate.Handle
                     (
                         ex =>
                         {
                             Magna.TraceException
                                 (
-                                    "Utility::Unwrap",
+                                    nameof (Utility) + "::" + nameof (Unwrap),
                                     ex
                                 );
 
@@ -4005,8 +3801,9 @@ namespace AM
                         }
                     );
 
-                return aggregate.InnerExceptions[0];
-            }
+                return aggregate.InnerExceptions [0];
+
+            } // if
 
             return exception;
 
@@ -4064,15 +3861,15 @@ namespace AM
         /// </summary>
         [Pure]
         public static long ToUnixTime (this DateTime dateTime) =>
-            (long)(dateTime - UnixStart).TotalSeconds;
+            (long) (dateTime - UnixStart).TotalSeconds;
 
         /// <summary>
-        /// Get very last index of substrings.
+        /// Получение индекса последнего вхождения любой из перечисленных строк.
         /// </summary>
         public static int LastIndexOfAny
             (
                 string text,
-                string[] fragments
+                IEnumerable<string> fragments
             )
         {
             var result = -1;

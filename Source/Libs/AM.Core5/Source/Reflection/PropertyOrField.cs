@@ -49,7 +49,7 @@ namespace AM.Reflection
             get
             {
                 return IsProperty
-                       && PropertyInfo.ThrowIfNull("PropertyInfo")
+                       && PropertyInfo.ThrowIfNull()
                        .GetIndexParameters().Length != 0;
             }
         }
@@ -84,10 +84,10 @@ namespace AM.Reflection
             {
                 if (IsProperty)
                 {
-                    return PropertyInfo.ThrowIfNull("PropertyInfo").PropertyType;
+                    return PropertyInfo.ThrowIfNull().PropertyType;
                 }
 
-                return FieldInfo.ThrowIfNull("FieldInfo").FieldType;
+                return FieldInfo.ThrowIfNull().FieldType;
             }
         }
 
@@ -117,7 +117,7 @@ namespace AM.Reflection
         /// otherwise, <c>false</c>.</value>
         public bool ReadOnly =>
             IsProperty
-            && !PropertyInfo.ThrowIfNull("PropertyInfo").CanWrite;
+            && !PropertyInfo.ThrowIfNull().CanWrite;
 
         #endregion
 
@@ -212,10 +212,10 @@ namespace AM.Reflection
         {
             if (IsProperty)
             {
-                return PropertyInfo.ThrowIfNull("PropertyInfo").GetValue(obj, null);
+                return PropertyInfo.ThrowIfNull().GetValue(obj, null);
             }
 
-            return FieldInfo.ThrowIfNull("FieldInfo").GetValue(obj);
+            return FieldInfo.ThrowIfNull().GetValue(obj);
         }
 
         /// <summary>
@@ -243,11 +243,11 @@ namespace AM.Reflection
         {
             if (IsProperty)
             {
-                PropertyInfo.ThrowIfNull("PropertyInfo").SetValue(obj, value, null);
+                PropertyInfo.ThrowIfNull().SetValue(obj, value, null);
             }
             else
             {
-                FieldInfo.ThrowIfNull("FieldInfo").SetValue(obj, value);
+                FieldInfo.ThrowIfNull().SetValue(obj, value);
             }
         }
 

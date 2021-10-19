@@ -4,17 +4,16 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
-/* ServerConfiguration.cs --
+/* ServerConfiguration.cs -- конфигурация сервера
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.IO;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 using AM;
@@ -30,41 +29,42 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis.Server
 {
     /// <summary>
-    ///
+    /// Конфигурация сервера.
     /// </summary>
-    [XmlRoot("configuration")]
+    [XmlRoot ("configuration")]
     public sealed class ServerConfiguration
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Path for AlphabetTable (without extension).
+        /// Путь до таблицы символов (без расширения).
         /// </summary>
-        [XmlElement("alphabetTablePath")]
-        [JsonPropertyName("alphabetTablePath")]
+        [XmlElement ("alphabetTablePath")]
+        [JsonPropertyName ("alphabetTablePath")]
         public string? AlphabetTablePath { get; set; }
 
         /// <summary>
-        /// Data path.
+        /// Путь к директории с данными.
         /// </summary>
-        [XmlElement("dataPath")]
-        [JsonPropertyName("dataPath")]
+        [XmlElement ("dataPath")]
+        [JsonPropertyName ("dataPath")]
         public string? DataPath { get; set; }
 
         /// <summary>
-        /// System path.
+        /// Системный путь.
         /// </summary>
-        [XmlElement("systemPath")]
-        [JsonPropertyName("systemPath")]
+        [XmlElement ("systemPath")]
+        [JsonPropertyName ("systemPath")]
         public string? SystemPath { get; set; }
 
         /// <summary>
-        /// Path for UpperCaseTable (without extension).
+        /// Путь до таблицы преобразования символов
+        /// в верхний регистр (без расширения).
         /// </summary>
-        [XmlElement("upperCaseTable")]
-        [JsonPropertyName("upperCaseTable")]
+        [XmlElement ("upperCaseTable")]
+        [JsonPropertyName ("upperCaseTable")]
         public string? UpperCaseTable { get; set; }
 
         #endregion
@@ -72,14 +72,14 @@ namespace ManagedIrbis.Server
         #region Public methods
 
         /// <summary>
-        /// Create server configuration from INI-file.
+        /// Создание конфигурации из INI-файла.
         /// </summary>
         public static ServerConfiguration FromIniFile
             (
                 ServerIniFile iniFile
             )
         {
-            Sure.NotNull(iniFile, nameof(iniFile));
+            Sure.NotNull (iniFile);
 
             var result = new ServerConfiguration
             {
@@ -90,59 +90,60 @@ namespace ManagedIrbis.Server
             };
 
             return result;
-        }
+
+        } // method FromIniFile
 
         /// <summary>
-        /// Create server configuration from INI file.
+        /// Создание серверной конфигурации из INI-файла.
         /// </summary>
         public static ServerConfiguration FromIniFile
             (
                 string fileName
             )
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            Sure.NotNullNorEmpty (fileName);
 
             using var iniFile = new IniFile
                 (
                     fileName,
-                    IrbisEncoding.Ansi,
-                    false
+                    IrbisEncoding.Ansi
                 );
-            ServerIniFile serverIni = new ServerIniFile(iniFile);
-            ServerConfiguration result = FromIniFile(serverIni);
+            var serverIni = new ServerIniFile (iniFile);
+            var result = FromIniFile (serverIni);
 
             return result;
-        }
+
+        } // method FromIniFile
 
         /// <summary>
-        /// Create server configuration from path.
+        /// Загрузка серверной конфигурации по пути до системной директории.
         /// </summary>
         public static ServerConfiguration FromPath
             (
                 string path
             )
         {
-            Sure.NotNullNorEmpty(path, nameof(path));
+            Sure.NotNullNorEmpty (path);
 
-            string systemPath = Path.GetFullPath(path);
-            systemPath = PathUtility.StripTrailingBackslash(systemPath);
+            var systemPath = Path.GetFullPath (path);
+            systemPath = PathUtility.StripTrailingBackslash (systemPath);
 
-            ServerConfiguration result = new ServerConfiguration
+            var result = new ServerConfiguration
             {
-                SystemPath = systemPath
-                    + Path.DirectorySeparatorChar,
+                SystemPath = systemPath + Path.DirectorySeparatorChar,
                 DataPath = Path.Combine
                     (
                         systemPath,
                         "DATAI"
                         + Path.DirectorySeparatorChar
                     ),
-                AlphabetTablePath = Path.Combine(systemPath, "isisacw"),
-                UpperCaseTable = Path.Combine(systemPath, "isisucw")
+                AlphabetTablePath = Path.Combine (systemPath, "isisacw"),
+                UpperCaseTable = Path.Combine (systemPath, "isisucw")
             };
 
             return result;
-        }
+
+        } // method FromPath
 
         #endregion
 
@@ -154,13 +155,14 @@ namespace ManagedIrbis.Server
                 BinaryReader reader
             )
         {
-            Sure.NotNull(reader, nameof(reader));
+            Sure.NotNull (reader);
 
             AlphabetTablePath = reader.ReadNullableString();
             DataPath = reader.ReadNullableString();
             SystemPath = reader.ReadNullableString();
             UpperCaseTable = reader.ReadNullableString();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -168,46 +170,40 @@ namespace ManagedIrbis.Server
                 BinaryWriter writer
             )
         {
-            Sure.NotNull(writer, nameof(writer));
+            Sure.NotNull (writer);
 
             writer
-                .WriteNullable(AlphabetTablePath)
-                .WriteNullable(DataPath)
-                .WriteNullable(SystemPath)
-                .WriteNullable(UpperCaseTable);
-        }
+                .WriteNullable (AlphabetTablePath)
+                .WriteNullable (DataPath)
+                .WriteNullable (SystemPath)
+                .WriteNullable (UpperCaseTable);
+
+        } // method SaveToStream
 
         #endregion
 
         #region IVerifiable members
 
         /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify(bool throwOnError)
+        public bool Verify
+            (
+                bool throwOnError
+            )
         {
-            var verifier = new Verifier<ServerConfiguration>(this, throwOnError);
+            var verifier = new Verifier<ServerConfiguration> (this, throwOnError);
 
             // IRBIS64 doesn't use external upper case table
 
             verifier
-                .DirectoryExist
-                    (
-                        SystemPath.ThrowIfNull(nameof(SystemPath)),
-                        nameof(SystemPath)
-                    )
-                .DirectoryExist
-                    (
-                        DataPath.ThrowIfNull(nameof(DataPath)),
-                        nameof(DataPath)
-                    )
-                .NotNullNorEmpty
-                    (
-                        AlphabetTablePath,
-                        nameof(AlphabetTablePath)
-                    );
-                //.NotNullNorEmpty(UpperCaseTable, "UpperCaseTable");
+                .DirectoryExist (SystemPath.ThrowIfNull())
+                .DirectoryExist (DataPath.ThrowIfNull())
+                .NotNullNorEmpty (AlphabetTablePath);
+
+            //.NotNullNorEmpty(UpperCaseTable, "UpperCaseTable");
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 

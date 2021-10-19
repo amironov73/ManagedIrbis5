@@ -147,9 +147,7 @@ namespace ManagedIrbis.Biblio
                 return Array.Empty<string>();
             }
 
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-
+            var processor = context.Processor.ThrowIfNull();
             using var formatter = processor.AcquireFormatter(context);
             formatter.ParseProgram(format);
             var formatted = formatter.FormatRecords(mfns);
@@ -170,7 +168,7 @@ namespace ManagedIrbis.Biblio
                 string format
             )
         {
-            var records = Records .ThrowIfNull(nameof(Records));
+            var records = Records .ThrowIfNull();
             var mfns = records.Select(r => r.Mfn).ToArray();
             var result = FormatRecords(context, mfns, format);
 
@@ -186,15 +184,12 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            var report = processor.Report
-                .ThrowIfNull("processor.Report");
+            var processor = context.Processor.ThrowIfNull();
+            var report = processor.Report.ThrowIfNull();
 
             if (Duplicates.Count != 0)
             {
-                var items
-                    = new List<BiblioItem>(Duplicates.Count);
+                var items = new List<BiblioItem>(Duplicates.Count);
                 foreach (var dublicate in Duplicates)
                 {
                     var item = _FindItem(dublicate);

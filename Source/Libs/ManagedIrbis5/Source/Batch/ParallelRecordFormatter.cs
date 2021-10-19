@@ -165,7 +165,7 @@ namespace ManagedIrbis.Batch
                 var batch = new BatchRecordFormatter
                     (
                         connection,
-                        connection.Database.ThrowIfNull("connection.Database"),
+                        connection.Database.ThrowIfNull(),
                         Format,
                         1000,
                         chunk
@@ -202,8 +202,8 @@ namespace ManagedIrbis.Batch
 
         private bool _AllDone()
         {
-            return _queue.ThrowIfNull("_queue").IsEmpty
-                   && _tasks.ThrowIfNull("_tasks").All(t => t.IsCompleted);
+            return _queue.ThrowIfNull().IsEmpty
+                   && _tasks.ThrowIfNull().All(t => t.IsCompleted);
         }
 
         #endregion

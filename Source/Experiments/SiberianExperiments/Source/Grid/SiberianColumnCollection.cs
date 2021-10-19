@@ -37,7 +37,7 @@ namespace ManagedIrbis.WinForms.Grid
         #region List members
 
         /// <inheritdoc cref="ISiberianColumnCollection.this"/>
-        public new ISiberianColumn this[int index] => base[index].ThrowIfNull("base[index]");
+        public new ISiberianColumn this[int index] => base[index].ThrowIfNull();
 
         #endregion
 

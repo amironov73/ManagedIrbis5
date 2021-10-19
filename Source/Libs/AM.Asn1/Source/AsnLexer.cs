@@ -37,30 +37,30 @@ namespace AM.Asn1
         private TextNavigator? _navigator;
 
         private static char[] _integer =
-            {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
-            };
+        {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+        };
 
         private static char[] _identifier =
-            {
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
-                'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-                'y', 'z',
+        {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
+            'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+            'y', 'z',
 
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-                'Y', 'Z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+            'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+            'Y', 'Z',
 
-                'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к',
-                'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц',
-                'ч', 'ш', 'щ', 'ь', 'ы', 'ъ', 'э', 'ю', 'я',
+            'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к',
+            'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц',
+            'ч', 'ш', 'щ', 'ь', 'ы', 'ъ', 'э', 'ю', 'я',
 
-                'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К',
-                'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц',
-                'Ч', 'Ш', 'Щ', 'Ь', 'Ы', 'Ъ', 'Э', 'Ю', 'Я',
+            'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К',
+            'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц',
+            'Ч', 'Ш', 'Щ', 'Ь', 'Ы', 'Ъ', 'Э', 'Ю', 'Я',
 
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'
-            };
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'
+        };
 
         private int Column => _navigator?.Column ?? 0;
 
@@ -80,18 +80,19 @@ namespace AM.Asn1
             }
 
             var result = new StringBuilder();
+
             //string[] reserved = AsnUtility.GetReservedWords();
 
             while (true)
             {
                 var c = PeekChar();
                 if (c == TextNavigator.EOF
-                    || Array.IndexOf(_identifier, c) < 0)
+                    || Array.IndexOf (_identifier, c) < 0)
                 {
                     break;
                 }
 
-                result.Append(c);
+                result.Append (c);
                 ReadChar();
                 c = PeekChar();
                 if (c == '\r' || c == '\n')
@@ -114,19 +115,20 @@ namespace AM.Asn1
             }
 
             var result = new StringBuilder();
-            result.Append(initialLetter);
+            result.Append (initialLetter);
+
             // string[] reserved = AsnUtility.GetReservedWords();
 
             while (true)
             {
                 var c = PeekChar();
                 if (c == TextNavigator.EOF
-                    || Array.IndexOf(_identifier, c) < 0)
+                    || Array.IndexOf (_identifier, c) < 0)
                 {
                     break;
                 }
 
-                result.Append(c);
+                result.Append (c);
                 ReadChar();
                 c = PeekChar();
                 if (c == '\r' || c == '\n')
@@ -147,7 +149,8 @@ namespace AM.Asn1
             {
                 return null;
             }
-            result.Append(c);
+
+            result.Append (c);
             ReadChar();
 
             while (true)
@@ -157,7 +160,8 @@ namespace AM.Asn1
                 {
                     break;
                 }
-                result.Append(c);
+
+                result.Append (c);
                 ReadChar();
             }
 
@@ -182,7 +186,7 @@ namespace AM.Asn1
                 digitFound = true;
             }
 
-            result.Append(c);
+            result.Append (c);
             ReadChar();
 
             while (true)
@@ -194,13 +198,13 @@ namespace AM.Asn1
                 }
 
                 digitFound = true;
-                result.Append(c);
+                result.Append (c);
                 ReadChar();
             }
 
             if (!dotFound && c == '.')
             {
-                result.Append(c);
+                result.Append (c);
                 ReadChar();
 
                 while (true)
@@ -212,7 +216,7 @@ namespace AM.Asn1
                     }
 
                     digitFound = true;
-                    result.Append(c);
+                    result.Append (c);
                     ReadChar();
                 }
             }
@@ -224,14 +228,14 @@ namespace AM.Asn1
 
             if (c == 'E' || c == 'e')
             {
-                result.Append(c);
+                result.Append (c);
                 ReadChar();
                 digitFound = false;
                 c = PeekChar();
 
                 if (c == '+' || c == '-')
                 {
-                    result.Append(c);
+                    result.Append (c);
                     ReadChar();
                     PeekChar();
                 }
@@ -245,7 +249,7 @@ namespace AM.Asn1
                     }
 
                     digitFound = true;
-                    result.Append(c);
+                    result.Append (c);
                     ReadChar();
                 }
 
@@ -263,8 +267,8 @@ namespace AM.Asn1
                 char stop
             )
         {
-            var result = _navigator?.ReadUntilNoCrLf(stop);
-            if (ReferenceEquals(result, null))
+            var result = _navigator?.ReadUntilNoCrLf (stop);
+            if (ReferenceEquals (result, null))
             {
                 ThrowSyntax();
             }
@@ -290,7 +294,7 @@ namespace AM.Asn1
                     + message
                 );
 
-            throw new AsnSyntaxException(message);
+            throw new AsnSyntaxException (message);
         }
 
         #endregion
@@ -306,7 +310,7 @@ namespace AM.Asn1
             )
         {
             var result = new List<AsnToken>();
-            _navigator = new TextNavigator(text);
+            _navigator = new TextNavigator (text);
 
             while (!IsEof)
             {
@@ -324,12 +328,13 @@ namespace AM.Asn1
                 switch (c)
                 {
                     default:
-                        if (string.IsNullOrEmpty(value))
+                        if (string.IsNullOrEmpty (value))
                         {
-                            _navigator.Move(-1);
+                            _navigator.Move (-1);
                             value = ReadIdentifier();
                         }
-                        if (string.IsNullOrEmpty(value))
+
+                        if (string.IsNullOrEmpty (value))
                         {
                             ThrowSyntax();
                         }
@@ -601,14 +606,16 @@ namespace AM.Asn1
                     ThrowSyntax();
                 }
 
-                var token = new AsnToken(kind, line, column, value.ThrowIfNull(nameof(value)));
-                result.Add(token);
-
+                var token = new AsnToken (kind, line, column, value.ThrowIfNull());
+                result.Add (token);
             }
 
-            return new AsnTokenList(result.ToArray());
-        }
+            return new AsnTokenList (result.ToArray());
+
+        } // method Tokenize
 
         #endregion
-    }
-}
+
+    } // class AsnLexer
+
+} // namespace AM.Asn1

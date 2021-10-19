@@ -107,8 +107,7 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
+            var processor = context.Processor.ThrowIfNull();
 
             var settings = Settings;
             if (!ReferenceEquals(settings, null))
@@ -152,10 +151,8 @@ namespace ManagedIrbis.Biblio
                 using (var formatter
                     = processor.AcquireFormatter(context))
                 {
-                    var select = SelectClause
-                        .ThrowIfNull("SelectClause");
-                    var format = processor.GetText(context, select)
-                        .ThrowIfNull("SelectClause");
+                    var select = SelectClause.ThrowIfNull();
+                    var format = processor.GetText(context, select).ThrowIfNull();
                     formatter.ParseProgram(format);
 
                     var formatted = formatter.FormatRecords(mfns);
@@ -169,8 +166,8 @@ namespace ManagedIrbis.Biblio
                                 context,
                                 extendedFormat
                             )
-                            .ThrowIfNull("ExtendedFormat");
-                        formatter.ParseProgram(extendedFormat);
+                            .ThrowIfNull (nameof (extendedFormat));
+                        formatter.ParseProgram (extendedFormat);
                         formatted2 = formatter.FormatRecords(mfns);
                     }
 
@@ -248,7 +245,7 @@ namespace ManagedIrbis.Biblio
 
             foreach (var term in Terms)
             {
-                var title = term.Title.ThrowIfNull("term.Title");
+                var title = term.Title.ThrowIfNull();
                 var item = term.Item;
                 if (ReferenceEquals(item, null))
                 {
@@ -301,10 +298,8 @@ namespace ManagedIrbis.Biblio
             var log = context.Log;
             log.WriteLine("Begin render {0}", this);
 
-            var processor = context.Processor
-                .ThrowIfNull("context.Processor");
-            var report = processor.Report
-                .ThrowIfNull("processor.Report");
+            var processor = context.Processor.ThrowIfNull();
+            var report = processor.Report.ThrowIfNull();
 
             report.Body.Add(new NewPageBand());
             RenderTitle(context);

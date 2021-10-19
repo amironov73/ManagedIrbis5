@@ -78,10 +78,10 @@ namespace ManagedIrbis.Server.Commands
                 errorCode = -8888;
             }
 
-            var request = Data.Request.ThrowIfNull(nameof(Data.Request));
-            var response = new ServerResponse(request);
+            var request = Data.Request.ThrowIfNull();
+            var response = new ServerResponse (request);
             Data.Response = response;
-            response.WriteInt32(errorCode).NewLine();
+            response.WriteInt32 (errorCode).NewLine();
             SendResponse();
         }
 
@@ -97,9 +97,10 @@ namespace ManagedIrbis.Server.Commands
                 var serverVersion = ServerUtility.GetServerVersion();
                 versionString = serverVersion.Version;
             }
-            var packet = response.Encode(versionString);
-            var socket = Data.Socket.ThrowIfNull(nameof(Data.Socket));
-            socket.SendAsync(packet);
+
+            var packet = response.Encode (versionString);
+            var socket = Data.Socket.ThrowIfNull();
+            socket.SendAsync (packet);
         }
 
         /// <summary>

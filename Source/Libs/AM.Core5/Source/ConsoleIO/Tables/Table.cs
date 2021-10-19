@@ -155,7 +155,7 @@ namespace AM.ConsoleIO.Tables
                 object title
             )
         {
-            var titleText = title.ToString().ThrowIfNull(nameof(title));
+            var titleText = title.ToString().ThrowIfNull();
             _columns.Add (new ColumnHeader(titleText));
 
             return this;
