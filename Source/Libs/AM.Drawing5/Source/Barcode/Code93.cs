@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
 
 /* Code93.cs -- штрихкод, поддерживающий A-Z, 0-9 и некоторые спецсимволы
  * Ars Magna project, http://arsmagna.ru
@@ -13,10 +14,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using AM.Text;
 
 #endregion
 
@@ -90,91 +88,52 @@ namespace AM.Drawing.Barcodes
     /// <summary>
     /// Штрихкод, поддерживающий A-Z, 0-9 и некоторые спецсимволы.
     /// </summary>
-    public class Code93
-        : IBarcode
+    public sealed class Code93
+        : LinearBarcodeBase
     {
-        #region Properties
+        #region LinearBarcodeBase methods
 
-        /// <summary>
-        /// Множитель для ширины полос.
-        /// </summary>
-        public float Weight { get; set; } = 3.0f;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public static string Encode
+        /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
+        public override string Encode
             (
-                string text
+                BarcodeData text
             )
         {
-            var result = new List<char>();
+            var builder = StringBuilderPool.Shared.Get();
 
-            return new string(result.ToArray());
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
 
-        /// <summary>
-        /// Проверка, пригодны ли данные для штрих-кода.
-        /// </summary>
-        public bool Verify
+            return result;
+
+        } // method Encode
+
+        /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
+        public override bool Verify
             (
                 BarcodeData data
             )
         {
             var message = data.Message;
 
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace (message))
             {
                 return false;
             }
 
-
             return true;
-        }
+
+        } // method Verify
 
         #endregion
 
         #region IBarcode members
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
-        public string Symbology { get; } = "Code 93";
-
-        /// <inheritdoc cref="IBarcode.DrawBarcode"/>
-        public void DrawBarcode
-            (
-                BarcodeContext context
-            )
-        {
-            var data = context.Data;
-            if (data is null || !Verify(data))
-            {
-                return;
-            }
-
-            var encoded = Encode(data.Message.ThrowIfNull("data.Message"));
-            encoded = "00" + encoded + "00";
-            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
-            var bounds = context.Bounds;
-            using var fore = new SolidBrush(Color.Black);
-            using var back = new SolidBrush(Color.White);
-            var position = bounds.Left;
-
-            foreach (var c in encoded)
-            {
-                var rect = new RectangleF(position, bounds.Top, Weight, bounds.Height);
-                var brush = c == '0' ? back : fore;
-                graphics.FillRectangle(brush, rect);
-                position += Weight;
-            }
-
-        }
+        public override string Symbology { get; } = "Code 93";
 
         #endregion
-    }
-}
+
+    } // class Code93
+
+} // namespace AM.Drawing.Barcodes

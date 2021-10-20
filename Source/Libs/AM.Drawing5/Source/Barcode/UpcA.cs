@@ -7,13 +7,13 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* UpcA.cs --
+/* UpcA.cs -- UPC-A
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Collections.Generic;
+using AM.Text;
 
 #endregion
 
@@ -24,7 +24,7 @@ namespace AM.Drawing.Barcodes
     /// <summary>
     /// UPC-A
     /// </summary>
-    public class UpcA
+    public sealed class UpcA
         : LinearBarcodeBase
     {
         #region Private members
@@ -41,7 +41,6 @@ namespace AM.Drawing.Barcodes
             "0111011",
             "0110111",
             "0001011"
-
         };
 
         private static readonly string[] _rightCodes =
@@ -82,9 +81,10 @@ namespace AM.Drawing.Barcodes
 
                 var result = (10 - sum % 10) % 10;
 
-                return (char) (result + '0');
+                return (char)(result + '0');
             }
-        }
+
+        } // method ComputeCheckDigit
 
         #endregion
 
@@ -96,32 +96,37 @@ namespace AM.Drawing.Barcodes
                 BarcodeData data
             )
         {
-            var text = data.Message.ThrowIfNull("data.Message");
-            var result = new List<char>();
+            var text = data.Message.ThrowIfNull ("data.Message");
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (3 + 5 + 3 + 12 * 7);
 
-            var check = ComputeCheckDigit(text);
-            text = text.Substring(0, 11) + check;
+            var check = ComputeCheckDigit (text);
+            text = text.Substring (0, 11) + check;
 
-            result.AddRange("101"); // открывающая последовательность
+            builder.Append ("101"); // открывающая последовательность
 
             for (var i = 0; i < 6; i++)
             {
                 var c = text[i] - '0';
-                result.AddRange(_leftCodes[c]);
+                builder.Append (_leftCodes[c]);
             }
 
-            result.AddRange("01010"); // разделитель
+            builder.Append ("01010"); // разделитель
 
             for (var i = 6; i < text.Length; i++)
             {
                 var c = text[i] - '0';
-                result.AddRange(_rightCodes[c]);
+                builder.Append (_rightCodes[c]);
             }
 
-            result.AddRange("101"); // закрывающая последовательность
+            builder.Append ("101"); // закрывающая последовательность
 
-            return new string(result.ToArray());
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method Encode
 
         /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
         public override bool Verify
@@ -131,25 +136,28 @@ namespace AM.Drawing.Barcodes
         {
             var message = data.Message;
 
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace (message))
             {
                 return false;
             }
 
             foreach (var c in message)
             {
-                if (!char.IsDigit(c))
+                if (!char.IsDigit (c))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
+
+        } // method Verify
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
         public override string Symbology { get; } = "UPC-A";
 
         #endregion
-    }
-}
+
+    } // class UpcA
+
+} // namespace AM.Drawing.Barcodes

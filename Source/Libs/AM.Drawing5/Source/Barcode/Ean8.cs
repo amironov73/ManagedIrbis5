@@ -13,10 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using AM.Text;
 
 #endregion
 
@@ -27,7 +24,7 @@ namespace AM.Drawing.Barcodes
     /// <summary>
     /// EAN 8
     /// </summary>
-    public class Ean8
+    public sealed class Ean8
         : LinearBarcodeBase
     {
         #region Private members
@@ -70,31 +67,36 @@ namespace AM.Drawing.Barcodes
                 BarcodeData data
             )
         {
-            var text = data.Message.ThrowIfNull("data.Message");
-            var result = new List<char>();
+            var text = data.Message.ThrowIfNull();
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (3 * 3 + 7 * 8);
 
-            result.AddRange("101"); // открывающая последовательность
+            builder.Append ("101"); // открывающая последовательность
 
             var half = text.Length / 2;
 
             for (var i = 0; i < half; i++)
             {
                 var c = text[i] - '0';
-                result.AddRange(_codesA[c]);
+                builder.Append (_codesA[c]);
             }
 
-            result.AddRange("01010"); // разделитель
+            builder.Append ("01010"); // разделитель
 
             for (var i = half; i < text.Length; i++)
             {
                 var c = text[i] - '0';
-                result.AddRange(_codesB[c]);
+                builder.Append (_codesB[c]);
             }
 
-            result.AddRange("101"); // закрывающая последовательность
+            builder.Append ("101"); // закрывающая последовательность
 
-            return new string(result.ToArray());
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method Encode
 
         /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
         public override bool Verify
@@ -118,11 +120,14 @@ namespace AM.Drawing.Barcodes
             }
 
             return true;
-        }
+
+        } // method Verify
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
         public override string Symbology { get; } = "EAN13";
 
         #endregion
-    }
-}
+
+    } // class Ean8
+
+} // namespace AM.Drawing.Barcodes

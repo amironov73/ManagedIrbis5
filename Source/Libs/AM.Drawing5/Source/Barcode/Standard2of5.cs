@@ -7,13 +7,13 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* Standard2of5.cs --
+/* Standard2of5.cs -- штрих-код "2 из 5"
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System.Collections.Generic;
+using AM.Text;
 
 #endregion
 
@@ -22,9 +22,9 @@ using System.Collections.Generic;
 namespace AM.Drawing.Barcodes
 {
     /// <summary>
-    ///
+    /// Штрих-код "2 из 5"
     /// </summary>
-    public class Standard2of5
+    public sealed class Standard2of5
         : LinearBarcodeBase
     {
         #region Private members
@@ -53,21 +53,26 @@ namespace AM.Drawing.Barcodes
                 BarcodeData data
             )
         {
-            var text = data.Message.ThrowIfNull("data.Message");
-            var result = new List<char>();
+            var text = data.Message.ThrowIfNull();
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (8 + 7 + text.Length * 14);
 
-            result.AddRange("11011010");
+            builder.Append ("11011010");
 
             foreach (var c in text)
             {
                 var digit = c - '0';
-                result.AddRange(_patterns[digit]);
+                builder.Append (_patterns[digit]);
             }
 
-            result.AddRange("1101011");
+            builder.Append ("1101011");
 
-            return new string(result.ToArray());
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method Encode
 
         /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
         public override bool Verify
@@ -75,7 +80,6 @@ namespace AM.Drawing.Barcodes
                 BarcodeData data
             )
         {
-
             var message = data.Message;
 
             if (string.IsNullOrWhiteSpace(message))
@@ -92,11 +96,14 @@ namespace AM.Drawing.Barcodes
             }
 
             return true;
-        }
+
+        } // method Verify
 
         /// <inheritdoc cref="LinearBarcodeBase.Symbology"/>
         public override string Symbology { get; } = "Standard 2 of 5";
 
         #endregion
-    }
-}
+
+    } // class Standard2of5
+
+} // namespace AM.Drawing.Barcodes

@@ -8,7 +8,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
-/* Codabar.cs --
+/* Codabar.cs -- штриховой код, позволяющий кодировать числа от 0 до 9, символы -, $, :, /, ., + и четыре буквы (A, B, C, D)
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,21 +16,58 @@
 
 using System.Collections.Generic;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
 
 namespace AM.Drawing.Barcodes
 {
-    /// <summary>
+    //
+    // https://ru.wikipedia.org/wiki/Codabar
+    //
+    // Codabar - штриховой код, позволяющий кодировать
+    // числа от 0 до 9, символы -, $, :, /, ., +
+    // и четыре буквы (A, B, C, D). Штрихкод CODABAR,
+    // в зависимости от спецификации, позволяет закодировать
+    // только цифры (от 0 до 9), и в некоторых вариантах шесть
+    // спецсимволов (-, $, :, /, ., +). Четыре буквы (A, B, C, D)
+    // используются как стартовый и стоповые биты и не выводятся
+    // при дешифровании. Каждый символ содержит 7 элементов
+    // (4 штриха и 3 пробела).
+    //
+    // Для кодирования символа используются
+    // два или три широких элемента и четыре или пять узких.
+    // Расстояние между символами (пробелы) не содержит информации.
+    // Коэффициент пропорциональности (N) - отношение ширины
+    // узкого элемента к ширине широкого N= от 1: 2,25 до 1:3.
+    //
+    // Из преимуществ можно выделить возможность кодирования
+    // 6 специальных символов. Пробелы между символами
+    // не содержат информации.
+    //
+    // К недостаткам относится низкое распределение информации
+    // на единицу площади. Пример: 5,5 мм на символ с минимальной
+    // шириной штриха X=0,3 мм и пропорцией кода N=1:3.
+    //
+    // Рекомендуемые методы печати: офсетная, лазерная и матричная,
+    // гравировка, флексография, термо- термотрансферная печать,
+    // фотопечать.
+    //
+    // Применяется на складах, транспорте, в логистике и др.
     ///
+
+    /// <summary>
+    /// Штриховой код, позволяющий кодировать числа от 0 до 9,
+    /// символы -, $, :, /, ., + и четыре буквы (A, B, C, D).
     /// </summary>
-    public class Codabar
+    public sealed class Codabar
         : LinearBarcodeBase
     {
         #region Private members
 
-        private static readonly Dictionary<char, string> _patterns = new()
+        private static readonly Dictionary<char, string> _patterns = new ()
         {
             ['0'] = "101010011",
             ['1'] = "101011001",
@@ -68,20 +105,24 @@ namespace AM.Drawing.Barcodes
                 BarcodeData data
             )
         {
-            var text = data.Message.ThrowIfNull("data.Message");
-            var result = new List<char>();
+            var text = data.Message.ThrowIfNull();
+            var builder = StringBuilderPool.Shared.Get();
 
             foreach (var c in text)
             {
-                result.AddRange(_patterns[c]);
-                result.Add('0'); // межсимвольный разделитель
+                builder.Append (_patterns [c]);
+                builder.Append ('0'); // межсимвольный разделитель
             }
 
             // убираем последний межсимвольный разделитель
-            result.RemoveAt(result.Count - 1);
+            builder.Remove (builder.Length - 1, 1);
 
-            return new string(result.ToArray());
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method Encode
 
         /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
         public override bool Verify
@@ -91,7 +132,7 @@ namespace AM.Drawing.Barcodes
         {
             var message = data.Message;
 
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace (message))
             {
                 return false;
             }
@@ -101,13 +142,13 @@ namespace AM.Drawing.Barcodes
                 return false;
             }
 
-            char c1 = char.ToUpperInvariant(message[0]);
+            var c1 = char.ToUpperInvariant (message[0]);
             if (c1 != 'A' && c1 != 'B' && c1 != 'C' && c1 != 'D')
             {
                 return false;
             }
 
-            char c2 = char.ToUpperInvariant(message[^1]);
+            var c2 = char.ToUpperInvariant (message[^1]);
             if (c2 != 'A' && c2 != 'B' && c2 != 'C' && c2 != 'D')
             {
                 return false;
@@ -115,18 +156,21 @@ namespace AM.Drawing.Barcodes
 
             foreach (var c in message)
             {
-                if (!_patterns.ContainsKey(c))
+                if (!_patterns.ContainsKey (c))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
+
+        } // method Verify
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
         public override string Symbology { get; } = "Codabar";
 
         #endregion
-    }
-}
+
+    } // class Codabar
+
+} // namespace AM.Drawing.Barcodes

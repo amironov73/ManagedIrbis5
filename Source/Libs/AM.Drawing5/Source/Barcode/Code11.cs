@@ -13,10 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using AM.Text;
 
 #endregion
 
@@ -38,8 +35,8 @@ namespace AM.Drawing.Barcodes
     /// <summary>
     /// Штрихкод, поддерживающий цифры и дефис.
     /// </summary>
-    public class Code11
-        : IBarcode
+    public sealed class Code11
+        : LinearBarcodeBase
     {
         #region Constants
 
@@ -50,21 +47,12 @@ namespace AM.Drawing.Barcodes
 
         #endregion
 
-        #region Properties
-
-        /// <summary>
-        /// Множитель для ширины полос.
-        /// </summary>
-        public float Weight { get; set; } = 3.0f;
-
-        #endregion
-
         #region Private members
 
         // паттерны для отображения символов
         private static readonly string[] _patterns =
         {
-            "101011",  // 0
+            "101011", // 0
             "1101011", // 1
             "1001011", // 2
             "1100101", // 3
@@ -73,22 +61,23 @@ namespace AM.Drawing.Barcodes
             "1001101", // 6
             "1010011", // 7
             "1101001", // 8
-            "110101",  // 9
-            "101101",  // -
-            "1011001"  // start/stop
+            "110101", // 9
+            "101101", // -
+            "1011001" // start/stop
         };
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public static string Encode
+        #endregion
+
+        #region LinearBarcodeBase members
+
+        /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
+        public override string Encode
             (
-                string text
+                BarcodeData data
             )
         {
-            var result = new List<char>();
+            var text = data.Message.ThrowIfNull();
+            var builder = StringBuilderPool.Shared.Get();
             var checksumC = 0;
             var weight = 1;
 
@@ -106,10 +95,11 @@ namespace AM.Drawing.Barcodes
                 ++weight;
             }
 
-            var withChecksums = new List<char>(text.Length);
-            withChecksums.AddRange(text);
+            var withChecksums = StringBuilderPool.Shared.Get();
+            withChecksums.EnsureCapacity (text.Length);
+            withChecksums.Append (text);
             checksumC %= 11;
-            withChecksums.AddRange(checksumC.ToInvariantString());
+            withChecksums.Append (checksumC.ToInvariantString());
 
             // рекомендуется вычислять контрольную сумму K
             // для сообщений длиной >= 10
@@ -118,7 +108,7 @@ namespace AM.Drawing.Barcodes
                 weight = 1;
                 var checksumK = 0;
 
-                for (var i = withChecksums.Count; i >= 0; i--)
+                for (var i = withChecksums.Length; i >= 0; i--)
                 {
                     if (weight == 9)
                     {
@@ -132,90 +122,60 @@ namespace AM.Drawing.Barcodes
                 }
 
                 checksumK %= 11;
-                withChecksums.AddRange(checksumK.ToInvariantString());
-            }
+                withChecksums.Append (checksumK.ToInvariantString());
 
-            result.AddRange(_patterns[11]); // start/stop
-            result.Add('0'); // space
+            } // if
 
-            foreach (var c in withChecksums)
+            builder.Append (_patterns[11]); // start/stop
+            builder.Append ('0'); // space
+
+            foreach (var c in withChecksums.ToString())
             {
                 var d = c == '-' ? 10 : c - '0';
-                result.AddRange(_patterns[d]);
-                result.Add('0'); // space
+                builder.Append (_patterns[d]);
+                builder.Append ('0'); // space
             }
 
-            result.AddRange(_patterns[11]); // start/stop
+            builder.Append (_patterns[11]); // start/stop
 
-            return new string(result.ToArray());
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (withChecksums);
+            StringBuilderPool.Shared.Return (builder);
 
-        #endregion
+            return result;
 
-        #region Public methods
+        } // method Encode
 
-        /// <summary>
-        /// Проверка, пригодны ли данные для штрих-кода.
-        /// </summary>
-        public bool Verify
+        /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
+        public override bool Verify
             (
                 BarcodeData data
             )
         {
             var message = data.Message;
 
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace (message))
             {
                 return false;
             }
 
             foreach (var c in message)
             {
-                if (!Alphabet.Contains(c))
+                if (!Alphabet.Contains (c))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
 
-        #endregion
-
-        #region IBarcode members
+        } // method Verify
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
-        public string Symbology { get; } = "Code11";
-
-        /// <inheritdoc cref="IBarcode.DrawBarcode"/>
-        public void DrawBarcode
-            (
-                BarcodeContext context
-            )
-        {
-            var data = context.Data;
-            if (data is null || !Verify(data))
-            {
-                return;
-            }
-
-            var encoded = Encode(data.Message.ThrowIfNull("data.Message"));
-            encoded = "00" + encoded + "00";
-            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
-            var bounds = context.Bounds;
-            using var fore = new SolidBrush(data.ForeColor);
-            using var back = new SolidBrush(data.BackColor);
-            var position = bounds.Left;
-
-            foreach (var c in encoded)
-            {
-                var rect = new RectangleF(position, bounds.Top, Weight, bounds.Height);
-                var brush = c == '0' ? back : fore;
-                graphics.FillRectangle(brush, rect);
-                position += Weight;
-            }
-        }
+        public override string Symbology { get; } = "Code11";
 
         #endregion
-    }
-}
+
+    } // class Code11
+
+} // namespace AM.Drawing.Barcodes

@@ -14,10 +14,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using AM.Text;
 
 #endregion
 
@@ -26,9 +23,9 @@ using System.Linq;
 namespace AM.Drawing.Barcodes
 {
     /// <summary>
-    /// EAN 13
+    /// EAN 13.
     /// </summary>
-    public class Ean13
+    public sealed class Ean13
         : LinearBarcodeBase
     {
         #region Private members
@@ -127,21 +124,21 @@ namespace AM.Drawing.Barcodes
                 BarcodeData data
             )
         {
-            var text = data.Message.ThrowIfNull("data.Message");
-            var result = new List<char>();
+            var text = data.Message.ThrowIfNull();
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (3 * 3 + 13 * 7);
 
-            var check = ComputeCheckDigit(text);
-            text = text.Substring(0, 12) + check;
-
+            var check = ComputeCheckDigit (text);
+            text = text.Substring (0, 12) + check;
             var c = text[0] - '0';
             var pattern = _patterns[c];
 
-            result.AddRange("101"); // открывающая последовательность
+            builder.Append ("101"); // открывающая последовательность
 
             for (var i = 0; i < 6; i++)
             {
                 c = text[i + 1] - '0';
-                result.AddRange
+                builder.Append
                     (
                         pattern[i] == 'a'
                             ? _codesA[c]
@@ -149,18 +146,22 @@ namespace AM.Drawing.Barcodes
                     );
             }
 
-            result.AddRange("01010"); // разделитель
+            builder.Append ("01010"); // разделитель
 
             for (var i = 7; i < text.Length; i++)
             {
                 c = text[i] - '0';
-                result.AddRange(_codesC[c]);
+                builder.Append (_codesC[c]);
             }
 
-            result.AddRange("101"); // закрывающая последовательность
+            builder.Append ("101"); // закрывающая последовательность
 
-            return new string(result.ToArray());
-        }
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method Encode
 
         /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
         public override bool Verify
@@ -170,25 +171,28 @@ namespace AM.Drawing.Barcodes
         {
             var message = data.Message;
 
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace (message))
             {
                 return false;
             }
 
             foreach (var c in message)
             {
-                if (!char.IsDigit(c))
+                if (!char.IsDigit (c))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
+
+        } // method Verify
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
         public override string Symbology { get; } = "EAN13";
 
         #endregion
-    }
-}
+
+    } // class Ean13
+
+} // namespace AM.Drawing.Barcodes

@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable StringLiteralTypo
 
 /* Code39.cs -- штрихкод, поддерживающий A-Z, 0-9 и некоторые спецсимволы
  * Ars Magna project, http://arsmagna.ru
@@ -13,10 +14,10 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using System.Text;
+
+using AM.Text;
 
 #endregion
 
@@ -74,299 +75,258 @@ namespace AM.Drawing.Barcodes
     /// (например, знак доллара <c>$</c>).
     /// </summary>
     public class Code39
-        : IBarcode
+        : LinearBarcodeBase
     {
-        #region Properties
-
-        /// <summary>
-        /// Множитель для ширины полос.
-        /// </summary>
-        public float Weight { get; set; } = 3.0f;
-
-        #endregion
-
         #region Private members
 
         // паттерны для отображения символов
-        private static readonly Dictionary<char, string> _patterns = new()
+        private static readonly Dictionary<char, string> _patterns = new ()
         {
-                ['0'] = "101001101101",
-                ['1'] = "110100101011",
-                ['2'] = "101100101011",
-                ['3'] = "110110010101",
-                ['4'] = "101001101011",
-                ['5'] = "110100110101",
-                ['6'] = "101100110101",
-                ['7'] = "101001011011",
-                ['8'] = "110100101101",
-                ['9'] = "101100101101",
-                ['A'] = "110101001011",
-                ['B'] = "101101001011",
-                ['C'] = "110110100101",
-                ['D'] = "101011001011",
-                ['E'] = "110101100101",
-                ['F'] = "101101100101",
-                ['G'] = "101010011011",
-                ['H'] = "110101001101",
-                ['I'] = "101101001101",
-                ['J'] = "101011001101",
-                ['K'] = "110101010011",
-                ['L'] = "101101010011",
-                ['M'] = "110110101001",
-                ['N'] = "101011010011",
-                ['O'] = "110101101001",
-                ['P'] = "101101101001",
-                ['Q'] = "101010110011",
-                ['R'] = "110101011001",
-                ['S'] = "101101011001",
-                ['T'] = "101011011001",
-                ['U'] = "110010101011",
-                ['V'] = "100110101011",
-                ['W'] = "110011010101",
-                ['X'] = "100101101011",
-                ['Y'] = "110010110101",
-                ['Z'] = "100110110101",
-                ['-'] = "100101011011",
-                ['.'] = "110010101101",
-                [' '] = "100110101101",
-                ['$'] = "100100100101",
-                ['/'] = "100100101001",
-                ['+'] = "100101001001",
-                ['%'] = "101001001001",
-                ['*'] = "100101101101",
+            ['0'] = "101001101101",
+            ['1'] = "110100101011",
+            ['2'] = "101100101011",
+            ['3'] = "110110010101",
+            ['4'] = "101001101011",
+            ['5'] = "110100110101",
+            ['6'] = "101100110101",
+            ['7'] = "101001011011",
+            ['8'] = "110100101101",
+            ['9'] = "101100101101",
+            ['A'] = "110101001011",
+            ['B'] = "101101001011",
+            ['C'] = "110110100101",
+            ['D'] = "101011001011",
+            ['E'] = "110101100101",
+            ['F'] = "101101100101",
+            ['G'] = "101010011011",
+            ['H'] = "110101001101",
+            ['I'] = "101101001101",
+            ['J'] = "101011001101",
+            ['K'] = "110101010011",
+            ['L'] = "101101010011",
+            ['M'] = "110110101001",
+            ['N'] = "101011010011",
+            ['O'] = "110101101001",
+            ['P'] = "101101101001",
+            ['Q'] = "101010110011",
+            ['R'] = "110101011001",
+            ['S'] = "101101011001",
+            ['T'] = "101011011001",
+            ['U'] = "110010101011",
+            ['V'] = "100110101011",
+            ['W'] = "110011010101",
+            ['X'] = "100101101011",
+            ['Y'] = "110010110101",
+            ['Z'] = "100110110101",
+            ['-'] = "100101011011",
+            ['.'] = "110010101101",
+            [' '] = "100110101101",
+            ['$'] = "100100100101",
+            ['/'] = "100100101001",
+            ['+'] = "100101001001",
+            ['%'] = "101001001001",
+            ['*'] = "100101101101",
         };
 
         // таблица трансляции для расширенного набора символов
-        private static readonly Dictionary<char, string> _extended = new()
+        private static readonly Dictionary<char, string> _extended = new ()
         {
-            [(char)0]   = "%U",
-            [(char)1]   = "$A",
-            [(char)2]   = "$B",
-            [(char)3]   = "$C",
-            [(char)4]   = "$D",
-            [(char)5]   = "$E",
-            [(char)6]   = "$F",
-            [(char)7]   = "$G",
-            [(char)8]   = "$H",
-            [(char)9]   = "$I",
-            [(char)10]  = "$J",
-            [(char)11]  = "$K",
-            [(char)12]  = "$L",
-            [(char)13]  = "$M",
-            [(char)14]  = "$N",
-            [(char)15]  = "$O",
-            [(char)16]  = "$P",
-            [(char)17]  = "$Q",
-            [(char)18]  = "$R",
-            [(char)19]  = "$S",
-            [(char)20]  = "$T",
-            [(char)21]  = "$U",
-            [(char)22]  = "$V",
-            [(char)23]  = "$W",
-            [(char)24]  = "$X",
-            [(char)25]  = "$Y",
-            [(char)26]  = "$Z",
-            [(char)27]  = "%A",
-            [(char)28]  = "%B",
-            [(char)29]  = "%C",
-            [(char)30]  = "%D",
-            [(char)31]  = "%E",
-            ['!']       = "/A",
-            ['"']       =  "/",
-            ['#']       = "/C",
-            ['$']       = "/D",
-            ['%']       = "/E",
-            ['&']       = "/F",
-            ['\'']      = "/G",
-            ['(']       = "/H",
-            [')']       = "/I",
-            ['*']       = "/J",
-            ['+']       = "/K",
-            [',']       = "/L",
-            ['/']       = "/O",
-            [':']       = "/Z",
-            [';']       = "%F",
-            ['<']       = "%G",
-            ['=']       = "%H",
-            ['>']       = "%I",
-            ['?']       = "%J",
-            ['[']       = "%K",
-            ['\\']      =  "%",
-            [']']       = "%M",
-            ['^']       = "%N",
-            ['_']       = "%O",
-            ['{']       = "%P",
-            ['|']       = "%Q",
-            ['}']       = "%R",
-            ['~']       = "%S",
-            ['`']       = "%W",
-            ['@']       = "%V",
-            ['a']       = "+A",
-            ['b']       = "+B",
-            ['c']       = "+C",
-            ['d']       = "+D",
-            ['e']       = "+E",
-            ['f']       = "+F",
-            ['g']       = "+G",
-            ['h']       = "+H",
-            ['i']       = "+I",
-            ['j']       = "+J",
-            ['k']       = "+K",
-            ['l']       = "+L",
-            ['m']       = "+M",
-            ['n']       = "+N",
-            ['o']       = "+O",
-            ['p']       = "+P",
-            ['q']       = "+Q",
-            ['r']       = "+R",
-            ['s']       = "+S",
-            ['t']       = "+T",
-            ['u']       = "+U",
-            ['v']       = "+V",
-            ['w']       = "+W",
-            ['x']       = "+X",
-            ['y']       = "+Y",
-            ['z']       = "+Z",
+            [(char)0] = "%U",
+            [(char)1] = "$A",
+            [(char)2] = "$B",
+            [(char)3] = "$C",
+            [(char)4] = "$D",
+            [(char)5] = "$E",
+            [(char)6] = "$F",
+            [(char)7] = "$G",
+            [(char)8] = "$H",
+            [(char)9] = "$I",
+            [(char)10] = "$J",
+            [(char)11] = "$K",
+            [(char)12] = "$L",
+            [(char)13] = "$M",
+            [(char)14] = "$N",
+            [(char)15] = "$O",
+            [(char)16] = "$P",
+            [(char)17] = "$Q",
+            [(char)18] = "$R",
+            [(char)19] = "$S",
+            [(char)20] = "$T",
+            [(char)21] = "$U",
+            [(char)22] = "$V",
+            [(char)23] = "$W",
+            [(char)24] = "$X",
+            [(char)25] = "$Y",
+            [(char)26] = "$Z",
+            [(char)27] = "%A",
+            [(char)28] = "%B",
+            [(char)29] = "%C",
+            [(char)30] = "%D",
+            [(char)31] = "%E",
+            ['!'] = "/A",
+            ['"'] = "/",
+            ['#'] = "/C",
+            ['$'] = "/D",
+            ['%'] = "/E",
+            ['&'] = "/F",
+            ['\''] = "/G",
+            ['('] = "/H",
+            [')'] = "/I",
+            ['*'] = "/J",
+            ['+'] = "/K",
+            [','] = "/L",
+            ['/'] = "/O",
+            [':'] = "/Z",
+            [';'] = "%F",
+            ['<'] = "%G",
+            ['='] = "%H",
+            ['>'] = "%I",
+            ['?'] = "%J",
+            ['['] = "%K",
+            ['\\'] = "%",
+            [']'] = "%M",
+            ['^'] = "%N",
+            ['_'] = "%O",
+            ['{'] = "%P",
+            ['|'] = "%Q",
+            ['}'] = "%R",
+            ['~'] = "%S",
+            ['`'] = "%W",
+            ['@'] = "%V",
+            ['a'] = "+A",
+            ['b'] = "+B",
+            ['c'] = "+C",
+            ['d'] = "+D",
+            ['e'] = "+E",
+            ['f'] = "+F",
+            ['g'] = "+G",
+            ['h'] = "+H",
+            ['i'] = "+I",
+            ['j'] = "+J",
+            ['k'] = "+K",
+            ['l'] = "+L",
+            ['m'] = "+M",
+            ['n'] = "+N",
+            ['o'] = "+O",
+            ['p'] = "+P",
+            ['q'] = "+Q",
+            ['r'] = "+R",
+            ['s'] = "+S",
+            ['t'] = "+T",
+            ['u'] = "+U",
+            ['v'] = "+V",
+            ['w'] = "+W",
+            ['x'] = "+X",
+            ['y'] = "+Y",
+            ['z'] = "+Z",
             [(char)127] = "%T",
         };
 
         private static void Append
             (
-                IList<char> encoded,
+                StringBuilder encoded,
                 char c
             )
         {
-            if (_patterns.ContainsKey(c))
+            if (_patterns.ContainsKey (c))
             {
                 var pattern = _patterns[c];
                 foreach (var pc in pattern)
                 {
-                    encoded.Add(pc);
+                    encoded.Append (pc);
                 }
             }
-            else if (_extended.ContainsKey(c))
+            else if (_extended.ContainsKey (c))
             {
                 var extended = _extended[c];
                 foreach (var ec in extended)
                 {
-                    Append(encoded, ec);
+                    Append (encoded, ec);
                 }
             }
             else
             {
-                throw new Exception();
-            }
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public static string Encode
-            (
-                string text
-            )
-        {
-            var result = new List<char>();
-
-            text = text.Replace("*", string.Empty);
-            //text = "*" + text + ComputeChecksum(text) + "*";
-            text = "*" + text  + "*";
-
-            foreach (var c in text)
-            {
-                Append(result, c);
-                result.Add('0');
+                throw new ArsMagnaException();
             }
 
-            result.RemoveAt(result.Count - 1);
-
-            return new string(result.ToArray());
-        }
-
-        private static char ComputeChecksum(string text)
-        {
-            var charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%";
-            var sum = 0;
-
-            //Calculate the checksum
-            foreach (var c in text)
-            {
-                sum = sum + charset.IndexOf(char.ToUpper(c));
-            }
-
-            //return the checksum char
-            return charset[sum % 43];
-        }
+        } // method Append
 
         #endregion
 
-        #region Public methods
+        #region LinearBarcodeBase members
 
-        /// <summary>
-        /// Проверка, пригодны ли данные для штрих-кода.
-        /// </summary>
-        public bool Verify
+        /// <inheritdoc cref="LinearBarcodeBase.Encode"/>
+        public override string Encode
+            (
+                BarcodeData data
+            )
+        {
+            var builder = StringBuilderPool.Shared.Get();
+            var text = data.Message.ThrowIfNull ().Replace ("*", string.Empty);
+            //text = "*" + text + ComputeChecksum(text) + "*";
+            text = "*" + text + "*";
+
+            foreach (var c in text)
+            {
+                Append (builder, c);
+                builder.Append ('0');
+            }
+
+            builder.Remove (builder.Length - 1, 1);
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method Encode
+
+        // private static char ComputeChecksum (string text)
+        // {
+        //     var charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%";
+        //     var sum = 0;
+        //
+        //     //Calculate the checksum
+        //     foreach (var c in text)
+        //     {
+        //         sum = sum + charset.IndexOf (char.ToUpper (c));
+        //     }
+        //
+        //     //return the checksum char
+        //     return charset[sum % 43];
+        // }
+
+        /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
+        public override bool Verify
             (
                 BarcodeData data
             )
         {
             var message = data.Message;
 
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace (message))
             {
                 return false;
             }
 
             foreach (var c in message)
             {
-                if (!_patterns.ContainsKey(c)
-                    && !_extended.ContainsKey(c))
+                if (!_patterns.ContainsKey (c)
+                    && !_extended.ContainsKey (c))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
 
-        #endregion
-
-        #region IBarcode members
+        } // method Verify
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
-        public string Symbology { get; } = "Code39";
-
-        /// <inheritdoc cref="IBarcode.DrawBarcode"/>
-        public void DrawBarcode
-            (
-                BarcodeContext context
-            )
-        {
-            var data = context.Data;
-            if (data is null || !Verify(data))
-            {
-                return;
-            }
-
-            var encoded = Encode(data.Message.ThrowIfNull("data.Message"));
-            encoded = "00" + encoded + "00";
-            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
-            var bounds = context.Bounds;
-            using var fore = new SolidBrush(Color.Black);
-            using var back = new SolidBrush(Color.White);
-            var position = bounds.Left;
-
-            foreach (var c in encoded)
-            {
-                var rect = new RectangleF(position, bounds.Top, Weight, bounds.Height);
-                var brush = c == '0' ? back : fore;
-                graphics.FillRectangle(brush, rect);
-                position += Weight;
-            }
-        }
+        public override string Symbology { get; } = "Code39";
 
         #endregion
-    }
-}
+
+    } // class Code39
+
+} // namespace AM.Drawing.Barcodes
