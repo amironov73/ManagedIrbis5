@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* RepeatingGroup.cs -- повторяющаяся группа при форматировании записи
@@ -15,9 +16,12 @@
 
 #region Using directives
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+
+using AM;
 
 #endregion
 
@@ -55,10 +59,10 @@ namespace ManagedIrbis
         /// Конструктор.
         /// </summary>
         public RepeatingGroup
-        (
-            Record record,
-            int tag
-        )
+            (
+                Record record,
+                int tag
+            )
             : this(record, new[] { tag }) { }
 
         /// <summary>
@@ -81,7 +85,8 @@ namespace ManagedIrbis
                 {
                     Count = count;
                 }
-            }
+
+            } // foreach
 
         } // constructor
 
@@ -89,8 +94,76 @@ namespace ManagedIrbis
 
         #region Public methods
 
+        /// <summary>
+        /// Перечисление полей, входящих в повторяющуюся группу.
+        /// </summary>
+        public IEnumerable<Field> EnumerateFields()
+        {
+            foreach (var tag in Tags)
+            {
+                foreach (var field in Record.EnumerateField (tag))
+                {
+                    yield return field;
+                }
+            }
+        } // method EnumerateFields
+
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
         public Enumerator GetEnumerator() => new (this);
+
+        /// <summary>
+        /// Выполненение указанных действий для каждого повторения в группе.
+        /// </summary>
+        public RepeatingGroup ForEach
+            (
+                Action<Repeat> action
+            )
+        {
+            foreach (var repeat in this)
+            {
+                action (repeat);
+            }
+
+            return this;
+
+        } // method ForEach
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        public RepeatingGroup SetValue
+            (
+                char code,
+                string? newValue
+            )
+        {
+            foreach (var repeat in this)
+            {
+                repeat.SetValue (code, newValue);
+            }
+
+            return this;
+
+        } // method SetValue
+
+        /// <summary>
+        /// Замена значения подполя.
+        /// </summary>
+        public RepeatingGroup ReplaceValue
+            (
+                char code,
+                string? oldValue,
+                string? newValue
+            )
+        {
+            foreach (var repeat in this)
+            {
+                repeat.ReplaceValue (code, oldValue, newValue);
+            }
+
+            return this;
+
+        } // method ReplaceValue
 
         /// <summary>
         /// Команда вывода значения поля до первого разделителя
@@ -237,9 +310,25 @@ namespace ManagedIrbis
             #region Public methods
 
             /// <summary>
+            /// Перечисление полей, входящих в повторяющуюся группу.
+            /// </summary>
+            public IEnumerable<Field> EnumerateFields()
+            {
+                foreach (var tag in Group.Tags)
+                {
+                    var field = Group.Record.GetField (tag, Index);
+                    if (field is not null)
+                    {
+                        yield return field;
+                    }
+
+                } // foreach
+
+            } // method EnumerateFields
+
+            /// <summary>
             /// Значение до разделителя первого поля, среди заданных при создании группы.
             /// </summary>
-            /// <returns></returns>
             public string? FM() => Group.Record.GetField (Group.Tags[0], Index)?.Value;
 
             /// <summary>
@@ -259,6 +348,47 @@ namespace ManagedIrbis
             /// </summary>
             public string? FM (char code) =>
                 Group.Record.GetField (Group.Tags[0], Index)?.GetFirstSubFieldValue (code);
+
+            /// <summary>
+            /// Замена значения подполя.
+            /// </summary>
+            public Repeat ReplaceValue
+                (
+                    char code,
+                    string? oldValue,
+                    string? newValue
+                )
+            {
+                foreach (var field in EnumerateFields())
+                {
+                    if (field.GetSubFieldValue (code).SameString (oldValue))
+                    {
+                        field.SetSubFieldValue (code, newValue);
+                    }
+
+                } // foreach
+
+                return this;
+
+            } // method ReplaceValue
+
+            /// <summary>
+            /// Установка значения подполя.
+            /// </summary>
+            public Repeat SetValue
+                (
+                    char code,
+                    string? newValue
+                )
+            {
+                foreach (var field in EnumerateFields())
+                {
+                    field.SetSubFieldValue (code, newValue);
+                }
+
+                return this;
+
+            } // method SetValue
 
             #endregion
 

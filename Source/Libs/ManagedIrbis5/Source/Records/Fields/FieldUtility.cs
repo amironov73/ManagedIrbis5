@@ -1484,8 +1484,8 @@ namespace ManagedIrbis
             (
                 this Field field,
                 char code,
-                string oldValue,
-                string newValue
+                string? oldValue,
+                string? newValue
             )
         {
             var subFields = field.Subfields;
@@ -1504,7 +1504,8 @@ namespace ManagedIrbis
             }
 
             return field;
-        }
+
+        } // method ReplaceSubField
 
         // ==========================================================
 

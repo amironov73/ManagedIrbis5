@@ -22,12 +22,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.Collections;
+using AM.Text;
 
 using ManagedIrbis.Direct;
 using ManagedIrbis.ImportExport;
@@ -45,12 +45,12 @@ namespace ManagedIrbis
     /// <summary>
     /// Библиографическая запись. Состоит из произвольного количества полей.
     /// </summary>
-    [DebuggerDisplay("[{" + nameof(Database) +
-        "}] MFN={" + nameof(Mfn) + "} ({" + nameof(Version) + "})")]
+    [DebuggerDisplay ("[{" + nameof (Database) +
+        "}] MFN={" + nameof (Mfn) + "} ({" + nameof (Version) + "})")]
     public sealed class Record
         : IRecord,
-        IEnumerable<Field>,
-        IVerifiable
+            IEnumerable<Field>,
+            IVerifiable
     {
         #region Constants
 
@@ -143,6 +143,7 @@ namespace ManagedIrbis
             )
         {
             Status = status;
+
             return this;
 
         } // method Add
@@ -159,11 +160,11 @@ namespace ManagedIrbis
                 string? value = default
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = new Field(tag);
-            field.DecodeBody(value);
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.DecodeBody (value);
+            Fields.Add (field);
 
             return this;
 
@@ -181,12 +182,13 @@ namespace ManagedIrbis
                 SubField subfield1
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = new Field(tag) { subfield1 };
-            Fields.Add(field);
+            var field = new Field (tag) { subfield1 };
+            Fields.Add (field);
 
             return this;
+
         } // method Add
 
         /// <summary>
@@ -202,10 +204,10 @@ namespace ManagedIrbis
                 SubField subfield2
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = new Field(tag) { subfield1, subfield2 };
-            Fields.Add(field);
+            var field = new Field (tag) { subfield1, subfield2 };
+            Fields.Add (field);
 
             return this;
 
@@ -225,10 +227,10 @@ namespace ManagedIrbis
                 SubField subfield3
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = new Field(tag) { subfield1, subfield2, subfield3 };
-            Fields.Add(field);
+            var field = new Field (tag) { subfield1, subfield2, subfield3 };
+            Fields.Add (field);
 
             return this;
 
@@ -246,11 +248,11 @@ namespace ManagedIrbis
                 params SubField[] subfields
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = new Field(tag);
-            field.Subfields.AddRange(subfields);
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.Subfields.AddRange (subfields);
+            Fields.Add (field);
 
             return this;
 
@@ -270,11 +272,11 @@ namespace ManagedIrbis
                 string? value = default
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = new Field(tag);
-            field.Subfields.Add(new SubField(code, value));
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.Subfields.Add (new SubField (code, value));
+            Fields.Add (field);
 
             return this;
 
@@ -298,16 +300,16 @@ namespace ManagedIrbis
                 string? value2 = default
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = new Field(tag);
-            field.Subfields.Add(new SubField(code1, value1));
-            field.Subfields.Add(new SubField(code2, value2));
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.Subfields.Add (new SubField (code1, value1));
+            field.Subfields.Add (new SubField (code2, value2));
+            Fields.Add (field);
 
             return this;
-
         } // method Add
+
 
         /// <summary>
         /// Добавление поля в конец записи.
@@ -331,13 +333,13 @@ namespace ManagedIrbis
                 string? value3 = default
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = new Field(tag);
-            field.Subfields.Add(new SubField(code1, value1));
-            field.Subfields.Add(new SubField(code2, value2));
-            field.Subfields.Add(new SubField(code3, value3));
-            Fields.Add(field);
+            var field = new Field (tag);
+            field.Subfields.Add (new SubField (code1, value1));
+            field.Subfields.Add (new SubField (code2, value2));
+            field.Subfields.Add (new SubField (code3, value3));
+            Fields.Add (field);
 
             return this;
 
@@ -355,10 +357,10 @@ namespace ManagedIrbis
                 string[] subfields
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            var field = Field.WithSubFields(tag, subfields);
-            Fields.Add(field);
+            var field = Field.WithSubFields (tag, subfields);
+            Fields.Add (field);
 
             return this;
 
@@ -373,13 +375,13 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
-            if (!string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty (value))
             {
-                var field = new Field {Tag = tag};
-                field.DecodeBody(value);
-                Fields.Add(field);
+                var field = new Field { Tag = tag };
+                field.DecodeBody (value);
+                Fields.Add (field);
             }
 
             return this;
@@ -469,43 +471,45 @@ namespace ManagedIrbis
                 Response response
             )
         {
+            Sure.NotNull (response);
+
             try
             {
                 var line = response.ReadUtf();
 
-                var first = line.Split('#');
-                Mfn = int.Parse(first[0]);
+                var first = line.Split ('#');
+                Mfn = int.Parse (first[0]);
                 Status = first.Length == 1
                     ? None
-                    : (RecordStatus) first[1].SafeToInt32();
+                    : (RecordStatus)first[1].SafeToInt32();
 
                 line = response.ReadUtf();
-                var second = line.Split('#');
+                var second = line.Split ('#');
                 Version = second.Length == 1
                     ? 0
-                    : int.Parse(second[1]);
+                    : int.Parse (second[1]);
 
                 while (!response.EOT)
                 {
                     line = response.ReadUtf();
-                    if (string.IsNullOrEmpty(line))
+                    if (string.IsNullOrEmpty (line))
                     {
                         break;
                     }
 
                     var field = new Field();
-                    field.Decode(line);
-                    Fields.Add(field);
+                    field.Decode (line);
+                    Fields.Add (field);
                 }
             }
             catch (Exception exception)
             {
                 // response.DebugUtf(Console.Error);
-                Magna.Error(nameof(Record) + "::" + nameof(Decode));
+                Magna.Error (nameof (Record) + "::" + nameof (Decode));
 
                 throw new IrbisException
                     (
-                        nameof(Record) + "::" + nameof(Decode),
+                        nameof (Record) + "::" + nameof (Decode),
                         exception
                     );
             }
@@ -518,8 +522,10 @@ namespace ManagedIrbis
                 MstRecord64 record
             )
         {
+            Sure.NotNull (record);
+
             Mfn = record.Leader.Mfn;
-            Status = (RecordStatus) record.Leader.Status;
+            Status = (RecordStatus)record.Leader.Status;
             Version = record.Leader.Version;
 
             // result.Fields.BeginUpdate();
@@ -527,8 +533,8 @@ namespace ManagedIrbis
 
             foreach (var entry in record.Dictionary)
             {
-                var field = record.DecodeField(entry);
-                Fields.Add(field);
+                var field = record.DecodeField (entry);
+                Fields.Add (field);
             }
 
             // result.Fields.EndUpdate();
@@ -540,45 +546,47 @@ namespace ManagedIrbis
         /// </summary>
         public void Decode
             (
-                string[] lines
+                IList<string> lines
             )
         {
+            Sure.NotNull (lines);
+
             try
             {
                 var line = lines[0];
 
-                var first = line.Split('#');
-                Mfn = int.Parse(first[0]);
+                var first = line.Split ('#');
+                Mfn = int.Parse (first[0]);
                 Status = first.Length == 1
                     ? None
-                    : (RecordStatus) first[1].SafeToInt32();
+                    : (RecordStatus)first[1].SafeToInt32();
 
                 line = lines[1];
-                var second = line.Split('#');
+                var second = line.Split ('#');
                 Version = second.Length == 1
                     ? 0
-                    : int.Parse(second[1]);
+                    : int.Parse (second[1]);
 
-                for (var i = 2; i < lines.Length; i++)
+                for (var i = 2; i < lines.Count; i++)
                 {
                     line = lines[i];
-                    if (string.IsNullOrEmpty(line))
+                    if (string.IsNullOrEmpty (line))
                     {
                         break;
                     }
 
                     var field = new Field();
-                    field.Decode(line);
-                    Fields.Add(field);
+                    field.Decode (line);
+                    Fields.Add (field);
                 }
             }
             catch (Exception exception)
             {
-                Magna.Error(nameof(Record) + "::" + nameof(Decode));
+                Magna.Error (nameof (Record) + "::" + nameof (Decode));
 
                 throw new IrbisException
                     (
-                        nameof(Record) + "::" + nameof(Decode),
+                        nameof (Record) + "::" + nameof (Decode),
                         exception
                     );
             }
@@ -591,22 +599,26 @@ namespace ManagedIrbis
                 string? delimiter = IrbisText.IrbisDelimiter
             )
         {
-            var result = new StringBuilder(512);
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (512);
 
-            result.Append(Mfn.ToInvariantString())
-                .Append('#')
-                .Append(((int) Status).ToInvariantString())
-                .Append(delimiter)
-                .Append("0#")
-                .Append(Version.ToInvariantString())
-                .Append(delimiter);
+            builder.Append (Mfn.ToInvariantString())
+                .Append ('#')
+                .Append (((int)Status).ToInvariantString())
+                .Append (delimiter)
+                .Append ("0#")
+                .Append (Version.ToInvariantString())
+                .Append (delimiter);
 
             foreach (var field in Fields)
             {
-                result.Append(field).Append(delimiter);
+                builder.Append (field).Append (delimiter);
             }
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
 
         } // method Encode
 
@@ -616,6 +628,8 @@ namespace ManagedIrbis
                 MstRecord64 record
             )
         {
+            Sure.NotNull (record);
+
             throw new NotImplementedException();
 
         } // method Encode
@@ -643,15 +657,15 @@ namespace ManagedIrbis
                 char code
             )
         {
-            Sure.Positive (tag, nameof(tag));
+            Sure.Positive (tag);
 
             var field = GetField (tag);
 
-            if (!ReferenceEquals(field, null))
+            if (!ReferenceEquals (field, null))
             {
                 return code == '*'
                     ? field.GetValueOrFirstSubField()
-                    : field.GetSubFieldValue(code);
+                    : field.GetSubFieldValue (code);
             }
 
             return default;
@@ -668,8 +682,6 @@ namespace ManagedIrbis
                 char code
             )
         {
-            Sure.Positive (tag, nameof (tag));
-
             var index = 0;
             while (true)
             {
@@ -681,9 +693,9 @@ namespace ManagedIrbis
 
                 var value = code == '*'
                     ? field.GetValueOrFirstSubField()
-                    : field.GetSubFieldValue(code);
+                    : field.GetSubFieldValue (code);
 
-                if (!string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty (value))
                 {
                     if (occurrence == 0)
                     {
@@ -709,16 +721,13 @@ namespace ManagedIrbis
                 int tag
             )
         {
-            Sure.Positive(tag, nameof(tag));
-
             var result = new LocalList<string>();
-
             foreach (var field in Fields)
             {
                 if (field.Tag == tag
                     && !field.Value.IsEmpty())
                 {
-                    result.Add(field.Value);
+                    result.Add (field.Value);
                 }
             }
 
@@ -735,10 +744,7 @@ namespace ManagedIrbis
                 char code
             )
         {
-            Sure.Positive(tag, nameof(tag));
-
             var result = new LocalList<string>();
-
             foreach (var field in Fields)
             {
                 if (field.Tag == tag)
@@ -746,10 +752,10 @@ namespace ManagedIrbis
                     // TODO: Value, если есть, всегда первое в списке подполей
                     var value = code == '*'
                         ? field.GetValueOrFirstSubField()
-                        : field.GetSubFieldValue(code);
+                        : field.GetSubFieldValue (code);
                     if (!value.IsEmpty())
                     {
-                        result.Add(value);
+                        result.Add (value);
                     }
                 }
             }
@@ -767,7 +773,7 @@ namespace ManagedIrbis
                 int occurrence = 0
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.NonNegative (occurrence);
 
             foreach (var field in Fields)
             {
@@ -780,7 +786,8 @@ namespace ManagedIrbis
 
                     --occurrence;
                 }
-            }
+
+            } // foreach
 
             return null;
 
@@ -795,15 +802,14 @@ namespace ManagedIrbis
                 int tag
             )
         {
-            Sure.Positive(tag, nameof(tag));
-
             foreach (var field in Fields)
             {
                 if (field.Tag == tag)
                 {
                     yield return field;
                 }
-            }
+
+            } // foreach
 
         } // method EnumerateField
 
@@ -818,7 +824,7 @@ namespace ManagedIrbis
                 int tag
             )
         {
-            Sure.Positive(tag, nameof(tag));
+            Sure.Positive (tag);
 
             foreach (var field in Fields)
             {
@@ -826,10 +832,11 @@ namespace ManagedIrbis
                 {
                     return field;
                 }
-            }
+
+            } // foreach
 
             var result = new Field { Tag = tag };
-            Fields.Add(result);
+            Fields.Add (result);
 
             return result;
 
@@ -843,15 +850,14 @@ namespace ManagedIrbis
                 int tag
             )
         {
-            Sure.Positive(tag, nameof(tag));
-
             foreach (var field in Fields)
             {
                 if (field.Tag == tag)
                 {
                     return true;
                 }
-            }
+
+            } // foreach
 
             return false;
 
@@ -867,12 +873,10 @@ namespace ManagedIrbis
                 int tag
             )
         {
-            Sure.Positive(tag, nameof(tag));
-
             Field? field;
-            while ((field = GetField(tag)) is not null)
+            while ((field = GetField (tag)) is not null)
             {
-                Fields.Remove(field);
+                Fields.Remove (field);
             }
 
             return this;
@@ -888,10 +892,7 @@ namespace ManagedIrbis
 
         #region IEnumerable<Field> members
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
         public IEnumerator<Field> GetEnumerator() => Fields.GetEnumerator();
@@ -906,7 +907,7 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<Record>(this, throwOnError);
+            var verifier = new Verifier<Record> (this, throwOnError);
 
             // TODO: implement
 
@@ -919,7 +920,7 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Encode("\n");
+        public override string ToString() => Encode ("\n");
 
         #endregion
 

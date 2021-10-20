@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* RecordUtility.cs -- вспомогательные методы для работы с записями
  * Ars Magna project, http://arsmagna.ru
@@ -31,6 +32,64 @@ namespace ManagedIrbis.Records
     public static class RecordUtility
     {
         #region Public methods
+
+        /// <summary>
+        /// Выполнение действий для каждого повторения указанного поля.
+        /// </summary>
+        public static Record ForEach
+            (
+                this Record record,
+                int tag,
+                Action<RepeatingGroup.Repeat> action
+            )
+        {
+            var group = new RepeatingGroup (record, tag);
+            group.ForEach (action);
+
+            return record;
+
+        } // method ForEach
+
+        /// <summary>
+        /// Замена значения подполя.
+        /// </summary>
+        public static Record ReplaceValue
+            (
+                this Record record,
+                int tag,
+                char code,
+                string? oldValue,
+                string? newValue
+            )
+        {
+            foreach (var field in record.EnumerateField (tag))
+            {
+                field.ReplaceSubField (code, oldValue, newValue);
+            }
+
+            return record;
+
+        } // method ReplaceValue
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        public static Record SetValue
+            (
+                this Record record,
+                int tag,
+                char code,
+                string? newValue
+            )
+        {
+            foreach (var field in record.EnumerateField (tag))
+            {
+                field.SetSubFieldValue (code, newValue);
+            }
+
+            return record;
+
+        } // method SetValue
 
         /// <summary>
         /// Простое расформатирование записи на уровне <c>"v123^a"</c>.

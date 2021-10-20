@@ -8,7 +8,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* ConsoleControl.cs --
+/* ConsoleControl.cs -- имитация консоли
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,58 +31,57 @@ using Timer = System.Windows.Forms.Timer;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    /// Pseudo-console.
+    /// Имитация консоли.
     /// </summary>
-    // ReSharper disable once RedundantNameQualifier
-    [System.ComponentModel.DesignerCategory("Code")]
-    [ToolboxBitmap(typeof(BusyStripe), "Images.ConsoleControl.bmp")]
+    [DesignerCategory ("Code")]
+    [ToolboxBitmap (typeof (ConsoleControl), "Images.ConsoleControl.bmp")]
     public sealed class ConsoleControl
         : Control
     {
         #region Constants
 
         /// <summary>
-        /// Default cursor height (lines).
+        /// Высота курсора по умолчанию (пикселы).
         /// </summary>
         public const int DefaultCursorHeight = 2;
 
         /// <summary>
-        /// Default window height.
+        /// Высота окна по умолчанию (символы).
         /// </summary>
         public const int DefaultWindowHeight = 25;
 
         /// <summary>
-        /// Default window width.
+        /// Ширина окна по умолчанию (символы).
         /// </summary>
         public const int DefaultWindowWidth = 80;
 
         /// <summary>
-        /// Default font name.
+        /// Имя шрифта символов по умолчанию.
         /// </summary>
         public const string DefaultFontName = "Courier New";
 
         /// <summary>
-        /// Default font size.
+        /// Размер шрифта символов по умолчанию.
         /// </summary>
         public const float DefaultFontSize = 10f;
 
         /// <summary>
-        /// Maximal window height.
+        /// Максимальная высота окна (символы).
         /// </summary>
         public const int MaximalWindowHeight = 100;
 
         /// <summary>
-        /// Maximal window width.
+        /// Максимальная ширина окна (символы).
         /// </summary>
         public const int MaximalWindowWidth = 100;
 
         /// <summary>
-        /// Minimal window height.
+        /// Минимальная высота окна (символы).
         /// </summary>
         public const int MinimalWindowHeight = 2;
 
         /// <summary>
-        /// Minimal window width.
+        /// Минимальная ширина окна (символы).
         /// </summary>
         public const int MinimalWindowWidth = 2;
 
@@ -90,33 +89,42 @@ namespace AM.Windows.Forms
 
         #region Nested classes
 
+        /// <summary>
+        /// Ячейка окна с отображаемым символом.
+        /// </summary>
         struct Cell
         {
-            public bool Emphasized;
-
-            public char Character;
+            // ReSharper disable InconsistentNaming
 
             public Color ForeColor;
 
             public Color BackColor;
 
+            public bool Emphasized;
+
+            public char Character;
+
+            // ReSharper restore InconsistentNaming
+
+            /// <inheritdoc cref="ValueType.ToString"/>
             public override string ToString()
             {
-                return new string(Character, 1);
+                return new string (Character, 1);
             }
-        }
+
+        } // struct Cell
 
         #endregion
 
         #region Events
 
         /// <summary>
-        /// Raised on input (Enter key).
+        /// Событие возникает при нажатии на клавишу <c>Enter</c>.
         /// </summary>
         public event EventHandler<ConsoleInputEventArgs>? Input;
 
         /// <summary>
-        /// Raised when TAB key pressed.
+        /// Событие возникает при нажатии на клавишу <c>Tab</c>.
         /// </summary>
         public event EventHandler<ConsoleInputEventArgs>? TabPressed;
 
@@ -127,27 +135,27 @@ namespace AM.Windows.Forms
         /// <summary>
         /// Allow input?
         /// </summary>
-        [DefaultValue(false)]
+        [DefaultValue (false)]
         public bool AllowInput { get; set; }
 
         /// <summary>
         /// Echo input?
         /// </summary>
-        [DefaultValue(true)]
+        [DefaultValue (true)]
         public bool EchoInput { get; set; }
 
         /// <summary>
         /// Bold version of the <see cref="P:Font"/>.
         /// </summary>
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Font ItalicFont => _italicFont.ThrowIfNull(nameof(_italicFont));
+        [Browsable (false)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+        public Font ItalicFont => _italicFont.ThrowIfNull();
 
         /// <summary>
         /// Cursor height.
         /// </summary>
-        [Browsable(false)]
-        [DefaultValue(DefaultCursorHeight)]
+        [Browsable (false)]
+        [DefaultValue (DefaultCursorHeight)]
         public int CursorHeight
         {
             get => _cursorHeight;
@@ -155,43 +163,46 @@ namespace AM.Windows.Forms
             {
                 if (value < 1 || value > _cellHeight)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(value));
+                    throw new ArgumentOutOfRangeException (nameof (value));
                 }
 
                 _cursorHeight = value;
-            }
-        }
+
+            } // set
+
+        } // property CursorHeight
 
         /// <summary>
-        /// Column position of the cursor.
+        /// Номер колонки, в которой находится курсор (нумерация с 0).
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public int CursorLeft { get; set; }
 
         /// <summary>
-        /// Row position of the cursor.
+        /// Номер строки, в которой находится курсор (нумерация с 0).
         /// </summary>
-        [Browsable(false)]
+        [Browsable (false)]
         public int CursorTop { get; set; }
 
         /// <summary>
-        /// Whether the cursor is visible.
+        /// Курсор видим?
         /// </summary>
-        [DefaultValue(true)]
+        [DefaultValue (true)]
         public bool CursorVisible
         {
             get => _cursorVisible;
             set
             {
                 _cursorVisible = value;
-                _CursorHandler(this, EventArgs.Empty);
+                _CursorHandler (this, EventArgs.Empty);
             }
-        }
+
+        } // property CursorVisible
 
         /// <summary>
-        /// Window height.
+        /// Текущая высота окна (символы).
         /// </summary>
-        [DefaultValue(DefaultWindowHeight)]
+        [DefaultValue (DefaultWindowHeight)]
         public int WindowHeight
         {
             get => _windowHeight;
@@ -199,32 +210,32 @@ namespace AM.Windows.Forms
             {
                 if (value < MinimalWindowHeight || value > MaximalWindowHeight)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(value));
+                    throw new ArgumentOutOfRangeException (nameof (value));
                 }
 
                 _windowHeight = value;
                 _SetupWindow();
             }
-        }
+
+        } // property WindowHeight
 
         /// <summary>
-        /// Window width.
+        /// Текущая ширина окна (символы).
         /// </summary>
-        [DefaultValue(DefaultWindowWidth)]
+        [DefaultValue (DefaultWindowWidth)]
         public int WindowWidth
         {
             get => _windowWidth;
             set
             {
-                if (value < MinimalWindowWidth || value > MaximalWindowWidth)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(value));
-                }
+                Sure.InRange (value, MinimalWindowWidth, MaximalWindowWidth);
 
                 _windowWidth = value;
                 _SetupWindow();
-            }
-        }
+
+            } // set
+
+        } // property WindowWidth
 
         #endregion
 
@@ -263,7 +274,8 @@ namespace AM.Windows.Forms
             _inputBuffer = new StringBuilder();
             _historyList = new List<string>();
             _historyPosition = 0;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -292,6 +304,9 @@ namespace AM.Windows.Forms
         private readonly List<string> _historyList;
         private int _historyPosition;
 
+        /// <summary>
+        /// Палитра цветов EGA.
+        /// </summary>
         private static readonly Color[] _egaColors =
         {
             /* 0x00 */ Color.Black,
@@ -320,9 +335,11 @@ namespace AM.Windows.Forms
                 CursorLeft = 0;
                 CursorTop++;
             }
+
             if (CursorTop >= WindowHeight)
             {
                 ScrollUp();
+
                 //CursorTop--;
             }
         }
@@ -344,15 +361,14 @@ namespace AM.Windows.Forms
                 EventArgs eventArgs
             )
         {
-            if (!_cursorVisible
-                || DesignMode)
+            if (!_cursorVisible || DesignMode)
             {
                 return;
             }
 
             _cursorVisibleNow = !_cursorVisibleNow;
 
-            using var graphics = Graphics.FromHwnd(Handle);
+            using var graphics = Graphics.FromHwnd (Handle);
             var rectangle = new Rectangle
                 (
                     _cellWidth * CursorLeft,
@@ -362,11 +378,11 @@ namespace AM.Windows.Forms
                 );
 
             var cell = _cells![CursorTop * WindowWidth + CursorLeft];
-            using var foreBrush = new SolidBrush(cell.ForeColor);
-            using var backBrush = new SolidBrush(cell.BackColor);
-            using var cursorBrush = new SolidBrush(ForeColor);
-            var s = new string(cell.Character, 1);
-            graphics.FillRectangle(backBrush, rectangle);
+            using var foreBrush = new SolidBrush (cell.ForeColor);
+            using var backBrush = new SolidBrush (cell.BackColor);
+            using var cursorBrush = new SolidBrush (ForeColor);
+            var s = new string (cell.Character, 1);
+            graphics.FillRectangle (backBrush, rectangle);
             graphics.DrawString
                 (
                     s,
@@ -385,10 +401,11 @@ namespace AM.Windows.Forms
                         rectangle.Width,
                         CursorHeight
                     );
-                graphics.FillRectangle(cursorBrush, rectangle);
+                graphics.FillRectangle (cursorBrush, rectangle);
                 SystemSounds.Asterisk.Play();
             }
-        }
+
+        } // method _CursorHandler
 
         private void _HandleEnter()
         {
@@ -396,41 +413,44 @@ namespace AM.Windows.Forms
             WriteLine();
 
             var text = _inputBuffer.ToString();
-            var eventArgs = new ConsoleInputEventArgs
+            if (Input is {} input)
+            {
+                var eventArgs = new ConsoleInputEventArgs
                 {
                     Text = text
                 };
-            Input?.Invoke(this, eventArgs);
+                input.Invoke (this, eventArgs);
+            }
 
-            AddHistoryEntry(text);
+            AddHistoryEntry (text);
             _inputBuffer.Length = 0;
-        }
+
+        } // method _HandleEnter
 
         private void _HandleTab()
         {
-            var text = _inputBuffer.ToString();
-            var eventArgs = new ConsoleInputEventArgs
+            if (TabPressed is { } tabPressed)
+            {
+                var text = _inputBuffer.ToString();
+                var eventArgs = new ConsoleInputEventArgs
                 {
                     Text = text
                 };
-            TabPressed?.Invoke(this, eventArgs);
-        }
+                tabPressed.Invoke (this, eventArgs);
+            }
+
+        } // method _HandleTab
 
         private void _HideCursorTemporary()
         {
             _cursorVisibleNow = true;
-            _CursorHandler(this, EventArgs.Empty);
-        }
+            _CursorHandler (this, EventArgs.Empty);
 
-        private int _InputPosition()
-        {
-            var result = (CursorTop - _inputRow) * WindowWidth
-                         + CursorLeft - _inputColumn;
+        } // method _HideCursorTemporary
 
-            return result;
-        }
+        private int _InputPosition() => (CursorTop - _inputRow) * WindowWidth + CursorLeft - _inputColumn;
 
-        private void _MoveInput(int delta)
+        private void _MoveInput (int delta)
         {
             var length = _inputBuffer.Length;
             var currentPosition = _InputPosition();
@@ -439,14 +459,16 @@ namespace AM.Windows.Forms
             {
                 newPosition = 0;
             }
+
             if (newPosition > length)
             {
                 newPosition = length;
             }
 
             var newDelta = newPosition - currentPosition;
-            MoveCursor(newDelta, 0);
-        }
+            MoveCursor (newDelta, 0);
+
+        } // method _MoveInput
 
         private void _SetupCells()
         {
@@ -471,14 +493,16 @@ namespace AM.Windows.Forms
             var clientSize = ClientSize;
             _cellHeight = clientSize.Height / WindowHeight;
             _cellWidth = clientSize.Width / WindowWidth;
-        }
+
+        } // method _SetupCells
 
         private void _SetupFont()
         {
-            _italicFont = new Font(_font!, FontStyle.Italic);
+            _italicFont = new Font (_font!, FontStyle.Italic);
 
             _SetupCells();
-        }
+
+        } // method _SetupFont
 
         private void _SetupWindow()
         {
@@ -497,15 +521,16 @@ namespace AM.Windows.Forms
                 string text
             )
         {
-            if (!string.IsNullOrEmpty(text) && !_historyList.Contains(text))
+            if (!string.IsNullOrEmpty (text) && !_historyList.Contains (text))
             {
-                _historyList.Insert(0, text);
+                _historyList.Insert (0, text);
             }
+
             _historyPosition = 0;
         }
 
         /// <summary>
-        /// Backspace.
+        /// Обработка клавиши <c>Backspace</c>.
         /// </summary>
         public bool Backspace()
         {
@@ -520,18 +545,19 @@ namespace AM.Windows.Forms
             var position = _InputPosition();
             if (position != 0)
             {
-                _inputBuffer.Remove(position - 1, 1);
+                _inputBuffer.Remove (position - 1, 1);
             }
 
             var text = _inputBuffer + " ";
-            Write(_inputRow, _inputColumn, text);
-            MoveCursor(-1, 0);
+            Write (_inputRow, _inputColumn, text);
+            MoveCursor (-1, 0);
 
             return true;
-        }
+
+        } // method Backspace
 
         /// <summary>
-        /// Clear the console.
+        /// Очистка консоли.
         /// </summary>
         public void Clear()
         {
@@ -556,7 +582,8 @@ namespace AM.Windows.Forms
             _inputRow = 0;
 
             Invalidate();
-        }
+
+        } // method Clear
 
         /// <summary>
         /// Clear from given position to end of the console.
@@ -569,17 +596,18 @@ namespace AM.Windows.Forms
         {
             for (var x = column; x < WindowWidth; x++)
             {
-                Write(row, x, ' ', ForeColor, BackColor, false);
+                Write (row, x, ' ', ForeColor, BackColor, false);
             }
 
             for (var y = row + 1; y < WindowHeight; y++)
             {
                 for (var x = 0; x < WindowWidth; x++)
                 {
-                    Write(y, x, ' ', ForeColor, BackColor, false);
+                    Write (y, x, ' ', ForeColor, BackColor, false);
                 }
             }
-        }
+
+        } // method ClearFrom
 
         /// <summary>
         /// Clear history list.
@@ -607,11 +635,11 @@ namespace AM.Windows.Forms
             var position = _InputPosition();
             if (position < length)
             {
-                _inputBuffer.Remove(position, 1);
+                _inputBuffer.Remove (position, 1);
             }
 
             var text = _inputBuffer + " ";
-            Write(_inputRow, _inputColumn, text);
+            Write (_inputRow, _inputColumn, text);
 
             return true;
         }
@@ -627,7 +655,7 @@ namespace AM.Windows.Forms
             }
 
             _HideCursorTemporary();
-            ClearFrom(_inputRow, _inputColumn);
+            ClearFrom (_inputRow, _inputColumn);
 
             CursorLeft = _inputColumn;
             CursorTop = _inputRow;
@@ -660,17 +688,17 @@ namespace AM.Windows.Forms
 
                 if (position >= _inputBuffer.Length)
                 {
-                    _inputBuffer.Append(c);
+                    _inputBuffer.Append (c);
                 }
                 else
                 {
-                    _inputBuffer.Insert(position, c);
+                    _inputBuffer.Insert (position, c);
                 }
 
                 if (EchoInput)
                 {
                     var text = _inputBuffer.ToString();
-                    Write(_inputRow, _inputColumn, text);
+                    Write (_inputRow, _inputColumn, text);
                     _AdvanceCursor();
                 }
 
@@ -699,6 +727,7 @@ namespace AM.Windows.Forms
                 CursorTop--;
                 CursorLeft += WindowWidth;
             }
+
             while (CursorLeft >= WindowWidth)
             {
                 CursorTop++;
@@ -724,18 +753,18 @@ namespace AM.Windows.Forms
             var done = false;
             string? result = null;
 
-            void InputHandler(object? _, ConsoleInputEventArgs args)
+            void InputHandler (object? _, ConsoleInputEventArgs args)
             {
                 result = args.Text;
                 done = true;
             }
 
-            void DisposeHandler(object? o, EventArgs eventArgs) => done = true;
+            void DisposeHandler (object? o, EventArgs eventArgs) => done = true;
 
             Input += InputHandler;
             Disposed += DisposeHandler;
 
-            ApplicationUtility.WaitFor(ref done);
+            ApplicationUtility.WaitFor (ref done);
 
             Input -= InputHandler;
             Disposed -= DisposeHandler;
@@ -772,6 +801,7 @@ namespace AM.Windows.Forms
             {
                 _inputRow--;
             }
+
             if (CursorTop != 0)
             {
                 CursorTop--;
@@ -796,7 +826,7 @@ namespace AM.Windows.Forms
             }
 
             var text = _historyList[_historyPosition];
-            SetInput(text);
+            SetInput (text);
 
             if (advanceAfter)
             {
@@ -822,8 +852,8 @@ namespace AM.Windows.Forms
             }
 
             DropInput();
-            _inputBuffer.Append(text);
-            Write(text);
+            _inputBuffer.Append (text);
+            Write (text);
         }
 
         /// <summary>
@@ -924,7 +954,7 @@ namespace AM.Windows.Forms
                 string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return;
             }
@@ -968,9 +998,9 @@ namespace AM.Windows.Forms
                         break;
 
                     case '\b':
-                        MoveCursor(-1, 0);
-                        Write(' ', foreColor, backColor, emphasize);
-                        MoveCursor(-1, 0);
+                        MoveCursor (-1, 0);
+                        Write (' ', foreColor, backColor, emphasize);
+                        MoveCursor (-1, 0);
                         break;
 
                     case '\f':
@@ -978,7 +1008,7 @@ namespace AM.Windows.Forms
                         break;
 
                     case '\t':
-                        WriteTab(backColor);
+                        WriteTab (backColor);
                         break;
 
                     case '\r':
@@ -990,7 +1020,7 @@ namespace AM.Windows.Forms
                         break;
 
                     default:
-                        Write(c, foreColor, backColor, emphasize);
+                        Write (c, foreColor, backColor, emphasize);
                         break;
                 }
             }
@@ -1005,7 +1035,7 @@ namespace AM.Windows.Forms
                 string? text
             )
         {
-            Write(ForeColor, BackColor, emphasize, text);
+            Write (ForeColor, BackColor, emphasize, text);
         }
 
         /// <summary>
@@ -1017,7 +1047,7 @@ namespace AM.Windows.Forms
                 string? text
             )
         {
-            Write(foreColor, BackColor, false, text);
+            Write (foreColor, BackColor, false, text);
         }
 
         /// <summary>
@@ -1035,14 +1065,14 @@ namespace AM.Windows.Forms
                 string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return;
             }
 
             foreach (var c in text)
             {
-                Write(row, column, c, ForeColor, BackColor, false);
+                Write (row, column, c, ForeColor, BackColor, false);
                 column++;
                 if (column >= WindowWidth)
                 {
@@ -1078,7 +1108,7 @@ namespace AM.Windows.Forms
                 string? text
             )
         {
-            Write(text);
+            Write (text);
             WriteLine();
         }
 
@@ -1091,7 +1121,7 @@ namespace AM.Windows.Forms
                 string? text
             )
         {
-            Write(emphasize, text);
+            Write (emphasize, text);
             WriteLine();
         }
 
@@ -1104,7 +1134,7 @@ namespace AM.Windows.Forms
                 string? text
             )
         {
-            Write(foreColor, text);
+            Write (foreColor, text);
             WriteLine();
         }
 
@@ -1121,9 +1151,10 @@ namespace AM.Windows.Forms
             {
                 count = 8;
             }
+
             for (var i = 0; i < count; i++)
             {
-                Write(' ', ForeColor, backColor, false);
+                Write (' ', ForeColor, backColor, false);
             }
         }
 
@@ -1132,7 +1163,7 @@ namespace AM.Windows.Forms
         #region Control members
 
         /// <inheritdoc />
-        protected override Size DefaultSize => new Size(640, 375);
+        protected override Size DefaultSize => new Size (640, 375);
 
         /// <inheritdoc />
         protected override void Dispose
@@ -1140,48 +1171,50 @@ namespace AM.Windows.Forms
                 bool disposing
             )
         {
-            if (!ReferenceEquals(_cursorTimer, null))
+            if (!ReferenceEquals (_cursorTimer, null))
             {
                 _cursorTimer.Dispose();
             }
 
-            if (!ReferenceEquals(_italicFont, null))
+            if (!ReferenceEquals (_italicFont, null))
             {
                 _italicFont.Dispose();
             }
 
-            base.Dispose(disposing);
+            base.Dispose (disposing);
         }
 
         /// <inheritdoc />
         public override Font Font
         {
-            get => _font.ThrowIfNull(nameof(_font));
+            get => _font.ThrowIfNull();
             set
             {
                 _font = value;
                 _SetupFont();
             }
-        }
 
-        /// <inheritdoc />
+        } // property Font
+
+        /// <inheritdoc cref="Control.OnClientSizeChanged" />
         protected override void OnClientSizeChanged
             (
                 EventArgs e
             )
         {
-            base.OnClientSizeChanged(e);
+            base.OnClientSizeChanged (e);
 
             _SetupCells();
-        }
 
-        /// <inheritdoc />
+        } // method OnClientSizeChanged
+
+        /// <inheritdoc cref="Control.OnKeyPress" />
         protected override void OnKeyPress
             (
                 KeyPressEventArgs e
             )
         {
-            base.OnKeyPress(e);
+            base.OnKeyPress (e);
 
             if (!AllowInput)
             {
@@ -1189,10 +1222,11 @@ namespace AM.Windows.Forms
             }
 
             var c = e.KeyChar;
-            e.Handled = InputChar(c);
-        }
+            e.Handled = InputChar (c);
 
-        /// <inheritdoc />
+        } // method OnKeyPress
+
+        /// <inheritdoc cref="Control.OnPaint" />
         protected override void OnPaint
             (
                 PaintEventArgs paintEvent
@@ -1204,9 +1238,9 @@ namespace AM.Windows.Forms
             var rowOffset = 0;
 
             var backColor = BackColor;
-            var backBrush = new SolidBrush(backColor);
+            var backBrush = new SolidBrush (backColor); // не надо using!
             var foreColor = ForeColor;
-            var foreBrush = new SolidBrush(foreColor);
+            var foreBrush = new SolidBrush (foreColor); // не надо using!
 
             try
             {
@@ -1222,33 +1256,34 @@ namespace AM.Windows.Forms
                         {
                             backBrush.Dispose();
                             backColor = cell.BackColor;
-                            backBrush = new SolidBrush(backColor);
+                            backBrush = new SolidBrush (backColor);
                         }
+
                         if (cell.ForeColor != foreColor)
                         {
                             foreBrush.Dispose();
                             foreColor = cell.ForeColor;
-                            foreBrush = new SolidBrush(foreColor);
+                            foreBrush = new SolidBrush (foreColor);
                         }
 
                         var rectangle = new Rectangle
-                        (
-                            columnOffset,
-                            rowOffset,
-                            _cellWidth,
-                            _cellHeight
-                        );
+                            (
+                                columnOffset,
+                                rowOffset,
+                                _cellWidth,
+                                _cellHeight
+                            );
 
-                        graphics.FillRectangle(backBrush, rectangle);
-                        var s = new string(cell.Character, 1);
+                        graphics.FillRectangle (backBrush, rectangle);
+                        var s = new string (cell.Character, 1);
                         graphics.DrawString
-                        (
-                            s,
-                            cell.Emphasized ? ItalicFont : Font,
-                            foreBrush,
-                            columnOffset - 2,
-                            rowOffset
-                        );
+                            (
+                                s,
+                                cell.Emphasized ? ItalicFont : Font,
+                                foreBrush,
+                                columnOffset - 2,
+                                rowOffset
+                            );
 
                         cellOffset++;
                         columnOffset += _cellWidth;
@@ -1263,16 +1298,17 @@ namespace AM.Windows.Forms
                 foreBrush.Dispose();
             }
 
-            base.OnPaint(paintEvent);
-        }
+            base.OnPaint (paintEvent);
 
-        /// <inheritdoc />
+        } // method OnPaint
+
+        /// <inheritdoc cref="Control.OnPreviewKeyDown" />
         protected override void OnPreviewKeyDown
             (
                 PreviewKeyDownEventArgs e
             )
         {
-            base.OnPreviewKeyDown(e);
+            base.OnPreviewKeyDown (e);
 
             if (!AllowInput)
             {
@@ -1308,17 +1344,17 @@ namespace AM.Windows.Forms
 
                 case Keys.Left:
                     e.IsInputKey = true;
-                    _MoveInput(-1);
+                    _MoveInput (-1);
                     return;
 
                 case Keys.Right:
                     e.IsInputKey = true;
-                    _MoveInput(1);
+                    _MoveInput (1);
                     return;
 
                 case Keys.Up:
                     e.IsInputKey = true;
-                    ShowHistoryEntry(true);
+                    ShowHistoryEntry (true);
                     return;
 
                 case Keys.Down:
@@ -1326,25 +1362,31 @@ namespace AM.Windows.Forms
                     if (_historyPosition != 0)
                     {
                         _historyPosition--;
-                        ShowHistoryEntry(false);
+                        ShowHistoryEntry (false);
                     }
                     else
                     {
                         DropInput();
                     }
-                    return;
-            }
-        }
 
-        /// <inheritdoc />
+                    return;
+
+            } // switch
+
+        } // method OnPreviewKeyDown
+
+        /// <inheritdoc cref="Control.OnPaintBackground" />
         protected override void OnPaintBackground
             (
                 PaintEventArgs paintEvent
             )
         {
             // Do nothing
-        }
+
+        } // method OnPaintBackground
 
         #endregion
-    }
-}
+
+    } // class ConsoleControl
+
+} // namespace AM.Windows.Forms
