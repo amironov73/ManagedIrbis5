@@ -16,11 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using ManagedIrbis.Gbl;
+
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure
+namespace ManagedIrbis.Processing
 {
     /// <summary>
     /// Пустой приемник записей для целей отладки.
@@ -74,4 +76,4 @@ namespace ManagedIrbis.Gbl.Infrastructure
 
     } // class NullRecordSink
 
-} // namespace ManagedIrbis.Gbl.Infrastructure
+} // namespace ManagedIrbis.Processing

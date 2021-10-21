@@ -6,32 +6,35 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* ISyncRecordSink.cs -- интерфейс синхронного приемника записей для глобальной корректировки
+/* IAsyncRecordSink.cs -- интерфейс асинхронного приемника записей для глобальной корректировки
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
+using System.Threading.Tasks;
+
+using ManagedIrbis.Gbl;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure
+namespace ManagedIrbis.Processing
 {
     /// <summary>
-    /// Интерфейс синхронного приемника записей для глобальной корректировки.
+    /// Интерфейс асинхронного приемника записей для глобальной корректировки.
     /// </summary>
-    public interface ISyncRecordSink
-        : IDisposable
+    public interface IAsyncRecordSink
+        : IAsyncDisposable
     {
         /// <summary>
         /// Помещение в приемник модифицированной записи.
         /// Повторные попытки помещения одной и той же записи игнорируются.
         /// Сообщения, связанные с одной записью, склеиваются.
         /// </summary>
-        void PostRecord
+        Task PostRecordAsync
             (
                 Record record,
                 string? message = null
@@ -42,13 +45,13 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// Может использоваться для пакетной отправки
         /// измененных записей на сервер.
         /// </summary>
-        void Complete();
+        Task CompleteAsync();
 
         /// <summary>
         /// Получение протокола.
         /// </summary>
-        GblProtocolLine[] GetProtocol();
+        Task<GblProtocolLine[]> GetProtocolAsync();
 
-    } // interface ISyncRecordSink
+    } // interface IAsyncRecordSink
 
-} // namespace ManagedIrbis.Gbl.Infrastructure
+} // namespace ManagedIrbis.Processing

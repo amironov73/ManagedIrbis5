@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using ManagedIrbis.Processing;
 using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.Logging;

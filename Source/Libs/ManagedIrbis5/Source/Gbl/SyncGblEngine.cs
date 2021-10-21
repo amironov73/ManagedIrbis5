@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 
 using ManagedIrbis.Gbl.Infrastructure;
+using ManagedIrbis.Processing;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

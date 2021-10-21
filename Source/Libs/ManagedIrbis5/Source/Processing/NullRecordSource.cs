@@ -8,7 +8,6 @@
 // ReSharper disable UnusedMember.Global
 
 /* NullRecordSource.cs -- пустой источник записей
- * для глобальной корректировки.
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +20,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure
+namespace ManagedIrbis.Processing
 {
     /// <summary>
     /// Пустой источник записей для целей отладки.
@@ -67,4 +66,4 @@ namespace ManagedIrbis.Gbl.Infrastructure
 
     } // class NullRecordSource
 
-} // namespace ManagedIrbis.Gbl.Infrastructure
+} // namespace ManagedIrbis.Processing

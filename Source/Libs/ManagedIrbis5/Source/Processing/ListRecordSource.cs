@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure
+namespace ManagedIrbis.Processing
 {
     /// <summary>
     /// Источник записей в оперативной памяти.
@@ -148,4 +148,4 @@ namespace ManagedIrbis.Gbl.Infrastructure
 
     } // class ListRecordSource
 
-} // namespace ManagedIrbis.Gbl.Infrastructure
+} // namespace ManagedIrbis.Processing

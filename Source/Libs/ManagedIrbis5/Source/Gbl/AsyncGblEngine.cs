@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using ManagedIrbis.Gbl.Infrastructure;
+using ManagedIrbis.Processing;
 using ManagedIrbis.Providers;
 
 using Microsoft.Extensions.DependencyInjection;

@@ -1,4 +1,4 @@
-﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
@@ -6,26 +6,25 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* IAsyncRecordSource.cs -- интерфейс асинхронного источника записей для глобальной корректировки
+/* ISyncRecordSource.cs -- интерфейс синхронного источника записей для глобальной корректировки
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Threading.Tasks;
 
 #endregion
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl.Infrastructure
+namespace ManagedIrbis.Processing
 {
     /// <summary>
-    /// Интерфейс асинхронного источника записей для глобальной корректировки.
+    /// Интерфейс синхронного источника записей для глобальной корректировки.
     /// </summary>
-    public interface IAsyncRecordSource
-        : IAsyncDisposable
+    public interface ISyncRecordSource
+        : IDisposable
     {
         /// <summary>
         /// Получение следующей записи из источника.
@@ -33,7 +32,7 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// <returns>
         /// <c>null</c> означает, что записи в источнике закончились.
         /// </returns>
-        Task<Record?> GetNextRecordAsync();
+        Record? GetNextRecord();
 
         /// <summary>
         /// Получение общего количества записей,
@@ -42,8 +41,8 @@ namespace ManagedIrbis.Gbl.Infrastructure
         /// <returns>
         /// Отрицательное число означает, что количество записей неизвестно.
         /// </returns>
-        Task<int> GetRecordCountAsync();
+        int GetRecordCount();
 
-    } // interface IAsyncRecordSource
+    } // interface ISyncRecordSource
 
-} // namespace ManagedIrbis.Gbl.Infrastructure
+} // namespace ManagedIrbis.Processing
