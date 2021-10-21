@@ -124,13 +124,14 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public static Technology[] Parse
             (
-                Record record
+                Record record,
+                int tag = Tag
             )
         {
             var result = new List<Technology>();
             foreach (var field in record.Fields)
             {
-                if (field.Tag == Tag)
+                if (field.Tag == tag)
                 {
                     var tech = Parse(field);
                     result.Add(tech);
