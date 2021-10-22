@@ -17,13 +17,16 @@
 #region Using directives
 
 using System;
+using System.Linq;
 
 using AM;
+using AM.Collections;
 using AM.Text.Ranges;
 
 using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -43,6 +46,16 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         public ISyncProvider Provider { get; }
 
+        /// <summary>
+        /// Конфигурация библиографических записей.
+        /// </summary>
+        public RecordConfiguration RecordConfiguration { get; }
+
+        /// <summary>
+        /// Конфигурация подшивателя.
+        /// </summary>
+        public BindingConfiguration BindingConfiguration { get; }
+
         #endregion
 
         #region Construction
@@ -52,10 +65,14 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         public BindingManager
             (
-                ISyncProvider provider
+                ISyncProvider provider,
+                BindingConfiguration? bindingConfiguration = null,
+                RecordConfiguration? recordConfiguration = null
             )
         {
             Provider = provider;
+            BindingConfiguration = bindingConfiguration ?? BindingConfiguration.GetDefault();
+            RecordConfiguration = recordConfiguration ?? RecordConfiguration.GetDefault();
 
         } // constructor
 
@@ -71,6 +88,8 @@ namespace ManagedIrbis.Magazines
                 BindingSpecification specification
             )
         {
+            // TODO: реализовать добавление номеров из другого года
+
             Sure.NotNull (specification);
 
             if (string.IsNullOrEmpty (specification.MagazineIndex)
@@ -79,7 +98,7 @@ namespace ManagedIrbis.Magazines
                 || string.IsNullOrEmpty (specification.Description)
                 || string.IsNullOrEmpty (specification.BindingNumber)
                 || string.IsNullOrEmpty (specification.Inventory)
-                || string.IsNullOrEmpty (specification.Fond)
+                || string.IsNullOrEmpty (specification.Place)
                 || string.IsNullOrEmpty (specification.Complect))
             {
                 throw new IrbisException ("Empty binding specification");
@@ -136,7 +155,7 @@ namespace ManagedIrbis.Magazines
                                 .Add ('a', ExemplarStatus.Bound) // подполе A: статус экземпляра
                                 .Add ('b', specification.Complect) // подполе B: номер комплекта
                                 .Add ('c', "?") // подполе C: дата поступления
-                                .Add ('d', specification.Fond) // подполе D: место хранения
+                                .Add ('d', specification.Place) // подполе D: место хранения
                                 .Add ('p', bindingIndex) // подполе P: шифр подшивки
                                 .Add ('i', specification.Inventory) // подполе I: инвентарный номер подшивки
                         );
@@ -178,7 +197,7 @@ namespace ManagedIrbis.Magazines
                         .Add ('a', ExemplarStatus.Free)     // подполе A: статус экземпляра
                         .Add ('b', specification.Inventory) // подполе B: инвентарный номер
                         .Add ('c', IrbisDate.TodayText)     // подполе C: дата поступления
-                        .Add ('d', specification.Fond)      // подполе D: место хранения
+                        .Add ('d', specification.Place)      // подполе D: место хранения
                     // TODO: 910^h - штрих-код или радиометка подшивки
                 );
 
@@ -190,7 +209,7 @@ namespace ManagedIrbis.Magazines
                 (
                     new Field { Tag = 909 }                    // поле 909: зарегистрированы поступления
                         .Add ('q', specification.Year)         // подполе Q: кумулированные сведения, год
-                        .Add ('d', specification.Fond)         // подполе D: место хранения
+                        .Add ('d', specification.Place)         // подполе D: место хранения
                         .Add ('k', specification.Complect)     // подполе K: номер комплекта
                         .Add ('h', specification.IssueNumbers) // подполе H: кумулированные сведения, номера
                 );
@@ -198,6 +217,68 @@ namespace ManagedIrbis.Magazines
             Provider.WriteRecord (mainRecord);
 
         } // method BindMagazines
+
+        /// <summary>
+        /// Проверка номера журнала/газеты на возможность добавления в подшивку.
+        /// </summary>
+        public bool CheckIssue
+            (
+                BindingSpecification specification,
+                MagazineIssueInfo issue
+            )
+        {
+            if (!BindingConfiguration.CheckWorksheet (issue.Worksheet))
+            {
+                // В номере неверный рабочий лист
+                return false;
+            }
+
+            var exemplars = issue.Exemplars;
+            if (exemplars.IsNullOrEmpty())
+            {
+                // В номере не зарегистрированы экземпляры
+                return false;
+            }
+
+            exemplars = exemplars
+                .Where (exemplar => exemplar.Number == specification.Complect)
+                .ToArray();
+            if (exemplars.IsNullOrEmpty())
+            {
+                // В номере нет требуемого комплекта
+                return false;
+            }
+
+            if (exemplars.Length != 1)
+            {
+                // В номере больше одного комплекта
+                return false;
+            }
+
+            var place = exemplars.First().Place;
+            if (!BindingConfiguration.CheckPlace (place))
+            {
+                // Запрещенное место хранения
+                return false;
+            }
+
+            if (!place.SameString (specification.Place))
+            {
+                // Различаются места хранения
+                return false;
+            }
+
+            if (!BindingConfiguration.CheckStatus (exemplars.First().Status))
+            {
+                // Недопустимый статус экземпляра
+                return false;
+            }
+
+            // TODO: проверить попадание номера в спецификацию подшивки
+
+            return true;
+
+        } // method CheckIssue
 
         /// <summary>
         /// Расшитие и удаление подшивки по ее индексу.

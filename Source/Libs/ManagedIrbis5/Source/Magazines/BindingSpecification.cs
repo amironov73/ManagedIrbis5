@@ -4,12 +4,24 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* BindingSpecification.cs -- спецификация подшивки
  * Ars Magna project, http://arsmagna.ru
  */
+
+#region Using directives
+
+using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+
+using AM;
+
+#endregion
 
 #nullable enable
 
@@ -19,6 +31,7 @@ namespace ManagedIrbis.Magazines
     /// Спецификация подшивки газет/журналов.
     /// </summary>
     public sealed class BindingSpecification
+        : IVerifiable
     {
         #region Properties
 
@@ -28,6 +41,9 @@ namespace ManagedIrbis.Magazines
         /// <remarks>
         /// Например, "Л680583".
         /// </remarks>
+        [JsonPropertyName ("magazine")]
+        [XmlAttribute ("magazine")]
+        [Description ("Шифр журнала")]
         public string? MagazineIndex { get; set; }
 
         /// <summary>
@@ -36,6 +52,9 @@ namespace ManagedIrbis.Magazines
         /// <remarks>
         /// Например, "2017".
         /// </remarks>
+        [JsonPropertyName ("year")]
+        [XmlAttribute ("year")]
+        [Description ("Год")]
         public string? Year { get; set; }
 
         /// <summary>
@@ -44,6 +63,9 @@ namespace ManagedIrbis.Magazines
         /// <remarks>
         /// Например, "123".
         /// </remarks>
+        [JsonPropertyName ("volume")]
+        [XmlAttribute ("volume")]
+        [Description ("Номер тома")]
         public string? VolumeNumber { get; set; }
 
         /// <summary>
@@ -52,6 +74,9 @@ namespace ManagedIrbis.Magazines
         /// <remarks>
         /// Например, "1-27,29-58,60-72".
         /// </remarks>
+        [JsonPropertyName ("numbers")]
+        [XmlAttribute ("numbers")]
+        [Description ("Номера выпусков")]
         public string? IssueNumbers { get; set; }
 
         /// <summary>
@@ -60,14 +85,20 @@ namespace ManagedIrbis.Magazines
         /// <remarks>
         /// Например, "янв.-июнь"
         /// </remarks>
+        [JsonPropertyName ("description")]
+        [XmlAttribute ("description")]
+        [Description ("Описание подшивки")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// Номер подшивки.
+        /// Номер подшивки в году.
         /// </summary>
         /// <remarks>
         /// Например, "6284".
         /// </remarks>
+        [JsonPropertyName ("number")]
+        [XmlAttribute ("number")]
+        [Description ("Номер подшивки в году")]
         public string? BindingNumber { get; set; }
 
         /// <summary>
@@ -76,15 +107,21 @@ namespace ManagedIrbis.Magazines
         /// <remarks>
         /// Например, "Г6284".
         /// </remarks>
+        [JsonPropertyName ("inventory")]
+        [XmlAttribute ("inventory")]
+        [Description ("Инвентарный номер подшивки")]
         public string? Inventory { get; set; }
 
         /// <summary>
-        /// Фонд подшивки.
+        /// Место хранения подшивки.
         /// </summary>
         /// <remarks>
         /// Например, "ФП".
         /// </remarks>
-        public string? Fond { get; set; }
+        [JsonPropertyName ("place")]
+        [XmlAttribute ("place")]
+        [Description ("Место хранения подшивки")]
+        public string? Place { get; set; }
 
         /// <summary>
         /// Номер комплекта.
@@ -92,7 +129,20 @@ namespace ManagedIrbis.Magazines
         /// <remarks>
         /// Например, "1".
         /// </remarks>
+        [JsonPropertyName ("complect")]
+        [XmlAttribute ("complect")]
+        [Description ("Номер комплекта")]
         public string? Complect { get; set; }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify (bool throwOnError)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 

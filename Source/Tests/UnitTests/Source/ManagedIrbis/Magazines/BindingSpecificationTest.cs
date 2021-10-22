@@ -26,7 +26,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             Assert.IsNull(specification.Description);
             Assert.IsNull(specification.BindingNumber);
             Assert.IsNull(specification.Inventory);
-            Assert.IsNull(specification.Fond);
+            Assert.IsNull(specification.Place);
             Assert.IsNull(specification.Complect);
         }
     }

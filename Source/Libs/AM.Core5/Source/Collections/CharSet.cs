@@ -18,7 +18,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
@@ -31,18 +30,17 @@ using AM.Runtime;
 namespace AM.Collections
 {
     /// <summary>
-    /// Character set.
+    /// Множество символов.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(ToString) + "()}")]
     public sealed class CharSet
         : IHandmadeSerializable,
-        IEnumerable<char>,
-        IEquatable<CharSet>
+            IEnumerable<char>,
+            IEquatable<CharSet>
     {
         #region Constants
 
         /// <summary>
-        /// Default capacity of <see cref="CharSet"/>.
+        /// Емкость по умолчанию.
         /// </summary>
         public const int DefaultCapacity = 0x10000;
 
@@ -56,7 +54,7 @@ namespace AM.Collections
             #region Construction
 
             /// <summary>
-            /// Constructor.
+            /// Конструктор.
             /// </summary>
             public CharSetEnumerator
                 (
@@ -196,20 +194,12 @@ namespace AM.Collections
         #region Properties
 
         ///<summary>
-        /// Indexer.
+        /// Индексатор.
         ///</summary>
-        public bool this[char index]
+        public bool this [char index]
         {
-            [DebuggerStepThrough]
-            get
-            {
-                return _data[index];
-            }
-            [DebuggerStepThrough]
-            set
-            {
-                _data[index] = value;
-            }
+            get => _data[index];
+            set => _data[index] = value;
         }
 
         /// <summary>
@@ -219,53 +209,57 @@ namespace AM.Collections
         {
             get
             {
-                int result = 0;
-                for (int i = 0; i < _data.Length; i++)
+                var result = 0;
+                for (var i = 0; i < _data.Length; i++)
                 {
                     if (_data[i])
                     {
                         result++;
                     }
                 }
+
                 return result;
             }
-        }
+
+        } // property Count
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public CharSet()
-            : this(DefaultCapacity)
+            : this (DefaultCapacity)
         {
-        }
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public CharSet
             (
                 int capacity
             )
         {
-            Sure.Positive(capacity, nameof(capacity));
+            Sure.Positive (capacity);
 
-            _data = new BitArray(capacity);
-        }
+            _data = new BitArray (capacity);
+
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public CharSet
             (
                 BitArray data
             )
         {
-            _data = new BitArray(data);
-        }
+            _data = new BitArray (data);
+
+        } // constructor
 
         /// <summary>
         /// Copy constructor.
@@ -275,10 +269,10 @@ namespace AM.Collections
                 CharSet other
             )
         {
-            Sure.NotNull(other, nameof(other));
+            Sure.NotNull (other);
 
-            _data = new BitArray(other._data);
-        }
+            _data = new BitArray (other._data);
+        } // constructor
 
         /// <summary>
         /// Constructor.
@@ -289,11 +283,11 @@ namespace AM.Collections
             )
             : this()
         {
-            Sure.NotNull((object?)characters, nameof(characters));
+            Sure.NotNull ((object?)characters);
 
-            foreach (char c in characters)
+            foreach (var c in characters)
             {
-                Add(c);
+                Add (c);
             }
         }
 
@@ -306,7 +300,7 @@ namespace AM.Collections
             )
             : this()
         {
-            Add(characters);
+            Add (characters);
         }
 
         /// <summary>
@@ -318,9 +312,9 @@ namespace AM.Collections
             )
             : this()
         {
-            Sure.NotNull(characters, nameof(characters));
+            Sure.NotNull (characters, nameof (characters));
 
-            Add(characters);
+            Add (characters);
         }
 
         #endregion
@@ -329,19 +323,19 @@ namespace AM.Collections
 
         private readonly BitArray _data;
 
-        private void _Add(char[] ch, bool val)
+        private void _Add (char[] characters, bool val)
         {
-            for (int i = 0; i < ch.Length; i++)
+            foreach (var one in characters)
             {
-                _data[ch[i]] = val;
+                _data[one] = val;
             }
         }
 
-        private void _Add(string s, bool val)
+        private void _Add (string s, bool val)
         {
-            int len1 = s.Length - 1;
-            int len2 = s.Length - 2;
-            int i = 0;
+            var len1 = s.Length - 1;
+            var len2 = s.Length - 2;
+            var i = 0;
             for (; i < len1; i++)
             {
                 if (s[i] == '\\')
@@ -361,10 +355,12 @@ namespace AM.Collections
 
                         throw new ArgumentException();
                     }
+
                     for (int c = s[i]; c <= s[i + 2]; c++)
                     {
                         _data[c] = val;
                     }
+
                     i += 2;
                 }
                 else
@@ -372,6 +368,7 @@ namespace AM.Collections
                     _data[s[i]] = val;
                 }
             }
+
             for (; i < s.Length; i++)
             {
                 if (s[i] == '\\')
@@ -384,6 +381,7 @@ namespace AM.Collections
 
                     throw new ArgumentException();
                 }
+
                 _data[s[i]] = val;
             }
         }
@@ -413,7 +411,7 @@ namespace AM.Collections
                 params char[] range
             )
         {
-            _Add(range, true);
+            _Add (range, true);
 
             return this;
         }
@@ -426,9 +424,9 @@ namespace AM.Collections
                 string range
             )
         {
-            Sure.NotNull(range, nameof(range));
+            Sure.NotNull (range);
 
-            _Add(range, true);
+            _Add (range, true);
 
             return this;
         }
@@ -442,9 +440,9 @@ namespace AM.Collections
                 char to
             )
         {
-            for (char c = from; c <= to; c++)
+            for (var c = from; c <= to; c++)
             {
-                Add(c);
+                Add (c);
             }
 
             return this;
@@ -458,10 +456,10 @@ namespace AM.Collections
                 CharSet other
             )
         {
-            Sure.NotNull(other, nameof(other));
+            Sure.NotNull (other);
 
-            CharSet result = Clone();
-            result._data.And(other._data);
+            var result = Clone();
+            result._data.And (other._data);
 
             return result;
         }
@@ -474,14 +472,14 @@ namespace AM.Collections
                 string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return true;
             }
 
-            for (int i = 0; i < text.Length; i++)
+            foreach (var one in text)
             {
-                if (!this[text[i]])
+                if (!this [one])
                 {
                     return false;
                 }
@@ -495,7 +493,7 @@ namespace AM.Collections
         /// </summary>
         public CharSet Clear()
         {
-            return SetAll(false);
+            return SetAll (false);
         }
 
         /// <summary>
@@ -503,7 +501,7 @@ namespace AM.Collections
         /// </summary>
         public CharSet Clone()
         {
-            return new CharSet(this);
+            return new CharSet (this);
         }
 
         /// <summary>
@@ -523,7 +521,7 @@ namespace AM.Collections
         /// </summary>
         public CharSet Not()
         {
-            CharSet result = Clone();
+            var result = Clone();
             result._data.Not();
 
             return result;
@@ -537,10 +535,10 @@ namespace AM.Collections
                 CharSet other
             )
         {
-            Sure.NotNull(other, nameof(other));
+            Sure.NotNull (other);
 
-            CharSet result = Clone();
-            result._data.Or(other._data);
+            var result = Clone();
+            result._data.Or (other._data);
 
             return result;
         }
@@ -566,7 +564,7 @@ namespace AM.Collections
                 params char[] range
             )
         {
-            _Add(range, false);
+            _Add (range, false);
 
             return this;
         }
@@ -579,9 +577,9 @@ namespace AM.Collections
                 string range
             )
         {
-            Sure.NotNull(range, nameof(range));
+            Sure.NotNull (range);
 
-            _Add(range, false);
+            _Add (range, false);
 
             return this;
         }
@@ -595,9 +593,9 @@ namespace AM.Collections
                 char to
             )
         {
-            for (char c = from; c <= to; c++)
+            for (var c = from; c <= to; c++)
             {
-                Remove(c);
+                Remove (c);
             }
 
             return this;
@@ -611,7 +609,7 @@ namespace AM.Collections
                 bool state
             )
         {
-            _data.SetAll(state);
+            _data.SetAll (state);
 
             return this;
         }
@@ -621,14 +619,14 @@ namespace AM.Collections
         /// </summary>
         public char[] ToArray()
         {
-            int length = _data.Length / 8 + 1;
-            List<char> result = new List<char>(length);
+            var length = _data.Length / 8 + 1;
+            var result = new List<char> (length);
 
-            for (int i = 0; i < _data.Length; i++)
+            for (var i = 0; i < _data.Length; i++)
             {
                 if (_data[i])
                 {
-                    result.Add((char)i);
+                    result.Add ((char)i);
                 }
             }
 
@@ -643,9 +641,9 @@ namespace AM.Collections
                 CharSet other
             )
         {
-            Sure.NotNull(other, nameof(other));
+            Sure.NotNull (other);
 
-            CharSet result = new CharSet(_data.Xor(other._data));
+            var result = new CharSet (_data.Xor (other._data));
 
             return result;
         }
@@ -663,10 +661,10 @@ namespace AM.Collections
                 CharSet right
             )
         {
-            Sure.NotNull(left, nameof(left));
-            Sure.NotNull(right, nameof(right));
+            Sure.NotNull (left);
+            Sure.NotNull (right);
 
-            return left.Or(right);
+            return left.Or (right);
         }
 
         /// <summary>
@@ -678,12 +676,12 @@ namespace AM.Collections
                 string right
             )
         {
-            Sure.NotNull(left, "left");
-            Sure.NotNull(right, "right");
+            Sure.NotNull (left);
+            Sure.NotNull (right);
 
-            CharSet result = new CharSet(left);
+            var result = new CharSet (left);
 
-            return result.Add(right);
+            return result.Add (right);
         }
 
         /// <summary>
@@ -695,11 +693,11 @@ namespace AM.Collections
                 char right
             )
         {
-            Sure.NotNull(left, "left");
+            Sure.NotNull (left);
 
-            CharSet result = new CharSet(left);
+            var result = new CharSet (left);
 
-            return result.Add(right);
+            return result.Add (right);
         }
 
         /// <summary>
@@ -711,10 +709,10 @@ namespace AM.Collections
                 CharSet right
             )
         {
-            Sure.NotNull(left, "left");
-            Sure.NotNull(right, "right");
+            Sure.NotNull (left);
+            Sure.NotNull (right);
 
-            return left.And(right.Not());
+            return left.And (right.Not());
         }
 
         /// <summary>
@@ -726,12 +724,12 @@ namespace AM.Collections
                 string right
             )
         {
-            Sure.NotNull(left, "left");
-            Sure.NotNull(right, "right");
+            Sure.NotNull (left);
+            Sure.NotNull (right);
 
-            CharSet result = new CharSet(left);
+            var result = new CharSet (left);
 
-            return result.Remove(right);
+            return result.Remove (right);
         }
 
         /// <summary>
@@ -743,11 +741,11 @@ namespace AM.Collections
                 char right
             )
         {
-            Sure.NotNull(left, "left");
+            Sure.NotNull (left);
 
-            CharSet result = new CharSet(left);
+            var result = new CharSet (left);
 
-            return result.Remove(right);
+            return result.Remove (right);
         }
 
         /// <summary>
@@ -759,10 +757,10 @@ namespace AM.Collections
                 CharSet right
             )
         {
-            Sure.NotNull(left, "left");
-            Sure.NotNull(right, "right");
+            Sure.NotNull (left);
+            Sure.NotNull (right);
 
-            return left.And(right);
+            return left.And (right);
         }
 
         /// <summary>
@@ -774,10 +772,10 @@ namespace AM.Collections
                 string right
             )
         {
-            Sure.NotNull(left, "left");
-            Sure.NotNull(right, "right");
+            Sure.NotNull (left);
+            Sure.NotNull (right);
 
-            return left.And(new CharSet(right));
+            return left.And (new CharSet (right));
         }
 
         #endregion
@@ -790,12 +788,12 @@ namespace AM.Collections
                 BinaryReader reader
             )
         {
-            Sure.NotNull(reader, "reader");
+            Sure.NotNull (reader);
 
             Clear();
-            string text = reader.ReadString();
-            Add(text);
-        }
+            Add (reader.ReadString());
+
+        } // method RwstoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
         public void SaveToStream
@@ -803,11 +801,11 @@ namespace AM.Collections
                 BinaryWriter writer
             )
         {
-            Sure.NotNull(writer, "writer");
+            Sure.NotNull (writer);
 
-            string text = ToString();
-            writer.Write(text);
-        }
+            writer.Write (ToString());
+
+        } // method SaveToStream
 
         #endregion
 
@@ -815,16 +813,10 @@ namespace AM.Collections
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator" />
         [ExcludeFromCodeCoverage]
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
-        public IEnumerator<char> GetEnumerator()
-        {
-            return new CharSetEnumerator(this);
-        }
+        public IEnumerator<char> GetEnumerator() => new CharSetEnumerator (this);
 
         #endregion
 
@@ -836,74 +828,61 @@ namespace AM.Collections
                 CharSet? other
             )
         {
-            Sure.NotNull(other, nameof(other));
-
-            other = other.ThrowIfNull();
+            Sure.NotNull (other);
 
             return BitArrayUtility.AreEqual
                 (
                     _data,
-                    other._data
+                    other!._data
                 );
-        }
+
+        } // method Equals
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return new string(ToArray());
-        }
+        public override string ToString() => new (ToArray());
 
         /// <inheritdoc cref="object.GetHashCode" />
         public override int GetHashCode()
         {
-            int result = 0;
+            var result = 0;
 
             unchecked
             {
-                for (int i = 0; i < _data.Length; i++)
+                for (var i = 0; i < _data.Length; i++)
                 {
                     if (_data[i])
                     {
                         result = result * 17 + i + 1;
                     }
                 }
-            }
+
+            } // unchecked
 
             return result;
-        }
+
+        } // method GetHashCode
 
         /// <inheritdoc cref="object.Equals(object?)" />
-        public override bool Equals(object? obj)
-        {
-            if (ReferenceEquals(obj, null))
+        public override bool Equals (object? obj) => obj switch
             {
-                return false;
-            }
+                null => false,
 
-            CharSet? charset = obj as CharSet;
-            if (ReferenceEquals(charset, null))
-            {
-                if (obj is string)
-                {
-                    charset = new CharSet((string)obj);
+                CharSet charset =>
+                    ReferenceEquals (charset, this)
+                    || BitArrayUtility.AreEqual (_data, charset._data),
 
-                    return BitArrayUtility.AreEqual(_data, charset._data);
-                }
-                return false;
-            }
-            if (ReferenceEquals(charset, this))
-            {
-                return true;
-            }
+                string s => BitArrayUtility.AreEqual (_data, new CharSet (s)._data),
 
+                _ => false
 
-            return BitArrayUtility.AreEqual(_data, charset._data);
-        }
+            };  // method Equals
 
         #endregion
-    }
-}
+
+    } // class CharSet
+
+} // namespace AM.Collections

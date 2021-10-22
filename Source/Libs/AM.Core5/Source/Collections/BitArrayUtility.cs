@@ -2,12 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* BitArrayUtility.cs -- вспомогательные методы для BitArray
  * Ars Magna project, http://arsmagna.ru
@@ -31,7 +26,7 @@ namespace AM.Collections
         #region Public methods
 
         /// <summary>
-        /// Compares two <see cref="BitArray"/>s.
+        /// Сравнение двух <see cref="BitArray"/>s.
         /// </summary>
         public static bool AreEqual
             (
@@ -39,33 +34,28 @@ namespace AM.Collections
                 BitArray right
             )
         {
-            Sure.NotNull(left, "left");
-            Sure.NotNull(right, "right");
+            Sure.NotNull (left);
+            Sure.NotNull (right);
 
             if (left.Length != right.Length)
             {
                 return false;
             }
 
-            int length = left.Length;
-            bool[] leftA = new bool[length];
-            ICollection leftCollection = left;
-            leftCollection.CopyTo(leftA, 0);
-            bool[] rightA = new bool[length];
-            ICollection rightCollection = right;
-            rightCollection.CopyTo(rightA,0);
-
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < left.Length; i++)
             {
-                if (leftA[i] != rightA[i])
+                if (left[i] != right[i])
                 {
                     return false;
                 }
             }
 
             return true;
-        }
+
+        } // method AreEqual
 
         #endregion
-    }
-}
+
+    } // class BitArrayUtility
+
+} // namespace AM.Collections
