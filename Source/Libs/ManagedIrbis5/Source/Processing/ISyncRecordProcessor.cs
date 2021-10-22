@@ -31,7 +31,7 @@ namespace ManagedIrbis.Processing
         /// <summary>
         /// Обработка одной записи.
         /// </summary>
-        GblProtocolLine ProcessOneRecord (Record record);
+        ProtocolLine ProcessOneRecord (Record record);
 
         /// <summary>
         /// Обработка множества записей.

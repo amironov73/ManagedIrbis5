@@ -36,20 +36,20 @@ namespace ManagedIrbis.Magazines
     /// <summary>
     /// Данные о кумуляции номеров. Поле 909.
     /// </summary>
-    [XmlRoot("cumulation")]
+    [XmlRoot ("cumulation")]
     public sealed class MagazineCumulation
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
 
         /// <summary>
-        /// Тег поля.
+        /// Метка поля по умолчанию.
         /// </summary>
         public const int Tag = 909;
 
         /// <summary>
-        /// Known subfield codes.
+        /// Коды известных полей.
         /// </summary>
         public const string KnownCodes = "dfhkq";
 
@@ -60,59 +60,59 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Год. Подполе Q.
         /// </summary>
-        [XmlAttribute("year")]
-        [JsonPropertyName("year")]
+        [XmlAttribute ("year")]
+        [JsonPropertyName ("year")]
         public string? Year { get; set; }
 
         /// <summary>
         /// Том. Подполе F.
         /// </summary>
-        [XmlAttribute("volume")]
-        [JsonPropertyName("volume")]
+        [XmlAttribute ("volume")]
+        [JsonPropertyName ("volume")]
         public string? Volume { get; set; }
 
         /// <summary>
         /// Место хранения. Подполе D.
         /// </summary>
-        [XmlAttribute("place")]
-        [JsonPropertyName("place")]
+        [XmlAttribute ("place")]
+        [JsonPropertyName ("place")]
         public string? Place { get; set; }
 
         /// <summary>
         /// Кумулированные номера. Подполе H.
         /// </summary>
-        [XmlAttribute("numbers")]
-        [JsonPropertyName("numbers")]
+        [XmlAttribute ("numbers")]
+        [JsonPropertyName ("numbers")]
         public string? Numbers { get; set; }
 
         /// <summary>
         /// Номер комплекта. Подполе K.
-        /// </summary>
-        [XmlAttribute("set")]
-        [JsonPropertyName("set")]
-        public string? Set { get; set; }
+            /// </summary>
+        [XmlAttribute ("set")]
+        [JsonPropertyName ("set")]
+        public string? ComplectNumber { get; set; }
 
         /// <summary>
-        /// Unknown subfields.
+        /// Неопознанные подполя.
         /// </summary>
-        [XmlElement("unknown")]
-        [JsonPropertyName("unknown")]
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
         public SubField[]? UnknownSubFields { get; set; }
 
         /// <summary>
-        /// Field.
+        /// Ассоциированное поле библиографической записи.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -120,7 +120,7 @@ namespace ManagedIrbis.Magazines
         #region Public methods
 
         /// <summary>
-        /// Apply to the <see cref="Field"/>.
+        /// Применение кумуляции к полю записи <see cref="Field"/>.
         /// </summary>
         public void ApplyTo
             (
@@ -128,11 +128,12 @@ namespace ManagedIrbis.Magazines
             )
         {
             field
-                .ApplySubField('q', Year)
-                .ApplySubField('f', Volume)
-                .ApplySubField('d', Place)
-                .ApplySubField('h', Numbers)
-                .ApplySubField('k', Set);
+                .ApplySubField ('q', Year)
+                .ApplySubField ('f', Volume)
+                .ApplySubField ('d', Place)
+                .ApplySubField ('h', Numbers)
+                .ApplySubField ('k', ComplectNumber);
+
         } // method ApplyTo
 
         /// <summary>
@@ -147,16 +148,17 @@ namespace ManagedIrbis.Magazines
 
             var result = new MagazineCumulation
             {
-                Year = field.GetFirstSubFieldValue('q'),
-                Volume = field.GetFirstSubFieldValue('f'),
-                Place = field.GetFirstSubFieldValue('d'),
-                Numbers = field.GetFirstSubFieldValue('h'),
-                Set = field.GetFirstSubFieldValue('k'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
+                Year = field.GetFirstSubFieldValue ('q'),
+                Volume = field.GetFirstSubFieldValue ('f'),
+                Place = field.GetFirstSubFieldValue ('d'),
+                Numbers = field.GetFirstSubFieldValue ('h'),
+                ComplectNumber = field.GetFirstSubFieldValue ('k'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
 
             return result;
+
         } // method Parse
 
         /// <summary>
@@ -169,9 +171,10 @@ namespace ManagedIrbis.Magazines
             )
         {
             return record.Fields
-                .GetField(tag)
-                .Select(field => Parse(field))
+                .GetField (tag)
+                .Select (field => Parse (field))
                 .ToArray();
+
         } // method Parse
 
 
@@ -180,7 +183,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         [ExcludeFromCodeCoverage]
         public bool ShouldSerializeUnknownSubFields() =>
-            !ReferenceEquals(UnknownSubFields, null)
+            !ReferenceEquals (UnknownSubFields, null)
             && UnknownSubFields.Length != 0;
 
         /// <summary>
@@ -189,14 +192,15 @@ namespace ManagedIrbis.Magazines
         public Field ToField()
         {
             Field result = new Field { Tag = Tag }
-                .AddNonEmptySubField('q', Year)
-                .AddNonEmptySubField('f', Volume)
-                .AddNonEmptySubField('d', Place)
-                .AddNonEmptySubField('h', Numbers)
-                .AddNonEmptySubField('k', Set)
-                .AddSubFields(UnknownSubFields);
+                .AddNonEmptySubField ('q', Year)
+                .AddNonEmptySubField ('f', Volume)
+                .AddNonEmptySubField ('d', Place)
+                .AddNonEmptySubField ('h', Numbers)
+                .AddNonEmptySubField ('k', ComplectNumber)
+                .AddSubFields (UnknownSubFields);
 
             return result;
+
         } // method ToField
 
         #endregion
@@ -213,8 +217,9 @@ namespace ManagedIrbis.Magazines
             Volume = reader.ReadNullableString();
             Place = reader.ReadNullableString();
             Numbers = reader.ReadNullableString();
-            Set = reader.ReadNullableString();
+            ComplectNumber = reader.ReadNullableString();
             UnknownSubFields = reader.ReadNullableArray<SubField>();
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -224,12 +229,13 @@ namespace ManagedIrbis.Magazines
             )
         {
             writer
-                .WriteNullable(Year)
-                .WriteNullable(Volume)
-                .WriteNullable(Place)
-                .WriteNullable(Numbers)
-                .WriteNullable(Set)
-                .WriteNullableArray(UnknownSubFields);
+                .WriteNullable (Year)
+                .WriteNullable (Volume)
+                .WriteNullable (Place)
+                .WriteNullable (Numbers)
+                .WriteNullable (ComplectNumber)
+                .WriteNullableArray (UnknownSubFields);
+
         } // method SaveToStream
 
         #endregion
@@ -242,13 +248,14 @@ namespace ManagedIrbis.Magazines
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<MagazineCumulation>(this, throwOnError);
+            var verifier = new Verifier<MagazineCumulation> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Year, "Year")
-                .NotNullNorEmpty(Numbers, "Number");
+                .NotNullNorEmpty (Year, "Year")
+                .NotNullNorEmpty (Numbers, "Number");
 
             return verifier.Result;
+
         } // method Verify
 
         #endregion

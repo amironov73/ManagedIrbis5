@@ -370,7 +370,7 @@ namespace ManagedIrbis.Mapping
         /// <summary>
         /// Преобразование в дату.
         /// </summary>
-        public static DateTime ToDateTime(ReadOnlyMemory<char> value)
+        public static DateTime ToDateTime(ReadOnlySpan<char> value)
             => IrbisDate.ConvertStringToDate(value);
 
         /// <summary>

@@ -19,7 +19,6 @@
 using System;
 using System.Globalization;
 using System.IO;
-
 using System.Text.RegularExpressions;
 
 using AM;
@@ -54,17 +53,17 @@ namespace ManagedIrbis.Infrastructure
         public static string ConversionFormat = DefaultFormat;
 
         /// <summary>
-        /// Text representation of today date.
+        /// Сегодняшняя дата в формате ИРБИС.
         /// </summary>
         public static string TodayText => new IrbisDate().Text;
 
         /// <summary>
-        /// В виде текста.
+        /// Дата в виде текста.
         /// </summary>
         public string Text { get; private set; }
 
         /// <summary>
-        /// В виде даты.
+        /// Дата как дата.
         /// </summary>
         public DateTime Date { get; private set; }
 
@@ -81,11 +80,11 @@ namespace ManagedIrbis.Infrastructure
         public IrbisDate()
         {
             Date = DateTime.Today;
-            Text = ConvertDateToString(Date);
+            Text = ConvertDateToString (Date);
         }
 
         /// <summary>
-        /// Конструктор
+        /// Конструктор.
         /// </summary>
         public IrbisDate
             (
@@ -95,7 +94,7 @@ namespace ManagedIrbis.Infrastructure
             // Sure.NotNullNorEmpty(text, nameof(text));
 
             Text = text ?? string.Empty;
-            Date = ConvertStringToDate(text);
+            Date = ConvertStringToDate (text);
         }
 
         /// <summary>
@@ -107,7 +106,7 @@ namespace ManagedIrbis.Infrastructure
             )
         {
             Date = date;
-            Text = ConvertDateToString(date);
+            Text = ConvertDateToString (date);
         }
 
         #endregion
@@ -117,8 +116,8 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Преобразование даты в строку.
         /// </summary>
-        public static string ConvertDateToString(DateTime date)
-            => date.ToString(ConversionFormat);
+        public static string ConvertDateToString (DateTime date)
+            => date.ToString (ConversionFormat);
 
         /// <summary>
         /// Преобразование строки в дату.
@@ -128,14 +127,14 @@ namespace ManagedIrbis.Infrastructure
                 string? date
             )
         {
-            if (ReferenceEquals(date, null) || date.Length < 4)
+            if (ReferenceEquals (date, null) || date.Length < 4)
             {
                 return DateTime.MinValue;
             }
 
             if (date.Length > 8)
             {
-                var match = Regex.Match(date, @"\d{8}");
+                var match = Regex.Match (date, @"\d{8}");
                 if (match.Success)
                 {
                     date = match.Value;
@@ -159,7 +158,7 @@ namespace ManagedIrbis.Infrastructure
         /// </summary>
         public static DateTime ConvertStringToDate
             (
-                ReadOnlyMemory<char> date
+                ReadOnlySpan<char> date
             )
         {
             // TODO: реализовать оптимально
@@ -171,16 +170,16 @@ namespace ManagedIrbis.Infrastructure
 
             if (date.Length > 8)
             {
-                var match = Regex.Match(date.ToString(), @"\d{8}");
+                var match = Regex.Match (date.ToString(), @"\d{8}");
                 if (match.Success)
                 {
-                    date = match.Value.AsMemory();
+                    date = match.Value;
                 }
             }
 
             DateTime.TryParseExact
                 (
-                    date.ToString(),
+                    date,
                     ConversionFormat,
                     CultureInfo.CurrentCulture,
                     DateTimeStyles.None,
@@ -188,40 +187,42 @@ namespace ManagedIrbis.Infrastructure
                 );
 
             return result;
-        }
+
+        } // method ConvertStringToDate
 
         /// <summary>
-        /// Convert string to time.
+        /// Явное преобразование строки в промежуток времени.
         /// </summary>
         public static TimeSpan ConvertStringToTime
             (
                 string? time
             )
         {
-            if (ReferenceEquals(time, null) || time.Length < 4)
+            if (ReferenceEquals (time, null) || time.Length < 4)
             {
                 return new TimeSpan();
             }
 
-            var hours = int.Parse(time.Substring(0, 2));
-            var minutes = int.Parse(time.Substring(2, 2));
+            var hours = int.Parse (time.Substring (0, 2));
+            var minutes = int.Parse (time.Substring (2, 2));
             var seconds = time.Length < 6
                 ? 0
-                : int.Parse(time.Substring(4, 2));
-            var result = new TimeSpan(hours, minutes, seconds);
+                : int.Parse (time.Substring (4, 2));
+            var result = new TimeSpan (hours, minutes, seconds);
 
             return result;
-        }
+
+        } // method ConvertStringToTime
 
         /// <summary>
-        /// Convert time to string.
+        /// Явное преобразование промежутка времени в строку.
         /// </summary>
         public static string ConvertTimeToString
             (
                 TimeSpan time
             )
         {
-            return String.Format
+            return string.Format
                 (
                     CultureInfo.InvariantCulture,
                     "{0:00}{1:00}{2:00}",
@@ -229,25 +230,26 @@ namespace ManagedIrbis.Infrastructure
                     time.Minutes,
                     time.Seconds
                 );
-        }
+
+        } // method ConvertTimeToString
 
         /// <summary>
-        /// Неявное преобразование.
+        /// Неявное преобразование из строки.
         /// </summary>
         public static implicit operator IrbisDate (string text) => new (text);
 
         /// <summary>
-        /// Неявное преобразование.
+        /// Неявное преобразование из даты.
         /// </summary>
         public static implicit operator IrbisDate (DateTime date) => new (date);
 
         /// <summary>
-        /// Неявное преобразование.
+        /// Неявное преобразование в строку.
         /// </summary>
         public static implicit operator string (IrbisDate date) => date.Text;
 
         /// <summary>
-        /// Неявное преобразование.
+        /// Неявное преобразование в дату.
         /// </summary>
         public static implicit operator DateTime (IrbisDate date) => date.Date;
 
@@ -262,11 +264,12 @@ namespace ManagedIrbis.Infrastructure
             )
         {
             Text = reader.ReadString();
-            Date = ConvertStringToDate(Text);
-        }
+            Date = ConvertStringToDate (Text);
+
+        } // method RestoreFromStream
 
         /// <see cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream (BinaryWriter writer) => writer.Write(Text);
+        public void SaveToStream (BinaryWriter writer) => writer.Write (Text);
 
         #endregion
 
@@ -276,5 +279,7 @@ namespace ManagedIrbis.Infrastructure
         public override string ToString() => Text.ToVisibleString();
 
         #endregion
-    }
-}
+
+    } // class IrbisDate
+
+} // namespace ManagedIrbis.Infrastructure

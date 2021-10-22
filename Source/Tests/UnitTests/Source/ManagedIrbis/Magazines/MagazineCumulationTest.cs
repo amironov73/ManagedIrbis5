@@ -41,7 +41,7 @@ namespace UnitTests.ManagedIrbis.Magazines
                 Year = "2016",
                 Place = "Ф403",
                 Numbers = "1,3,4,6,7,9,10,12,13,15,16,18,20,21,23,25,26,28,29,31,32,34,35,37,38,40,41,43,44,46,48,49,51,52,54,55,57,58,60,61,64,66,67,69,70,72,73,75,76,78,79,81,82,84,85,87,88,90,91,93,94,96,97,99,100,102,103,105,106,108,109,111,114,115,2/ч,5/ч,8/ч,11/ч,14/ч,17/ч,19/ч,22/ч,24/ч,27/ч,30/ч,33/ч,36/ч,39/ч,42/ч,45/ч,47/ч,50/ч,53/ч,56/ч,59/ч,62/ч,65/ч,68/ч,71/ч,74/ч,77/ч,80/ч,83/ч,86/ч,89/ч,92/ч,95/ч,98/ч,101/ч,104/ч,107/ч,4/п,7/п,10/п,13/п,16/п,21/п,26/п,29/п,32/п,35/п,38/п,41/п,44/п,52/п,55/п,58/п,61/п,67/п,70/п,72/п,73/п,79/п,82/п,85/п,88/п,91/п,94/п,97/п,100/п,103/п,106/п,109/п,63/д,110/ч,112/п,113/ч,115/п,117,118,120,121,123,124,116/ч,118/п,119/ч,121/п,122/ч,124/п,126,128,129,131,127/ч,129/п,130/ч,132/п,132,134,135,137,138,135/п,138/п,133/ч,136/ч,139/ч,140,141/п,141,142/ч,145/ч,143,144/п,144,146,147,147/п,148/ч,149,125/ч-126,1/т-52/т",
-                Set = "1"
+                ComplectNumber = "1"
             };
 
             return result;
@@ -136,7 +136,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             Assert.IsNull(cumulation.Volume);
             Assert.IsNull(cumulation.Place);
             Assert.IsNull(cumulation.Numbers);
-            Assert.IsNull(cumulation.Set);
+            Assert.IsNull(cumulation.ComplectNumber);
             Assert.IsNull(cumulation.UnknownSubFields);
             Assert.IsNull(cumulation.UserData);
         }
@@ -150,7 +150,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             Assert.AreEqual(field.GetFirstSubFieldValue('f'), cumulation.Volume);
             Assert.AreEqual(field.GetFirstSubFieldValue('d'), cumulation.Place);
             Assert.AreEqual(field.GetFirstSubFieldValue('h'), cumulation.Numbers);
-            Assert.AreEqual(field.GetFirstSubFieldValue('k'), cumulation.Set);
+            Assert.AreEqual(field.GetFirstSubFieldValue('k'), cumulation.ComplectNumber);
             Assert.IsNotNull(cumulation.UnknownSubFields);
             Assert.AreEqual(0, cumulation.UnknownSubFields!.Length);
         }
@@ -184,7 +184,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             Assert.AreEqual(cumulation.Volume, field.GetFirstSubFieldValue('f'));
             Assert.AreEqual(cumulation.Place, field.GetFirstSubFieldValue('d'));
             Assert.AreEqual(cumulation.Numbers, field.GetFirstSubFieldValue('h'));
-            Assert.AreEqual(cumulation.Set, field.GetFirstSubFieldValue('k'));
+            Assert.AreEqual(cumulation.ComplectNumber, field.GetFirstSubFieldValue('k'));
         }
 
         private void _TestSerialization
@@ -199,7 +199,7 @@ namespace UnitTests.ManagedIrbis.Magazines
             Assert.AreEqual(first.Volume, second.Volume);
             Assert.AreEqual(first.Place, second.Place);
             Assert.AreEqual(first.Numbers, second.Numbers);
-            Assert.AreEqual(first.Set, second.Set);
+            Assert.AreEqual(first.ComplectNumber, second.ComplectNumber);
             if (first.UnknownSubFields is null)
             {
                 Assert.IsNull(second.UnknownSubFields);

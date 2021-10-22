@@ -49,6 +49,11 @@ namespace ManagedIrbis
         public const string TitlePrefix = "T=";
 
         /// <summary>
+        /// Шифр документа в базе.
+        /// </summary>
+        public const string IndexPrefix = "I=";
+
+        /// <summary>
         /// Инвентарный номер, штрих-код или радиометка.
         /// </summary>
         public const string InventoryPrefix = "IN=";
@@ -58,11 +63,27 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
+        /// Поиск единственной записи с указанным шифром.
+        /// Запись может отсуствовать, это не будет считаться ошибкой.
+        /// </summary>
+        public static Record? ByIndex
+            (
+                this ISyncProvider connection,
+                string index
+            )
+        {
+            // Sure.NotNull(connection, nameof(connection));
+            // Sure.NotNullNorEmpty(inventory, nameof(inventory));
+
+            return SingleOrDefault (connection, IndexPrefix, index);
+
+        } // method ByIndex
+
+        /// <summary>
         /// Поиск единственной записи, содержащей экземпляр с указанным номером
         /// (или штрих-кодом или радио-меткой).
         /// Запись может отсуствовать, это не будет считаться ошибкой.
         /// </summary>
-        /// <returns></returns>
         public static Record? ByInventory
             (
                 this ISyncProvider connection,
@@ -72,9 +93,9 @@ namespace ManagedIrbis
             // Sure.NotNull(connection, nameof(connection));
             // Sure.NotNullNorEmpty(inventory, nameof(inventory));
 
-            return SingleOrDefault(connection, InventoryPrefix, inventory);
-        }
+            return SingleOrDefault (connection, InventoryPrefix, inventory);
 
+        } // method ByInventory
 
         /// <summary>
         /// Поиск первой попавшейся записи, удовлетворяющей указанному условию.

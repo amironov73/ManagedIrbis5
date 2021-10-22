@@ -50,7 +50,7 @@ namespace ManagedIrbis.Processing
         /// <summary>
         /// Получение протокола.
         /// </summary>
-        Task<GblProtocolLine[]> GetProtocolAsync();
+        Task<ProtocolLine[]> GetProtocolAsync();
 
     } // interface IAsyncRecordSink
 

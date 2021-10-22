@@ -23,6 +23,7 @@ using System.Linq;
 using AM;
 
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Processing;
 
 #endregion
 
@@ -80,7 +81,7 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Результаты для каждой записи.
         /// </summary>
-        public GblProtocolLine[]? Protocol { get; set; }
+        public ProtocolLine[]? Protocol { get; set; }
 
         #endregion
 
@@ -122,9 +123,9 @@ namespace ManagedIrbis.Gbl
             RecordsProcessed += intermediateResult.RecordsProcessed;
             RecordsFailed += intermediateResult.RecordsFailed;
             RecordsSucceeded += intermediateResult.RecordsSucceeded;
-            Protocol ??= Array.Empty<GblProtocolLine>();
+            Protocol ??= Array.Empty<ProtocolLine>();
             var otherLines
-                = intermediateResult.Protocol ?? Array.Empty<GblProtocolLine>();
+                = intermediateResult.Protocol ?? Array.Empty<ProtocolLine>();
             Protocol = ArrayUtility.Merge
                 (
                     Protocol,
@@ -141,7 +142,7 @@ namespace ManagedIrbis.Gbl
                 Response response
             )
         {
-            Protocol = GblProtocolLine.Decode(response);
+            Protocol = ProtocolLine.Decode(response);
             RecordsProcessed = Protocol.Length;
             RecordsSucceeded = Protocol.Count(line => line.Success);
 

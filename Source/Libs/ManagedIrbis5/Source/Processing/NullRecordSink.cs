@@ -16,8 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using ManagedIrbis.Gbl;
-
 #endregion
 
 #nullable enable
@@ -40,10 +38,10 @@ namespace ManagedIrbis.Processing
         public void Complete() {}
 
         /// <inheritdoc cref="ISyncRecordSink.GetProtocol"/>
-        public IReadOnlyList<GblProtocolLine> GetProtocol() => Array.Empty<GblProtocolLine>();
+        public IReadOnlyList<ProtocolLine> GetProtocol() => Array.Empty<ProtocolLine>();
 
         /// <inheritdoc cref="ISyncRecordSink.GetProtocol"/>
-        GblProtocolLine[] ISyncRecordSink.GetProtocol() => Array.Empty<GblProtocolLine>();
+        ProtocolLine[] ISyncRecordSink.GetProtocol() => Array.Empty<ProtocolLine>();
 
         #endregion
 
@@ -56,7 +54,7 @@ namespace ManagedIrbis.Processing
         public Task CompleteAsync() => Task.CompletedTask;
 
         /// <inheritdoc cref="IAsyncRecordSink.GetProtocolAsync"/>
-        public Task<GblProtocolLine[]> GetProtocolAsync() => Task.FromResult(Array.Empty<GblProtocolLine>());
+        public Task<ProtocolLine[]> GetProtocolAsync() => Task.FromResult(Array.Empty<ProtocolLine>());
 
         #endregion
 

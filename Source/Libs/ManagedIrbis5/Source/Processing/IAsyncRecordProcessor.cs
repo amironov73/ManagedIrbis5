@@ -32,7 +32,7 @@ namespace ManagedIrbis.Processing
         /// <summary>
         /// Обработка одной записи.
         /// </summary>
-        Task<GblProtocolLine> ProcessOneRecordAsync (Record record);
+        Task<ProtocolLine> ProcessOneRecordAsync (Record record);
 
         /// <summary>
         /// Обработка множества записей.

@@ -26,7 +26,7 @@ using ManagedIrbis.Infrastructure;
 
 #nullable enable
 
-namespace ManagedIrbis.Gbl
+namespace ManagedIrbis.Processing
 {
     //
     // Типичная строка с положительным результатом:
@@ -39,7 +39,7 @@ namespace ManagedIrbis.Gbl
     /// <summary>
     /// Строка в протоколе выполнения глобальной корректировки.
     /// </summary>
-    public sealed class GblProtocolLine
+    public sealed class ProtocolLine
     {
         #region Properties
 
@@ -159,12 +159,12 @@ namespace ManagedIrbis.Gbl
         /// <summary>
         /// Parse server response.
         /// </summary>
-        public static GblProtocolLine[] Decode
+        public static ProtocolLine[] Decode
             (
                 Response response
             )
         {
-            var result = new List<GblProtocolLine>();
+            var result = new List<ProtocolLine>();
 
             while (true)
             {
@@ -174,7 +174,7 @@ namespace ManagedIrbis.Gbl
                     break;
                 }
 
-                var item = new GblProtocolLine();
+                var item = new ProtocolLine();
                 item.Decode(line);
                 result.Add(item);
             } // while
@@ -192,6 +192,6 @@ namespace ManagedIrbis.Gbl
 
         #endregion
 
-    } // class GblProtocolLine
+    } // class ProtocolLine
 
-} // namespace ManagedIrbis.Gbl
+} // namespace ManagedIrbis.Processing

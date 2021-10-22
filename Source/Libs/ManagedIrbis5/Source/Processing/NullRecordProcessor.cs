@@ -33,7 +33,7 @@ namespace ManagedIrbis.Processing
         #region ISyncRecordProcessor members
 
         /// <inheritdoc cref="ISyncRecordProcessor.ProcessOneRecord"/>
-        public GblProtocolLine ProcessOneRecord (Record record) => new ();
+        public ProtocolLine ProcessOneRecord (Record record) => new ();
 
         /// <inheritdoc cref="ISyncRecordProcessor.ProcessRecords"/>
         public GblResult ProcessRecords (ISyncRecordSource source, ISyncRecordSink sync) => new ();
@@ -43,8 +43,8 @@ namespace ManagedIrbis.Processing
         #region IAsyncRecordProcessor members
 
         /// <inheritdoc cref="IAsyncRecordProcessor.ProcessOneRecordAsync"/>
-        public Task<GblProtocolLine> ProcessOneRecordAsync (Record record) =>
-            Task.FromResult (new GblProtocolLine());
+        public Task<ProtocolLine> ProcessOneRecordAsync (Record record) =>
+            Task.FromResult (new ProtocolLine());
 
         /// <inheritdoc cref="IAsyncRecordProcessor.ProcessRecordsAsync"/>
         public Task<GblResult> ProcessRecordsAsync (ISyncRecordSource source, ISyncRecordSink sync) =>

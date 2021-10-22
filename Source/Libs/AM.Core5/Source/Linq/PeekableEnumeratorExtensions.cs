@@ -23,6 +23,9 @@ using System.Diagnostics.CodeAnalysis;
 
 #nullable enable
 
+#pragma warning disable 8603
+#pragma warning disable 8604
+
 namespace AM.Linq
 {
     /// <summary>

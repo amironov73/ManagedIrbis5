@@ -49,7 +49,7 @@ namespace ManagedIrbis.Processing
         /// <summary>
         /// Получение протокола.
         /// </summary>
-        GblProtocolLine[] GetProtocol();
+        ProtocolLine[] GetProtocol();
 
     } // interface ISyncRecordSink
 
