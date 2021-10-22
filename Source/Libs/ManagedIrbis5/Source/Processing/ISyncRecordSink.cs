@@ -14,8 +14,6 @@
 
 using System;
 
-using ManagedIrbis.Gbl;
-
 #endregion
 
 #nullable enable

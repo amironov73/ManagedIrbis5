@@ -23,67 +23,68 @@ namespace ManagedIrbis.Fields
         #region Constants
 
         /// <summary>
-        /// Free.
+        /// Отдельный экземпляр (на индивидуальном учете)
+        /// свободен и доступен для выдачи.
         /// </summary>
         public const string Free = "0";
 
         /// <summary>
-        /// Loan.
+        /// Экземпляр выдан читателю.
         /// </summary>
         public const string Loan = "1";
 
         /// <summary>
-        /// Wait.
+        /// Данный экземпляр ещё не поступил в библиотеку, ожидается.
         /// </summary>
         public const string Wait = "2";
 
         /// <summary>
-        /// In bindery.
+        /// Находится в переплетной мастерской.
         /// </summary>
         public const string Bindery = "3";
 
         /// <summary>
-        /// Lost.
+        /// Экземпляр утерян.
         /// </summary>
         public const string Lost = "4";
 
         /// <summary>
-        /// Not available.
+        /// Временно не выдается.
         /// </summary>
         public const string NotAvailable = "5";
 
         /// <summary>
-        /// Written off.
+        /// Экземпляр списан.
         /// </summary>
         public const string WrittenOff = "6";
 
         /// <summary>
-        /// On the way.
+        /// Номер журнала/газеты поступил, но еще не дошел до места хранения.
         /// </summary>
         public const string OnTheWay = "8";
 
         /// <summary>
-        /// Reserved.
+        /// Экземпляр на бронеполке.
         /// </summary>
         public const string Reserved = "9";
 
         /// <summary>
-        /// BiblioNet.
+        /// Группа экземпляров для библиотеки сети.
         /// </summary>
         public const string BiblioNet = "C";
 
         /// <summary>
-        /// Bound.
+        /// Номер журнала/газеты переплетен (входит в подшивку).
         /// </summary>
         public const string Bound = "P";
 
         /// <summary>
-        /// Reproduction.
+        /// Группа экземпляров на размножение с вводом инвентарных номеров.
         /// </summary>
         public const string Reproduction = "R";
 
         /// <summary>
-        /// Summary.
+        /// Группа экземпляров безинвентарного учета.
         /// </summary>
         public const string Summary = "U";
 

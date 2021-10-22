@@ -21,6 +21,7 @@ using System;
 using AM;
 using AM.Text.Ranges;
 
+using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
 
@@ -113,7 +114,9 @@ namespace ManagedIrbis.Magazines
             foreach (var numberText in numbers)
             {
                 // Создание записей, если их еще нет.
-                var issueIndex = $"{specification.MagazineIndex}/{specification.Year}/{numberText}";
+                var issueIndex = string.IsNullOrEmpty (specification.VolumeNumber)
+                    ? $"{specification.MagazineIndex}/{specification.Year}/{numberText}"
+                    : $"{specification.MagazineIndex}/{specification.Year}/{specification.VolumeNumber}/{numberText}";
                 var issueRecord = Provider.ByIndex (issueIndex);
                 if (issueRecord is null)
                 {
@@ -130,7 +133,7 @@ namespace ManagedIrbis.Magazines
                     issueRecord.Fields.Add
                         (
                             new Field { Tag = 910 } // поле 910: сведения об экземпляре
-                                .Add ('a', "0") // подполе A: статус экземпляра
+                                .Add ('a', ExemplarStatus.Bound) // подполе A: статус экземпляра
                                 .Add ('b', specification.Complect) // подполе B: номер комплекта
                                 .Add ('c', "?") // подполе C: дата поступления
                                 .Add ('d', specification.Fond) // подполе D: место хранения
@@ -172,7 +175,7 @@ namespace ManagedIrbis.Magazines
             bindingRecord.Fields.Add
                 (
                     new Field { Tag = 910 }                 // поле 910: сведения об экземпляре
-                        .Add ('a', "0")                     // подполе A: статус экземпляра
+                        .Add ('a', ExemplarStatus.Free)     // подполе A: статус экземпляра
                         .Add ('b', specification.Inventory) // подполе B: инвентарный номер
                         .Add ('c', IrbisDate.TodayText)     // подполе C: дата поступления
                         .Add ('d', specification.Fond)      // подполе D: место хранения
