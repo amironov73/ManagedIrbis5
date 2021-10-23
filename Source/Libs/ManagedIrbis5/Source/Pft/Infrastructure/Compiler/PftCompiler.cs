@@ -118,7 +118,6 @@ namespace ManagedIrbis.Pft.Infrastructure.Compiler
             References = new NonNullCollection<string>
             {
                 "AM.Core.dll",
-                "JetBrains.Annotations.dll",
                 "ManagedIrbis.dll",
                 "Microsoft.CSharp.dll",
                 "MoonSharp.Interpreter.dll",
