@@ -13,7 +13,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* Tcp4ServerSocket.cs -- простой серверный сокет для TCP v4
+/* PipeServerSocket.cs -- простой серверный сокет для System.IO.Pipes
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.Sockets;
+using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -33,11 +33,9 @@ using System.Threading.Tasks;
 namespace ManagedIrbis.Server.Sockets
 {
     /// <summary>
-    /// Простой серверный (обслуживающий подключенного клиента)
-    /// сокет для TCP v4.
-    /// Ничего не сжимает, не шифрует, не переиспользуется.
+    /// Простой серверный сокет для System.IO.Pipes.
     /// </summary>
-    public sealed class Tcp4ServerSocket
+    public sealed class PipeServerSocket
         : IAsyncServerSocket
     {
         #region Construction
@@ -45,13 +43,13 @@ namespace ManagedIrbis.Server.Sockets
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public Tcp4ServerSocket
+        public PipeServerSocket
             (
-                TcpClient client,
+                PipeStream stream,
                 CancellationToken cancellationToken
             )
         {
-            _client = client;
+            _stream = stream;
             _cancellationToken = cancellationToken;
 
         } // constructor
@@ -60,7 +58,7 @@ namespace ManagedIrbis.Server.Sockets
 
         #region Private members
 
-        private readonly TcpClient _client;
+        private readonly PipeStream _stream;
         private readonly CancellationToken _cancellationToken;
 
         #endregion
@@ -68,8 +66,7 @@ namespace ManagedIrbis.Server.Sockets
         #region IAsyncServerSocket members
 
         /// <inheritdoc cref="IAsyncServerSocket.GetRemoteAddress"/>
-        public string GetRemoteAddress() =>
-            _client.Client.RemoteEndPoint?.ToString() ?? "(unknown)";
+        public string GetRemoteAddress() => "(unknown)";
 
         /// <inheritdoc cref="IAsyncServerSocket.ReceiveAllAsync"/>
         public async Task<MemoryStream?> ReceiveAllAsync()
@@ -80,7 +77,6 @@ namespace ManagedIrbis.Server.Sockets
             }
 
             var result = new MemoryStream();
-            NetworkStream stream = _client.GetStream();
             var buffer = new byte[50 * 1024];
 
             while (true)
@@ -90,7 +86,7 @@ namespace ManagedIrbis.Server.Sockets
                     return null;
                 }
 
-                var read = await stream.ReadAsync
+                var read = await _stream.ReadAsync
                     (
                         buffer,
                         0,
@@ -135,8 +131,6 @@ namespace ManagedIrbis.Server.Sockets
                 return false;
             }
 
-            var stream = _client.GetStream();
-
             foreach (var unit in data)
             {
                 if (_cancellationToken.IsCancellationRequested)
@@ -144,7 +138,7 @@ namespace ManagedIrbis.Server.Sockets
                     return false;
                 }
 
-                await stream.WriteAsync (unit, _cancellationToken);
+                await _stream.WriteAsync (unit, _cancellationToken);
             }
 
             return true;
@@ -156,16 +150,10 @@ namespace ManagedIrbis.Server.Sockets
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public ValueTask DisposeAsync()
-        {
-            _client.Dispose();
-
-            return ValueTask.CompletedTask;
-
-        } // method DisposeAsync
+        public ValueTask DisposeAsync() => _stream.DisposeAsync();
 
         #endregion
 
-    } // class Tcp5ServerSocket
+    } // class PipeServerSocket
 
 } // namespace ManagedIrbis.Server.Sockets

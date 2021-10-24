@@ -13,15 +13,14 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* Tcp4ServerListener.cs -- серверный слушатель для простого TCP v4
+/* PipeServerListener.cs -- серверный слушатель для System.IO.Pipes
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System;
-using System.Net;
-using System.Net.Sockets;
+using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,24 +33,42 @@ using AM;
 namespace ManagedIrbis.Server.Sockets
 {
     /// <summary>
-    /// Серверный слушатель для простого TCP v4.
+    /// Серверный слушатель для System.IO.Pipes.
     /// </summary>
-    public sealed class Tcp4ServerListener
+    public sealed class PipeServerListener
         : IAsyncServerListener
     {
+        #region Properties
+
+        /// <summary>
+        /// Имя.
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Максимальное количество подключаемых клиентов.
+        /// </summary>
+        public int InstanceCount { get; }
+
+        #endregion
+
         #region Construction
 
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public Tcp4ServerListener
+        public PipeServerListener
             (
-                IPEndPoint endPoint,
+                string name,
+                int instanceCount,
                 CancellationToken cancellationToken
             )
         {
-            _endPoint = endPoint;
-            _listener = new TcpListener (endPoint);
+            Sure.NotNullNorEmpty (name);
+            Sure.Positive (instanceCount);
+
+            Name = name;
+            InstanceCount = instanceCount;
             _cancellationToken = cancellationToken;
             _cancellationToken.Register (_StopListener);
 
@@ -61,37 +78,14 @@ namespace ManagedIrbis.Server.Sockets
 
         #region Private members
 
-        private readonly IPEndPoint _endPoint;
-        private readonly TcpListener _listener;
+        private NamedPipeServerStream? _stream;
         private readonly CancellationToken _cancellationToken;
-        private bool _working;
 
         private void _StopListener()
         {
-            _listener.Stop();
-        }
+            _stream?.Dispose();
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Создание слушателя для указанного порта.
-        /// </summary>
-        public static Tcp4ServerListener ForPort
-            (
-                int portNumber,
-                CancellationToken token
-            )
-        {
-            Sure.InRange (portNumber, 1, 65535);
-
-            var endPoint = new IPEndPoint (IPAddress.Any, portNumber);
-            var result = new Tcp4ServerListener (endPoint, token);
-
-            return result;
-
-        } // method ForPort
+        } // method _StopListener
 
         #endregion
 
@@ -105,39 +99,51 @@ namespace ManagedIrbis.Server.Sockets
                 return null;
             }
 
-            var client = await _listener.AcceptTcpClientAsync().ConfigureAwait (false);
-            var result = new Tcp4ServerSocket (client, _cancellationToken);
+            Sure.NotNull (_stream);
+
+            await _stream!.WaitForConnectionAsync (_cancellationToken);
+            if (_cancellationToken.IsCancellationRequested)
+            {
+                return null;
+            }
+
+            var result = new PipeServerSocket (_stream, _cancellationToken);
 
             return result;
 
         } // method AcceptClientAsync
 
         /// <inheritdoc cref="IAsyncServerListener.GetLocalAddress"/>
-        public string GetLocalAddress() => _endPoint.ToString();
+        public string GetLocalAddress() => Name;
 
         /// <inheritdoc cref="IAsyncServerListener.StartAsync"/>
         public Task StartAsync()
         {
-            if (!_working)
-            {
-                _listener.Start();
-                _working = true;
-            }
+            _stream ??= new NamedPipeServerStream
+                (
+                    Name,
+                    PipeDirection.InOut,
+                    InstanceCount,
+#pragma warning disable CA1416
+
+                    // supported only on Windows
+                    PipeTransmissionMode.Message,
+#pragma warning restore CA1416
+                    PipeOptions.Asynchronous
+                );
 
             return Task.CompletedTask;
 
         } // method StartAsync
 
         /// <inheritdoc cref="IAsyncServerListener.StopAsync"/>
-        public Task StopAsync()
+        public async Task StopAsync()
         {
-            if (_working)
+            if (_stream is not null)
             {
-                _listener.Stop();
-                _working = false;
+                await _stream.DisposeAsync();
+                _stream = null;
             }
-
-            return Task.CompletedTask;
 
         } // method StopAsync
 
@@ -150,6 +156,6 @@ namespace ManagedIrbis.Server.Sockets
 
         #endregion
 
-    } // class Tcp4ServerListener
+    } // class Tcp46erverListener
 
 } // namespace ManagedIrbis.Server.Sockets

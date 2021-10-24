@@ -13,7 +13,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* Tcp4ServerListener.cs -- серверный слушатель для простого TCP v4
+/* Tcp6ServerListener.cs -- серверный слушатель для простого TCP v6
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -34,9 +34,9 @@ using AM;
 namespace ManagedIrbis.Server.Sockets
 {
     /// <summary>
-    /// Серверный слушатель для простого TCP v4.
+    /// Серверный слушатель для простого TCP v6.
     /// </summary>
-    public sealed class Tcp4ServerListener
+    public sealed class Tcp6ServerListener
         : IAsyncServerListener
     {
         #region Construction
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Sockets
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public Tcp4ServerListener
+        public Tcp6ServerListener
             (
                 IPEndPoint endPoint,
                 CancellationToken cancellationToken
@@ -78,7 +78,7 @@ namespace ManagedIrbis.Server.Sockets
         /// <summary>
         /// Создание слушателя для указанного порта.
         /// </summary>
-        public static Tcp4ServerListener ForPort
+        public static Tcp6ServerListener ForPort
             (
                 int portNumber,
                 CancellationToken token
@@ -86,8 +86,8 @@ namespace ManagedIrbis.Server.Sockets
         {
             Sure.InRange (portNumber, 1, 65535);
 
-            var endPoint = new IPEndPoint (IPAddress.Any, portNumber);
-            var result = new Tcp4ServerListener (endPoint, token);
+            var endPoint = new IPEndPoint (IPAddress.IPv6Any, portNumber);
+            var result = new Tcp6ServerListener (endPoint, token);
 
             return result;
 
@@ -106,7 +106,7 @@ namespace ManagedIrbis.Server.Sockets
             }
 
             var client = await _listener.AcceptTcpClientAsync().ConfigureAwait (false);
-            var result = new Tcp4ServerSocket (client, _cancellationToken);
+            var result = new Tcp6ServerSocket (client, _cancellationToken);
 
             return result;
 
@@ -150,6 +150,6 @@ namespace ManagedIrbis.Server.Sockets
 
         #endregion
 
-    } // class Tcp4ServerListener
+    } // class Tcp46erverListener
 
 } // namespace ManagedIrbis.Server.Sockets

@@ -13,7 +13,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* Tcp4ServerSocket.cs -- простой серверный сокет для TCP v4
+/* Tcp6ServerSocket.cs -- простой серверный сокет для TCP v6
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -34,10 +34,10 @@ namespace ManagedIrbis.Server.Sockets
 {
     /// <summary>
     /// Простой серверный (обслуживающий подключенного клиента)
-    /// сокет для TCP v4.
+    /// сокет для TCP v6.
     /// Ничего не сжимает, не шифрует, не переиспользуется.
     /// </summary>
-    public sealed class Tcp4ServerSocket
+    public sealed class Tcp6ServerSocket
         : IAsyncServerSocket
     {
         #region Construction
@@ -45,7 +45,7 @@ namespace ManagedIrbis.Server.Sockets
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public Tcp4ServerSocket
+        public Tcp6ServerSocket
             (
                 TcpClient client,
                 CancellationToken cancellationToken
@@ -166,6 +166,6 @@ namespace ManagedIrbis.Server.Sockets
 
         #endregion
 
-    } // class Tcp5ServerSocket
+    } // class Tcp6ServerSocket
 
 } // namespace ManagedIrbis.Server.Sockets
