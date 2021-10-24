@@ -89,9 +89,9 @@ namespace ManagedIrbis.Server.Commands
     //
 
     /// <summary>
-    /// Подключение клиента.
+    /// Подключение клиента (плюс отсылка клиенту серверного INI-файла).
     /// </summary>
-    public class ConnectCommand
+    public sealed class ConnectCommand
         : ServerCommand
     {
         #region Properties
@@ -110,7 +110,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -122,39 +122,43 @@ namespace ManagedIrbis.Server.Commands
         public override void Execute()
         {
             var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute(Data);
+            engine.OnBeforeExecute (Data);
 
             try
             {
                 var request = Data.Request.ThrowIfNull();
                 var clientId = request.ClientId.ThrowIfNull();
-                var context = engine.FindContext(clientId);
+                var context = engine.FindContext (clientId);
                 if (context is not null)
                 {
                     // Клиент с таким идентификатором уже зарегистрирован
-                    throw new IrbisException(-3337);
+                    throw new IrbisException (-3337);
                 }
 
                 var username = request.RequireAnsiString();
                 var password = request.RequireAnsiString();
 
-                var userInfo = engine.FindUser(username);
+                var userInfo = engine.FindUser (username);
                 if (userInfo is null)
                 {
-                    throw new IrbisException(-3333);
+                    // несовпадение имен пользователя
+                    throw new IrbisException (-3333);
                 }
 
-                if (password != userInfo.Password)
+                if (string.CompareOrdinal (password, userInfo.Password) != 0)
                 {
-                    throw new IrbisException(-4444);
+                    // несовпадение паролей
+                    throw new IrbisException (-4444);
                 }
+
+                // TODO: проверять на совпадение коды АРМ
 
                 Data.User = userInfo;
-                var workstation = request.Workstation.IfEmpty("?");
-                var iniFile = engine.GetUserIniFile(userInfo, workstation);
+                var workstation = request.Workstation.IfEmpty ("?");
+                var iniFile = engine.GetUserIniFile (userInfo, workstation);
                 var socket = Data.Socket.ThrowIfNull();
 
-                context = engine.CreateContext(clientId);
+                context = engine.CreateContext (clientId);
                 Data.Context = context;
                 context.Address = socket.GetRemoteAddress();
                 context.Username = username;
@@ -163,25 +167,30 @@ namespace ManagedIrbis.Server.Commands
 
                 var response = Data.Response.ThrowIfNull();
                 // Код возврата
-                response.WriteInt32(0).NewLine();
+                response.WriteInt32 (0).NewLine();
                 // Интервал подтверждения
-                response.WriteInt32(engine.IniFile.ClientTimeLive).NewLine();
+                response.WriteInt32 (engine.IniFile.ClientTimeLive).NewLine();
                 // INI-файл
-                response.WriteAnsiString(iniFile).NewLine();
+                response.WriteAnsiString (iniFile).NewLine();
 
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(ConnectCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (ConnectCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

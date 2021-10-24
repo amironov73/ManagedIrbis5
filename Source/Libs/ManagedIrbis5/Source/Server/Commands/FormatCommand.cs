@@ -34,7 +34,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Форматирование записей.
     /// </summary>
-    public class FormatCommand
+    public sealed class FormatCommand
         : ServerCommand
     {
         #region Construction
@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -92,38 +92,41 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireContext(Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
-                var request = Data.Request.ThrowIfNull(nameof(Data.Request));
-                var response = Data.Response.ThrowIfNull(nameof(Data.Response));
+                var request = Data.Request.ThrowIfNull();
+                var response = Data.Response.ThrowIfNull();
                 var database = request.RequireAnsiString();
                 var format = request.RequireAutoString();
                 var count = request.GetInt32();
+
+                // Код возврата
                 response.WriteInt32(0).NewLine();
-                using (var provider = engine.GetProvider(database))
+
+                using (var provider = engine.GetProvider (database))
                 {
                     if (count < 0)
                     {
                         var text = request.RemainingUtfText();
-                        string[] lines = IrbisText.IrbisToWindows(text)
+                        string[] lines = IrbisText.IrbisToWindows (text)
                             .ThrowIfNull().SplitLines();
-                        var record = _ParseRecord(lines);
+                        var record = _ParseRecord (lines);
                         var formatParameters = new FormatRecordParameters
                         {
                             Record = record,
                             Format = format
                         };
-                        provider.FormatRecords(formatParameters);
+                        provider.FormatRecords (formatParameters);
                         text = formatParameters.Result.AsSingle();
-                        text = IrbisText.WindowsToIrbis(text);
-                        response.WriteUtfString(text).NewLine();
+                        text = IrbisText.WindowsToIrbis (text);
+                        response.WriteUtfString (text).NewLine();
                     }
                     else
                     {
@@ -134,11 +137,11 @@ namespace ManagedIrbis.Server.Commands
                             {
                                 Mfn = mfn
                             };
-                            var record = provider.ReadRecord<Record>(recordParameters);
-                            if (ReferenceEquals(record, null))
+                            var record = provider.ReadRecord<Record> (recordParameters);
+                            if (record is null)
                             {
                                 // TODO выяснить, что пишется на самом деле
-                                response.WriteUtfString("ERROR").NewLine();
+                                response.WriteUtfString ("ERROR").NewLine();
                             }
                             else
                             {
@@ -147,10 +150,10 @@ namespace ManagedIrbis.Server.Commands
                                     Record = record,
                                     Format = format
                                 };
-                                provider.FormatRecords(formatParameters);
+                                provider.FormatRecords (formatParameters);
                                 var text = formatParameters.Result.AsSingle();
-                                text = IrbisText.WindowsToIrbis(text);
-                                response.WriteUtfString(text).NewLine();
+                                text = IrbisText.WindowsToIrbis (text);
+                                response.WriteUtfString (text).NewLine();
                             }
                         }
                     }
@@ -160,15 +163,19 @@ namespace ManagedIrbis.Server.Commands
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(FormatCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (FormatCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

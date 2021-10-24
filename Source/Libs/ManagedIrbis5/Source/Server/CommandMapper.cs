@@ -33,12 +33,12 @@ namespace ManagedIrbis.Server
     /// <summary>
     /// Отображает коды команд на собственно команды.
     /// </summary>
-    public class CommandMapper
+    public class CommandMapper // not sealed!
     {
         #region Properties
 
         /// <summary>
-        /// Engine.
+        /// Серверный движок.
         /// </summary>
         public ServerEngine Engine { get; }
 
@@ -47,7 +47,7 @@ namespace ManagedIrbis.Server
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public CommandMapper
             (
@@ -55,14 +55,15 @@ namespace ManagedIrbis.Server
             )
         {
             Engine = engine;
-        }
+
+        } // constructor
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Throws the exception.
+        /// Выбрасывает исключение: обнаружена неизвестная команда.
         /// </summary>
         protected virtual ServerCommand UnknownCommand
             (
@@ -70,11 +71,12 @@ namespace ManagedIrbis.Server
                 string commandCode
             )
         {
-            throw new IrbisException("Unknown command: " + commandCode);
-        }
+            throw new IrbisException ("Unknown command: " + commandCode);
+
+        } // method UnknownCommand
 
         /// <summary>
-        /// Map the command.
+        /// Собственно отображение кода команды на команду движка.
         /// </summary>
         public virtual ServerCommand MapCommand
             (
@@ -84,22 +86,22 @@ namespace ManagedIrbis.Server
             ServerCommand result;
             var request = data.Request.ThrowIfNull();
 
-            if (ReferenceEquals(request.CommandCode1, null)
+            if (ReferenceEquals (request.CommandCode1, null)
                 || request.CommandCode1 != request.CommandCode2)
             {
                 throw new IrbisException();
             }
 
-            string commandCode = request.CommandCode1.ToUpperInvariant();
+            var commandCode = request.CommandCode1.ToUpperInvariant();
 
             switch (commandCode)
             {
                 case "!":
-                    result = new ListFilesCommand(data);
+                    result = new ListFilesCommand (data);
                     break;
 
                 case "#":
-                    result = new GetDatabaseLockCommand(data);
+                    result = new GetDatabaseLockCommand (data);
                     break;
 
                 // case "+1":
@@ -112,7 +114,7 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "+3":
-                    result = new ListProcessesCommand(data);
+                    result = new ListProcessesCommand (data);
                     break;
 
                 // case "+4":
@@ -131,11 +133,11 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "+9":
-                    result = new ListUsersCommand(data);
+                    result = new ListUsersCommand (data);
                     break;
 
                 case "0":
-                    result = new DatabaseInfoCommand(data);
+                    result = new DatabaseInfoCommand (data);
                     break;
 
                 // case "1":
@@ -143,20 +145,20 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "2":
-                    result = new DatabaseStatCommand(data);
+                    result = new DatabaseStatCommand (data);
                     break;
 
-                // case "3":
-                //     result = new FormatIsoGroupCommand(data);
-                //     break;
-                //
+                case "3":
+                    result = new FormatIsoGroupCommand (data);
+                    break;
+
                 // case "4":
                 //     // ???
                 //     result = UnknownCommand(data, commandCode);
                 //     break;
 
                 case "5":
-                    result = new GblCommand(data);
+                    result = new GblCommand (data);
                     break;
 
                 // case "6":
@@ -164,7 +166,7 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "7":
-                    result = new PrintTableCommand(data);
+                    result = new PrintTableCommand (data);
                     break;
 
                 // case "8":
@@ -172,15 +174,15 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "9":
-                    result = new ImportIsoCommand(data);
+                    result = new ImportIsoCommand (data);
                     break;
 
                 case "A":
-                    result = new ConnectCommand(data);
+                    result = new ConnectCommand (data);
                     break;
 
                 case "B":
-                    result = new DisconnectCommand(data);
+                    result = new DisconnectCommand (data);
                     break;
 
                 // case "C":
@@ -197,23 +199,23 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "F":
-                    result = new ActualizeRecordCommand(data);
+                    result = new ActualizeRecordCommand (data);
                     break;
 
                 case "G":
-                    result = new FormatCommand(data);
+                    result = new FormatCommand (data);
                     break;
 
-                // case "H":
-                //     result = new ReadTermsCommand(data);
-                //     break;
-                //
-                // case "I":
-                //     result = new ReadPostingsCommand(data);
-                //     break;
+                case "H":
+                    result = new ReadTermsCommand (data);
+                    break;
+
+                case "I":
+                    result = new ReadPostingsCommand (data);
+                    break;
 
                 case "J":
-                    result = new GblVirtualCommand(data);
+                    result = new GblVirtualCommand (data);
                     break;
 
                 // case "K":
@@ -221,19 +223,19 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "L":
-                    result = new ReadFileCommand(data);
+                    result = new ReadFileCommand (data);
                     break;
 
                 case "M":
-                    result = new BackupCommand(data);
+                    result = new BackupCommand (data);
                     break;
 
                 case "N":
-                    result = new NopCommand(data);
+                    result = new NopCommand (data);
                     break;
 
                 case "O":
-                    result = new MaxMfnCommand(data);
+                    result = new MaxMfnCommand (data);
                     break;
 
                 // case "P":
@@ -253,7 +255,7 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "T":
-                    result = new CreateDatabaseCommand(data);
+                    result = new CreateDatabaseCommand (data);
                     break;
 
                 // case "U":
@@ -265,7 +267,7 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "W":
-                    result = new DeleteDatabaseCommand(data);
+                    result = new DeleteDatabaseCommand (data);
                     break;
 
                 // case "X":
@@ -277,7 +279,7 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "Z":
-                    result = new CreateDictionaryCommand(data);
+                    result = new CreateDictionaryCommand (data);
                     break;
 
                 //===================================================
@@ -290,22 +292,24 @@ namespace ManagedIrbis.Server
                 //     break;
 
                 case "FLUSH":
-                    result = new FlushServerCommand(data);
+                    result = new FlushServerCommand (data);
                     break;
 
                 case "DUMP":
-                    result = new DumpStateCommand(data);
+                    result = new DumpStateCommand (data);
                     break;
 
                 //===================================================
 
                 default:
-                    result = UnknownCommand(data, commandCode);
+                    result = UnknownCommand (data, commandCode);
                     break;
-            }
+
+            } // switch
 
             return result;
-        }
+
+        } // method MapCommand
 
         #endregion
 

@@ -32,7 +32,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Статистика по базе данных.
     /// </summary>
-    public class DatabaseStatCommand
+    public sealed class DatabaseStatCommand
         : ServerCommand
     {
         #region Construction
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -56,7 +56,7 @@ namespace ManagedIrbis.Server.Commands
         public override void Execute()
         {
             var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute(Data);
+            engine.OnBeforeExecute (Data);
 
             try
             {
@@ -69,20 +69,26 @@ namespace ManagedIrbis.Server.Commands
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull();
-                response.WriteInt32(0).NewLine();
+                // Код возврата
+                response.WriteInt32 (0).NewLine();
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(DatabaseStatCommand) + "::" + nameof(Execute), exception);
+                Magna.TraceException
+                    (
+                        nameof (DatabaseStatCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
                 SendError(-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

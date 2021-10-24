@@ -33,7 +33,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Получение списка серверных процессов.
     /// </summary>
-    public class ListProcessesCommand
+    public sealed class ListProcessesCommand
         : ServerCommand
     {
         #region Construction
@@ -45,7 +45,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -53,7 +53,7 @@ namespace ManagedIrbis.Server.Commands
 
         #region Private members
 
-        private static string _FormatTime (DateTime time) => time.ToString("dd.MM.yyyy hh:mm:ss");
+        private static string _FormatTime (DateTime time) => time.ToString ("dd.MM.yyyy hh:mm:ss");
 
         private static string? _TranslateWorkstation (string? code) => code switch
             {
@@ -66,7 +66,7 @@ namespace ManagedIrbis.Server.Commands
                 _ => code
             };
 
-        private static string? _TranslateCommand(string? command) => command switch
+        private static string? _TranslateCommand (string? command) => command switch
             {
                 "+1" => "IRBIS_SERVER_STAT",
                 "3" =>  "IRBIS_FORMAT_ISO_GROUP",
@@ -104,12 +104,12 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireAdministratorContext(Data);
+                var context = engine.RequireAdministratorContext (Data);
                 Data.Context = context;
                 // UpdateContext();
 
@@ -130,55 +130,63 @@ namespace ManagedIrbis.Server.Commands
                 // Активный            // Состояние
 
                 var contexts = engine.Contexts.ToArray();
-                var response = Data.Response.ThrowIfNull(nameof(Data.Response));
-                response.WriteInt32(0).NewLine();
+                var response = Data.Response.ThrowIfNull();
+                // Код возврата
+                response.WriteInt32 (0).NewLine();
+
                 // Общее число подключенных клиентов
-                response.WriteInt32(contexts.Length + 1).NewLine();
+                response.WriteInt32 (contexts.Length + 1).NewLine();
+
                 // Число строк на один процесс
-                response.WriteInt32(9).NewLine();
+                response.WriteInt32 (9).NewLine();
                 var index = 1;
 
                 var processId = Process.GetCurrentProcess().Id;
 
                 // Сначала идет сервер
-                response.WriteAnsiString("*").NewLine();
-                response.WriteAnsiString("Local IP address").NewLine();
-                response.WriteAnsiString("Сервер ИРБИС").NewLine();
-                response.WriteAnsiString("*****").NewLine();
-                response.WriteAnsiString("*****").NewLine();
-                response.WriteAnsiString(_FormatTime(engine.StartedAt)).NewLine();
-                response.WriteAnsiString("*****").NewLine();
-                response.WriteAnsiString("*****").NewLine();
-                response.WriteInt32(processId).NewLine();
-                response.WriteAnsiString("Активный").NewLine();
+                response.WriteAnsiString ("*").NewLine();
+                response.WriteAnsiString ("Local IP address").NewLine();
+                response.WriteAnsiString ("Сервер ИРБИС").NewLine();
+                response.WriteAnsiString ("*****").NewLine();
+                response.WriteAnsiString ("*****").NewLine();
+                response.WriteAnsiString (_FormatTime (engine.StartedAt)).NewLine();
+                response.WriteAnsiString ("*****").NewLine();
+                response.WriteAnsiString ("*****").NewLine();
+                response.WriteInt32 (processId).NewLine();
+                response.WriteAnsiString ("Активный").NewLine();
 
                 foreach (var ctx in contexts)
                 {
-                    response.WriteInt32(index++).NewLine();
-                    response.WriteAnsiString(ctx.Address).NewLine();
-                    response.WriteAnsiString(ctx.Username).NewLine();
-                    response.WriteAnsiString(ctx.Id).NewLine();
-                    response.WriteAnsiString(_TranslateWorkstation(ctx.Workstation)).NewLine();
-                    response.WriteAnsiString(_FormatTime(ctx.Connected)).NewLine();
-                    response.WriteAnsiString(_TranslateCommand(ctx.LastCommand)).NewLine();
-                    response.WriteInt32(ctx.CommandCount).NewLine();
-                    response.WriteInt32(processId).NewLine();
-                    response.WriteAnsiString("Активный").NewLine();
+                    response.WriteInt32 (index++).NewLine();
+                    response.WriteAnsiString (ctx.Address).NewLine();
+                    response.WriteAnsiString (ctx.Username).NewLine();
+                    response.WriteAnsiString (ctx.Id).NewLine();
+                    response.WriteAnsiString (_TranslateWorkstation (ctx.Workstation)).NewLine();
+                    response.WriteAnsiString (_FormatTime (ctx.Connected)).NewLine();
+                    response.WriteAnsiString (_TranslateCommand (ctx.LastCommand)).NewLine();
+                    response.WriteInt32 (ctx.CommandCount).NewLine();
+                    response.WriteInt32 (processId).NewLine();
+                    response.WriteAnsiString ("Активный").NewLine();
                 }
 
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(ListProcessesCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (ListProcessesCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

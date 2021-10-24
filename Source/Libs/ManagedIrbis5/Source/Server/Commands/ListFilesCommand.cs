@@ -37,9 +37,9 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis.Server.Commands
 {
     /// <summary>
-    /// Список файлов.
+    /// Список файлов на сервере.
     /// </summary>
-    public class ListFilesCommand
+    public sealed class ListFilesCommand
         : ServerCommand
     {
         #region Construction
@@ -51,7 +51,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -64,47 +64,47 @@ namespace ManagedIrbis.Server.Commands
                 FileSpecification specification
             )
         {
-            Sure.NotNull(specification, nameof(specification));
+            Sure.NotNull (specification);
 
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            var fileName = specification.FileName.ThrowIfNull(nameof(specification.FileName));
-            if (string.IsNullOrEmpty(fileName))
+            var engine = Data.Engine.ThrowIfNull();
+            var fileName = specification.FileName.ThrowIfNull();
+            if (string.IsNullOrEmpty (fileName))
             {
                 return null;
             }
 
             string? result;
             var database = specification.Database;
-            var path = (int)specification.Path;
+            var path = (int) specification.Path;
             if (path == 0)
             {
                 result = Path.Combine(engine.SystemPath, fileName);
             }
             else if (path == 1)
             {
-                result = Path.Combine(engine.DataPath, fileName);
+                result = Path.Combine (engine.DataPath, fileName);
             }
             else
             {
-                if (string.IsNullOrEmpty(database))
+                if (string.IsNullOrEmpty (database))
                 {
                     return null;
                 }
 
-                var parPath = Path.Combine(engine.DataPath, database + ".par");
-                if (!File.Exists(parPath))
+                var parPath = Path.Combine (engine.DataPath, database + ".par");
+                if (!File.Exists (parPath))
                 {
                     result = null;
                 }
                 else
                 {
                     Dictionary<int, string> dictionary;
-                    using (var reader = TextReaderUtility.OpenRead(parPath, IrbisEncoding.Ansi))
+                    using (var reader = TextReaderUtility.OpenRead (parPath, IrbisEncoding.Ansi))
                     {
-                        dictionary = ParFile.ReadDictionary(reader);
+                        dictionary = ParFile.ReadDictionary (reader);
                     }
 
-                    if (!dictionary.ContainsKey(path))
+                    if (!dictionary.ContainsKey (path))
                     {
                         result = null;
                     }
@@ -129,19 +129,19 @@ namespace ManagedIrbis.Server.Commands
                 string? template
             )
         {
-            if (string.IsNullOrEmpty(template))
+            if (string.IsNullOrEmpty (template))
             {
                 return Array.Empty<string>();
             }
 
-            var directory = Path.GetDirectoryName(template);
-            if (string.IsNullOrEmpty(directory))
+            var directory = Path.GetDirectoryName (template);
+            if (string.IsNullOrEmpty (directory))
             {
                 return Array.Empty<string>();
             }
 
-            var pattern = Path.GetFileName(template);
-            if (string.IsNullOrEmpty(pattern))
+            var pattern = Path.GetFileName (template);
+            if (string.IsNullOrEmpty (pattern))
             {
                 return Array.Empty<string>();
             }
@@ -154,9 +154,9 @@ namespace ManagedIrbis.Server.Commands
                 );
 
             result = result
-                .Select(Path.GetFileName)
+                .Select (Path.GetFileName)
                 .NonEmptyLines()
-                .OrderBy(_ => _)
+                .OrderBy (_ => _)
                 .ToArray();
 
             return result;
@@ -170,40 +170,47 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireContext(Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
-                var request = Data.Request.ThrowIfNull(nameof(Data.Request));
+                var request = Data.Request.ThrowIfNull();
                 var lines = request.RemainingAnsiStrings();
-                var response = Data.Response.ThrowIfNull(nameof(Data.Response));
+                var response = Data.Response.ThrowIfNull();
+                // Код возврата не отправляется
+
                 foreach (var line in lines)
                 {
-                    var specification = FileSpecification.Parse(line);
-                    var template = _ResolveSpecification(specification);
-                    var files = _ListFiles(template);
-                    var text = string.Join(IrbisText.IrbisDelimiter, files);
-                    response.WriteAnsiString(text).NewLine();
+                    var specification = FileSpecification.Parse (line);
+                    var template = _ResolveSpecification (specification);
+                    var files = _ListFiles (template);
+                    var text = string.Join (IrbisText.IrbisDelimiter, files);
+                    response.WriteAnsiString (text).NewLine();
                 }
 
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(ListFilesCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (ListFilesCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

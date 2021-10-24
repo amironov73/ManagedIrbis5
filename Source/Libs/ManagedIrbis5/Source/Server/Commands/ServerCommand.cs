@@ -37,12 +37,12 @@ namespace ManagedIrbis.Server.Commands
         #region Properties
 
         /// <summary>
-        /// Data.
+        /// Рабочие данные, связанные с текущим запросом.
         /// </summary>
         public WorkData Data { get; private set; }
 
         /// <summary>
-        /// Send version to the client.
+        /// Отправлять ли клиенту номер версии сервера?
         /// </summary>
         public virtual bool SendVersion => false;
 
@@ -51,7 +51,7 @@ namespace ManagedIrbis.Server.Commands
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         protected ServerCommand
             (
@@ -59,7 +59,8 @@ namespace ManagedIrbis.Server.Commands
             )
         {
             Data = data;
-        }
+
+        } // constructor
 
         #endregion
 
@@ -81,9 +82,11 @@ namespace ManagedIrbis.Server.Commands
             var request = Data.Request.ThrowIfNull();
             var response = new ServerResponse (request);
             Data.Response = response;
+            // Код возврата
             response.WriteInt32 (errorCode).NewLine();
             SendResponse();
-        }
+
+        } // method SendError
 
         /// <summary>
         /// Отправка клиенту нормального ответа.
@@ -101,10 +104,11 @@ namespace ManagedIrbis.Server.Commands
             var packet = response.Encode (versionString);
             var socket = Data.Socket.ThrowIfNull();
             socket.SendAsync (packet);
-        }
+
+        } // method SendResponse
 
         /// <summary>
-        /// Update the context.
+        /// Обновление контекста.
         /// </summary>
         public void UpdateContext()
         {
@@ -112,10 +116,11 @@ namespace ManagedIrbis.Server.Commands
             context.LastActivity = DateTime.Now;
             context.LastCommand = Data.Request!.CommandCode1;
             context.CommandCount++;
-        }
+
+        } // method UpdateContext
 
         /// <summary>
-        /// Execute the command.
+        /// Собственно исполнение команды.
         /// </summary>
         public abstract void Execute();
 

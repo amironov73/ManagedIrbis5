@@ -38,6 +38,7 @@ namespace ManagedIrbis.Magazines
     /// Менеджер подшивок.
     /// </summary>
     public sealed class BindingManager
+        : IBindingManager
     {
         #region Properties
 
@@ -80,9 +81,7 @@ namespace ManagedIrbis.Magazines
 
         #region Public methods
 
-        /// <summary>
-        /// Создание либо обновление подшивки по ее спецификации.
-        /// </summary>
+        /// <inheritdoc cref="IBindingManager.BindMagazines"/>
         public void BindMagazines
             (
                 BindingSpecification specification
@@ -218,9 +217,7 @@ namespace ManagedIrbis.Magazines
 
         } // method BindMagazines
 
-        /// <summary>
-        /// Проверка номера журнала/газеты на возможность добавления в подшивку.
-        /// </summary>
+        /// <inheritdoc cref="IBindingManager.CheckIssue"/>
         public bool CheckIssue
             (
                 BindingSpecification specification,
@@ -280,9 +277,7 @@ namespace ManagedIrbis.Magazines
 
         } // method CheckIssue
 
-        /// <summary>
-        /// Расшитие и удаление подшивки по ее индексу.
-        /// </summary>
+        /// <inheritdoc cref="IBindingManager.UnbindMagazines"/>
         public void UnbindMagazines
             (
                 string bindingIndex
@@ -293,6 +288,15 @@ namespace ManagedIrbis.Magazines
             throw new NotImplementedException();
 
         } // method UnbindMagazines
+
+        #endregion
+
+        #region IDisposable members
+
+        /// <inheritdoc cref="IDisposable.Dispose"/>
+        public void Dispose()
+        {
+        } // method Dispose
 
         #endregion
 

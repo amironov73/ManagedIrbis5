@@ -32,7 +32,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Получение максимального MFN для указанной базы данных.
     /// </summary>
-    public class MaxMfnCommand
+    public sealed class MaxMfnCommand
         : ServerCommand
     {
         #region Construction
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -55,39 +55,45 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireContext(Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
-                var request = Data.Request.ThrowIfNull(nameof(Data.Request));
+                var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
 
                 int result;
-                using (var direct = engine.GetDatabase(database))
+                using (var direct = engine.GetDatabase (database))
                 {
                     result = direct.GetMaxMfn();
                 }
 
-                var response = Data.Response.ThrowIfNull(nameof(Data.Response));
-                response.WriteInt32(result).NewLine();
+                var response = Data.Response.ThrowIfNull();
+                // Код возврата
+                response.WriteInt32 (result).NewLine();
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(MaxMfnCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (MaxMfnCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

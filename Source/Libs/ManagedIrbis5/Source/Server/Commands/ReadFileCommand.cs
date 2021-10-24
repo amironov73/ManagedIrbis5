@@ -35,7 +35,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Чтение файла из серверного контекста.
     /// </summary>
-    public class ReadFileCommand
+    public sealed class ReadFileCommand
         : ServerCommand
     {
         #region Constants
@@ -83,6 +83,7 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var response = Data.Response.ThrowIfNull();
+                // Код возврата не отправляется
                 var lines = request.RemainingAnsiStrings();
                 foreach (var line in lines)
                 {
@@ -118,7 +119,11 @@ namespace ManagedIrbis.Server.Commands
                     }
                     catch (Exception exception)
                     {
-                        Magna.TraceException (nameof (ReadFileCommand) + "::" + nameof (Execute), exception);
+                        Magna.TraceException
+                            (
+                                nameof (ReadFileCommand) + "::" + nameof (Execute),
+                                exception
+                            );
                         response.NewLine();
                     }
 
@@ -132,7 +137,12 @@ namespace ManagedIrbis.Server.Commands
             }
             catch (Exception exception)
             {
-                Magna.TraceException (nameof (ReadFileCommand) + "::" + nameof (Execute), exception);
+                Magna.TraceException
+                    (
+                        nameof (ReadFileCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
                 SendError (-8888);
             }
 

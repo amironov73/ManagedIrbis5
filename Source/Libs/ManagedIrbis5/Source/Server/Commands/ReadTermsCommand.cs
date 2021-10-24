@@ -13,7 +13,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* DatabaseInfoCommand.cs -- получение информации о базе данных
+/* ReadTermsCommand.cs -- чтение терминов поискового словаря
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,7 +22,9 @@
 using System;
 
 using AM;
-using AM.Collections;
+
+using ManagedIrbis.Direct;
+using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -31,43 +33,32 @@ using AM.Collections;
 namespace ManagedIrbis.Server.Commands
 {
     /// <summary>
-    /// Получение информации о базе данных.
+    /// Чтение терминов поскового словаря.
     /// </summary>
-    public sealed class DatabaseInfoCommand
+    public sealed class ReadTermsCommand
         : ServerCommand
     {
+        #region Properties
+
+        /// <summary>
+        /// Чтение в обратном порядке?
+        /// </summary>
+        public bool ReverseOrder { get; set; }
+
+        #endregion
+
         #region Construction
 
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public DatabaseInfoCommand
+        public ReadTermsCommand
             (
                 WorkData data
             )
             : base (data)
         {
         } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private static void _WriteRecords
-            (
-                ServerResponse response,
-                int[]? mfns
-            )
-        {
-            if (!mfns.IsNullOrEmpty())
-            {
-                var line = string.Join (",", mfns);
-                response.WriteAnsiString (line);
-            }
-
-            response.NewLine();
-
-        } // method _WriteRecords
 
         #endregion
 
@@ -81,28 +72,53 @@ namespace ManagedIrbis.Server.Commands
 
             try
             {
-                var context = engine.RequireAdministratorContext (Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
                 var request = Data.Request.ThrowIfNull();
-                var database = request.RequireAnsiString();
-
-                DatabaseInfo info;
-                using (var direct = engine.GetDatabase (database))
+                var parameters = new TermParameters
                 {
-                    info = direct.GetDatabaseInfo();
+                    Database = request.RequireAnsiString(),
+                    StartTerm = request.RequireUtfString(),
+                    NumberOfTerms = request.GetInt32(),
+                    Format = request.GetUtfString()
+                };
+
+                if (parameters.NumberOfTerms == 0)
+                {
+                    parameters.NumberOfTerms = Constants.MaxPostings;
                 }
+
+                Term[] terms;
+                var returnCode = 0;
+                using (DirectAccess64 direct = engine.GetDatabase (parameters.Database))
+                {
+                    terms = direct.ReadTerms (parameters);
+                }
+
+                if (terms.Length != 0
+                    && terms[0].Text != parameters.StartTerm)
+                {
+                    returnCode = (int) ReturnCode.TermNotExist;
+                }
+
+                if (terms.Length < parameters.NumberOfTerms)
+                {
+                    returnCode = (int) ReturnCode.LastTermInList;
+                }
+
+                // TODO format
+                // TODO reverse order
 
                 var response = Data.Response.ThrowIfNull();
                 // Код возврата
-                response.WriteInt32 (0).NewLine();
-                _WriteRecords (response, info.LogicallyDeletedRecords);
-                _WriteRecords (response, info.PhysicallyDeletedRecords);
-                _WriteRecords (response, info.NonActualizedRecords);
-                _WriteRecords (response, info.LockedRecords);
-                response.WriteInt32 (info.MaxMfn).NewLine();
-                response.WriteInt32 (info.DatabaseLocked ? 1 : 0).NewLine();
+                response.WriteInt32 (returnCode).NewLine();
+                foreach (var term in terms)
+                {
+                    response.WriteUtfString (term.ToString()).NewLine();
+                }
+
                 SendResponse();
             }
             catch (IrbisException exception)
@@ -113,7 +129,7 @@ namespace ManagedIrbis.Server.Commands
             {
                 Magna.TraceException
                     (
-                        nameof (DatabaseInfoCommand) + "::" + nameof (Execute),
+                        nameof (ReadTermsCommand) + "::" + nameof (Execute),
                         exception
                     );
 
@@ -126,6 +142,6 @@ namespace ManagedIrbis.Server.Commands
 
         #endregion
 
-    } // class DatabaseInfoCommand
+    } // class ReadTermsCommand
 
 } // namespace ManagedIrbis.Server.Commands

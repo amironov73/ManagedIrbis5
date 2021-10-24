@@ -32,7 +32,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Отключение клиента.
     /// </summary>
-    public class DisconnectCommand
+    public sealed class DisconnectCommand
         : ServerCommand
     {
         #region Construction
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -56,30 +56,36 @@ namespace ManagedIrbis.Server.Commands
         public override void Execute()
         {
             var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute(Data);
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireContext(Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
 
                 var response = Data.Response.ThrowIfNull();
-                response.WriteInt32(0).NewLine();
+                // Код возврата
+                response.WriteInt32 (0).NewLine();
                 SendResponse();
 
-                engine.DestroyContext(context);
+                engine.DestroyContext (context);
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(DisconnectCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (DisconnectCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

@@ -32,7 +32,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Полнотекстовый поиск.
     /// </summary>
-    public class FullTextSearchCommand
+    public sealed class FullTextSearchCommand
         : ServerCommand
     {
         #region Construction
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -55,34 +55,40 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireContext(Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
                 var request = Data.Request.ThrowIfNull();
 
-                // TODO implement
+                // TODO: implement
 
                 var response = Data.Response.ThrowIfNull();
-                response.WriteInt32(0).NewLine();
+                // Код возврата
+                response.WriteInt32 (0).NewLine();
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(FullTextSearchCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (FullTextSearchCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

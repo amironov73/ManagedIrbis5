@@ -32,7 +32,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Формирование таблицы.
     /// </summary>
-    public class PrintTableCommand
+    public sealed class PrintTableCommand
         : ServerCommand
     {
         #region Construction
@@ -78,6 +78,7 @@ namespace ManagedIrbis.Server.Commands
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull (nameof (Data.Response));
+                // Код возврата не отправляется
                 response.WriteAnsiString (string.Empty).NewLine();
                 SendResponse();
             }
@@ -87,7 +88,12 @@ namespace ManagedIrbis.Server.Commands
             }
             catch (Exception exception)
             {
-                Magna.TraceException (nameof (PrintTableCommand) + "::" + nameof (Execute), exception);
+                Magna.TraceException
+                    (
+                        nameof (PrintTableCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
                 SendError (-8888);
             }
 

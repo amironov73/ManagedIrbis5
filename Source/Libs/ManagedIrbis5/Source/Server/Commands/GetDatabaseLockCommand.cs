@@ -13,7 +13,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* GetDatabaseLockCommand.cs --
+/* GetDatabaseLockCommand.cs -- получение статуса блокировки базы данных
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,9 +30,9 @@ using AM;
 namespace ManagedIrbis.Server.Commands
 {
     /// <summary>
-    ///
+    /// Получение статуса блокировки базы данных
     /// </summary>
-    public class GetDatabaseLockCommand
+    public sealed class GetDatabaseLockCommand
         : ServerCommand
     {
         #region Construction
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -55,12 +55,12 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireContext(Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
@@ -69,16 +69,22 @@ namespace ManagedIrbis.Server.Commands
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull();
-                response.WriteInt32(0).NewLine();
+                // Код возврата
+                response.WriteInt32 (0).NewLine();
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(GetDatabaseLockCommand) + "::" + nameof(Execute), exception);
+                Magna.TraceException
+                    (
+                        nameof (GetDatabaseLockCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
                 SendError(-8888);
             }
 

@@ -28,12 +28,14 @@ using ManagedIrbis.Infrastructure;
 
 #endregion
 
+#nullable enable
+
 namespace ManagedIrbis.Server.Commands
 {
     /// <summary>
     /// Чтение постингов.
     /// </summary>
-    public class ReadPostingsCommand
+    public sealed class ReadPostingsCommand
         : ServerCommand
     {
         #region Construction
@@ -96,6 +98,7 @@ namespace ManagedIrbis.Server.Commands
                 }
 
                 var response = Data.Response.ThrowIfNull();
+                // Код возврата
                 response.WriteInt32 (returnCode).NewLine();
                 foreach (var link in links)
                 {
@@ -116,6 +119,7 @@ namespace ManagedIrbis.Server.Commands
                         nameof (ReadPostingsCommand) + "::" + nameof (Execute),
                         exception
                     );
+
                 SendError (-8888);
             }
 

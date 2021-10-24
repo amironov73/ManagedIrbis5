@@ -32,7 +32,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Нестандартная команда: очистка кешей.
     /// </summary>
-    public class FlushServerCommand
+    public sealed class FlushServerCommand
         : ServerCommand
     {
         #region Construction
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -56,31 +56,39 @@ namespace ManagedIrbis.Server.Commands
         public override void Execute()
         {
             var engine = Data.Engine.ThrowIfNull();
-            engine.OnBeforeExecute(Data);
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireAdministratorContext(Data);
+                var context = engine.RequireAdministratorContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
                 var request = Data.Request.ThrowIfNull();
 
+                // TODO: implement
+
                 var response = Data.Response.ThrowIfNull();
-                response.WriteInt32(0).NewLine();
+                // Код возврата
+                response.WriteInt32 (0).NewLine();
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(FlushServerCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (FlushServerCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

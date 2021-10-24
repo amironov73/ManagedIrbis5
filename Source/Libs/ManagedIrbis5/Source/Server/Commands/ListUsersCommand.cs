@@ -32,7 +32,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Получение списка пользователей, которым разрешен доступ к системе.
     /// </summary>
-    public class ListUsersCommand
+    public sealed class ListUsersCommand
         : ServerCommand
     {
         #region Construction
@@ -44,7 +44,7 @@ namespace ManagedIrbis.Server.Commands
             (
                 WorkData data
             )
-            : base(data)
+            : base (data)
         {
         } // constructor
 
@@ -55,12 +55,12 @@ namespace ManagedIrbis.Server.Commands
         /// <inheritdoc cref="ServerCommand.Execute" />
         public override void Execute()
         {
-            var engine = Data.Engine.ThrowIfNull(nameof(Data.Engine));
-            engine.OnBeforeExecute(Data);
+            var engine = Data.Engine.ThrowIfNull();
+            engine.OnBeforeExecute (Data);
 
             try
             {
-                var context = engine.RequireAdministratorContext(Data);
+                var context = engine.RequireAdministratorContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
@@ -89,37 +89,46 @@ namespace ManagedIrbis.Server.Commands
                 //                // Администратор запрещен
 
                 var users = engine.Users;
-                var response = Data.Response.ThrowIfNull(nameof(Data.Response));
-                response.WriteInt32(0).NewLine();
+                var response = Data.Response.ThrowIfNull();
+                // Код возврата
+                response.WriteInt32 (0).NewLine();
+
                 // Количество известных системе пользователей
-                response.WriteInt32(users.Length).NewLine();
-                response.WriteInt32(8).NewLine(); // Строк на одного пользователя
+                response.WriteInt32 (users.Length).NewLine();
+                response.WriteInt32 (8).NewLine(); // Строк на одного пользователя
+
                 var index = 1;
                 foreach (var user in users)
                 {
-                    response.WriteInt32(index++).NewLine();
-                    response.WriteAnsiString(user.Name).NewLine();
-                    response.WriteAnsiString(user.Password).NewLine();
-                    response.WriteAnsiString(user.Cataloger).NewLine();
-                    response.WriteAnsiString(user.Reader).NewLine();
-                    response.WriteAnsiString(user.Circulation).NewLine();
-                    response.WriteAnsiString(user.Acquisitions).NewLine();
-                    response.WriteAnsiString(user.Provision).NewLine();
-                    response.WriteAnsiString(user.Administrator).NewLine();
+                    response.WriteInt32 (index++).NewLine();
+                    response.WriteAnsiString (user.Name).NewLine();
+                    response.WriteAnsiString (user.Password).NewLine();
+                    response.WriteAnsiString (user.Cataloger).NewLine();
+                    response.WriteAnsiString (user.Reader).NewLine();
+                    response.WriteAnsiString (user.Circulation).NewLine();
+                    response.WriteAnsiString (user.Acquisitions).NewLine();
+                    response.WriteAnsiString (user.Provision).NewLine();
+                    response.WriteAnsiString (user.Administrator).NewLine();
                 }
+
                 SendResponse();
             }
             catch (IrbisException exception)
             {
-                SendError(exception.ErrorCode);
+                SendError (exception.ErrorCode);
             }
             catch (Exception exception)
             {
-                Magna.TraceException(nameof(ListUsersCommand) + "::" + nameof(Execute), exception);
-                SendError(-8888);
+                Magna.TraceException
+                    (
+                        nameof (ListUsersCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
+                SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
+            engine.OnAfterExecute (Data);
 
         } // method Execute
 

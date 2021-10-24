@@ -32,7 +32,7 @@ namespace ManagedIrbis.Server.Commands
     /// <summary>
     /// Актуализация записи.
     /// </summary>
-    public class ActualizeRecordCommand
+    public sealed class ActualizeRecordCommand
         : ServerCommand
     {
         #region Construction
@@ -71,6 +71,7 @@ namespace ManagedIrbis.Server.Commands
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull();
+                // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();
             }
@@ -80,7 +81,12 @@ namespace ManagedIrbis.Server.Commands
             }
             catch (Exception exception)
             {
-                Magna.TraceException (nameof (ActualizeRecordCommand) + "::" + nameof (Execute), exception);
+                Magna.TraceException
+                    (
+                        nameof (ActualizeRecordCommand) + "::" + nameof (Execute),
+                        exception
+                    );
+
                 SendError (-8888);
             }
 
