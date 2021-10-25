@@ -30,7 +30,7 @@ namespace AM.IO
         #region Public methods
 
         /// <summary>
-        /// Compress the data.
+        /// Сжатие указанных данных.
         /// </summary>
         public static byte[] Compress
             (
@@ -44,37 +44,42 @@ namespace AM.IO
                     CompressionMode.Compress
                 ))
             {
-                compressor.Write(data, 0, data.Length);
+                compressor.Write (data, 0, data.Length);
             }
 
             return memory.ToArray();
-        }
+
+        } // method Compress
 
         /// <summary>
-        /// Decompress the data.
+        /// Распаковка указанных данных.
         /// </summary>
         public static byte[] Decompress
             (
                 byte[] data
             )
         {
-            var memory = new MemoryStream(data);
-            using var decompresser = new DeflateStream
+            var memory = new MemoryStream (data);
+            var result = new MemoryStream();
+            using (var decompresser = new DeflateStream
                 (
                     memory,
                     CompressionMode.Decompress
-                );
-            var result = new MemoryStream();
-            StreamUtility.AppendTo
-                (
-                    decompresser,
-                    result
-                );
-            decompresser.Dispose();
+                ))
+            {
+                StreamUtility.AppendTo
+                    (
+                        decompresser,
+                        result
+                    );
+            }
 
             return result.ToArray();
-        }
+
+        } // method Decompress
 
         #endregion
-    }
-}
+
+    } // class CompressionUtility
+
+} // namespace AM.IO
