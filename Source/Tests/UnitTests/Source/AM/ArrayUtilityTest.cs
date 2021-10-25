@@ -115,49 +115,49 @@ namespace UnitTests.AM
         }
 
         [TestMethod]
-        public void ArrayUtility_GetSpan_1()
+        public void ArrayUtility_GetSlice_1()
         {
             int[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            var actual = array.GetSpan(3, 4);
+            var actual = array.GetSlice(3, 4);
             int[] expected = { 4, 5, 6, 7 };
             CollectionAssert.AreEqual(expected, actual);
 
-            actual = array.GetSpan(9, 5);
+            actual = array.GetSlice(9, 5);
             expected = new[] { 10 };
             CollectionAssert.AreEqual(expected, actual);
 
-            actual = array.GetSpan(3, 0);
+            actual = array.GetSlice(3, 0);
             expected = new int[0];
             CollectionAssert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void ArrayUtility_GetSpan_2()
+        public void ArrayUtility_GetSlice_2()
         {
             int[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            var actual = array.GetSpan(3);
+            var actual = array.GetSlice(3);
             int[] expected = { 4, 5, 6, 7, 8, 9, 10 };
             CollectionAssert.AreEqual(expected, actual);
 
-            actual = array.GetSpan(9);
+            actual = array.GetSlice(9);
             expected = new[] { 10 };
             CollectionAssert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void ArrayUtility_GetSpan_3()
+        public void ArrayUtility_GetSlice_3()
         {
             int[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            var actual = array.GetSpan(300);
+            var actual = array.GetSlice(300);
             var expected = new int[0];
             CollectionAssert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void ArrayUtility_GetSpan_4()
+        public void ArrayUtility_GetSlice_4()
         {
             int[] array = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            var actual = array.GetSpan(300, 10);
+            var actual = array.GetSlice(300, 10);
             var expected = new int[0];
             CollectionAssert.AreEqual(expected, actual);
         }

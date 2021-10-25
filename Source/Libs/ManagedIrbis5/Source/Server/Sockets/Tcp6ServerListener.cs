@@ -150,6 +150,6 @@ namespace ManagedIrbis.Server.Sockets
 
         #endregion
 
-    } // class Tcp46erverListener
+    } // class Tcp6ServerListener
 
 } // namespace ManagedIrbis.Server.Sockets

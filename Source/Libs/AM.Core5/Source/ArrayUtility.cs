@@ -288,7 +288,7 @@ namespace AM
         /// <summary>
         /// Извлечение непрерывного диапазона элементов массива.
         /// </summary>
-        public static T[] GetSpan<T>
+        public static T[] GetSlice<T>
             (
                 this T[] array,
                 int offset,
@@ -318,12 +318,12 @@ namespace AM
 
             return result;
 
-        } // method GetSpan
+        } // method GetSlice
 
         /// <summary>
         /// Get span of the array.
         /// </summary>
-        public static T[] GetSpan<T>
+        public static T[] GetSlice<T>
             (
                 this T[] array,
                 int offset
@@ -337,10 +337,54 @@ namespace AM
             }
 
             var count = array.Length - offset;
-            T[] result = array.GetSpan(offset, count);
+            T[] result = array.GetSlice(offset, count);
 
             return result;
-        }
+
+        } // method GetSlice
+
+        /// <summary>
+        /// Searches for the specified pattern
+        /// and returns the index of its first occurrence
+        /// in a one-dimensional array.
+        /// </summary>
+        public static int IndexOf
+            (
+                byte[] data,
+                byte[] pattern
+            )
+        {
+            Sure.NotNull (data);
+            Sure.NotNull (pattern);
+
+            var patternLength = pattern.Length;
+            var dataLength = data.Length - patternLength;
+            if (patternLength == 0 || dataLength < 0)
+            {
+                return -1;
+            }
+
+            for (var i = 0; i <= dataLength; i++)
+            {
+                var found = true;
+                for (var j = 0; j < patternLength; j++)
+                {
+                    if (data[i + j] != pattern[j])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+
+        } // method IndexOf
 
         /// <summary>
         /// Determines whether the specified array is null or empty
@@ -350,13 +394,7 @@ namespace AM
         /// <returns><c>true</c> if the array is null or empty;
         /// otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsNullOrEmpty
-            (
-                Array? array
-            )
-        {
-            return ReferenceEquals(array, null) || array.Length == 0;
-        }
+        public static bool IsNullOrEmpty (Array? array) => array is null or { Length: 0 };
 
         /// <summary>
         /// Merges the specified arrays.
@@ -478,5 +516,7 @@ namespace AM
         }
 
         #endregion
-    }
-}
+
+    } // class ArrayUtility
+
+} // namespace AM

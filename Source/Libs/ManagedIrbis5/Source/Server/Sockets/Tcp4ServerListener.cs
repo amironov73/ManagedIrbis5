@@ -36,7 +36,7 @@ namespace ManagedIrbis.Server.Sockets
     /// <summary>
     /// Серверный слушатель для простого TCP v4.
     /// </summary>
-    public sealed class Tcp4ServerListener
+    public class Tcp4ServerListener
         : IAsyncServerListener
     {
         #region Construction
@@ -61,9 +61,21 @@ namespace ManagedIrbis.Server.Sockets
 
         #region Private members
 
-        private readonly IPEndPoint _endPoint;
-        private readonly TcpListener _listener;
-        private readonly CancellationToken _cancellationToken;
+        /// <summary>
+        /// Оконечная точка подключения.
+        /// </summary>
+        protected readonly IPEndPoint _endPoint;
+
+        /// <summary>
+        /// TCP-слушатель.
+        /// </summary>
+        protected readonly TcpListener _listener;
+
+        /// <summary>
+        /// Токен отметки.
+        /// </summary>
+        protected readonly CancellationToken _cancellationToken;
+
         private bool _working;
 
         private void _StopListener()
@@ -98,7 +110,7 @@ namespace ManagedIrbis.Server.Sockets
         #region IAsyncServerListener members
 
         /// <inheritdoc cref="IAsyncServerListener.AcceptClientAsync"/>
-        public async Task<IAsyncServerSocket?> AcceptClientAsync()
+        public virtual async Task<IAsyncServerSocket?> AcceptClientAsync()
         {
             if (_cancellationToken.IsCancellationRequested)
             {

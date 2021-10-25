@@ -37,7 +37,7 @@ namespace ManagedIrbis.Server.Sockets
     /// сокет для TCP v4.
     /// Ничего не сжимает, не шифрует, не переиспользуется.
     /// </summary>
-    public sealed class Tcp4ServerSocket
+    public class Tcp4ServerSocket
         : IAsyncServerSocket
     {
         #region Construction
@@ -72,7 +72,7 @@ namespace ManagedIrbis.Server.Sockets
             _client.Client.RemoteEndPoint?.ToString() ?? "(unknown)";
 
         /// <inheritdoc cref="IAsyncServerSocket.ReceiveAllAsync"/>
-        public async Task<MemoryStream?> ReceiveAllAsync()
+        public virtual async Task<MemoryStream?> ReceiveAllAsync()
         {
             if (_cancellationToken.IsCancellationRequested)
             {
@@ -125,7 +125,7 @@ namespace ManagedIrbis.Server.Sockets
         } // method ReadAllAsync
 
         /// <inheritdoc cref="IAsyncServerSocket.SendAsync"/>
-        public async Task<bool> SendAsync
+        public virtual async Task<bool> SendAsync
             (
                 IEnumerable<ReadOnlyMemory<byte>> data
             )
@@ -166,6 +166,6 @@ namespace ManagedIrbis.Server.Sockets
 
         #endregion
 
-    } // class Tcp5ServerSocket
+    } // class Tcp4ServerSocket
 
 } // namespace ManagedIrbis.Server.Sockets
