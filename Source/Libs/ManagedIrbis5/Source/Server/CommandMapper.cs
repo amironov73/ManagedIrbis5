@@ -127,10 +127,10 @@ namespace ManagedIrbis.Server
                 // case "+7":
                 //     result = new UpdateUserListCommand(data);
                 //     break;
-                //
-                // case "+8":
-                //     result = new RestartServerCommand(data);
-                //     break;
+
+                case "+8":
+                    result = new RestartServerCommand(data);
+                    break;
 
                 case "+9":
                     result = new ListUsersCommand (data);
@@ -238,18 +238,18 @@ namespace ManagedIrbis.Server
                     result = new MaxMfnCommand (data);
                     break;
 
-                // case "P":
-                //     result = new ReadTermsCommand(data) { ReverseOrder = true };
-                //     break;
-                //
+                case "P":
+                    result = new ReadTermsCommand (data) { ReverseOrder = true };
+                    break;
+
                 // case "Q":
                 //     result = new UnlockRecordsCommand(data);
                 //     break;
                 //
-                // case "R":
-                //     result = new FullTextSearchCommand(data);
-                //     break;
-                //
+                case "R":
+                    result = new FullTextSearchCommand (data);
+                    break;
+
                 // case "S":
                 //     result = new TruncateDatabaseCommand(data);
                 //     break;
