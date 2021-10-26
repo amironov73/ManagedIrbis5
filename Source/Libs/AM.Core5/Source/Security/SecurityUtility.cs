@@ -16,14 +16,13 @@
 #region Using directives
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 using AM.IO;
+using AM.Text;
 
 #endregion
 
@@ -39,26 +38,28 @@ namespace AM.Security
         #region Public methods
 
         /// <summary>
-        /// Get certificate for SslStream.
+        /// Получение сертификата для SslStream.
         /// </summary>
         public static X509Certificate GetSslCertificate()
         {
-            var assembly = typeof(SecurityUtility).Assembly;
+            var assembly = typeof (SecurityUtility).Assembly;
             var resourceName = "AM.Core.ArsMagnaSslSocket.cer";
-            using Stream? stream = assembly.GetManifestResourceStream(resourceName);
-            if (ReferenceEquals(stream, null))
+            using Stream? stream = assembly.GetManifestResourceStream (resourceName);
+            if (ReferenceEquals (stream, null))
             {
                 throw new ArsMagnaException();
             }
 
             var rawData = stream.ReadToEnd();
             var result = new X509Certificate();
-            result.Import(rawData);
+            result.Import (rawData);
 
             return result;
-        }
+
+        } // method GetSslSertificate
 
         /// <summary>
+        /// Получение сертификата для указанного субъекта
         /// </summary>
         /// Get certificate by the subject.
         public static X509Certificate GetRootCertificate
@@ -66,13 +67,13 @@ namespace AM.Security
                 string subject
             )
         {
-            Sure.NotNullNorEmpty(subject, nameof(subject));
+            Sure.NotNullNorEmpty (subject);
 
-            using X509Store store = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
-            store.Open(OpenFlags.ReadOnly);
+            using var store = new X509Store (StoreName.Root, StoreLocation.LocalMachine);
+            store.Open (OpenFlags.ReadOnly);
             foreach (X509Certificate2 certificate in store.Certificates)
             {
-                if (string.Compare(certificate.Subject, subject,
+                if (string.Compare (certificate.Subject, subject,
                     StringComparison.InvariantCultureIgnoreCase) == 0)
                 {
                     return certificate;
@@ -80,7 +81,8 @@ namespace AM.Security
             }
 
             throw new ArsMagnaException();
-        }
+
+        } // method GetRootSertificate
 
         /// <summary>
         /// Простое шифрование текста до неузнаваемости.
@@ -95,26 +97,29 @@ namespace AM.Security
                 string password
             )
         {
-            var plainBytes = Encoding.UTF8.GetBytes(secretText);
+            var plainBytes = Encoding.UTF8.GetBytes (secretText);
             var symmetricAlgorithm = Rijndael.Create();
-            var passwordBytes = new Rfc2898DeriveBytes(password, new byte[16])
-                .GetBytes(16);
+            var passwordBytes = new Rfc2898DeriveBytes (password, new byte[16])
+                .GetBytes (16);
+
             // ReSharper disable IdentifierTypo
             var encryptor = symmetricAlgorithm.CreateEncryptor
                 (
                     passwordBytes,
                     new byte[16]
                 );
+
             // ReSharper restore IdentifierTypo
             var memory = new MemoryStream();
-            var crypto = new CryptoStream(memory, encryptor, CryptoStreamMode.Write);
-            crypto.Write(plainBytes, 0, plainBytes.Length);
+            var crypto = new CryptoStream (memory, encryptor, CryptoStreamMode.Write);
+            crypto.Write (plainBytes, 0, plainBytes.Length);
             crypto.FlushFinalBlock();
             var encryptedBytes = memory.ToArray();
-            var result = Convert.ToBase64String(encryptedBytes);
+            var result = Convert.ToBase64String (encryptedBytes);
 
             return result;
-        }
+
+        } // method Encrypt
 
         /// <summary>
         /// Расшифровка ранее зашифрованного текста.
@@ -128,56 +133,56 @@ namespace AM.Security
                 string password
             )
         {
-            var encryptedBytes = Convert.FromBase64String(encryptedText);
+            var encryptedBytes = Convert.FromBase64String (encryptedText);
             var symmetricAlgorithm = Rijndael.Create();
-            var passwordBytes = new Rfc2898DeriveBytes(password, new byte[16])
-                .GetBytes(16);
-            // ReSharper disable IdentifierTypo
+            var passwordBytes = new Rfc2898DeriveBytes (password, new byte[16])
+                .GetBytes (16);
+
             var decryptor = symmetricAlgorithm.CreateDecryptor
                 (
                     passwordBytes,
                     new byte[16]
                 );
-            // ReSharper restore IdentifierTypo
-            var memory = new MemoryStream(encryptedBytes);
-            var crypto = new CryptoStream(memory, decryptor, CryptoStreamMode.Read);
-            var reader = new BinaryReader(crypto);
-            var decryptedBytes = reader.ReadBytes(encryptedBytes.Length);
-            var result = Encoding.UTF8.GetString(decryptedBytes);
+
+            var memory = new MemoryStream (encryptedBytes);
+            var crypto = new CryptoStream (memory, decryptor, CryptoStreamMode.Read);
+            var reader = new BinaryReader (crypto);
+            var decryptedBytes = reader.ReadBytes (encryptedBytes.Length);
+            var result = Encoding.UTF8.GetString (decryptedBytes);
 
             return result;
-        }
+
+        } // method Decrypt
 
         /// <summary>
         /// Псевдошифрование в Base64.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
         public static string EncryptToBase64
             (
                 string text
             )
         {
-            var bytes = Encoding.UTF8.GetBytes(text);
-            var result = Convert.ToBase64String(bytes);
+            var bytes = Encoding.UTF8.GetBytes (text);
+            var result = Convert.ToBase64String (bytes);
 
             return result;
-        }
+
+        } // method EncryptToBase64
 
         /// <summary>
         /// Псевдорасшифровка из Base64.
         /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
         public static string DecryptFromBase64
             (
                 string text
             )
         {
-            var bytes = Convert.FromBase64String(text);
-            var result = Encoding.UTF8.GetString(bytes);
+            var bytes = Convert.FromBase64String (text);
+            var result = Encoding.UTF8.GetString (bytes);
+
             return result;
-        }
+
+        } // method DecryptFromBase64
 
         /// <summary>
         /// Вычисление хеша для указанной строки.
@@ -187,10 +192,11 @@ namespace AM.Security
                 string text
             )
         {
-            var bytes = Encoding.UTF8.GetBytes(text);
+            var bytes = Encoding.UTF8.GetBytes (text);
 
-            return ComputeMD5(bytes);
-        }
+            return ComputeMD5 (bytes);
+
+        } // method ComputeMD5
 
         /// <summary>
         /// Вычисление хеша для указанных данных.
@@ -201,17 +207,21 @@ namespace AM.Security
             )
         {
             using var md5 = MD5.Create();
-            var data = md5.ComputeHash(bytes);
+            var data = md5.ComputeHash (bytes);
 
-            var builder = new StringBuilder(data.Length * 2);
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (data.Length * 2);
             foreach (var b in data)
             {
-                builder.Append(b.ToString("x2"));
+                builder.Append (b.ToString ("x2"));
             }
 
             return builder.ToString();
-        }
+
+        } // method ComputeMD5
 
         #endregion
-    }
-}
+
+    } // class SecurityUtility
+
+} // namespace AM.Security

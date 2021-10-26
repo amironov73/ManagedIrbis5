@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertToUsingDeclaration
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
@@ -13,9 +12,8 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
-// ReSharper disable UseAwaitUsing
 
-/* Tcp4CompressingServerSocket.cs -- серверный сокет для TCP v4, умеющий сжимать трафик
+/* Tcp4SecureServerSocket.cs -- простой серверный сокет для TCP v4
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,12 +22,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
+using System.Net.Security;
 using System.Net.Sockets;
+// using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AM.IO;
+using AM.Security;
 
 #endregion
 
@@ -38,9 +37,11 @@ using AM.IO;
 namespace ManagedIrbis.Server.Sockets
 {
     /// <summary>
-    /// Серверный сокет для TCP v4, умеющий сжимать трафик.
+    /// Простой серверный (обслуживающий подключенного клиента)
+    /// сокет для TCP v4.
+    /// Ничего не сжимает, не шифрует, не переиспользуется.
     /// </summary>
-    public sealed class Tcp4CompressingServerSocket
+    public sealed class Tcp4SecureServerSocket
         : Tcp4ServerSocket
     {
         #region Construction
@@ -48,14 +49,42 @@ namespace ManagedIrbis.Server.Sockets
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public Tcp4CompressingServerSocket
+        public Tcp4SecureServerSocket
             (
                 TcpClient client,
                 CancellationToken cancellationToken
             )
             : base (client, cancellationToken)
         {
+            var certificate = SecurityUtility.GetSslCertificate();
+            _sslStream = new SslStream (client.GetStream(), false);
+            _sslStream.AuthenticateAsServer (certificate);
+
         } // constructor
+
+        #endregion
+
+        #region Private members
+
+        private readonly SslStream _sslStream;
+
+        // private bool _ValidateServerCertificate
+        //     (
+        //         object sender,
+        //         X509Certificate certificate,
+        //         X509Chain chain,
+        //         SslPolicyErrors sslPolicyErrors
+        //     )
+        // {
+        //     if (sslPolicyErrors == SslPolicyErrors.None)
+        //     {
+        //         return true;
+        //     }
+        //
+        //     // Console.WriteLine ("Certificate error: {0}", sslPolicyErrors);
+        //
+        //     return false;
+        // }
 
         #endregion
 
@@ -64,17 +93,20 @@ namespace ManagedIrbis.Server.Sockets
         /// <inheritdoc cref="IAsyncServerSocket.ReceiveAllAsync"/>
         public override async Task<MemoryStream?> ReceiveAllAsync()
         {
-            var compressed = await base.ReceiveAllAsync();
-            if (compressed is null)
+            var result = new MemoryStream();
+
+            var buffer = new byte[50 * 1024];
+            while (true)
             {
-                return null;
+                var read = await _sslStream.ReadAsync (buffer, 0, buffer.Length);
+                if (read <= 0)
+                {
+                    break;
+                }
+                result.Write (buffer, 0, read);
             }
 
-            var result = new MemoryStream();
-            using (var decompresser = new DeflateStream (compressed, CompressionMode.Decompress))
-            {
-                StreamUtility.AppendTo (decompresser, result);
-            }
+            result.Position = 0;
 
             return result;
 
@@ -86,23 +118,17 @@ namespace ManagedIrbis.Server.Sockets
                 IEnumerable<ReadOnlyMemory<byte>> data
             )
         {
-            var memory = new MemoryStream();
-            using (var compressor = new DeflateStream (memory, CompressionMode.Compress))
+            foreach (var bytes in data)
             {
-                foreach (var chunk in data)
-                {
-                    compressor.Write (chunk.Span);
-                }
+                await _sslStream.WriteAsync (bytes);
             }
 
-            var outgoing = new ReadOnlyMemory<byte>[] { memory.ToArray() };
-
-            return await base.SendAsync (outgoing);
+            return true;
 
         } // method SendAsync
 
         #endregion
 
-    } // class Tcp4CompressingServerSocket
+    } // class Tcp4SecureServerSocket
 
 } // namespace ManagedIrbis.Server.Sockets
