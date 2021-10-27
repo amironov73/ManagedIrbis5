@@ -66,6 +66,7 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
+                database.NotUsed ();
 
                 // TODO implement
 

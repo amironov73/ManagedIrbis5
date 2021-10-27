@@ -53,6 +53,19 @@ namespace AM
         #region Properties
 
         /// <summary>
+        /// Переменная не используется.
+        /// </summary>
+        public static void NotUsed<T>
+            (
+                this T variable,
+                [CallerArgumentExpression("variable")] string? variableName = null,
+                [CallerMemberName] string? member = null,
+                [CallerFilePath] string? file = null,
+                [CallerLineNumber] int line = 0
+            )
+            => Magna.Debug ($"variable {variableName} ({member} on {file}: {line}) not used");
+
+        /// <summary>
         /// Первый день следующего месяца.
         /// </summary>
         [Pure]

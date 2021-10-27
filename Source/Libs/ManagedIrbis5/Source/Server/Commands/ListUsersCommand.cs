@@ -109,7 +109,8 @@ namespace ManagedIrbis.Server.Commands
                     response.WriteAnsiString (user.Acquisitions).NewLine();
                     response.WriteAnsiString (user.Provision).NewLine();
                     response.WriteAnsiString (user.Administrator).NewLine();
-                }
+
+                } // foreach
 
                 SendResponse();
             }

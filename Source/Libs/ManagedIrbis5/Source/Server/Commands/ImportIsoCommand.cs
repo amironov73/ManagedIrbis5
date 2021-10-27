@@ -60,15 +60,16 @@ namespace ManagedIrbis.Server.Commands
 
             try
             {
-                ServerContext context = engine.RequireContext (Data);
+                var context = engine.RequireContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
-                ClientRequest request = Data.Request.ThrowIfNull();
+                var request = Data.Request.ThrowIfNull();
+                request.NotUsed ();
 
                 // TODO implement
 
-                ServerResponse response = Data.Response.ThrowIfNull();
+                var response = Data.Response.ThrowIfNull();
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();

@@ -1,6 +1,9 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 // ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
@@ -13,7 +16,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedType.Global
 
-/* GblCommand.cs -- глобальная корректировка
+/* ReloadMasterFileCommand.cs -- реорганизация файла документов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,9 +33,9 @@ using AM;
 namespace ManagedIrbis.Server.Commands
 {
     /// <summary>
-    /// Глобальная корректировка.
+    /// Реорганизация файла документов.
     /// </summary>
-    public sealed class GblCommand
+    public sealed class ReloadMasterFileCommand
         : ServerCommand
     {
         #region Construction
@@ -40,7 +43,7 @@ namespace ManagedIrbis.Server.Commands
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public GblCommand
+        public ReloadMasterFileCommand
             (
                 WorkData data
             )
@@ -60,16 +63,17 @@ namespace ManagedIrbis.Server.Commands
 
             try
             {
-                var context = engine.RequireContext (Data);
+                var context = engine.RequireAdministratorContext (Data);
                 Data.Context = context;
                 UpdateContext();
 
                 var request = Data.Request.ThrowIfNull();
-                request.NotUsed ();
+                var database = request.RequireAnsiString();
+                database.NotUsed ();
 
-                // TODO: implement
+                // TODO implement
 
-                var response = Data.Response.ThrowIfNull();
+                ServerResponse response = Data.Response.ThrowIfNull();
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();
@@ -82,11 +86,10 @@ namespace ManagedIrbis.Server.Commands
             {
                 Magna.TraceException
                     (
-                        nameof (GblCommand) + "::" + nameof (Execute),
+                        nameof (ReloadMasterFileCommand) + "::" + nameof (Execute),
                         exception
                     );
-
-                SendError(-8888);
+                SendError (-8888);
             }
 
             engine.OnAfterExecute (Data);
@@ -95,6 +98,6 @@ namespace ManagedIrbis.Server.Commands
 
         #endregion
 
-    } // class GblCommand
+    } // class ReloadMasterFileCommand
 
 } // namespace ManagedIrbis.Server.Commands

@@ -167,7 +167,8 @@ namespace ManagedIrbis.Server.Commands
                     response.WriteInt32 (ctx.CommandCount).NewLine();
                     response.WriteInt32 (processId).NewLine();
                     response.WriteAnsiString ("Активный").NewLine();
-                }
+
+                } // foreach
 
                 SendResponse();
             }

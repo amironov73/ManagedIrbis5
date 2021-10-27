@@ -66,8 +66,11 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
+                database.NotUsed ();
                 var description = request.GetAnsiString();
+                description.NotUsed ();
                 var readerAccess = request.GetInt32();
+                readerAccess.NotUsed ();
 
                 // Response is (ANSI):
                 // 0

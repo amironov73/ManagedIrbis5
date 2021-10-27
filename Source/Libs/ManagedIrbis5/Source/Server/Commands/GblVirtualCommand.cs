@@ -65,6 +65,7 @@ namespace ManagedIrbis.Server.Commands
                 UpdateContext();
 
                 var request = Data.Request.ThrowIfNull();
+                request.NotUsed ();
 
                 // TODO implement
 

@@ -66,14 +66,23 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
+                database.NotUsed ();
                 var table = request.RequireAnsiString();
+                table.NotUsed ();
                 var headers = request.GetUtfString();
+                headers.NotUsed ();
                 var mode = request.GetAnsiString();
+                mode.NotUsed ();
                 var searchQuery = request.GetUtfString();
+                searchQuery.NotUsed ();
                 var minMfn = request.GetInt32();
+                minMfn.NotUsed ();
                 var maxMfn = request.GetInt32();
+                maxMfn.NotUsed ();
                 var sequentialQuery = request.GetUtfString();
+                sequentialQuery.NotUsed ();
                 var mfnList = Array.Empty<int>(); // TODO get mfnList
+                mfnList.NotUsed ();
 
                 // TODO implement
 

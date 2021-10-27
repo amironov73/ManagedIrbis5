@@ -61,29 +61,30 @@ namespace ManagedIrbis.Server.Commands
         {
             var result = new Record();
 
-            var parts = lines[0].Split('#');
-            result.Mfn = FastNumber.ParseInt32(parts[0]);
+            var parts = lines[0].Split ('#');
+            result.Mfn = FastNumber.ParseInt32 (parts[0]);
             if (parts.Length != 1)
             {
                 result.Status = (RecordStatus) FastNumber.ParseInt32(parts[1]);
             }
 
-            parts = lines[1].Split('#');
-            result.Version = FastNumber.ParseInt32(parts[1]);
+            parts = lines[1].Split ('#');
+            result.Version = FastNumber.ParseInt32 (parts[1]);
 
             for (var i = 2; i < lines.Length; i++)
             {
                 var line = lines[i];
-                if (!string.IsNullOrEmpty(line))
+                if (!string.IsNullOrEmpty (line))
                 {
                     var field = new Field();
-                    field.Decode(line);
-                    result.Fields.Add(field);
+                    field.Decode (line);
+                    result.Fields.Add (field);
                 }
             }
 
             return result;
-        }
+
+        } // method _ParseRecord
 
         #endregion
 
@@ -127,7 +128,9 @@ namespace ManagedIrbis.Server.Commands
                         text = formatParameters.Result.AsSingle();
                         text = IrbisText.WindowsToIrbis (text);
                         response.WriteUtfString (text).NewLine();
-                    }
+
+                    } // if
+
                     else
                     {
                         for (var i = 0; i < count; i++)
@@ -155,9 +158,12 @@ namespace ManagedIrbis.Server.Commands
                                 text = IrbisText.WindowsToIrbis (text);
                                 response.WriteUtfString (text).NewLine();
                             }
-                        }
-                    }
-                }
+
+                        } // for
+
+                    } // else
+
+                } // using
 
                 SendResponse();
             }

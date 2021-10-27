@@ -117,8 +117,10 @@ namespace ManagedIrbis.Server.Commands
                                 fileName
                             );
                     }
-                }
-            }
+
+                } // else
+
+            } // else
 
             return result;
 
