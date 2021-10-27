@@ -726,26 +726,28 @@ namespace ManagedIrbis
 
             try
             {
-                var database = EnsureDatabase(parameters.Database);
-                using var query = new SyncQuery(this, CommandCode.ReadRecord);
-                query.AddAnsi(database);
-                query.Add(parameters.Mfn);
+                var database = EnsureDatabase (parameters.Database);
+                using var query = new SyncQuery (this, CommandCode.ReadRecord);
+                query.AddAnsi (database);
+                query.Add (parameters.Mfn);
                 if (parameters.Version != 0)
                 {
-                    query.Add(parameters.Version);
+                    query.Add (parameters.Version);
                 }
                 else
                 {
-                    query.Add(parameters.Lock);
+                    query.Add (parameters.Lock);
                 }
 
-                query.AddFormat(parameters.Format);
+                query.AddFormat (parameters.Format);
 
-                using var response = ExecuteSync(query);
-                if (!response.IsGood(false, ConnectionUtility.GoodCodesForReadRecord))
+                using var response = ExecuteSync (query);
+                if (!response.IsGood (false, ConnectionUtility.GoodCodesForReadRecord))
                 {
                     return null;
                 }
+
+                // TODO: забирать результат расформатирования
 
                 result = new T
                 {

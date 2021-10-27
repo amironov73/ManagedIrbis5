@@ -152,10 +152,10 @@ namespace ManagedIrbis.Server
                     result = new FormatIsoGroupCommand (data);
                     break;
 
-                // case "4":
-                //     // ???
-                //     result = UnknownCommand(data, commandCode);
-                //     break;
+                case "4":
+                    // ???
+                    result = UnknownCommand (data, commandCode);
+                    break;
 
                 case "5":
                     result = new GblCommand (data);
@@ -185,10 +185,10 @@ namespace ManagedIrbis.Server
                     result = new DisconnectCommand (data);
                     break;
 
-                // case "C":
-                //     result = new ReadRecordCommand(data);
-                //     break;
-                //
+                case "C":
+                    result = new ReadRecordCommand (data);
+                    break;
+
                 // case "D":
                 //     result = new WriteRecordCommand(data);
                 //     break;
