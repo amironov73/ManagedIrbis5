@@ -135,26 +135,22 @@ namespace AM.IO
                 string wildcard
             )
         {
-            Sure.NotNullNorEmpty(wildcard, nameof(wildcard));
+            Sure.NotNullNorEmpty (wildcard);
 
-            var dir = Path.GetDirectoryName(wildcard);
-            var name = Path.GetFileName(wildcard);
-            if (string.IsNullOrEmpty(dir))
+            var dir = Path.GetDirectoryName (wildcard);
+            if (string.IsNullOrEmpty (dir))
             {
-                var files = new DirectoryInfo(Directory.GetCurrentDirectory())
-                    .GetFiles(wildcard);
-                var result = new List<string>(files.Length);
-                foreach (var file in files)
-                {
-                    result.Add(file.Name);
-                }
-
-                return result.ToArray();
+                return Directory.GetFiles (Directory.GetCurrentDirectory(), wildcard);
             }
 
-            return Directory.GetFiles(dir, name);
-        }
+            var name = Path.GetFileName (wildcard);
+
+            return Directory.GetFiles (dir, name);
+
+        } // method Glob
 
         #endregion
-    }
-}
+
+    } // class DirectoryInfo
+
+} // namespace AM.IO

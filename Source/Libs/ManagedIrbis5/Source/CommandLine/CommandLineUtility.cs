@@ -80,7 +80,7 @@ namespace ManagedIrbis.CommandLine
         /// <param name="environmentName">Имя переменной окружения.</param>
         /// <returns>Строка подключения либо <c>null</c>.</returns>
         public static string? GetConnectionStringFromEnvironment (string? environmentName = DefaultIrbisEnvironment) =>
-            environmentName is null ? null : Environment.GetEnvironmentVariable(environmentName);
+            environmentName is null ? null : Environment.GetEnvironmentVariable (environmentName);
 
         /// <summary>
         /// Настройки для подключения к серверу.
@@ -145,11 +145,11 @@ namespace ManagedIrbis.CommandLine
             var rootCommand = GetRootCommand();
             rootCommand.Handler = CommandHandler.Create
                 (
-                    (ConnectionSettings settings) => settings.Apply(connection)
+                    (ConnectionSettings settings) => settings.Apply (connection)
                 );
 
-            var parser = new CommandLineBuilder(rootCommand).Build();
-            parser.Invoke(arguments);
+            var parser = new CommandLineBuilder (rootCommand).Build();
+            parser.Invoke (arguments);
 
         } // method ConfigureConnectionFromCommandLine
 
@@ -165,12 +165,12 @@ namespace ManagedIrbis.CommandLine
                 string? environmentValue
             )
         {
-            if (string.IsNullOrEmpty(environmentValue))
+            if (string.IsNullOrEmpty (environmentValue))
             {
                 return;
             }
 
-            if (environmentValue.Contains('='))
+            if (environmentValue.Contains ('='))
             {
                 //
                 // Если строка содержит символ '=', то это строка подключения.
@@ -179,16 +179,16 @@ namespace ManagedIrbis.CommandLine
 
                 // TODO: дешифровать строку подключения, если необходимо
 
-                settings.ParseConnectionString(environmentValue);
+                settings.ParseConnectionString (environmentValue);
             }
 
             var rootCommand = GetRootCommand();
             rootCommand.Handler = CommandHandler.Create
                 (
-                    (ConnectionSettings cs) => cs.Apply(settings)
+                    (ConnectionSettings cs) => cs.Apply (settings)
                 );
-            var parser = new CommandLineBuilder(rootCommand).Build();
-            parser.Invoke(environmentValue);
+            var parser = new CommandLineBuilder (rootCommand).Build();
+            parser.Invoke (environmentValue);
 
         } // method ParseEnvironment
 
@@ -204,10 +204,10 @@ namespace ManagedIrbis.CommandLine
                 string? environmentName = DefaultIrbisEnvironment
             )
         {
-            var environmentValue = GetConnectionStringFromEnvironment(environmentName);
-            if (!string.IsNullOrEmpty(environmentValue))
+            var environmentValue = GetConnectionStringFromEnvironment (environmentName);
+            if (!string.IsNullOrEmpty (environmentValue))
             {
-                ParseEnvironment(connection, environmentValue);
+                ParseEnvironment (connection, environmentValue);
             }
 
         } // method ConfigureConnectionFromEnvironment

@@ -1,8 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿// ReSharper disable CheckNamespace
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM.IO;
 
-// ReSharper disable CheckNamespace
+#nullable enable
 
 namespace UnitTests.AM.IO
 {
@@ -10,7 +12,7 @@ namespace UnitTests.AM.IO
     public class DumpUtilityTest
     {
         [TestMethod]
-        public void DumpUtility_DumpToTextByte()
+        public void DumpUtility_DumpToTextByte_1()
         {
             byte[] data = {1, 2, 5, 10, 25, 50, 100};
 
@@ -22,7 +24,7 @@ namespace UnitTests.AM.IO
         }
 
         [TestMethod]
-        public void DumpUtility_DumpToTextInt32()
+        public void DumpUtility_DumpToTextInt32_1()
         {
             int[] data = { 1, 2, 5, 10, 25, 50, 100 };
 

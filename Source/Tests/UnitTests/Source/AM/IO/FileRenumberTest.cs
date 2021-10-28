@@ -1,0 +1,102 @@
+﻿// ReSharper disable CheckNamespace
+// ReSharper disable IdentifierTypo
+
+using System.Collections.Generic;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using AM.IO;
+
+#nullable enable
+
+namespace UnitTests.AM.IO
+{
+    [TestClass]
+    public sealed class FileRenumberTest
+    {
+        [TestMethod]
+        [Description ("Простой случай")]
+        public void FileRenumber_GenerateNames_1()
+        {
+            var renamer = new FileRenumber();
+            var sourceFiles = new [] { "hello1", "hello2", "hello100" };
+            var generated = renamer.GenerateNames (sourceFiles);
+            var expected = new List<FileRenumber.Bunch>()
+            {
+                new ("hello1", "hello001"),
+                new ("hello2", "hello002"),
+            };
+            CollectionAssert.AreEqual (expected, generated);
+        }
+
+        [TestMethod]
+        [Description ("Все числа однозначные")]
+        public void FileRenumber_GenerateNames_2()
+        {
+            var renamer = new FileRenumber();
+            var sourceFiles = new [] { "hello1", "hello2", "hello3" };
+            var generated = renamer.GenerateNames (sourceFiles);
+            var expected = new List<FileRenumber.Bunch>();
+            CollectionAssert.AreEqual (expected, generated);
+        }
+
+        [TestMethod]
+        [Description ("Некторые без цифр")]
+        public void FileRenumber_GenerateNames_3()
+        {
+            var renamer = new FileRenumber();
+            var sourceFiles = new [] { "hello1", "hello", "hello300" };
+            var generated = renamer.GenerateNames (sourceFiles);
+            var expected = new List<FileRenumber.Bunch>()
+            {
+                new ("hello1", "hello001"),
+            };
+            CollectionAssert.AreEqual (expected, generated);
+        }
+
+        [TestMethod]
+        [Description ("Вторая группа")]
+        public void FileRenumber_GenerateNames_4()
+        {
+            var renamer = new FileRenumber { GroupNumber = 1 };
+            var sourceFiles = new [] { "hello1world2", "hello2world3", "hello300world100" };
+            var generated = renamer.GenerateNames (sourceFiles);
+            var expected = new List<FileRenumber.Bunch>()
+            {
+                new ("hello1world2", "hello1world002"),
+                new ("hello2world3", "hello2world003"),
+            };
+            CollectionAssert.AreEqual (expected, generated);
+        }
+
+        [TestMethod]
+        [Description ("Вторая группа, в некоторых отсутствует")]
+        public void FileRenumber_GenerateNames_5()
+        {
+            var renamer = new FileRenumber { GroupNumber = 1 };
+            var sourceFiles = new [] { "hello1world2", "hello2world", "hello300world100" };
+            var generated = renamer.GenerateNames (sourceFiles);
+            var expected = new List<FileRenumber.Bunch>()
+            {
+                new ("hello1world2", "hello1world002"),
+            };
+            CollectionAssert.AreEqual (expected, generated);
+        }
+
+        [TestMethod]
+        [Description ("Явно заданное число знаков")]
+        public void FileRenumber_GenerateNames_6()
+        {
+            var renamer = new FileRenumber { GroupWidth = 5 };
+            var sourceFiles = new [] { "hello1", "hello2", "hello300" };
+            var generated = renamer.GenerateNames (sourceFiles);
+            var expected = new List<FileRenumber.Bunch>()
+            {
+                new ("hello1", "hello00001"),
+                new ("hello2", "hello00002"),
+                new ("hello300", "hello00300"),
+            };
+            CollectionAssert.AreEqual (expected, generated);
+        }
+    }
+}
