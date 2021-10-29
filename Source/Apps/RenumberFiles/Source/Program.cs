@@ -25,12 +25,9 @@ using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.IO;
 
-using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Text.Output;
-
-using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -77,9 +74,10 @@ namespace RenumberFiles
         {
             try
             {
-                var wildcards = parseResult.ValueForArgument<string[]> ("wildcard");
-                var groupNumber = parseResult.ValueForOption<int> ("-o");
-                var groupWidth = parseResult.ValueForOption<int> ("-w");
+                var wildcards = parseResult.ValueForArgument<string[]> (inputArgument);
+                var groupNumber = parseResult.ValueForOption (numberOption);
+                var groupWidth = parseResult.ValueForOption (widthOption);
+                var dryRun = parseResult.ValueForOption (dryOption);
 
                 if (wildcards.IsNullOrEmpty())
                 {
@@ -102,7 +100,8 @@ namespace RenumberFiles
                     var renumber = new FileRenumber()
                     {
                         GroupWidth = groupWidth,
-                        GroupNumber = groupNumber
+                        GroupNumber = groupNumber,
+                        DryRun = dryRun
                     };
 
                     var output = AbstractOutput.Console;
@@ -131,28 +130,35 @@ namespace RenumberFiles
 
         } // method Run
 
+        private static readonly Argument<string> inputArgument = new ("wildcard")
+        {
+            Arity = ArgumentArity.ZeroOrMore,
+            Description = "маска файлов, подлежащих обработке"
+        };
+        private static readonly Option<int> numberOption = new ("-n", () => 0)
+        {
+            IsRequired = false,
+            Description = "номер цифровой группы"
+        };
+        private static readonly Option<int> widthOption = new ("-w", () => 0)
+        {
+            IsRequired = false,
+            Description = "ширина цифровой группы"
+        };
+        private static readonly Option<bool> dryOption = new ("-d", () => false)
+        {
+            IsRequired = false,
+            Description = "холостой прогон (репетиция)"
+        };
+
         static void Main (string[] args)
         {
-            var inputMask = new Argument<string>("wildcard")
-            {
-                Arity = ArgumentArity.ZeroOrMore,
-                Description = "маска файлов, подлежащих обработке"
-            };
-            var numberOption = new Option<int> ("-n", () => 0)
-            {
-                IsRequired = false,
-                Description = "номер цифровой группы"
-            };
-            var widthOption = new Option<int> ("-w", () => 0)
-            {
-                IsRequired = false,
-                Description = "ширина цифровой группы"
-            };
             var rootCommand = new RootCommand("FileRenumber")
             {
-                inputMask,
+                inputArgument,
                 numberOption,
-                widthOption
+                widthOption,
+                dryOption
             };
             rootCommand.Description = "Перенумерация файлов";
             rootCommand.Handler = CommandHandler.Create<ParseResult> (Run);

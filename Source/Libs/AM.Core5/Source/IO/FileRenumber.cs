@@ -96,13 +96,17 @@ namespace AM.IO
             /// </summary>
             public void Rename
                 (
-                    AbstractOutput? output = null
+                    AbstractOutput? output = null,
+                    bool dryRun = false
                 )
             {
                 var fullName = FullNewName;
 
                 output?.WriteLine ($"{OldName} -> {fullName}");
-                File.Move (OldName, fullName);
+                if (!dryRun)
+                {
+                    File.Move (OldName, fullName);
+                }
 
             } // method Rename
 
@@ -123,6 +127,11 @@ namespace AM.IO
         /// Ноль означает автоматическое определение ширины.
         /// </summary>
         public int GroupWidth { get; set; }
+
+        /// <summary>
+        /// Холостой прогон <see cref="Rename"/> (репетиция).
+        /// </summary>
+        public bool DryRun { get; set; }
 
         #endregion
 
@@ -242,7 +251,7 @@ namespace AM.IO
         {
             foreach (var bunch in fileList)
             {
-                bunch.Rename (output);
+                bunch.Rename (output, DryRun);
             }
 
         } // method Rename

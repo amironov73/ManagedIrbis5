@@ -262,9 +262,9 @@ namespace ManagedIrbis.Server
                 //     result = new UnlockDatabaseCommand(data);
                 //     break;
                 //
-                // case "V":
-                //     result = new RecordPostingsCommand(data);
-                //     break;
+                case "V":
+                    result = new RecordPostingsCommand (data);
+                    break;
 
                 case "W":
                     result = new DeleteDatabaseCommand (data);
