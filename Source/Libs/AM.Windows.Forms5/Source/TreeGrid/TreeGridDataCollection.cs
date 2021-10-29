@@ -130,11 +130,10 @@ namespace AM.Windows.Forms
                 TreeGridNode node
             )
         {
-            var serializer = new XmlSerializer(typeof(TreeGridDataCollection));
-            using var stream = File.OpenRead(fileName);
+            var serializer = new XmlSerializer (typeof (TreeGridDataCollection));
+            using var stream = File.OpenRead (fileName);
             var result = (TreeGridDataCollection) serializer
-                    .Deserialize(stream)
-                    .ThrowIfNull("serializer.Deserialize");
+                    .Deserialize (stream).ThrowIfNull();
             result.Node = node;
             return result;
         }
@@ -145,9 +144,9 @@ namespace AM.Windows.Forms
         /// <param name="fileName">Name of the file.</param>
         public void Save ( string fileName )
         {
-            var serializer = new XmlSerializer(typeof(TreeGridDataCollection));
-            using var stream = File.OpenWrite(fileName);
-            serializer.Serialize(stream,this);
+            var serializer = new XmlSerializer (typeof (TreeGridDataCollection));
+            using var stream = File.OpenWrite (fileName);
+            serializer.Serialize (stream,this);
         }
 
         /// <summary>
@@ -243,22 +242,23 @@ namespace AM.Windows.Forms
             reader.Read();
             while (reader.LocalName == "item")
             {
-                var attribute = reader.GetAttribute("isnull");
-                if (!string.IsNullOrEmpty(attribute))
+                var attribute = reader.GetAttribute ("isnull");
+                if (!string.IsNullOrEmpty (attribute))
                 {
-                    Add(null!);
+                    Add (null!);
                 }
                 else
                 {
-                    var typeName = reader.GetAttribute("type").ThrowIfNull("typeName");
-                    var type = Type.GetType(typeName).ThrowIfNull("Type.GetType(typeName)");
+                    var typeName = reader.GetAttribute ("type").ThrowIfNull();
+                    var type = Type.GetType (typeName).ThrowIfNull();
                     var value = reader.ReadString();
-                    var result = Convert.ChangeType(value, type);
-                    Add(result);
+                    var result = Convert.ChangeType (value, type);
+                    Add (result);
                 }
                 reader.Read();
             }
-        }
+
+        } // method ReadXml
 
         /// <inheritdoc cref="IXmlSerializable.WriteXml"/>
         void IXmlSerializable.WriteXml
@@ -270,24 +270,28 @@ namespace AM.Windows.Forms
             {
                 if (item is null)
                 {
-                    writer.WriteStartElement("item");
-                    writer.WriteAttributeString("isnull","true");
+                    writer.WriteStartElement ("item");
+                    writer.WriteAttributeString ("isnull","true");
                     writer.WriteEndElement();
                 }
                 else
                 {
-                    writer.WriteStartElement("item");
+                    writer.WriteStartElement ("item");
                     writer.WriteAttributeString
                         (
                             "type",
                             item.GetType().ToString()
                         );
-                    writer.WriteString(item.ToString());
+                    writer.WriteString (item.ToString());
                     writer.WriteEndElement();
                 }
-            }
-        }
+
+            } // method foreach
+
+        } // method WriteXml
 
         #endregion
-    }
-}
+
+    } // class TreeGridDataCollection
+
+} // namespace AM.Windows.Forms

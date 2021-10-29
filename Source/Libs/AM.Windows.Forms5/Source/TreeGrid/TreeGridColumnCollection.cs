@@ -167,8 +167,7 @@ namespace AM.Windows.Forms
             var serializer = new XmlSerializer(typeof(TreeGridColumnCollection));
             using var stream = File.OpenRead(fileName);
             var result = (TreeGridColumnCollection)serializer
-                    .Deserialize(stream)
-                    .ThrowIfNull("serializer.Deserialize");
+                    .Deserialize(stream).ThrowIfNull();
 
             return result;
         }
@@ -192,10 +191,9 @@ namespace AM.Windows.Forms
                 var typeName = reader.GetAttribute("type");
                 if (!string.IsNullOrEmpty(typeName))
                 {
-                    var type = Type.GetType(typeName).ThrowIfNull("Type.GetType");
-                    var column = (TreeGridColumn) Activator.CreateInstance(type)
-                        .ThrowIfNull("Activator.CreateInstance");
-                    ((IXmlSerializable) column).ReadXml(reader);
+                    var type = Type.GetType (typeName).ThrowIfNull();
+                    var column = (TreeGridColumn) Activator.CreateInstance (type).ThrowIfNull();
+                    ((IXmlSerializable) column).ReadXml (reader);
                     Add(column);
                 }
             }

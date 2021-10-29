@@ -88,8 +88,8 @@ namespace AM.Windows.Forms
         public Brush GetForegroundBrush () => ForegroundOverride
             ?? TreeGridUtilities.GetForegroundBrush
                 (
-                    Grid.ThrowIfNull(nameof(Grid)),
-                    Node.ThrowIfNull(nameof(Node)),
+                    Grid.ThrowIfNull(),
+                    Node.ThrowIfNull(),
                     State
                 );
 
@@ -99,8 +99,8 @@ namespace AM.Windows.Forms
         public Brush GetBackgroundBrush () => BackgroundOverride
             ?? TreeGridUtilities.GetBackgroundBrush
                 (
-                    Grid.ThrowIfNull(nameof(Grid)),
-                    Node.ThrowIfNull(nameof(Node)),
+                    Grid.ThrowIfNull(),
+                    Node.ThrowIfNull(),
                     State
                 );
 
@@ -126,7 +126,7 @@ namespace AM.Windows.Forms
         public void DrawBackground()
         {
             var brush = GetBackgroundBrush();
-            Graphics.ThrowIfNull(nameof(Graphics)).FillRectangle
+            Graphics.ThrowIfNull().FillRectangle
                 (
                     brush,
                     Bounds

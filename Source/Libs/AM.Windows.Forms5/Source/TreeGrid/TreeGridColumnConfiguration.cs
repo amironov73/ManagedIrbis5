@@ -146,8 +146,7 @@ namespace AM.Windows.Forms
             var serializer = new XmlSerializer (typeof(TreeGridColumnConfiguration));
             using var stream = File.OpenRead(fileName);
             return (TreeGridColumnConfiguration) serializer
-                .Deserialize(stream)
-                .ThrowIfNull("serializer.Deserialize");
+                .Deserialize(stream).ThrowIfNull();
         }
 
         /// <summary>
@@ -155,10 +154,8 @@ namespace AM.Windows.Forms
         /// </summary>
         public TreeGridColumn CreateColumn ()
         {
-            var columnType = Type.GetType(ColumnType.ThrowIfNull("ColumnType"))
-                .ThrowIfNull("Type.GetType");
-            var result = (TreeGridColumn) Activator.CreateInstance(columnType)
-                .ThrowIfNull("Activator.CreateInstance");
+            var columnType = Type.GetType (ColumnType.ThrowIfNull ()).ThrowIfNull();
+            var result = (TreeGridColumn) Activator.CreateInstance (columnType).ThrowIfNull();
 
             result.Title = Title;
             result.Resizeable = Resizeable;

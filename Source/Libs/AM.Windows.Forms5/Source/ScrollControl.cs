@@ -86,7 +86,7 @@ namespace AM.Windows.Forms
         {
             if (_pressed)
             {
-                Scroll?.Invoke(this, _eventArgs.ThrowIfNull(nameof(_eventArgs)));
+                Scroll?.Invoke (this, _eventArgs.ThrowIfNull());
             }
         }
 

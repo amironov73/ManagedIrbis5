@@ -7,7 +7,7 @@
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
 
-/* DataGridViewUtility.cs --
+/* DataGridViewUtility.cs -- полезные методы для DataGridView
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -27,7 +27,7 @@ using AM.Xml;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///
+    /// Полезные методы для <see cref="DataGridView"/>
     /// </summary>
     public static class DataGridViewUtility
     {
@@ -51,7 +51,7 @@ namespace AM.Windows.Forms
 
                 foreach (var info in columns)
                 {
-                    DataGridViewColumn column = info.ToGridColumn();
+                    var column = info.ToGridColumn();
                     grid.Columns.Add(column);
                 }
             }
@@ -59,7 +59,8 @@ namespace AM.Windows.Forms
             {
                 grid.ResumeLayout();
             }
-        }
+
+        } // method ApplyColumns
 
         /// <summary>
         /// Converts the column description into
@@ -72,15 +73,14 @@ namespace AM.Windows.Forms
         {
             var columnTypeName = column.Type;
             Type? columnType = null;
-            if (!string.IsNullOrEmpty(columnTypeName))
+            if (!string.IsNullOrEmpty (columnTypeName))
             {
-                columnType = Type.GetType(columnTypeName, true);
+                columnType = Type.GetType (columnTypeName, true);
             }
 
             var result = columnType is null
                 ? new DataGridViewTextBoxColumn()
-                : (DataGridViewColumn) Activator.CreateInstance(columnType)
-                    .ThrowIfNull("Activator.CreateInstance");
+                : (DataGridViewColumn) Activator.CreateInstance (columnType).ThrowIfNull();
 
             result.DataPropertyName = column.Name;
             result.HeaderText = column.Title;
@@ -92,22 +92,21 @@ namespace AM.Windows.Forms
             {
                 if (column.Width > 0)
                 {
-                    result.AutoSizeMode
-                        = DataGridViewAutoSizeColumnMode.None;
+                    result.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
                     result.Width = column.Width;
                 }
                 else
                 {
-                    result.AutoSizeMode
-                        = DataGridViewAutoSizeColumnMode.Fill;
+                    result.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                     result.FillWeight = Math.Abs(column.Width);
                 }
             }
-            result.HeaderCell.Style.Alignment
-                        = DataGridViewContentAlignment.MiddleCenter;
+
+            result.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
             return result;
-        }
+
+        } // method ToGridColumn
 
         /// <summary>
         /// Gets the columns.
@@ -117,7 +116,7 @@ namespace AM.Windows.Forms
                 string xmlText
             )
         {
-            var info = XmlUtility.DeserializeString<DataSetInfo>(xmlText);
+            var info = XmlUtility.DeserializeString<DataSetInfo> (xmlText);
 
             var result = new List<DataGridViewColumn>();
             foreach (var column in info.Tables[0].Columns)
@@ -126,7 +125,8 @@ namespace AM.Windows.Forms
             }
 
             return result;
-        }
+
+        } // method GetColumns
 
         ///// <summary>
         ///// Generates the table HTML.
@@ -215,5 +215,7 @@ namespace AM.Windows.Forms
         //}
 
         #endregion
-    }
-}
+
+    } // class DataGridViewUtility
+
+} // namespace AM.Windows.Forms

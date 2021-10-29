@@ -57,7 +57,7 @@ namespace AM.Win32
         /// Получение ветки регистра для WSL.
         /// </summary>
         public static RegistryKey GetRootRegistryKey() =>
-            Registry.CurrentUser.OpenSubKey(RegistryPath).ThrowIfNull("GetRootKey");
+            Registry.CurrentUser.OpenSubKey (RegistryPath).ThrowIfNull();
 
         /// <summary>
         /// Перечисление установленных дистрибутивов.

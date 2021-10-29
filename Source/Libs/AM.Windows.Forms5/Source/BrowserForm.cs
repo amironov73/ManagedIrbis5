@@ -9,12 +9,13 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* BrowserForm.cs --
+/* BrowserForm.cs -- простая форма с веб-браузером для показа HTML
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
@@ -26,7 +27,7 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    ///
+    /// Простая форма с веб-браузером для показа HTML.
     /// </summary>
     public partial class BrowserForm
         : Form
@@ -34,10 +35,10 @@ namespace AM.Windows.Forms
         #region Properties
 
         /// <summary>
-        /// Gets or sets the document text.
+        /// HTML отображаемого документа.
         /// </summary>
-        [DefaultValue(null)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DefaultValue (null)]
+        [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
         public string DocumentText
         {
             get => _webBrowser.DocumentText;
@@ -49,33 +50,39 @@ namespace AM.Windows.Forms
         #region Construction
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="BrowserForm"/> class.
+        /// Конструктор.
         /// </summary>
         public BrowserForm()
         {
             InitializeComponent();
-        }
+
+        } // constructor
 
         #endregion
 
         #region Private members
 
-        private void _copyButton_Click(object sender, System.EventArgs e)
+        private void _copyButton_Click
+            (
+                object sender,
+                EventArgs e
+            )
         {
-            Clipboard.SetText(DocumentText, TextDataFormat.Html);
+            Clipboard.SetText (DocumentText, TextDataFormat.Html);
         }
 
-        private void _openButton_Click(object sender, System.EventArgs e)
+        private void _openButton_Click
+            (
+                object sender, EventArgs e
+            )
         {
-            if (_openFileDialog.ShowDialog(this)
-                 == DialogResult.OK)
+            if (_openFileDialog.ShowDialog(this) == DialogResult.OK)
             {
                 _webBrowser.Navigate(_openFileDialog.FileName);
             }
         }
 
-        private void _saveButton_Click(object sender, System.EventArgs e)
+        private void _saveButton_Click(object sender, EventArgs e)
         {
             if (_saveFileDialog.ShowDialog(this)
                  == DialogResult.OK)
@@ -87,7 +94,7 @@ namespace AM.Windows.Forms
         private void _pageSetupButton_Click
             (
                 object? sender,
-                System.EventArgs e
+                EventArgs e
             )
         {
             _webBrowser.ShowPageSetupDialog();
@@ -96,7 +103,7 @@ namespace AM.Windows.Forms
         private void _pasteButton_Click
             (
                 object? sender,
-                System.EventArgs e
+                EventArgs e
             )
         {
             var text = Clipboard.GetText(TextDataFormat.Html);
@@ -107,7 +114,11 @@ namespace AM.Windows.Forms
             }
         }
 
-        private void _printButton_Click(object sender, System.EventArgs e)
+        private void _printButton_Click
+            (
+                object sender,
+                EventArgs e
+            )
         {
             _webBrowser.ShowPrintDialog();
         }
@@ -117,7 +128,7 @@ namespace AM.Windows.Forms
         #region Public methods
 
         /// <summary>
-        /// Gets the document.
+        /// Получение документа с DOM.
         /// </summary>
         public HtmlDocument GetDocument()
         {
@@ -126,9 +137,11 @@ namespace AM.Windows.Forms
                 _webBrowser.Navigate("about:blank");
             }
 
-            return _webBrowser.Document.ThrowIfNull("_webBrowser.Document");
+            return _webBrowser.Document.ThrowIfNull();
         }
 
         #endregion
-    }
-}
+
+    } //
+
+} // namespace

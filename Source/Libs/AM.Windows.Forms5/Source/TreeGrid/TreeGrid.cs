@@ -749,8 +749,7 @@ namespace AM.Windows.Forms
         public virtual TreeGridNode CreateNode()
         {
             var nodeType = DefaultNodeType;
-            var result = (TreeGridNode) Activator.CreateInstance(nodeType)
-                    .ThrowIfNull(nameof(Activator.CreateInstance));
+            var result = (TreeGridNode) Activator.CreateInstance (nodeType).ThrowIfNull();
             result._SetTreeGrid(this);
 
             return result;

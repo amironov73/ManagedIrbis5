@@ -44,7 +44,7 @@ namespace AM.Windows.Forms
         /// </summary>
         /// <value>The tree grid.</value>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TreeGrid Grid => Node.Grid.ThrowIfNull("Node.TreeGrid");
+        public TreeGrid Grid => Node.Grid.ThrowIfNull();
 
         #endregion
 

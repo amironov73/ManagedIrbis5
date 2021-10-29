@@ -39,27 +39,27 @@ namespace AM.Windows.Forms
         /// Список доступных элементов.
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ListBox AvailableList => _available.ThrowIfNull("AvailableList");
+        public ListBox AvailableList => _available.ThrowIfNull();
 
         ///<summary>
         /// Собственно доступные элементы.
         ///</summary>
         [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ListBox.ObjectCollection AvailableItems => _available.ThrowIfNull("AvailableList").Items;
+        public ListBox.ObjectCollection AvailableItems => _available.ThrowIfNull().Items;
 
         /// <summary>
         /// Список отобранных элементов.
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ListBox SelectedList => _selected.ThrowIfNull("SelectedList");
+        public ListBox SelectedList => _selected.ThrowIfNull();
 
         ///<summary>
         /// Собственно отобранные элементы.
         ///</summary>
         [Editor("System.Windows.Forms.Design.ListControlStringCollectionEditor, System.Design, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", typeof(UITypeEditor))]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public ListBox.ObjectCollection SelectedItems => _selected.ThrowIfNull("SelectedList").Items;
+        public ListBox.ObjectCollection SelectedItems => _selected.ThrowIfNull().Items;
 
         #endregion
 

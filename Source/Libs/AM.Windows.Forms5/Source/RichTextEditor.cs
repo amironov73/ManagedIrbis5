@@ -142,10 +142,9 @@ namespace AM.Windows.Forms
         {
             if (_openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                FileName = _openFileDialog.FileName
-                    .ThrowIfNull("FileName");
+                FileName = _openFileDialog.FileName.ThrowIfNull();
 
-                LoadFromFile(FileName);
+                LoadFromFile (FileName);
             }
         }
 
@@ -179,8 +178,7 @@ namespace AM.Windows.Forms
                 {
                     return;
                 }
-                FileName = _saveFileDialog.FileName
-                    .ThrowIfNull("FileName");
+                FileName = _saveFileDialog.FileName.ThrowIfNull();
             }
             SaveToFile(FileName);
         }
@@ -193,7 +191,7 @@ namespace AM.Windows.Forms
                 string fileName
             )
         {
-            File.WriteAllText(fileName, Rtf, Encoding.UTF8);
+            File.WriteAllText (fileName, Rtf, Encoding.UTF8);
         }
 
         #endregion

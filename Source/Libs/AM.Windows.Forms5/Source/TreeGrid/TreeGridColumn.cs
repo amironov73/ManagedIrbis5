@@ -275,8 +275,8 @@ namespace AM.Windows.Forms
                 TreeGridDrawCellEventArgs args
             )
         {
-            args.Node.ThrowIfNull("args.Node").OnDrawCell(args);
-            DrawCell?.Invoke(this, args);
+            args.Node.ThrowIfNull().OnDrawCell (args);
+            DrawCell?.Invoke (this, args);
         }
 
         /// <summary>

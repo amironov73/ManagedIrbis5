@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* DataSetInfo.cs -- information about dataset
+/* DataSetInfo.cs -- информация о датасете
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,54 +30,49 @@ using AM.Runtime;
 namespace AM.Data
 {
     /// <summary>
-    /// Information about <see cref="DataSet"/>.
+    /// Информация о датасете <see cref="DataSet"/>.
     /// </summary>
-    [XmlRoot("dataset")]
-    public class DataSetInfo
+    [XmlRoot ("dataset")]
+    public sealed class DataSetInfo
         : IHandmadeSerializable,
         IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Gets or sets the connection string.
+        /// Строка подключения.
         /// </summary>
-        [XmlElement("connectionString")]
-        [JsonPropertyName("connectionString")]
+        [XmlElement ("connectionString")]
+        [JsonPropertyName ("connectionString")]
         public string? ConnectionString { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether
-        /// the dataset is read only.
+        /// Датасет только для чтения?
         /// </summary>
-        [XmlAttribute("readOnly")]
-        [JsonPropertyName("readOnly")]
+        [XmlAttribute ("readOnly")]
+        [JsonPropertyName ("readOnly")]
         public bool ReadOnly { get; set; }
 
         /// <summary>
-        /// Gets or sets the select command text.
+        /// Команда выборки данных.
         /// </summary>
-        /// <value>The select command text.</value>
-        [XmlElement("selectCommand")]
-        [JsonPropertyName("selectCommand")]
+        [XmlElement ("selectCommand")]
+        [JsonPropertyName ("selectCommand")]
         public string? SelectCommandText { get; set; }
 
         /// <summary>
-        /// Gets the table list.
+        /// Список таблиц, входящих в датасет.
         /// </summary>
-        [XmlElement("table")]
-        [JsonPropertyName("tables")]
-        public NonNullCollection<DataTableInfo> Tables
-        {
-            get; private set;
-        }
+        [XmlElement ("table")]
+        [JsonPropertyName ("tables")]
+        public NonNullCollection<DataTableInfo> Tables { get; private set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -85,67 +80,60 @@ namespace AM.Data
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DataSetInfo()
         {
             Tables = new NonNullCollection<DataTableInfo>();
-        }
+
+        } // constructor
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Loads <see cref="DataSetInfo"/> from the specified file.
+        /// Чтение информации <see cref="DataSetInfo"/> из указанного файла.
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <returns></returns>
         public static DataSetInfo Load
             (
                 string fileName
             )
         {
-            var serializer = new XmlSerializer(typeof(DataSetInfo));
-            using var stream = File.OpenRead(fileName);
+            var serializer = new XmlSerializer (typeof (DataSetInfo));
+            using var stream = File.OpenRead (fileName);
 
-            return (DataSetInfo)serializer.Deserialize(stream)
-                .ThrowIfNull("serializer.Deserialize(stream)");
-        }
+            return (DataSetInfo) serializer.Deserialize (stream).ThrowIfNull();
+
+        } // method Load
 
         /// <summary>
-        /// Saves this instance into the specified file.
+        /// Сохранение датасета в файл.
         /// </summary>
-        /// <param name="fileName">Name of the file.</param>
         public void Save
             (
                 string fileName
             )
         {
-            var serializer = new XmlSerializer(typeof(DataSetInfo));
-            using var stream = File.Create(fileName);
+            var serializer = new XmlSerializer (typeof (DataSetInfo));
+            using var stream = File.Create (fileName);
             serializer.Serialize(stream, this);
-        }
+
+        } // method Save
 
         /// <summary>
         /// Should serialize the <see cref="ReadOnly"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeReadOnly()
-        {
-            return ReadOnly;
-        }
+        public bool ShouldSerializeReadOnly() => ReadOnly;
 
         /// <summary>
         /// Should serialize the <see cref="Tables"/> collection?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeTables()
-        {
-            return Tables.Count != 0;
-        }
+        public bool ShouldSerializeTables() => Tables.Count != 0;
 
         #endregion
 
@@ -161,7 +149,8 @@ namespace AM.Data
             ReadOnly = reader.ReadBoolean();
             SelectCommandText = reader.ReadNullableString();
             Tables = reader.ReadNonNullCollection<DataTableInfo>();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -169,15 +158,12 @@ namespace AM.Data
                 BinaryWriter writer
             )
         {
-            /*
+            writer.WriteNullable (ConnectionString);
+            writer.Write (ReadOnly);
+            writer.WriteNullable (SelectCommandText);
+            writer.WriteCollection (Tables);
 
-            writer.WriteNullable(ConnectionString);
-            writer.Write(ReadOnly);
-            writer.WriteNullable(SelectCommandText);
-            writer.WriteCollection(Tables);
-
-            */
-        }
+        } // method SaveToStream
 
         #endregion
 
@@ -193,12 +179,15 @@ namespace AM.Data
 
             foreach (var table in Tables)
             {
-                verifier.VerifySubObject(table, "Table");
+                verifier.VerifySubObject (table);
             }
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
-    }
-}
+
+    } // class DataSetInfo
+
+} // namespace AM.Data

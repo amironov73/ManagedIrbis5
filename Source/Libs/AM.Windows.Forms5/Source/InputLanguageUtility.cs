@@ -64,8 +64,7 @@ namespace AM.Windows.Forms
         /// American English language.
         /// </summary>
         public static InputLanguage AmericanEnglishLanguage =>
-            InputLanguage.FromCulture(new CultureInfo(0x0409))
-                .ThrowIfNull("InputLanguage.FromCulture");
+            InputLanguage.FromCulture (new CultureInfo (0x0409)).ThrowIfNull();
 
         /// <summary>
         /// Next installed input language.
@@ -94,8 +93,7 @@ namespace AM.Windows.Forms
         /// Russian language.
         /// </summary>
         public static InputLanguage RussianLanguage =>
-            InputLanguage.FromCulture(new CultureInfo(0x0419))
-                .ThrowIfNull("InputLanguage.FromCulture");
+            InputLanguage.FromCulture (new CultureInfo (0x0419)).ThrowIfNull();
 
         #endregion
 
@@ -135,7 +133,7 @@ namespace AM.Windows.Forms
                 (
                     new CultureInfo(isoLanguageCode)
                 )
-                .ThrowIfNull("InputLanguage");
+                .ThrowIfNull();
 
             ChangeInputLanguage(language);
         }
@@ -152,8 +150,8 @@ namespace AM.Windows.Forms
             // Convert Integer Culture code to InputLanguage object.
             // Be aware: if Culture code is not supported
             // Exception will be invoked here
-            var language = InputLanguage.FromCulture(new CultureInfo(languageId))
-                .ThrowIfNull("language");
+            var language = InputLanguage.FromCulture (new CultureInfo (languageId))
+                .ThrowIfNull();
 
             ChangeInputLanguage(language);
         }

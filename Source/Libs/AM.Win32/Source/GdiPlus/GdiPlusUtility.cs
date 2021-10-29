@@ -48,7 +48,7 @@ namespace AM.Win32
                     new [] { typeof(IntPtr) },
                     null
                 )
-                .ThrowIfNull("method");
+                .ThrowIfNull();
 
             var result = (Bitmap?)method.Invoke
                 (
@@ -57,7 +57,8 @@ namespace AM.Win32
                 );
 
             return result;
-        }
+
+        } // method GetBitmapFromGdiPlus
 
         #endregion
 

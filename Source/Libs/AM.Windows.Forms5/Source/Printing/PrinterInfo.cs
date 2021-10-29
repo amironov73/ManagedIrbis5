@@ -94,11 +94,10 @@ namespace AM.Windows.Forms.Printing
                 string fileName
             )
         {
-            using Stream stream = File.OpenRead(fileName);
-            var serializer = new XmlSerializer(typeof(PrinterInfo));
+            using var stream = File.OpenRead (fileName);
+            var serializer = new XmlSerializer (typeof (PrinterInfo));
 
-            return (PrinterInfo) serializer.Deserialize(stream)
-                .ThrowIfNull("serializer.Deserialize(stream)");
+            return (PrinterInfo) serializer.Deserialize (stream).ThrowIfNull();
         }
 
         /// <summary>
@@ -109,7 +108,7 @@ namespace AM.Windows.Forms.Printing
                 string fileName
             )
         {
-            using Stream stream = File.Create(fileName);
+            using var stream = File.Create(fileName);
             var serializer = new XmlSerializer(typeof(PrinterInfo));
             serializer.Serialize(stream, this);
         }

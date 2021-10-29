@@ -166,7 +166,7 @@ namespace AM.Windows.Forms
             }
             set
             {
-                _CreateButtons(value.ThrowIfNull(nameof(value)), _current);
+                _CreateButtons(value.ThrowIfNull(), _current);
             }
         }
 

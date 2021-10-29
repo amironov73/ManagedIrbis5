@@ -107,7 +107,7 @@ namespace AM.Windows.Forms.Printing
             using var stream = File.OpenRead(fileName);
             var serializer = new XmlSerializer(typeof(PrinterDefinition));
 
-            return (PrinterDefinition)serializer.Deserialize(stream).ThrowIfNull("Deserialize");
+            return (PrinterDefinition)serializer.Deserialize(stream).ThrowIfNull();
         }
 
         /// <summary>

@@ -40,12 +40,12 @@ namespace AM.Windows.Forms
         /// Gets or sets the type of the enum.
         /// </summary>
         /// <value>The type of the enum.</value>
-        [DefaultValue(null)]
-        [TypeConverter(typeof(EnumTypeConverter))]
+        [DefaultValue (null)]
+        [TypeConverter (typeof (EnumTypeConverter))]
         public Type? EnumType
         {
             get => _enumType;
-            set => _SetEnumType(value.ThrowIfNull(nameof(value)));
+            set => _SetEnumType (value.ThrowIfNull());
         }
 
         /// <summary>
