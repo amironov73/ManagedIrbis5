@@ -15,6 +15,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using AM;
@@ -49,6 +50,26 @@ namespace ManagedIrbis.Records
             return record;
 
         } // method ForEach
+
+        /// <summary>
+        /// Замена полей с указанной меткой.
+        /// </summary>
+        public static Record ReplaceField
+            (
+                this Record record,
+                int tag,
+                IEnumerable<Field> newFields
+            )
+        {
+            Sure.NotNull (record);
+            Sure.NotNull ((object?) newFields);
+
+            record.RemoveField (tag);
+            record.Fields.AddRange (newFields);
+
+            return record;
+
+        } // method ReplaceField
 
         /// <summary>
         /// Замена значения подполя.
