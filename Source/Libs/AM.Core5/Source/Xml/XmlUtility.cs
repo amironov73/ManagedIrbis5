@@ -47,8 +47,7 @@ namespace AM.Xml
             var serializer = new XmlSerializer (typeof (T));
             using Stream stream = File.OpenRead (fileName);
 
-            return (T)serializer.Deserialize (stream)
-                .ThrowIfNull ("deserialize");
+            return (T)serializer.Deserialize (stream).ThrowIfNull();
 
         } // method DeserializeFile
 
@@ -65,8 +64,7 @@ namespace AM.Xml
             var reader = new StringReader (xmlText);
             var serializer = new XmlSerializer (typeof (T));
 
-            return (T)serializer.Deserialize (reader)
-                .ThrowIfNull ();
+            return (T)serializer.Deserialize (reader).ThrowIfNull ();
 
         } // method DeserializeString
 

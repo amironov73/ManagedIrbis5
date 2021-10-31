@@ -262,7 +262,7 @@ namespace AM.Drawing.Barcodes
             )
         {
             var builder = StringBuilderPool.Shared.Get();
-            var text = data.Message.ThrowIfNull ().Replace ("*", string.Empty);
+            var text = data.Message.ThrowIfNull().Replace ("*", string.Empty);
             //text = "*" + text + ComputeChecksum(text) + "*";
             text = "*" + text + "*";
 

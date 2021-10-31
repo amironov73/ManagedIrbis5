@@ -112,14 +112,14 @@ namespace AM.Drawing.CardPrinting
                 DrawingContext context
             )
         {
-            Graphics graphics = context.Graphics.ThrowIfNull("context.Graphics");
+            Graphics graphics = context.Graphics.ThrowIfNull();
 
-            if (Width > 0 && Height > 0 && !string.IsNullOrEmpty(Source))
+            if (Width > 0 && Height > 0 && !string.IsNullOrEmpty (Source))
             {
-                var source = context.ExpandText(Source);
-                if (!string.IsNullOrEmpty(source))
+                var source = context.ExpandText (Source);
+                if (!string.IsNullOrEmpty (source))
                 {
-                    using Image bitmap = Image.FromFile(source);
+                    using Image bitmap = Image.FromFile (source);
                     _ProportionalPrint
                         (
                             graphics,
@@ -129,9 +129,12 @@ namespace AM.Drawing.CardPrinting
                             Width,
                             Height
                         );
-                }
-            }
-        }
+
+                } // if
+
+            } // if
+
+        } // method Draw
 
         #endregion
 

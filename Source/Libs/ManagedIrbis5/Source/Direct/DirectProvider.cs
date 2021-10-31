@@ -839,8 +839,7 @@ namespace ManagedIrbis.Direct
             )
             where T: class, IRecord, new()
         {
-            var databaseName = parameters.Database
-                ?? Database.ThrowIfNullOrEmpty(nameof(Database));
+            var databaseName = parameters.Database ?? Database.ThrowIfNullOrEmpty ();
 
             // TODO: поддержка версий записи
 
@@ -850,10 +849,10 @@ namespace ManagedIrbis.Direct
             }
 
             // TODO: выставлять код ошибки
-            using var accessProxy = GetAccessor(databaseName);
-            using var mark = LockUp(databaseName);
+            using var accessProxy = GetAccessor (databaseName);
+            using var mark = LockUp (databaseName);
             var result = mark.Success
-                ? accessProxy.Accessor.ReadRecord<T>(parameters.Mfn)
+                ? accessProxy.Accessor.ReadRecord<T> (parameters.Mfn)
                 : default;
 
             return result;

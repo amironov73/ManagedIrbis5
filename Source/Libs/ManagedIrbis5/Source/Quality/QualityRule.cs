@@ -575,11 +575,11 @@ namespace ManagedIrbis.Quality
             var grouped = fields.GroupBy
                 (
                     f => f.Value
-                        .ThrowIfNullOrEmpty("field.Value")
+                        .ThrowIfNullOrEmpty()
                         .ToString()
                         .ToLowerInvariant()
-                )
-                ;
+                );
+
             foreach (var grp in grouped)
             {
                 if (grp.Count() != 1)
@@ -637,7 +637,7 @@ namespace ManagedIrbis.Quality
                 .GroupBy
                 (
                     sf => sf.Value
-                        .ThrowIfNullOrEmpty("field.Value")
+                        .ThrowIfNullOrEmpty()
                         .ToString()
                         .ToLowerInvariant()
                 );

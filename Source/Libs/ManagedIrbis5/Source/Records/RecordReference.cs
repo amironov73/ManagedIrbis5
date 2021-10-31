@@ -28,6 +28,8 @@ using AM.Runtime;
 
 using ManagedIrbis.ImportExport;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
 
 #endregion
 
@@ -38,39 +40,38 @@ namespace ManagedIrbis
     /// <summary>
     /// Ссылка на запись (например, для сохранения в "кармане").
     /// </summary>
-    [XmlRoot("record")]
-    [DebuggerDisplay("MFN={" + nameof(Mfn) + "}, Index={" + nameof(Index) +"}")]
+    [XmlRoot ("record")]
+    [DebuggerDisplay ("MFN={" + nameof (Mfn) + "}, Index={" + nameof (Index) + "}")]
     public sealed class RecordReference
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Database name, e. g. "IBIS".
+        /// Имя базы данных, например, "IBIS".
         /// </summary>
-        [XmlAttribute("db")]
-        [JsonPropertyName("db")]
+        [XmlAttribute ("db")]
+        [JsonPropertyName ("db")]
         public string? Database { get; set; }
 
         /// <summary>
-        /// MFN of the record.
-        /// <c>0</c> means "use <see cref="Index"/> field".
+        /// MFN записи.
+        /// <c>0</c> означает "использовать свойство <see cref="Index"/>".
         /// </summary>
-        [XmlAttribute("mfn")]
-        [JsonPropertyName("mfn")]
+        [XmlAttribute ("mfn")]
+        [JsonPropertyName ("mfn")]
         public int Mfn { get; set; }
 
         /// <summary>
-        /// Index of the record, e. g. "81.432.1-42/P41-012833".
+        /// Шифр записи в базе данных, например, "81.432.1-42/P41-012833".
         /// </summary>
-        [XmlAttribute("index")]
-        [JsonPropertyName("index")]
+        [XmlAttribute ("index")]
+        [JsonPropertyName ("index")]
         public string? Index { get; set; }
 
         /// <summary>
-        /// Record itself. Not written.
-        /// Can be <c>null</c>.
+        /// Собственно запись. Не сохраняется в XML или JSON.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
@@ -81,7 +82,7 @@ namespace ManagedIrbis
         #region Construction
 
         /// <summary>
-        /// Default constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public RecordReference()
         {
@@ -92,12 +93,15 @@ namespace ManagedIrbis
         /// </summary>
         public RecordReference
             (
-                Record record
+                Record record,
+                RecordConfiguration? configuration = null
             )
         {
+            configuration ??= RecordConfiguration.GetDefault();
+
             Database = record.Database;
             Mfn = record.Mfn;
-            Index = record.FM(903).ThrowIfNullOrEmpty("record.FM(903)");
+            Index = configuration.GetIndex (record).ThrowIfNullOrEmpty();
             Record = record;
 
         } // constructor
@@ -107,7 +111,7 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
-        /// Compare two references.
+        /// Сравнение двух ссылок.
         /// </summary>
         public static bool Compare
             (
@@ -123,7 +127,7 @@ namespace ManagedIrbis
                 }
             }
 
-            if (!ReferenceEquals(first.Index, null))
+            if (!ReferenceEquals (first.Index, null))
             {
                 if (first.Index != second.Index)
                 {
@@ -131,61 +135,61 @@ namespace ManagedIrbis
                 }
             }
 
-            if (first.Mfn == 0 && ReferenceEquals(first.Index, null))
+            if (first.Mfn == 0 && ReferenceEquals (first.Index, null))
             {
                 return false;
             }
 
             return true;
+
         } // method Compare
 
         /// <summary>
-        /// Load references from archive file.
+        /// Загрузка ссылок из архивного файла.
         /// </summary>
         public static RecordReference[] LoadFromZipFile
             (
                 string fileName
             )
         {
-            Sure.NotNull(fileName, nameof(fileName));
+            Sure.NotNull (fileName);
 
             var result = SerializationUtility
-                .RestoreArrayFromFile<RecordReference>(fileName);
+                .RestoreArrayFromFile<RecordReference> (fileName);
 
             return result;
+
         } // method LoadfromZipFile
 
         /// <summary>
-        /// Load record according to the reference.
+        /// Загрузка записи по ссылке на нее.
         /// </summary>
         public Record? ReadRecord
             (
                 ISyncProvider connection
             )
         {
-            Verify(true);
+            Verify (true);
 
-            /*
             if (Mfn != 0)
             {
-                Record = connection.ReadRecordAsync
-                    (
-                        Database.ThrowIfNull("Database"),
-                        Mfn
-                    )
-                    .Result;
+                var parameters = new ReadRecordParameters()
+                {
+                    Database = Database.ThrowIfNullOrEmpty(),
+                    Mfn = Mfn
+                };
+                Record = connection.ReadRecord<Record> (parameters);
             }
             else
             {
                 Record = connection.SearchReadOneRecord
                     (
-                        "\"I={0}\"",
-                        Index
+                        $"\"{CommonSearches.IndexPrefix}{Index}\""
                     );
             }
-            */
 
             return Record;
+
         } // method ReadRecord
 
         /// <summary>
@@ -199,32 +203,31 @@ namespace ManagedIrbis
             )
         {
             var result = new List<Record>();
-            foreach (RecordReference reference in references)
+            foreach (var reference in references)
             {
-                var record = reference.ReadRecord(connection);
-                if (ReferenceEquals(record, null))
+                var record = reference.ReadRecord (connection);
+                if (record is null)
                 {
                     Magna.Error
                         (
-                            nameof(RecordReference) + "::" + nameof(ReadRecords)
+                            nameof (RecordReference) + "::" + nameof (ReadRecords)
                             + "record not found: "
                             + reference
                         );
 
                     if (throwOnError)
                     {
-                        throw new IrbisException("record not found");
+                        throw new IrbisException ("record not found");
                     }
                 }
                 else
                 {
-                    result.Add(record);
+                    result.Add (record);
                 }
             }
 
             return result;
 
-            // ReSharper restore PossibleMultipleEnumeration
         } // method ReadRecords
 
 
@@ -237,7 +240,8 @@ namespace ManagedIrbis
                 string fileName
             )
         {
-            references.SaveToFile(fileName);
+            references.SaveToFile (fileName);
+
         } // method SaveToZipFile
 
         #endregion
@@ -253,6 +257,7 @@ namespace ManagedIrbis
             Database = reader.ReadNullableString();
             Mfn = reader.ReadPackedInt32();
             Index = reader.ReadNullableString();
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -262,9 +267,10 @@ namespace ManagedIrbis
             )
         {
             writer
-                .WriteNullable(Database)
-                .WritePackedInt32(Mfn)
-                .WriteNullable(Index);
+                .WriteNullable (Database)
+                .WritePackedInt32 (Mfn)
+                .WriteNullable (Index);
+
         } // method SaveToStream
 
         #endregion
@@ -277,18 +283,19 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<RecordReference>(this, throwOnError);
+            var verifier = new Verifier<RecordReference> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Database, nameof(Database))
+                .NotNullNorEmpty (Database, nameof (Database))
                 .Assert
                     (
                         Mfn != 0
-                        || !string.IsNullOrEmpty(Index),
+                        || !string.IsNullOrEmpty (Index),
                         "Mfn or Index"
                     );
 
             return verifier.Result;
+
         } // method Verify
 
         #endregion
@@ -296,13 +303,12 @@ namespace ManagedIrbis
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => ReferenceEquals(Record, null)
+        public override string ToString() => ReferenceEquals (Record, null)
             ? Database.ToVisibleString()
               + "#"
               + Mfn.ToInvariantString()
               + "#"
               + Index.ToVisibleString()
-
             : Database.ToVisibleString()
               + IrbisText.IrbisDelimiter
               + Record.ToProtocolText();

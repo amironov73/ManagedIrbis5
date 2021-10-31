@@ -236,7 +236,7 @@ namespace AM.IO
             public string? Name
             {
                 get => _name;
-                set => SetName(value.ThrowIfNull("value"));
+                set => SetName (value.ThrowIfNull());
             }
 
             /// <summary>

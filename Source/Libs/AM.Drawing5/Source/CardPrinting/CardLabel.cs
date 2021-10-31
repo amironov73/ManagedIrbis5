@@ -37,25 +37,25 @@ namespace AM.Drawing.CardPrinting
         /// <summary>
         /// Шрифт.
         /// </summary>
-        [XmlElement("font")]
-        [DisplayName("Шрифт")]
-        [JsonPropertyName("font")]
+        [XmlElement ("font")]
+        [DisplayName ("Шрифт")]
+        [JsonPropertyName ("font")]
         public string? Font { get; set; }
 
         /// <summary>
         /// Цвет текста.
         /// </summary>
-        [XmlElement("color")]
-        [DisplayName("Цвет")]
-        [JsonPropertyName("color")]
+        [XmlElement ("color")]
+        [DisplayName ("Цвет")]
+        [JsonPropertyName ("color")]
         public string? Color { get; set; }
 
         /// <summary>
         /// Собственно текст.
         /// </summary>
-        [XmlElement("text")]
-        [DisplayName("Текст")]
-        [JsonPropertyName("text")]
+        [XmlElement ("text")]
+        [DisplayName ("Текст")]
+        [JsonPropertyName ("text")]
         public string? Text { get; set; }
 
         #endregion
@@ -68,25 +68,27 @@ namespace AM.Drawing.CardPrinting
                 DrawingContext context
             )
         {
-            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
+            var graphics = context.Graphics.ThrowIfNull();
 
-            if (!string.IsNullOrEmpty(Font)
-                && !string.IsNullOrEmpty(Color)
-                && !string.IsNullOrEmpty(Text))
+            if (!string.IsNullOrEmpty (Font)
+                && !string.IsNullOrEmpty (Color)
+                && !string.IsNullOrEmpty (Text))
             {
                 var fontConverter = new FontConverter();
-                using var font = (Font) fontConverter.ConvertFromString(Font).ThrowIfNull("Font");
+                using var font = (Font) fontConverter.ConvertFromString (Font).ThrowIfNull();
                 var colorConverter = new ColorConverter();
-                var color = (Color) colorConverter.ConvertFromString(Color).ThrowIfNull("Color");
+                var color = (Color) colorConverter.ConvertFromString (Color).ThrowIfNull();
 
-                var text = context.ExpandText(Text);
-                if (!string.IsNullOrEmpty(text))
+                var text = context.ExpandText (Text);
+                if (!string.IsNullOrEmpty (text))
                 {
-                    using var brush = new SolidBrush(color);
-                    graphics.DrawString(text, font, brush, Left, Top);
+                    using var brush = new SolidBrush (color);
+                    graphics.DrawString (text, font, brush, Left, Top);
                 }
-            }
-        }
+
+            } // if
+
+        } // method Draw
 
         #endregion
 

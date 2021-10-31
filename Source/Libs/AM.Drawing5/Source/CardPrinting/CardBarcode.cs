@@ -30,7 +30,7 @@ using AM.Drawing.Barcodes;
 namespace AM.Drawing.CardPrinting
 {
     /// <summary>
-    /// Штрих-код EAN-13
+    /// Штрих-код EAN-13.
     /// </summary>
     public sealed class CardBarcode
         : CardItem
@@ -40,25 +40,25 @@ namespace AM.Drawing.CardPrinting
         /// <summary>
         /// Ширина.
         /// </summary>
-        [XmlElement("width")]
-        [DisplayName("Ширина")]
-        [JsonPropertyName("width")]
+        [XmlElement ("width")]
+        [DisplayName ("Ширина")]
+        [JsonPropertyName ("width")]
         public int Width { get; set; }
 
         /// <summary>
         /// Высота.
         /// </summary>
-        [XmlElement("height")]
-        [DisplayName("Высота")]
-        [JsonPropertyName("height")]
+        [XmlElement ("height")]
+        [DisplayName ("Высота")]
+        [JsonPropertyName ("height")]
         public int Height { get; set; }
 
         /// <summary>
         /// Текст штрих-кода.
         /// </summary>
-        [XmlElement("text")]
-        [DisplayName("Текст")]
-        [JsonPropertyName("text")]
+        [XmlElement ("text")]
+        [DisplayName ("Текст")]
+        [JsonPropertyName ("text")]
         public string? Text { get; set; }
 
         #endregion
@@ -74,12 +74,12 @@ namespace AM.Drawing.CardPrinting
                 DrawingContext context
             )
         {
-            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
+            var graphics = context.Graphics.ThrowIfNull();
 
-            if (!string.IsNullOrEmpty(Text))
+            if (!string.IsNullOrEmpty (Text))
             {
                 var text = context.ExpandText(Text);
-                if (!string.IsNullOrEmpty(text))
+                if (!string.IsNullOrEmpty (text))
                 {
                     var barcode = new Code39();
                     var data = new BarcodeData
@@ -96,9 +96,12 @@ namespace AM.Drawing.CardPrinting
                     graphics.SmoothingMode = SmoothingMode.None;
                     graphics.PixelOffsetMode = PixelOffsetMode.None;
                     barcode.DrawBarcode(barcodeContext);
-                }
-            }
-        }
+
+                } // if
+
+            } // if
+
+        } // method Draw
 
         #endregion
 

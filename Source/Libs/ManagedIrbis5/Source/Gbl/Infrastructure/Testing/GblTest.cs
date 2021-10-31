@@ -157,13 +157,12 @@ namespace ManagedIrbis.Gbl.Infrastructure.Testing
                     ConsoleInput.Write(description);
                 }
 
-                var recordFile = GetFullName (RecordFileName)
-                    .ThrowIfNullOrEmpty ("GetFullName returns null");
+                var recordFile = GetFullName (RecordFileName).ThrowIfNullOrEmpty ();
                 var record = PlainText.ReadOneRecord (recordFile, IrbisEncoding.Utf8)
-                    .ThrowIfNull("ReadOneRecord returns null");
+                    .ThrowIfNull();
                 record.Mfn = 1; // TODO some other value?
                 var gblFileName = GetFullName (InputFileName)
-                    .ThrowIfNullOrEmpty ("GetFullName returns null");
+                    .ThrowIfNullOrEmpty ();
                 var input = File.ReadAllText (gblFileName, IrbisEncoding.Utf8)
                     .DosToUnix()
                     .ThrowIfNull("input");

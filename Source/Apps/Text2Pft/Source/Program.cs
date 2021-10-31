@@ -43,9 +43,9 @@ namespace Text2Pft
             try
             {
                 var inputName = parseResult.ValueForArgument<string> ("text-file")
-                    .ThrowIfNullOrEmpty ("text-file");
+                    .ThrowIfNullOrEmpty ();
                 var outputName = parseResult.ValueForArgument<string> ("pft-file")
-                    .ThrowIfNullOrEmpty("pft-file");
+                    .ThrowIfNullOrEmpty();
                 var encoding = IrbisEncoding.Ansi;
 
                 using var input = new StreamReader (inputName, encoding);

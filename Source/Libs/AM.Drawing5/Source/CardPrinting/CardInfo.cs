@@ -145,11 +145,12 @@ namespace AM.Drawing.CardPrinting
                 string fileName
             )
         {
-            using var stream = File.OpenRead(fileName);
-            var serializer = new XmlSerializer(typeof(CardInfo));
-            return (CardInfo) serializer.Deserialize(stream)
-                .ThrowIfNull("serializer.Deserialize");
-        }
+            using var stream = File.OpenRead (fileName);
+            var serializer = new XmlSerializer (typeof (CardInfo));
+
+            return (CardInfo) serializer.Deserialize (stream).ThrowIfNull();
+
+        } // method LoadXml
 
         /// <summary>
         /// Отрисовка карточки.
@@ -183,7 +184,8 @@ namespace AM.Drawing.CardPrinting
             context.Graphics = null;
 
             return bitmap;
-        }
+
+        } // method Draw
 
         #endregion
 

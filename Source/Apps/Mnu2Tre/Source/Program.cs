@@ -43,9 +43,9 @@ namespace Mnu2Tre
             try
             {
                 var inputName = parseResult.ValueForArgument<string> ("mnu-file")
-                    .ThrowIfNullOrEmpty ("mnu-file");
+                    .ThrowIfNullOrEmpty ();
                 var outputName = parseResult.ValueForArgument<string> ("tre-file")
-                    .ThrowIfNullOrEmpty ("tre-file");
+                    .ThrowIfNullOrEmpty ();
 
                 try
                 {

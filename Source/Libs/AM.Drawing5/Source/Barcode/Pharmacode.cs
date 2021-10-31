@@ -43,7 +43,7 @@ namespace AM.Drawing.Barcodes
                 BarcodeData data
             )
         {
-            var text = data.Message.ThrowIfNull("data.Message");
+            var text = data.Message.ThrowIfNull();
             var result = new StringBuilder();
             var number = text.ParseInt32();
 
@@ -51,24 +51,25 @@ namespace AM.Drawing.Barcodes
             {
                 if ((number & 1) == 0)
                 {
-                    result.Insert(0, Thick);
+                    result.Insert (0, Thick);
                     number = (number - 2) / 2;
                 }
                 else
                 {
-                    result.Insert(0, Thin);
+                    result.Insert (0, Thin);
                     number = (number - 1) / 2;
                 }
 
                 if (number != 0)
                 {
-                    result.Insert(0, Gap);
+                    result.Insert (0, Gap);
                 }
 
             } while (number != 0);
 
             return result.ToString();
-        }
+
+        } // method Encode
 
         /// <inheritdoc cref="LinearBarcodeBase.Verify"/>
         public override bool Verify
@@ -78,19 +79,22 @@ namespace AM.Drawing.Barcodes
         {
             var message = data.Message;
 
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace (message))
             {
                 return false;
             }
 
             var number = message.ParseInt32();
 
-            return number > 2 && number < 131071;
-        }
+            return number is > 2 and < 131071;
+
+        } // method Verify
 
         /// <inheritdoc cref="IBarcode.Symbology"/>
         public override string Symbology { get; } = "Pharmacode";
 
         #endregion
-    }
-}
+
+    } // class Pharmacode
+
+} // namespace AM.Drawing.Barcodes

@@ -94,7 +94,7 @@ namespace AM.Drawing.Barcodes
                         width,
                         Bounds.Height
                     );
-                Graphics?.FillRectangle(brush.ThrowIfNull("brush"), rectangle);
+                Graphics?.FillRectangle (brush.ThrowIfNull(), rectangle);
                 Position += width;
 
                 return true;
@@ -181,22 +181,22 @@ namespace AM.Drawing.Barcodes
                 return;
             }
 
-            var message = data.Message.ThrowIfNull("data.Message");
+            var message = data.Message.ThrowIfNull();
             using var painter = new Painter
             {
-                Graphics = context.Graphics.ThrowIfNull("context.Graphics"),
-                Fore = new SolidBrush(Color.Black),
-                Back = new SolidBrush(Color.White),
+                Graphics = context.Graphics.ThrowIfNull(),
+                Fore = new SolidBrush (Color.Black),
+                Back = new SolidBrush (Color.White),
                 Bounds = context.Bounds,
                 Weight = Weight,
                 Position = context.Bounds.Left
             };
 
             // стартовый паттерн
-            var success = painter.Draw('X')
-                          && painter.Draw('A')
-                          && painter.Draw('X')
-                          && painter.Draw('A');
+            var success = painter.Draw ('X')
+                          && painter.Draw ('A')
+                          && painter.Draw ('X')
+                          && painter.Draw ('A');
             if (!success)
             {
                 return;
@@ -216,17 +216,19 @@ namespace AM.Drawing.Barcodes
                         return;
                     }
                 }
-            }
+
+            } // for
 
             // завершающий паттерн
-            if (painter.Draw('Y'))
+            if (painter.Draw ('Y'))
             {
-                if (painter.Draw('A'))
+                if (painter.Draw ('A'))
                 {
-                    painter.Draw('X');
+                    painter.Draw ('X');
                 }
             }
-        }
+
+        } // method DrawBarcode
 
         #endregion
 

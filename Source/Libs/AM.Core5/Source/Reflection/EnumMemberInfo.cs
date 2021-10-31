@@ -182,8 +182,7 @@ namespace AM.Reflection
 
             foreach (var name in Enum.GetNames(enumType))
             {
-                var field = enumType.GetField(name)
-                    .ThrowIfNull("enumType.GetField");
+                var field = enumType.GetField (name).ThrowIfNull();
 
                 var titleAttribute = ReflectionUtility
                     .GetCustomAttribute<DisplayNameAttribute>(field);

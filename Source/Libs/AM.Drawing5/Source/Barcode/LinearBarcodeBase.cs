@@ -13,10 +13,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 
 #endregion
 
@@ -71,28 +68,31 @@ namespace AM.Drawing.Barcodes
             )
         {
             var data = context.Data;
-            if (data is null || !Verify(data))
+            if (data is null || !Verify (data))
             {
                 return;
             }
 
-            var encoded = Encode(data);
+            var encoded = Encode (data);
             encoded = "00" + encoded + "00";
-            var graphics = context.Graphics.ThrowIfNull("context.Graphics");
+            var graphics = context.Graphics.ThrowIfNull();
             var bounds = context.Bounds;
-            using var fore = new SolidBrush(data.ForeColor);
-            using var back = new SolidBrush(data.BackColor);
+            using var fore = new SolidBrush (data.ForeColor);
+            using var back = new SolidBrush (data.BackColor);
             var position = bounds.Left;
 
             foreach (var c in encoded)
             {
-                var rect = new RectangleF(position, bounds.Top, Weight, bounds.Height);
+                var rect = new RectangleF (position, bounds.Top, Weight, bounds.Height);
                 var brush = c == '0' ? back : fore;
-                graphics.FillRectangle(brush, rect);
+                graphics.FillRectangle (brush, rect);
                 position += Weight;
             }
-        }
+
+        } // method DrawBarcode
 
         #endregion
-    }
-}
+
+    } // class LinearBarcodeBase
+
+} // namespace AM.Drawing.Barcodes

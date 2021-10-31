@@ -281,7 +281,7 @@ namespace ExemplarKiller
             var fileName = args[0];
             doDelete = ConfigurationUtility.GetBoolean ("delete");
             databases = ConfigurationUtility.GetString ("databases")
-                .ThrowIfNull("Databases not specified")
+                .ThrowIfNull()
                 .Split
                     (
                         new[] { ';', ',', ' ' },

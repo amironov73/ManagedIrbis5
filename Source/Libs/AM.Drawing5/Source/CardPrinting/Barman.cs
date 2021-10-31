@@ -113,14 +113,14 @@ namespace AM.Drawing.CardPrinting
                 PrintPageEventArgs e
             )
         {
-            var graphics = e.Graphics.ThrowIfNull("Graphics");
+            var graphics = e.Graphics.ThrowIfNull();
 
             if (_image is not null)
             {
                 graphics.InterpolationMode = InterpolationMode.NearestNeighbor;
                 graphics.SmoothingMode = SmoothingMode.None;
                 graphics.PixelOffsetMode = PixelOffsetMode.None;
-                graphics.DrawImage(_image, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
+                graphics.DrawImage (_image, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
                 e.HasMorePages = false;
             }
         }

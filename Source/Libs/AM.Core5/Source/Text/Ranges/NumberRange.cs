@@ -265,13 +265,13 @@ namespace AM.Text.Ranges
                 (
                     NumberText.Min
                         (
-                            Start.ThrowIfNull (nameof (Start)),
-                            other.Start.ThrowIfNull (nameof (other.Start))
+                            Start.ThrowIfNull(),
+                            other.Start.ThrowIfNull()
                         ),
                     NumberText.Max
                         (
-                            Stop.ThrowIfNull (nameof (Stop)),
-                            other.Stop.ThrowIfNull (nameof (other.Stop))
+                            Stop.ThrowIfNull(),
+                            other.Stop.ThrowIfNull()
                         )
                 );
 
