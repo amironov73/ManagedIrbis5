@@ -19,6 +19,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 using AM.Text.Output;
@@ -120,18 +121,27 @@ namespace AM.IO
         /// Номер цифровой группы, подлежащей перенумерации.
         /// Нумерация с нуля.
         /// </summary>
+        [JsonPropertyName ("group")]
         public int GroupNumber { get; set; }
 
         /// <summary>
         /// Ширина (для дополнения нулями слева).
         /// Ноль означает автоматическое определение ширины.
         /// </summary>
+        [JsonPropertyName ("width")]
         public int GroupWidth { get; set; }
 
         /// <summary>
         /// Холостой прогон <see cref="Rename"/> (репетиция).
         /// </summary>
+        [JsonPropertyName ("dry")]
         public bool DryRun { get; set; }
+
+        /// <summary>
+        /// Префикс (отменяет использование оригинальных имен файлов).
+        /// </summary>
+        [JsonPropertyName ("prefix")]
+        public string? Prefix { get; set; }
 
         #endregion
 
@@ -194,7 +204,7 @@ namespace AM.IO
                 pattern = new string ('0', GroupWidth);
             }
 
-            if (pattern.Length == 1)
+            if (pattern.Length == 1 && string.IsNullOrEmpty (Prefix))
             {
                 // нет смысла переименовывать файлы, им не нужны ведущие нули
                 return result;
@@ -205,15 +215,23 @@ namespace AM.IO
                 var oldName = Path.GetFileNameWithoutExtension (sourceFile);
                 var match = regex.Matches (oldName)!.SafeAt (GroupNumber)!;
                 var value = int.Parse  (match.Value, CultureInfo.InvariantCulture);
-                var newName = oldName.Substring (0, match.Index)
-                    + value.ToString (pattern, CultureInfo.InvariantCulture)
-                    + oldName.Substring (match.Index + match.Length);
+
+                var newName = string.IsNullOrEmpty (Prefix)
+
+
+                    ? oldName.Substring (0, match.Index)
+                        + value.ToString (pattern, CultureInfo.InvariantCulture)
+                        + oldName.Substring (match.Index + match.Length)
+
+                    : Prefix + value.ToString (pattern, CultureInfo.InvariantCulture);
+
                 if (string.CompareOrdinal (oldName, newName) != 0)
                 {
                     var bunch = new Bunch (sourceFile, newName);
                     result.Add (bunch);
                 }
-            }
+
+            } // foreach
 
             return result;
 

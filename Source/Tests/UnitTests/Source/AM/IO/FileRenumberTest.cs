@@ -98,5 +98,37 @@ namespace UnitTests.AM.IO
             };
             CollectionAssert.AreEqual (expected, generated);
         }
+
+        [TestMethod]
+        [Description ("Имена, состоящеие из одних цифр")]
+        public void FileRenumber_GenerateNames_7()
+        {
+            var renamer = new FileRenumber();
+            var sourceFiles = new [] { "1", "2", "100" };
+            var generated = renamer.GenerateNames (sourceFiles);
+            var expected = new List<FileRenumber.Bunch>()
+            {
+                new ("1", "001"),
+                new ("2", "002"),
+            };
+            CollectionAssert.AreEqual (expected, generated);
+        }
+
+        [TestMethod]
+        [Description ("Использование префикса")]
+        public void FileRenumber_GenerateNames_8()
+        {
+            var renamer = new FileRenumber() { Prefix = "prefix_" };
+            var sourceFiles = new [] { "hello1", "hello2", "hello100" };
+            var generated = renamer.GenerateNames (sourceFiles);
+            var expected = new List<FileRenumber.Bunch>()
+            {
+                new ("hello1", "prefix_001"),
+                new ("hello2", "prefix_002"),
+                new ("hello100", "prefix_100"),
+            };
+            CollectionAssert.AreEqual (expected, generated);
+        }
+
     }
 }
