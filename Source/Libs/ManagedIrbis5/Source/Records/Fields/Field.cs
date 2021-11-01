@@ -24,13 +24,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 using ManagedIrbis.Infrastructure;
 
@@ -80,8 +80,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Метка поля.
         /// </summary>
-        [XmlAttribute("tag")]
-        [JsonPropertyName("tag")]
+        [XmlAttribute ("tag")]
+        [JsonPropertyName ("tag")]
         public int Tag { get; set; }
 
         /// <summary>
@@ -109,6 +109,7 @@ namespace ManagedIrbis
                     }
                 }
             } // set
+
         } // property Value
 
         /// <summary>
@@ -167,13 +168,12 @@ namespace ManagedIrbis
         {
             Tag = tag;
             Value = value;
+
         } // constructor
 
         /// <summary>
         /// Конструктор.
         /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="subfield1"></param>
         public Field
             (
                 int tag,
@@ -181,15 +181,13 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(subfield1);
+            Add (subfield1);
+
         } // constructor
 
         /// <summary>
         /// Конструктор.
         /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="subfield1"></param>
-        /// <param name="subfield2"></param>
         public Field
             (
                 int tag,
@@ -198,17 +196,14 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(subfield1);
-            Subfields.Add(subfield2);
+            Add (subfield1);
+            Add (subfield2);
+
         } // constructor
 
         /// <summary>
         /// Конструктор.
         /// </summary>
-        /// <param name="tag"></param>
-        /// <param name="subfield1"></param>
-        /// <param name="subfield2"></param>
-        /// <param name="subfield3"></param>
         public Field
             (
                 int tag,
@@ -218,16 +213,17 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(subfield1);
-            Subfields.Add(subfield2);
-            Subfields.Add(subfield3);
+            Add (subfield1);
+            Add (subfield2);
+            Add (subfield3);
+
         } // constructor
 
         /// <summary>
         /// Конструктор.
         /// </summary>
         /// <param name="tag">Метка поля.</param>
-        /// <param name="subfields">Подполя.</param>
+        /// <param name="subfields">Массив подполей.</param>
         public Field
             (
                 int tag,
@@ -235,7 +231,8 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.AddRange(subfields);
+            Subfields.AddRange (subfields);
+
         } // constructor
 
         /// <summary>
@@ -248,11 +245,12 @@ namespace ManagedIrbis
             (
                 int tag,
                 char code1,
-                ReadOnlyMemory<char> value1 = default
+                string? value1 = default
             )
         {
             Tag = tag;
-            Subfields.Add(new SubField(code1, value1));
+            Add (new SubField (code1, value1));
+
         } // constructor
 
         /// <summary>
@@ -273,8 +271,9 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(new SubField(code1, value1));
-            Subfields.Add(new SubField(code2, value2));
+            Add (new SubField (code1, value1));
+            Add (new SubField (code2, value2));
+
         } // constructor
 
         /// <summary>
@@ -299,30 +298,11 @@ namespace ManagedIrbis
             )
         {
             Tag = tag;
-            Subfields.Add(new SubField(code1, value1));
-            Subfields.Add(new SubField(code2, value2));
-            Subfields.Add(new SubField(code3, value3));
-        } // constructor
+            Add (new SubField (code1, value1));
+            Add (new SubField (code2, value2));
+            Add (new SubField (code3, value3));
 
-        // /// <summary>
-        // /// Конструктор.
-        // /// </summary>
-        // /// <param name="tag">Метка поля.</param>
-        // /// <param name="subfields">Коды и значения подполей.</param>
-        // public Field
-        //     (
-        //         int tag,
-        //         params string?[] subfields
-        //     )
-        // {
-        //     Tag = tag;
-        //     for (var i = 0; i < subfields.Length; i += 2)
-        //     {
-        //         var code = subfields[i]![0];
-        //         var value = subfields[i + 1];
-        //         Subfields.Add(new SubField(code, value));
-        //     }
-        // } // constructor
+        } // constructor
 
         #endregion
 
@@ -337,16 +317,17 @@ namespace ManagedIrbis
                 params string[] subfields
             )
         {
-            var result = new Field(tag);
+            var result = new Field (tag);
             for (var i = 0; i < subfields.Length; i += 2)
             {
                 var code = subfields[i][0];
                 var value = subfields[i + 1];
-                result.Subfields.Add(new SubField(code, value));
+                result.Subfields.Add (new SubField(code, value));
             }
 
             return result;
-        }
+
+        } // method WithSubFields
 
         /// <summary>
         /// Добавление подполя в конец списка подполей.
@@ -358,8 +339,10 @@ namespace ManagedIrbis
                 SubField subfield
             )
         {
-            Subfields.Add(subfield);
+            Subfields.Add (subfield);
+
             return this;
+
         } // method Add
 
         /// <summary>
@@ -374,8 +357,35 @@ namespace ManagedIrbis
                 ReadOnlyMemory<char> value
             )
         {
-            Subfields.Add(new SubField(code, value));
+            Subfields.Add (new SubField (code, value));
+
             return this;
+
+        } // method Add
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
+        /// <remarks>Фиксируется текстовое представление объекта
+        /// на момент добавления.</remarks>>
+        public Field Add
+            (
+                char code,
+                object? value
+            )
+        {
+            if (code == ValueCode)
+            {
+                Value = value?.ToString();
+                return this;
+            }
+
+            var text = value?.ToString();
+            var subfield = new SubField (code, text);
+            Subfields.Add (subfield);
+
+            return this;
+
         } // method Add
 
         /// <summary>
@@ -390,30 +400,32 @@ namespace ManagedIrbis
                 string? value = default
             )
         {
-            Subfields.Add(new SubField(code, value));
+            Subfields.Add (new SubField(code, value));
+
             return this;
+
         } // method Add
 
         /// <summary>
-        /// Assign the field from another.
+        /// Присваивание одного поля другому.
         /// </summary>
         public Field AssignFrom
             (
                 Field source
             )
         {
-            Value = source.Value;
             Subfields.Clear();
             foreach (var subField in source.Subfields)
             {
-                Subfields.Add(subField.Clone());
+                Subfields.Add (subField.Clone());
             }
 
             return this;
+
         } // method AssignFrom
 
         /// <summary>
-        /// Compares the specified fields.
+        /// Сравнение двух полей.
         /// </summary>
         public static int Compare
             (
@@ -437,14 +449,13 @@ namespace ManagedIrbis
                 return result;
             }
 
-            result = field1.Subfields.Count
-                     - field2.Subfields.Count;
+            result = field1.Subfields.Count - field2.Subfields.Count;
             if (result != 0)
             {
                 return result;
             }
 
-            for (int i = 0; i < field1.Subfields.Count; i++)
+            for (var i = 0; i < field1.Subfields.Count; i++)
             {
                 var subField1 = field1.Subfields[i];
                 var subField2 = field2.Subfields[i];
@@ -476,7 +487,7 @@ namespace ManagedIrbis
             if (Subfields.Count == 0)
             {
                 result = new SubField { Code = ValueCode };
-                Subfields.Add(result);
+                Subfields.Add (result);
                 return result;
 
             }
@@ -485,10 +496,11 @@ namespace ManagedIrbis
             if (result.Code != ValueCode)
             {
                 result = new SubField { Code = ValueCode };
-                Subfields.Insert(0, result);
+                Subfields.Insert (0, result);
             }
 
             return result;
+
         } // method CreateValueSubField
 
         /// <summary>
@@ -509,30 +521,8 @@ namespace ManagedIrbis
             }
 
             return null;
+
         } // method GetValueSubField
-
-        /// <summary>
-        /// Добавление подполя в конец списка подполей.
-        /// </summary>
-        public Field Add
-            (
-                char code,
-                object? value
-            )
-        {
-            if (code == ValueCode)
-            {
-                Value = value?.ToString();
-                return this;
-            }
-
-            var text = value?.ToString();
-            var subfield = new SubField { Code = code, Value = text };
-            Subfields.Add(subfield);
-
-            return this;
-
-        } // method Add
 
         /// <summary>
         /// Добавление поля, если переданное значение не равно 0.
@@ -561,9 +551,9 @@ namespace ManagedIrbis
                 long value
             )
         {
-            if (value is not 0)
+            if (value is not 0L)
             {
-                Add(code, value.ToInvariantString());
+                Add (code, value.ToInvariantString());
             }
 
             return this;
@@ -584,7 +574,7 @@ namespace ManagedIrbis
             {
                 if (value.Value != DateTime.MinValue)
                 {
-                    Add(code, IrbisDate.ConvertDateToString(value.Value));
+                    Add (code, IrbisDate.ConvertDateToString (value.Value));
                 }
             }
 
@@ -611,14 +601,15 @@ namespace ManagedIrbis
                 }
 
                 var text = value.ToString();
-                if (!string.IsNullOrEmpty(text))
+                if (!string.IsNullOrEmpty (text))
                 {
                     var subfield = new SubField { Code = code, Value = text };
-                    Subfields.Add(subfield);
+                    Subfields.Add (subfield);
                 }
             }
 
             return this;
+
         } // method AddNonEmpty
 
         /// <summary>
@@ -629,6 +620,7 @@ namespace ManagedIrbis
             Subfields.Clear();
 
             return this;
+
         } // method Clear
 
         /// <summary>
@@ -644,6 +636,7 @@ namespace ManagedIrbis
             }
 
             return result;
+
         } // method Clone
 
         /// <summary>
@@ -654,10 +647,16 @@ namespace ManagedIrbis
                 ReadOnlySpan<char> line
             )
         {
-            var index = line.IndexOf('#');
-            Tag = line.Slice(0, index).ParseInt32();
-            line = line.Slice(index + 1);
-            DecodeBody(line);
+            var index = line.IndexOf ('#');
+            if (index <= 0)
+            {
+                throw new ArgumentException ($"Bad field text: {line.ToString()}");
+            }
+
+            Tag = line.Slice (0, index).ParseInt32();
+            line = line.Slice (index + 1);
+            DecodeBody (line);
+
         } // method Decode
 
         /// <summary>
@@ -668,7 +667,7 @@ namespace ManagedIrbis
                 ReadOnlySpan<char> line
             )
         {
-            var index = line.IndexOf('^');
+            var index = line.IndexOf ('^');
             if (index < 0)
             {
                 // TODO: реализовать оптимально
@@ -679,14 +678,14 @@ namespace ManagedIrbis
             if (index != 0)
             {
                 // TODO: реализовать оптимально
-                Value = line.Slice(0, index).ToString();
+                Value = line.Slice (0, index).ToString();
             }
 
-            line = line.Slice(index + 1);
+            line = line.Slice (index + 1);
 
             try
             {
-                while (true)
+                while (!line.IsEmpty)
                 {
                     index = line.IndexOf ('^');
                     if (index < 0)
@@ -931,10 +930,11 @@ namespace ManagedIrbis
 
             while ((subfield = GetFirstSubField(code)) is not null)
             {
-                Subfields.Remove(subfield);
+                Subfields.Remove (subfield);
             }
 
             return this;
+
         } // method RemoveSubField
 
         /// <summary>
@@ -948,20 +948,20 @@ namespace ManagedIrbis
                     sf => (sf.Value!.Length)
                           + (sf.Code == ValueCode ? 1 : 2)
                 );
-            var result = new StringBuilder (length);
-
-            // if (!string.IsNullOrEmpty(Value))
-            // {
-            //     result.Append(Value);
-            // }
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (length);
 
             foreach (var subField in Subfields)
             {
                 var subText = subField.ToString();
-                result.Append(subText);
+                builder.Append (subText);
             }
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
         } // method ToText
 
         #endregion
@@ -1074,15 +1074,20 @@ namespace ManagedIrbis
                     sf => (sf.Value!.Length)
                     + (sf.Code == ValueCode ? 1 : 2)
                 );
-            var result = new StringBuilder (length);
-            result.Append(Tag.ToInvariantString())
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (length);
+            builder.Append(Tag.ToInvariantString())
                 .Append('#');
             foreach (var subfield in Subfields)
             {
-                result.Append(subfield);
+                builder.Append(subfield);
             }
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
         } // method ToString
 
         #endregion
