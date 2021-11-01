@@ -25,6 +25,7 @@ using AM.Linq;
 
 using ManagedIrbis.Batch;
 using ManagedIrbis.Fields;
+using ManagedIrbis.Providers;
 
 #endregion
 
@@ -108,6 +109,20 @@ namespace ManagedIrbis.Magazines
         }
 
         /// <summary>
+        /// Получение журнала по MFN его записи.
+        /// </summary>
+        public MagazineInfo? GetMagazine
+            (
+                int mfn
+            )
+        {
+            var record = Connection.ReadRecord (mfn);
+
+            return record is null ? null : MagazineInfo.Parse (record);
+
+        } // method GetMagazine
+
+        /// <summary>
         /// Получение журнала по его выпуску.
         /// </summary>
         public MagazineInfo? GetMagazine
@@ -183,8 +198,8 @@ namespace ManagedIrbis.Magazines
             var records = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database.ThrowIfNull("Connection.Database"),
                     searchExpression,
+                    Connection.Database.ThrowIfNull("Connection.Database"),
                     1000
                 );
 

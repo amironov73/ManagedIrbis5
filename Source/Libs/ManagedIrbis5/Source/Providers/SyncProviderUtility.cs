@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using AM;
 using AM.Collections;
 using AM.IO;
 using AM.Linq;
@@ -583,12 +584,13 @@ namespace ManagedIrbis.Providers
             var parameters = new SearchParameters
             {
                 Expression = expression,
+                Database = connection.Database.ThrowIfNull(),
                 NumberOfRecords = 1
             };
-            var found = connection.Search(parameters);
+            var found = connection.Search (parameters);
 
             return found is { Length: 1 }
-                ? connection.ReadRecord(found[0].Mfn)
+                ? connection.ReadRecord (found[0].Mfn)
                 : default;
 
         } // method SearchReadOneRecord

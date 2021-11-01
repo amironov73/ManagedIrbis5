@@ -582,7 +582,16 @@ namespace ManagedIrbis
             }
             catch (Exception exception)
             {
-                Magna.Error (nameof (Record) + "::" + nameof (Decode));
+                Magna.Error
+                    (
+                        nameof (Record) + "::" + nameof (Decode)
+                        + ": " + exception.GetType() + ": " + exception.Message
+                    );
+
+                Console.Error.WriteLine
+                    (
+                        string.Join (Environment.NewLine, lines)
+                    );
 
                 throw new IrbisException
                     (

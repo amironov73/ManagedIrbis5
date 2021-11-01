@@ -80,7 +80,6 @@ namespace AM.AppServices
             )
         {
             Args = args;
-
         } // constructor
 
         #endregion
@@ -96,13 +95,13 @@ namespace AM.AppServices
         /// <summary>
         /// Построение конфигурации.
         /// </summary>
-        protected virtual IConfigurationBuilder BuildConfiguration ()
+        protected virtual IConfigurationBuilder BuildConfiguration()
         {
             var result = new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddJsonFile("appsettings.json", true)
+                .SetBasePath (AppContext.BaseDirectory)
+                .AddJsonFile ("appsettings.json", true, true)
                 .AddEnvironmentVariables()
-                .AddCommandLine(Args);
+                .AddCommandLine (Args);
 
             return result;
 
@@ -111,7 +110,7 @@ namespace AM.AppServices
         /// <summary>
         /// Построение хоста.
         /// </summary>
-        protected virtual IHostBuilder BuildHost() => Host.CreateDefaultBuilder(Args);
+        protected virtual IHostBuilder BuildHost() => Host.CreateDefaultBuilder (Args);
 
         /// <summary>
         /// Корневая команда для разбора командной строки.
@@ -143,7 +142,7 @@ namespace AM.AppServices
             )
         {
             logging.ClearProviders();
-            logging.AddNLog(Configuration);
+            logging.AddNLog (Configuration);
 
         } // method ConfigureLogging
 
@@ -158,10 +157,10 @@ namespace AM.AppServices
                 return null;
             }
 
-            var result = new CommandLineBuilder(rootCommand)
+            var result = new CommandLineBuilder (rootCommand)
                 .UseDefaults()
                 .Build()
-                .Parse(Args);
+                .Parse (Args);
 
             return result;
 
@@ -180,25 +179,25 @@ namespace AM.AppServices
             // Это временный хост, чтобы сделать возможным логирование
             // до того, как всё проинициализируется окончательно
             var preliminaryServices = new ServiceCollection()
-                .AddLogging(builder =>
-                    {
-                        builder.ClearProviders();
-                        builder.AddConsole();
-                    })
+                .AddLogging (builder =>
+                {
+                    builder.ClearProviders();
+                    builder.AddConsole();
+                })
                 .BuildServiceProvider();
 
             Logger = preliminaryServices.GetRequiredService<ILogger<MagnaApplication>>();
-            Logger.LogInformation("Preliminary logging enabled");
+            Logger.LogInformation ("Preliminary logging enabled");
 
             Magna.Application = this;
             Configuration = BuildConfiguration().Build();
             ParseResult = ParseCommandLine();
 
             var hostBuilder = BuildHost();
-            hostBuilder.ConfigureServices(ConfigureServices);
+            hostBuilder.ConfigureServices (ConfigureServices);
             hostBuilder.ConfigureServices
                 (
-                    serviceCollection => serviceCollection.AddLogging(ConfigureLogging)
+                    serviceCollection => serviceCollection.AddLogging (ConfigureLogging)
                 );
 
             var host = hostBuilder.Build();
@@ -210,7 +209,7 @@ namespace AM.AppServices
 
             _prerun = true;
 
-            Logger.LogInformation("Pre-run configuration done");
+            Logger.LogInformation ("Pre-run configuration done");
 
             return this;
 
@@ -228,7 +227,7 @@ namespace AM.AppServices
         /// </summary>
         /// <returns>Код, возвращаемый операционной системе.
         /// </returns>
-        public virtual int Run ()
+        public virtual int Run()
         {
             try
             {
@@ -247,9 +246,8 @@ namespace AM.AppServices
                 Logger.LogError
                     (
                         exception,
-                        nameof(MagnaApplication) + "::" + nameof(Run)
+                        nameof (MagnaApplication) + "::" + nameof (Run)
                     );
-
             }
 
             return 1;

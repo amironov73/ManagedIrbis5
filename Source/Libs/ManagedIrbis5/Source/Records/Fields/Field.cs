@@ -684,18 +684,37 @@ namespace ManagedIrbis
 
             line = line.Slice(index + 1);
 
-            while (true)
+            try
             {
-                index = line.IndexOf('^');
-                if (index < 0)
+                while (true)
                 {
-                    Add(line[0], line.Slice(1).ToString());
-                    return;
-                }
+                    index = line.IndexOf ('^');
+                    if (index < 0)
+                    {
+                        Add (line[0], line.Slice (1).ToString());
+                        return;
+                    }
 
-                Add(line[0], line.Slice(1, index - 1).ToString());
-                line = line.Slice(index + 1);
+                    if (index != 0)
+                    {
+                        // если index == 0, мы попали на строку вида
+                        // 910#^Ap^B1^C20061003^DЧЗ^^PЗ461/2006/ Подшивка № 746 сент.-окт^IП746
+                        // пропускаем без сожаления
+
+                        Add (line[0], line.Slice (1, index - 1).ToString());
+                    }
+
+                    line = line.Slice (index + 1);
+                }
             }
+            catch (Exception exception)
+            {
+                Console.Error.WriteLine (line);
+                Console.Error.WriteLine (exception);
+
+                throw;
+            }
+
         } // method DecodeBody
 
         /// <summary>

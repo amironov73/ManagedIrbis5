@@ -157,6 +157,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnvironmenExperiment", "Exp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenumberFiles", "Apps\RenumberFiles\RenumberFiles.csproj", "{D789CF22-9D79-4E95-94DA-E1CC60ECDCCE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountMagazines", "Apps\CountMagazines\CountMagazines.csproj", "{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1007,6 +1009,18 @@ Global
 		{D789CF22-9D79-4E95-94DA-E1CC60ECDCCE}.Release|x64.Build.0 = Release|Any CPU
 		{D789CF22-9D79-4E95-94DA-E1CC60ECDCCE}.Release|x86.ActiveCfg = Release|Any CPU
 		{D789CF22-9D79-4E95-94DA-E1CC60ECDCCE}.Release|x86.Build.0 = Release|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Debug|x64.Build.0 = Debug|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Debug|x86.Build.0 = Debug|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|x64.ActiveCfg = Release|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|x64.Build.0 = Release|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|x86.ActiveCfg = Release|Any CPU
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1082,6 +1096,7 @@ Global
 		{2868E48C-1750-4090-948B-D3167673AE17} = {F56FBD0E-5530-4F55-ABE1-9E106B93417F}
 		{40882C15-AAFD-4B87-A1BF-6EE2455A760C} = {707BA757-27E8-4184-A89A-3B4572F4BCB0}
 		{D789CF22-9D79-4E95-94DA-E1CC60ECDCCE} = {1E5940AA-0540-4947-8216-45E381E76C72}
+		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7} = {1E5940AA-0540-4947-8216-45E381E76C72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E077767-1AE0-47E0-AEFB-59E4D7464AD4}

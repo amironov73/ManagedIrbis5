@@ -82,7 +82,7 @@ namespace ManagedIrbis.AppServices
             (
                 string[] args
             )
-            : base(args)
+            : base (args)
         {
             IniFile = new LocalCatalogerIniFile (new IniFile());
 
@@ -105,7 +105,7 @@ namespace ManagedIrbis.AppServices
 
             // сначала берем настройки из INI-файла, если он есть
             var connectionString = IniFile.BuildConnectionString();
-            if (!string.IsNullOrEmpty(connectionString))
+            if (!string.IsNullOrEmpty (connectionString))
             {
                 Settings.ParseConnectionString (connectionString);
                 if (Settings.Verify (false))
@@ -116,34 +116,35 @@ namespace ManagedIrbis.AppServices
 
             // сначала берем настройки из стандартного JSON-файла конфигурации
             connectionString = ConnectionUtility.GetConfiguredConnectionString (Configuration)
-                ?? ConnectionUtility.GetStandardConnectionString();
+                               ?? ConnectionUtility.GetStandardConnectionString();
 
             if (!string.IsNullOrEmpty (connectionString))
             {
-                Settings.ParseConnectionString(connectionString);
+                Settings.ParseConnectionString (connectionString);
             }
 
             // затем из опционального файла с настройками подключения
             connectionString = ConnectionUtility.GetConnectionStringFromFile();
-            if (!string.IsNullOrEmpty(connectionString))
+            if (!string.IsNullOrEmpty (connectionString))
             {
-                Settings.ParseConnectionString(connectionString);
+                Settings.ParseConnectionString (connectionString);
             }
 
             // затем из переменных окружения
-            CommandLineUtility.ConfigureConnectionFromEnvironment(Settings);
+            CommandLineUtility.ConfigureConnectionFromEnvironment (Settings);
 
             // наконец, из командной строки
-            CommandLineUtility.ConfigureConnectionFromCommandLine(Settings, Args);
+            // TODO: сделать по-умному
+            // CommandLineUtility.ConfigureConnectionFromCommandLine (Settings, Args);
 
             // Применяем настройки по умолчанию, если соответствующие элементы не заданы
             Settings.ApplyDefaults();
 
             // Logger.LogInformation($"Using connection settings: {Settings}");
 
-            if (!Settings.Verify(false))
+            if (!Settings.Verify (false))
             {
-                throw new IrbisException("Can't build connection settings");
+                throw new IrbisException ("Can't build connection settings");
             }
 
         } // method BuildConnectionSettings
@@ -162,7 +163,7 @@ namespace ManagedIrbis.AppServices
             LoadIniFile();
             BuildConnectionSettings();
             Connection = Factory.CreateSyncConnection();
-            Settings.ThrowIfNull ().Apply (Connection);
+            Settings.ThrowIfNull().Apply (Connection);
 
         } // method ConfigureConnection
 
@@ -177,7 +178,7 @@ namespace ManagedIrbis.AppServices
         protected virtual bool LoadIniFile()
         {
             var iniName = GetIniFileName();
-            if (string.IsNullOrEmpty(iniName))
+            if (string.IsNullOrEmpty (iniName))
             {
                 return false;
             }
@@ -205,27 +206,27 @@ namespace ManagedIrbis.AppServices
                 IServiceCollection services
             )
         {
-            base.ConfigureServices(context, services);
+            base.ConfigureServices (context, services);
 
             services.RegisterIrbisProviders();
-            ConfigureConnection(context, services);
+            ConfigureConnection (context, services);
 
         } // method ConfigureServices
 
         /// <inheritdoc cref="MagnaApplication.Run"/>
-        public override int Run ()
+        public override int Run()
         {
             try
             {
                 PreRun();
 
                 using var host = Magna.Host;
-                using var connection = Connection.ThrowIfNull ();
+                using var connection = Connection.ThrowIfNull();
                 connection.Connect();
                 if (!connection.Connected)
                 {
                     Logger.LogError ("Can't connect");
-                    Logger.LogInformation (IrbisException.GetErrorDescription(connection.LastError));
+                    Logger.LogInformation (IrbisException.GetErrorDescription (connection.LastError));
 
                     return 1;
                 }
@@ -239,15 +240,16 @@ namespace ManagedIrbis.AppServices
                 Logger.LogInformation ("Disconnecting");
 
                 return result;
-
             }
             catch (Exception exception)
             {
                 Logger.LogError
                     (
                         exception,
-                        nameof(IrbisApplication) + "::" + nameof(Run)
+                        nameof (IrbisApplication) + "::" + nameof (Run)
+                            + ": " + exception.GetType() + ": " + exception.Message
                     );
+                Console.Error.WriteLine (exception);
             }
 
             return 1;
