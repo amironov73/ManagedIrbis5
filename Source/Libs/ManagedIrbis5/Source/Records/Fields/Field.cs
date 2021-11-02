@@ -117,7 +117,7 @@ namespace ManagedIrbis
         /// </summary>
         [XmlArrayItem("subfield")]
         [JsonPropertyName("subfields")]
-        public SubFieldCollection Subfields { get; } = new ();
+        public SubFieldCollection Subfields { get; }
 
         /// <summary>
         /// Номер повторения поля.
@@ -152,6 +152,8 @@ namespace ManagedIrbis
         /// </summary>
         public Field()
         {
+            Subfields = new SubFieldCollection() { Field = this };
+
         } // constructor
 
         /// <summary>
@@ -165,6 +167,7 @@ namespace ManagedIrbis
                 int tag,
                 string? value
             )
+            : this()
         {
             Tag = tag;
             Value = value;
@@ -179,6 +182,7 @@ namespace ManagedIrbis
                 int tag,
                 SubField subfield1
             )
+            : this()
         {
             Tag = tag;
             Add (subfield1);
@@ -194,6 +198,7 @@ namespace ManagedIrbis
                 SubField subfield1,
                 SubField subfield2
             )
+            : this()
         {
             Tag = tag;
             Add (subfield1);
@@ -211,6 +216,7 @@ namespace ManagedIrbis
                 SubField subfield2,
                 SubField subfield3
             )
+            : this()
         {
             Tag = tag;
             Add (subfield1);
@@ -229,6 +235,7 @@ namespace ManagedIrbis
                 int tag,
                 params SubField[] subfields
             )
+            : this()
         {
             Tag = tag;
             Subfields.AddRange (subfields);
@@ -247,6 +254,7 @@ namespace ManagedIrbis
                 char code1,
                 string? value1 = default
             )
+            : this()
         {
             Tag = tag;
             Add (new SubField (code1, value1));
@@ -269,6 +277,7 @@ namespace ManagedIrbis
                 char code2,
                 string? value2 = default
             )
+            : this()
         {
             Tag = tag;
             Add (new SubField (code1, value1));
@@ -296,6 +305,7 @@ namespace ManagedIrbis
                 char code3,
                 string? value3 = default
             )
+            : this()
         {
             Tag = tag;
             Add (new SubField (code1, value1));
@@ -407,124 +417,6 @@ namespace ManagedIrbis
         } // method Add
 
         /// <summary>
-        /// Присваивание одного поля другому.
-        /// </summary>
-        public Field AssignFrom
-            (
-                Field source
-            )
-        {
-            Subfields.Clear();
-            foreach (var subField in source.Subfields)
-            {
-                Subfields.Add (subField.Clone());
-            }
-
-            return this;
-
-        } // method AssignFrom
-
-        /// <summary>
-        /// Сравнение двух полей.
-        /// </summary>
-        public static int Compare
-            (
-                Field field1,
-                Field field2
-            )
-        {
-            var result = field1.Tag - field2.Tag;
-            if (result != 0)
-            {
-                return result;
-            }
-
-            result = Utility.CompareOrdinal
-                (
-                    field1.Value,
-                    field2.Value
-                );
-            if (result != 0)
-            {
-                return result;
-            }
-
-            result = field1.Subfields.Count - field2.Subfields.Count;
-            if (result != 0)
-            {
-                return result;
-            }
-
-            for (var i = 0; i < field1.Subfields.Count; i++)
-            {
-                var subField1 = field1.Subfields[i];
-                var subField2 = field2.Subfields[i];
-
-                result = SubField.Compare
-                    (
-                        subField1,
-                        subField2
-                    );
-                if (result != 0)
-                {
-                    return result;
-                }
-            }
-
-            return result;
-
-        } // method Compare
-
-        /// <summary>
-        /// Если нет подполя, выделенного для хранения
-        /// значения поля до первого разделителя,
-        /// создаем его (оно должно быть первым в списке подполей).
-        /// </summary>
-        public SubField CreateValueSubField()
-        {
-            SubField result;
-
-            if (Subfields.Count == 0)
-            {
-                result = new SubField { Code = ValueCode };
-                Subfields.Add (result);
-                return result;
-
-            }
-
-            result = Subfields[0];
-            if (result.Code != ValueCode)
-            {
-                result = new SubField { Code = ValueCode };
-                Subfields.Insert (0, result);
-            }
-
-            return result;
-
-        } // method CreateValueSubField
-
-        /// <summary>
-        /// Получаем подполе, выделенное для хранения
-        /// значения поля до первого разделителя.
-        /// </summary>
-        public SubField? GetValueSubField()
-        {
-            if (Subfields.Count == 0)
-            {
-                return null;
-            }
-
-            var result = Subfields[0];
-            if (result.Code == ValueCode)
-            {
-                return result;
-            }
-
-            return null;
-
-        } // method GetValueSubField
-
-        /// <summary>
         /// Добавление поля, если переданное значение не равно 0.
         /// </summary>
         public Field AddNonEmpty
@@ -613,10 +505,29 @@ namespace ManagedIrbis
         } // method AddNonEmpty
 
         /// <summary>
-        /// Очистка подполей.
+        /// Присваивание одного поля другому.
+        /// </summary>
+        public Field AssignFrom
+            (
+                Field source
+            )
+        {
+            Subfields.Clear();
+            foreach (var subField in source.Subfields)
+            {
+                Subfields.Add (subField.Clone());
+            }
+
+            return this;
+
+        } // method AssignFrom
+
+        /// <summary>
+        /// Очистка списка подполей. Остальные свойства остаются.
         /// </summary>
         public Field Clear()
         {
+            ThrowIfReadOnly();
             Subfields.Clear();
 
             return this;
@@ -624,15 +535,115 @@ namespace ManagedIrbis
         } // method Clear
 
         /// <summary>
+        /// Сравнение двух полей.
+        /// </summary>
+        public static int Compare
+            (
+                Field field1,
+                Field field2
+            )
+        {
+            var result = field1.Tag - field2.Tag;
+            if (result != 0)
+            {
+                return result;
+            }
+
+            result = Utility.CompareOrdinal
+                (
+                    field1.Value,
+                    field2.Value
+                );
+            if (result != 0)
+            {
+                return result;
+            }
+
+            result = field1.Subfields.Count - field2.Subfields.Count;
+            if (result != 0)
+            {
+                return result;
+            }
+
+            for (var i = 0; i < field1.Subfields.Count; i++)
+            {
+                var subField1 = field1.Subfields[i];
+                var subField2 = field2.Subfields[i];
+
+                result = SubField.Compare
+                    (
+                        subField1,
+                        subField2
+                    );
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
+
+            return result;
+
+        } // method Compare
+
+        /// <summary>
+        /// Если нет подполя, выделенного для хранения
+        /// значения поля до первого разделителя,
+        /// создаем его (оно должно быть первым в списке подполей).
+        /// </summary>
+        public SubField CreateValueSubField()
+        {
+            SubField result;
+
+            if (Subfields.Count == 0)
+            {
+                result = new SubField { Code = ValueCode };
+                Subfields.Add (result);
+
+                return result;
+            }
+
+            result = Subfields[0];
+            if (result.Code != ValueCode)
+            {
+                result = new SubField { Code = ValueCode };
+                Subfields.Insert (0, result);
+            }
+
+            return result;
+
+        } // method CreateValueSubField
+
+        /// <summary>
+        /// Получаем подполе, выделенное для хранения
+        /// значения поля до первого разделителя.
+        /// </summary>
+        public SubField? GetValueSubField()
+        {
+            if (Subfields.Count == 0)
+            {
+                return null;
+            }
+
+            var result = Subfields[0];
+            if (result.Code == ValueCode)
+            {
+                return result;
+            }
+
+            return null;
+
+        } // method GetValueSubField
+
+        /// <summary>
         /// Клонирование поля.
         /// </summary>
         public Field Clone()
         {
-            var result = (Field) MemberwiseClone();
+            var result = new Field (Tag);
 
             for (var i = 0; i < Subfields.Count; i++)
             {
-                Subfields[i] = Subfields[i].Clone();
+                result.Subfields.Add (Subfields[i].Clone());
             }
 
             return result;
@@ -732,18 +743,21 @@ namespace ManagedIrbis
                     return firstSubfield;
                 }
 
+                // дальше первого элемента искать не имеет смысла
+
                 return null;
             }
 
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     return subfield;
                 }
             }
 
             return null;
+
         } // method GetFirstSubField
 
         /// <summary>
@@ -756,11 +770,12 @@ namespace ManagedIrbis
         {
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     yield return subfield;
                 }
             }
+
         } // method EnumerateSubFields
 
         /// <summary>
@@ -775,7 +790,7 @@ namespace ManagedIrbis
 
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     result.Add(subfield);
                 }

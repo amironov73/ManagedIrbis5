@@ -244,20 +244,20 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Convert back to <see cref="Field"/>.
         /// </summary>
-        public Field ToField() => new Field { Tag = 210 }
-                .AddNonEmptySubField('a', Surname)
-                .AddNonEmptySubField('b', Initials)
-                .AddNonEmptySubField('g', Extension)
-                .AddNonEmptySubField('<', Role)
-                .AddNonEmptySubField('1', IntegralPart)
-                .AddNonEmptySubField('c', IdentifyingSigns)
-                .AddNonEmptySubField('d', RomanNumerals)
-                .AddNonEmptySubField('f', Dates)
-                .AddNonEmptySubField('7', Graphics)
-                .AddNonEmptySubField('8', Language)
-                .AddNonEmptySubField('9', Mark)
-                .AddNonEmptySubField('4', RelationCode)
-                .AddNonEmptySubField('3', RelatedRecord);
+        public Field ToField() => new Field (210)
+                .AddNonEmpty ('a', Surname)
+                .AddNonEmpty ('b', Initials)
+                .AddNonEmpty ('g', Extension)
+                .AddNonEmpty ('<', Role)
+                .AddNonEmpty ('1', IntegralPart)
+                .AddNonEmpty ('c', IdentifyingSigns)
+                .AddNonEmpty ('d', RomanNumerals)
+                .AddNonEmpty ('f', Dates)
+                .AddNonEmpty ('7', Graphics)
+                .AddNonEmpty ('8', Language)
+                .AddNonEmpty ('9', Mark)
+                .AddNonEmpty ('4', RelationCode)
+                .AddNonEmpty ('3', RelatedRecord);
 
         #endregion
 

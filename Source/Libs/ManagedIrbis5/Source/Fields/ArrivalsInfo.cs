@@ -209,13 +209,13 @@ namespace ManagedIrbis.Fields
         /// Convert the <see cref="ArrivalsInfo"/>
         /// back to <see cref="Field"/>.
         /// </summary>
-        public Field ToField() => new Field { Tag = Tag }
-                .AddNonEmptySubField('1', OnBalanceWithoutPeriodicals)
-                .AddNonEmptySubField('b', OffBalanceWithoutPeriodicals)
-                .AddNonEmptySubField('a', TotalWithoutPeriodicals)
-                .AddNonEmptySubField('2', OffBalanceWithPeriodicals)
-                .AddNonEmptySubField('3', Educational)
-                .AddSubFields(UnknownSubFields);
+        public Field ToField() => new Field (Tag)
+                .AddNonEmpty ('1', OnBalanceWithoutPeriodicals)
+                .AddNonEmpty ('b', OffBalanceWithoutPeriodicals)
+                .AddNonEmpty ('a', TotalWithoutPeriodicals)
+                .AddNonEmpty ('2', OffBalanceWithPeriodicals)
+                .AddNonEmpty ('3', Educational)
+                .AddSubFields (UnknownSubFields);
 
         #endregion
 

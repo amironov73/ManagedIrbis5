@@ -56,9 +56,9 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            if (!string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty (value))
             {
-                field.Add(code, value);
+                field.Add (code, value);
             }
 
             return field;
@@ -76,9 +76,9 @@ namespace ManagedIrbis
                 string? value
             )
         {
-            if (flag && !string.IsNullOrEmpty(value))
+            if (flag && !string.IsNullOrEmpty (value))
             {
-                field.Add(code, value);
+                field.Add (code, value);
             }
 
             return field;
@@ -96,7 +96,7 @@ namespace ManagedIrbis
         {
             if (value.HasValue)
             {
-                field.Add(code, value.Value);
+                field.Add (code, value.Value);
             }
 
             return field;
@@ -114,7 +114,7 @@ namespace ManagedIrbis
         {
             if (value.HasValue)
             {
-                field.Add(code, value.Value);
+                field.Add (code, value.Value);
             }
 
             return field;
@@ -132,7 +132,7 @@ namespace ManagedIrbis
         {
             if (value.HasValue)
             {
-                field.Add(code, IrbisDate.ConvertDateToString(value.Value));
+                field.Add (code, IrbisDate.ConvertDateToString (value.Value));
             }
 
             return field;
@@ -149,11 +149,11 @@ namespace ManagedIrbis
                 IEnumerable<SubField>? subFields
             )
         {
-            if (!ReferenceEquals(subFields, null))
+            if (!ReferenceEquals (subFields, null))
             {
                 foreach (var subField in subFields)
                 {
-                    field.Subfields.Add(subField);
+                    field.Subfields.Add (subField);
                 }
             }
 
@@ -171,7 +171,7 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .SelectMany(field => field.Subfields)
+                .SelectMany (field => field.Subfields)
                 .NonNullItems()
                 .ToArray();
         }
@@ -188,25 +188,26 @@ namespace ManagedIrbis
                 object? value
             )
         {
-            Sure.NotNull(field, nameof(field));
+            Sure.NotNull (field, nameof (field));
 
             if (code == SubField.NoCode)
             {
                 return field;
             }
 
-            if (ReferenceEquals(value, null))
+            if (ReferenceEquals (value, null))
             {
-                field.RemoveSubField(code);
+                field.RemoveSubField (code);
             }
             else
             {
-                var subField = field.GetFirstSubField(code);
-                if (ReferenceEquals(subField, null))
+                var subField = field.GetFirstSubField (code);
+                if (ReferenceEquals (subField, null))
                 {
                     subField = new SubField { Code = code };
-                    field.Subfields.Add(subField);
+                    field.Subfields.Add (subField);
                 }
+
                 subField.Value = value.ToString();
             }
 
@@ -231,16 +232,17 @@ namespace ManagedIrbis
 
             if (value == false)
             {
-                field.RemoveSubField(code);
+                field.RemoveSubField (code);
             }
             else
             {
-                var subField = field.GetFirstSubField(code);
-                if (ReferenceEquals(subField, null))
+                var subField = field.GetFirstSubField (code);
+                if (ReferenceEquals (subField, null))
                 {
                     subField = new SubField { Code = code };
-                    field.Subfields.Add(subField);
+                    field.Subfields.Add (subField);
                 }
+
                 subField.Value = text;
             }
 
@@ -262,18 +264,19 @@ namespace ManagedIrbis
                 return field;
             }
 
-            if (string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty (value))
             {
-                field.RemoveSubField(code);
+                field.RemoveSubField (code);
             }
             else
             {
-                var subField = field.GetFirstSubField(code);
-                if (ReferenceEquals(subField, null))
+                var subField = field.GetFirstSubField (code);
+                if (ReferenceEquals (subField, null))
                 {
                     subField = new SubField { Code = code };
-                    field.Subfields.Add(subField);
+                    field.Subfields.Add (subField);
                 }
+
                 subField.Value = value;
             }
 
@@ -291,11 +294,10 @@ namespace ManagedIrbis
                 params char[] codes
             )
         {
-
             return subFields
                 .Where
                     (
-                        subField => subField.Code.IsOneOf(codes)
+                        subField => subField.Code.IsOneOf (codes)
                     )
                 .ToArray();
         }
@@ -310,7 +312,7 @@ namespace ManagedIrbis
             )
         {
             return field.Subfields
-                .FilterSubFields(codes);
+                .FilterSubFields (codes);
         }
 
         // ==========================================================
@@ -325,7 +327,7 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(field => field.Tag == tag)
+                .Where (field => field.Tag == tag)
                 .ToArray();
         }
 
@@ -347,6 +349,7 @@ namespace ManagedIrbis
                     {
                         return field;
                     }
+
                     occurrence--;
                 }
             }
@@ -364,7 +367,7 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(field => field.Tag.IsOneOf(tags))
+                .Where (field => field.Tag.IsOneOf (tags))
                 .ToArray();
         }
 
@@ -411,8 +414,8 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .GetField(tags)
-                .GetOccurrence(occurrence);
+                .GetField (tags)
+                .GetOccurrence (occurrence);
         }
 
         /// <summary>
@@ -426,7 +429,7 @@ namespace ManagedIrbis
         {
             return fields
                 .NonNullItems()
-                .Where(predicate)
+                .Where (predicate)
                 .ToArray();
         }
 
@@ -440,11 +443,11 @@ namespace ManagedIrbis
             )
         {
             var result = fields.ToArray();
-            if (!ReferenceEquals(action, null))
+            if (!ReferenceEquals (action, null))
             {
                 foreach (var field in result)
                 {
-                    action(field);
+                    action (field);
                 }
             }
 
@@ -462,18 +465,18 @@ namespace ManagedIrbis
             )
         {
             var result = fields.ToArray();
-            if (!ReferenceEquals(fieldAction, null)
-                || !ReferenceEquals(subFieldAction, null))
+            if (!ReferenceEquals (fieldAction, null)
+                || !ReferenceEquals (subFieldAction, null))
             {
                 foreach (var field in result)
                 {
-                    fieldAction?.Invoke(field);
+                    fieldAction?.Invoke (field);
 
-                    if (!ReferenceEquals(subFieldAction, null))
+                    if (!ReferenceEquals (subFieldAction, null))
                     {
                         foreach (var subField in field.Subfields)
                         {
-                            subFieldAction(subField);
+                            subFieldAction (subField);
                         }
                     }
                 }
@@ -492,13 +495,13 @@ namespace ManagedIrbis
             )
         {
             var result = fields.ToArray();
-            if (!ReferenceEquals(action, null))
+            if (!ReferenceEquals (action, null))
             {
                 foreach (var field in result)
                 {
                     foreach (var subField in field.Subfields)
                     {
-                        action(subField);
+                        action (subField);
                     }
                 }
             }
@@ -516,7 +519,7 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(field => field.Subfields.Any(predicate))
+                .Where (field => field.Subfields.Any (predicate))
                 .ToArray();
         }
 
@@ -538,8 +541,8 @@ namespace ManagedIrbis
                             .NonNullItems()
                             .Any
                                 (
-                                    sub => sub.Code.SameChar(codes)
-                                        && predicate(sub)
+                                    sub => sub.Code.SameChar (codes)
+                                           && predicate (sub)
                                 )
                     )
                 .ToArray();
@@ -561,8 +564,8 @@ namespace ManagedIrbis
                         field => field.Subfields
                             .Any
                                 (
-                                    sub => sub.Code.SameChar(codes)
-                                        && sub.Value.SameString(values)
+                                    sub => sub.Code.SameChar (codes)
+                                           && sub.Value.SameString (values)
                                 )
                     )
                 .ToArray();
@@ -584,8 +587,8 @@ namespace ManagedIrbis
                         field => field.Subfields
                             .Any
                                 (
-                                    sub => sub.Code.SameChar(code)
-                                        && sub.Value.SameString(value)
+                                    sub => sub.Code.SameChar (code)
+                                           && sub.Value.SameString (value)
                                 )
                     )
                 .ToArray();
@@ -603,14 +606,14 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(field => field.Tag.IsOneOf(tags))
+                .Where (field => field.Tag.IsOneOf (tags))
                 .Where
                     (
                         field => field.Subfields
                             .Any
                                 (
-                                    sub => sub.Code.SameChar(codes)
-                                        && sub.Value.SameString(values)
+                                    sub => sub.Code.SameChar (codes)
+                                           && sub.Value.SameString (values)
                                 )
                     )
                 .ToArray();
@@ -627,8 +630,8 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .Where(fieldPredicate)
-                .Where(field => field.Subfields.Any(subPredicate))
+                .Where (fieldPredicate)
+                .Where (field => field.Subfields.Any (subPredicate))
                 .ToArray();
         }
 
@@ -674,12 +677,12 @@ namespace ManagedIrbis
                         {
                             var tag = field.Tag.ToInvariantString();
 
-                            return !string.IsNullOrEmpty(tag)
-                                && Regex.IsMatch
-                                   (
-                                       tag,
-                                       tagRegex
-                                   );
+                            return !string.IsNullOrEmpty (tag)
+                                   && Regex.IsMatch
+                                       (
+                                           tag,
+                                           tagRegex
+                                       );
                         }
                     )
                 .ToArray();
@@ -696,8 +699,8 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .GetFieldRegex(tagRegex)
-                .GetOccurrence(occurrence);
+                .GetFieldRegex (tagRegex)
+                .GetOccurrence (occurrence);
         }
 
         /// <summary>
@@ -713,14 +716,14 @@ namespace ManagedIrbis
             // TODO: реализовать эффективно
 
             return fields
-                .GetField(tags)
+                .GetField (tags)
                 .Where
                     (
                         field =>
                         {
                             var value = field.Value;
                             return !value.IsEmpty()
-                                   && Regex.IsMatch(value, textRegex);
+                                   && Regex.IsMatch (value, textRegex);
                         })
                 .ToArray();
         }
@@ -737,8 +740,8 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .GetFieldRegex(tags, textRegex)
-                .GetOccurrence(occurrence);
+                .GetFieldRegex (tags, textRegex)
+                .GetOccurrence (occurrence);
         }
 
         /// <summary>
@@ -754,16 +757,16 @@ namespace ManagedIrbis
         {
             // TODO: реализовать эффективно
 
-            var regex = new Regex(textRegex);
+            var regex = new Regex (textRegex);
             return fields
-                .GetField(tags)
-                .Where(field => field.FilterSubFields(codes)
-                    .Any(sub =>
+                .GetField (tags)
+                .Where (field => field.FilterSubFields (codes)
+                    .Any (sub =>
                     {
                         var value = sub.Value;
 
                         return !value.IsEmpty()
-                            && regex.IsMatch(value);
+                               && regex.IsMatch (value);
                     }))
                 .ToArray();
         }
@@ -781,8 +784,8 @@ namespace ManagedIrbis
             )
         {
             return fields
-                .GetFieldRegex(tags, codes, textRegex)
-                .GetOccurrence(occurrence);
+                .GetFieldRegex (tags, codes, textRegex)
+                .GetOccurrence (occurrence);
         }
 
         // ==========================================================
@@ -800,7 +803,7 @@ namespace ManagedIrbis
                     (
                         field => field.Value!
                     )
-                .Where(line => !line.IsEmpty())
+                .Where (line => !line.IsEmpty())
                 .ToArray();
         }
 
@@ -819,7 +822,7 @@ namespace ManagedIrbis
                 if (field.Tag == tag
                     && !field.Value.IsEmpty())
                 {
-                    result.Add(field.Value);
+                    result.Add (field.Value);
                 }
             }
 
@@ -846,7 +849,6 @@ namespace ManagedIrbis
             }
 
             return null;
-
         } // method GetFirstField
 
         /// <summary>
@@ -869,7 +871,6 @@ namespace ManagedIrbis
             }
 
             return null;
-
         } // method GetFirstField
 
         /// <summary>
@@ -893,7 +894,6 @@ namespace ManagedIrbis
             }
 
             return null;
-
         } // method GetFirstField
 
         /// <summary>
@@ -907,7 +907,7 @@ namespace ManagedIrbis
         {
             foreach (var field in fields)
             {
-                if (field.Tag.IsOneOf(tags))
+                if (field.Tag.IsOneOf (tags))
                 {
                     return field;
                 }
@@ -931,7 +931,7 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     return subFields[i];
                 }
@@ -959,7 +959,7 @@ namespace ManagedIrbis
                     var count = subFields.Count;
                     for (var i = 0; i < count; i++)
                     {
-                        if (subFields[i].Code.SameChar(code))
+                        if (subFields[i].Code.SameChar (code))
                         {
                             return subFields[i];
                         }
@@ -985,7 +985,7 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     return subFields[i].Value;
                 }
@@ -1011,7 +1011,7 @@ namespace ManagedIrbis
                 {
                     foreach (var subField in field.Subfields)
                     {
-                        if (subField.Code.SameChar(code))
+                        if (subField.Code.SameChar (code))
                         {
                             return subField.Value;
                         }
@@ -1038,14 +1038,14 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     result ??= new List<SubField>();
-                    result.Add(subFields[i]);
+                    result.Add (subFields[i]);
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
         }
@@ -1064,12 +1064,13 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     if (occurrence == 0)
                     {
                         return subFields[i];
                     }
+
                     occurrence--;
                 }
             }
@@ -1093,18 +1094,19 @@ namespace ManagedIrbis
                 var count = subFields.Count;
                 for (var i = 0; i < count; i++)
                 {
-                    if (subFields[i].Code.SameChar(code))
+                    if (subFields[i].Code.SameChar (code))
                     {
                         result ??= new List<SubField>();
-                        result.Add(subFields[i]);
+                        result.Add (subFields[i]);
                     }
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
-        }
+
+        } // method GetSubField
 
         /// <summary>
         /// Получение подполей.
@@ -1122,18 +1124,19 @@ namespace ManagedIrbis
                 var count = subFields.Count;
                 for (var i = 0; i < count; i++)
                 {
-                    if (subFields[i].Code.IsOneOf(codes))
+                    if (subFields[i].Code.IsOneOf (codes))
                     {
                         result ??= new List<SubField>();
-                        result.Add(subFields[i]);
+                        result.Add (subFields[i]);
                     }
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
-        }
+
+        } // method GetSubField
 
         /// <summary>
         /// Получение подполей.
@@ -1152,19 +1155,20 @@ namespace ManagedIrbis
                 {
                     foreach (var subField in field.Subfields)
                     {
-                        if (subField.Code.SameChar(code))
+                        if (subField.Code.SameChar (code))
                         {
                             result ??= new List<SubField>();
-                            result.Add(subField);
+                            result.Add (subField);
                         }
                     }
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
-        }
+
+        } // method GetSubField
 
         /// <summary>
         /// Получение подполя.
@@ -1188,12 +1192,13 @@ namespace ManagedIrbis
                         var subCount = subFields.Count;
                         for (var j = 0; j < subCount; j++)
                         {
-                            if (subFields[j].Code.SameChar(code))
+                            if (subFields[j].Code.SameChar (code))
                             {
                                 if (subOccurrence == 0)
                                 {
                                     return subFields[j];
                                 }
+
                                 subOccurrence--;
                             }
                         }
@@ -1204,7 +1209,8 @@ namespace ManagedIrbis
             }
 
             return null;
-        }
+
+        } // method GetSubField
 
         /// <summary>
         /// Получение подполя.
@@ -1225,12 +1231,13 @@ namespace ManagedIrbis
                     var subCount = subFields.Count;
                     for (var j = 0; j < subCount; j++)
                     {
-                        if (subFields[j].Code.SameChar(code))
+                        if (subFields[j].Code.SameChar (code))
                         {
                             if (occurrence == 0)
                             {
                                 return subFields[j];
                             }
+
                             occurrence--;
                         }
                     }
@@ -1238,7 +1245,8 @@ namespace ManagedIrbis
             }
 
             return null;
-        }
+
+        } // method GetSubField
 
         // ==========================================================
 
@@ -1256,18 +1264,20 @@ namespace ManagedIrbis
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     if (occurrence == 0)
                     {
                         return subFields[i].Value;
                     }
+
                     occurrence--;
                 }
             }
 
             return default;
-        }
+
+        } // method GetSubFieldValue
 
         // ==========================================================
 
@@ -1281,6 +1291,8 @@ namespace ManagedIrbis
                 char code
             )
         {
+            Sure.NotNull ((object?) fields);
+
             var result = new List<string>();
             foreach (var field in fields)
             {
@@ -1288,10 +1300,10 @@ namespace ManagedIrbis
                 {
                     foreach (var subField in field.Subfields)
                     {
-                        if (subField.Code.SameChar(code)
+                        if (subField.Code.SameChar (code)
                             && !subField.Value.IsEmpty())
                         {
-                            result.Add(subField.Value);
+                            result.Add (subField.Value);
                         }
                     }
                 }
@@ -1309,18 +1321,21 @@ namespace ManagedIrbis
                 char code
             )
         {
+            Sure.NotNull (field);
+
             var subFields = field.Subfields;
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     return true;
                 }
             }
 
             return false;
-        }
+
+        } // method HaveSubField
 
         /// <summary>
         /// Есть хотя бы одно подполе с указанным кодом?
@@ -1332,19 +1347,22 @@ namespace ManagedIrbis
                 string value
             )
         {
+            Sure.NotNull (field);
+
             var subFields = field.Subfields;
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code)
-                    && subFields[i].Value.SameString(value))
+                if (subFields[i].Code.SameChar (code)
+                    && subFields[i].Value.SameString (value))
                 {
                     return true;
                 }
             }
 
             return false;
-        }
+
+        } // method HaveSubField
 
         /// <summary>
         /// Есть хотя бы одно поле с любым из указанных кодов?
@@ -1355,18 +1373,21 @@ namespace ManagedIrbis
                 params char[] codes
             )
         {
+            Sure.NotNull (field);
+
             var subFields = field.Subfields;
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(codes))
+                if (subFields[i].Code.SameChar (codes))
                 {
                     return true;
                 }
             }
 
             return false;
-        }
+
+        } // method HaveSubField
 
         // ==========================================================
 
@@ -1379,20 +1400,21 @@ namespace ManagedIrbis
                 char code
             )
         {
-            Sure.NotNull(field, nameof(field));
+            Sure.NotNull (field);
 
             var subFields = field.Subfields;
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(code))
+                if (subFields[i].Code.SameChar (code))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
+
+        } // method HaveNotSubField
 
         /// <summary>
         /// Нет ни одного подполя с указанными кодами?
@@ -1403,50 +1425,37 @@ namespace ManagedIrbis
                 params char[] codes
             )
         {
+            Sure.NotNull (field);
+
             var subFields = field.Subfields;
             var count = subFields.Count;
             for (var i = 0; i < count; i++)
             {
-                if (subFields[i].Code.SameChar(codes))
+                if (subFields[i].Code.SameChar (codes))
                 {
                     return false;
                 }
             }
 
             return true;
-        }
+
+        } // method HaveNotSubField
 
         // ==========================================================
 
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
-        public static Field[] NotNullTag
-            (
-                this IEnumerable<Field> fields
-            )
-        {
-            return fields
-                .Where
-                    (
-                        field => field.Tag != 0
-                    )
-                .ToArray();
-        }
+        public static Field[] NotNullTag (this IEnumerable<Field> fields) =>
+            fields.Where (field => field.Tag != 0).ToArray();
 
         // ==========================================================
 
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
-        public static Field[] NotNullValue
-            (
-                this IEnumerable<Field> fields
-            )
-        {
-            return fields .Where(field => !field.Value.IsEmpty())
-                .ToArray();
-        }
+        public static Field[] NotNullValue (this IEnumerable<Field> fields) =>
+            fields.Where (field => !field.Value.IsEmpty()).ToArray();
 
         // ==========================================================
 
@@ -1493,9 +1502,9 @@ namespace ManagedIrbis
             for (var i = 0; i < count; i++)
             {
                 var subField = subFields[i];
-                if (subField.Code.SameChar(code))
+                if (subField.Code.SameChar (code))
                 {
-                    if (subField.Value.SameStringSensitive(oldValue))
+                    if (subField.Value.SameStringSensitive (oldValue))
                     {
                         subField.Value = newValue;
                         /* subField.SetValue(newValue); */
@@ -1524,16 +1533,16 @@ namespace ManagedIrbis
                 (
                     code
                 );
-            var changed = string.CompareOrdinal(oldValue, newValue);
+            var changed = string.CompareOrdinal (oldValue, newValue);
 
             if (changed != 0)
             {
-                field.SetSubFieldValue(code, newValue);
+                field.SetSubFieldValue (code, newValue);
             }
 
             return field;
 
-        }
+        } // method ReplaceSubField
 
         // ==========================================================
 
@@ -1550,17 +1559,18 @@ namespace ManagedIrbis
             foreach (var subField in subFields)
             {
                 if (subField.Code != '\0'
-                    && !subField.Code.SameChar(knownCodes))
+                    && !subField.Code.SameChar (knownCodes))
                 {
                     result ??= new List<SubField>();
-                    result.Add(subField);
+                    result.Add (subField);
                 }
             }
 
-            return ReferenceEquals(result, null)
+            return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
-        }
+
+        } // method GetUnknownSubFields
 
         // ==========================================================
 
@@ -1636,7 +1646,7 @@ namespace ManagedIrbis
         {
             var result = new Field { Tag = tag.ParseInt32() };
 
-            var first = body.Span.IndexOf(Field.Delimiter);
+            var first = body.Span.IndexOf (Field.Delimiter);
             if (first != 0)
             {
                 if (first < 0)
@@ -1647,12 +1657,12 @@ namespace ManagedIrbis
                 else
                 {
                     result.Value = body.Slice
-                        (
-                            0,
-                            first
-                        )
+                            (
+                                0,
+                                first
+                            )
                         .ToString();
-                    body = body.Slice(first);
+                    body = body.Slice (first);
                 }
             }
 
@@ -1672,6 +1682,7 @@ namespace ManagedIrbis
                                 value
                             );
                     }
+
                     value.Length = 0;
                     code = (char)0;
                 }
@@ -1683,7 +1694,7 @@ namespace ManagedIrbis
                     }
                     else
                     {
-                        value.Append(c);
+                        value.Append (c);
                     }
                 }
             }
@@ -1698,7 +1709,8 @@ namespace ManagedIrbis
             }
 
             return result;
-        }
+
+        } // method Parse
 
         /// <summary>
         /// Парсинг строкового представления поля.
@@ -1712,20 +1724,22 @@ namespace ManagedIrbis
         {
             // TODO: реализовать эффективно
 
-            if (string.IsNullOrEmpty(line))
+            if (string.IsNullOrEmpty (line))
             {
                 return null;
             }
 
-            var parts = line.Split('#', 2);
+            var parts = line.Split ('#', 2);
             var tag = parts[0];
             var body = parts.Length == 1 ? string.Empty : parts[1];
+
             return Parse
                 (
                     tag.AsMemory(),
                     body.AsMemory()
                 );
-        }
+
+        } // method Parse
 
         // ==========================================================
 
@@ -1745,15 +1759,16 @@ namespace ManagedIrbis
                 CloseOutput = true
             };
             var writer = new StringWriter();
-            var xml = XmlWriter.Create(writer, settings);
+            var xml = XmlWriter.Create (writer, settings);
             var serializer = new XmlSerializer
                 (
-                    typeof(Field)
+                    typeof (Field)
                 );
-            serializer.Serialize(xml, field);
+            serializer.Serialize (xml, field);
 
             return writer.ToString();
-        }
+
+        } // method ToXml
 
         /// <summary>
         /// Restore the field from XML.
@@ -1763,12 +1778,13 @@ namespace ManagedIrbis
                 string text
             )
         {
-            var serializer = new XmlSerializer(typeof(Field));
-            var reader = new StringReader(text);
-            var result = (Field?)serializer.Deserialize(reader);
+            var serializer = new XmlSerializer (typeof (Field));
+            var reader = new StringReader (text);
+            var result = (Field?)serializer.Deserialize (reader);
 
             return result;
-        }
+
+        } // method FromXml
 
         // ==========================================================
 
@@ -1786,19 +1802,14 @@ namespace ManagedIrbis
                         field => field.Tag == 0
                     )
                 .ToArray();
-        }
+
+        } // method WithNullTag
 
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
-        public static Field[] WithNullValue
-            (
-                this IEnumerable<Field> fields
-            )
-        {
-            return fields .Where(field => field.Value.IsEmpty())
-                .ToArray();
-        }
+        public static Field[] WithNullValue (this IEnumerable<Field> fields) =>
+            fields.Where (field => field.Value.IsEmpty()).ToArray();
 
         // ==========================================================
 
@@ -1866,11 +1877,12 @@ namespace ManagedIrbis
                     {
                         return field;
                     }
+
                     occurrence--;
                 }
             }
 
-            throw new KeyNotFoundException($"Tag={tag}");
+            throw new KeyNotFoundException ($"Tag={tag}");
 
         } // method RequireField
 
@@ -1892,6 +1904,7 @@ namespace ManagedIrbis
                     yield return field;
                 }
             }
+
         } // method EnumerateField
 
         /// <summary>
@@ -1908,12 +1921,13 @@ namespace ManagedIrbis
             {
                 if (field.Tag == tag)
                 {
-                    if (field.HaveSubField(code))
+                    if (field.HaveSubField (code))
                     {
                         yield return field;
                     }
                 }
             }
+
         } // method EnumerateField
 
         /// <summary>
@@ -1931,12 +1945,13 @@ namespace ManagedIrbis
             {
                 if (field.Tag == tag)
                 {
-                    if (field.HaveSubField(code, value))
+                    if (field.HaveSubField (code, value))
                     {
                         yield return field;
                     }
                 }
             }
+
         } // method EnumerateField
 
         #endregion

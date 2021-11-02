@@ -5,6 +5,7 @@
 // ReSharper disable StringLiteralTypo
 
 using System;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -394,6 +395,79 @@ namespace UnitTests.ManagedIrbis.Records.Fields
         }
 
         [TestMethod]
+        [Description ("Очистка подполей")]
+        public void Field_Clear_1()
+        {
+            var field = new Field (100, "Value");
+            Assert.AreSame (field, field.Clear());
+            Assert.AreEqual (0, field.Subfields.Count);
+        }
+
+        [TestMethod]
+        [Description ("Клонирование: пустое поле")]
+        public void Field_Clone_1()
+        {
+            var original = new Field();
+            var clone = original.Clone();
+            Assert.AreNotSame (original, clone);
+            Assert.AreEqual (original.Tag, clone.Tag);
+            Assert.AreEqual (original.Subfields.Count, clone.Subfields.Count);
+        }
+
+        [TestMethod]
+        [Description ("Клонирование: только значение до первого разделителя")]
+        public void Field_Clone_2()
+        {
+            var original = new Field (100, "Value");
+            var clone = original.Clone();
+            Assert.AreNotSame (original, clone);
+            Assert.AreEqual (original.Tag, clone.Tag);
+            Assert.AreEqual (original.Subfields.Count, clone.Subfields.Count);
+            Assert.AreEqual(original.Subfields[0].Code, clone.Subfields[0].Code);
+            Assert.AreEqual(original.Subfields[0].Value, clone.Subfields[0].Value);
+        }
+
+        [TestMethod]
+        [Description ("Клонирование: только подполя")]
+        public void Field_Clone_3()
+        {
+            var original = new Field (100, 'a', "SubFieldA", 'b', "SubFieldB");
+            var clone = original.Clone();
+            Assert.AreNotSame (original, clone);
+            Assert.AreEqual (original.Tag, clone.Tag);
+            Assert.AreEqual (original.Subfields.Count, clone.Subfields.Count);
+            Assert.AreEqual(original.Subfields[0].Code, clone.Subfields[0].Code);
+            Assert.AreEqual(original.Subfields[0].Value, clone.Subfields[0].Value);
+            Assert.AreEqual(original.Subfields[1].Code, clone.Subfields[1].Code);
+            Assert.AreEqual(original.Subfields[1].Value, clone.Subfields[1].Value);
+        }
+
+        [TestMethod]
+        [Description ("Создание подполя для значения до первого разделителя: пустое поле")]
+        public void Field_CreateValueSubField_1()
+        {
+            var field = new Field();
+            var sub1 = field.CreateValueSubField();
+            Assert.IsNotNull (sub1);
+            var sub2 = field.CreateValueSubField();
+            Assert.AreSame (sub1, sub2);
+        }
+
+        [TestMethod]
+        [Description ("Создание подполя для значения до первого разделителя: непустое поле")]
+        public void Field_CreateValueSubField_2()
+        {
+            var field = new Field()
+            {
+                new ('a', "SubFieldA")
+            };
+            var sub1 = field.CreateValueSubField();
+            Assert.IsNotNull (sub1);
+            var sub2 = field.CreateValueSubField();
+            Assert.AreSame (sub1, sub2);
+        }
+
+        [TestMethod]
         [Description ("Декодирование поля: пустое поле")]
         public void Field_Decode_1()
         {
@@ -521,6 +595,128 @@ namespace UnitTests.ManagedIrbis.Records.Fields
             Assert.AreEqual ('b', field.Subfields[2].Code);
             Assert.AreEqual ("Подполе B", field.Subfields[2].Value);
             Assert.AreEqual ("Значение", field.Value);
+        }
+
+        [TestMethod]
+        [Description ("Поиск первого подполя с указанным кодом: пустое поле")]
+        public void Field_GetFirstSubField_1()
+        {
+            var field = new Field();
+            var found = field.GetFirstSubField ('a');
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Поиск первого подполя с указанным кодом: только значение до первого разделителя")]
+        public void Field_GetFirstSubField_2()
+        {
+            var field = new Field() { Value = "Value"};
+            var found = field.GetFirstSubField ('a');
+            Assert.IsNull (found);
+
+            found = field.GetFirstSubField ('\0');
+            Assert.IsNotNull (found);
+            Assert.AreEqual ('\0', found.Code);
+            Assert.AreEqual ("Value", found.Value);
+        }
+
+        [TestMethod]
+        [Description ("Поиск первого подполя с указанным кодом: только подполя")]
+        public void Field_GetFirstSubField_3()
+        {
+            var field = new Field()
+            {
+                new ('b', "SubFieldB"),
+                new ('a', "SubFieldA1"),
+                new ('a', "SubFieldA2"),
+            };
+            var found = field.GetFirstSubField ('z');
+            Assert.IsNull (found);
+
+            found = field.GetFirstSubField ('\0');
+            Assert.IsNull (found);
+
+            found = field.GetFirstSubField ('a');
+            Assert.IsNotNull (found);
+            Assert.AreEqual ('a', found.Code);
+            Assert.AreEqual ("SubFieldA1", found.Value);
+        }
+
+        [TestMethod]
+        [Description ("Перечисление подполей: пустое поле")]
+        public void Field_EnumerateSubFields_1()
+        {
+            var field = new Field();
+            var array = field.EnumerateSubFields ('a').ToArray();
+            Assert.AreEqual (0, array.Length);
+        }
+
+        [TestMethod]
+        [Description ("Перечисление подполей: только значение до первого разделителя")]
+        public void Field_EnumerateSubFields_2()
+        {
+            var field = new Field() { Value = "Value" };
+            var array = field.EnumerateSubFields ('a').ToArray();
+            Assert.AreEqual (0, array.Length);
+
+            array = field.EnumerateSubFields ('\0').ToArray();
+            Assert.AreEqual (1, array.Length);
+            Assert.AreEqual ('\0', array[0].Code);
+            Assert.AreEqual ("Value", array[0].Value);
+        }
+
+        [TestMethod]
+        [Description ("Перечисление подполей: только подполя")]
+        public void Field_EnumerateSubFields_3()
+        {
+            var field = new Field()
+            {
+                new ('a', "SubFieldA1"),
+                new ('b', "SubFieldB"),
+                new ('a', "SubFieldA2")
+            };
+            var array = field.EnumerateSubFields ('z').ToArray();
+            Assert.AreEqual (0, array.Length);
+
+            array = field.EnumerateSubFields ('\0').ToArray();
+            Assert.AreEqual (0, array.Length);
+
+            array = field.EnumerateSubFields ('a').ToArray();
+            Assert.AreEqual (2, array.Length);
+            Assert.AreEqual ('a', array[0].Code);
+            Assert.AreEqual ('a', array[1].Code);
+            Assert.AreEqual ("SubFieldA1", array[0].Value);
+            Assert.AreEqual ("SubFieldA2", array[1].Value);
+        }
+
+        [TestMethod]
+        [Description ("Получение подполя для значения до первого разделителя: пустое поле")]
+        public void Field_GetValueSubField_1()
+        {
+            var field = new Field();
+            var sub = field.GetValueSubField();
+            Assert.IsNull (sub);
+        }
+
+        [TestMethod]
+        [Description ("Получение подполя для значения до первого разделителя: непустое поле, но значения нет")]
+        public void Field_GetValueSubField_2()
+        {
+            var field = new Field()
+            {
+                new ('a', "SubFieldA")
+            };
+            var sub = field.GetValueSubField();
+            Assert.IsNull (sub);
+        }
+
+        [TestMethod]
+        [Description ("Получение подполя для значения до первого разделителя: непустое поле, значение есть")]
+        public void Field_GetValueSubField_3()
+        {
+            var field = new Field() { Value = "Value" };
+            var sub = field.GetValueSubField();
+            Assert.IsNotNull (sub);
         }
 
         private void _TestSerialization

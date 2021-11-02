@@ -14,6 +14,7 @@
 #region Using directives
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml;
@@ -30,15 +31,36 @@ using AM.Runtime;
 
 namespace ManagedIrbis
 {
+    /*
+
+        Подполе состоит из однобуквенного кода и значения произвольной длины.
+        Технически возможны подполя с пустой строкой в качестве значения,
+        однако, стандарт RUSMARC не допускает таких значений.
+
+        Коды подполей нечувствительны к регистру символов.
+
+        Технически возможны любые коды подполей, однако стандарт допускает
+        лишь коды в дипапазоне от `\u0021` (восклицательный знак)
+        до `\u007E` (тильда).
+
+        Кириллические символы лучше не использовать в качестве кодов подполей.
+
+        Подполе с кодом `\0` используется для хранения значения поля до первого разделителя.
+
+        Значение подполя не может содержать символ разделителя подполей
+        (в ИРБИС это крышка `^`). Код подполя может быть равен разделителю подполей.
+
+     */
+
     /// <summary>
     /// Подполе библиографической записи.
     /// </summary>
-    [XmlRoot("subfield")]
+    [XmlRoot ("subfield")]
     public sealed class SubField
         : IVerifiable,
-        IXmlSerializable,
-        IHandmadeSerializable,
-        IReadOnly<SubField>
+            IXmlSerializable,
+            IHandmadeSerializable,
+            IReadOnly<SubField>
     {
         #region Constants
 
@@ -70,7 +92,7 @@ namespace ManagedIrbis
         public string? Value
         {
             get => _value;
-            set => SetValue(value);
+            set => SetValue (value);
         }
 
         /// <summary>
@@ -84,6 +106,13 @@ namespace ManagedIrbis
         [XmlIgnore]
         [JsonIgnore]
         public Field? Field { get; internal set; }
+
+        /// <summary>
+        /// Флаг: удалять начальные и конечные пробелы в значении поля.
+        /// </summary>
+        // ReSharper disable InconsistentNaming
+        public static bool TrimValue;
+        // ReSharper restore InconsistentNaming
 
         #endregion
 
@@ -100,20 +129,32 @@ namespace ManagedIrbis
         /// Конструктор.
         /// </summary>
         /// <param name="code">Код подполя.</param>
-        /// <param name="value">Значение подполя (опционально).</param>
+        /// <param name="value">Значение подполя.</param>
         public SubField
             (
                 char code,
-                ReadOnlyMemory<char> value = default
+                ReadOnlySpan<char> value
             )
         {
             Code = code;
-            if (value.Span.Contains(Delimiter))
-            {
-                throw new ArgumentException(nameof(value));
-            }
+            Value = value.EmptyToNull();
 
-            Value = value.ToString();
+        } // constructor
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="code">Код подполя.</param>
+        /// <param name="value">Значение подполя.</param>
+        public SubField
+            (
+                char code,
+                ReadOnlyMemory<char> value
+            )
+        {
+            Code = code;
+            Value = value.EmptyToNull();
+
         } // constructor
 
         /// <summary>
@@ -124,11 +165,12 @@ namespace ManagedIrbis
         public SubField
             (
                 char code,
-                string? value
+                string? value = default
             )
         {
             Code = code;
             Value = value;
+
         } // constructor
 
         #endregion
@@ -144,7 +186,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Клонирование подполя.
         /// </summary>
-        public SubField Clone() => (SubField) MemberwiseClone();
+        public SubField Clone() => (SubField)MemberwiseClone();
 
         /// <summary>
         /// Сравнение двух подполей.
@@ -156,16 +198,17 @@ namespace ManagedIrbis
             )
         {
             // сравниваем коды подполей с точностью до регистра символов
-            var result = char.ToUpperInvariant(subField1.Code)
-                .CompareTo(char.ToUpperInvariant(subField2.Code));
+            var result = char.ToUpperInvariant (subField1.Code)
+                .CompareTo (char.ToUpperInvariant (subField2.Code));
             if (result != 0)
             {
                 return result;
             }
 
-            result = string.CompareOrdinal(subField1.Value, subField2.Value);
+            result = string.CompareOrdinal (subField1.Value, subField2.Value);
 
             return result;
+
         } // method Compare
 
         /// <summary>
@@ -178,11 +221,11 @@ namespace ManagedIrbis
         {
             if (!text.IsEmpty)
             {
-                var code = char.ToLowerInvariant(text[0]);
-                SubFieldCode.Verify(code, true);
+                var code = char.ToLowerInvariant (text[0]);
+                SubFieldCode.Verify (code, true);
                 Code = code;
                 var value = text[1..];
-                SubFieldValue.Verify(value, true);
+                SubFieldValue.Verify (value, true);
                 Value = value.EmptyToNull();
             }
 
@@ -197,7 +240,11 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            SubFieldValue.Verify(value, true);
+            if (TrimValue)
+            {
+                value = value.Trim();
+            }
+            SubFieldValue.Verify (value, true);
             _value = value.ToString();
 
         } // method SetValue
@@ -211,7 +258,11 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            SubFieldValue.Verify(value, true);
+            if (TrimValue && !string.IsNullOrEmpty (value))
+            {
+                value = value.Trim().EmptyToNull();
+            }
+            SubFieldValue.Verify (value, true);
             _value = value;
 
         } // method SetValue
@@ -237,8 +288,8 @@ namespace ManagedIrbis
                 BinaryWriter writer
             )
         {
-            writer.Write(Code);
-            writer.WriteNullable(Value);
+            writer.Write (Code);
+            writer.WriteNullable (Value);
 
         } // method SaveToStream
 
@@ -247,6 +298,7 @@ namespace ManagedIrbis
         #region IXmlSerializable members
 
         /// <inheritdoc cref="IXmlSerializable.GetSchema"/>
+        [ExcludeFromCodeCoverage]
         XmlSchema? IXmlSerializable.GetSchema() => null;
 
         /// <inheritdoc cref="IXmlSerializable.ReadXml"/>
@@ -255,8 +307,8 @@ namespace ManagedIrbis
                 XmlReader reader
             )
         {
-            Code = reader.GetAttribute("code").FirstChar();
-            Value = reader.GetAttribute("value");
+            Code = reader.GetAttribute ("code").FirstChar();
+            Value = reader.GetAttribute ("value");
 
         } // method ReadXml
 
@@ -266,8 +318,8 @@ namespace ManagedIrbis
                 XmlWriter writer
             )
         {
-            writer.WriteAttributeString("code", Code.ToString());
-            writer.WriteAttributeString("value", Value);
+            writer.WriteAttributeString ("code", Code.ToString());
+            writer.WriteAttributeString ("value", Value);
 
         } // method WriteXml
 
@@ -281,7 +333,7 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<SubField>(this, throwOnError);
+            var verifier = new Verifier<SubField> (this, throwOnError);
 
             verifier.Assert
                 (
@@ -291,10 +343,11 @@ namespace ManagedIrbis
 
             verifier.Assert
                 (
-                    SubFieldValue.Verify(Value, throwOnError)
+                    SubFieldValue.Verify (Value, throwOnError)
                 );
 
             return verifier.Result;
+
         } // method Verify
 
         #endregion
@@ -308,6 +361,7 @@ namespace ManagedIrbis
             result.SetReadOnly();
 
             return result;
+
         } // method AsReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.ReadOnly"/>
@@ -325,6 +379,7 @@ namespace ManagedIrbis
             {
                 throw new ReadOnlyException();
             }
+
         } // method ThrowIfReadOnly
 
         #endregion
@@ -335,7 +390,7 @@ namespace ManagedIrbis
         public override string ToString() =>
             Code == NoCode
                 ? Value ?? string.Empty
-                : "^" + char.ToLowerInvariant(Code) + Value;
+                : "^" + char.ToLowerInvariant (Code) + Value;
 
         #endregion
 

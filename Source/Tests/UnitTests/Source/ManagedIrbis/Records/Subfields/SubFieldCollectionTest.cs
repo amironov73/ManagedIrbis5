@@ -35,12 +35,12 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         public void SubFieldCollection_Constructor_1()
         {
             var collection = new SubFieldCollection
-                {
-                    new (),
-                    new ('a'),
-                    new ('b', "Value")
-                };
-            Assert.AreEqual(3, collection.Count);
+            {
+                new (),
+                new ('a'),
+                new ('b', "Value")
+            };
+            Assert.AreEqual (3, collection.Count);
         }
 
         private void _TestSerialization
@@ -49,15 +49,14 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             )
         {
             var collection1 = new SubFieldCollection();
-            collection1.AddRange(subFields);
+            collection1.AddRange (subFields);
 
             var bytes = collection1.SaveToMemory();
 
-            var collection2 = bytes
-                    .RestoreObjectFromMemory <SubFieldCollection>();
+            var collection2 = bytes.RestoreObjectFromMemory<SubFieldCollection>();
 
-            Assert.IsNotNull(collection2);
-            Assert.AreEqual(collection1.Count, collection2!.Count);
+            Assert.IsNotNull (collection2);
+            Assert.AreEqual (collection1.Count, collection2.Count);
 
             for (var i = 0; i < collection1.Count; i++)
             {
@@ -81,39 +80,39 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             _TestSerialization
                 (
                     new SubField(),
-                    new SubField('a'),
-                    new SubField('b', "Hello")
+                    new SubField ('a'),
+                    new SubField ('b', "Hello")
                 );
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException (typeof (ArgumentNullException))]
         public void SubFieldCollection_NotNull_1()
         {
             var collection = new SubFieldCollection
-                {
-                    new SubField(),
-                    null!,
-                    new SubField('a')
-                };
-            Assert.AreEqual(2, collection.Count);
+            {
+                new SubField(),
+                null!,
+                new SubField ('a')
+            };
+            Assert.AreEqual (2, collection.Count);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ReadOnlyException))]
+        [ExpectedException (typeof (ReadOnlyException))]
         public void SubFieldCollection_ReadOnly_1()
         {
             var collection = new SubFieldCollection().AsReadOnly();
-            collection.Add(new SubField());
+            collection.Add (new SubField());
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ReadOnlyException))]
+        [ExpectedException (typeof (ReadOnlyException))]
         public void SubFieldCollection_ReadOnly_2()
         {
             var collection = new SubFieldCollection();
             collection.SetReadOnly();
-            collection.Add(new SubField());
+            collection.Add (new SubField());
         }
 
         /*
@@ -151,20 +150,20 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         {
             var source = _GetCollection();
             var target = new SubFieldCollection();
-            target.Assign(source);
+            target.Assign (source);
 
-            Assert.AreEqual(source.Field, target.Field);
-            Assert.AreEqual(source.Count, target.Count);
+            Assert.AreEqual (source.Field, target.Field);
+            Assert.AreEqual (source.Count, target.Count);
             for (var i = 0; i < source.Count; i++)
             {
                 Assert.AreEqual
                     (
                         0,
                         SubField.Compare
-                        (
-                            source[i],
-                            target[i]
-                        )
+                            (
+                                source[i],
+                                target[i]
+                            )
                     );
             }
         }
@@ -174,20 +173,20 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         {
             var source = _GetCollection();
             var target = new SubFieldCollection();
-            target.AssignClone(source);
+            target.AssignClone (source);
 
-            Assert.AreEqual(source.Field, target.Field);
-            Assert.AreEqual(source.Count, target.Count);
+            Assert.AreEqual (source.Field, target.Field);
+            Assert.AreEqual (source.Count, target.Count);
             for (var i = 0; i < source.Count; i++)
             {
                 Assert.AreEqual
                     (
                         0,
                         SubField.Compare
-                        (
-                            source[i],
-                            target[i]
-                        )
+                            (
+                                source[i],
+                                target[i]
+                            )
                     );
             }
         }
@@ -195,83 +194,83 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         [TestMethod]
         public void SubFieldCollection_SetField_1()
         {
-            var field = new Field(200);
-            var subFieldA = new SubField('a', "Title1");
-            field.Subfields.Add(subFieldA);
-            var subFieldE = new SubField('e', "Subtitle");
-            field.Subfields.Add(subFieldE);
-            field.SetSubFieldValue('a', "Title2");
-            Assert.AreEqual("Title2", subFieldA.Value);
-            Assert.AreEqual("Subtitle", subFieldE.Value);
+            var field = new Field (200);
+            var subFieldA = new SubField ('a', "Title1");
+            field.Subfields.Add (subFieldA);
+            var subFieldE = new SubField ('e', "Subtitle");
+            field.Subfields.Add (subFieldE);
+            field.SetSubFieldValue ('a', "Title2");
+            Assert.AreEqual ("Title2", subFieldA.Value);
+            Assert.AreEqual ("Subtitle", subFieldE.Value);
         }
 
         [TestMethod]
         public void SubFieldCollection_Clone_1()
         {
             var collection = new SubFieldCollection();
-            var subFieldA = new SubField('a', "Title1");
-            collection.Add(subFieldA);
-            var subFieldE = new SubField('e', "Subtitle");
-            collection.Add(subFieldE);
+            var subFieldA = new SubField ('a', "Title1");
+            collection.Add (subFieldA);
+            var subFieldE = new SubField ('e', "Subtitle");
+            collection.Add (subFieldE);
 
             var clone = collection.Clone();
-            Assert.AreEqual(collection.Count, clone.Count);
+            Assert.AreEqual (collection.Count, clone.Count);
         }
 
         [TestMethod]
         public void SubFieldCollection_Find_1()
         {
             var collection = new SubFieldCollection();
-            var subFieldA = new SubField('a', "Title1");
-            collection.Add(subFieldA);
-            var subFieldE = new SubField('e', "Subtitle");
-            collection.Add(subFieldE);
+            var subFieldA = new SubField ('a', "Title1");
+            collection.Add (subFieldA);
+            var subFieldE = new SubField ('e', "Subtitle");
+            collection.Add (subFieldE);
 
             var found = collection.Find
                 (
-                    x => x.Value.SameString("Subtitle")
+                    x => x.Value.SameString ("Subtitle")
                 );
-            Assert.AreEqual(subFieldE, found);
+            Assert.AreEqual (subFieldE, found);
 
             found = collection.Find
                 (
-                    x => x.Value.SameString("Notitle")
+                    x => x.Value.SameString ("Notitle")
                 );
-            Assert.IsNull(found);
+            Assert.IsNull (found);
         }
 
         [TestMethod]
         public void SubFieldCollection_FindAll_1()
         {
             var collection = new SubFieldCollection();
-            var subFieldA = new SubField('a', "Title1");
-            collection.Add(subFieldA);
-            var subFieldE = new SubField('e', "Subtitle");
-            collection.Add(subFieldE);
+            var subFieldA = new SubField ('a', "Title1");
+            collection.Add (subFieldA);
+            var subFieldE = new SubField ('e', "Subtitle");
+            collection.Add (subFieldE);
 
             var found = collection.FindAll
                 (
-                    x => x.Value.SameString("Subtitle")
+                    x => x.Value.SameString ("Subtitle")
                 );
-            Assert.AreEqual(1, found.Length);
+            Assert.AreEqual (1, found.Length);
 
             found = collection.FindAll
                 (
-                    x => x.Value.SameString("Notitle")
+                    x => x.Value.SameString ("Notitle")
                 );
-            Assert.AreEqual(0, found.Length);
+            Assert.AreEqual (0, found.Length);
         }
 
         [Ignore]
         [TestMethod]
-        [ExpectedException(typeof(ReadOnlyException))]
+        [ExpectedException (typeof (ReadOnlyException))]
         public void SubFieldCollection_SetReadOnly_1()
         {
             var collection = new SubFieldCollection();
-            var subFieldA = new SubField('a', "Title1");
-            collection.Add(subFieldA);
-            var subFieldE = new SubField('e', "Subtitle");
-            collection.Add(subFieldE);
+            var subFieldA = new SubField ('a', "Title1");
+            collection.Add (subFieldA);
+            var subFieldE = new SubField ('e', "Subtitle");
+            collection.Add (subFieldE);
 
             collection.SetReadOnly();
 
@@ -279,17 +278,17 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ReadOnlyException))]
+        [ExpectedException (typeof (ReadOnlyException))]
         public void SubFieldCollection_AsReadOnly_1()
         {
             var collection = new SubFieldCollection();
-            var subFieldA = new SubField('a', "Title1");
-            collection.Add(subFieldA);
-            var subFieldE = new SubField('e', "Subtitle");
-            collection.Add(subFieldE);
+            var subFieldA = new SubField ('a', "Title1");
+            collection.Add (subFieldA);
+            var subFieldE = new SubField ('e', "Subtitle");
+            collection.Add (subFieldE);
 
             collection = collection.AsReadOnly();
-            collection.Add(new SubField());
+            collection.Add (new SubField());
         }
 
         [TestMethod]
@@ -297,50 +296,50 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         {
             var collection = _GetCollection();
             collection.Clear();
-            Assert.AreEqual(0, collection.Count);
+            Assert.AreEqual (0, collection.Count);
         }
 
         [TestMethod]
         public void SubFieldCollection_InsertItem_1()
         {
             var collection = _GetCollection();
-            Assert.AreEqual(3, collection.Count);
-            var subField = new SubField('d', "Subfield D");
-            collection.Insert(1, subField);
-            Assert.AreEqual(subField, collection[1]);
-            Assert.AreEqual(4, collection.Count);
+            Assert.AreEqual (3, collection.Count);
+            var subField = new SubField ('d', "Subfield D");
+            collection.Insert (1, subField);
+            Assert.AreEqual (subField, collection[1]);
+            Assert.AreEqual (4, collection.Count);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException (typeof (ArgumentNullException))]
         public void SubFieldCollection_InsertItem_2()
         {
             var collection = _GetCollection();
-            collection.Insert(1, null!);
+            collection.Insert (1, null!);
         }
 
         [TestMethod]
         public void SubFieldCollection_RemoveItem_1()
         {
             var collection = _GetCollection();
-            Assert.AreEqual(3, collection.Count);
-            collection.Remove(collection[1]);
-            Assert.AreEqual(2, collection.Count);
+            Assert.AreEqual (3, collection.Count);
+            collection.Remove (collection[1]);
+            Assert.AreEqual (2, collection.Count);
         }
 
         [TestMethod]
         public void SubFieldCollection_SetItem_1()
         {
             var collection = _GetCollection();
-            Assert.AreEqual(3, collection.Count);
-            var subField = new SubField('d', "Subfield D");
+            Assert.AreEqual (3, collection.Count);
+            var subField = new SubField ('d', "Subfield D");
             collection[1] = subField;
-            Assert.AreEqual(3, collection.Count);
-            Assert.AreEqual(subField, collection[1]);
+            Assert.AreEqual (3, collection.Count);
+            Assert.AreEqual (subField, collection[1]);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException (typeof (ArgumentNullException))]
         public void SubFieldCollection_SetItem_2()
         {
             var collection = _GetCollection();

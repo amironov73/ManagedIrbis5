@@ -42,12 +42,12 @@ namespace ManagedIrbis
     /// значения <c>null</c>.
     /// </summary>
     [Serializable]
-    [XmlRoot("subfields")]
-    [DebuggerDisplay("Count={" + nameof(Count) + "}")]
+    [XmlRoot ("subfields")]
+    [DebuggerDisplay ("Count={" + nameof (Count) + "}")]
     public sealed class SubFieldCollection
         : Collection<SubField>,
-        IHandmadeSerializable,
-        IReadOnly<SubFieldCollection>
+            IHandmadeSerializable,
+            IReadOnly<SubFieldCollection>
     {
         #region Properties
 
@@ -57,7 +57,7 @@ namespace ManagedIrbis
         [XmlIgnore]
         [JsonIgnore]
         [field: NonSerialized]
-        public Field? Field { get; internal set;  }
+        public Field? Field { get; internal set; }
 
         #endregion
 
@@ -73,7 +73,7 @@ namespace ManagedIrbis
                 Field newField
             )
         {
-            foreach (SubField subField in this)
+            foreach (var subField in this)
             {
                 subField.Field = newField;
             }
@@ -107,7 +107,7 @@ namespace ManagedIrbis
 
             foreach (var subField in subFields)
             {
-                Add(subField);
+                Add (subField);
             }
 
             return this;
@@ -122,11 +122,11 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            Sure.NotNull(other, nameof(other));
+            Sure.NotNull (other, nameof (other));
 
             Clear();
             Field = other.Field;
-            AddRange(other);
+            AddRange (other);
 
             return this;
         }
@@ -140,13 +140,13 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            Sure.NotNull(other, nameof(other));
+            Sure.NotNull (other, nameof (other));
 
             Clear();
             Field = other.Field;
             foreach (var subField in other)
             {
-                Add(subField.Clone());
+                Add (subField.Clone());
             }
 
             return this;
@@ -158,7 +158,7 @@ namespace ManagedIrbis
         /// </summary>
         public SubFieldCollection Clone()
         {
-            SubFieldCollection result = new()
+            SubFieldCollection result = new ()
             {
                 Field = Field
             };
@@ -167,7 +167,7 @@ namespace ManagedIrbis
             {
                 var clone = subField.Clone();
                 clone.Field = Field;
-                result.Add(clone);
+                result.Add (clone);
             }
 
             return result;
@@ -181,11 +181,11 @@ namespace ManagedIrbis
                 Predicate<SubField> predicate
             )
         {
-            Sure.NotNull(predicate, nameof(predicate));
+            Sure.NotNull (predicate, nameof (predicate));
 
             return this.FirstOrDefault
                 (
-                    subField => predicate(subField)
+                    subField => predicate (subField)
                 );
         }
 
@@ -197,10 +197,10 @@ namespace ManagedIrbis
                 Predicate<SubField> predicate
             )
         {
-            Sure.NotNull(predicate, nameof(predicate));
+            Sure.NotNull (predicate, nameof (predicate));
 
             return this
-                .Where(subField => predicate(subField))
+                .Where (subField => predicate (subField))
                 .ToArray();
         }
 
@@ -245,7 +245,7 @@ namespace ManagedIrbis
         {
             ThrowIfReadOnly();
 
-            foreach (SubField subField in this)
+            foreach (var subField in this)
             {
                 subField.Field = null;
             }
@@ -266,15 +266,16 @@ namespace ManagedIrbis
 
             if (item is null)
             {
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException (nameof (item));
             }
 
             item.Field = Field;
 
             /* SetModified(); */
 
-            base.InsertItem(index, item);
-        }
+            base.InsertItem (index, item);
+
+        } // method InsertItem
 
         /// <inheritdoc cref="Collection{T}.RemoveItem" />
         protected override void RemoveItem
@@ -286,17 +287,15 @@ namespace ManagedIrbis
 
             if (index >= 0 && index < Count)
             {
-                SubField? subField = this[index];
-                if (subField != null)
-                {
-                    subField.Field = null;
-                }
+                var subField = this[index];
+                subField.Field = null;
 
                 /* SetModified(); */
             }
 
-            base.RemoveItem(index);
-        }
+            base.RemoveItem (index);
+
+        } // method RemoveItem
 
         /// <inheritdoc cref="Collection{T}.SetItem" />
         protected override void SetItem
@@ -309,15 +308,16 @@ namespace ManagedIrbis
 
             if (item is null)
             {
-                throw new ArgumentNullException(nameof(item));
+                throw new ArgumentNullException (nameof (item));
             }
 
             item.Field = Field;
 
             /* SetModified(); */
 
-            base.SetItem(index, item);
-        }
+            base.SetItem (index, item);
+
+        } // method SetItem
 
         #endregion
 
@@ -330,12 +330,13 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            Sure.NotNull(reader, nameof(reader));
+            Sure.NotNull (reader);
 
             ClearItems();
-            SubField[] array = reader.ReadArray<SubField>();
-            AddRange(array);
-        }
+            var array = reader.ReadArray<SubField>();
+            AddRange (array);
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -343,10 +344,11 @@ namespace ManagedIrbis
                 BinaryWriter writer
             )
         {
-            Sure.NotNull(writer, nameof(writer));
+            Sure.NotNull (writer);
 
-            writer.WriteArray(this.ToArray());
-        }
+            writer.WriteArray (this.ToArray());
+
+        } // method SaveToStream
 
         #endregion
 
@@ -355,16 +357,16 @@ namespace ManagedIrbis
         /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
         public bool ReadOnly { get; internal set; }
 
-        // ReSharper restore InconsistentNaming
 
         /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
         public SubFieldCollection AsReadOnly()
         {
-            SubFieldCollection result = Clone();
+            var result = Clone();
             result.SetReadOnly();
 
             return result;
-        }
+
+        } // method AsReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
         public void ThrowIfReadOnly()
@@ -373,22 +375,24 @@ namespace ManagedIrbis
             {
                 Magna.Error
                     (
-                        nameof(SubFieldCollection) + "::" + nameof(ThrowIfReadOnly)
+                        nameof (SubFieldCollection) + "::" + nameof (ThrowIfReadOnly)
                     );
 
                 throw new ReadOnlyException();
             }
-        }
+
+        } // method ThrowIfReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
         public void SetReadOnly()
         {
             ReadOnly = true;
-            foreach (SubField subField in this)
+            foreach (var subField in this)
             {
                 subField.SetReadOnly();
             }
-        }
+
+        } // method SetReadOnly
 
         #endregion
 
