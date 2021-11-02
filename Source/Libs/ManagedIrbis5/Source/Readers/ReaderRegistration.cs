@@ -150,18 +150,15 @@ namespace ManagedIrbis.Readers
         /// <summary>
         /// Преобразование в поле.
         /// </summary>
-        /// <returns></returns>
         public Field ToField()
         {
-            var result = new Field
-                {
-                    Value = DateString
-                }
-                .AddNonEmptySubField('c', Chair)
-                .AddNonEmptySubField('a', OrderNumber)
-                .AddNonEmptySubField('b', Reason);
+            var result = new Field (RegistrationTag, DateString)
+                .AddNonEmpty ('c', Chair)
+                .AddNonEmpty ('a', OrderNumber)
+                .AddNonEmpty ('b', Reason);
 
             return result;
+
         } // method ToField
 
         #endregion
@@ -178,6 +175,7 @@ namespace ManagedIrbis.Readers
             Chair = reader.ReadNullableString();
             OrderNumber = reader.ReadNullableString();
             Reason = reader.ReadNullableString();
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
@@ -190,6 +188,7 @@ namespace ManagedIrbis.Readers
             writer.WriteNullable(Chair);
             writer.WriteNullable(OrderNumber);
             writer.WriteNullable(Reason);
+
         } // method SaveToStream
 
         #endregion
@@ -197,10 +196,7 @@ namespace ManagedIrbis.Readers
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return $"{DateString.ToVisibleString()} - {Chair.ToVisibleString()}";
-        } // method ToString
+        public override string ToString() => $"{DateString.ToVisibleString()} - {Chair.ToVisibleString()}";
 
         #endregion
 

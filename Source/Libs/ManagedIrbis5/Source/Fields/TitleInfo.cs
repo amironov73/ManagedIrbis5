@@ -380,14 +380,14 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public Field ToField200()
         {
-            var result = new Field { Tag = Tag }
-                .AddNonEmptySubField('v', VolumeNumber)
-                .AddNonEmptySubField('a', Title)
-                .AddNonEmptySubField('u', Specific)
-                .AddNonEmptySubField('b', General)
-                .AddNonEmptySubField('e', Subtitle)
-                .AddNonEmptySubField('f', FirstResponsibility)
-                .AddNonEmptySubField('g', OtherResponsibility);
+            var result = new Field (Tag)
+                .AddNonEmpty ('v', VolumeNumber)
+                .AddNonEmpty ('a', Title)
+                .AddNonEmpty ('u', Specific)
+                .AddNonEmpty ('b', General)
+                .AddNonEmpty ('e', Subtitle)
+                .AddNonEmpty ('f', FirstResponsibility)
+                .AddNonEmpty ('g', OtherResponsibility);
 
             return result;
         }
@@ -400,13 +400,14 @@ namespace ManagedIrbis.Fields
                 int tag
             )
         {
-            var result = new Field { Tag = tag }
-                .AddNonEmptySubField('c', Title)
-                .AddNonEmptySubField('e', Subtitle)
-                .AddNonEmptySubField('g', FirstResponsibility);
+            var result = new Field (tag)
+                .AddNonEmpty ('c', Title)
+                .AddNonEmpty ('e', Subtitle)
+                .AddNonEmpty ('g', FirstResponsibility);
 
             return result;
-        }
+
+        } // method ToField330
 
         #endregion
 
@@ -418,6 +419,8 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             VolumeNumber = reader.ReadNullableString();
             Title = reader.ReadNullableString();
             Specific = reader.ReadNullableString();
@@ -425,7 +428,8 @@ namespace ManagedIrbis.Fields
             Subtitle = reader.ReadNullableString();
             FirstResponsibility = reader.ReadNullableString();
             OtherResponsibility = reader.ReadNullableString();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         void IHandmadeSerializable.SaveToStream
@@ -433,15 +437,18 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullable(VolumeNumber)
-                .WriteNullable(Title)
-                .WriteNullable(Specific)
-                .WriteNullable(General)
-                .WriteNullable(Subtitle)
-                .WriteNullable(FirstResponsibility)
-                .WriteNullable(OtherResponsibility);
-        }
+                .WriteNullable (VolumeNumber)
+                .WriteNullable (Title)
+                .WriteNullable (Specific)
+                .WriteNullable (General)
+                .WriteNullable (Subtitle)
+                .WriteNullable (FirstResponsibility)
+                .WriteNullable (OtherResponsibility);
+
+        } // method SaveToStream
 
         #endregion
 
@@ -468,23 +475,9 @@ namespace ManagedIrbis.Fields
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(VolumeNumber))
-            {
-                return string.Format
-                (
-                    "Title: {0}, Subtitle: {1}",
-                    Title.ToVisibleString(),
-                    Subtitle.ToVisibleString()
-                );
-            }
-
-            return string.Format
-                (
-                    "Volume: {0}, Title: {1}, Subtitle: {2}",
-                    VolumeNumber.ToVisibleString(),
-                    Title.ToVisibleString(),
-                    Subtitle.ToVisibleString()
-                );
+            return string.IsNullOrEmpty (VolumeNumber)
+                ? $"Title: {Title.ToVisibleString()}, Subtitle: {Subtitle.ToVisibleString()}"
+                : $"Volume: {VolumeNumber}, Title: {Title.ToVisibleString()}, Subtitle: {Subtitle.ToVisibleString()}";
         }
 
         #endregion

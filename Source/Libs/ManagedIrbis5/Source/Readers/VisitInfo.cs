@@ -435,26 +435,28 @@ namespace ManagedIrbis.Readers
         /// </summary>
         public Field ToField()
         {
-            var result = new Field { Tag = 40 }
-                .AddNonEmptySubField('g', Database)
-                .AddNonEmptySubField('a', Index)
-                .AddNonEmptySubField('b', Inventory)
-                .AddNonEmptySubField('h', Barcode)
-                .AddNonEmptySubField('k', Sigla)
-                .AddNonEmptySubField('d', DateGivenString)
-                .AddNonEmptySubField('v', Department)
-                .AddNonEmptySubField('e', DateExpectedString)
-                .AddNonEmptySubField('f', DateReturnedString)
-                .AddNonEmptySubField('l', DateProlongString)
-                .AddNonEmptySubField('u', Lost)
-                .AddNonEmptySubField('c', Description)
-                .AddNonEmptySubField('i', Responsible)
-                .AddNonEmptySubField('1', TimeIn)
-                .AddNonEmptySubField('2', TimeOut)
-                .AddNonEmptySubField('9', Comment);
+            var result = new Field (Tag)
+                .AddNonEmpty ('g', Database)
+                .AddNonEmpty ('a', Index)
+                .AddNonEmpty ('b', Inventory)
+                .AddNonEmpty ('h', Barcode)
+                .AddNonEmpty ('k', Sigla)
+                .AddNonEmpty ('d', DateGivenString)
+                .AddNonEmpty ('v', Department)
+                .AddNonEmpty ('e', DateExpectedString)
+                .AddNonEmpty ('f', DateReturnedString)
+                .AddNonEmpty ('l', DateProlongString)
+                .AddNonEmpty ('u', Lost)
+                .AddNonEmpty ('c', Description)
+                .AddNonEmpty ('i', Responsible)
+                .AddNonEmpty ('1', TimeIn)
+                .AddNonEmpty ('2', TimeOut)
+                .AddNonEmpty ('9', Comment)
+                .AddRange (UnknownSubFields);
 
             return result;
-        }
+
+        } // method ToField
 
         #endregion
 

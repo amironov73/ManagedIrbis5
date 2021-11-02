@@ -162,22 +162,16 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Применение к уже имеющемуся полю.
         /// </summary>
-        public void ApplyTo
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('q', Period)
-                .ApplySubField('n', NumberOfIssues)
-                .ApplySubField('a', FirstIssue)
-                .ApplySubField('b', LastIssue)
-                .ApplySubField('y', TotalPrice)
-                .ApplySubField('e', IssuePrice)
-                .ApplySubField('v', Currency)
-                .ApplySubField('d', PeriodicityCode)
-                .ApplySubField('x', PeriodicityNumber);
-        } // method ApplyTo
+        public Field ApplyTo (Field field) => field
+            .SetSubFieldValue ('q', Period)
+            .SetSubFieldValue ('n', NumberOfIssues)
+            .SetSubFieldValue ('a', FirstIssue)
+            .SetSubFieldValue ('b', LastIssue)
+            .SetSubFieldValue ('y', TotalPrice)
+            .SetSubFieldValue ('e', IssuePrice)
+            .SetSubFieldValue ('v', Currency)
+            .SetSubFieldValue ('d', PeriodicityCode)
+            .SetSubFieldValue ('x', PeriodicityNumber);
 
         /// <summary>
         /// Разбор поля.
@@ -239,17 +233,17 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public Field ToField()
         {
-             var result = new Field { Tag = Tag }
-                .AddNonEmptySubField('q', Period)
-                .AddNonEmptySubField('n', NumberOfIssues)
-                .AddNonEmptySubField('a', FirstIssue)
-                .AddNonEmptySubField('b', LastIssue)
-                .AddNonEmptySubField('y', TotalPrice)
-                .AddNonEmptySubField('e', IssuePrice)
-                .AddNonEmptySubField('v', Currency)
-                .AddNonEmptySubField('d', PeriodicityCode)
-                .AddNonEmptySubField('x', PeriodicityNumber)
-                .AddSubFields(UnknownSubfields);
+             var result = new Field (Tag)
+                .AddNonEmpty ('q', Period)
+                .AddNonEmpty ('n', NumberOfIssues)
+                .AddNonEmpty ('a', FirstIssue)
+                .AddNonEmpty ('b', LastIssue)
+                .AddNonEmpty ('y', TotalPrice)
+                .AddNonEmpty ('e', IssuePrice)
+                .AddNonEmpty ('v', Currency)
+                .AddNonEmpty ('d', PeriodicityCode)
+                .AddNonEmpty ('x', PeriodicityNumber)
+                .AddRange (UnknownSubfields);
 
             return result;
         } // class ToFields

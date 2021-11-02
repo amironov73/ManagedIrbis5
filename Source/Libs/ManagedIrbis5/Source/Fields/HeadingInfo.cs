@@ -203,22 +203,16 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="HeadingInfo"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', Title)
-                .ApplySubField('b', Subtitle1)
-                .ApplySubField('c', Subtitle2)
-                .ApplySubField('d', Subtitle3)
-                .ApplySubField('g', GeographicalSubtitle1)
-                .ApplySubField('e', GeographicalSubtitle2)
-                .ApplySubField('o', GeographicalSubtitle3)
-                .ApplySubField('h', ChronologicalSubtitle)
-                .ApplySubField('9', Aspect);
-        }
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', Title)
+            .SetSubFieldValue ('b', Subtitle1)
+            .SetSubFieldValue ('c', Subtitle2)
+            .SetSubFieldValue ('d', Subtitle3)
+            .SetSubFieldValue ('g', GeographicalSubtitle1)
+            .SetSubFieldValue ('e', GeographicalSubtitle2)
+            .SetSubFieldValue ('o', GeographicalSubtitle3)
+            .SetSubFieldValue ('h', ChronologicalSubtitle)
+            .SetSubFieldValue ('9', Aspect);
 
         /// <summary>
         /// Parse the field.
@@ -273,17 +267,17 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public Field ToField()
         {
-            var result = new Field(Tag)
-                .AddNonEmptySubField('a', Title)
-                .AddNonEmptySubField('b', Subtitle1)
-                .AddNonEmptySubField('c', Subtitle2)
-                .AddNonEmptySubField('d', Subtitle3)
-                .AddNonEmptySubField('g', GeographicalSubtitle1)
-                .AddNonEmptySubField('e', GeographicalSubtitle2)
-                .AddNonEmptySubField('o', GeographicalSubtitle3)
-                .AddNonEmptySubField('h', ChronologicalSubtitle)
-                .AddNonEmptySubField('9', Aspect)
-                .AddSubFields(UnknownSubFields);
+            var result = new Field (Tag)
+                .AddNonEmpty ('a', Title)
+                .AddNonEmpty ('b', Subtitle1)
+                .AddNonEmpty ('c', Subtitle2)
+                .AddNonEmpty ('d', Subtitle3)
+                .AddNonEmpty ('g', GeographicalSubtitle1)
+                .AddNonEmpty ('e', GeographicalSubtitle2)
+                .AddNonEmpty ('o', GeographicalSubtitle3)
+                .AddNonEmpty ('h', ChronologicalSubtitle)
+                .AddNonEmpty ('9', Aspect)
+                .AddRange (UnknownSubFields);
 
             return result;
         }

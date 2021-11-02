@@ -150,23 +150,15 @@ namespace ManagedIrbis.Readers
         /// <summary>
         /// Apply to the field.
         /// </summary>
-        public Field ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', Postcode)
-                .ApplySubField('b', Country)
-                .ApplySubField('c', City)
-                .ApplySubField('d', Street)
-                .ApplySubField('e', Building)
-                .ApplySubField('g', Entrance)
-                .ApplySubField('h', Apartment)
-                .ApplySubField('f', AdditionalData);
-
-            return field;
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', Postcode)
+            .SetSubFieldValue ('b', Country)
+            .SetSubFieldValue ('c', City)
+            .SetSubFieldValue ('d', Street)
+            .SetSubFieldValue ('e', Building)
+            .SetSubFieldValue ('g', Entrance)
+            .SetSubFieldValue ('h', Apartment)
+            .SetSubFieldValue ('f', AdditionalData);
 
         /// <summary>
         /// Разбор поля 13.
@@ -217,18 +209,19 @@ namespace ManagedIrbis.Readers
         /// </summary>
         public Field ToField()
         {
-            var result = new Field { Tag = Tag }
-                .AddNonEmptySubField('a', Postcode)
-                .AddNonEmptySubField('b', Country)
-                .AddNonEmptySubField('c', City)
-                .AddNonEmptySubField('d', Street)
-                .AddNonEmptySubField('e', Building)
-                .AddNonEmptySubField('g', Entrance)
-                .AddNonEmptySubField('h', Apartment)
-                .AddNonEmptySubField('f', AdditionalData)
-                .AddSubFields(UnknownSubFields);
+            var result = new Field (Tag)
+                .AddNonEmpty ('a', Postcode)
+                .AddNonEmpty ('b', Country)
+                .AddNonEmpty ('c', City)
+                .AddNonEmpty ('d', Street)
+                .AddNonEmpty ('e', Building)
+                .AddNonEmpty ('g', Entrance)
+                .AddNonEmpty ('h', Apartment)
+                .AddNonEmpty ('f', AdditionalData)
+                .AddRange (UnknownSubFields);
 
             return result;
+
         } // method ToField
 
         #endregion

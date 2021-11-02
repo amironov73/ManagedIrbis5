@@ -179,21 +179,18 @@ namespace ManagedIrbis.Readers
         /// </summary>
         public Field ToField()
         {
-            var result = new Field { Tag = Tag }
-                .Add('a', Active ? "1" : "0")
-                .AddNonEmptySubField('b', ID)
-                .AddNonEmptySubField('c', Title)
-                .AddNonEmptySubField('d', Query)
-                .AddNonEmptySubField('e', Periodicity.ToInvariantString())
-                .AddNonEmptySubField('f', LastServed)
-                .AddNonEmptySubField('i', Database);
-
-            if (!ReferenceEquals(UnknownSubFields, null))
-            {
-                result.AddSubFields(UnknownSubFields);
-            }
+            var result = new Field (Tag)
+                .Add ('a', Active)
+                .AddNonEmpty ('b', ID)
+                .AddNonEmpty ('c', Title)
+                .AddNonEmpty ('d', Query)
+                .AddNonEmpty ('e', Periodicity.ToInvariantString())
+                .AddNonEmpty ('f', LastServed)
+                .AddNonEmpty ('i', Database)
+                .AddRange (UnknownSubFields);
 
             return result;
+
         } // method ToField
 
         /// <summary>

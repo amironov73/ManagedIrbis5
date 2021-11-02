@@ -272,7 +272,7 @@ namespace UnitTests.ManagedIrbis.Records.Fields
         public void Field_AddNonEmpty_1()
         {
             var field = new Field()
-                .AddNonEmpty ('a', null)
+                .AddNonEmpty ('a', (object?) null)
                 .AddNonEmpty ('b', new MyClass { Text = "SubfieldB" })
                 .AddNonEmpty ('c', string.Empty);
             Assert.AreEqual (1, field.Subfields.Count);

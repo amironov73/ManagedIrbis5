@@ -208,22 +208,16 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="CollectiveInfo"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', Title)
-                .ApplySubField('s', Country)
-                .ApplySubField('r', Abbreviation)
-                .ApplySubField('n', Number)
-                .ApplySubField('f', Date)
-                .ApplySubField('c', City1)
-                .ApplySubField('b', Department)
-                .ApplySubField('x', Characteristic ? "1" : null)
-                .ApplySubField('7', Gost);
-        }
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', Title)
+            .SetSubFieldValue ('s', Country)
+            .SetSubFieldValue ('r', Abbreviation)
+            .SetSubFieldValue ('n', Number)
+            .SetSubFieldValue ('f', Date)
+            .SetSubFieldValue ('c', City1)
+            .SetSubFieldValue ('b', Department)
+            .SetSubFieldValue ('x', Characteristic, "1")
+            .SetSubFieldValue ('7', Gost);
 
         /// <summary>
         /// Parse the <see cref="Record"/>.
@@ -303,18 +297,18 @@ namespace ManagedIrbis.Fields
                 int tag
             )
         {
-            var result = new Field(tag);
+            var result = new Field (tag);
             result
-                .AddNonEmptySubField('a', Title)
-                .AddNonEmptySubField('s', Country)
-                .AddNonEmptySubField('r', Abbreviation)
-                .AddNonEmptySubField('n', Number)
-                .AddNonEmptySubField('f', Date)
-                .AddNonEmptySubField('c', City1)
-                .AddNonEmptySubField('b', Department)
-                .AddNonEmptySubField('x', Characteristic ? "1" : null)
-                .AddNonEmptySubField('7', Gost)
-                .AddSubFields(UnknownSubFields);
+                .AddNonEmpty ('a', Title)
+                .AddNonEmpty ('s', Country)
+                .AddNonEmpty ('r', Abbreviation)
+                .AddNonEmpty ('n', Number)
+                .AddNonEmpty ('f', Date)
+                .AddNonEmpty ('c', City1)
+                .AddNonEmpty ('b', Department)
+                .AddNonEmpty ('x', Characteristic ? "1" : null)
+                .AddNonEmpty ('7', Gost)
+                .AddRange (UnknownSubFields);
 
             return result;
         }

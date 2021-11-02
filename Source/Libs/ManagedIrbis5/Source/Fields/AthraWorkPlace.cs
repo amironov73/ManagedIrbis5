@@ -84,16 +84,9 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Apply to the <see cref="Field"/>.
         /// </summary>
-        public Field ApplyTo
-            (
-                Field field
-            )
-        {
-            field.ApplySubField('y', WorksHere)
-                .ApplySubField('p', WorkPlace);
-
-            return field;
-        } // method ApplyTo
+        public Field ApplyTo (Field field) => field
+            .SetSubFieldValue ('y', WorksHere)
+            .SetSubFieldValue ('p', WorkPlace);
 
         /// <summary>
         /// Parse the field.
@@ -124,8 +117,8 @@ namespace ManagedIrbis.Fields
         /// Convert back to <see cref="Field"/>.
         /// </summary>
         public Field ToField() => new Field { Tag = 910 }
-                .AddNonEmptySubField('p', WorkPlace)
-                .AddNonEmptySubField('y', WorksHere);
+                .AddNonEmpty ('p', WorkPlace)
+                .AddNonEmpty ('y', WorksHere);
 
         #endregion
 

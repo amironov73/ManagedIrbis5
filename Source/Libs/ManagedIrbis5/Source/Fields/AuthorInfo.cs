@@ -278,23 +278,17 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="AuthorInfo"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField700
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', FamilyName)
-                .ApplySubField('b', Initials)
-                .ApplySubField('g', FullName)
-                .ApplySubField('9', CantBeInverted ? "1" : null)
-                .ApplySubField('1', Postfix)
-                .ApplySubField('c', Appendix)
-                .ApplySubField('d', Number)
-                .ApplySubField('f', Dates)
-                .ApplySubField('r', Variant)
-                .ApplySubField('p', WorkPlace);
-        }
+        public Field ApplyToField700 (Field field) => field
+            .SetSubFieldValue ('a', FamilyName)
+            .SetSubFieldValue ('b', Initials)
+            .SetSubFieldValue ('g', FullName)
+            .SetSubFieldValue ('9', CantBeInverted, "1")
+            .SetSubFieldValue ('1', Postfix)
+            .SetSubFieldValue ('c', Appendix)
+            .SetSubFieldValue ('d', Number)
+            .SetSubFieldValue ('f', Dates)
+            .SetSubFieldValue ('r', Variant)
+            .SetSubFieldValue ('p', WorkPlace);
 
         /// <summary>
         /// Apply the <see cref="AuthorInfo"/>
@@ -306,21 +300,21 @@ namespace ManagedIrbis.Fields
             )
         {
             var withInitials = FamilyName;
-            if (!string.IsNullOrEmpty(Initials))
+            if (!string.IsNullOrEmpty (Initials))
             {
                 withInitials = withInitials + " " + Initials;
             }
 
             field
-                .ApplySubField('a', withInitials)
-                .ApplySubField('g', FullName)
-                .ApplySubField('9', CantBeInverted ? "1" : null)
-                .ApplySubField('1', Postfix)
-                .ApplySubField('c', Appendix)
-                .ApplySubField('d', Number)
-                .ApplySubField('f', Dates)
-                .ApplySubField('r', Variant)
-                .ApplySubField('p', WorkPlace);
+                .SetSubFieldValue ('a', withInitials)
+                .SetSubFieldValue ('g', FullName)
+                .SetSubFieldValue ('9', CantBeInverted ? "1" : null)
+                .SetSubFieldValue ('1', Postfix)
+                .SetSubFieldValue ('c', Appendix)
+                .SetSubFieldValue ('d', Number)
+                .SetSubFieldValue ('f', Dates)
+                .SetSubFieldValue ('r', Variant)
+                .SetSubFieldValue ('p', WorkPlace);
         }
 
         /// <summary>
@@ -411,10 +405,10 @@ namespace ManagedIrbis.Fields
             }
 
             field
-                .ApplySubField(subFields[0], withInitials)
-                .ApplySubField(subFields[1], FullName)
-                .ApplySubField(subFields[2], CantBeInverted ? "1" : null)
-                .ApplySubField(subFields[3], WorkPlace);
+                .SetSubFieldValue (subFields[0], withInitials)
+                .SetSubFieldValue (subFields[1], FullName)
+                .SetSubFieldValue (subFields[2], CantBeInverted, "1")
+                .SetSubFieldValue (subFields[3], WorkPlace);
 
             return true;
         }
@@ -727,16 +721,16 @@ namespace ManagedIrbis.Fields
             )
         {
             var result = new Field { Tag = tag }
-                .AddNonEmptySubField('a', FamilyName)
-                .AddNonEmptySubField('b', Initials)
-                .AddNonEmptySubField('g', FullName)
-                .AddNonEmptySubField('9', CantBeInverted ? "1" : null)
-                .AddNonEmptySubField('1', Postfix)
-                .AddNonEmptySubField('c', Appendix)
-                .AddNonEmptySubField('d', Number)
-                .AddNonEmptySubField('f', Dates)
-                .AddNonEmptySubField('r', Variant)
-                .AddNonEmptySubField('p', WorkPlace);
+                .AddNonEmpty ('a', FamilyName)
+                .AddNonEmpty ('b', Initials)
+                .AddNonEmpty ('g', FullName)
+                .AddNonEmpty ('9', CantBeInverted ? "1" : null)
+                .AddNonEmpty ('1', Postfix)
+                .AddNonEmpty ('c', Appendix)
+                .AddNonEmpty ('d', Number)
+                .AddNonEmpty ('f', Dates)
+                .AddNonEmpty ('r', Variant)
+                .AddNonEmpty ('p', WorkPlace);
 
             return result;
         }

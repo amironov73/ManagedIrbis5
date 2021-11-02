@@ -171,21 +171,14 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="NumberOfTitlesInfo"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('1', NewArrivals)
-                .ApplySubField('2', Books)
-                .ApplySubField('3', Monographic)
-                .ApplySubField('4', Brochures)
-                .ApplySubField('5', Volumes)
-                .ApplySubField('6', Domestic)
-                .ApplySubField('7', Foreign);
-
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('1', NewArrivals)
+            .SetSubFieldValue ('2', Books)
+            .SetSubFieldValue ('3', Monographic)
+            .SetSubFieldValue ('4', Brochures)
+            .SetSubFieldValue ('5', Volumes)
+            .SetSubFieldValue ('6', Domestic)
+            .SetSubFieldValue ('7', Foreign);
 
         /// <summary>
         /// Parse the <see cref="Field"/>.
@@ -197,14 +190,14 @@ namespace ManagedIrbis.Fields
         {
             var result = new NumberOfTitlesInfo
             {
-                NewArrivals = field.GetFirstSubFieldValue('1'),
-                Books = field.GetFirstSubFieldValue('2'),
-                Monographic = field.GetFirstSubFieldValue('3'),
-                Brochures = field.GetFirstSubFieldValue('4'),
-                Volumes = field.GetFirstSubFieldValue('5'),
-                Domestic = field.GetFirstSubFieldValue('6'),
-                Foreign = field.GetFirstSubFieldValue('7'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
+                NewArrivals = field.GetFirstSubFieldValue ('1'),
+                Books = field.GetFirstSubFieldValue ('2'),
+                Monographic = field.GetFirstSubFieldValue ('3'),
+                Brochures = field.GetFirstSubFieldValue ('4'),
+                Volumes = field.GetFirstSubFieldValue ('5'),
+                Domestic = field.GetFirstSubFieldValue ('6'),
+                Foreign = field.GetFirstSubFieldValue ('7'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
 
@@ -225,15 +218,15 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public Field ToField()
         {
-            var result = new Field(Tag)
-                .AddNonEmptySubField('1', NewArrivals)
-                .AddNonEmptySubField('2', Books)
-                .AddNonEmptySubField('3', Monographic)
-                .AddNonEmptySubField('4', Brochures)
-                .AddNonEmptySubField('5', Volumes)
-                .AddNonEmptySubField('6', Domestic)
-                .AddNonEmptySubField('7', Foreign)
-                .AddSubFields(UnknownSubFields);
+            var result = new Field (Tag)
+                .AddNonEmpty ('1', NewArrivals)
+                .AddNonEmpty ('2', Books)
+                .AddNonEmpty ('3', Monographic)
+                .AddNonEmpty ('4', Brochures)
+                .AddNonEmpty ('5', Volumes)
+                .AddNonEmpty ('6', Domestic)
+                .AddNonEmpty ('7', Foreign)
+                .AddRange (UnknownSubFields);
 
             return result;
 

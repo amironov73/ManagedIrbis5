@@ -191,10 +191,10 @@ namespace ManagedIrbis.Fields
             // TODO check the applying
 
             field
-                .ApplySubField('t', DisplayText)
-                .ApplySubField('a', FileName)
-                .ApplySubField('n', PageCount)
-                .ApplySubField('b', AccessRights);
+                .SetSubFieldValue ('t', DisplayText)
+                .SetSubFieldValue ('a', FileName)
+                .SetSubFieldValue ('n', PageCount)
+                .SetSubFieldValue ('b', AccessRights);
         }
 
         /// <summary>
@@ -238,10 +238,10 @@ namespace ManagedIrbis.Fields
         public Field ToField()
         {
             var result = new Field(Tag)
-                .AddNonEmptySubField('t', FileName)
-                .AddNonEmptySubField('a', FileName)
-                .AddNonEmptySubField('n', PageCount.ToString())
-                .AddNonEmptySubField('b', AccessRights);
+                .AddNonEmpty ('t', FileName)
+                .AddNonEmpty ('a', FileName)
+                .AddNonEmpty ('n', PageCount.ToString())
+                .AddNonEmpty ('b', AccessRights);
 
             return result;
 

@@ -140,18 +140,12 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="ArrivalsInfo"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('1', OnBalanceWithoutPeriodicals)
-                .ApplySubField('b', OffBalanceWithoutPeriodicals)
-                .ApplySubField('a', TotalWithoutPeriodicals)
-                .ApplySubField('2', OffBalanceWithPeriodicals)
-                .ApplySubField('3', Educational);
-        }
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('1', OnBalanceWithoutPeriodicals)
+            .SetSubFieldValue ('b', OffBalanceWithoutPeriodicals)
+            .SetSubFieldValue ('a', TotalWithoutPeriodicals)
+            .SetSubFieldValue ('2', OffBalanceWithPeriodicals)
+            .SetSubFieldValue ('3', Educational);
 
         /// <summary>
         /// Parse the <see cref="Field"/>.
@@ -215,7 +209,7 @@ namespace ManagedIrbis.Fields
                 .AddNonEmpty ('a', TotalWithoutPeriodicals)
                 .AddNonEmpty ('2', OffBalanceWithPeriodicals)
                 .AddNonEmpty ('3', Educational)
-                .AddSubFields (UnknownSubFields);
+                .AddRange (UnknownSubFields);
 
         #endregion
 

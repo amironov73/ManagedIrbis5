@@ -217,21 +217,12 @@ namespace ManagedIrbis.Reservations
         /// <summary>
         /// Применение данных к полю записи.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            Sure.NotNull (field);
-
-            field
-                .ApplySubField ('a', DateString)
-                .ApplySubField ('b', BeginTimeString)
-                .ApplySubField ('c', EndTimeString)
-                .ApplySubField ('d', Ticket)
-                .ApplySubField ('e', Name);
-
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', DateString)
+            .SetSubFieldValue ('b', BeginTimeString)
+            .SetSubFieldValue ('c', EndTimeString)
+            .SetSubFieldValue ('d', Ticket)
+            .SetSubFieldValue ('e', Name);
 
         /// <summary>
         /// Разбор поля записи.
@@ -281,11 +272,11 @@ namespace ManagedIrbis.Reservations
         {
             var result = new Field (Tag);
             result
-                .AddNonEmptySubField ('a', DateString)
-                .AddNonEmptySubField ('b', BeginTimeString)
-                .AddNonEmptySubField ('c', EndTimeString)
-                .AddNonEmptySubField ('d', Ticket)
-                .AddNonEmptySubField ('e', Name);
+                .AddNonEmpty ('a', DateString)
+                .AddNonEmpty ('b', BeginTimeString)
+                .AddNonEmpty ('c', EndTimeString)
+                .AddNonEmpty ('d', Ticket)
+                .AddNonEmpty ('e', Name);
 
             return result;
 

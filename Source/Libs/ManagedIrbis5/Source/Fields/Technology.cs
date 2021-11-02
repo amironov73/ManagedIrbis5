@@ -75,17 +75,10 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Применение информации к полю.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', Date)
-                .ApplySubField('b', Responsible)
-                .ApplySubField('c', Phase);
-
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', Date)
+            .SetSubFieldValue ('b', Responsible)
+            .SetSubFieldValue ('c', Phase);
 
         /// <summary>
         /// Получение даты последней модификации записи.
@@ -166,10 +159,10 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public Field ToField()
         {
-            var result = new Field(Tag)
-                .AddNonEmptySubField('a', Date)
-                .AddNonEmptySubField('b', Responsible)
-                .AddNonEmptySubField('c', Phase);
+            var result = new Field (Tag)
+                .AddNonEmpty ('a', Date)
+                .AddNonEmpty ('b', Responsible)
+                .AddNonEmpty ('c', Phase);
 
             return result;
 

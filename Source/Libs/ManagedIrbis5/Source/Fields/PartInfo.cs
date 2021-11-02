@@ -143,12 +143,12 @@ namespace ManagedIrbis.Fields
         /// Применение данных о выпуске/части <see cref="PartInfo"/>
         /// к полю записи <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField (Field field) => field
-            .ApplySubField('h', SecondLevelNumber)
-            .ApplySubField('i', SecondLevelTitle)
-            .ApplySubField('k', ThirdLevelNumber)
-            .ApplySubField('l', ThirdLevelTitle)
-            .ApplySubField('u', Role);
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('h', SecondLevelNumber)
+            .SetSubFieldValue ('i', SecondLevelTitle)
+            .SetSubFieldValue ('k', ThirdLevelNumber)
+            .SetSubFieldValue ('l', ThirdLevelTitle)
+            .SetSubFieldValue ('u', Role);
 
         /// <summary>
         /// Разбор библиографической записи <see cref="Record"/>.
@@ -165,8 +165,8 @@ namespace ManagedIrbis.Fields
             {
                 if (field.Tag == Tag)
                 {
-                    var part = ParseField(field);
-                    result.Add(part);
+                    var part = ParseField (field);
+                    result.Add (part);
                 }
             }
 
@@ -193,19 +193,18 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeUnknownSubFields() =>
-            !ArrayUtility.IsNullOrEmpty(UnknownSubFields);
+        public bool ShouldSerializeUnknownSubFields() => !ArrayUtility.IsNullOrEmpty (UnknownSubFields);
 
         /// <summary>
         /// Transform back to field.
         /// </summary>
-        public Field ToField() => new Field(Tag)
-            .AddNonEmptySubField('h', SecondLevelNumber)
-            .AddNonEmptySubField('i', SecondLevelTitle)
-            .AddNonEmptySubField('k', ThirdLevelNumber)
-            .AddNonEmptySubField('l', ThirdLevelTitle)
-            .AddNonEmptySubField('u', Role)
-            .AddSubFields(UnknownSubFields);
+        public Field ToField() => new Field (Tag)
+            .AddNonEmpty ('h', SecondLevelNumber)
+            .AddNonEmpty ('i', SecondLevelTitle)
+            .AddNonEmpty ('k', ThirdLevelNumber)
+            .AddNonEmpty ('l', ThirdLevelTitle)
+            .AddNonEmpty ('u', Role)
+            .AddRange (UnknownSubFields);
 
         #endregion
 

@@ -183,27 +183,20 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Apply to the <see cref="Field"/>.
         /// </summary>
-        public Field ApplyTo
-            (
-                Field field
-            )
-        {
-            field.ApplySubField('a', Surname)
-                .ApplySubField('b', Initials)
-                .ApplySubField('g', Extension)
-                .ApplySubField('<', Role)
-                .ApplySubField('1', IntegralPart)
-                .ApplySubField('c', IdentifyingSigns)
-                .ApplySubField('d', RomanNumerals)
-                .ApplySubField('f', Dates)
-                .ApplySubField('7', Graphics)
-                .ApplySubField('8', Language)
-                .ApplySubField('9', Mark)
-                .ApplySubField('4', RelationCode)
-                .ApplySubField('3', RelatedRecord);
-
-            return field;
-        }
+        public Field ApplyTo (Field field) => field
+            .SetSubFieldValue ('a', Surname)
+            .SetSubFieldValue ('b', Initials)
+            .SetSubFieldValue ('g', Extension)
+            .SetSubFieldValue ('<', Role)
+            .SetSubFieldValue ('1', IntegralPart)
+            .SetSubFieldValue ('c', IdentifyingSigns)
+            .SetSubFieldValue ('d', RomanNumerals)
+            .SetSubFieldValue ('f', Dates)
+            .SetSubFieldValue ('7', Graphics)
+            .SetSubFieldValue ('8', Language)
+            .SetSubFieldValue ('9', Mark)
+            .SetSubFieldValue ('4', RelationCode)
+            .SetSubFieldValue ('3', RelatedRecord);
 
         /// <summary>
         /// Parse the field.

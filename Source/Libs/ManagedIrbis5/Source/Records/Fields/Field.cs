@@ -22,6 +22,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.IO;
 using System.Text.Json.Serialization;
@@ -97,13 +98,13 @@ namespace ManagedIrbis
             set
             {
                 Clear();
-                if (value.SafeContains(Delimiter))
+                if (value.SafeContains (Delimiter))
                 {
-                    DecodeBody(value);
+                    DecodeBody (value);
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(value))
+                    if (!string.IsNullOrEmpty (value))
                     {
                         CreateValueSubField().Value = value;
                     }
@@ -376,6 +377,11 @@ namespace ManagedIrbis
         /// <summary>
         /// Добавление подполя в конец списка подполей.
         /// </summary>
+        public Field Add (char code, bool value) => Add (code, value ? "1" : "0");
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
         /// <remarks>Фиксируется текстовое представление объекта
         /// на момент добавления.</remarks>>
         public Field Add
@@ -391,8 +397,7 @@ namespace ManagedIrbis
             }
 
             var text = value?.ToString();
-            var subfield = new SubField (code, text);
-            Subfields.Add (subfield);
+            Add (code, text);
 
             return this;
 
@@ -427,7 +432,25 @@ namespace ManagedIrbis
         {
             if (value is not 0)
             {
-                Add(code, value.ToInvariantString());
+                Add (code, value.ToInvariantString());
+            }
+
+            return this;
+
+        } // method AddNonEmpty
+
+        /// <summary>
+        /// Добавление поля, если переданное значение не равно 0.
+        /// </summary>
+        public Field AddNonEmpty
+            (
+                char code,
+                int? value
+            )
+        {
+            if (value.HasValue && value.Value is not 0)
+            {
+                Add (code, value.Value.ToInvariantString());
             }
 
             return this;
@@ -495,14 +518,67 @@ namespace ManagedIrbis
                 var text = value.ToString();
                 if (!string.IsNullOrEmpty (text))
                 {
-                    var subfield = new SubField { Code = code, Value = text };
-                    Subfields.Add (subfield);
+                    Add (code, text);
                 }
             }
 
             return this;
 
         } // method AddNonEmpty
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей
+        /// при условии, что значение поля не пустое.
+        /// </summary>
+        public Field AddNonEmpty
+            (
+                char code,
+                bool flag,
+                object? value
+            )
+        {
+            if (flag && value is not null)
+            {
+                if (code == ValueCode)
+                {
+                    Value = value.ToString();
+                    return this;
+                }
+
+                var text = value.ToString();
+                if (!string.IsNullOrEmpty (text))
+                {
+                    Add (code, text);
+                }
+            }
+
+            return this;
+
+        } // method AddNonEmpty
+
+        /// <summary>
+        /// Добавление нескольких полей.
+        /// </summary>
+        public Field AddRange
+            (
+                IEnumerable<SubField?>? subFields
+            )
+        {
+            if (subFields is not null)
+            {
+                foreach (var subField in subFields)
+                {
+                    if (subField is not null)
+                    {
+                        Add (subField);
+                    }
+                }
+
+            } // if
+
+            return this;
+
+        } // method AddRange
 
         /// <summary>
         /// Присваивание одного поля другому.
@@ -918,17 +994,140 @@ namespace ManagedIrbis
             }
             else
             {
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty (value))
                 {
-                    RemoveSubField(code);
+                    RemoveSubField (code);
                 }
                 else
                 {
-                    GetOrAddSubField(code).Value = value;
+                    GetOrAddSubField (code).Value = value;
+                }
+
+            } // else
+
+            return this;
+
+        } // method SetSubFieldValue
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue (char code, int value) => SetSubFieldValue (code, value.ToInvariantString());
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue (char code, long value) => SetSubFieldValue (code, value.ToInvariantString());
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue (char code, DateTime value) =>
+            SetSubFieldValue (code, IrbisDate.ConvertDateToString (value));
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue (char code, int? value) =>
+            SetSubFieldValue (code, value?.ToInvariantString());
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue (char code, long? value) =>
+            SetSubFieldValue (code, value?.ToInvariantString());
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue (char code, DateTime? value) =>
+            SetSubFieldValue (code, value.HasValue ? IrbisDate.ConvertDateToString (value.Value) : null);
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue
+            (
+                char code,
+                object? value
+            )
+        {
+            var text = value is IFormattable formattable
+                ? formattable.ToString (null, CultureInfo.InvariantCulture)
+                : value?.ToString();
+
+            return SetSubFieldValue (code, text);
+
+        } // method SetSubFieldValue
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="flag">Флаг: добавление подполя (<c>true</c>) или его удаление.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue
+            (
+                char code,
+                bool flag,
+                object? value
+            )
+        {
+            string? text = null;
+
+            if (flag)
+            {
+                if (value is IFormattable formattable)
+                {
+                    text = formattable.ToString (null, CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    text = value?.ToString();
                 }
             }
 
+            if (code == ValueCode)
+            {
+                Value = text;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty (text))
+                {
+                    RemoveSubField (code);
+                }
+                else
+                {
+                    GetOrAddSubField (code).Value = text;
+                }
+
+            } // else
+
             return this;
+
         } // method SetSubFieldValue
 
         /// <summary>

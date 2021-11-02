@@ -122,19 +122,12 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Применение кумуляции к полю записи <see cref="Field"/>.
         /// </summary>
-        public void ApplyTo
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField ('q', Year)
-                .ApplySubField ('f', Volume)
-                .ApplySubField ('d', Place)
-                .ApplySubField ('h', Numbers)
-                .ApplySubField ('k', ComplectNumber);
-
-        } // method ApplyTo
+        public Field ApplyTo (Field field) => field
+            .SetSubFieldValue ('q', Year)
+            .SetSubFieldValue ('f', Volume)
+            .SetSubFieldValue ('d', Place)
+            .SetSubFieldValue ('h', Numbers)
+            .SetSubFieldValue ('k', ComplectNumber);
 
         /// <summary>
         /// Разбор поля.
@@ -191,13 +184,13 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         public Field ToField()
         {
-            Field result = new Field { Tag = Tag }
-                .AddNonEmptySubField ('q', Year)
-                .AddNonEmptySubField ('f', Volume)
-                .AddNonEmptySubField ('d', Place)
-                .AddNonEmptySubField ('h', Numbers)
-                .AddNonEmptySubField ('k', ComplectNumber)
-                .AddSubFields (UnknownSubFields);
+            Field result = new Field (Tag)
+                .AddNonEmpty ('q', Year)
+                .AddNonEmpty ('f', Volume)
+                .AddNonEmpty ('d', Place)
+                .AddNonEmpty ('h', Numbers)
+                .AddNonEmpty ('k', ComplectNumber)
+                .AddRange (UnknownSubFields);
 
             return result;
 

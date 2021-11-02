@@ -72,14 +72,8 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="ContentType"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field.ApplySubField('a', MediumCode);
-
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', MediumCode);
 
         /// <summary>
         /// Parse the field.
@@ -105,7 +99,7 @@ namespace ManagedIrbis.Fields
         public Field ToField()
         {
             var result = new Field(Tag)
-                .AddNonEmptySubField('a', MediumCode);
+                .AddNonEmpty ('a', MediumCode);
 
             return result;
 

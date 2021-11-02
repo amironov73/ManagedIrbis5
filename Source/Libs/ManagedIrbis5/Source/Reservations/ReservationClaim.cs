@@ -222,21 +222,12 @@ namespace ManagedIrbis.Reservations
         /// <summary>
         /// Применение запроса к полю записи.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            Sure.NotNull (field);
-
-            field
-                .ApplySubField ('a', Ticket)
-                .ApplySubField ('b', DateString)
-                .ApplySubField ('c', TimeString)
-                .ApplySubField ('d', DurationString)
-                .ApplySubField ('z', Status);
-
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', Ticket)
+            .SetSubFieldValue ('b', DateString)
+            .SetSubFieldValue ('c', TimeString)
+            .SetSubFieldValue ('d', DurationString)
+            .SetSubFieldValue ('z', Status);
 
         /// <summary>
         /// Разбор поля записи.
@@ -294,19 +285,12 @@ namespace ManagedIrbis.Reservations
         /// <summary>
         /// Превращение запроса в поле записи.
         /// </summary>
-        public Field ToField()
-        {
-            var result = new Field (Tag);
-            result
-                .AddNonEmptySubField ('a', Ticket)
-                .AddNonEmptySubField ('b', DateString)
-                .AddNonEmptySubField ('c', TimeString)
-                .AddNonEmptySubField ('d', DurationString)
-                .AddNonEmptySubField ('z', Status);
-
-            return result;
-
-        } // method ToField
+        public Field ToField() => new Field (Tag)
+                .AddNonEmpty ('a', Ticket)
+                .AddNonEmpty ('b', DateString)
+                .AddNonEmpty ('c', TimeString)
+                .AddNonEmpty ('d', DurationString)
+                .AddNonEmpty ('z', Status);
 
         #endregion
 

@@ -17,6 +17,7 @@
 
 #region Using directives
 
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -174,26 +175,20 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Apply to the field.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', Kind)
-                .ApplySubField('b', Resource)
-                .ApplySubField('t', Title)
-                .ApplySubField('p', View);
-        }
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', Kind)
+            .SetSubFieldValue ('b', Resource)
+            .SetSubFieldValue ('t', Title)
+            .SetSubFieldValue ('p', View);
 
         /// <summary>
         /// Decode the resource.
         /// </summary>
         public byte[] Decode()
         {
-            if (string.IsNullOrEmpty(Resource))
+            if (string.IsNullOrEmpty (Resource))
             {
-                return new byte[0];
+                return Array.Empty<byte>();
             }
 
             byte[] result = IrbisUtility.DecodePercentString(Resource);
@@ -264,10 +259,10 @@ namespace ManagedIrbis.Fields
         public Field ToField()
         {
             var result = new Field  { Tag = Tag }
-                .AddNonEmptySubField('a', Kind)
-                .AddNonEmptySubField('b', Resource)
-                .AddNonEmptySubField('t', Title)
-                .AddNonEmptySubField('p', View);
+                .AddNonEmpty ('a', Kind)
+                .AddNonEmpty ('b', Resource)
+                .AddNonEmpty ('t', Title)
+                .AddNonEmpty ('p', View);
 
             return result;
         }

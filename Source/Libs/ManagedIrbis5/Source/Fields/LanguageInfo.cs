@@ -178,24 +178,17 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="LanguageInfo"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', CatalogingLanguage)
-                .ApplySubField('k', CatalogingRules)
-                .ApplySubField('n', CharacterSet)
-                .ApplySubField('g', TitleCharacterSet)
-                .ApplySubField('b', IntermediateTranslationLanguage)
-                .ApplySubField('e', OriginalLanguage)
-                .ApplySubField('o', TocLanguage)
-                .ApplySubField('f', TitlePageLanguage)
-                .ApplySubField('z', MainTitleLanguage)
-                .ApplySubField('i', AccompanyingMaterialLanguage);
-
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', CatalogingLanguage)
+            .SetSubFieldValue ('k', CatalogingRules)
+            .SetSubFieldValue ('n', CharacterSet)
+            .SetSubFieldValue ('g', TitleCharacterSet)
+            .SetSubFieldValue ('b', IntermediateTranslationLanguage)
+            .SetSubFieldValue ('e', OriginalLanguage)
+            .SetSubFieldValue ('o', TocLanguage)
+            .SetSubFieldValue ('f', TitlePageLanguage)
+            .SetSubFieldValue ('z', MainTitleLanguage)
+            .SetSubFieldValue ('i', AccompanyingMaterialLanguage);
 
         /// <summary>
         /// Parse the field.
@@ -255,16 +248,16 @@ namespace ManagedIrbis.Fields
         {
             var result = new Field(Tag);
             result
-                .AddNonEmptySubField('a', CatalogingLanguage)
-                .AddNonEmptySubField('k', CatalogingRules)
-                .AddNonEmptySubField('n', CharacterSet)
-                .AddNonEmptySubField('g', TitleCharacterSet)
-                .AddNonEmptySubField('b', IntermediateTranslationLanguage)
-                .AddNonEmptySubField('e', OriginalLanguage)
-                .AddNonEmptySubField('o', TocLanguage)
-                .AddNonEmptySubField('f', TitlePageLanguage)
-                .AddNonEmptySubField('z', MainTitleLanguage)
-                .AddNonEmptySubField('i', AccompanyingMaterialLanguage);
+                .AddNonEmpty ('a', CatalogingLanguage)
+                .AddNonEmpty ('k', CatalogingRules)
+                .AddNonEmpty ('n', CharacterSet)
+                .AddNonEmpty ('g', TitleCharacterSet)
+                .AddNonEmpty ('b', IntermediateTranslationLanguage)
+                .AddNonEmpty ('e', OriginalLanguage)
+                .AddNonEmpty ('o', TocLanguage)
+                .AddNonEmpty ('f', TitlePageLanguage)
+                .AddNonEmpty ('z', MainTitleLanguage)
+                .AddNonEmpty ('i', AccompanyingMaterialLanguage);
 
             return result;
 

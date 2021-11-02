@@ -182,22 +182,15 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="ImprintInfo"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('c', Publisher)
-                .ApplySubField('l', PrintedPublisher)
-                .ApplySubField('a', City1)
-                .ApplySubField('x', City2)
-                .ApplySubField('y', City3)
-                .ApplySubField('d', Year)
-                .ApplySubField('1', Place)
-                .ApplySubField('t', PrintingHouse);
-
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('c', Publisher)
+            .SetSubFieldValue ('l', PrintedPublisher)
+            .SetSubFieldValue ('a', City1)
+            .SetSubFieldValue ('x', City2)
+            .SetSubFieldValue ('y', City3)
+            .SetSubFieldValue ('d', Year)
+            .SetSubFieldValue ('1', Place)
+            .SetSubFieldValue ('t', PrintingHouse);
 
         /// <summary>
         /// Parse the field.
@@ -315,16 +308,16 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public Field ToField()
         {
-            var result = new Field(Tag)
-                .AddNonEmptySubField('c', Publisher)
-                .AddNonEmptySubField('l', PrintedPublisher)
-                .AddNonEmptySubField('a', City1)
-                .AddNonEmptySubField('x', City2)
-                .AddNonEmptySubField('y', City3)
-                .AddNonEmptySubField('d', Year)
-                .AddNonEmptySubField('1', Place)
-                .AddNonEmptySubField('t', PrintingHouse)
-                .AddSubFields(UnknownSubFields);
+            var result = new Field (Tag)
+                .AddNonEmpty ('c', Publisher)
+                .AddNonEmpty ('l', PrintedPublisher)
+                .AddNonEmpty ('a', City1)
+                .AddNonEmpty ('x', City2)
+                .AddNonEmpty ('y', City3)
+                .AddNonEmpty ('d', Year)
+                .AddNonEmpty ('1', Place)
+                .AddNonEmpty ('t', PrintingHouse)
+                .AddRange (UnknownSubFields);
 
             return result;
 

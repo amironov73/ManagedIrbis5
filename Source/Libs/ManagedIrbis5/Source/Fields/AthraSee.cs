@@ -195,28 +195,21 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Apply to the <see cref="Field"/>.
         /// </summary>
-        public Field ApplyTo
-            (
-                Field field
-            )
-        {
-            field.ApplySubField('a', Surname)
-                .ApplySubField('b', Initials)
-                .ApplySubField('g', Extension)
-                .ApplySubField('<', Role)
-                .ApplySubField('1', IntegralPart)
-                .ApplySubField('c', IdentifyingSigns)
-                .ApplySubField('d', RomanNumerals)
-                .ApplySubField('f', Dates)
-                .ApplySubField('0', Instruction)
-                .ApplySubField('7', Graphics)
-                .ApplySubField('8', Language)
-                .ApplySubField('5', Link)
-                .ApplySubField('9', Mark)
-                .ApplySubField('4', RelationCode);
-
-            return field;
-        } // method ApplyTo
+        public Field ApplyTo (Field field) => field
+            .SetSubFieldValue ('a', Surname)
+            .SetSubFieldValue ('b', Initials)
+            .SetSubFieldValue ('g', Extension)
+            .SetSubFieldValue ('<', Role)
+            .SetSubFieldValue ('1', IntegralPart)
+            .SetSubFieldValue ('c', IdentifyingSigns)
+            .SetSubFieldValue ('d', RomanNumerals)
+            .SetSubFieldValue ('f', Dates)
+            .SetSubFieldValue ('0', Instruction)
+            .SetSubFieldValue ('7', Graphics)
+            .SetSubFieldValue ('8', Language)
+            .SetSubFieldValue ('5', Link)
+            .SetSubFieldValue ('9', Mark)
+            .SetSubFieldValue ('4', RelationCode);
 
         /// <summary>
         /// Parse the field.
@@ -259,20 +252,20 @@ namespace ManagedIrbis.Fields
         /// Convert back to <see cref="Field"/>.
         /// </summary>
         public Field ToField() => new Field { Tag = 410 }
-                .AddNonEmptySubField('a', Surname)
-                .AddNonEmptySubField('b', Initials)
-                .AddNonEmptySubField('g', Extension)
-                .AddNonEmptySubField('<', Role)
-                .AddNonEmptySubField('1', IntegralPart)
-                .AddNonEmptySubField('c', IdentifyingSigns)
-                .AddNonEmptySubField('d', RomanNumerals)
-                .AddNonEmptySubField('f', Dates)
-                .AddNonEmptySubField('0', Instruction)
-                .AddNonEmptySubField('7', Graphics)
-                .AddNonEmptySubField('8', Language)
-                .AddNonEmptySubField('5', Link)
-                .AddNonEmptySubField('9', Mark)
-                .AddNonEmptySubField('4', RelationCode);
+                .AddNonEmpty ('a', Surname)
+                .AddNonEmpty ('b', Initials)
+                .AddNonEmpty ('g', Extension)
+                .AddNonEmpty ('<', Role)
+                .AddNonEmpty ('1', IntegralPart)
+                .AddNonEmpty ('c', IdentifyingSigns)
+                .AddNonEmpty ('d', RomanNumerals)
+                .AddNonEmpty ('f', Dates)
+                .AddNonEmpty ('0', Instruction)
+                .AddNonEmpty ('7', Graphics)
+                .AddNonEmpty ('8', Language)
+                .AddNonEmpty ('5', Link)
+                .AddNonEmpty ('9', Mark)
+                .AddNonEmpty ('4', RelationCode);
 
         #endregion
 

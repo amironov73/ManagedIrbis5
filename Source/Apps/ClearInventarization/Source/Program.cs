@@ -57,23 +57,23 @@ namespace ClearInventarization
                     continue;
                 }
 
-                if (!string.IsNullOrEmpty(exemplar.RealPlace))
+                if (!string.IsNullOrEmpty (exemplar.RealPlace))
                 {
                     if (_realPlaceRegex is not null)
                     {
-                        if (!_realPlaceRegex.IsMatch(exemplar.RealPlace))
+                        if (!_realPlaceRegex.IsMatch (exemplar.RealPlace))
                         {
                             continue;
                         }
                     }
 
-                    exemplar.Field!.SetSubFieldValue('!', null);
+                    exemplar.Field!.RemoveSubField ('!');
                     found = true;
                 }
 
-                if (!string.IsNullOrEmpty(exemplar.CheckedDate))
+                if (!string.IsNullOrEmpty (exemplar.CheckedDate))
                 {
-                    exemplar.Field!.SetSubFieldValue('s', null);
+                    exemplar.Field!.RemoveSubField ('s');
                     found = true;
                 }
             }

@@ -203,25 +203,19 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Apply to the field.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('t', DocumentType)
-                .ApplySubField('b', DocumentKind)
-                .ApplySubField('c', DocumentCharacter1)
-                .ApplySubField('2', DocumentCharacter2)
-                .ApplySubField('3', DocumentCharacter3)
-                .ApplySubField('4', DocumentCharacter4)
-                .ApplySubField('5', DocumentCharacter5)
-                .ApplySubField('6', DocumentCharacter6)
-                .ApplySubField('x', PurposeCode1)
-                .ApplySubField('y', PurposeCode2)
-                .ApplySubField('9', PurposeCode3)
-                .ApplySubField('z', AgeRestrictions);
-        }
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('t', DocumentType)
+            .SetSubFieldValue ('b', DocumentKind)
+            .SetSubFieldValue ('c', DocumentCharacter1)
+            .SetSubFieldValue ('2', DocumentCharacter2)
+            .SetSubFieldValue ('3', DocumentCharacter3)
+            .SetSubFieldValue ('4', DocumentCharacter4)
+            .SetSubFieldValue ('5', DocumentCharacter5)
+            .SetSubFieldValue ('6', DocumentCharacter6)
+            .SetSubFieldValue ('x', PurposeCode1)
+            .SetSubFieldValue ('y', PurposeCode2)
+            .SetSubFieldValue ('9', PurposeCode3)
+            .SetSubFieldValue ('z', AgeRestrictions);
 
         /// <summary>
         /// Parse the specified field.
@@ -258,18 +252,18 @@ namespace ManagedIrbis.Fields
         public Field ToField()
         {
             var result = new Field(900)
-                .AddNonEmptySubField('t', DocumentType)
-                .AddNonEmptySubField('b', DocumentKind)
-                .AddNonEmptySubField('c', DocumentCharacter1)
-                .AddNonEmptySubField('2', DocumentCharacter2)
-                .AddNonEmptySubField('3', DocumentCharacter3)
-                .AddNonEmptySubField('4', DocumentCharacter4)
-                .AddNonEmptySubField('5', DocumentCharacter5)
-                .AddNonEmptySubField('6', DocumentCharacter6)
-                .AddNonEmptySubField('x', PurposeCode1)
-                .AddNonEmptySubField('y', PurposeCode2)
-                .AddNonEmptySubField('9', PurposeCode3)
-                .AddNonEmptySubField('z', AgeRestrictions);
+                .AddNonEmpty ('t', DocumentType)
+                .AddNonEmpty ('b', DocumentKind)
+                .AddNonEmpty ('c', DocumentCharacter1)
+                .AddNonEmpty ('2', DocumentCharacter2)
+                .AddNonEmpty ('3', DocumentCharacter3)
+                .AddNonEmpty ('4', DocumentCharacter4)
+                .AddNonEmpty ('5', DocumentCharacter5)
+                .AddNonEmpty ('6', DocumentCharacter6)
+                .AddNonEmpty ('x', PurposeCode1)
+                .AddNonEmpty ('y', PurposeCode2)
+                .AddNonEmpty ('9', PurposeCode3)
+                .AddNonEmpty ('z', AgeRestrictions);
 
             return result;
         }

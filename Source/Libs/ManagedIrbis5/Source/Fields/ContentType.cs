@@ -112,19 +112,13 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="ContentType"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', ContentKind)
-                .ApplySubField('b', DegreeOfApplicability)
-                .ApplySubField('c', TypeSpecification)
-                .ApplySubField('d', MovementSpecification)
-                .ApplySubField('e', DimensionSpecification)
-                .ApplySubField('f', SensorySpecification);
-        }
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', ContentKind)
+            .SetSubFieldValue ('b', DegreeOfApplicability)
+            .SetSubFieldValue ('c', TypeSpecification)
+            .SetSubFieldValue ('d', MovementSpecification)
+            .SetSubFieldValue ('e', DimensionSpecification)
+            .SetSubFieldValue ('f', SensorySpecification);
 
         /// <summary>
         /// Parse the field.
@@ -154,12 +148,12 @@ namespace ManagedIrbis.Fields
         public Field ToField()
         {
             var result = new Field(Tag)
-                .AddNonEmptySubField('a', ContentKind)
-                .AddNonEmptySubField('b', DegreeOfApplicability)
-                .AddNonEmptySubField('c', TypeSpecification)
-                .AddNonEmptySubField('d', MovementSpecification)
-                .AddNonEmptySubField('e', DimensionSpecification)
-                .AddNonEmptySubField('f', SensorySpecification);
+                .AddNonEmpty ('a', ContentKind)
+                .AddNonEmpty ('b', DegreeOfApplicability)
+                .AddNonEmpty ('c', TypeSpecification)
+                .AddNonEmpty ('d', MovementSpecification)
+                .AddNonEmpty ('e', DimensionSpecification)
+                .AddNonEmpty ('f', SensorySpecification);
 
             return result;
         }

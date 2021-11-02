@@ -154,19 +154,12 @@ namespace ManagedIrbis.Fields
         /// Apply the <see cref="IsbnInfo"/>
         /// to the <see cref="Field"/>.
         /// </summary>
-        public void ApplyToField
-            (
-                Field field
-            )
-        {
-            field
-                .ApplySubField('a', Isbn)
-                .ApplySubField('b', Refinement)
-                .ApplySubField('z', Erroneous)
-                .ApplySubField('d', PriceString)
-                .ApplySubField('c', Currency);
-
-        } // method ApplyToField
+        public Field ApplyToField (Field field) => field
+            .SetSubFieldValue ('a', Isbn)
+            .SetSubFieldValue ('b', Refinement)
+            .SetSubFieldValue ('z', Erroneous)
+            .SetSubFieldValue ('d', PriceString)
+            .SetSubFieldValue ('c', Currency);
 
         /// <summary>
         /// Parse the <see cref="Record"/>.
@@ -226,16 +219,16 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public Field ToField()
         {
-            var result = new Field(Tag)
-                .AddNonEmptySubField('a', Isbn)
-                .AddNonEmptySubField('b', Refinement)
-                .AddNonEmptySubField('z', Erroneous)
-                .AddNonEmptySubField
+            var result = new Field (Tag)
+                .AddNonEmpty ('a', Isbn)
+                .AddNonEmpty ('b', Refinement)
+                .AddNonEmpty ('z', Erroneous)
+                .AddNonEmpty ('c', Currency)
+                .AddNonEmpty
                     (
                         'd',
                         Price != 0.0m ? Price.ToInvariantString() : null
-                    )
-                .AddNonEmptySubField('c', Currency);
+                    );
 
             return result;
 
