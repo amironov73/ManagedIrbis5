@@ -97,7 +97,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Список полей.
         /// </summary>
-        public List<Field> Fields { get; } = new ();
+        public FieldCollection Fields { get; }
 
         /// <summary>
         /// Описание в произвольной форме (опциональное).
@@ -130,7 +130,36 @@ namespace ManagedIrbis
 
         #endregion
 
+        #region Construction
+
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
+        public Record()
+        {
+            Fields = new FieldCollection() { Record = this };
+
+        } // constructor
+
+        #endregion
+
         #region Public methods
+
+        /// <summary>
+        /// Добавление поля в конец списка полей.
+        /// </summary>
+        /// <param name="field">Добавляемое поле.</param>
+        /// <returns>this</returns>
+        public Record Add
+            (
+                Field field
+            )
+        {
+            Fields.Add (field);
+
+            return this;
+
+        } // method Add
 
         /// <summary>
         /// Установка статуса записи.

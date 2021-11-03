@@ -158,6 +158,7 @@ namespace AM
             {
                 Logger.LogDebug(lazy());
             }
+
         } // method Debug
 
         /// <summary>

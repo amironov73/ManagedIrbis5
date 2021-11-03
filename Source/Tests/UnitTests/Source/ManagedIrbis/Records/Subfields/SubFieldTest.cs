@@ -303,7 +303,6 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
             }
         }
 
-        [Ignore]
         [TestMethod]
         [Description ("Замена управляющих символов на пробелы")]
         public void SubField_SetValue_4()
@@ -393,6 +392,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         */
 
         [TestMethod]
+        [Description ("Проверяем метод Write в нашем конвертере")]
         public void SubField_ToJson_1()
         {
             var subField = new SubField ('a', "Value");
@@ -424,6 +424,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         */
 
         [TestMethod]
+        [Description ("Проверяем метод Read в нашем конвертере")]
         public void SubField_FromJson_1()
         {
             const string text = "{\"code\":\"a\",\"value\":\"Value\"}";
@@ -439,7 +440,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         }
 
         [TestMethod]
-        [Description ("Проверяем наш метод WriteXml")]
+        [Description ("Проверяем метод WriteXml")]
         public void SubField_ToXml_1()
         {
             var subField = new SubField ('a', "Value");

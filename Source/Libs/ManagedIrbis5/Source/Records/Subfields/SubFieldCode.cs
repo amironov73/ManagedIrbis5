@@ -10,7 +10,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-/* SubFieldCode.cs -- subfield code related routines
+/* SubFieldCode.cs -- методы, работающие с кодами подполей
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,20 +26,60 @@ using AM.Collections;
 
 namespace ManagedIrbis
 {
+    /*
+
+        > **ИДЕНТИФИКАТОР ПОДПОЛЯ** (Subfield Identifier) или **КОД ПОДПОЛЯ**
+        > (Subfield code) – код, идентифицирующий отдельные подполя внутри переменного
+        > поля. Состоит из двух символов. Первый символ – разделитель (Delimiter),
+        > всегда один и тот же уникальный символ, установленный по ISO 2709,
+        > второй символ – код подполя (Subfield code), который может быть цифровым
+        > или буквенным.
+        >
+        > *Стандарт RUSMARC*
+
+        Коды подполей нечувствительны к регистру символов.
+
+        Технически возможны любые коды подполей, однако стандарт допускает
+        лишь коды в дипапазоне от `\u0021` (восклицательный знак)
+        до `\u007E` (тильда).
+
+        Кириллические символы лучше не использовать в качестве кодов подполей - возникнут
+        проблемы при экспорте записей в коммуникативные форматы. ManagedIrbis обрабатывает
+        любые коды подполей без проблем.
+
+        В стандарте RUSMARC принято ссылаться на подполя `$a`, `$b` и т. д.
+        В документации ИРБИС64 принято обозначение `^a`, `^b` и т. д.
+        Мы будем придерживаться последнего обозначения.
+
+        Стандарт допускает лишь как правило алфавитно-цифровые код
+        подполей `A-Z, 0-9`, но в ИРБИС64 бывают подполя с экзотическими
+        кодами вроде `!`, `(` и др.
+
+        ИРБИС64 трактует код подполя `*` как "данные до первого разделителя
+        либо значение первого по порядку подполя" (смотря по тому,
+        что присутствует в записи). ManagedIrbis поддерживает эту особенность.
+
+        Подполе с кодом `\0` используется для хранения значения поля до первого разделителя.
+        Это расширение ManagedIrbis.
+
+        Код подполя может быть равен разделителю подполей.
+
+     */
+
     /// <summary>
-    /// Subfield code related routines.
+    /// Методы, работающие с кодами подполей.
     /// </summary>
     public static class SubFieldCode
     {
         #region Constants
 
         /// <summary>
-        /// Begin of valid codes range.
+        /// Начало диапазона допустимых кодов подполей.
         /// </summary>
         public const char DefaultFirstCode = '!';
 
         /// <summary>
-        /// End of valid codes range (including!).
+        /// Конец диапазона допустимых кодов подполей (включительно!).
         /// </summary>
         public const char DefaultLastCode = '~';
 
@@ -48,13 +88,14 @@ namespace ManagedIrbis
         #region Properties
 
         /// <summary>
-        /// Throw exception on verification error.
+        /// Нужно ли выбрасывать исключение при ошибке верификации кода подполя.
+        /// По умолчанию - не нужно.
         /// </summary>
         [ExcludeFromCodeCoverage]
         public static bool ThrowOnVerification { get; set; }
 
         /// <summary>
-        /// <see cref="CharSet"/> of valid codes.
+        /// Набор символов <see cref="CharSet"/> для допустимых кодов подполей.
         /// </summary>
         public static CharSet ValidCodes => _validCodes;
 
@@ -68,8 +109,10 @@ namespace ManagedIrbis
         static SubFieldCode()
         {
             _validCodes = new CharSet();
-            _validCodes.AddRange(DefaultFirstCode, DefaultLastCode);
-            _validCodes.Remove('^');
+            _validCodes.AddRange (DefaultFirstCode, DefaultLastCode);
+
+            // _validCodes.Remove ('^'); // символ крышки мы трактуем как допустимый
+
         } // static constructor
 
         #endregion
@@ -83,17 +126,19 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
-        /// Whether the code valid.
+        /// Проверка кода подполя на валидность.
         /// </summary>
-        public static bool IsValidCode (char code) => ValidCodes.Contains(code);
+        public static bool IsValidCode (char code) => ValidCodes.Contains (code);
 
         /// <summary>
-        /// Code normalization.
+        /// Нормализация кода подполя.
+        /// Заключается в приведении символа к нижнему регистру
+        /// (если возможно).
         /// </summary>
-        public static char Normalize (char code) => char.ToLowerInvariant(code);
+        public static char Normalize (char code) => char.ToLowerInvariant (code);
 
         /// <summary>
-        /// Verify subfield code.
+        /// Верификация кода подполя.
         /// </summary>
         public static bool Verify
             (
@@ -121,9 +166,9 @@ namespace ManagedIrbis
         } // method Verify
 
         /// <summary>
-        /// Verify subfield code.
+        /// Верификация кода подполя.
         /// </summary>
-        public static bool Verify (char code) => Verify(code, ThrowOnVerification);
+        public static bool Verify (char code) => Verify (code, ThrowOnVerification);
 
         #endregion
 

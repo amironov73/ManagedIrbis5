@@ -173,6 +173,32 @@ namespace AM
         } // method DirectoryExist
 
         /// <summary>
+        /// Фиксация сбоя.
+        /// </summary>
+        public Verifier<T> Failure()
+        {
+            Result = false;
+
+            return this;
+
+        } // method Failure
+
+        /// <summary>
+        /// Фиксация сбоя.
+        /// </summary>
+        public Verifier<T> Failure
+            (
+                string message
+            )
+        {
+            Result = false;
+            _Throw (message);
+
+            return this;
+
+        } // method Failure
+
+        /// <summary>
         /// Проверка существования указанного файла.
         /// </summary>
         public Verifier<T> FileExist

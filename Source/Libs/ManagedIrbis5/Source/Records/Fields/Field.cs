@@ -22,6 +22,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.IO;
@@ -41,6 +42,48 @@ using ManagedIrbis.Infrastructure;
 
 namespace ManagedIrbis
 {
+    /*
+
+     Поле записи. Состоит из метки, значения до первого разделителя
+     и произвольного количества подполей.
+
+     Поле записи характеризуется числовой меткой в диапазоне
+     от 1 до 2147483647 (на практике встречаются коды от 1 до 9999)
+     и содержит значение до первого разделителя (опционально)
+     и произвольное количество подполей (см. класс `SubField`).
+
+     Стандартом MARC у полей предусмотрены также два односимвольных
+     индикатора, но ИРБИС вслед за ISIS их не поддерживает.
+
+     Кроме того, стандарт MARC предусматривает т. наз. "фиксированные"
+     поля с метками от 1 до 9 включительно, которые не должны содержать
+     ни индикаторов, ни подполей, но имеют строго фиксированную структуру.
+     ИРБИС такие поля обрабатывает особым образом только в ситуации
+     импорта/экспорта в формат ISO2709, в остальном же он их трактует
+     точно так же, как и прочие поля (которые стандарт называет
+     полями переменной длины).
+
+     Стандартом MARC предусмотрены метки в диапазоне от 1 до 999,
+     все прочие являются самодеятельностью ИРБИС. Поля с нестандартными
+     метками не могут быть выгружены в формат ISO2709.
+
+     Хотя технически поле может содержать одновременно и значение
+     до первого разделителя, и подполя, но стандартом такая ситуация
+     не предусмотрена, на практике она означает сбой. В стандарте
+     MARC поле содержит либо значение либо подполя.
+
+     Начиная с версии 2018, ИРБИС64 резервирует метку 2147483647
+     для поля GUID - уникального идентификатора записи.
+
+     Порядок подполей в поле важен, т. к. на этот порядок завязана
+     обработка т. наз. "вложенных полей".
+
+     Стандартом MARC предусмотрено, что внутри поля могут повторяться
+     подполя с одинаковым кодом, однако, ИРБИС вслед за ISIS очень
+     ограниченно поддерживает эту ситуацию (см. форматный выход `&umarci`).
+
+     */
+
     /// <summary>
     /// Поле библиографической записи.
     /// </summary>
@@ -94,7 +137,7 @@ namespace ManagedIrbis
         /// </remarks>
         public string? Value
         {
-            get => GetValueSubField()?.Value ?? default;
+            get => GetValueSubField()?.Value;
             set
             {
                 Clear();
@@ -109,6 +152,7 @@ namespace ManagedIrbis
                         CreateValueSubField().Value = value;
                     }
                 }
+
             } // set
 
         } // property Value
@@ -116,8 +160,8 @@ namespace ManagedIrbis
         /// <summary>
         /// Список подполей.
         /// </summary>
-        [XmlArrayItem("subfield")]
-        [JsonPropertyName("subfields")]
+        [XmlArrayItem ("subfield")]
+        [JsonPropertyName ("subfields")]
         public SubFieldCollection Subfields { get; }
 
         /// <summary>
@@ -153,7 +197,7 @@ namespace ManagedIrbis
         /// </summary>
         public Field()
         {
-            Subfields = new SubFieldCollection() { Field = this };
+            Subfields = new SubFieldCollection { Field = this };
 
         } // constructor
 
@@ -415,7 +459,7 @@ namespace ManagedIrbis
                 string? value = default
             )
         {
-            Subfields.Add (new SubField(code, value));
+            Subfields.Add (new SubField (code, value));
 
             return this;
 
@@ -795,8 +839,13 @@ namespace ManagedIrbis
             }
             catch (Exception exception)
             {
-                Console.Error.WriteLine (line);
-                Console.Error.WriteLine (exception);
+                Magna.TraceException
+                    (
+                        nameof (Field) + "::" + nameof (DecodeBody)
+                            + ": " + exception.GetType() + ": " + exception.Message,
+                        exception
+                    );
+                Magna.Debug (line.ToString());
 
                 throw;
             }
@@ -824,6 +873,11 @@ namespace ManagedIrbis
                 return null;
             }
 
+            if (code == '*')
+            {
+                return Subfields.FirstOrDefault();
+            }
+
             foreach (var subfield in Subfields)
             {
                 if (subfield.Code.SameChar (code))
@@ -844,6 +898,28 @@ namespace ManagedIrbis
                 char code
             )
         {
+            if (code == ValueCode)
+            {
+                var value = GetValueSubField();
+                if (value is not null)
+                {
+                    yield return value;
+                }
+
+                yield break;
+            }
+
+            if (code == '*')
+            {
+                var first = Subfields.FirstOrDefault();
+                if (first is not null)
+                {
+                    yield return first;
+                }
+
+                yield break;
+            }
+
             foreach (var subfield in Subfields)
             {
                 if (subfield.Code.SameChar (code))
@@ -864,15 +940,27 @@ namespace ManagedIrbis
         {
             var result = new List<SubField>();
 
-            foreach (var subfield in Subfields)
+            if (code == '*')
             {
-                if (subfield.Code.SameChar (code))
+                var first = Subfields.FirstOrDefault();
+                if (first is not null)
                 {
-                    result.Add(subfield);
+                    result.Add (first);
+                }
+            }
+            else
+            {
+                foreach (var subfield in Subfields)
+                {
+                    if (subfield.Code.SameChar (code))
+                    {
+                        result.Add (subfield);
+                    }
                 }
             }
 
             return result.ToArray();
+
         } // method GetSubFields
 
         /// <summary>
@@ -886,23 +974,29 @@ namespace ManagedIrbis
                 char code
             )
         {
-            if (code == '\0')
+            if (code == ValueCode)
             {
+                return GetValueSubField() ?? CreateValueSubField();
+            }
 
+            if (code == '*')
+            {
+                return Subfields.FirstOrDefault() ?? CreateValueSubField();
             }
 
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     return subfield;
                 }
             }
 
-            var result = new SubField { Code = code };
-            Subfields.Add(result);
+            var result = new SubField (code);
+            Add (result);
 
             return result;
+
         } // method GetOrAddSubField
 
         /// <summary>
@@ -929,10 +1023,20 @@ namespace ManagedIrbis
                 return GetValueSubField();
             }
 
+            if (code == '*')
+            {
+                if (occurrence != 0)
+                {
+                    return null;
+                }
+
+                return Subfields.FirstOrDefault();
+            }
+
             if (occurrence < 0)
             {
                 // отрицательные индексы отсчитываются от конца
-                occurrence = Subfields.Count(sf => sf.Code.SameChar(code)) + occurrence;
+                occurrence = Subfields.Count (sf => sf.Code.SameChar (code)) + occurrence;
                 if (occurrence < 0)
                 {
                     return null;
@@ -941,7 +1045,7 @@ namespace ManagedIrbis
 
             foreach (var subfield in Subfields)
             {
-                if (subfield.Code.SameChar(code))
+                if (subfield.Code.SameChar (code))
                 {
                     if (occurrence == 0)
                     {
@@ -953,6 +1057,7 @@ namespace ManagedIrbis
             }
 
             return null;
+
         } // method GetSubField
 
         /// <summary>
@@ -968,13 +1073,13 @@ namespace ManagedIrbis
                 char code,
                 int occurrence = 0
             )
-            => GetSubField(code, occurrence)?.Value ?? default;
+            => GetSubField (code, occurrence)?.Value;
 
         /// <summary>
-        /// For * specification.
+        /// Поиск подполя '*' (имитация ИРБИС).
         /// </summary>
         public string? GetValueOrFirstSubField()
-            => Subfields.FirstOrDefault()?.Value ?? default;
+            => Subfields.FirstOrDefault()?.Value;
 
         /// <summary>
         /// Установка значения подполя.
@@ -991,6 +1096,11 @@ namespace ManagedIrbis
             if (code == ValueCode)
             {
                 Value = value;
+            }
+            else if (code == '*')
+            {
+                var first = Subfields.FirstOrDefault() ?? CreateValueSubField();
+                first.Value = value;
             }
             else
             {
@@ -1224,11 +1334,13 @@ namespace ManagedIrbis
         public void SetReadOnly()
         {
             ReadOnly = true;
+            Subfields.ReadOnly = true;
 
             foreach (var subfield in Subfields)
             {
                 subfield.SetReadOnly();
             }
+
         } // method SetReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly"/>
@@ -1250,6 +1362,7 @@ namespace ManagedIrbis
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        [ExcludeFromCodeCoverage]
         public IEnumerator<SubField> GetEnumerator() => Subfields.GetEnumerator();
 
         #endregion
@@ -1262,18 +1375,29 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            // TODO: удостовериться, что подполе-значение единственное и первое!
+            var verifier = new Verifier<Field> (this, throwOnError);
 
-            var verifier = new Verifier<Field>(this, throwOnError);
-
-            verifier.Positive(Tag, nameof(Tag));
-            verifier.Positive(Subfields.Count, "Subfields.Count");
+            verifier.Positive (Tag);
+            verifier.Positive (Subfields.Count);
             foreach (var subfield in Subfields)
             {
-                verifier.VerifySubObject(subfield);
+                verifier.VerifySubObject (subfield);
             }
 
+            if (verifier.Result)
+            {
+                for (var i = 1; i < Subfields.Count; i++)
+                {
+                    if (Subfields[i].Code == ValueCode)
+                    {
+                        verifier.Failure ("Value field is not first");
+                    }
+                }
+
+            } // if
+
             return verifier.Result;
+
         } // method Verify
 
         #endregion

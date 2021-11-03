@@ -35,7 +35,7 @@ namespace ManagedIrbis.WinForms.Editors
         /// </summary>
         public bool ReadOnly
         {
-            get { return _gridView.ReadOnly; }
+            get => _gridView.ReadOnly;
             set
             {
                 _bindingNavigator.Enabled = !value;
@@ -83,9 +83,11 @@ namespace ManagedIrbis.WinForms.Editors
         /// </summary>
         public void GetFields
             (
-                List<Field> collection
+                IEnumerable<Field> collection
             )
         {
+            /*
+
             //collection.BeginUpdate();
             collection.Clear();
             //collection.EnsureCapacity(_items.Count);
@@ -106,6 +108,8 @@ namespace ManagedIrbis.WinForms.Editors
                 }
             }
 
+            */
+
             //collection.EndUpdate();
 
         } // method GetFields
@@ -115,11 +119,11 @@ namespace ManagedIrbis.WinForms.Editors
         /// </summary>
         public void SetFields
             (
-                List<Field> collection
+                IEnumerable<Field> collection
             )
         {
-            _originalFields = collection;
-            var list = new List<FieldItem>(collection.Count);
+            // _originalFields = collection;
+            var list = new List<FieldItem>();
             foreach (var field in collection)
             {
                 var item = new FieldItem

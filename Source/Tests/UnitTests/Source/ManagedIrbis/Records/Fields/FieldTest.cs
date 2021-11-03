@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using AM;
+using AM.Linq;
 using AM.Runtime;
 
 using ManagedIrbis;
@@ -29,6 +30,18 @@ namespace UnitTests.ManagedIrbis.Records.Fields
             {
                 return Text.ToVisibleString();
             }
+        }
+
+        private Field _GetField()
+        {
+            var result = new Field (200, "Значение")
+            {
+                { 'a', "Заглавие" },
+                { 'e', "подзаголовочные" },
+                { 'f', "об ответственности" }
+            };
+
+            return result;
         }
 
         [TestMethod]
@@ -256,8 +269,22 @@ namespace UnitTests.ManagedIrbis.Records.Fields
         }
 
         [TestMethod]
-        [Description ("Добавление объекта произвольного типа")]
+        [Description ("Добавление логического значения")]
         public void Field_Add_4()
+        {
+            var field = new Field();
+            Assert.AreSame (field, field.Add ('a', true));
+            Assert.AreSame (field, field.Add ('b', false));
+            Assert.AreEqual (2, field.Subfields.Count);
+            Assert.AreEqual ('a', field.Subfields[0].Code);
+            Assert.AreEqual ('b', field.Subfields[1].Code);
+            Assert.AreEqual ("1", field.Subfields[0].Value);
+            Assert.AreEqual ("0", field.Subfields[1].Value);
+        }
+
+        [TestMethod]
+        [Description ("Добавление объекта произвольного типа")]
+        public void Field_Add_5()
         {
             var field = new Field();
             var obj = new MyClass() { Text = "Какой-то текст" };
@@ -265,6 +292,20 @@ namespace UnitTests.ManagedIrbis.Records.Fields
             Assert.AreEqual (1, field.Subfields.Count);
             Assert.AreEqual ('a', field.Subfields[0].Code);
             Assert.AreEqual ("Какой-то текст", field.Subfields[0].Value);
+        }
+
+        [TestMethod]
+        [Description ("Добавление объекта произвольного типа")]
+        public void Field_Add_6()
+        {
+            const string someText = "Some text";
+            var field = new Field();
+            var obj = new MyClass() { Text = someText };
+            Assert.AreSame (field, field.Add ('\0', obj));
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreEqual ('\0', field.Subfields[0].Code);
+            Assert.AreEqual (someText, field.Subfields[0].Value);
+            Assert.AreEqual (someText, field.Value);
         }
 
         [TestMethod]
@@ -330,6 +371,107 @@ namespace UnitTests.ManagedIrbis.Records.Fields
             Assert.AreEqual (1, field.Subfields.Count);
             Assert.AreEqual ('b', field.Subfields[0].Code);
             Assert.AreEqual ("20170930", field.Subfields[0].Value);
+        }
+
+        [TestMethod]
+        [Description ("Добавление подполя при условии, что оно не равно 0")]
+        public void Field_AddNonEmpty_6()
+        {
+            int? first = 0;
+            int? second = 1;
+            var field = new Field()
+                .AddNonEmpty ('a', first)
+                .AddNonEmpty ('b', second);
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreEqual ('b', field.Subfields[0].Code);
+            Assert.AreEqual ("1", field.Subfields[0].Value);
+        }
+
+        [TestMethod]
+        [Description ("Добавление подполя с флагом")]
+        public void Field_AddNonEmpty_7()
+        {
+            const string someText = "Some text";
+            MyClass? value = null;
+            var field = new Field();
+            Assert.AreSame (field, field.AddNonEmpty ('a', false, value));
+            Assert.AreEqual (0, field.Subfields.Count);
+
+            Assert.AreSame (field, field.AddNonEmpty ('a', true, value));
+            Assert.AreEqual (0, field.Subfields.Count);
+
+            value = new MyClass { Text = someText };
+            Assert.AreSame (field, field.AddNonEmpty ('a', false, value));
+            Assert.AreEqual (0, field.Subfields.Count);
+
+            Assert.AreSame (field, field.AddNonEmpty ('a', true, value));
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreEqual ('a', field.Subfields[0].Code);
+            Assert.AreEqual (someText, field.Subfields[0].Value);
+        }
+
+        [TestMethod]
+        [Description ("Добавление подполя с флагом: значение до первого разделителя")]
+        public void Field_AddNonEmpty_8()
+        {
+            const string someText = "Some text";
+            var value = new MyClass { Text = someText };
+            var field = new Field();
+            Assert.AreSame (field, field.AddNonEmpty ('\0', true, value));
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreEqual ('\0', field.Subfields[0].Code);
+            Assert.AreEqual (someText, field.Subfields[0].Value);
+            Assert.AreEqual (someText, field.Value);
+        }
+
+        [TestMethod]
+        [Description ("Добавление подполя: значение до первого разделителя")]
+        public void Field_AddNonEmpty_9()
+        {
+            const string someText = "Some text";
+            var value = new MyClass { Text = someText };
+            var field = new Field();
+            Assert.AreSame (field, field.AddNonEmpty ('\0',  value));
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreEqual ('\0', field.Subfields[0].Code);
+            Assert.AreEqual (someText, field.Subfields[0].Value);
+            Assert.AreEqual (someText, field.Value);
+        }
+
+        [TestMethod]
+        [Description ("Добавление нескольких подполей: пустой массив")]
+        public void Field_AddRange_1()
+        {
+            var field = new Field();
+            Assert.AreSame (field, field.AddRange (Array.Empty<SubField>()));
+            Assert.AreEqual (0, field.Subfields.Count);
+        }
+
+        [TestMethod]
+        [Description ("Добавление нескольких подполей: массив из одного элемента")]
+        public void Field_AddRange_2()
+        {
+            var field = new Field();
+            var sf1 = new SubField ('a', "SubA");
+            Assert.AreSame (field, field.AddRange(Sequence.FromItem (sf1)));
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreEqual (sf1.Code, field.Subfields[0].Code);
+            Assert.AreEqual (sf1.Value, field.Subfields[0].Value);
+        }
+
+        [TestMethod]
+        [Description ("Добавление нескольких подполей: массив из двух элементов")]
+        public void Field_AddRange_3()
+        {
+            var field = new Field();
+            var sf1 = new SubField ('a', "SubA");
+            var sf2 = new SubField ('b', "SubB");
+            Assert.AreSame (field, field.AddRange(Sequence.FromItems (sf1, sf2)));
+            Assert.AreEqual (2, field.Subfields.Count);
+            Assert.AreEqual (sf1.Code, field.Subfields[0].Code);
+            Assert.AreEqual (sf1.Value, field.Subfields[0].Value);
+            Assert.AreEqual (sf2.Code, field.Subfields[1].Code);
+            Assert.AreEqual (sf2.Value, field.Subfields[1].Value);
         }
 
         [TestMethod]
@@ -598,6 +740,398 @@ namespace UnitTests.ManagedIrbis.Records.Fields
         }
 
         [TestMethod]
+        [Description ("Поиск или добавление подполя: пустое поле")]
+        public void Field_GetOrAddSubField_1()
+        {
+            var field = new Field();
+            var subfield = field.GetOrAddSubField ('a');
+            Assert.IsNotNull (subfield);
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreSame (field, subfield.Field);
+            Assert.AreEqual ('a', subfield.Code);
+        }
+
+        [TestMethod]
+        [Description ("Поиск или добавление подполя: подполе уже существует")]
+        public void Field_GetOrAddSubField_2()
+        {
+            var field = new Field();
+            var subfield1 = new SubField ('a');
+            field.Add (subfield1);
+            var subfield2 = field.GetOrAddSubField ('a');
+            Assert.IsNotNull (subfield2);
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreSame (field, subfield2.Field);
+            Assert.AreSame (subfield1, subfield2);
+            Assert.AreEqual ('a', subfield2.Code);
+        }
+
+        [TestMethod]
+        [Description ("Поиск или добавление подполя: значение до первого разделителя")]
+        public void Field_GetOrAddSubField_3()
+        {
+            var field = new Field();
+            var subfield = field.GetOrAddSubField ('\0');
+            Assert.IsNotNull (subfield);
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreSame (field, subfield.Field);
+            Assert.AreEqual ('\0', subfield.Code);
+        }
+
+        [TestMethod]
+        [Description ("Поиск или добавление подполя: значение до первого разделителя")]
+        public void Field_GetOrAddSubField_4()
+        {
+            var field = new Field();
+            var subfield1 = new SubField ('\0');
+            field.Add (subfield1);
+            var subfield2 = field.GetOrAddSubField ('\0');
+            Assert.IsNotNull (subfield2);
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreSame (field, subfield2.Field);
+            Assert.AreEqual ('\0', subfield2.Code);
+        }
+
+        [TestMethod]
+        [Description ("Поиск или добавление подполя: подполя есть, но не те")]
+        public void Field_GetOrAddSubField_5()
+        {
+            var field = new Field();
+            field.Add ('a');
+            var subfield = field.GetOrAddSubField ('b');
+            Assert.IsNotNull (subfield);
+            Assert.AreEqual (2, field.Subfields.Count);
+            Assert.AreSame (field, subfield.Field);
+            Assert.AreEqual ('b', subfield.Code);
+        }
+
+        [TestMethod]
+        [Description ("Получение массива подполей: пустое поле")]
+        public void Field_GetSubFields_1()
+        {
+            var field = new Field();
+            var subfields = field.GetSubFields ('a');
+            Assert.AreEqual (0, subfields.Length);
+        }
+
+        [TestMethod]
+        [Description ("Получение массива подполей: есть одно подходящее подполе")]
+        public void Field_GetSubFields_2()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA" },
+                { 'b', "SubB" },
+            };
+            var subfields = field.GetSubFields ('a');
+            Assert.AreEqual (1, subfields.Length);
+            Assert.AreSame (field.Subfields[0], subfields[0]);
+        }
+
+        [TestMethod]
+        [Description ("Получение массива подполей: есть два подходящих подполя")]
+        public void Field_GetSubFields_3()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA1" },
+                { 'b', "SubB" },
+                { 'a', "SubA2" },
+            };
+            var subfields = field.GetSubFields ('a');
+            Assert.AreEqual (2, subfields.Length);
+            Assert.AreSame (field.Subfields[0], subfields[0]);
+            Assert.AreSame (field.Subfields[2], subfields[1]);
+        }
+
+        [TestMethod]
+        [Description ("Получение массива подполей: нет подходящих полей")]
+        public void Field_GetSubFields_4()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA1" },
+                { 'b', "SubB" },
+            };
+            var subfields = field.GetSubFields ('z');
+            Assert.AreEqual (0, subfields.Length);
+        }
+
+        [TestMethod]
+        [Description ("Поиск подподя с указанным кодом: пустое поле")]
+        public void Field_GetSubField_1()
+        {
+            var field = new Field();
+            var found = field.GetSubField ('a');
+            Assert.IsNull (found);
+
+            found = field.GetSubField ('a', 1);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Поиск подполя с указанным кодом: есть одно вхождение")]
+        public void Field_GetSubField_2()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA" },
+                { 'b', "SubB" }
+            };
+            var found = field.GetSubField ('a');
+            Assert.AreSame (field.Subfields[0], found);
+
+            found = field.GetSubField ('a', 1);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Поиск подполя с указанным кодом: есть два вхождения")]
+        public void Field_GetSubField_3()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA1" },
+                { 'b', "SubB" },
+                { 'a', "SubA2" },
+            };
+            var found = field.GetSubField ('a');
+            Assert.AreSame (field.Subfields[0], found);
+
+            found = field.GetSubField ('a', 1);
+            Assert.AreSame (field.Subfields[2], found);
+
+            found = field.GetSubField ('a', 2);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Поиск подполя с указанным кодом: нет ни одного вхождения нужного подполя")]
+        public void Field_GetSubField_4()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA" },
+                { 'b', "SubB" },
+            };
+            var found = field.GetSubField ('c');
+            Assert.IsNull (found);
+
+            found = field.GetSubField ('c', 1);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Поиск подполя с указанным кодом: отрицательный индекс")]
+        public void Field_GetSubField_5()
+        {
+            var field = new Field()
+            {
+                { 'a', "SubA1" },
+                { 'b', "SubB" },
+                { 'a', "SubA2" },
+                { 'c', "SubC" },
+                { 'a', "SubA3" },
+            };
+            var found = field.GetSubField ('a', -1);
+            Assert.AreSame (field.Subfields[4], found);
+
+            found = field.GetSubField ('a', -2);
+            Assert.AreSame (field.Subfields[2], found);
+
+            found = field.GetSubField ('a', -3);
+            Assert.AreSame (field.Subfields[0], found);
+
+            found = field.GetSubField ('a', -4);
+            Assert.IsNull (found);
+
+            found = field.GetSubField ('b', -1);
+            Assert.AreSame (field.Subfields[1], found);
+
+            found = field.GetSubField ('b', -2);
+            Assert.IsNull (found);
+
+            found = field.GetSubField ('c', -1);
+            Assert.AreSame (field.Subfields[3], found);
+
+            found = field.GetSubField ('c', -2);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Поиск подполя с указанным кодом: значение до первого разделителя")]
+        public void Field_GetSubField_6()
+        {
+            var field = new Field();
+            var found = field.GetSubField ('\0');
+            Assert.IsNull (found);
+
+            field.Value = "Value";
+            found = field.GetSubField ('\0');
+            Assert.IsNotNull (found);
+            Assert.AreSame (field.Subfields[0], found);
+            Assert.AreEqual ("Value", found.Value);
+
+            found = field.GetSubField ('\0', 1);
+            Assert.IsNull (found);
+
+            found = field.GetSubField ('\0', -1);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Значение подполя с указанным кодом: пустое поле")]
+        public void Field_GetSubFieldValue_1()
+        {
+            var field = new Field();
+            var found = field.GetSubFieldValue ('a');
+            Assert.IsNull (found);
+
+            found = field.GetSubFieldValue ('a', 1);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Значение подполя с указанным кодом: есть одно вхождение")]
+        public void Field_GetSubFieldValue_2()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA" },
+                { 'b', "SubB" }
+            };
+            var found = field.GetSubFieldValue ('a');
+            Assert.AreSame (field.Subfields[0].Value, found);
+
+            found = field.GetSubFieldValue ('a', 1);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Значение подполя с указанным кодом: есть два вхождения")]
+        public void Field_GetSubFieldValue_3()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA1" },
+                { 'b', "SubB" },
+                { 'a', "SubA2" },
+            };
+            var found = field.GetSubFieldValue ('a');
+            Assert.AreSame (field.Subfields[0].Value, found);
+
+            found = field.GetSubFieldValue ('a', 1);
+            Assert.AreSame (field.Subfields[2].Value, found);
+
+            found = field.GetSubFieldValue ('a', 2);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Значение подполя с указанным кодом: нет ни одного вхождения нужного подполя")]
+        public void Field_GetSubFieldValue_4()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA" },
+                { 'b', "SubB" },
+            };
+            var found = field.GetSubFieldValue ('c');
+            Assert.IsNull (found);
+
+            found = field.GetSubFieldValue ('c', 1);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Значение подполя с указанным кодом: отрицательный индекс")]
+        public void Field_GetSubFieldValue_5()
+        {
+            var field = new Field()
+            {
+                { 'a', "SubA1" },
+                { 'b', "SubB" },
+                { 'a', "SubA2" },
+                { 'c', "SubC" },
+                { 'a', "SubA3" },
+            };
+            var found = field.GetSubFieldValue ('a', -1);
+            Assert.AreSame (field.Subfields[4].Value, found);
+
+            found = field.GetSubFieldValue ('a', -2);
+            Assert.AreSame (field.Subfields[2].Value, found);
+
+            found = field.GetSubFieldValue ('a', -3);
+            Assert.AreSame (field.Subfields[0].Value, found);
+
+            found = field.GetSubFieldValue ('a', -4);
+            Assert.IsNull (found);
+
+            found = field.GetSubFieldValue ('b', -1);
+            Assert.AreSame (field.Subfields[1].Value, found);
+
+            found = field.GetSubFieldValue ('b', -2);
+            Assert.IsNull (found);
+
+            found = field.GetSubFieldValue ('c', -1);
+            Assert.AreSame (field.Subfields[3].Value, found);
+
+            found = field.GetSubFieldValue ('c', -2);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Значение подполя с указанным кодом: значение до первого разделителя")]
+        public void Field_GetSubFieldValue_6()
+        {
+            var field = new Field();
+            var found = field.GetSubFieldValue ('\0');
+            Assert.IsNull (found);
+
+            field.Value = "Value";
+            found = field.GetSubFieldValue ('\0');
+            Assert.AreSame (field.Subfields[0].Value, found);
+            Assert.AreEqual ("Value", found);
+
+            found = field.GetSubFieldValue ('\0', 1);
+            Assert.IsNull (found);
+
+            found = field.GetSubFieldValue ('\0', -1);
+            Assert.IsNull (found);
+        }
+
+        [TestMethod]
+        [Description ("Звездочка: пустое поле")]
+        public void Field_GetValueOrFirstSubField_1()
+        {
+            var field = new Field();
+            var value = field.GetValueOrFirstSubField();
+            Assert.IsNull (value);
+        }
+
+        [TestMethod]
+        [Description ("Звездочка: есть значение до первого разделителя")]
+        public void Field_GetValueOrFirstSubField_2()
+        {
+            var field = new Field { Value = "Value" };
+            var value = field.GetValueOrFirstSubField();
+            Assert.AreSame (field.Value, value);
+        }
+
+        [TestMethod]
+        [Description ("Звездочка: есть подполя")]
+        public void Field_GetValueOrFirstSubField_3()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA" },
+                { 'b', "SubB" },
+            };
+            var value = field.GetValueOrFirstSubField();
+            Assert.AreSame (field.Subfields[0].Value, value);
+        }
+
+        [TestMethod]
         [Description ("Поиск первого подполя с указанным кодом: пустое поле")]
         public void Field_GetFirstSubField_1()
         {
@@ -702,7 +1236,7 @@ namespace UnitTests.ManagedIrbis.Records.Fields
         [Description ("Получение подполя для значения до первого разделителя: непустое поле, но значения нет")]
         public void Field_GetValueSubField_2()
         {
-            var field = new Field()
+            var field = new Field
             {
                 new ('a', "SubFieldA")
             };
@@ -714,9 +1248,50 @@ namespace UnitTests.ManagedIrbis.Records.Fields
         [Description ("Получение подполя для значения до первого разделителя: непустое поле, значение есть")]
         public void Field_GetValueSubField_3()
         {
-            var field = new Field() { Value = "Value" };
+            var field = new Field { Value = "Value" };
             var sub = field.GetValueSubField();
             Assert.IsNotNull (sub);
+        }
+
+        [TestMethod]
+        [Description ("Удаление подполя с указанным кодом: пустое поле")]
+        public void Field_RemoveSubField_1()
+        {
+            var field = new Field();
+            Assert.AreSame (field, field.RemoveSubField ('a'));
+            Assert.AreSame (field, field.RemoveSubField ('\0'));
+        }
+
+        [TestMethod]
+        [Description ("Удаление подполя с указанным кодом: только значение до первого разделителя")]
+        public void Field_RemoveSubField_2()
+        {
+            var field = new Field { Value = "Value" };
+            Assert.AreSame (field, field.RemoveSubField ('a'));
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreSame (field, field.RemoveSubField ('\0'));
+            Assert.AreEqual (0, field.Subfields.Count);
+        }
+
+        [TestMethod]
+        [Description ("Удаление подполя с указанным кодом: только значения")]
+        public void Field_RemoveSubField_3()
+        {
+            var field = new Field
+            {
+                { 'a', "SubA1" },
+                { 'b', "SubB" },
+                { 'a', "SubA2" }
+            };
+            Assert.AreSame (field, field.RemoveSubField ('z'));
+            Assert.AreEqual (3, field.Subfields.Count);
+            Assert.AreSame (field, field.RemoveSubField ('a'));
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreSame (field, field.RemoveSubField ('\0'));
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreEqual ('b', field.Subfields[0].Code);
+            Assert.AreSame (field, field.RemoveSubField ('b'));
+            Assert.AreEqual (0, field.Subfields.Count);
         }
 
         private void _TestSerialization
@@ -927,6 +1502,107 @@ namespace UnitTests.ManagedIrbis.Records.Fields
             Assert.AreEqual ("Подполе A", field.Subfields[0].Value);
             Assert.AreEqual ('b', field.Subfields[1].Code);
             Assert.AreEqual ("Подполе B", field.Subfields[1].Value);
+        }
+
+        [TestMethod]
+        [ExpectedException (typeof (ReadOnlyException))]
+        [Description ("Нельзя изменять значение до первого разделителя в ReadOnly-полях")]
+        public void Field_ReadOnly_1()
+        {
+            var field = _GetField().AsReadOnly();
+            Assert.IsTrue (field.ReadOnly);
+            field.Value = "New value";
+        }
+
+        [TestMethod]
+        [ExpectedException (typeof (ReadOnlyException))]
+        [Description ("Нельзя добавлять подполя в ReadOnly-полях")]
+        public void Field_ReadOnly_2()
+        {
+            var field = _GetField().AsReadOnly();
+            Assert.IsTrue (field.ReadOnly);
+            field.Add ('a', "Value");
+        }
+
+        [TestMethod]
+        [ExpectedException (typeof (ReadOnlyException))]
+        [Description ("Нельзя изменять значение подполей в ReadOnly-полях")]
+        public void Field_ReadOnly_3()
+        {
+            var field = _GetField().AsReadOnly();
+            Assert.IsTrue (field.ReadOnly);
+            var subField = field.Subfields[0];
+            subField.Value = "New value";
+        }
+
+        [TestMethod]
+        [Description ("Можно изменять метку в ReadOnly-полях")]
+        public void Field_ReadOnly_4()
+        {
+            var field = _GetField().AsReadOnly();
+            Assert.IsTrue (field.ReadOnly);
+            field.Tag = 1000;
+            Assert.AreEqual (1000, field.Tag);
+        }
+
+        [TestMethod]
+        [Description ("Свойство Record: должно присваиваться автоматически")]
+        public void Field_Record_1()
+        {
+            var record = new Record();
+            var field = new Field();
+            Assert.IsNull (field.Record);
+            record.Add (field);
+            Assert.AreSame (record, field.Record);
+        }
+
+        [TestMethod]
+        [Description ("Свойство Value: присваивание пустой строки")]
+        public void Field_Value_1()
+        {
+            var field = _GetField();
+            Assert.AreNotEqual (0, field.Subfields.Count);
+            field.Value = string.Empty;
+            Assert.AreEqual (0, field.Subfields.Count);
+        }
+
+        [TestMethod]
+        [Description ("Свойство Value: присваивание пустой строки")]
+        public void Field_Value_2()
+        {
+            var field = _GetField();
+            Assert.AreNotEqual (0, field.Subfields.Count);
+            field.Value = null;
+            Assert.AreEqual (0, field.Subfields.Count);
+        }
+
+        [TestMethod]
+        [Description ("Свойство Value: присваивание строки без разделителей")]
+        public void Field_Value_3()
+        {
+            const string simpleValue = "Привет, мир!";
+            var field = _GetField();
+            Assert.AreNotEqual (0, field.Subfields.Count);
+            field.Value = simpleValue;
+            Assert.AreEqual (1, field.Subfields.Count);
+            Assert.AreEqual (simpleValue, field.Value);
+            Assert.AreEqual ('\0', field.Subfields[0].Code);
+            Assert.AreEqual (simpleValue, field.Subfields[0].Value);
+        }
+
+        [TestMethod]
+        [Description ("Свойство Value: присваивание строки с разделителями")]
+        public void Field_Value_4()
+        {
+            var field = _GetField();
+            Assert.AreNotEqual (0, field.Subfields.Count);
+            field.Value = "^aSubA^bSubB";
+            Assert.AreEqual (2, field.Subfields.Count);
+            Assert.IsNull (field.Value);
+            Assert.AreEqual ('a', field.Subfields[0].Code);
+            Assert.AreEqual ("SubA", field.Subfields[0].Value);
+            Assert.AreEqual ('b', field.Subfields[1].Code);
+            Assert.AreEqual ("SubB", field.Subfields[1].Value);
         }
     }
 }

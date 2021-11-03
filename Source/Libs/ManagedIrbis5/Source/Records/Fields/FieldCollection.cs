@@ -339,11 +339,11 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            Sure.NotNull(item, "item");
+            Sure.NotNull (item);
 
             item.Record = Record;
 
-            base.InsertItem(index, item);
+            base.InsertItem (index, item);
 
             SetModified();
 
@@ -379,15 +379,11 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
+            Sure.NotNull (item);
 
-            if (item is null)
-            {
-                throw new ArgumentNullException();
-            }
+            item!.Record = Record;
 
-            item.Record = Record;
-
-            base.SetItem(index, item);
+            base.SetItem (index, item);
 
             SetModified();
 
@@ -409,6 +405,7 @@ namespace ManagedIrbis
             ClearItems();
             var array = reader.ReadArray<Field>();
             AddRange(array);
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
@@ -418,6 +415,7 @@ namespace ManagedIrbis
             )
         {
             writer.WriteArray(this.ToArray());
+
         } // method SaveToStream
 
         #endregion

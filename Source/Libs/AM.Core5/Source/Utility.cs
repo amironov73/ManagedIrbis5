@@ -3224,7 +3224,55 @@ namespace AM
             span.TotalSeconds.ToString ("F0", CultureInfo.InvariantCulture);
 
         /// <summary>
-        /// Mangle given text with the escape character.
+        /// Замена управляющих символов в тексте на указанный
+        /// (по умолчанию - пробел).
+        /// </summary>
+        public static string? ReplaceControlCharacters
+            (
+                string? text,
+                char substitute = ' '
+            )
+        {
+            if (string.IsNullOrEmpty (text))
+            {
+                return text;
+            }
+
+            var needReplace = false;
+            foreach (var c in text)
+            {
+                if (c < ' ')
+                {
+                    needReplace = true;
+                    break;
+                }
+            }
+
+            if (!needReplace)
+            {
+                return text;
+            }
+
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (text.Length);
+
+            foreach (var c in text)
+            {
+                builder.Append
+                    (
+                        c < ' ' ? substitute : c
+                    );
+            }
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method Replace
+
+        /// <summary>
+        /// Экранирование символов в тексте с помощью escape-символа.
         /// </summary>
         [Pure]
         public static string? Mangle
@@ -3239,8 +3287,25 @@ namespace AM
                 return text;
             }
 
+            var found = 0;
+            foreach (var c in text)
+            {
+                // если текст не содержит недопустимых символов,
+                // незачем городить весь огород
+
+                if (c == escape || badCharacters.Contains (c))
+                {
+                    ++found;
+                }
+            }
+
+            if (found == 0)
+            {
+                return text;
+            }
+
             var builder = StringBuilderPool.Shared.Get();
-            builder.EnsureCapacity (text.Length);
+            builder.EnsureCapacity (text.Length + found);
             foreach (var c in text)
             {
                 if (badCharacters.Contains (c) || c == escape)

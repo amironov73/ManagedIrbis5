@@ -58,6 +58,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         {
             Assert.IsTrue (SubFieldCode.Verify ('c'));
             Assert.IsTrue (SubFieldCode.Verify ('1'));
+            Assert.IsTrue (SubFieldCode.Verify ('^'));
         }
 
         [TestMethod]
@@ -73,7 +74,7 @@ namespace UnitTests.ManagedIrbis.Records.Subfields
         [Description ("Исключения при верификации кодов подполей")]
         public void SubFieldCode_Verify_3()
         {
-            Assert.IsFalse (SubFieldCode.Verify ('^', true));
+            Assert.IsFalse (SubFieldCode.Verify ('\u1111', true));
         }
     }
 }

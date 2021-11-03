@@ -67,12 +67,13 @@ namespace ManagedIrbis
 
         #region Private members
 
-        [ExcludeFromCodeCoverage]
         internal SubFieldCollection SetField
             (
                 Field newField
             )
         {
+            ThrowIfReadOnly();
+
             foreach (var subField in this)
             {
                 subField.Field = newField;
@@ -96,7 +97,7 @@ namespace ManagedIrbis
         #region Public methods
 
         /// <summary>
-        /// Добавление в коллекцию нескольких подполей сразу
+        /// Добавление в коллекцию нескольких подполей сразу.
         /// </summary>
         public SubFieldCollection AddRange
             (
@@ -114,7 +115,7 @@ namespace ManagedIrbis
         }
 
         /// <summary>
-        /// Assign.
+        /// Заимствование полей из другой коллекции.
         /// </summary>
         public SubFieldCollection Assign
             (
@@ -122,7 +123,7 @@ namespace ManagedIrbis
             )
         {
             ThrowIfReadOnly();
-            Sure.NotNull (other, nameof (other));
+            Sure.NotNull (other);
 
             Clear();
             Field = other.Field;
@@ -158,7 +159,7 @@ namespace ManagedIrbis
         /// </summary>
         public SubFieldCollection Clone()
         {
-            SubFieldCollection result = new ()
+            var result = new SubFieldCollection()
             {
                 Field = Field
             };
@@ -174,30 +175,27 @@ namespace ManagedIrbis
         }
 
         /// <summary>
-        /// Поиск с помощью предиката.
+        /// Поиск подполя с помощью предиката.
         /// </summary>
         public SubField? Find
             (
                 Predicate<SubField> predicate
             )
         {
-            Sure.NotNull (predicate, nameof (predicate));
+            Sure.NotNull (predicate);
 
-            return this.FirstOrDefault
-                (
-                    subField => predicate (subField)
-                );
+            return this.FirstOrDefault (subField => predicate (subField));
         }
 
         /// <summary>
-        /// Отбор с помощью предиката.
+        /// Отбор подполей с помощью предиката.
         /// </summary>
         public SubField[] FindAll
             (
                 Predicate<SubField> predicate
             )
         {
-            Sure.NotNull (predicate, nameof (predicate));
+            Sure.NotNull (predicate);
 
             return this
                 .Where (subField => predicate (subField))
@@ -356,7 +354,6 @@ namespace ManagedIrbis
 
         /// <inheritdoc cref="IReadOnly{T}.ReadOnly" />
         public bool ReadOnly { get; internal set; }
-
 
         /// <inheritdoc cref="IReadOnly{T}.AsReadOnly" />
         public SubFieldCollection AsReadOnly()
