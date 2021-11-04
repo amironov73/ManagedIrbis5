@@ -104,10 +104,10 @@ namespace ManagedIrbis.Server
                     result = new GetDatabaseLockCommand (data);
                     break;
 
-                // case "+1":
-                //     result = new ServerStatCommand(data);
-                //     break;
-                //
+                case "+1":
+                    result = new ServerStatCommand (data);
+                    break;
+
                 // case "+2":
                 //     // ???
                 //     result = UnknownCommand(data, commandCode);
