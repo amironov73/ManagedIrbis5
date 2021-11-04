@@ -86,8 +86,8 @@ namespace ManagedIrbis.Server
             ServerCommand result;
             var request = data.Request.ThrowIfNull();
 
-            if (ReferenceEquals (request.CommandCode1, null)
-                || request.CommandCode1 != request.CommandCode2)
+            if (string.IsNullOrEmpty (request.CommandCode1)
+                || string.CompareOrdinal (request.CommandCode1, request.CommandCode2) != 0)
             {
                 throw new IrbisException();
             }
@@ -218,9 +218,9 @@ namespace ManagedIrbis.Server
                     result = new GblVirtualCommand (data);
                     break;
 
-                // case "K":
-                //     result = new SearchCommand(data);
-                //     break;
+                case "K":
+                    result = new SearchCommand (data);
+                    break;
 
                 case "L":
                     result = new ReadFileCommand (data);
