@@ -138,6 +138,12 @@ namespace AM.IO
         public bool DryRun { get; set; }
 
         /// <summary>
+        /// Добавление к каждому числу.
+        /// </summary>
+        [JsonPropertyName ("delta")]
+        public int Delta { get; set; }
+
+        /// <summary>
         /// Префикс (отменяет использование оригинальных имен файлов).
         /// </summary>
         [JsonPropertyName ("prefix")]
@@ -182,6 +188,8 @@ namespace AM.IO
                     // странно, но это не удалось сконвертировать в число
                     continue;
                 }
+
+                value += Delta;
 
                 if (maxValue < value)
                 {

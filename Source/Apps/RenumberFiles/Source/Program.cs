@@ -78,6 +78,7 @@ namespace RenumberFiles
                 var groupNumber = parseResult.ValueForOption (numberOption);
                 var groupWidth = parseResult.ValueForOption (widthOption);
                 var dryRun = parseResult.ValueForOption (dryOption);
+                var delta = parseResult.ValueForOption<int> (addOption);
 
                 if (wildcards.IsNullOrEmpty())
                 {
@@ -101,7 +102,8 @@ namespace RenumberFiles
                     {
                         GroupWidth = groupWidth,
                         GroupNumber = groupNumber,
-                        DryRun = dryRun
+                        DryRun = dryRun,
+                        Delta = delta
                     };
 
                     var output = AbstractOutput.Console;
@@ -130,7 +132,7 @@ namespace RenumberFiles
 
         } // method Run
 
-        private static readonly Argument<string> inputArgument = new ("wildcard")
+        private static readonly Argument<string[]> inputArgument = new ("wildcard")
         {
             Arity = ArgumentArity.ZeroOrMore,
             Description = "маска файлов, подлежащих обработке"
@@ -149,6 +151,11 @@ namespace RenumberFiles
         {
             IsRequired = false,
             Description = "холостой прогон (репетиция)"
+        };
+        private static readonly Option<int> addOption = new ("-a", () => 0)
+        {
+            IsRequired = false,
+            Description = "добавление к каждому числу"
         };
 
         static void Main (string[] args)
