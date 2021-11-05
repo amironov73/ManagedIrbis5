@@ -432,6 +432,11 @@ namespace ManagedIrbis
         } // method Clear
 
         /// <summary>
+        /// Снятие признака "запись модифицирована".
+        /// </summary>
+        public void NotModified() => Modified = false;
+
+        /// <summary>
         /// Создание глубокой копии записи.
         /// </summary>
         public Record Clone()

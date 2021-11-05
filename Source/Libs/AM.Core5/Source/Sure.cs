@@ -239,7 +239,7 @@ namespace AM
         {
             if (ReferenceEquals (argument, null))
             {
-                throw new ArgumentException (argumentName);
+                throw new ArgumentNullException (argumentName);
             }
 
         } // method NotNull

@@ -1359,6 +1359,7 @@ namespace ManagedIrbis
         #region IEnumerable<SubField> members
 
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
+        [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>

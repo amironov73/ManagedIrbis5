@@ -92,7 +92,7 @@ namespace ManagedIrbis
                 bool throwOnError
             )
         {
-            var result = IsValidValue(value);
+            var result = IsValidValue (value);
 
             if (!result)
             {

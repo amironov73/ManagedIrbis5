@@ -43,8 +43,8 @@ namespace ManagedIrbis
     [Serializable]
     public sealed class FieldCollection
         : Collection<Field>,
-        IHandmadeSerializable,
-        IReadOnly<FieldCollection>
+            IHandmadeSerializable,
+            IReadOnly<FieldCollection>
     {
         #region Properties
 
@@ -61,15 +61,14 @@ namespace ManagedIrbis
         private List<Field> _GetInnerList()
         {
             // ReSharper disable SuspiciousTypeConversion.Global
-            var result = (List<Field>) Items;
+            var result = (List<Field>)Items;
+
             // ReSharper restore SuspiciousTypeConversion.Global
 
             return result;
         }
 
         private bool _dontRenumber;
-
-        // ReSharper disable InconsistentNaming
 
         internal void _RenumberFields()
         {
@@ -85,34 +84,19 @@ namespace ManagedIrbis
                 var tag = field.Tag;
                 field.Repeat = tag <= 0
                     ? 0
-                    : seen.Increment(tag);
-            }
-        }
-
-        internal FieldCollection _SetRecord
-            (
-                Record? newRecord
-            )
-        {
-            Record = newRecord;
-
-            foreach (var field in this)
-            {
-                field.Record = newRecord;
+                    : seen.Increment (tag);
             }
 
-            return this;
-        }
+        } // method _RenumberField
 
         internal void SetModified()
         {
-            if (!ReferenceEquals(Record, null))
+            if (Record is not null)
             {
                 Record.Modified = true;
             }
-        }
 
-        // ReSharper restore InconsistentNaming
+        } // method SetModified
 
         #endregion
 
@@ -132,7 +116,8 @@ namespace ManagedIrbis
             {
                 innerList.Capacity = newCapacity;
             }
-        }
+
+        } // method AddCapacity
 
         /// <summary>
         /// Add range of <see cref="Field"/>s.
@@ -148,21 +133,20 @@ namespace ManagedIrbis
             {
                 var inner = _GetInnerList();
                 var newCapacity = inner.Count + outer.Count;
-                EnsureCapacity(newCapacity);
+                EnsureCapacity (newCapacity);
             }
 
             foreach (var field in fields)
             {
-                Add(field);
+                Add (field);
             }
-        }
+
+        } // method AddRange
 
         /// <summary>
-        /// Apply the field value.
+        /// Применение значения поля к коллекции.
+        /// Только для неповторяющихся полей!
         /// </summary>
-        /// <remarks>
-        /// For non-repeating fields only.
-        /// </remarks>
         public FieldCollection ApplyFieldValue
             (
                 int tag,
@@ -174,104 +158,65 @@ namespace ManagedIrbis
                     item => item.Tag == tag
                 );
 
-            if (string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty (value))
             {
-                if (!ReferenceEquals(field, null))
+                if (field is not null)
                 {
-                    Remove(field);
+                    Remove (field);
                 }
             }
             else
             {
+                // значение не пустое
+
                 if (field is null)
                 {
-                    field = new Field {Tag = tag};
-                    Add(field);
+                    field = new Field { Tag = tag };
+                    Add (field);
                 }
 
                 field.Value = value;
             }
 
             return this;
-        }
+
+        } // method ApplyFieldValue
 
         /// <summary>
-        /// Apply the field value.
+        /// Запрет перенумерации полей перед большим обновлением.
         /// </summary>
-        /// <remarks>
-        /// For non-repeating fields only.
-        /// </remarks>
-        public FieldCollection ApplyFieldValue
-            (
-                int tag,
-                ReadOnlyMemory<char> value
-            )
-        {
-            var field = this.FirstOrDefault
-                (
-                    item => item.Tag == tag
-                );
-
-            if (value.IsEmpty)
-            {
-                if (!ReferenceEquals(field, null))
-                {
-                    Remove(field);
-                }
-            }
-            else
-            {
-                if (field is null)
-                {
-                    field = new Field {Tag = tag};
-                    Add(field);
-                }
-
-                field.Value = value.ToString();
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Begin record update.
-        /// </summary>
-        public void BeginUpdate()
-        {
-            _dontRenumber = true;
-        }
+        public void BeginUpdate() => _dontRenumber = true;
 
         /// <summary>
         /// Создание клона коллекции.
         /// </summary>
         public FieldCollection Clone()
         {
-            var result = new FieldCollection
-            {
-                Record = Record
-            };
+            var result = new FieldCollection { Record = Record };
 
             foreach (var field in this)
             {
                 var clone = field.Clone();
                 clone.Record = Record;
-                result.Add(clone);
+                result.Add (clone);
             }
 
             return result;
-        }
+
+        } // method Clone
 
         /// <summary>
-        /// End record update.
+        /// Разрешение перенумерации полей по окончании большого обновления.
         /// </summary>
         public void EndUpdate()
         {
             _dontRenumber = false;
             _RenumberFields();
-        }
+
+        } // method EndUpdate
 
         /// <summary>
-        /// Ensure the capacity.
+        /// Убеждаемся, что емкость списка не меньше указанного числа.
         /// </summary>
         public void EnsureCapacity
             (
@@ -283,34 +228,20 @@ namespace ManagedIrbis
             {
                 innerList.Capacity = capacity;
             }
-        }
+
+        } // method EnsureCapacity
 
         /// <summary>
-        /// Find first occurrence of the field with given predicate.
+        /// Поиск первого вхождения поля, удовлетворяющего данному предикату.
         /// </summary>
-        public Field? Find
-            (
-                Predicate<Field> predicate
-            )
-        {
-            return this.FirstOrDefault (field => predicate(field));
-        }
+        public Field? Find (Predicate<Field> predicate) =>
+            this.FirstOrDefault (field => predicate (field));
 
         /// <summary>
-        /// Find all occurrences of the field
-        /// with given predicate.
+        /// Отбор полей с помощью предиката.
         /// </summary>
-        public Field[] FindAll
-            (
-                Predicate<Field> predicate
-            )
-        {
-            return this.Where
-                (
-                    field => predicate(field)
-                )
-                .ToArray();
-        }
+        public Field[] FindAll (Predicate<Field> predicate) =>
+            this.Where (field => predicate (field)).ToArray();
 
         #endregion
 
@@ -329,7 +260,8 @@ namespace ManagedIrbis
             SetModified();
 
             base.ClearItems();
-        }
+
+        } // method ClearItems
 
         /// <inheritdoc cref="Collection{T}.InsertItem" />
         protected override void InsertItem
@@ -348,7 +280,8 @@ namespace ManagedIrbis
             SetModified();
 
             _RenumberFields();
-        }
+
+        } // method InsertItem
 
         /// <inheritdoc cref="Collection{T}.RemoveItem" />
         protected override void RemoveItem
@@ -364,12 +297,13 @@ namespace ManagedIrbis
                 field.Record = null;
             }
 
-            base.RemoveItem(index);
+            base.RemoveItem (index);
 
             SetModified();
 
             _RenumberFields();
-        }
+
+        } // method RemoveItem
 
         /// <inheritdoc cref="Collection{T}.SetItem" />
         protected override void SetItem
@@ -388,7 +322,8 @@ namespace ManagedIrbis
             SetModified();
 
             _RenumberFields();
-        }
+
+        } // method SetItem
 
         #endregion
 
@@ -404,7 +339,7 @@ namespace ManagedIrbis
 
             ClearItems();
             var array = reader.ReadArray<Field>();
-            AddRange(array);
+            AddRange (array);
 
         } // method RestoreFromStream
 
@@ -414,7 +349,7 @@ namespace ManagedIrbis
                 BinaryWriter writer
             )
         {
-            writer.WriteArray(this.ToArray());
+            writer.WriteArray (this.ToArray());
 
         } // method SaveToStream
 
@@ -432,7 +367,8 @@ namespace ManagedIrbis
             result.SetReadOnly();
 
             return result;
-        }
+
+        } // method AsReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.SetReadOnly" />
         public void SetReadOnly()
@@ -442,7 +378,8 @@ namespace ManagedIrbis
             {
                 field.SetReadOnly();
             }
-        }
+
+        } // method SetReadOnly
 
         /// <inheritdoc cref="IReadOnly{T}.ThrowIfReadOnly" />
         public void ThrowIfReadOnly()
@@ -451,11 +388,12 @@ namespace ManagedIrbis
             {
                 Magna.Error
                     (
-                        "FieldCollection::ThrowIfReadOnly"
+                        nameof (FieldCollection) + "::" + nameof (ThrowIfReadOnly)
                     );
 
                 throw new ReadOnlyException();
             }
+
         } // method ThrowIfReadOnly
 
         #endregion
