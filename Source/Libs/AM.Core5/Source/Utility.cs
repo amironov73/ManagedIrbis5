@@ -58,7 +58,7 @@ namespace AM
         public static void NotUsed<T>
             (
                 this T variable,
-                [CallerArgumentExpression("variable")] string? variableName = null,
+                [CallerArgumentExpression ("variable")] string? variableName = null,
                 [CallerMemberName] string? member = null,
                 [CallerFilePath] string? file = null,
                 [CallerLineNumber] int line = 0
@@ -102,7 +102,8 @@ namespace AM
 
                 return new DateTime (today.Year, today.Month, 1);
             }
-        }
+
+        } // property BeginningOfTheMonth
 
         /// <summary>
         /// Первый день текущего года.
@@ -119,8 +120,7 @@ namespace AM
         /// Сегодняшний день.
         /// </summary>
         [Pure]
-        public static DateTime Today =>
-            PlatformAbstractionLayer.Current.Today();
+        public static DateTime Today => PlatformAbstractionLayer.Current.Today();
 
         /// <summary>
         /// Завтрашний день.
@@ -143,11 +143,13 @@ namespace AM
         /// <summary>
         /// Длительность: один час.
         /// </summary>
+        [Pure]
         public static TimeSpan OneHour => new (1, 0, 0);
 
         /// <summary>
         /// Длительность: одна минута.
         /// </summary>
+        [Pure]
         public static TimeSpan OneMinute => new (0, 1, 0);
 
         /// <summary>
@@ -164,7 +166,7 @@ namespace AM
             [DebuggerStepThrough]
             get
             {
-                if (ReferenceEquals (_cp866, null))
+                if (_cp866 is null)
                 {
                     RegisterEncodingProviders();
                     _cp866 = Encoding.GetEncoding (866);
@@ -184,7 +186,7 @@ namespace AM
             [DebuggerStepThrough]
             get
             {
-                if (ReferenceEquals (_windows1251, null))
+                if (_windows1251 is null)
                 {
                     RegisterEncodingProviders();
                     _windows1251 = Encoding.GetEncoding (1251);
@@ -357,6 +359,7 @@ namespace AM
         /// <summary>
         /// Проверка, содержит ли строка любой из перечисленных символов.
         /// </summary>
+        [Pure]
         public static bool ContainsAnySymbol
             (
                 this string? text,
@@ -381,17 +384,14 @@ namespace AM
         /// <summary>
         /// Строка содержит пробельные символы?
         /// </summary>
-        public static bool ContainsWhitespace
-            (
-                this string? text
-            )
-        {
-            return text.ContainsAnySymbol (_whitespace);
-        }
+        [Pure]
+        public static bool ContainsWhitespace (this string? text) =>
+            text.ContainsAnySymbol (_whitespace);
 
         /// <summary>
         /// Подсчет вхождений указанной строки в тексте.
         /// </summary>
+        [Pure]
         public static int CountSubstrings
             (
                 this string? text,
@@ -432,6 +432,7 @@ namespace AM
         /// Содержит ли перечень строк указанную строку
         /// (с точностью до регистра символов)?
         /// </summary>
+        [Pure]
         public static bool ContainsNoCase
             (
                 this IEnumerable<string> lines,
@@ -557,6 +558,7 @@ namespace AM
         /// зрения помещения его в URL.
         /// </summary>
         /// <remarks>Set of safe chars, from RFC 1738.4 minus '+'</remarks>
+        [Pure]
         public static bool IsUrlSafeChar
             (
                 char ch
@@ -630,12 +632,14 @@ namespace AM
         /// Is digit from 0 to 9?
         /// </summary>
         [Pure]
+        [DebuggerStepThrough]
         public static bool IsArabicDigit (this char c) => c is >= '0' and <= '9';
 
         /// <summary>
         /// Is letter from A to Z or a to z?
         /// </summary>
         [Pure]
+        [DebuggerStepThrough]
         public static bool IsLatinLetter (this char c) => c is >= 'A' and <= 'Z' or >= 'a' and <= 'z';
 
         /// <summary>
@@ -643,6 +647,7 @@ namespace AM
         /// or letter from A to Z or a to z?
         /// </summary>
         [Pure]
+        [DebuggerStepThrough]
         public static bool IsLatinLetterOrArabicDigit (this char c) =>
             c is >= '0' and <= '9' or >= 'A' and <= 'Z' or >= 'a' and <= 'z';
 
@@ -650,6 +655,7 @@ namespace AM
         /// Проверка, является ли указанный символ русской буквой от А до Я (или от а до я).
         /// </summary>
         [Pure]
+        [DebuggerStepThrough]
         public static bool IsRussianLetter (this char c) => c is >= 'А' and <= 'я' or 'Ё' or 'ё';
 
         /// <summary>
@@ -661,15 +667,7 @@ namespace AM
                 Encoding encoding
             )
         {
-            var stdOutput = new StreamWriter
-                (
-                    new FileStream
-                        (
-                            fileName,
-                            FileMode.Create
-                        ),
-                    encoding
-                )
+            var stdOutput = new StreamWriter (new FileStream (fileName, FileMode.Create), encoding)
                 {
                     AutoFlush = true
                 };
@@ -746,23 +744,35 @@ namespace AM
         /// Бросает исключение, если переданное значение пустое,
         /// иначе просто возвращает его.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ReadOnlyMemory<T> ThrowIfEmpty<T>
             (
                 this ReadOnlyMemory<T> memory,
-                [CallerArgumentExpression("memory")] string? message = null
+                [CallerArgumentExpression ("memory")] string? message = null
             )
         {
             if (memory.IsEmpty)
             {
-                Magna.Error
-                    (
-                        nameof (Utility) + "::" + nameof (ThrowIfEmpty)
-                        + ": "
-                        + message
-                    );
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    Magna.Error
+                        (
+                            nameof (Utility) + "::" + nameof (ThrowIfEmpty)
+                            + ": "
+                            + message
+                        );
 
-                throw new ArgumentException (message);
-            }
+                    throw new ArgumentException (message);
+
+                } // if
+
+                Magna.Error (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
+
+                throw new ArgumentException();
+
+            } // if
 
             return memory;
 
@@ -772,22 +782,33 @@ namespace AM
         /// Бросает исключение, если переданное значение пустое,
         /// иначе просто возвращает его.
         /// </summary>
+        [Pure]
+        [DebuggerStepThrough]
         public static ReadOnlySpan<T> ThrowIfEmpty<T>
             (
                 this ReadOnlySpan<T> memory,
-                [CallerArgumentExpression("memory")] string? message = null
+                [CallerArgumentExpression ("memory")] string? message = null
             )
         {
             if (memory.IsEmpty)
             {
-                Magna.Error
-                    (
-                        nameof (Utility) + "::" + nameof (ThrowIfEmpty)
-                        + ": "
-                        + message
-                    );
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    Magna.Error
+                        (
+                            nameof (Utility) + "::" + nameof (ThrowIfEmpty)
+                            + ": "
+                            + message
+                        );
 
-                throw new ArgumentException (message);
+                    throw new ArgumentException (message);
+
+                } // if
+
+                Magna.Error (nameof (Utility) + "::" + nameof (ThrowIfEmpty));
+
+                throw new ArgumentException();
 
             } // if
 
@@ -804,23 +825,31 @@ namespace AM
         public static T ThrowIfNull<T>
             (
                 this T? value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
             where T : class
         {
-            Sure.NotNull (message);
-
-            if (ReferenceEquals (value, null))
+            if (value is null)
             {
-                Magna.Error
-                    (
-                        nameof (Utility) + "::" + nameof (ThrowIfNull)
-                        + ": "
-                        + message
-                    );
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    Magna.Error
+                        (
+                            nameof (Utility) + "::" + nameof (ThrowIfNull)
+                            + ": "
+                            + message
+                        );
 
-                throw new ArgumentException (message);
-            }
+                    throw new ArgumentException (message);
+
+                } // if
+
+                Magna.Error (nameof (Utility) + "::" + nameof (ThrowIfNull));
+
+                throw new ArgumentException();
+
+            } // if
 
             return value;
 
@@ -856,9 +885,24 @@ namespace AM
         public static string ThrowIfNullOrEmpty
             (
                 this string? value,
-                [CallerArgumentExpression("value")] string? argumentName = null
+                [CallerArgumentExpression ("value")] string? argumentName = null
             )
-            => string.IsNullOrEmpty (value) ? throw new ArgumentException (argumentName) : value;
+        {
+            if (string.IsNullOrEmpty (value))
+            {
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (argumentName);
+                }
+
+                throw new ArgumentException();
+
+            } // if
+
+            return value;
+
+        } // method ThrowIfNullOrEmpty
 
         /// <summary>
         /// Бросает исключение, если переданная строка пустая
@@ -869,9 +913,24 @@ namespace AM
         public static ReadOnlySpan<char> ThrowIfNullOrEmpty
             (
                 this ReadOnlySpan<char> value,
-                [CallerArgumentExpression("value")] string? argumentName = null
+                [CallerArgumentExpression ("value")] string? argumentName = null
             )
-            => value.IsEmpty ? throw new ArgumentException (argumentName) : value;
+        {
+            if (value.IsEmpty)
+            {
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (argumentName);
+                }
+
+                throw new ArgumentException();
+
+            } // if
+
+            return value;
+
+        } // method ThrowIfNullOrEmpty
 
         /// <summary>
         /// Бросает исключение, если переданная строка пробельная
@@ -884,7 +943,22 @@ namespace AM
                 this string? value,
                 [CallerArgumentExpression ("value")] string? name = null
             )
-            => string.IsNullOrWhiteSpace (value) ? throw new ArgumentException (name) : value;
+        {
+            if (string.IsNullOrWhiteSpace (value))
+            {
+                if (!string.IsNullOrEmpty (name))
+                {
+                    // .NET 5 SDK подставляет в name значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (name);
+                }
+
+                throw new ArgumentException();
+
+            } // if
+
+            return value;
+
+        } // method ThrowIfNullOrWhiteSpace
 
         /// <summary>
         /// Бросает исключение, если переданная строка пробельная
@@ -895,9 +969,24 @@ namespace AM
         public static ReadOnlySpan<char> ThrowIfNullOrWhiteSpace
             (
                 this ReadOnlySpan<char> value,
-                [CallerArgumentExpression("value")] string? name = null
+                [CallerArgumentExpression ("value")] string? name = null
             )
-            => value.IsEmpty || value.IsWhiteSpace() ? throw new ArgumentException (name) : value;
+        {
+            if (value.IsEmpty || value.IsWhiteSpace())
+            {
+                if (!string.IsNullOrEmpty (name))
+                {
+                    // .NET 5 SDK подставляет в name значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (name);
+                }
+
+                throw new ArgumentException();
+
+            } // if
+
+            return value;
+
+        } // method ThrowIfNullOrWhiteSpace
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -907,9 +996,24 @@ namespace AM
         public static int ThrowIfZero
             (
                 this int value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value == 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value is 0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+
+            } // if
+
+            return value;
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -919,9 +1023,23 @@ namespace AM
         public static uint ThrowIfZero
             (
                 this uint value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value == 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value is 0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -931,9 +1049,23 @@ namespace AM
         public static short ThrowIfZero
             (
                 this short value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value == 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value is 0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -943,9 +1075,23 @@ namespace AM
         public static ushort ThrowIfZero
             (
                 this ushort value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value == 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value is 0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -955,7 +1101,7 @@ namespace AM
         public static long ThrowIfZero
             (
                 this long value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
             => value == 0 ? throw new ArgumentException (message) : value;
 
@@ -967,9 +1113,23 @@ namespace AM
         public static ulong ThrowIfZero
             (
                 this ulong value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value == 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value is 0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -979,9 +1139,23 @@ namespace AM
         public static double ThrowIfZero
             (
                 this double value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value == 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value is 0.0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число равно нулю.
@@ -993,7 +1167,21 @@ namespace AM
                 this decimal value,
                 [CallerArgumentExpression("value")] string? message = null
             )
-            => value == 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value is 0.0m)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfZero
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1003,9 +1191,23 @@ namespace AM
         public static int ThrowIfNegative
             (
                 this int value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value < 0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1015,9 +1217,23 @@ namespace AM
         public static short ThrowIfNegative
             (
                 this short value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value < 0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1027,9 +1243,23 @@ namespace AM
         public static long ThrowIfNegative
             (
                 this long value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value < 0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1039,9 +1269,23 @@ namespace AM
         public static double ThrowIfNegative
             (
                 this double value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value < 0.0)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число отрицательное.
@@ -1051,9 +1295,23 @@ namespace AM
         public static decimal ThrowIfNegative
             (
                 this decimal value,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < 0 ? throw new ArgumentException (message) : value;
+        {
+            if (value < 0.0m)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfNegative
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1065,9 +1323,23 @@ namespace AM
                 this int value,
                 int minimum,
                 int maximum,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
+        {
+            if (value < minimum || value > maximum)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfOutOfTheRange
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1079,9 +1351,23 @@ namespace AM
                 this uint value,
                 uint minimum,
                 uint maximum,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
+        {
+            if (value < minimum || value > maximum)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfOutOfTheRange
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1093,9 +1379,23 @@ namespace AM
                 this short value,
                 short minimum,
                 short maximum,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
+        {
+            if (value < minimum || value > maximum)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfOutOfTheRange
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1107,9 +1407,23 @@ namespace AM
                 this ushort value,
                 ushort minimum,
                 ushort maximum,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
+        {
+            if (value < minimum || value > maximum)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfOutOfTheRange
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1121,9 +1435,23 @@ namespace AM
                 this long value,
                 long minimum,
                 long maximum,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
+        {
+            if (value < minimum || value > maximum)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfOutOfTheRange
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1135,9 +1463,23 @@ namespace AM
                 this ulong value,
                 ulong minimum,
                 ulong maximum,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
+        {
+            if (value < minimum || value > maximum)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfOutOfTheRange
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1149,9 +1491,23 @@ namespace AM
                 this double value,
                 double minimum,
                 double maximum,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
+        {
+            if (value < minimum || value > maximum)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfOutOfTheRange
 
         /// <summary>
         /// Бросает исключение, если число не попадает в указанный интервал.
@@ -1163,9 +1519,23 @@ namespace AM
                 this decimal value,
                 decimal minimum,
                 decimal maximum,
-                [CallerArgumentExpression("value")] string? message = null
+                [CallerArgumentExpression ("value")] string? message = null
             )
-            => value < minimum || value > maximum ? throw new ArgumentException (message) : value;
+        {
+            if (value < minimum || value > maximum)
+            {
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (message);
+                }
+
+                throw new ArgumentException();
+            }
+
+            return value;
+
+        } // method ThrowIfOutOfTheRange
 
         /// <summary>
         /// Сравнение двух блоков памяти

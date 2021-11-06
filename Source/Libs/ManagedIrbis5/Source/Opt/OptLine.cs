@@ -29,103 +29,110 @@ namespace ManagedIrbis.Opt
     /// <summary>
     /// Строка OPT-файла.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Key) + "} {" + nameof(Value) + "}")]
+    [DebuggerDisplay ("{" + nameof (Key) + "} {" + nameof (Value) + "}")]
     public sealed class OptLine
         : IHandmadeSerializable
     {
-            #region Properties
+        #region Properties
 
-            /// <summary>
-            /// Ключ.
-            /// </summary>
-            public string? Key { get; set; }
+        /// <summary>
+        /// Ключ.
+        /// </summary>
+        public string? Key { get; set; }
 
-            /// <summary>
-            /// Значение.
-            /// </summary>
-            public string? Value { get; set; }
+        /// <summary>
+        /// Значение.
+        /// </summary>
+        public string? Value { get; set; }
 
-            #endregion
+        #endregion
 
-            #region Public methods
+        #region Public methods
 
-            /// <summary>
-            /// Сравнение строки с ключом.
-            /// </summary>
-            public bool Compare ( string? text ) =>
-                OptUtility.CompareString(Key.ThrowIfNull("Key"), text);
+        /// <summary>
+        /// Сравнение строки с ключом.
+        /// </summary>
+        public bool Compare (string? text) =>
+            OptUtility.CompareString (Key.ThrowIfNull ("Key"), text);
 
-            /// <summary>
-            /// Разбор строки.
-            /// </summary>
-            public static OptLine? Parse
-                (
-                    string line
-                )
+        /// <summary>
+        /// Разбор строки.
+        /// </summary>
+        public static OptLine? Parse
+            (
+                string? line
+            )
+        {
+            if (string.IsNullOrEmpty (line))
             {
-                if (string.IsNullOrEmpty(line))
-                {
-                    return null;
-                }
+                return null;
+            }
 
-                line = line.Trim();
-                if (string.IsNullOrEmpty(line))
-                {
-                    return null;
-                }
-
-                var parts = line.Split
-                    (
-                        ' ',
-                        StringSplitOptions.RemoveEmptyEntries
-                    );
-
-                if (parts.Length != 2)
-                {
-                    return null;
-                }
-
-                var result = new OptLine
-                {
-                    Key = parts[0],
-                    Value = parts[1]
-                };
-
-                return result;
-            } // method Parse
-
-            #endregion
-
-            #region IHandmadeSerializable
-
-            /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
-            public void RestoreFromStream
-                (
-                    BinaryReader reader
-                )
+            line = line.Trim();
+            if (string.IsNullOrEmpty (line))
             {
-                Key = reader.ReadNullableString();
-                Value = reader.ReadNullableString();
-            } // method RestoreFromStream
+                return null;
+            }
 
-            /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
-            public void SaveToStream
+            var parts = line.Split
                 (
-                    BinaryWriter writer
-                )
+                    ' ',
+                    StringSplitOptions.RemoveEmptyEntries
+                );
+
+            if (parts.Length != 2)
             {
-                writer.WriteNullable(Key);
-                writer.WriteNullable(Value);
-            } // method SaveToStream
+                return null;
+            }
 
-            #endregion
+            var result = new OptLine
+            {
+                Key = parts[0],
+                Value = parts[1]
+            };
 
-            #region Object members
+            return result;
 
-            /// <inheritdoc cref="object.ToString" />
-            public override string ToString() => $"{Key} {Value}";
+        } // method Parse
 
-            #endregion
+        #endregion
+
+        #region IHandmadeSerializable
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            Key = reader.ReadNullableString();
+            Value = reader.ReadNullableString();
+
+        } // method RestoreFromStream
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer.WriteNullable (Key);
+            writer.WriteNullable (Value);
+
+        } // method SaveToStream
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString() => $"{Key} {Value}";
+
+        #endregion
 
     } // class OptLine
 
