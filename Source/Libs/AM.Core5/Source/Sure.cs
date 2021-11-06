@@ -20,7 +20,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 #endregion
 
@@ -42,13 +41,20 @@ namespace AM
         public static void AssertState
             (
                 bool condition,
-                [CallerArgumentExpression("condition")] string? message = null
+                [CallerArgumentExpression ("condition")] string? message = null
             )
         {
             if (!condition)
             {
-                throw new InvalidOleVariantTypeException (message);
-            }
+                if (!string.IsNullOrEmpty (message))
+                {
+                    // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+                    throw new ApplicationException(message);
+                }
+
+                throw new ApplicationException();
+
+            } // if
 
         } // method AssertState
 
@@ -59,13 +65,19 @@ namespace AM
         public static void Defined<T>
             (
                 T value,
-                [CallerArgumentExpression("value")] string? argumentName = null
+                [CallerArgumentExpression ("value")] string? argumentName = null
             )
             where T : struct
         {
             if (!Enum.IsDefined (typeof (T), value))
             {
-                throw new ArgumentOutOfRangeException (argumentName);
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
             }
 
         } // method Defined
@@ -78,23 +90,37 @@ namespace AM
         public static void FileExists
             (
                 string? path,
-                [CallerArgumentExpression("path")] string? argumentName = null
+                [CallerArgumentExpression ("path")] string? argumentName = null
             )
         {
             if (string.IsNullOrEmpty (path))
             {
-                throw new ArgumentNullException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentNullException (argumentName);
+                }
+
+                throw new ArgumentNullException();
+
+            } // if
 
             if (!File.Exists (path))
             {
-                throw new FileNotFoundException
-                    (
-                        argumentName
-                        + " : "
-                        + path
-                    );
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new FileNotFoundException
+                        (
+                            argumentName
+                            + " : "
+                            + path
+                        );
+                }
+
+                throw new FileNotFoundException (path);
+
+            } // if
 
         } // method FileExists
 
@@ -109,14 +135,20 @@ namespace AM
                 int argument,
                 int fromValue,
                 int toValue,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
-            if (argument < fromValue
-                || argument > toValue)
+            if (argument < fromValue || argument > toValue)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method InRange
 
@@ -131,14 +163,20 @@ namespace AM
                 long argument,
                 long fromValue,
                 long toValue,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
-            if (argument < fromValue
-                || argument > toValue)
+            if (argument < fromValue || argument > toValue)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method InRange
 
@@ -154,14 +192,20 @@ namespace AM
                 double argument,
                 double fromValue,
                 double toValue,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
-            if (argument < fromValue
-                || argument > toValue)
+            if (argument < fromValue || argument > toValue)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method InRange
 
@@ -172,13 +216,20 @@ namespace AM
         public static void NonNegative
             (
                 int argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
             if (argument < 0)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method NonNegative
 
@@ -189,13 +240,20 @@ namespace AM
         public static void NonNegative
             (
                 long argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
             if (argument < 0)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method NonNegative
 
@@ -206,13 +264,20 @@ namespace AM
         public static void NonNegative
             (
                 double argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
             if (argument < 0.0)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method NonNegative
 
@@ -223,14 +288,21 @@ namespace AM
         public static void NotNull<T>
             (
                 T? argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
             where T : class
         {
-            if (ReferenceEquals (argument, null))
+            if (argument is null)
             {
-                throw new ArgumentNullException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentNullException (argumentName);
+                }
+
+                throw new ArgumentNullException();
+
+            } // if
 
         } // method NotNull
 
@@ -241,14 +313,21 @@ namespace AM
         public static void NotNull<T>
             (
                 T? argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
             where T : struct
         {
             if (!argument.HasValue)
             {
-                throw new ArgumentException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentException (argumentName);
+                }
+
+                throw new ArgumentException();
+
+            } // if
 
         } // method NotNull
 
@@ -260,13 +339,20 @@ namespace AM
         public static void NotNullNorEmpty
             (
                 string? argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
             if (string.IsNullOrEmpty (argument))
             {
-                throw new ArgumentNullException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentNullException (argumentName);
+                }
+
+                throw new ArgumentNullException();
+
+            } // if
 
         } // method NotNullNorEmpty
 
@@ -277,13 +363,20 @@ namespace AM
         public static void Positive
             (
                 int argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
             if (argument <= 0)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method Positive
 
@@ -294,13 +387,20 @@ namespace AM
         public static void Positive
             (
                 long argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
             if (argument <= 0.0)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method Positive
 
@@ -311,13 +411,20 @@ namespace AM
         public static void Positive
             (
                 double argument,
-                [CallerArgumentExpression("argument")] string? argumentName = null
+                [CallerArgumentExpression ("argument")] string? argumentName = null
             )
         {
             if (argument <= 0.0)
             {
-                throw new ArgumentOutOfRangeException (argumentName);
-            }
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
+
+                throw new ArgumentOutOfRangeException();
+
+            } // if
 
         } // method Positive
 

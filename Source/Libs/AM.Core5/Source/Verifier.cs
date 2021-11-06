@@ -299,16 +299,23 @@ namespace AM
         /// </summary>
         public void Throw
             (
-                string message
+                string? message
             )
         {
-            Magna.Error
-                (
-                    nameof (Verifier<T>) + "::" + nameof (Throw)
-                    + ": " + message
-                );
+            if (!string.IsNullOrEmpty (message))
+            {
+                Magna.Error
+                    (
+                        nameof (Verifier<T>) + "::" + nameof (Throw)
+                        + ": " + message
+                    );
 
-            throw new VerificationException (message);
+                throw new VerificationException (message);
+            }
+
+            Magna.Error (nameof (Verifier<T>) + "::" + nameof (Throw));
+
+            throw new VerificationException();
 
         } // method Throw
 
@@ -335,7 +342,9 @@ namespace AM
                 [CallerArgumentExpression("verifiable")] string? name = null
             )
         {
-            Sure.NotNullNorEmpty (name);
+            // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески
+            // Пока мы на .NET 5, уберем эту проверку
+            // Sure.NotNullNorEmpty (name);
 
             return Assert (verifiable.Verify (ThrowOnError), name);
 

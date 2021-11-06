@@ -159,12 +159,12 @@ namespace ManagedIrbis.Fst
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<FstFile>(this, throwOnError);
+            var verifier = new Verifier<FstFile> (this, throwOnError);
 
-            verifier.Assert(Lines.Count != 0, "Lines.Count != 0");
+            verifier.Assert (Lines.Count != 0, "Lines.Count != 0");
             foreach (var line in Lines)
             {
-                verifier.VerifySubObject(line);
+                verifier.VerifySubObject (line);
             }
 
             return verifier.Result;
