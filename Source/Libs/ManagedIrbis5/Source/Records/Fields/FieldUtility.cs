@@ -31,8 +31,6 @@ using System.Xml.Serialization;
 using AM;
 using AM.Linq;
 
-using ManagedIrbis.Infrastructure;
-
 #endregion
 
 #nullable enable
@@ -45,46 +43,6 @@ namespace ManagedIrbis
     public static class FieldUtility
     {
         #region Public methods
-
-        /// <summary>
-        /// Все подполя указанных полей в одном массиве.
-        /// </summary>
-        public static SubField[] AllSubFields (this IEnumerable<Field> fields) =>
-            fields.SelectMany (field => field.Subfields).ToArray();
-
-        // ==========================================================
-
-        /// <summary>
-        /// Отбор подполей с указанными кодами.
-        /// </summary>
-        public static SubField[] FilterSubFields
-            (
-                this IEnumerable<SubField> subFields,
-                params char[] codes
-            )
-        {
-            return subFields
-                .Where
-                    (
-                        subField => subField.Code.IsOneOf (codes)
-                    )
-                .ToArray();
-        }
-
-        /// <summary>
-        /// Отбор подполей с указанными кодами.
-        /// </summary>
-        public static SubField[] FilterSubFields
-            (
-                this Field field,
-                params char[] codes
-            )
-        {
-            return field.Subfields
-                .FilterSubFields (codes);
-        }
-
-        // ==========================================================
 
         /// <summary>
         /// Фильтрация полей.
@@ -529,7 +487,10 @@ namespace ManagedIrbis
             var regex = new Regex (textRegex);
             return fields
                 .GetField (tags)
-                .Where (field => field.FilterSubFields (codes)
+                .Where (field => field.Subfields.Where
+                    (
+                        subfield => subfield.Code.IsOneOf (codes)
+                    )
                     .Any (sub =>
                     {
                         var value = sub.Value;
@@ -1635,7 +1596,7 @@ namespace ManagedIrbis
             (
                 this IEnumerable<Field> fields,
                 int tag,
-                int occurrence = default
+                int occurrence = 0
             )
         {
             foreach (var field in fields)
@@ -1654,74 +1615,6 @@ namespace ManagedIrbis
             throw new KeyNotFoundException ($"Tag={tag}");
 
         } // method RequireField
-
-        // ==========================================================
-
-        /// <summary>
-        /// Перечисление полей с указанной меткой.
-        /// </summary>
-        public static IEnumerable<Field> EnumerateField
-            (
-                this IEnumerable<Field> fields,
-                int tag
-            )
-        {
-            foreach (var field in fields)
-            {
-                if (field.Tag == tag)
-                {
-                    yield return field;
-                }
-            }
-
-        } // method EnumerateField
-
-        /// <summary>
-        /// Перечисление полей с указанной меткой.
-        /// </summary>
-        public static IEnumerable<Field> EnumerateField
-            (
-                this IEnumerable<Field> fields,
-                int tag,
-                char code
-            )
-        {
-            foreach (var field in fields)
-            {
-                if (field.Tag == tag)
-                {
-                    if (field.HaveSubField (code))
-                    {
-                        yield return field;
-                    }
-                }
-            }
-
-        } // method EnumerateField
-
-        /// <summary>
-        /// Перечисление полей с указанной меткой.
-        /// </summary>
-        public static IEnumerable<Field> EnumerateField
-            (
-                this IEnumerable<Field> fields,
-                int tag,
-                char code,
-                string value
-            )
-        {
-            foreach (var field in fields)
-            {
-                if (field.Tag == tag)
-                {
-                    if (field.HaveSubField (code, value))
-                    {
-                        yield return field;
-                    }
-                }
-            }
-
-        } // method EnumerateField
 
         #endregion
 

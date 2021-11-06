@@ -231,18 +231,6 @@ namespace ManagedIrbis
 
         } // method EnsureCapacity
 
-        /// <summary>
-        /// Поиск первого вхождения поля, удовлетворяющего данному предикату.
-        /// </summary>
-        public Field? Find (Predicate<Field> predicate) =>
-            this.FirstOrDefault (field => predicate (field));
-
-        /// <summary>
-        /// Отбор полей с помощью предиката.
-        /// </summary>
-        public Field[] FindAll (Predicate<Field> predicate) =>
-            this.Where (field => predicate (field)).ToArray();
-
         #endregion
 
         #region Collection<T> members

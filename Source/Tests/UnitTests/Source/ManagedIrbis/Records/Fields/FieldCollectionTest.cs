@@ -172,39 +172,6 @@ namespace UnitTests.ManagedIrbis.Records.Fields
             Assert.AreEqual (0, collection.Count);
         }
 
-        [TestMethod]
-        [Description ("Поиск первого вхождения поля с помощью предиката")]
-        public void FieldCollection_Find_1()
-        {
-            var collection = new FieldCollection ();
-            var field1001 = new Field (100);
-            var field1002 = new Field (100);
-            var field2001 = new Field (200);
-            var field2002 = new Field (200);
-            collection.AddRange (new [] {field1001, field1002, field2001, field2002});
-            var found = collection.Find (field => field.Tag == 100 && field.Repeat == 2);
-            Assert.AreSame (field1002, found);
-
-            found = collection.Find (field => field.Tag == 1001);
-            Assert.IsNull (found);
-        }
-
-        [TestMethod]
-        [Description ("Поиск всех вхождений полей с помощью предиката")]
-        public void FieldCollection_FindAll_1()
-        {
-            var collection = new FieldCollection ();
-            var field1001 = new Field (100);
-            var field1002 = new Field (100);
-            var field2001 = new Field (200);
-            var field2002 = new Field (200);
-            collection.AddRange (new [] {field1001, field1002, field2001, field2002});
-            var found = collection.FindAll (field => field.Tag == 100);
-            Assert.AreEqual (2, found.Length);
-            Assert.AreSame (field1001, found[0]);
-            Assert.AreSame (field1002, found[1]);
-        }
-
         private void _TestSerialization
             (
                 FieldCollection first
