@@ -21,15 +21,16 @@ namespace UnitTests.ManagedIrbis
         : Common.CommonUnitTest
     {
         [TestMethod]
+        [Description ("Конструктор по умолчанию")]
         public void RawRecord_Constructor_1()
         {
             var record = new RawRecord();
-            Assert.IsNull(record.Database);
-            Assert.AreEqual(0, record.Mfn);
-            Assert.AreEqual((RecordStatus)0, record.Status);
-            Assert.IsFalse(record.Deleted);
-            Assert.AreEqual(0, record.Version);
-            Assert.IsNotNull(record.Fields);
+            Assert.IsNull (record.Database);
+            Assert.AreEqual (0, record.Mfn);
+            Assert.AreEqual ((RecordStatus)0, record.Status);
+            Assert.IsFalse (record.Deleted);
+            Assert.AreEqual (0, record.Version);
+            Assert.IsNotNull (record.Fields);
         }
 
         private string[] _GetLines()
@@ -66,6 +67,7 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
+        [Description ("Разбор текстового представления")]
         public void RawRecord_Parse_1()
         {
             var fileName = Path.Combine
@@ -78,50 +80,51 @@ namespace UnitTests.ManagedIrbis
                     fileName,
                     IrbisEncoding.Utf8
                 );
-            var record = RawRecord.Parse(text).ThrowIfNull();
-            Assert.AreEqual(154569, record.Mfn);
-            Assert.AreEqual(22, record.Fields?.Count);
+            var record = RawRecord.Parse (text).ThrowIfNull();
+            Assert.AreEqual (154569, record.Mfn);
+            Assert.AreEqual (22, record.Fields?.Count);
         }
 
         [TestMethod]
+        [Description ("Разбор текстового представления")]
         public void RawRecord_Parse_2()
         {
             var lines = _GetLines();
-            var record = RawRecord.Parse(lines).ThrowIfNull();
-            Assert.AreEqual(154569, record.Mfn);
-            Assert.AreEqual(22, record.Fields?.Count);
+            var record = RawRecord.Parse (lines).ThrowIfNull();
+            Assert.AreEqual (154569, record.Mfn);
+            Assert.AreEqual (22, record.Fields?.Count);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(IrbisException))]
+        [ExpectedException (typeof (IrbisException))]
         public void RawRecord_Parse_Exception_1()
         {
-            RawRecord.Parse(new string[0]);
+            RawRecord.Parse (new string[0]);
         }
 
         [TestMethod]
         public void RawRecord_EncodeRecord_1()
         {
             var lines = _GetLines();
-            var record = RawRecord.Parse(lines);
+            var record = RawRecord.Parse (lines);
             var encoded = record.Encode();
-            Assert.IsNotNull(encoded);
+            Assert.IsNotNull (encoded);
         }
 
         [TestMethod]
         public void RawRecord_ToString_1()
         {
             var lines = _GetLines();
-            var record = RawRecord.Parse(lines);
+            var record = RawRecord.Parse (lines);
             var encoded = record.ToString();
-            Assert.IsNotNull(encoded);
+            Assert.IsNotNull (encoded);
         }
 
         [TestMethod]
         public void RawRecord_Deleted_1()
         {
             var lines = _GetLines();
-            var record = RawRecord.Parse(lines);
+            var record = RawRecord.Parse (lines);
             record.Deleted = true;
             Assert.AreEqual
                 (
@@ -137,13 +140,14 @@ namespace UnitTests.ManagedIrbis
         }
 
         [TestMethod]
+        [Description ("Свойство Database")]
         public void RawRecord_Database_1()
         {
             const string ibis = "IBIS";
             var lines = _GetLines();
-            var record = RawRecord.Parse(lines);
+            var record = RawRecord.Parse (lines);
             record.Database = ibis;
-            Assert.AreEqual(ibis, record.Database);
+            Assert.AreEqual (ibis, record.Database);
         }
     }
 }

@@ -2,10 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMethodReturnValue.Global
 
 /* NullRecord.cs -- пустая запись
@@ -48,26 +46,28 @@ namespace ManagedIrbis.Records
         #region IRecord members
 
         /// <inheritdoc cref="IRecord.Decode(Response)"/>
-        public void Decode (Response _ )
+        public void Decode (Response _)
         {
-        }
+        } // method Decode
 
         /// <inheritdoc cref="IRecord.Decode(MstRecord64)"/>
-        public void Decode(MstRecord64 _ )
+        public void Decode (MstRecord64 _)
         {
-        }
+        } // method Decode
 
         /// <inheritdoc cref="IRecord.Encode(string)"/>
-        public string Encode(string? delimiter = IrbisText.IrbisDelimiter) => string.Empty;
+        public string Encode (string? delimiter = IrbisText.IrbisDelimiter) => string.Empty;
 
         /// <inheritdoc cref="IRecord.Encode(MstRecord64)"/>
-        public void Encode(MstRecord64 _)
+        public void Encode (MstRecord64 _)
         {
-        }
+        } // method Encode
 
         /// <inheritdoc cref="IRecord.FM"/>
-        public string? FM(int _) => null;
+        public string? FM (int _) => null;
 
         #endregion
-    }
-}
+
+    } // class NullRecord
+
+} // namespace ManagedIrbis.Records

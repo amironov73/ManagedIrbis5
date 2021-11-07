@@ -209,8 +209,9 @@ namespace ManagedIrbis.Records
         public string? GetCountryCode (Record record, string? defaultValue = null) => record.FM (CountryTag) ?? defaultValue;
 
         /// <summary>
-        /// Получение кодов страны.
+        /// Получение кодов стран.
         /// </summary>
+        [Pure]
         public string[] GetCountryCodes
             (
                 Record record,
@@ -236,6 +237,7 @@ namespace ManagedIrbis.Records
         /// <summary>
         /// Получение конфигурации по умолчанию.
         /// </summary>
+        [Pure]
         public static RecordConfiguration GetDefault() => new ();
 
         /// <summary>

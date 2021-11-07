@@ -54,7 +54,7 @@ namespace UnitTests.Common
                         UnitTestDllPath,
                         @"../../../../../../TestData"
                     );
-                result = Path.GetFullPath(result);
+                result = Path.GetFullPath (result);
 
                 return result;
             }
@@ -97,7 +97,7 @@ namespace UnitTests.Common
         protected virtual ISyncProvider GetProvider()
         {
             var rootPath = Irbis64RootPath;
-            var result = new DirectProvider(rootPath)
+            var result = new DirectProvider (rootPath)
             {
                 Database = "IBIS",
                 PlatformAbstraction = new TestingPlatformAbstraction()
@@ -111,11 +111,11 @@ namespace UnitTests.Common
                 Field field
             )
         {
-            var codes = field.Subfields.Select(sf => sf.Code)
-                .OrderBy(c => c)
+            var codes = field.Subfields.Select (sf => sf.Code)
+                .OrderBy (c => c)
                 .ToArray();
 
-            return new string(codes);
+            return new string (codes);
         }
 
         protected static void CompareFields
@@ -124,14 +124,14 @@ namespace UnitTests.Common
                 Field actual
             )
         {
-            var expectedCodes = GatherCodes(expected);
-            var actualCodes = GatherCodes(actual);
-            Assert.AreEqual(expectedCodes, actualCodes, true);
+            var expectedCodes = GatherCodes (expected);
+            var actualCodes = GatherCodes (actual);
+            Assert.AreEqual (expectedCodes, actualCodes, true);
             foreach (char code in expectedCodes)
             {
-                var expectedSubFields = expected.EnumerateSubFields(code).ToArray();
-                var actualSubFields = actual.EnumerateSubFields(code).ToArray();
-                Assert.AreEqual(expectedSubFields.Length, actualSubFields.Length);
+                var expectedSubFields = expected.EnumerateSubFields (code).ToArray();
+                var actualSubFields = actual.EnumerateSubFields (code).ToArray();
+                Assert.AreEqual (expectedSubFields.Length, actualSubFields.Length);
                 for (var i = 0; i < expectedSubFields.Length; i++)
                 {
                     Assert.AreEqual
@@ -165,9 +165,9 @@ namespace UnitTests.Common
                 return;
             }
 
-            Console.WriteLine($"Difference at index {index}");
-            Console.WriteLine($"Expected: {expected.Substring(index)}");
-            Console.WriteLine($"Actual  : {actual.Substring(index)}");
+            Console.WriteLine ($"Difference at index {index}");
+            Console.WriteLine ($"Expected: {expected.Substring (index)}");
+            Console.WriteLine ($"Actual  : {actual.Substring (index)}");
         }
     }
 }
