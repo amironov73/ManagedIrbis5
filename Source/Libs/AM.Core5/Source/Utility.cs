@@ -3246,6 +3246,37 @@ namespace AM
             value.IsEmpty ? null : value.ToString();
 
         /// <summary>
+        /// Добавление объекта, предваренного разделителем.
+        /// </summary>
+        public static StringBuilder AppendWithDelimiter
+            (
+                this StringBuilder builder,
+                object? obj,
+                string? delimiter = ", "
+            )
+        {
+            if (obj is not null)
+            {
+                if (builder.Length != 0)
+                {
+                    builder.Append (delimiter);
+                }
+
+                if (obj is IFormattable formattable)
+                {
+                    builder.Append (formattable.ToString (null, CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    builder.Append (obj);
+                }
+            }
+
+            return builder;
+
+        } // method AppdenWithDelimiter
+
+        /// <summary>
         /// Determines whether given value can be converted to
         /// the specified type.
         /// </summary>

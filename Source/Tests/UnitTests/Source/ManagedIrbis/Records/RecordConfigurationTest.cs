@@ -252,6 +252,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
             var record = _GetRecord();
             Assert.AreEqual ("RU", configuration.GetCountryCode (record));
         }
+
         [TestMethod]
         [Description ("Получение кодов стран")]
         public void RecordConfiguration_GetCountryCodes_1()
@@ -262,6 +263,27 @@ namespace UnitTests.Source.ManagedIrbis.Records
             Assert.AreEqual (2, codes.Length);
             Assert.AreEqual ("RU", codes[0]);
             Assert.AreEqual ("US", codes[1]);
+        }
+
+        [TestMethod]
+        [Description ("Получение кодов стран")]
+        public void RecordConfiguration_GetCountryCodes_2()
+        {
+            var configuration = new RecordConfiguration();
+            var record = new Record();
+            var codes = configuration.GetCountryCodes (record, "RU");
+            Assert.AreEqual (1, codes.Length);
+            Assert.AreEqual ("RU", codes[0]);
+        }
+
+        [TestMethod]
+        [Description ("Получение кодов стран")]
+        public void RecordConfiguration_GetCountryCodes_3()
+        {
+            var configuration = new RecordConfiguration();
+            var record = new Record();
+            var codes = configuration.GetCountryCodes (record);
+            Assert.AreEqual (0, codes.Length);
         }
 
         [TestMethod]
@@ -298,6 +320,42 @@ namespace UnitTests.Source.ManagedIrbis.Records
             Assert.AreEqual (999, configuration.RentalTag);
             Assert.AreEqual (953, configuration.ResourceTag);
             Assert.AreEqual (920, configuration.WorksheetTag);
+        }
+
+        [TestMethod]
+        public void RecordConfiguration_GetExemplarFields_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var fields = configuration.GetExemplarFields (record);
+            Assert.AreEqual (7, fields.Length);
+        }
+
+        [TestMethod]
+        public void RecordConfiguration_GetExemplars_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var exemplars = configuration.GetExemplars (record);
+            Assert.AreEqual (7, exemplars.Length);
+        }
+
+        [TestMethod]
+        public void RecordConfiguration_GetHolderField_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var field = configuration.GetHolderField (record);
+            Assert.IsNotNull (field);
+        }
+
+        [TestMethod]
+        public void RecordConfiguration_GetHolderFields_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var fields = configuration.GetHolderFields (record);
+            Assert.AreEqual (1, fields.Length);
         }
 
         [TestMethod]

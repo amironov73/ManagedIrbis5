@@ -28,6 +28,7 @@ using System.Xml.Serialization;
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 using ManagedIrbis.Mapping;
 
@@ -40,10 +41,10 @@ namespace ManagedIrbis.Fields
     /// <summary>
     /// Предметная рубрика, поле 606.
     /// </summary>
-    [XmlRoot("heading")]
+    [XmlRoot ("heading")]
     public sealed class HeadingInfo
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
 
@@ -64,91 +65,91 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Предметный заголовок. Подполе a.
         /// </summary>
-        [SubField('a')]
-        [XmlElement("title")]
-        [JsonPropertyName("title")]
-        [Description("Предметный заголовок")]
-        [DisplayName("Предметный заголовок")]
+        [SubField ('a')]
+        [XmlElement ("title")]
+        [JsonPropertyName ("title")]
+        [Description ("Предметный заголовок")]
+        [DisplayName ("Предметный заголовок")]
         public string? Title { get; set; }
 
         /// <summary>
         /// Первый подзаголовок. Подполе b.
         /// </summary>
-        [SubField('b')]
-        [XmlElement("subtitle1")]
-        [JsonPropertyName("subtitle1")]
-        [Description("Первый подзаголовок")]
-        [DisplayName("Первый подзаголовок")]
+        [SubField ('b')]
+        [XmlElement ("subtitle1")]
+        [JsonPropertyName ("subtitle1")]
+        [Description ("Первый подзаголовок")]
+        [DisplayName ("Первый подзаголовок")]
         public string? Subtitle1 { get; set; }
 
         /// <summary>
         /// Второй подзаголовок. Подполе c.
         /// </summary>
-        [SubField('c')]
-        [XmlElement("subtitle2")]
-        [JsonPropertyName("subtitle2")]
-        [Description("Второй подзаголовок")]
-        [DisplayName("Второй подзаголовок")]
+        [SubField ('c')]
+        [XmlElement ("subtitle2")]
+        [JsonPropertyName ("subtitle2")]
+        [Description ("Второй подзаголовок")]
+        [DisplayName ("Второй подзаголовок")]
         public string? Subtitle2 { get; set; }
 
         /// <summary>
         /// Третий подзаголовок. Подполе d.
         /// </summary>
-        [SubField('d')]
-        [XmlElement("subtitle3")]
-        [JsonPropertyName("subtitle3")]
-        [Description("Третий подзаголовок")]
-        [DisplayName("Третий подзаголовок")]
+        [SubField ('d')]
+        [XmlElement ("subtitle3")]
+        [JsonPropertyName ("subtitle3")]
+        [Description ("Третий подзаголовок")]
+        [DisplayName ("Третий подзаголовок")]
         public string? Subtitle3 { get; set; }
 
         /// <summary>
         /// Географический подзаголовок. Подполе g.
         /// </summary>
-        [SubField('g')]
-        [XmlElement("geoSubtitle1")]
-        [JsonPropertyName("geoSubtitle1")]
-        [Description("Первый географический подзаголовок")]
-        [DisplayName("Первый географический подзаголовок")]
+        [SubField ('g')]
+        [XmlElement ("geoSubtitle1")]
+        [JsonPropertyName ("geoSubtitle1")]
+        [Description ("Первый географический подзаголовок")]
+        [DisplayName ("Первый географический подзаголовок")]
         public string? GeographicalSubtitle1 { get; set; }
 
         /// <summary>
         /// Географический подзаголовок. Подполе e.
         /// </summary>
-        [SubField('e')]
-        [XmlElement("geoSubtitle2")]
-        [JsonPropertyName("geoSubtitle2")]
-        [Description("Второй географический подзаголовок")]
-        [DisplayName("Второй географический подзаголовок")]
+        [SubField ('e')]
+        [XmlElement ("geoSubtitle2")]
+        [JsonPropertyName ("geoSubtitle2")]
+        [Description ("Второй географический подзаголовок")]
+        [DisplayName ("Второй географический подзаголовок")]
         public string? GeographicalSubtitle2 { get; set; }
 
         /// <summary>
         /// Географический подзаголовок. Подполе o.
         /// </summary>
-        [SubField('o')]
-        [XmlElement("geoSubtitle3")]
-        [JsonPropertyName("geoSubtitle3")]
-        [Description("Третий географический подзаголовок")]
-        [DisplayName("Третий географический подзаголовок")]
+        [SubField ('o')]
+        [XmlElement ("geoSubtitle3")]
+        [JsonPropertyName ("geoSubtitle3")]
+        [Description ("Третий географический подзаголовок")]
+        [DisplayName ("Третий географический подзаголовок")]
         public string? GeographicalSubtitle3 { get; set; }
 
         /// <summary>
         /// Хронологический подзаголовок. Подполе h.
         /// </summary>
-        [SubField('h')]
-        [XmlElement("chronoSubtitle")]
-        [JsonPropertyName("chronoSubtitle")]
-        [Description("Хронологический подзаголовок")]
-        [DisplayName("Хронологический подзаголовок")]
+        [SubField ('h')]
+        [XmlElement ("chronoSubtitle")]
+        [JsonPropertyName ("chronoSubtitle")]
+        [Description ("Хронологический подзаголовок")]
+        [DisplayName ("Хронологический подзаголовок")]
         public string? ChronologicalSubtitle { get; set; }
 
         /// <summary>
         /// Формальный подзаголовок (аспект). Подполе 9.
         /// </summary>
-        [SubField('9')]
-        [XmlElement("aspect")]
-        [JsonPropertyName("aspect")]
-        [Description("Формальный подзаголовок (аспект)")]
-        [DisplayName("Формальный подзаголовок (аспект)")]
+        [SubField ('9')]
+        [XmlElement ("aspect")]
+        [JsonPropertyName ("aspect")]
+        [Description ("Формальный подзаголовок (аспект)")]
+        [DisplayName ("Формальный подзаголовок (аспект)")]
         public string? Aspect { get; set; }
 
         /// <summary>
@@ -156,7 +157,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public SubField[]? UnknownSubFields { get; set; }
 
         /// <summary>
@@ -164,7 +165,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
@@ -172,12 +173,8 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
-
-        #endregion
-
-        #region Construction
 
         #endregion
 
@@ -189,9 +186,9 @@ namespace ManagedIrbis.Fields
                 string? subtitle
             )
         {
-            if (!string.IsNullOrEmpty(subtitle))
+            if (!string.IsNullOrEmpty (subtitle))
             {
-                builder.AppendFormat(" -- {0}", subtitle);
+                builder.AppendFormat (" -- {0}", subtitle);
             }
         }
 
@@ -217,28 +214,20 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Parse the field.
         /// </summary>
-        public static HeadingInfo ParseField
-            (
-                Field field
-            )
-        {
-            var result = new HeadingInfo
+        public static HeadingInfo ParseField (Field field) => new ()
             {
-                Title = field.GetFirstSubFieldValue('a'),
-                Subtitle1 = field.GetFirstSubFieldValue('b'),
-                Subtitle2 = field.GetFirstSubFieldValue('c'),
-                Subtitle3 = field.GetFirstSubFieldValue('d'),
-                GeographicalSubtitle1 = field.GetFirstSubFieldValue('g'),
-                GeographicalSubtitle2 = field.GetFirstSubFieldValue('e'),
-                GeographicalSubtitle3 = field.GetFirstSubFieldValue('o'),
-                ChronologicalSubtitle = field.GetFirstSubFieldValue('h'),
-                Aspect = field.GetFirstSubFieldValue('9'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
+                Title = field.GetFirstSubFieldValue ('a'),
+                Subtitle1 = field.GetFirstSubFieldValue ('b'),
+                Subtitle2 = field.GetFirstSubFieldValue ('c'),
+                Subtitle3 = field.GetFirstSubFieldValue ('d'),
+                GeographicalSubtitle1 = field.GetFirstSubFieldValue ('g'),
+                GeographicalSubtitle2 = field.GetFirstSubFieldValue ('e'),
+                GeographicalSubtitle3 = field.GetFirstSubFieldValue ('o'),
+                ChronologicalSubtitle = field.GetFirstSubFieldValue ('h'),
+                Aspect = field.GetFirstSubFieldValue ('9'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
-
-            return result;
-        }
 
         /// <summary>
         /// Parse the <see cref="Record"/>.
@@ -253,21 +242,20 @@ namespace ManagedIrbis.Fields
             {
                 if (field.Tag == Tag)
                 {
-                    var heading = ParseField(field);
-                    result.Add(heading);
+                    var heading = ParseField (field);
+                    result.Add (heading);
                 }
             }
 
             return result.ToArray();
-        }
+
+        } // method ParseRecord
 
         /// <summary>
         /// Convert <see cref="HeadingInfo"/>
         /// to <see cref="Field"/>.
         /// </summary>
-        public Field ToField()
-        {
-            var result = new Field (Tag)
+        public Field ToField() => new Field (Tag)
                 .AddNonEmpty ('a', Title)
                 .AddNonEmpty ('b', Subtitle1)
                 .AddNonEmpty ('c', Subtitle2)
@@ -278,9 +266,6 @@ namespace ManagedIrbis.Fields
                 .AddNonEmpty ('h', ChronologicalSubtitle)
                 .AddNonEmpty ('9', Aspect)
                 .AddRange (UnknownSubFields);
-
-            return result;
-        }
 
         #endregion
 
@@ -312,16 +297,16 @@ namespace ManagedIrbis.Fields
             )
         {
             writer
-                .WriteNullable(Title)
-                .WriteNullable(Subtitle1)
-                .WriteNullable(Subtitle2)
-                .WriteNullable(Subtitle3)
-                .WriteNullable(GeographicalSubtitle1)
-                .WriteNullable(GeographicalSubtitle2)
-                .WriteNullable(GeographicalSubtitle3)
-                .WriteNullable(ChronologicalSubtitle)
-                .WriteNullable(Aspect)
-                .WriteNullableArray(UnknownSubFields);
+                .WriteNullable (Title)
+                .WriteNullable (Subtitle1)
+                .WriteNullable (Subtitle2)
+                .WriteNullable (Subtitle3)
+                .WriteNullable (GeographicalSubtitle1)
+                .WriteNullable (GeographicalSubtitle2)
+                .WriteNullable (GeographicalSubtitle3)
+                .WriteNullable (ChronologicalSubtitle)
+                .WriteNullable (Aspect)
+                .WriteNullableArray (UnknownSubFields);
 
         } // method SaveToStream
 
@@ -336,10 +321,10 @@ namespace ManagedIrbis.Fields
             )
         {
             var verifier
-                = new Verifier<HeadingInfo>(this, throwOnError);
+                = new Verifier<HeadingInfo> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Title, nameof(Title));
+                .NotNullNorEmpty (Title);
 
             return verifier.Result;
 
@@ -352,23 +337,25 @@ namespace ManagedIrbis.Fields
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(Title))
+            if (string.IsNullOrEmpty (Title))
             {
                 return Title.ToVisibleString();
             }
 
-            var result = new StringBuilder();
-            result.Append(Title);
-            _AppendSubTitle(result, Subtitle1);
-            _AppendSubTitle(result, Subtitle2);
-            _AppendSubTitle(result, Subtitle3);
-            _AppendSubTitle(result, GeographicalSubtitle1);
-            _AppendSubTitle(result, GeographicalSubtitle2);
-            _AppendSubTitle(result, GeographicalSubtitle3);
-            _AppendSubTitle(result, ChronologicalSubtitle);
-            _AppendSubTitle(result, Aspect);
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append (Title);
+            _AppendSubTitle (builder, Subtitle1);
+            _AppendSubTitle (builder, Subtitle2);
+            _AppendSubTitle (builder, Subtitle3);
+            _AppendSubTitle (builder, GeographicalSubtitle1);
+            _AppendSubTitle (builder, GeographicalSubtitle2);
+            _AppendSubTitle (builder, GeographicalSubtitle3);
+            _AppendSubTitle (builder, ChronologicalSubtitle);
+            _AppendSubTitle (builder, Aspect);
 
-            return result.ToString();
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+            return result;
 
         } // method ToString
 
@@ -377,4 +364,3 @@ namespace ManagedIrbis.Fields
     } // class HeadingInfo
 
 } // namespace ManagedIrbis.Fields
-
