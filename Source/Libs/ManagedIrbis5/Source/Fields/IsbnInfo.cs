@@ -39,10 +39,10 @@ namespace ManagedIrbis.Fields
     /// <summary>
     /// ISBN и цена, поле 10.
     /// </summary>
-    [XmlRoot("isbn")]
+    [XmlRoot ("isbn")]
     public sealed class IsbnInfo
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
 
@@ -61,65 +61,65 @@ namespace ManagedIrbis.Fields
         #region Properties
 
         /// <summary>
-        /// ISBN.
+        /// ISBN, подполе A.
         /// </summary>
-        [SubField('a')]
-        [XmlElement("isbn")]
-        [JsonPropertyName("isbn")]
-        [Description("ISBN. Подполе a.")]
-        [DisplayName("ISBN")]
+        [SubField ('a')]
+        [XmlElement ("isbn")]
+        [JsonPropertyName ("isbn")]
+        [Description ("ISBN. Подполе a.")]
+        [DisplayName ("ISBN")]
         public string? Isbn { get; set; }
 
         /// <summary>
-        /// Уточнение. Подполе b.
+        /// Уточнение, подполе B.
         /// </summary>
-        [SubField('b')]
-        [XmlElement("refinement")]
-        [JsonPropertyName("refinement")]
-        [Description("Уточнение")]
-        [DisplayName("Уточнение")]
+        [SubField ('b')]
+        [XmlElement ("refinement")]
+        [JsonPropertyName ("refinement")]
+        [Description ("Уточнение")]
+        [DisplayName ("Уточнение")]
         public string? Refinement { get; set; }
 
         /// <summary>
-        /// Ошибочный ISBN. Подполе z.
+        /// Ошибочный ISBN, подполе Z.
         /// </summary>
-        [SubField('z')]
-        [XmlElement("erroneous")]
-        [JsonPropertyName("erroneous")]
-        [Description("Ошибочный ISBN")]
-        [DisplayName("Ошибочный ISBN")]
+        [SubField ('z')]
+        [XmlElement ("erroneous")]
+        [JsonPropertyName ("erroneous")]
+        [Description ("Ошибочный ISBN")]
+        [DisplayName ("Ошибочный ISBN")]
         public string? Erroneous { get; set; }
 
         /// <summary>
-        /// Цена общая для всех экземпляров. Подполе d.
+        /// Цена общая для всех экземпляров, подполе D.
         /// </summary>
-        [SubField('d')]
-        [XmlElement("price")]
-        [JsonPropertyName("price")]
-        [Description("Цена общая для всех экземпляров")]
-        [DisplayName("Цена общая для всех экземпляров")]
+        [SubField ('d')]
+        [XmlElement ("price")]
+        [JsonPropertyName ("price")]
+        [Description ("Цена общая для всех экземпляров")]
+        [DisplayName ("Цена общая для всех экземпляров")]
         public string? PriceString { get; set; }
 
         /// <summary>
-        /// Цена общая для всех экземпляров. Подполе d.
+        /// Цена общая для всех экземпляров, подполе D.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public decimal Price
         {
             get => PriceString.SafeToDecimal();
-            set => PriceString = value.ToString("#.00", CultureInfo.InvariantCulture);
+            set => PriceString = value.ToString ("#.00", CultureInfo.InvariantCulture);
         }
 
         /// <summary>
-        /// Обозначение валюты. Подполе c.
+        /// Обозначение валюты, подполе C.
         /// </summary>
-        [SubField('c')]
-        [XmlElement("currency")]
-        [JsonPropertyName("currency")]
-        [Description("Обозначение валюты")]
-        [DisplayName("Обозначение валюты")]
+        [SubField ('c')]
+        [XmlElement ("currency")]
+        [JsonPropertyName ("currency")]
+        [Description ("Обозначение валюты")]
+        [DisplayName ("Обозначение валюты")]
         public string? Currency { get; set; }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public SubField[]? UnknownSubFields { get; set; }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -166,16 +166,17 @@ namespace ManagedIrbis.Fields
         /// </summary>
         public static IsbnInfo[] ParseRecord
             (
-                Record record
+                Record record,
+                int tag = Tag
             )
         {
             var result = new List<IsbnInfo>();
             foreach (Field field in record.Fields)
             {
-                if (field.Tag == Tag)
+                if (field.Tag == tag)
                 {
-                    IsbnInfo isbn = ParseField(field);
-                    result.Add(isbn);
+                    var isbn = ParseField (field);
+                    result.Add (isbn);
                 }
             }
 
@@ -186,40 +187,29 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Parse the specified field.
         /// </summary>
-        public static IsbnInfo ParseField
-            (
-                Field field
-            )
-        {
-            var result = new IsbnInfo
+        public static IsbnInfo ParseField (Field field) => new ()
             {
-                Isbn = field.GetFirstSubFieldValue('a'),
-                Refinement = field.GetFirstSubFieldValue('b'),
-                Erroneous = field.GetFirstSubFieldValue('z'),
-                PriceString = field.GetFirstSubFieldValue('d'),
-                Currency = field.GetFirstSubFieldValue('c'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
+                Isbn = field.GetFirstSubFieldValue ('a'),
+                Refinement = field.GetFirstSubFieldValue ('b'),
+                Erroneous = field.GetFirstSubFieldValue ('z'),
+                PriceString = field.GetFirstSubFieldValue ('d'),
+                Currency = field.GetFirstSubFieldValue ('c'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
-
-            return result;
-
-        } // method ParseField
 
         /// <summary>
         /// Should serialize the <see cref="UnknownSubFields"/> array?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeUnknownSubFields() =>
-            !ArrayUtility.IsNullOrEmpty(UnknownSubFields);
+            !ArrayUtility.IsNullOrEmpty (UnknownSubFields);
 
         /// <summary>
         /// Transform back to field.
         /// </summary>
-        public Field ToField()
-        {
-            var result = new Field (Tag)
+        public Field ToField() => new Field (Tag)
                 .AddNonEmpty ('a', Isbn)
                 .AddNonEmpty ('b', Refinement)
                 .AddNonEmpty ('z', Erroneous)
@@ -229,10 +219,6 @@ namespace ManagedIrbis.Fields
                         'd',
                         Price != 0.0m ? Price.ToInvariantString() : null
                     );
-
-            return result;
-
-        } // method ToField
 
         #endregion
 
@@ -259,11 +245,11 @@ namespace ManagedIrbis.Fields
             )
         {
             writer
-                .WriteNullable(Isbn)
-                .WriteNullable(Refinement)
-                .WriteNullable(Erroneous)
-                .WriteNullable(Currency)
-                .WriteNullable(PriceString);
+                .WriteNullable (Isbn)
+                .WriteNullable (Refinement)
+                .WriteNullable (Erroneous)
+                .WriteNullable (Currency)
+                .WriteNullable (PriceString);
 
         } // method SaveToStream
 
@@ -277,13 +263,13 @@ namespace ManagedIrbis.Fields
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<IsbnInfo>(this, throwOnError);
+            var verifier = new Verifier<IsbnInfo> (this, throwOnError);
 
             verifier.Assert
                 (
-                    !string.IsNullOrEmpty(PriceString)
-                    || !string.IsNullOrEmpty(Isbn)
-                    || !string.IsNullOrEmpty(Erroneous)
+                    !string.IsNullOrEmpty (PriceString)
+                    || !string.IsNullOrEmpty (Isbn)
+                    || !string.IsNullOrEmpty (Erroneous)
                 );
 
             return verifier.Result;
@@ -297,12 +283,12 @@ namespace ManagedIrbis.Fields
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            if (string.IsNullOrEmpty(Isbn))
+            if (string.IsNullOrEmpty (Isbn))
             {
-                return string.IsNullOrEmpty(PriceString) ? "(null)" : PriceString;
+                return string.IsNullOrEmpty (PriceString) ? "(null)" : PriceString;
             }
 
-            if (string.IsNullOrEmpty(PriceString))
+            if (string.IsNullOrEmpty (PriceString))
             {
                 return Isbn;
             }

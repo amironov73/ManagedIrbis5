@@ -3,8 +3,6 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UseObjectOrCollectionInitializer
 
-
-using System;
 using System.IO;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,7 +20,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
     {
         private Record _GetRecord() => new Record()
             .Add (10, "^a5-7110-0177-9^d300.00")
-            .Add (11, "ISSN")
+            .Add (11, "^a0378-5955")
             .Add (60, "14")
             .Add (101, "rus")
             .Add (101, "eng")
@@ -30,7 +28,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
             .Add (102, "US")
             .Add (210, "^aМосква^cВся Москва^d1993")
             .Add (675, "37(470.311)(03)")
-            .Add (902, "ГПНТБ СО РАН")
+            .Add (902, "^aГПНТБ СО РАН")
             .Add (903, "37/К 88-602720")
             .Add (905, "^F2^21")
             .Add (907, "^A20020530^BДСМ^CПК")
@@ -245,7 +243,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
         }
 
         [TestMethod]
-        [Description ("Получение кода страны")]
+        [Description ("Код страны")]
         public void RecordConfiguration_GetCountryCode_1()
         {
             var configuration = new RecordConfiguration();
@@ -254,7 +252,16 @@ namespace UnitTests.Source.ManagedIrbis.Records
         }
 
         [TestMethod]
-        [Description ("Получение кодов стран")]
+        [Description ("Код страны")]
+        public void RecordConfiguration_GetCountryCode_2()
+        {
+            var configuration = new RecordConfiguration();
+            var record = new Record();
+            Assert.AreEqual ("EN", configuration.GetCountryCode (record, "EN"));
+        }
+
+        [TestMethod]
+        [Description ("Коды стран")]
         public void RecordConfiguration_GetCountryCodes_1()
         {
             var configuration = new RecordConfiguration();
@@ -266,7 +273,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
         }
 
         [TestMethod]
-        [Description ("Получение кодов стран")]
+        [Description ("Коды стран")]
         public void RecordConfiguration_GetCountryCodes_2()
         {
             var configuration = new RecordConfiguration();
@@ -277,7 +284,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
         }
 
         [TestMethod]
-        [Description ("Получение кодов стран")]
+        [Description ("Коды стран")]
         public void RecordConfiguration_GetCountryCodes_3()
         {
             var configuration = new RecordConfiguration();
@@ -287,7 +294,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
         }
 
         [TestMethod]
-        [Description ("Получение поля для настройки библиографической записи")]
+        [Description ("Поле для настройки библиографической записи")]
         public void RecordConfiguration_GetCustomizationField_1()
         {
             var configuration = new RecordConfiguration();
@@ -323,6 +330,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
         }
 
         [TestMethod]
+        [Description ("Экземпляры")]
         public void RecordConfiguration_GetExemplarFields_1()
         {
             var configuration = new RecordConfiguration();
@@ -332,6 +340,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
         }
 
         [TestMethod]
+        [Description ("Экземпляры")]
         public void RecordConfiguration_GetExemplars_1()
         {
             var configuration = new RecordConfiguration();
@@ -341,30 +350,211 @@ namespace UnitTests.Source.ManagedIrbis.Records
         }
 
         [TestMethod]
+        [Description ("Держатель документа")]
         public void RecordConfiguration_GetHolderField_1()
         {
             var configuration = new RecordConfiguration();
             var record = _GetRecord();
             var field = configuration.GetHolderField (record);
             Assert.IsNotNull (field);
+            Assert.AreEqual (configuration.HolderTag, field.Tag);
         }
 
         [TestMethod]
+        [Description ("Держатель документа")]
         public void RecordConfiguration_GetHolderFields_1()
         {
             var configuration = new RecordConfiguration();
             var record = _GetRecord();
             var fields = configuration.GetHolderFields (record);
             Assert.AreEqual (1, fields.Length);
+            Assert.AreEqual (configuration.HolderTag, fields[0].Tag);
         }
 
         [TestMethod]
-        [Description ("Получение количества выдач документа")]
+        [Description ("Графические данные")]
+        public void RecordConfiguration_GetImageField_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var field = configuration.GetImageField (record);
+            Assert.IsNotNull (field);
+            Assert.AreEqual (configuration.ImageTag, field.Tag);
+        }
+
+        [TestMethod]
+        [Description ("Графические данные")]
+        public void RecordConfiguration_GetImageFields_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var fields = configuration.GetImageFields (record);
+            Assert.AreEqual (1, fields.Length);
+            Assert.AreEqual (configuration.ImageTag, fields[0].Tag);
+        }
+
+        [TestMethod]
+        [Description ("Шифр документа в базе")]
+        public void RecordConfiguration_GetIndex_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var index = configuration.GetIndex (record);
+            Assert.AreEqual ("37/К 88-602720", index);
+        }
+
+        [TestMethod]
+        [Description ("ISBN")]
+        public void RecordConfiguration_GetIsbnFields_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var isbn = configuration.GetIsbnFields (record);
+            Assert.IsNotNull (isbn);
+            Assert.AreEqual (1, isbn.Length);
+            Assert.AreEqual (configuration.IsbnTag, isbn[0].Tag);
+            Assert.AreEqual ("5-7110-0177-9", isbn[0].GetFirstSubFieldValue ('a'));
+        }
+
+        [TestMethod]
+        [Description ("ISBN")]
+        public void RecordConfiguration_GetIsbn_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var isbn = configuration.GetIsbn (record);
+            Assert.IsNotNull (isbn);
+            Assert.AreEqual (1, isbn.Length);
+            Assert.AreEqual ("5-7110-0177-9", isbn[0].Isbn);
+        }
+
+        [TestMethod]
+        [Description ("ISSN")]
+        public void RecordConfiguration_GetIssnFields_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var issn = configuration.GetIssnFields (record);
+            Assert.IsNotNull (issn);
+            Assert.AreEqual (1, issn.Length);
+            Assert.AreEqual (configuration.IssnTag, issn[0].Tag);
+            Assert.AreEqual ("0378-5955", issn[0].GetFirstSubFieldValue ('a'));
+        }
+
+        [TestMethod]
+        [Description ("ISSN")]
+        public void RecordConfiguration_GetIssn_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var issn = configuration.GetIssn (record);
+            Assert.IsNotNull (issn);
+            Assert.AreEqual (1, issn.Length);
+            Assert.AreEqual ("0378-5955", issn[0].Issn);
+        }
+
+        [TestMethod]
+        [Description ("Раздел знаний")]
+        public void RecordConfiguration_GetKnowledgeSection_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var section = configuration.GetKnowledgeSection (record);
+            Assert.AreEqual ("14", section);
+        }
+
+        [TestMethod]
+        [Description ("Код языка текста")]
+        public void RecordConfiguration_GetLanguageCode_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var language = configuration.GetLanguageCode (record);
+            Assert.AreEqual ("rus", language);
+        }
+
+        [TestMethod]
+        [Description ("Код языка текста")]
+        public void RecordConfiguration_GetLanguageCode_2()
+        {
+            var configuration = new RecordConfiguration();
+            var record = new Record();
+            var language = configuration.GetLanguageCode (record, "eng");
+            Assert.AreEqual ("eng", language);
+        }
+
+        [TestMethod]
+        [Description ("Коды языков текста")]
+        public void RecordConfiguration_GetLanguageCodes_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var languages = configuration.GetLanguageCodes (record);
+            Assert.AreEqual (2, languages.Length);
+            Assert.AreEqual ("rus", languages[0]);
+            Assert.AreEqual ("eng", languages[1]);
+        }
+
+        [TestMethod]
+        [Description ("Коды языков текста")]
+        public void RecordConfiguration_GetLanguageCodes_2()
+        {
+            var configuration = new RecordConfiguration();
+            var record = new Record();
+            var languages = configuration.GetLanguageCodes (record, "eng");
+            Assert.AreEqual (1, languages.Length);
+            Assert.AreEqual ("eng", languages[0]);
+        }
+
+        [TestMethod]
+        [Description ("Технология")]
+        public void RecordConfiguration_GetOperatorFields_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var operators = configuration.GetOperatorFields (record);
+            Assert.AreEqual (2, operators.Length);
+        }
+
+        [TestMethod]
+        [Description ("Количество выдач документа")]
         public void RecordConfiguration_GetRentalCount_1()
         {
             var configuration = new RecordConfiguration();
             var record = _GetRecord();
             Assert.AreEqual (2, configuration.GetRentalCount (record));
+        }
+
+        [TestMethod]
+        [Description ("Внутренние двоичные ресурсы записи")]
+        public void RecordConfiguration_GetResourceField_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var resource = configuration.GetResourceField (record);
+            Assert.IsNotNull (resource);
+            Assert.AreEqual (configuration.ResourceTag, resource.Tag);
+        }
+
+        [TestMethod]
+        [Description ("Внутренние двоичные ресурсы записи")]
+        public void RecordConfiguration_GetResourceFields_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var resources = configuration.GetResourceFields (record);
+            Assert.AreEqual (1, resources.Length);
+            Assert.AreEqual (configuration.ResourceTag, resources[0].Tag);
+        }
+
+        [TestMethod]
+        [Description ("Технология")]
+        public void RecordConfiguration_GetTechnology_1()
+        {
+            var configuration = new RecordConfiguration();
+            var record = _GetRecord();
+            var technology = configuration.GetTechnology (record);
+            Assert.AreEqual (2, technology.Length);
         }
 
         [TestMethod]

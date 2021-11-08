@@ -40,6 +40,7 @@ namespace ManagedIrbis.Fields
     /// <summary>
     /// Держатель документа, поле 902.
     /// </summary>
+    [XmlRoot ("holder")]
     public sealed class Holder
         : IHandmadeSerializable,
         IVerifiable
@@ -248,6 +249,11 @@ namespace ManagedIrbis.Fields
         /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
+            if (string.IsNullOrEmpty (Organization))
+            {
+                return Organization.ToVisibleString();
+            }
+
             var builder = StringBuilderPool.Shared.Get();
             builder
                 .AppendWithDelimiter (Organization)

@@ -279,16 +279,26 @@ namespace ManagedIrbis.Records
         public string? GetIndex (Record record) => record.FM (IndexTag);
 
         /// <summary>
-        /// Получение поля с ISBN.
+        /// Получение массива полей с ISBN.
         /// </summary>
         [Pure]
-        public Field? GetIsbnField (Record record) => record.GetFirstField (IsbnTag);
+        public Field[] GetIsbnFields (Record record) => record.Fields.GetField (IsbnTag);
 
         /// <summary>
-        /// Получение поля с ISSN.
+        /// Получение массива ISBN.
+        /// </summary>
+        public IsbnInfo[] GetIsbn (Record record) => IsbnInfo.ParseRecord (record, IsbnTag);
+
+        /// <summary>
+        /// Получение массива полей с ISSN.
         /// </summary>
         [Pure]
-        public Field? GetIssnField (Record record) => record.GetFirstField (IssnTag);
+        public Field[] GetIssnFields (Record record) => record.Fields.GetField (IssnTag);
+
+        /// <summary>
+        /// Получение ISSN.
+        /// </summary>
+        public IssnInfo[] GetIssn (Record record) => IssnInfo.ParseRecord (record, IssnTag);
 
         /// <summary>
         /// Получение раздела знаний.
