@@ -9,16 +9,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-
-    - name: Setup .NET 5
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 5.0.401
         
-    - name: Setup .NET 6 RC
+    - name: Setup .NET 6
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.100-rc.2.21505.57
+        dotnet-version: 6.0.100
 
     - name: Build
       run: dotnet build --configuration Release Source/ManagedIrbis5.sln
