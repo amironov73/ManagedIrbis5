@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -34,13 +35,18 @@ namespace ManagedIrbis.Fields
     /// <remarks>
     /// Также "СМ. ТАКЖЕ" - поле 510.
     /// </remarks>
-    [XmlRoot("see")]
+    [XmlRoot ("see")]
     public sealed class AthraSee
     {
         #region Constants
 
         /// <summary>
-        /// Known subfield codes.
+        /// Метка поля.
+        /// </summary>
+        public const int Tag = 410;
+
+        /// <summary>
+        /// Известные коды подполей.
         /// </summary>
         public const string KnownCodes = "0145789abcdfg<";
 
@@ -52,140 +58,170 @@ namespace ManagedIrbis.Fields
         /// Начальный элемент ввода (фамилия или имя).
         /// Подполе a.
         /// </summary>
-        [SubField('a')]
-        [XmlElement("surname")]
-        [JsonPropertyName("surname")]
+        [SubField ('a')]
+        [XmlElement ("surname")]
+        [JsonPropertyName ("surname")]
+        [Description ("Начальный элемент ввода")]
+        [DisplayName ("Начальный элемент ввода")]
         public string? Surname { get; set; }
 
         /// <summary>
         /// Инициалы.
         /// Подполе b.
         /// </summary>
-        [SubField('b')]
-        [XmlElement("initials")]
-        [JsonPropertyName("intials")]
+        [SubField ('b')]
+        [XmlElement ("initials")]
+        [JsonPropertyName ("intials")]
+        [Description ("Инициалы")]
+        [DisplayName ("Инициалы")]
         public string? Initials { get; set; }
 
         /// <summary>
         /// Расширение инициалов.
         /// Подполе g.
         /// </summary>
-        [SubField('g')]
-        [XmlElement("extension")]
-        [JsonPropertyName("extension")]
+        [SubField ('g')]
+        [XmlElement ("extension")]
+        [JsonPropertyName ("extension")]
+        [Description ("Расширение инициалов")]
+        [DisplayName ("Расширение инициалов")]
         public string? Extension { get; set; }
 
         /// <summary>
         /// Роль (инвертирование ФИО допустимо?).
         /// Подполе &lt;.
         /// </summary>
-        [SubField('<')]
-        [XmlElement("role")]
-        [JsonPropertyName("role")]
+        [SubField ('<')]
+        [XmlElement ("role")]
+        [JsonPropertyName ("role")]
+        [Description ("Инвертирование ФИО допустимо?")]
+        [DisplayName ("Инвертирование ФИО допустимо?")]
         public string? Role { get; set; }
 
         /// <summary>
         /// Неотъемлемая часть имени (выводится в скобках).
         /// Подполе 1.
         /// </summary>
-        [SubField('1')]
-        [XmlElement("integral")]
-        [JsonPropertyName("integral")]
+        [SubField ('1')]
+        [XmlElement ("integral")]
+        [JsonPropertyName ("integral")]
+        [Description ("Неотъемлемая часть имени")]
+        [DisplayName ("Неотъемлемая часть имени")]
         public string? IntegralPart { get; set; }
 
         /// <summary>
         /// Идентифицирующие признаки имени.
         /// Подполе c.
         /// </summary>
-        [SubField('c')]
-        [XmlElement("identifying")]
-        [JsonPropertyName("identifying")]
+        [SubField ('c')]
+        [XmlElement ("identifying")]
+        [JsonPropertyName ("identifying")]
+        [Description ("Идентифицирующие признаки имени")]
+        [DisplayName ("Идентифицирующие признаки имени")]
         public string? IdentifyingSigns { get; set; }
 
         /// <summary>
         /// Римские цифры.
         /// Подполе d.
         /// </summary>
-        [SubField('d')]
-        [XmlElement("roman")]
-        [JsonPropertyName("roman")]
+        [SubField ('d')]
+        [XmlElement ("roman")]
+        [JsonPropertyName ("roman")]
+        [Description ("Римские цифры")]
+        [DisplayName ("Римские цифры")]
         public string? RomanNumerals { get; set; }
 
         /// <summary>
         /// Даты.
         /// Подполе f.
         /// </summary>
-        [SubField('f')]
-        [XmlElement("dates")]
-        [JsonPropertyName("dates")]
+        [SubField ('f')]
+        [XmlElement ("dates")]
+        [JsonPropertyName ("dates")]
+        [Description ("Даты")]
+        [DisplayName ("Даты")]
         public string? Dates { get; set; }
 
         /// <summary>
         /// Инструктивный текст.
         /// Подполе 0.
         /// </summary>
-        [SubField('0')]
-        [XmlElement("instruction")]
-        [JsonPropertyName("instruction")]
+        [SubField ('0')]
+        [XmlElement ("instruction")]
+        [JsonPropertyName ("instruction")]
+        [Description ("Инструктивный текст")]
+        [DisplayName ("Инструктивный текст")]
         public string? Instruction { get; set; }
 
         /// <summary>
         /// Графика.
         /// Подполе 7.
         /// </summary>
-        [SubField('7')]
-        [XmlElement("graphics")]
-        [JsonPropertyName("graphics")]
+        [SubField ('7')]
+        [XmlElement ("graphics")]
+        [JsonPropertyName ("graphics")]
+        [Description ("Графика")]
+        [DisplayName ("Графика")]
         public string? Graphics { get; set; }
 
         /// <summary>
         /// Язык заголовка.
         /// Подполе 8.
         /// </summary>
-        [SubField('8')]
-        [XmlElement("language")]
-        [JsonPropertyName("language")]
+        [SubField ('8')]
+        [XmlElement ("language")]
+        [JsonPropertyName ("language")]
+        [Description ("Язык заголовка")]
+        [DisplayName ("Язык заголовка")]
         public string? Language { get; set; }
 
         /// <summary>
         /// Код формирования ссылки.
         /// Подполе 5.
         /// </summary>
-        [SubField('5')]
-        [XmlElement("link")]
-        [JsonPropertyName("link")]
+        [SubField ('5')]
+        [XmlElement ("link")]
+        [JsonPropertyName ("link")]
+        [Description ("Код формирования ссылки")]
+        [DisplayName ("Код формирования ссылки")]
         public string? Link { get; set; }
 
         /// <summary>
         /// Признак ввода имени лица.
         /// Подполе 9.
         /// </summary>
-        [SubField('9')]
-        [XmlElement("mark")]
-        [JsonPropertyName("mark")]
+        [SubField ('9')]
+        [XmlElement ("mark")]
+        [JsonPropertyName ("mark")]
+        [Description ("Признак ввода имени лица")]
+        [DisplayName ("Признак ввода имени лица")]
         public string? Mark { get; set; }
 
         /// <summary>
         /// Код отношения.
         /// Подполе 4.
         /// </summary>
-        [SubField('4')]
-        [XmlElement("relation")]
-        [JsonPropertyName("relation")]
+        [SubField ('4')]
+        [XmlElement ("relation")]
+        [JsonPropertyName ("relation")]
+        [Description ("Код отношения")]
+        [DisplayName ("Код отношения")]
         public string? RelationCode { get; set; }
 
         /// <summary>
-        /// Associated <see cref="Field"/>.
+        /// Ассоциированное поле библиографической записи <see cref="Field"/>.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -193,7 +229,7 @@ namespace ManagedIrbis.Fields
         #region Public methods
 
         /// <summary>
-        /// Apply to the <see cref="Field"/>.
+        /// Применение данных к полю библиографической записи <see cref="Field"/>.
         /// </summary>
         public Field ApplyTo (Field field) => field
             .SetSubFieldValue ('a', Surname)
@@ -212,60 +248,45 @@ namespace ManagedIrbis.Fields
             .SetSubFieldValue ('4', RelationCode);
 
         /// <summary>
-        /// Parse the field.
+        /// Разбор поля библиографической записи.
         /// </summary>
-        public static AthraSee? Parse
-            (
-                Field? field
-            )
-        {
-            if (ReferenceEquals(field, null))
+        public static AthraSee ParseField (Field field) => new ()
             {
-                return null;
-            }
-
-            // TODO: реализовать эффективно
-
-            var result = new AthraSee
-            {
-                Surname = field.GetFirstSubFieldValue('a'),
-                Initials = field.GetFirstSubFieldValue('b'),
-                Extension = field.GetFirstSubFieldValue('g'),
-                Role = field.GetFirstSubFieldValue('<'),
-                IntegralPart = field.GetFirstSubFieldValue('1'),
-                IdentifyingSigns = field.GetFirstSubFieldValue('c'),
-                RomanNumerals = field.GetFirstSubFieldValue('d'),
-                Dates = field.GetFirstSubFieldValue('f'),
-                Instruction = field.GetFirstSubFieldValue('0'),
-                Graphics = field.GetFirstSubFieldValue('7'),
-                Language = field.GetFirstSubFieldValue('8'),
-                Link = field.GetFirstSubFieldValue('5'),
-                Mark = field.GetFirstSubFieldValue('9'),
-                RelationCode = field.GetFirstSubFieldValue('4'),
+                Surname = field.GetFirstSubFieldValue ('a'),
+                Initials = field.GetFirstSubFieldValue ('b'),
+                Extension = field.GetFirstSubFieldValue ('g'),
+                Role = field.GetFirstSubFieldValue ('<'),
+                IntegralPart = field.GetFirstSubFieldValue ('1'),
+                IdentifyingSigns = field.GetFirstSubFieldValue ('c'),
+                RomanNumerals = field.GetFirstSubFieldValue ('d'),
+                Dates = field.GetFirstSubFieldValue ('f'),
+                Instruction = field.GetFirstSubFieldValue ('0'),
+                Graphics = field.GetFirstSubFieldValue ('7'),
+                Language = field.GetFirstSubFieldValue ('8'),
+                Link = field.GetFirstSubFieldValue ('5'),
+                Mark = field.GetFirstSubFieldValue ('9'),
+                RelationCode = field.GetFirstSubFieldValue ('4'),
                 Field = field
             };
 
-            return result;
-        } // method Parse
-
         /// <summary>
-        /// Convert back to <see cref="Field"/>.
+        /// Преобразование в поле библиографической записи <see cref="Field"/>.
         /// </summary>
         public Field ToField() => new Field { Tag = 410 }
-                .AddNonEmpty ('a', Surname)
-                .AddNonEmpty ('b', Initials)
-                .AddNonEmpty ('g', Extension)
-                .AddNonEmpty ('<', Role)
-                .AddNonEmpty ('1', IntegralPart)
-                .AddNonEmpty ('c', IdentifyingSigns)
-                .AddNonEmpty ('d', RomanNumerals)
-                .AddNonEmpty ('f', Dates)
-                .AddNonEmpty ('0', Instruction)
-                .AddNonEmpty ('7', Graphics)
-                .AddNonEmpty ('8', Language)
-                .AddNonEmpty ('5', Link)
-                .AddNonEmpty ('9', Mark)
-                .AddNonEmpty ('4', RelationCode);
+            .AddNonEmpty ('a', Surname)
+            .AddNonEmpty ('b', Initials)
+            .AddNonEmpty ('g', Extension)
+            .AddNonEmpty ('<', Role)
+            .AddNonEmpty ('1', IntegralPart)
+            .AddNonEmpty ('c', IdentifyingSigns)
+            .AddNonEmpty ('d', RomanNumerals)
+            .AddNonEmpty ('f', Dates)
+            .AddNonEmpty ('0', Instruction)
+            .AddNonEmpty ('7', Graphics)
+            .AddNonEmpty ('8', Language)
+            .AddNonEmpty ('5', Link)
+            .AddNonEmpty ('9', Mark)
+            .AddNonEmpty ('4', RelationCode);
 
         #endregion
 
