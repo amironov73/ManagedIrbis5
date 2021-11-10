@@ -15,10 +15,13 @@
 #region Using directives
 
 using System.ComponentModel;
+using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
+using AM.IO;
+using AM.Runtime;
 
 using ManagedIrbis.Mapping;
 
@@ -37,6 +40,8 @@ namespace ManagedIrbis.Fields
     /// </remarks>
     [XmlRoot ("see")]
     public sealed class AthraSee
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Constants
 
@@ -71,7 +76,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [SubField ('b')]
         [XmlElement ("initials")]
-        [JsonPropertyName ("intials")]
+        [JsonPropertyName ("initials")]
         [Description ("Инициалы")]
         [DisplayName ("Инициалы")]
         public string? Initials { get; set; }
@@ -287,6 +292,80 @@ namespace ManagedIrbis.Fields
             .AddNonEmpty ('5', Link)
             .AddNonEmpty ('9', Mark)
             .AddNonEmpty ('4', RelationCode);
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            Surname = reader.ReadNullableString();
+            Initials = reader.ReadNullableString();
+            Extension = reader.ReadNullableString();
+            Role = reader.ReadNullableString();
+            IntegralPart = reader.ReadNullableString();
+            IdentifyingSigns = reader.ReadNullableString();
+            RomanNumerals = reader.ReadNullableString();
+            Dates = reader.ReadNullableString();
+            Instruction = reader.ReadNullableString();
+            Graphics = reader.ReadNullableString();
+            Language = reader.ReadNullableString();
+            Link = reader.ReadNullableString();
+            Mark = reader.ReadNullableString();
+            RelationCode = reader.ReadNullableString();
+
+        } // method RestoreFromStream
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer
+                .WriteNullable (Surname)
+                .WriteNullable (Initials)
+                .WriteNullable (Extension)
+                .WriteNullable (Role)
+                .WriteNullable (IntegralPart)
+                .WriteNullable (IdentifyingSigns)
+                .WriteNullable (RomanNumerals)
+                .WriteNullable (Dates)
+                .WriteNullable (Instruction)
+                .WriteNullable (Graphics)
+                .WriteNullable (Language)
+                .WriteNullable (Link)
+                .WriteNullable (Mark)
+                .WriteNullable (RelationCode);
+
+        } // method SaveToStream
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<AthraSee>(this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (Surname);
+
+            return verifier.Result;
+
+        } // method Verify
 
         #endregion
 
