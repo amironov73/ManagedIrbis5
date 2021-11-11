@@ -112,14 +112,14 @@ namespace ManagedIrbis
         /// Такое кодирование позволяет хранить в записи,
         /// например, небольшие JPEG-файлы.
         /// </summary>
-        public static string EncodePercentString
+        public static string? EncodePercentString
             (
                 byte[]? array
             )
         {
             if (array.IsNullOrEmpty())
             {
-                return string.Empty;
+                return null;
             }
 
             var estimatedLength = array.Length;
@@ -131,7 +131,7 @@ namespace ManagedIrbis
                 }
             }
 
-            var result = new StringBuilder(estimatedLength);
+            var result = new StringBuilder (estimatedLength);
             foreach (var b in array)
             {
                 if (b >= 'A' && b <= 'Z'
@@ -139,7 +139,7 @@ namespace ManagedIrbis
                     || b >= '0' && b <= '9'
                     )
                 {
-                    result.Append((char)b);
+                    result.Append ((char)b);
                 }
                 else
                 {
@@ -166,19 +166,19 @@ namespace ManagedIrbis
                 string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return Array.Empty<byte>();
             }
 
             var predictedLength = text.Length / 2;
-            using var stream = new MemoryStream(predictedLength);
+            using var stream = new MemoryStream (predictedLength);
             for (var i = 0; i < text.Length; i++)
             {
                 var c = text[i];
                 if (c != '%')
                 {
-                    stream.WriteByte((byte) c);
+                    stream.WriteByte ((byte)c);
                 }
                 else
                 {
@@ -186,23 +186,21 @@ namespace ManagedIrbis
                     {
                         Magna.Error
                             (
-                                nameof(IrbisUtility) + "::" + nameof(DecodePercentString)
+                                nameof (IrbisUtility) + "::" + nameof (DecodePercentString)
                                 + "unexpected end of stream"
                             );
 
-                        throw new FormatException(nameof(text));
+                        throw new FormatException (nameof (text));
                     }
 
                     var b = byte.Parse
                         (
-                            text.Substring(i + 1, 2),
+                            text.Substring (i + 1, 2),
                             NumberStyles.HexNumber
                         );
-                    stream.WriteByte(b);
+                    stream.WriteByte (b);
                     i += 2;
-
                 } // else
-
             } // for
 
             return stream.ToArray();

@@ -3917,6 +3917,12 @@ namespace AM
         } // method SafeContains
 
         /// <summary>
+        /// Безопасное вычисление длины строки.
+        /// </summary>
+        [Pure]
+        public static int SafeLength (this string? text) => text?.Length ?? 0;
+
+        /// <summary>
         /// Содержит ли данная строка заданную подстроку (без учета регистра символов)?
         /// </summary>
         [Pure]

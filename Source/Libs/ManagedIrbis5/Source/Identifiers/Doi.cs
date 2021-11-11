@@ -116,8 +116,8 @@ namespace ManagedIrbis.Identifiers
     /// <summary>
     /// DOI
     /// </summary>
-    [XmlRoot("doi")]
-    [DebuggerDisplay("{" + nameof(Prefix) + "} {" + nameof(Suffix) + "}")]
+    [XmlRoot ("doi")]
+    [DebuggerDisplay ("{" + nameof (Prefix) + "} {" + nameof (Suffix) + "}")]
     public sealed class Doi
         : IHandmadeSerializable
     {
@@ -126,23 +126,27 @@ namespace ManagedIrbis.Identifiers
         /// <summary>
         /// Префикс.
         /// </summary>
-        [XmlAttribute("prefix")]
-        [JsonPropertyName("prefix")]
+        [XmlAttribute ("prefix")]
+        [JsonPropertyName ("prefix")]
+        [Description ("Префикс")]
+        [DisplayName ("Префикс")]
         public string? Prefix { get; set; }
 
         /// <summary>
         /// Суффикс.
         /// </summary>
-        [XmlAttribute("suffix")]
-        [JsonPropertyName("suffix")]
+        [XmlAttribute ("suffix")]
+        [JsonPropertyName ("suffix")]
+        [Description ("Суффикс")]
+        [DisplayName ("Суффикс")]
         public string? Suffix { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -166,12 +170,22 @@ namespace ManagedIrbis.Identifiers
         {
             Prefix = reader.ReadNullableString();
             Suffix = reader.ReadNullableString();
+
         } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream (BinaryWriter writer) => writer
-                .WriteNullable(Prefix)
-                .WriteNullable(Suffix);
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer
+                .WriteNullable (Prefix)
+                .WriteNullable (Suffix);
+
+        } // method SaveToStream
 
         #endregion
 

@@ -121,7 +121,7 @@ namespace AM
         public Verifier<T> Assert
             (
                 bool condition,
-                [CallerArgumentExpression("condition")] string? message = null
+                [CallerArgumentExpression ("condition")] string? message = null
             )
         {
             Result = Result && condition;
@@ -154,7 +154,7 @@ namespace AM
         public Verifier<T> DirectoryExist
             (
                 string path,
-                [CallerArgumentExpression("path")] string? name = null
+                [CallerArgumentExpression ("path")] string? name = null
             )
         {
             if (string.IsNullOrEmpty (path))
@@ -204,7 +204,7 @@ namespace AM
         public Verifier<T> FileExist
             (
                 string path,
-                [CallerArgumentExpression("path")] string? name = null
+                [CallerArgumentExpression ("path")] string? name = null
             )
         {
             if (string.IsNullOrEmpty (path))
@@ -223,12 +223,32 @@ namespace AM
         } // method FileExist
 
         /// <summary>
+        /// Проверка на то, что указанное значение является одним из допустимых.
+        /// </summary>
+        public Verifier<T> IsOneOf
+            (
+                string? value,
+                string[] allowed,
+                [CallerArgumentExpression ("value")] string? name = null
+            )
+        {
+            if (!value.IsOneOf (allowed))
+            {
+                Result = false;
+                _Throw ($"value {value} is no allowed. Allowed values are: {string.Join (',', allowed)}");
+            }
+
+            return this;
+
+        } // method IsOneOf
+
+        /// <summary>
         /// Проверка указателя на объект на равенство <c>null</c>.
         /// </summary>
         public Verifier<T> NotNull
             (
                 object? value,
-                [CallerArgumentExpression("value")] string? name = null
+                [CallerArgumentExpression ("value")] string? name = null
             )
         {
             return Assert
@@ -245,7 +265,7 @@ namespace AM
         public Verifier<T> NotNullNorEmpty
             (
                 string? value,
-                [CallerArgumentExpression("value")] string? name = null
+                [CallerArgumentExpression ("value")] string? name = null
             )
         {
             return Assert (!string.IsNullOrEmpty (value), name);
@@ -339,7 +359,7 @@ namespace AM
         public Verifier<T> VerifySubObject
             (
                 IVerifiable verifiable,
-                [CallerArgumentExpression("verifiable")] string? name = null
+                [CallerArgumentExpression ("verifiable")] string? name = null
             )
         {
             // .NET 5 SDK подставляет в message значение null, .NET 6 делает по-человечески

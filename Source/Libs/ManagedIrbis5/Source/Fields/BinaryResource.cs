@@ -11,22 +11,19 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedType.Global
 
-/* BinaryResource.cs -- field 953.
+/* BinaryResource.cs -- встроенный двоичный ресурс
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
-using AM.Collections;
 using AM.IO;
 using AM.Runtime;
 
@@ -39,233 +36,154 @@ using ManagedIrbis.Mapping;
 namespace ManagedIrbis.Fields
 {
     /// <summary>
-    /// Binary resource in field 953.
+    /// Встроенный двоичный ресурс. Поле 953.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Resource) + "}")]
+    [XmlRoot ("resource")]
     public sealed class BinaryResource
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
 
         /// <summary>
-        /// Known codes.
-        /// </summary>
-        public const string KnownCodes = "abpt";
-
-        /// <summary>
-        /// Default tag for binary resources.
+        /// Метка поля.
         /// </summary>
         public const int Tag = 953;
+
+        /// <summary>
+        /// Известные коды подполей.
+        /// </summary>
+        public const string KnownCodes = "abpt";
 
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// Kind of resource. Subfield a.
+        /// Тип двоичного ресурса, подполе A.
         /// </summary>
-        /// <remarks>For example, "jpg".</remarks>
-        [SubField('a')]
-        [XmlElement("kind")]
-        [JsonPropertyName("kind")]
-        [Description("Тип двоичного ресурса")]
-        [DisplayName("Тип двоичного ресурса")]
+        /// <remarks>Например, "jpg".</remarks>
+        [SubField ('a')]
+        [XmlElement ("kind")]
+        [JsonPropertyName ("kind")]
+        [Description ("Тип двоичного ресурса")]
+        [DisplayName ("Тип двоичного ресурса")]
         public string? Kind { get; set; }
 
         /// <summary>
-        /// Percent-encoded resource. Subfield b.
+        /// Собственно двоичный ресурс (закодированный).
+        /// Подполе B.
         /// </summary>
-        [SubField('b')]
-        [XmlElement("resource")]
-        [JsonPropertyName("resource")]
-        [Description("Двоичный ресурс (закодированный)")]
-        [DisplayName("Двоичный ресурс (закодированный)")]
+        [SubField ('b')]
+        [XmlElement ("resource")]
+        [JsonPropertyName ("resource")]
+        [Description ("Двоичный ресурс (закодированный)")]
+        [DisplayName ("Двоичный ресурс (закодированный)")]
         public string? Resource { get; set; }
 
         /// <summary>
-        /// Title of resource. Subfield t.
+        /// Название двоичного ресурса. Подполе T.
         /// </summary>
-        [SubField('t')]
-        [XmlElement("title")]
-        [JsonPropertyName("title")]
-        [Description("Название двоичного ресурса")]
-        [DisplayName("Название двоичного ресурса")]
+        [SubField ('t')]
+        [XmlElement ("title")]
+        [JsonPropertyName ("title")]
+        [Description ("Название двоичного ресурса")]
+        [DisplayName ("Название двоичного ресурса")]
         public string? Title { get; set; }
 
         /// <summary>
-        /// View method. Subfield p.
+        /// Характер просмотра. Подполе P.
         /// </summary>
         /// <remarks>
         /// См. <see cref="ResourceView"/>.
         /// </remarks>
-        [SubField('p')]
-        [XmlElement("view")]
-        [JsonPropertyName("view")]
-        [Description("Характер просмотра")]
-        [DisplayName("Характер просмотр")]
+        [SubField ('p')]
+        [XmlElement ("view")]
+        [JsonPropertyName ("view")]
+        [Description ("Характер просмотра")]
+        [DisplayName ("Характер просмотр")]
         public string? View { get; set; }
 
         /// <summary>
-        /// Associated field.
+        /// Ассоциированное поле библиографической записи <see cref="Field"/>.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
-        [Description("Поле")]
-        [DisplayName("Поле")]
+        [Browsable (false)]
         public Field? Field { get; private set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Description("Пользовательские данные")]
-        [DisplayName("Пользовательские данные")]
+        [Browsable (false)]
         public object? UserData { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BinaryResource()
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BinaryResource
-            (
-                string? kind,
-                string? resource
-            )
-        {
-            Kind = kind;
-            Resource = resource;
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BinaryResource
-            (
-                string? kind,
-                string? resource,
-                string? title
-            )
-        {
-            Kind = kind;
-            Resource = resource;
-            Title = title;
-        }
-
-        #endregion
-
-        #region Private members
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Apply to the field.
+        /// Применение данные к полю библиографической записи <see cref="Field"/>.
         /// </summary>
         public Field ApplyToField (Field field) => field
+            .ThrowIfNull()
             .SetSubFieldValue ('a', Kind)
             .SetSubFieldValue ('b', Resource)
             .SetSubFieldValue ('t', Title)
             .SetSubFieldValue ('p', View);
 
         /// <summary>
-        /// Decode the resource.
+        /// Декодирование ресурса.
         /// </summary>
-        public byte[] Decode()
-        {
-            if (string.IsNullOrEmpty (Resource))
-            {
-                return Array.Empty<byte>();
-            }
-
-            byte[] result = IrbisUtility.DecodePercentString(Resource);
-
-            return result;
-        }
+        public byte[] Decode() => IrbisUtility.DecodePercentString (Resource);
 
         /// <summary>
-        /// Encode the resource.
+        /// Кодирование ресурса в строковое представление.
         /// </summary>
-        public string? Encode
-            (
-                byte[] array
-            )
-        {
-            Resource = array.IsNullOrEmpty()
-                ? null
-                : IrbisUtility.EncodePercentString(array);
-
-            return Resource;
-        }
+        public string? Encode (byte[] array) => Resource = IrbisUtility.EncodePercentString (array);
 
         /// <summary>
-        /// Parse field 953.
+        /// Разбор поля библиографической записи.
         /// </summary>
-        public static BinaryResource Parse
+        public static BinaryResource ParseField
             (
                 Field field
             )
         {
-            // TODO: реализовать эффективно
+            Sure.NotNull (field);
 
             var result = new BinaryResource
             {
-                Kind = field.GetFirstSubFieldValue('a'),
-                Resource = field.GetFirstSubFieldValue('b'),
-                Title = field.GetFirstSubFieldValue('t'),
-                View = field.GetFirstSubFieldValue('p'),
+                Kind = field.GetFirstSubFieldValue ('a'),
+                Resource = field.GetFirstSubFieldValue ('b'),
+                Title = field.GetFirstSubFieldValue ('t'),
+                View = field.GetFirstSubFieldValue ('p'),
                 Field = field
             };
 
             return result;
-        }
+
+        } // method ParseField
 
         /// <summary>
-        /// Parse fields 953 of the <see cref="Record"/>.
+        /// Разбор библиографической записи <see cref="Record"/>.
         /// </summary>
-        public static BinaryResource[] Parse
-            (
-                Record record,
-                int tag = Tag
-            )
-        {
-            var fields = record
-                .Fields
-                .GetField(tag);
-
-            var result = fields
-                .Select(Parse)
+        public static BinaryResource[] ParseRecord (Record record, int tag = Tag) =>
+            record.Fields
+                .GetField (tag)
+                .Select (ParseField)
                 .ToArray();
 
-            return result;
-        }
-
         /// <summary>
-        /// Convert back to field.
+        /// Преобразование в поле библиографической записи <see cref="Field"/>.
         /// </summary>
-        public Field ToField()
-        {
-            var result = new Field  { Tag = Tag }
+        public Field ToField() => new Field (Tag)
                 .AddNonEmpty ('a', Kind)
                 .AddNonEmpty ('b', Resource)
                 .AddNonEmpty ('t', Title)
                 .AddNonEmpty ('p', View);
-
-            return result;
-        }
 
         #endregion
 
@@ -277,11 +195,14 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Kind = reader.ReadNullableString();
             Resource = reader.ReadNullableString();
             Title = reader.ReadNullableString();
             View = reader.ReadNullableString();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -289,12 +210,15 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullable(Kind)
-                .WriteNullable(Resource)
-                .WriteNullable(Title)
-                .WriteNullable(View);
-        }
+                .WriteNullable (Kind)
+                .WriteNullable (Resource)
+                .WriteNullable (Title)
+                .WriteNullable (View);
+
+        } // method SaveToStream
 
         #endregion
 
@@ -306,14 +230,14 @@ namespace ManagedIrbis.Fields
                 bool throwOnError
             )
         {
-            Verifier<BinaryResource> verifier
-                = new Verifier<BinaryResource>(this, throwOnError);
+            var verifier = new Verifier<BinaryResource> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Resource, "Resource");
+                .NotNullNorEmpty (Resource, "Resource");
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
