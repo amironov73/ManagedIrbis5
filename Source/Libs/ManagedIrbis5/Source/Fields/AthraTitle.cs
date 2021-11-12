@@ -8,7 +8,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* AthraTitle.cs --
+/* AthraTitle.cs -- заголовок записи в базе данных ATHRA
  * Ars Magna project, http://arsmagna.ru
  */
 
