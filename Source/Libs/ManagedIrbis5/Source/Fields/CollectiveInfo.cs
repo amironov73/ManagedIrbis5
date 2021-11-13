@@ -39,15 +39,15 @@ namespace ManagedIrbis.Fields
     /// Коллективный (в т. ч. временный) автор.
     /// Раскладка полей 710, 711, 962, 972.
     /// </summary>
-    [XmlRoot("collective")]
+    [XmlRoot ("collective")]
     public sealed class CollectiveInfo
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
 
         /// <summary>
-        /// Known subfield codes.
+        /// Известные коды подполей.
         /// </summary>
         public const string KnownCodes = "abcfnrsx7";
 
@@ -56,122 +56,122 @@ namespace ManagedIrbis.Fields
         #region Properties
 
         /// <summary>
-        /// Known tags.
+        /// Известные метки полей.
         /// </summary>
         public static int[] KnownTags { get; } = { 710, 711, 962, 972 };
 
         /// <summary>
-        /// Наименование. Подполе a.
+        /// Наименование. Подполе A.
         /// </summary>
-        [SubField('a')]
-        [XmlElement("title")]
-        [JsonPropertyName("title")]
-        [Description("Наименование")]
-        [DisplayName("Наименование")]
+        [SubField ('a')]
+        [XmlElement ("title")]
+        [JsonPropertyName ("title")]
+        [Description ("Наименование")]
+        [DisplayName ("Наименование")]
         public string? Title { get; set; }
 
         /// <summary>
-        /// Страна. Подполе s.
+        /// Страна. Подполе S.
         /// </summary>
-        [SubField('s')]
-        [XmlElement("country")]
-        [JsonPropertyName("country")]
-        [Description("Страна")]
-        [DisplayName("Страна")]
+        [SubField ('s')]
+        [XmlElement ("country")]
+        [JsonPropertyName ("country")]
+        [Description ("Страна")]
+        [DisplayName ("Страна")]
         public string? Country { get; set; }
 
         /// <summary>
-        /// Аббревиатура. Подполе r.
+        /// Аббревиатура. Подполе R.
         /// </summary>
-        [SubField('r')]
-        [XmlElement("abbreviation")]
-        [JsonPropertyName("abbreviation")]
-        [Description("Аббревиатура")]
-        [DisplayName("Аббревиатура")]
+        [SubField ('r')]
+        [XmlElement ("abbreviation")]
+        [JsonPropertyName ("abbreviation")]
+        [Description ("Аббревиатура")]
+        [DisplayName ("Аббревиатура")]
         public string? Abbreviation { get; set; }
 
         /// <summary>
-        /// Номер. Подполе n.
+        /// Номер. Подполе N.
         /// </summary>
-        [SubField('n')]
-        [XmlElement("number")]
-        [JsonPropertyName("number")]
-        [Description("Номер")]
-        [DisplayName("Номер")]
+        [SubField ('n')]
+        [XmlElement ("number")]
+        [JsonPropertyName ("number")]
+        [Description ("Номер")]
+        [DisplayName ("Номер")]
         public string? Number { get; set; }
 
         /// <summary>
-        /// Дата проведения мероприятия. Подполе f.
+        /// Дата проведения мероприятия. Подполе F.
         /// </summary>
-        [SubField('f')]
-        [XmlElement("date")]
-        [JsonPropertyName("date")]
-        [Description("Дата проведения мероприятия")]
-        [DisplayName("Дата проведения мероприятия")]
+        [SubField ('f')]
+        [XmlElement ("date")]
+        [JsonPropertyName ("date")]
+        [Description ("Дата проведения мероприятия")]
+        [DisplayName ("Дата проведения мероприятия")]
         public string? Date { get; set; }
 
         /// <summary>
-        /// Город. Подполе c.
+        /// Город. Подполе C.
         /// </summary>
-        [SubField('c')]
-        [XmlElement("city")]
-        [JsonPropertyName("city")]
-        [Description("Город")]
-        [DisplayName("Город")]
+        [SubField ('c')]
+        [XmlElement ("city")]
+        [JsonPropertyName ("city")]
+        [Description ("Город")]
+        [DisplayName ("Город")]
         public string? City1 { get; set; }
 
         /// <summary>
-        /// Подразделение. Подполе b.
+        /// Подразделение. Подполе B.
         /// </summary>
-        [SubField('b')]
-        [XmlElement("department")]
-        [JsonPropertyName("department")]
-        [Description("Подразделение")]
-        [DisplayName("Подразделение")]
+        [SubField ('b')]
+        [XmlElement ("department")]
+        [JsonPropertyName ("department")]
+        [Description ("Подразделение")]
+        [DisplayName ("Подразделение")]
         public string? Department { get; set; }
 
         /// <summary>
-        /// Характерное название подразделения. Подполе x.
+        /// Характерное название подразделения. Подполе X.
         /// </summary>
-        [SubField('x')]
-        [XmlElement("characteristic")]
-        [JsonPropertyName("characteristic")]
-        [Description("Характерное название подразделения")]
-        [DisplayName("Характерное название подразделения")]
+        [SubField ('x')]
+        [XmlElement ("characteristic")]
+        [JsonPropertyName ("characteristic")]
+        [Description ("Характерное название подразделения")]
+        [DisplayName ("Характерное название подразделения")]
         public bool Characteristic { get; set; }
 
         /// <summary>
         /// Сокращение по ГОСТ. Подполе 7.
         /// </summary>
-        [SubField('7')]
-        [XmlElement("gost")]
-        [JsonPropertyName("gost")]
-        [Description("Сокращение по ГОСТ")]
-        [DisplayName("Сокращение по ГОСТ")]
+        [SubField ('7')]
+        [XmlElement ("gost")]
+        [JsonPropertyName ("gost")]
+        [Description ("Сокращение по ГОСТ")]
+        [DisplayName ("Сокращение по ГОСТ")]
         public string? Gost { get; set; }
 
         /// <summary>
-        /// Unknown subfields.
+        /// Неизвестные подполя.
         /// </summary>
-        [XmlElement("unknown")]
-        [JsonPropertyName("unknown")]
-        [Browsable(false)]
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
+        [Browsable (false)]
         public SubField[]? UnknownSubFields { get; set; }
 
         /// <summary>
-        /// Associated field.
+        /// Ассоциированное поле библиографической записи.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -179,36 +179,26 @@ namespace ManagedIrbis.Fields
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public CollectiveInfo()
         {
-        }
+        } // constructor
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор с наименованием коллектива.
         /// </summary>
-        public CollectiveInfo
-            (
-                string? title
-            )
-        {
-            Title = title;
-        }
-
-        #endregion
-
-        #region Private members
+        public CollectiveInfo (string? title) => Title = title;
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Apply the <see cref="CollectiveInfo"/>
-        /// to the <see cref="Field"/>.
+        /// Применение данных к полю библиографической записи.
         /// </summary>
         public Field ApplyToField (Field field) => field
+            .ThrowIfNull ()
             .SetSubFieldValue ('a', Title)
             .SetSubFieldValue ('s', Country)
             .SetSubFieldValue ('r', Abbreviation)
@@ -220,85 +210,80 @@ namespace ManagedIrbis.Fields
             .SetSubFieldValue ('7', Gost);
 
         /// <summary>
-        /// Parse the <see cref="Record"/>.
+        /// Разбор библиографической записи.
         /// </summary>
         public static CollectiveInfo[] ParseRecord
             (
                 Record record,
-                int[] tags
+                IReadOnlyList<int> tags
             )
         {
+            Sure.NotNull (record);
+            Sure.NotNull (tags);
+
             var result = new List<CollectiveInfo>();
             foreach (var field in record.Fields)
             {
-                if (field.Tag.IsOneOf(tags))
+                if (field.Tag.IsOneOf (tags))
                 {
-                    var collective = Parse(field);
-                    result.Add(collective);
+                    var collective = Parse (field);
+                    result.Add (collective);
                 }
             }
 
             return result.ToArray();
-        }
+
+        } // method ParseRecord
 
         /// <summary>
-        /// Parse the specified field.
+        /// Разбор поля библиографической записи.
         /// </summary>
         public static CollectiveInfo Parse
             (
                 Field field
             )
         {
-            var result = new CollectiveInfo
+            Sure.NotNull (field);
+
+            return new CollectiveInfo
             {
-                Title = field.GetFirstSubFieldValue('a'),
-                Country = field.GetFirstSubFieldValue('s'),
-                Abbreviation = field.GetFirstSubFieldValue('r'),
-                Number = field.GetFirstSubFieldValue('n'),
-                Date = field.GetFirstSubFieldValue('f'),
-                City1 = field.GetFirstSubFieldValue('c'),
-                Department = field.GetFirstSubFieldValue('b'),
-                Characteristic = field.GetFirstSubFieldValue('x').IsEmpty(),
-                Gost = field.GetFirstSubFieldValue('7'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
+                Title = field.GetFirstSubFieldValue ('a'),
+                Country = field.GetFirstSubFieldValue ('s'),
+                Abbreviation = field.GetFirstSubFieldValue ('r'),
+                Number = field.GetFirstSubFieldValue ('n'),
+                Date = field.GetFirstSubFieldValue ('f'),
+                City1 = field.GetFirstSubFieldValue ('c'),
+                Department = field.GetFirstSubFieldValue ('b'),
+                Characteristic = !field.GetFirstSubFieldValue ('x').IsEmpty(),
+                Gost = field.GetFirstSubFieldValue ('7'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
-
-            return result;
 
         } // method Parse
 
         /// <summary>
-        /// Should serialize the <see cref="Characteristic"/> field?
+        /// Необходимо сериализовать свойство <see cref="Characteristic"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeCharacteristic()
-        {
-            return Characteristic;
-        }
+        [EditorBrowsable (EditorBrowsableState.Never)]
+        public bool ShouldSerializeCharacteristic() => Characteristic;
 
         /// <summary>
-        /// Should serialize the <see cref="UnknownSubFields"/> array?
+        /// Необходимо сериализовать свойство <see cref="UnknownSubFields"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeUnknownSubFields()
-        {
-            return !ArrayUtility.IsNullOrEmpty(UnknownSubFields);
-        }
+        [EditorBrowsable (EditorBrowsableState.Never)]
+        public bool ShouldSerializeUnknownSubFields() => !ArrayUtility.IsNullOrEmpty (UnknownSubFields);
 
         /// <summary>
-        /// Convert the <see cref="CollectiveInfo"/>
-        /// back to <see cref="Field"/>.
+        /// Преобразование в поле библиографической записи.
         /// </summary>
-        public Field ToField
-            (
-                int tag
-            )
+        public Field ToField (int tag)
         {
-            var result = new Field (tag);
-            result
+            Sure.Positive (tag);
+
+            return new Field (tag)
                 .AddNonEmpty ('a', Title)
                 .AddNonEmpty ('s', Country)
                 .AddNonEmpty ('r', Abbreviation)
@@ -310,8 +295,7 @@ namespace ManagedIrbis.Fields
                 .AddNonEmpty ('7', Gost)
                 .AddRange (UnknownSubFields);
 
-            return result;
-        }
+        } // method ToField
 
         #endregion
 
@@ -323,6 +307,8 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Title = reader.ReadNullableString();
             Country = reader.ReadNullableString();
             Abbreviation = reader.ReadNullableString();
@@ -333,7 +319,8 @@ namespace ManagedIrbis.Fields
             Gost = reader.ReadNullableString();
             UnknownSubFields = reader.ReadNullableArray<SubField>();
             Characteristic = reader.ReadBoolean();
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -341,18 +328,21 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullable(Title)
-                .WriteNullable(Country)
-                .WriteNullable(Abbreviation)
-                .WriteNullable(Number)
-                .WriteNullable(Date)
-                .WriteNullable(City1)
-                .WriteNullable(Department)
-                .WriteNullable(Gost)
-                .WriteNullableArray(UnknownSubFields)
-                .Write(Characteristic);
-        }
+                .WriteNullable (Title)
+                .WriteNullable (Country)
+                .WriteNullable (Abbreviation)
+                .WriteNullable (Number)
+                .WriteNullable (Date)
+                .WriteNullable (City1)
+                .WriteNullable (Department)
+                .WriteNullable (Gost)
+                .WriteNullableArray (UnknownSubFields)
+                .Write (Characteristic);
+
+        } // method CollectiveInfo
 
         #endregion
 
@@ -364,13 +354,14 @@ namespace ManagedIrbis.Fields
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<CollectiveInfo>(this, throwOnError);
+            var verifier = new Verifier<CollectiveInfo> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Title, "Title");
+                .NotNullNorEmpty (Title);
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 

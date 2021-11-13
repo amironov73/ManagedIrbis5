@@ -52,6 +52,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue ("@all")]
         [JsonPropertyName ("all")]
+        [Description ("Формат полного просмотра")]
         public string AllFormat { get; set; } = "@all";
 
         /// <summary>
@@ -61,7 +62,18 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue ("@brief")]
         [JsonPropertyName ("brief")]
+        [Description ("Формат краткого просмотра")]
         public string BriefFormat { get; set; } = "@brief";
+
+        /// <summary>
+        /// Вид содержания.
+        /// </summary>
+        [XmlAttribute ("content-type")]
+        [Category (IrbisRecord)]
+        [DefaultValue (181)]
+        [JsonPropertyName ("contentType")]
+        [Description ("Вид содержания")]
+        public int ContentTypeTag { get; set; } = 181;
 
         /// <summary>
         /// Метка поля для кода страны.
@@ -70,6 +82,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (102)]
         [JsonPropertyName ("country")]
+        [Description ("Код страны")]
         public int CountryTag { get; set; } = 102;
 
         /// <summary>
@@ -79,6 +92,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (905)]
         [JsonPropertyName ("customization")]
+        [Description ("Настройка записи")]
         public int CustomizationTag { get; set; } = 905;
 
         /// <summary>
@@ -88,6 +102,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (910)]
         [JsonPropertyName ("exemplar")]
+        [Description ("Экземпляр")]
         public int ExemplarTag { get; set; } = 910;
 
         /// <summary>
@@ -97,6 +112,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (951)]
         [JsonPropertyName ("fulltext")]
+        [Description ("Полный текст")]
         public int FullTextTag { get; set; } = 951;
 
         /// <summary>
@@ -106,6 +122,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (902)]
         [JsonPropertyName ("holder")]
+        [Description ("Держатель")]
         public int HolderTag { get; set; } = 902;
 
         /// <summary>
@@ -115,6 +132,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (950)]
         [JsonPropertyName ("image")]
+        [Description ("Графические данные")]
         public int ImageTag { get; set; } = 950;
 
         /// <summary>
@@ -124,6 +142,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (903)]
         [JsonPropertyName ("index")]
+        [Description ("Шифр документа")]
         public int IndexTag { get; set; } = 903;
 
         /// <summary>
@@ -133,6 +152,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (10)]
         [JsonPropertyName ("isbn")]
+        [Description ("ISBN")]
         public int IsbnTag { get; set; } = 10;
 
         /// <summary>
@@ -142,6 +162,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (11)]
         [JsonPropertyName ("issn")]
+        [Description ("ISSN")]
         public int IssnTag { get; set; } = 11;
 
         /// <summary>
@@ -151,6 +172,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (60)]
         [JsonPropertyName ("knowledge")]
+        [Description ("Раздел знаний")]
         public int KnowledgeTag { get; set; } = 60;
 
         /// <summary>
@@ -160,6 +182,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (101)]
         [JsonPropertyName ("language")]
+        [Description ("Язык основного текста")]
         public int LanguageTag { get; set; } = 101;
 
         /// <summary>
@@ -169,6 +192,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (907)]
         [JsonPropertyName ("operator")]
+        [Description ("Технология")]
         public int OperatorTag { get; set; } = 907;
 
         /// <summary>
@@ -178,6 +202,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (999)]
         [JsonPropertyName ("rental")]
+        [Description ("Количество выдач")]
         public int RentalTag { get; set; } = 999;
 
         /// <summary>
@@ -187,6 +212,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (953)]
         [JsonPropertyName ("resource")]
+        [Description ("Двоичный ресурс")]
         public int ResourceTag { get; set; } = 953;
 
         /// <summary>
@@ -196,6 +222,7 @@ namespace ManagedIrbis.Records
         [Category (IrbisRecord)]
         [DefaultValue (920)]
         [JsonPropertyName ("worksheet")]
+        [Description ("Рабочий лист")]
         public int WorksheetTag { get; set; } = 920;
 
         #endregion

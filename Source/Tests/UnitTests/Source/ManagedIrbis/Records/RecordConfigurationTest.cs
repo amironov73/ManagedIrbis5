@@ -575,6 +575,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
             Assert.IsNotNull (configuration);
             Assert.AreEqual ("@all", configuration.AllFormat);
             Assert.AreEqual ("@brief", configuration.BriefFormat);
+            Assert.AreEqual (181, configuration.ContentTypeTag);
             Assert.AreEqual (102, configuration.CountryTag);
             Assert.AreEqual (905, configuration.CustomizationTag);
             Assert.AreEqual (910, configuration.ExemplarTag);
@@ -600,7 +601,8 @@ namespace UnitTests.Source.ManagedIrbis.Records
             var fileName = Path.GetTempFileName();
             configuration.SaveConfiguration (fileName);
             var text = File.ReadAllText (fileName);
-            Assert.AreEqual ("{\"all\":\"@all\",\"brief\":\"@brief\",\"country\":102,\"customization\":905,\"exemplar\":910,\"fulltext\":951,\"holder\":902,\"image\":950,\"index\":903,\"isbn\":10,\"issn\":11,\"knowledge\":60,\"language\":101,\"operator\":907,\"rental\":999,\"resource\":953,\"worksheet\":920}", text);
+            Assert.AreEqual ("{\"all\":\"@all\",\"brief\":\"@brief\",\"contentType\":181,\"country\":102,\"customization\":905,\"exemplar\":910,\"fulltext\":951,\"holder\":902,\"image\":950,\"index\":903,\"isbn\":10,\"issn\":11,\"knowledge\":60,\"language\":101,\"operator\":907,\"rental\":999,\"resource\":953,\"worksheet\":920}",
+                text);
         }
     }
 }

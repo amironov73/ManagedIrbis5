@@ -36,164 +36,169 @@ namespace ManagedIrbis.Fields
     /// <summary>
     /// Коды (поле 900).
     /// </summary>
-    [XmlRoot("codes")]
+    [XmlRoot ("codes")]
     public sealed class CodesInfo
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
 
         /// <summary>
-        /// Known codes.
-        /// </summary>
-        public const string KnownCodes = "bctxyz234569";
-
-        /// <summary>
-        /// Tag.
+        /// Метка поля.
         /// </summary>
         public const int Tag = 900;
+
+        /// <summary>
+        /// Известные коды подполей.
+        /// </summary>
+        public const string KnownCodes = "bctxyz234569";
 
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// Тип документа. Подполе t.
+        /// Тип документа. Подполе T.
         /// </summary>
-        [SubField('t')]
-        [XmlAttribute("type")]
-        [JsonPropertyName("type")]
-        [Description("Тип документа")]
-        [DisplayName("Тип документа")]
+        [SubField ('t')]
+        [XmlAttribute ("type")]
+        [JsonPropertyName ("type")]
+        [Description ("Тип документа")]
+        [DisplayName ("Тип документа")]
         public string? DocumentType { get; set; }
 
         /// <summary>
-        /// Вид документа. Подполе b.
+        /// Вид документа. Подполе B.
         /// </summary>
-        [SubField('b')]
-        [XmlAttribute("kind")]
-        [JsonPropertyName("kind")]
-        [Description("Вид документа")]
-        [DisplayName("Вид документа")]
+        [SubField ('b')]
+        [XmlAttribute ("kind")]
+        [JsonPropertyName ("kind")]
+        [Description ("Вид документа")]
+        [DisplayName ("Вид документа")]
         public string? DocumentKind { get; set; }
 
         /// <summary>
-        /// Характер документа. Подполе c.
+        /// Характер документа. Подполе C.
         /// </summary>
-        [SubField('c')]
-        [XmlAttribute("character1")]
-        [JsonPropertyName("character1")]
-        [Description("Характер документа")]
-        [DisplayName("Характер документа (1)")]
+        [SubField ('c')]
+        [XmlAttribute ("character1")]
+        [JsonPropertyName ("character1")]
+        [Description ("Характер документа")]
+        [DisplayName ("Характер документа (1)")]
         public string? DocumentCharacter1 { get; set; }
 
         /// <summary>
         /// Характер документа. Подполе 2.
         /// </summary>
-        [SubField('2')]
-        [XmlAttribute("character2")]
-        [JsonPropertyName("character2")]
-        [Description("Характер документа")]
-        [DisplayName("Характер документа (2)")]
+        [SubField ('2')]
+        [XmlAttribute ("character2")]
+        [JsonPropertyName ("character2")]
+        [Description ("Характер документа")]
+        [DisplayName ("Характер документа (2)")]
         public string? DocumentCharacter2 { get; set; }
 
         /// <summary>
         /// Характер документа. Подполе 3.
         /// </summary>
-        [SubField('3')]
-        [XmlAttribute("character3")]
-        [JsonPropertyName("character3")]
-        [Description("Характер документа")]
-        [DisplayName("Характер документа (3)")]
+        [SubField ('3')]
+        [XmlAttribute ("character3")]
+        [JsonPropertyName ("character3")]
+        [Description ("Характер документа")]
+        [DisplayName ("Характер документа (3)")]
         public string? DocumentCharacter3 { get; set; }
 
         /// <summary>
         /// Характер документа. Подполе 4.
         /// </summary>
-        [SubField('4')]
-        [XmlAttribute("character4")]
-        [JsonPropertyName("character4")]
-        [Description("Характер документа")]
-        [DisplayName("Характер документа (4)")]
+        [SubField ('4')]
+        [XmlAttribute ("character4")]
+        [JsonPropertyName ("character4")]
+        [Description ("Характер документа")]
+        [DisplayName ("Характер документа (4)")]
         public string? DocumentCharacter4 { get; set; }
 
         /// <summary>
         /// Характер документа. Подполе 5.
         /// </summary>
-        [SubField('5')]
-        [XmlAttribute("character5")]
-        [JsonPropertyName("character5")]
-        [Description("Характер документа")]
-        [DisplayName("Характер документа (5)")]
+        [SubField ('5')]
+        [XmlAttribute ("character5")]
+        [JsonPropertyName ("character5")]
+        [Description ("Характер документа")]
+        [DisplayName ("Характер документа (5)")]
         public string? DocumentCharacter5 { get; set; }
 
         /// <summary>
         /// Характер документа. Подполе 6.
         /// </summary>
-        [SubField('6')]
-        [XmlAttribute("character6")]
-        [JsonPropertyName("character6")]
-        [Description("Характер документа")]
-        [DisplayName("Характер документа (6)")]
+        [SubField ('6')]
+        [XmlAttribute ("character6")]
+        [JsonPropertyName ("character6")]
+        [Description ("Характер документа")]
+        [DisplayName ("Характер документа (6)")]
         public string? DocumentCharacter6 { get; set; }
 
         /// <summary>
-        /// Код целевого назначения. Подполе x.
+        /// Код целевого назначения. Подполе X.
         /// </summary>
-        [SubField('x')]
-        [XmlAttribute("purpose1")]
-        [JsonPropertyName("purpose1")]
-        [Description("Код целевого назначения")]
-        [DisplayName("Код целевого назначения (1)")]
+        [SubField ('x')]
+        [XmlAttribute ("purpose1")]
+        [JsonPropertyName ("purpose1")]
+        [Description ("Код целевого назначения")]
+        [DisplayName ("Код целевого назначения (1)")]
         public string? PurposeCode1 { get; set; }
 
         /// <summary>
-        /// Код целевого назначения. Подполе y.
+        /// Код целевого назначения. Подполе Y.
         /// </summary>
-        [SubField('y')]
-        [XmlAttribute("purpose2")]
-        [JsonPropertyName("purpose2")]
-        [Description("Код целевого назначения")]
-        [DisplayName("Код целевого назначения (2)")]
+        [SubField ('y')]
+        [XmlAttribute ("purpose2")]
+        [JsonPropertyName ("purpose2")]
+        [Description ("Код целевого назначения")]
+        [DisplayName ("Код целевого назначения (2)")]
         public string? PurposeCode2 { get; set; }
 
         /// <summary>
         /// Код целевого назначения. Подполе 9.
         /// </summary>
-        [SubField('9')]
-        [XmlAttribute("purpose3")]
-        [JsonPropertyName("purpose3")]
-        [Description("Код целевого назначения")]
-        [DisplayName("Код целевого назначения (3)")]
+        [SubField ('9')]
+        [XmlAttribute ("purpose3")]
+        [JsonPropertyName ("purpose3")]
+        [Description ("Код целевого назначения")]
+        [DisplayName ("Код целевого назначения (3)")]
         public string? PurposeCode3 { get; set; }
 
         /// <summary>
-        /// Возрастные ограничения. Подполе z.
+        /// Возрастные ограничения. Подполе Z.
         /// </summary>
-        [SubField('z')]
-        [XmlAttribute("age")]
-        [JsonPropertyName("age")]
-        [Description("Возрастные ограничения")]
-        [DisplayName("Возрастные ограничения")]
+        [SubField ('z')]
+        [XmlAttribute ("age")]
+        [JsonPropertyName ("age")]
+        [Description ("Возрастные ограничения")]
+        [DisplayName ("Возрастные ограничения")]
         public string? AgeRestrictions { get; set; }
 
         /// <summary>
-        /// Associated field.
+        /// Неизвестные подполя.
+        /// </summary>
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
+        [Browsable (false)]
+        public SubField[]? UnknownSubFields { get; set; }
+
+        /// <summary>
+        /// Ассоциированное поле библиографической записи.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
-        [Description("Поле")]
-        [DisplayName("Поле")]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Description("Пользовательские данные")]
-        [DisplayName("Пользовательские данные")]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -201,9 +206,10 @@ namespace ManagedIrbis.Fields
         #region Public methods
 
         /// <summary>
-        /// Apply to the field.
+        /// Применение данных к полю библиографической записи.
         /// </summary>
         public Field ApplyToField (Field field) => field
+            .ThrowIfNull ()
             .SetSubFieldValue ('t', DocumentType)
             .SetSubFieldValue ('b', DocumentKind)
             .SetSubFieldValue ('c', DocumentCharacter1)
@@ -218,40 +224,39 @@ namespace ManagedIrbis.Fields
             .SetSubFieldValue ('z', AgeRestrictions);
 
         /// <summary>
-        /// Parse the specified field.
+        /// Разбор поля библиографической записи.
         /// </summary>
         public static CodesInfo Parse
             (
                 Field field
             )
         {
-            CodesInfo result = new CodesInfo
-                {
-                    DocumentType = field.GetFirstSubFieldValue('t'),
-                    DocumentKind = field.GetFirstSubFieldValue('b'),
-                    DocumentCharacter1 = field.GetFirstSubFieldValue('c'),
-                    DocumentCharacter2 = field.GetFirstSubFieldValue('2'),
-                    DocumentCharacter3 = field.GetFirstSubFieldValue('3'),
-                    DocumentCharacter4 = field.GetFirstSubFieldValue('4'),
-                    DocumentCharacter5 = field.GetFirstSubFieldValue('5'),
-                    DocumentCharacter6 = field.GetFirstSubFieldValue('6'),
-                    PurposeCode1 = field.GetFirstSubFieldValue('x'),
-                    PurposeCode2 = field.GetFirstSubFieldValue('y'),
-                    PurposeCode3 = field.GetFirstSubFieldValue('9'),
-                    AgeRestrictions = field.GetFirstSubFieldValue('z'),
-                    Field = field
-                };
+            Sure.NotNull (field);
 
-            return result;
+            return new CodesInfo
+            {
+                DocumentType = field.GetFirstSubFieldValue ('t'),
+                DocumentKind = field.GetFirstSubFieldValue ('b'),
+                DocumentCharacter1 = field.GetFirstSubFieldValue ('c'),
+                DocumentCharacter2 = field.GetFirstSubFieldValue ('2'),
+                DocumentCharacter3 = field.GetFirstSubFieldValue ('3'),
+                DocumentCharacter4 = field.GetFirstSubFieldValue ('4'),
+                DocumentCharacter5 = field.GetFirstSubFieldValue ('5'),
+                DocumentCharacter6 = field.GetFirstSubFieldValue ('6'),
+                PurposeCode1 = field.GetFirstSubFieldValue ('x'),
+                PurposeCode2 = field.GetFirstSubFieldValue ('y'),
+                PurposeCode3 = field.GetFirstSubFieldValue ('9'),
+                AgeRestrictions = field.GetFirstSubFieldValue ('z'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
+                Field = field
+            };
 
         } // method Parse
 
         /// <summary>
-        /// Transform back to field.
+        /// Преобразование в поле библиографической записи.
         /// </summary>
-        public Field ToField()
-        {
-            var result = new Field(900)
+        public Field ToField() => new Field (Tag)
                 .AddNonEmpty ('t', DocumentType)
                 .AddNonEmpty ('b', DocumentKind)
                 .AddNonEmpty ('c', DocumentCharacter1)
@@ -263,10 +268,8 @@ namespace ManagedIrbis.Fields
                 .AddNonEmpty ('x', PurposeCode1)
                 .AddNonEmpty ('y', PurposeCode2)
                 .AddNonEmpty ('9', PurposeCode3)
-                .AddNonEmpty ('z', AgeRestrictions);
-
-            return result;
-        }
+                .AddNonEmpty ('z', AgeRestrictions)
+                .AddRange (UnknownSubFields);
 
         #endregion
 
@@ -278,6 +281,8 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             DocumentType = reader.ReadNullableString();
             DocumentKind = reader.ReadNullableString();
             DocumentCharacter1 = reader.ReadNullableString();
@@ -290,7 +295,9 @@ namespace ManagedIrbis.Fields
             PurposeCode2 = reader.ReadNullableString();
             PurposeCode3 = reader.ReadNullableString();
             AgeRestrictions = reader.ReadNullableString();
-        }
+            UnknownSubFields = reader.ReadNullableArray<SubField>();
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -298,20 +305,24 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullable(DocumentType)
-                .WriteNullable(DocumentKind)
-                .WriteNullable(DocumentCharacter1)
-                .WriteNullable(DocumentCharacter2)
-                .WriteNullable(DocumentCharacter3)
-                .WriteNullable(DocumentCharacter4)
-                .WriteNullable(DocumentCharacter5)
-                .WriteNullable(DocumentCharacter6)
-                .WriteNullable(PurposeCode1)
-                .WriteNullable(PurposeCode2)
-                .WriteNullable(PurposeCode3)
-                .WriteNullable(AgeRestrictions);
-        }
+                .WriteNullable (DocumentType)
+                .WriteNullable (DocumentKind)
+                .WriteNullable (DocumentCharacter1)
+                .WriteNullable (DocumentCharacter2)
+                .WriteNullable (DocumentCharacter3)
+                .WriteNullable (DocumentCharacter4)
+                .WriteNullable (DocumentCharacter5)
+                .WriteNullable (DocumentCharacter6)
+                .WriteNullable (PurposeCode1)
+                .WriteNullable (PurposeCode2)
+                .WriteNullable (PurposeCode3)
+                .WriteNullable (AgeRestrictions)
+                .WriteNullableArray (UnknownSubFields);
+
+        } // method SaveToStream
 
         #endregion
 
@@ -323,31 +334,27 @@ namespace ManagedIrbis.Fields
                 bool throwOnError
             )
         {
-            Verifier<CodesInfo> verifier
-                = new Verifier<CodesInfo>(this, throwOnError);
+            var verifier = new Verifier<CodesInfo> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(DocumentType, "DocumentType");
+                .NotNullNorEmpty (DocumentType);
 
             return verifier.Result;
-        }
+
+        } // method Verify
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            return string.Format
+        public override string ToString() => string.Format
                 (
-                    "DocumentType: {0}, DocumentKind: {1}, "
-                    + "DocumentCharacter1: {2}",
+                    "DocumentType: {0}, DocumentKind: {1}, DocumentCharacter1: {2}",
                     DocumentType.ToVisibleString(),
                     DocumentKind.ToVisibleString(),
                     DocumentCharacter1.ToVisibleString()
                 );
-        }
 
         #endregion
 
