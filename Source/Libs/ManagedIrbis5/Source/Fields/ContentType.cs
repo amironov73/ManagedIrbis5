@@ -128,7 +128,7 @@ namespace ManagedIrbis.Fields
         public SubField[]? UnknownSubFields { get; set; }
 
         /// <summary>
-        /// Ассоциированное поле библиографической записи.
+        /// Ассоциированное поле библиографической записи <see cref="Field"/>.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
