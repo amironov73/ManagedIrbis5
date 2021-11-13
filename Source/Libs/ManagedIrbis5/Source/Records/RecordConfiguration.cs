@@ -216,6 +216,16 @@ namespace ManagedIrbis.Records
         public int ResourceTag { get; set; } = 953;
 
         /// <summary>
+        /// Метка для поля 203 ("текст: непосредственный").
+        /// </summary>
+        [XmlAttribute ("field-203")]
+        [Category (IrbisRecord)]
+        [DefaultValue (203)]
+        [JsonPropertyName ("field203")]
+        [Description ("Вид содержания")]
+        public int Tag203 { get; set; } = 203;
+
+        /// <summary>
         /// Метка поля для рабочего листа (вида документа).
         /// </summary>
         [XmlAttribute ("worksheet")]
@@ -228,6 +238,38 @@ namespace ManagedIrbis.Records
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Получение вида содержания (поле 203).
+        /// </summary>
+        public Field203? Get203
+            (
+                Record record
+            )
+        {
+            var field = record.GetField (Tag203);
+
+            return field is null
+                ? null
+                : Field203.ParseField (field);
+
+        } // method Get203
+
+        /// <summary>
+        /// Получение типа контента (поле 181).
+        /// </summary>
+        public ContentType? GetContentType
+            (
+                Record record
+            )
+        {
+            var field = record.GetField (ContentTypeTag);
+
+            return field is null
+                ? null
+                : ContentType.ParseField (field);
+
+        } // method GetContentType
 
         /// <summary>
         /// Получение кода страны.

@@ -4064,7 +4064,35 @@ namespace AM
             }
 
             throw new ArgumentNullException();
-        }
+
+        } // method NonEmpty
+
+        /// <summary>
+        /// Выбирает первую не пустую среди перечисленных строк,
+        /// либо возвращает значение по умолчанию.
+        /// </summary>
+        public static string NonEmptyOrDefault
+            (
+                string?[]? array,
+                string defaultValue = "(none)"
+            )
+        {
+            if (array.IsNullOrEmpty())
+            {
+                return defaultValue;
+            }
+
+            foreach (var contentType in array)
+            {
+                if (!string.IsNullOrEmpty (contentType))
+                {
+                    return contentType;
+                }
+            }
+
+            return defaultValue;
+
+        } // method
 
         /// <summary>
         /// Выбирает первый не пустой спан среди перечисленных.

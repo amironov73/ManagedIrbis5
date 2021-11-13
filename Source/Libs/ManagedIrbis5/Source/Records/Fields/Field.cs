@@ -601,6 +601,33 @@ namespace ManagedIrbis
         } // method AddNonEmpty
 
         /// <summary>
+        /// Добавление нескольких полей согласно спецификации кодов.
+        /// </summary>
+        public Field AddRange
+            (
+                ReadOnlySpan<char> codes,
+                IEnumerable<string?>? values
+            )
+        {
+            if (values is not null)
+            {
+                var index = 0;
+                foreach (var value in values)
+                {
+                    if (!string.IsNullOrEmpty (value))
+                    {
+                        Add (codes[index], value);
+                        ++index;
+                    }
+                }
+
+            } // if
+
+            return this;
+
+        } // method AddRange
+
+        /// <summary>
         /// Добавление нескольких полей.
         /// </summary>
         public Field AddRange
@@ -1235,6 +1262,38 @@ namespace ManagedIrbis
                 }
 
             } // else
+
+            return this;
+
+        } // method SetSubFieldValue
+
+        /// <summary>
+        /// Установка значений подполей скопом (согласно предлагаемым кодам).
+        /// </summary>
+        public Field SetSubFieldValue
+            (
+                ReadOnlySpan<char> codes,
+                IEnumerable<string?>? values
+            )
+        {
+            foreach (var code in codes)
+            {
+                RemoveSubField (code);
+            }
+
+            if (values is not null)
+            {
+                var index = 0;
+                foreach (var value in values)
+                {
+                    if (!string.IsNullOrEmpty (value))
+                    {
+                        SetSubFieldValue (codes[index], value);
+                        ++index;
+                    }
+                }
+
+            } // if
 
             return this;
 

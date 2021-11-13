@@ -90,8 +90,8 @@ namespace UnitTests.ManagedIrbis.Fields
         [Description ("Преобразование в поле библиографической записи")]
         public void ContentType_ToField_1()
         {
-            var codes = _GetContentType();
-            var actual = codes.ToField();
+            var contentType = _GetContentType();
+            var actual = contentType.ToField();
             var expected = _GetField();
             CompareFields (expected, actual);
         }
@@ -170,6 +170,5 @@ namespace UnitTests.ManagedIrbis.Fields
             Assert.AreEqual ("ContentKind: i, DegreeOfApplicability: 4, TypeSpecification: (null), MovementSpecification: (null), DimensionSpecification: 2, SensorySpecification: e",
                 contentType.ToString());
         }
-
     }
 }

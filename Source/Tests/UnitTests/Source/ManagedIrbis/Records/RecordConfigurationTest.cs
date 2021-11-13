@@ -601,7 +601,7 @@ namespace UnitTests.Source.ManagedIrbis.Records
             var fileName = Path.GetTempFileName();
             configuration.SaveConfiguration (fileName);
             var text = File.ReadAllText (fileName);
-            Assert.AreEqual ("{\"all\":\"@all\",\"brief\":\"@brief\",\"contentType\":181,\"country\":102,\"customization\":905,\"exemplar\":910,\"fulltext\":951,\"holder\":902,\"image\":950,\"index\":903,\"isbn\":10,\"issn\":11,\"knowledge\":60,\"language\":101,\"operator\":907,\"rental\":999,\"resource\":953,\"worksheet\":920}",
+            Assert.AreEqual ("{\"all\":\"@all\",\"brief\":\"@brief\",\"contentType\":181,\"country\":102,\"customization\":905,\"exemplar\":910,\"fulltext\":951,\"holder\":902,\"image\":950,\"index\":903,\"isbn\":10,\"issn\":11,\"knowledge\":60,\"language\":101,\"operator\":907,\"rental\":999,\"resource\":953,\"field203\":203,\"worksheet\":920}",
                 text);
         }
     }
