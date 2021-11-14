@@ -21,19 +21,10 @@ namespace UnitTests.ManagedIrbis.Fields
     [TestClass]
     public sealed class IssnInfoTest
     {
-        private IssnInfo _GetIssn()
-        {
-            return new ()
-            {
-                Issn = "0378-5955"
-            };
-        }
+        private IssnInfo _GetIssn() => new () { Issn = "0378-5955" };
 
-        private Field _GetField()
-        {
-            return new Field (IssnInfo.Tag)
+        private Field _GetField() => new Field (IssnInfo.Tag)
                 .Add ('a', "0378-5955");
-        }
 
         [TestMethod]
         [Description ("Конструктор по умолчанию")]

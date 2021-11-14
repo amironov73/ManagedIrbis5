@@ -148,7 +148,7 @@ namespace ManagedIrbis.Fields
         #region Public methods
 
         /// <summary>
-        /// Применение данных к полю библиографической записи.
+        /// Применение данных к указанному полю библиографической записи.
         /// </summary>
         public Field ApplyToField (Field field) => field
             .ThrowIfNull ()
@@ -160,7 +160,7 @@ namespace ManagedIrbis.Fields
             .SetSubFieldValue ('f', SensorySpecification);
 
         /// <summary>
-        /// Разбор поля библиографической записи.
+        /// Разбор указанного поля библиографической записи.
         /// </summary>
         public static ContentType ParseField
             (

@@ -1545,7 +1545,9 @@ namespace AM
                 ? string.IsNullOrEmpty (second)
                     ? string.Empty
                     : second
-                : first + separator + second;
+                : string.IsNullOrEmpty (second)
+                    ? first
+                    : first + separator + second;
 
         /// <summary>
         /// Склеивание только непустых строк с разделителем.

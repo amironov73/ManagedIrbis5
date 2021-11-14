@@ -21,23 +21,18 @@ namespace UnitTests.ManagedIrbis.Fields
     [TestClass]
     public class IsbnInfoTest
     {
-        private IsbnInfo _GetIsbn()
-        {
-            return new ()
+        private IsbnInfo _GetIsbn() => new ()
             {
                 Isbn = "5-200-00723-2",
                 PriceString = "3.40"
             };
-        }
 
-        private Field _GetField()
-        {
-            return new Field (IsbnInfo.Tag)
+        private Field _GetField() => new Field (IsbnInfo.Tag)
                 .Add ('a', "5-200-00723-2")
                 .Add ('d', "3.40");
-        }
 
         [TestMethod]
+        [Description ("Конструктор по умолчанию")]
         public void IsbnInfo_Construction_1()
         {
             var isbn = new IsbnInfo();
@@ -60,7 +55,7 @@ namespace UnitTests.ManagedIrbis.Fields
             var bytes = first.SaveToMemory();
             var second = bytes.RestoreObjectFromMemory<IsbnInfo>();
             Assert.IsNotNull (second);
-            Assert.AreEqual (first.Isbn, second!.Isbn);
+            Assert.AreEqual (first.Isbn, second.Isbn);
             Assert.AreEqual (first.Refinement, second.Refinement);
             Assert.AreEqual (first.Erroneous, second.Erroneous);
             Assert.AreEqual (first.PriceString, second.PriceString);
@@ -72,6 +67,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Сериализация")]
         public void IsbnInfo_Serialization_1()
         {
             var isbn = new IsbnInfo();
@@ -86,6 +82,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Разбор указанного поля библиографической записи")]
         public void IsbnInfo_ParseField_1()
         {
             var field = _GetField();
@@ -101,6 +98,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Разбор библиографической записи")]
         public void IsbnInfo_ParseRecord_1()
         {
             var record = new Record();
@@ -119,6 +117,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Преобразование данных в поле библиографической записи")]
         public void IsbnInfo_ToField_1()
         {
             var isbn = _GetIsbn();
@@ -132,6 +131,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Применение данных к полю библиографической записи")]
         public void IsbnInfo_ApplyToField_1()
         {
             var field = new Field (IsbnInfo.Tag)
@@ -147,6 +147,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Верификация")]
         public void Isbn_Verify_1()
         {
             var isbn = new IsbnInfo();
@@ -157,6 +158,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("XML-представление")]
         public void IsbnInfo_ToXml_1()
         {
             var isbn = new IsbnInfo();
@@ -168,6 +170,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("JSON-представление")]
         public void IsbnInfo_ToJson_1()
         {
             var isbn = new IsbnInfo();
@@ -178,6 +181,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Цена, общая для всех экземпляров")]
         public void IsbnInfo_Price_1()
         {
             var isbn = new IsbnInfo();
@@ -188,6 +192,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Плоское текстовое представление")]
         public void IsbnInfo_ToString_1()
         {
             var isbn = new IsbnInfo();

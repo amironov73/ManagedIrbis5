@@ -47,14 +47,14 @@ namespace ManagedIrbis.Fields
         #region Constants
 
         /// <summary>
-        /// Known subfield codes.
-        /// </summary>
-        public const string KnownCodes = "abcdz";
-
-        /// <summary>
-        /// Tag.
+        /// Метка поля.
         /// </summary>
         public const int Tag = 10;
+
+        /// <summary>
+        /// Известные коды подполей.
+        /// </summary>
+        public const string KnownCodes = "abcdz";
 
         #endregion
 
@@ -123,7 +123,7 @@ namespace ManagedIrbis.Fields
         public string? Currency { get; set; }
 
         /// <summary>
-        /// Unknown subfields.
+        /// Неизвестные подполя.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
@@ -151,10 +151,10 @@ namespace ManagedIrbis.Fields
         #region Public methods
 
         /// <summary>
-        /// Apply the <see cref="IsbnInfo"/>
-        /// to the <see cref="Field"/>.
+        /// Применение данных к полю библиографической записи <see cref="Field"/>.
         /// </summary>
         public Field ApplyToField (Field field) => field
+            .ThrowIfNull ()
             .SetSubFieldValue ('a', Isbn)
             .SetSubFieldValue ('b', Refinement)
             .SetSubFieldValue ('z', Erroneous)
@@ -162,7 +162,7 @@ namespace ManagedIrbis.Fields
             .SetSubFieldValue ('c', Currency);
 
         /// <summary>
-        /// Parse the <see cref="Record"/>.
+        /// Разбор библиографической записи <see cref="Record"/>.
         /// </summary>
         public static IsbnInfo[] ParseRecord
             (
@@ -170,6 +170,9 @@ namespace ManagedIrbis.Fields
                 int tag = Tag
             )
         {
+            Sure.NotNull (record);
+            Sure.Positive (tag);
+
             var result = new List<IsbnInfo>();
             foreach (Field field in record.Fields)
             {
@@ -185,7 +188,7 @@ namespace ManagedIrbis.Fields
         } // method ParseRecord
 
         /// <summary>
-        /// Parse the specified field.
+        /// Разбор указанного поля библиорафической записи.
         /// </summary>
         public static IsbnInfo ParseField (Field field) => new ()
             {
@@ -199,7 +202,7 @@ namespace ManagedIrbis.Fields
             };
 
         /// <summary>
-        /// Should serialize the <see cref="UnknownSubFields"/> array?
+        /// Нужно ли сериализовать свойство <see cref="UnknownSubFields"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable (EditorBrowsableState.Never)]
@@ -207,7 +210,7 @@ namespace ManagedIrbis.Fields
             !ArrayUtility.IsNullOrEmpty (UnknownSubFields);
 
         /// <summary>
-        /// Transform back to field.
+        /// Преобразование данных в поле библиографической записи.
         /// </summary>
         public Field ToField() => new Field (Tag)
                 .AddNonEmpty ('a', Isbn)
@@ -230,6 +233,8 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Isbn = reader.ReadNullableString();
             Refinement = reader.ReadNullableString();
             Erroneous = reader.ReadNullableString();
@@ -244,6 +249,8 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
                 .WriteNullable (Isbn)
                 .WriteNullable (Refinement)
@@ -281,21 +288,9 @@ namespace ManagedIrbis.Fields
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            if (string.IsNullOrEmpty (Isbn))
-            {
-                return string.IsNullOrEmpty (PriceString) ? "(null)" : PriceString;
-            }
-
-            if (string.IsNullOrEmpty (PriceString))
-            {
-                return Isbn;
-            }
-
-            return Isbn + " : " + PriceString;
-
-        } // method ToString
+        public override string ToString() =>
+            Utility.JoinNonEmpty (" : ", Isbn, PriceString)
+                .EmptyToNull().ToVisibleString();
 
         #endregion
 
