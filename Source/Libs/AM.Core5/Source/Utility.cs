@@ -1538,6 +1538,114 @@ namespace AM
         } // method ThrowIfOutOfTheRange
 
         /// <summary>
+        /// Склеивание только непустых строк с разделителем.
+        /// </summary>
+        public static string JoinNonEmpty (string separator, string? first, string? second) =>
+            string.IsNullOrEmpty (first)
+                ? string.IsNullOrEmpty (second)
+                    ? string.Empty
+                    : second
+                : first + separator + second;
+
+        /// <summary>
+        /// Склеивание только непустых строк с разделителем.
+        /// </summary>
+        public static string JoinNonEmpty
+            (
+                string separator,
+                string? first,
+                string? second,
+                string? third
+            )
+        {
+            var builder = StringBuilderPool.Shared.Get();
+
+            builder
+                .AppendWithDelimiter (first, separator)
+                .AppendWithDelimiter (second, separator)
+                .AppendWithDelimiter (third, separator);
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method JoinNonEmpty
+
+        /// <summary>
+        /// Склеивание только непустых строк с разделителем.
+        /// </summary>
+        public static string JoinNonEmpty
+            (
+                string separator,
+                string? first,
+                string? second,
+                string? third,
+                string? fourth
+            )
+        {
+            var builder = StringBuilderPool.Shared.Get();
+
+            builder
+                .AppendWithDelimiter (first, separator)
+                .AppendWithDelimiter (second, separator)
+                .AppendWithDelimiter (third, separator)
+                .AppendWithDelimiter (fourth, separator);
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method JoinNonEmpty
+
+        /// <summary>
+        /// Склеивание только непустых строк с разделителем.
+        /// </summary>
+        public static string JoinNonEmpty
+            (
+                string separator,
+                IEnumerable<string> strings
+            )
+        {
+            var builder = StringBuilderPool.Shared.Get();
+
+            foreach (var t in strings)
+            {
+                builder.AppendWithDelimiter (t, separator);
+            }
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method JoinNonEmpty
+
+        /// <summary>
+        /// Склеивание только непустых строк с разделителем.
+        /// </summary>
+        public static string JoinNonEmpty
+            (
+                string separator,
+                params string?[] strings
+            )
+        {
+            var builder = StringBuilderPool.Shared.Get();
+
+            foreach (var t in strings)
+            {
+                builder.AppendWithDelimiter (t, separator);
+            }
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+        } // method JoinNonEmpty
+
+        /// <summary>
         /// Сравнение двух блоков памяти
         /// (интерпретируемых как символы Unicode).
         /// </summary>

@@ -408,7 +408,7 @@ namespace ManagedIrbis.Records
         /// <summary>
         /// Получение информации о редактировании записи.
         /// </summary>
-        public Technology[] GetTechnology (Record record) => Technology.Parse (record, OperatorTag);
+        public Technology[] GetTechnology (Record record) => Technology.ParseRecord (record, OperatorTag);
 
         /// <summary>
         /// Получение количества выдач документа.

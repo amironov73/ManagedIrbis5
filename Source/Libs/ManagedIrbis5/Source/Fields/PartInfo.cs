@@ -265,14 +265,17 @@ namespace ManagedIrbis.Fields
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => string.Join
-            (
-                " -- ",
-                SecondLevelNumber,
-                SecondLevelTitle,
-                ThirdLevelNumber,
-                ThirdLevelTitle
-            ).ToVisibleString();
+        public override string ToString() =>
+            Utility.JoinNonEmpty
+                (
+                    " -- ",
+                    SecondLevelNumber,
+                    SecondLevelTitle,
+                    ThirdLevelNumber,
+                    ThirdLevelTitle
+                )
+            .EmptyToNull()
+            .ToVisibleString();
 
         #endregion
 

@@ -178,6 +178,7 @@ namespace ManagedIrbis.Fields
                 DimensionSpecification = field.GetFirstSubFieldValue ('e'),
                 SensorySpecification = field.GetFirstSubFieldValue ('f'),
                 UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
+                Field = field
             };
 
         } // method ParseField
