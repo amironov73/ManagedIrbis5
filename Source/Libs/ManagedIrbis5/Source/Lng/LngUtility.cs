@@ -9,7 +9,6 @@
 
 /* LngUtility.cs -- методы для работы с лингвистическими файлами
  * Ars Magna project, http://arsmagna.ru
- * TODO use case-sensitive dictionary?
  */
 
 #region Using directives
@@ -34,7 +33,8 @@ namespace ManagedIrbis.Lng
         #region Public methods
 
         /// <summary>
-        /// Load from the server.
+        /// Загрузка лингвистического файла с сервера
+        /// (синхронная версия).
         /// </summary>
         public static LngFile? ReadLngFile
             (
@@ -53,10 +53,12 @@ namespace ManagedIrbis.Lng
             result.ParseText(reader);
 
             return result;
+
         } // method ReadLngFile
 
         /// <summary>
-        /// Load from the server.
+        /// Загрузка лингвистического файла с сервера
+        /// (асинхронная версия).
         /// </summary>
         public static async Task<LngFile?> ReadOptFileAsync
             (
@@ -75,6 +77,7 @@ namespace ManagedIrbis.Lng
             result.ParseText(reader);
 
             return result;
+
         } // method ReadLngFileAsync
 
         #endregion

@@ -9,7 +9,6 @@
 
 /* LngFile.cs -- лингвистический файл
  * Ars Magna project, http://arsmagna.ru
- * TODO use case-sensitive dictionary?
  */
 
 #region Using directives
@@ -86,12 +85,13 @@ namespace ManagedIrbis.Lng
     /// Лингвистический файл.
     /// </summary>
     public sealed class LngFile
-        : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Name of the file.
+        /// Имя файла.
         /// </summary>
         public string? Name { get; set; }
 
@@ -99,55 +99,72 @@ namespace ManagedIrbis.Lng
 
         #region Private members
 
-        private readonly CaseInsensitiveDictionary<string> _dictionary = new();
+        private readonly CaseInsensitiveDictionary<string> _dictionary = new ();
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Clear the dictionary.
+        /// Добавление пары "оригинал-перевод".
         /// </summary>
-        public void Clear()
+        public LngFile Add
+            (
+                string original,
+                string translation
+            )
         {
-            _dictionary.Clear();
+            Sure.NotNull (original);
+            Sure.NotNull (translation);
+
+            _dictionary.Add (original, translation);
+
+            return this;
         }
 
         /// <summary>
-        /// Get translation for the text.
+        /// Очистка словаря.
+        /// </summary>
+        public void Clear() => _dictionary.Clear();
+
+        /// <summary>
+        /// Получение перевода текста.
         /// </summary>
         public string GetTranslation
             (
                 string text
             )
         {
-            _dictionary.TryGetValue(text, out var result);
+            _dictionary.TryGetValue (text, out var result);
 
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
                 result = text;
             }
 
             return result;
-        }
+
+        } // method GetTranslation
 
         /// <summary>
-        /// Read the dictionary from the <see cref="TextReader"/>.
+        /// Чтение из текстового потока <see cref="TextReader"/>.
         /// </summary>
         public void ParseText
             (
                 TextReader reader
             )
         {
+            Sure.NotNull (reader);
+
             string? key;
             while ((key = reader.ReadLine()) != null)
             {
-                if (_dictionary.ContainsKey(key))
+                if (_dictionary.ContainsKey (key))
                 {
                     Magna.Error
                         (
-                            "LngFile::ParseText: duplicate key: "
-                            + key
+                            nameof (LngFile) + "::" + nameof (ParseText)
+                            + ": duplicate key: " + key
                         );
                 }
 
@@ -162,13 +179,14 @@ namespace ManagedIrbis.Lng
 
             Magna.Trace
                 (
-                    "LngFile::ParseText: keys: "
-                    + _dictionary.Count
+                    nameof (LngFile) + "::" + nameof (ParseText)
+                    + ": keys: " + _dictionary.Count
                 );
-        }
+
+        } // method ParseText
 
         /// <summary>
-        /// Read local file.
+        /// Чтение из локального файла.
         /// </summary>
         public static LngFile ReadLocalFile
             (
@@ -177,46 +195,45 @@ namespace ManagedIrbis.Lng
         {
             var result = new LngFile { Name = fileName };
 
-            using var reader = TextReaderUtility.OpenRead
-                (
-                    fileName,
-                    IrbisEncoding.Utf8
-                );
-            result.ParseText(reader);
+            using var reader = new StreamReader (fileName, IrbisEncoding.Utf8);
+            result.ParseText (reader);
 
             return result;
-        }
+
+        } // method ReadLocalFile
 
         /// <summary>
-        /// Write the dictionary to the <see cref="TextWriter"/>.
+        /// Сохранение содержимого в текстовый поток <see cref="TextWriter"/>.
         /// </summary>
         public void WriteTo
             (
                 TextWriter writer
             )
         {
-            foreach (var pair in _dictionary.OrderBy(p => p.Key))
+            Sure.NotNull (writer);
+
+            foreach (var pair in _dictionary.OrderBy (p => p.Key))
             {
-                writer.WriteLine(pair.Key);
-                writer.WriteLine(pair.Value);
+                writer.WriteLine (pair.Key);
+                writer.WriteLine (pair.Value);
             }
-        }
+
+        } // method WriteTo
 
         /// <summary>
-        /// Write the dictionary to the file.
+        /// Сохранение содержимого в локальный файл.
         /// </summary>
         public void WriteLocalFile
             (
                 string fileName
             )
         {
-            using TextWriter writer = TextWriterUtility.Create
-                (
-                    fileName,
-                    IrbisEncoding.Utf8
-                );
-            WriteTo(writer);
-        }
+            Sure.NotNullNorEmpty (fileName);
+
+            using var writer = new StreamWriter (fileName, false, IrbisEncoding.Utf8);
+            WriteTo (writer);
+
+        } // method WriteLocalFile
 
         #endregion
 
@@ -228,12 +245,14 @@ namespace ManagedIrbis.Lng
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Name = reader.ReadNullableString();
             Clear();
             while (true)
             {
                 var key = reader.ReadNullableString();
-                if (ReferenceEquals(key, null))
+                if (ReferenceEquals (key, null))
                 {
                     break;
                 }
@@ -241,7 +260,8 @@ namespace ManagedIrbis.Lng
                 var value = reader.ReadNullableString();
                 _dictionary[key] = value ?? string.Empty;
             }
-        }
+
+        } // method RestoreFromStream
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -249,14 +269,45 @@ namespace ManagedIrbis.Lng
                 BinaryWriter writer
             )
         {
-            writer.WriteNullable(Name);
+            Sure.NotNull (writer);
+
+            writer.WriteNullable (Name);
             foreach (var pair in _dictionary) //-V3087
             {
-                writer.WriteNullable(pair.Key);
-                writer.WriteNullable(pair.Value);
+                writer.WriteNullable (pair.Key);
+                writer.WriteNullable (pair.Value);
             }
-            writer.WriteNullable((string?)null);
-        }
+
+            writer.WriteNullable ((string?) null);
+
+        } // method SaveToStream
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<LngFile> (this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (Name)
+                .NotNullNorEmpty (_dictionary);
+
+            return verifier.Result;
+
+        } // method Verify
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => Name.ToVisibleString();
 
         #endregion
 

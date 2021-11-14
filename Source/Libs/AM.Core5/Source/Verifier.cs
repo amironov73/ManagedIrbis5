@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -269,6 +270,45 @@ namespace AM
             )
         {
             return Assert (!string.IsNullOrEmpty (value), name);
+
+        } // method NotNullNorEmpty
+
+        /// <summary>
+        /// Проверка, что заданный массив не <c>null</c> и не пустой.
+        /// </summary>
+        public Verifier<T> NotNullNorEmpty<V>
+            (
+                V[]? value,
+                [CallerArgumentExpression ("value")] string? name = null
+            )
+        {
+            return Assert (!ArrayUtility.IsNullOrEmpty(value), name);
+
+        } // method NotNullNorEmpty
+
+        /// <summary>
+        /// Проверка, что заданный список не <c>null</c> и не пустой.
+        /// </summary>
+        public Verifier<T> NotNullNorEmpty<V>
+            (
+                IReadOnlyList<V>? value,
+                [CallerArgumentExpression ("value")] string? name = null
+            )
+        {
+            return Assert (value is not null && value.Count != 0, name);
+
+        } // method NotNullNorEmpty
+
+        /// <summary>
+        /// Проверка, что заданный словарь не <c>null</c> и не пустой.
+        /// </summary>
+        public Verifier<T> NotNullNorEmpty<V1, V2>
+            (
+                IDictionary<V1, V2>? value,
+                [CallerArgumentExpression ("value")] string? name = null
+            )
+        {
+            return Assert (value is not null && value.Count != 0, name);
 
         } // method NotNullNorEmpty
 

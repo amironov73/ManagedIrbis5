@@ -128,6 +128,7 @@ namespace ManagedIrbis.Fields
             {
                 WorksHere = field.GetFirstSubFieldValue ('y'),
                 WorkPlace = field.GetFirstSubFieldValue ('p'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
 
