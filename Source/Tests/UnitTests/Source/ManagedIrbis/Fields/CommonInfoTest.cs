@@ -108,7 +108,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
-        [Description ("Применение данных к указанному полю записи")]
+        [Description ("Применение данных к указанному полю библиографической записи")]
         public void CommonInfo_ApplyTo_1()
         {
             var expected461 = _GetField461();
