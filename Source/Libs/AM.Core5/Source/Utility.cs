@@ -39,6 +39,8 @@ using AM.IO;
 using AM.PlatformAbstraction;
 using AM.Text;
 
+using Microsoft.Extensions.Primitives;
+
 #endregion
 
 #nullable enable
@@ -3384,7 +3386,38 @@ namespace AM
 
             return builder;
 
-        } // method AppdenWithDelimiter
+        }
+
+        /// <summary>
+        /// Добавление объекта, заключенного в скобки.
+        /// </summary>
+        public static StringBuilder AppendWithBrackets
+            (
+                this StringBuilder builder,
+                object? obj,
+                string? open = " (",
+                string? close = ")"
+            )
+        {
+            if (obj is not null)
+            {
+                builder.Append (open);
+
+                if (obj is IFormattable formattable)
+                {
+                    builder.Append (formattable.ToString (null, CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    builder.Append (obj);
+                }
+
+                builder.Append (close);
+            }
+
+            return builder;
+
+        }
 
         /// <summary>
         /// Determines whether given value can be converted to

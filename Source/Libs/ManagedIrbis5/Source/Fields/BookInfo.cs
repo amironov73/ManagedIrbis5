@@ -235,7 +235,7 @@ namespace ManagedIrbis.Fields
         {
             get
             {
-                var result = TitleInfo.Parse(Record);
+                var result = TitleInfo.ParseRecord(Record);
 
                 return result[0];
             }

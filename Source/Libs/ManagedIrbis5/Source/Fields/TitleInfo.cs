@@ -17,17 +17,16 @@
 #region Using directives
 
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 using ManagedIrbis.Mapping;
 
@@ -40,99 +39,100 @@ namespace ManagedIrbis.Fields
     /// <summary>
     /// Сведения о заглавии, поле 200.
     /// </summary>
-    [DebuggerDisplay("{VolumeNumber} {Title}")]
+    [XmlRoot ("title")]
     public sealed class TitleInfo
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
+
+        /// <summary>
+        /// Метка поля.
+        /// </summary>
+        public const int Tag = 200;
 
         /// <summary>
         /// Известные коды подполей.
         /// </summary>
         public const string KnownCodes = "abefguv";
 
-        /// <summary>
-        /// Тег поля.
-        /// </summary>
-        public const int Tag = 200;
-
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// Обозначение и номер тома. Подполе v.
+        /// Обозначение и номер тома. Подполе V.
         /// </summary>
-        [SubField('v')]
-        [XmlAttribute("volume")]
-        [JsonPropertyName("volume")]
-        [Description("Обозначение и номер тома")]
-        [DisplayName("Обозначение и номер тома")]
+        [SubField ('v')]
+        [XmlAttribute ("volume")]
+        [JsonPropertyName ("volume")]
+        [Description ("Обозначение и номер тома")]
+        [DisplayName ("Обозначение и номер тома")]
         public string? VolumeNumber { get; set; }
 
         /// <summary>
-        /// Заглавие.
+        /// Заглавие. Подполе A.
         /// </summary>
-        [SubField('a')]
-        [XmlAttribute("title")]
-        [JsonPropertyName("title")]
-        [Description("Заглавие")]
-        [DisplayName("Заглавие")]
+        [SubField ('a')]
+        [XmlAttribute ("title")]
+        [JsonPropertyName ("title")]
+        [Description ("Заглавие")]
+        [DisplayName ("Заглавие")]
         public string? Title { get; set; }
 
         /// <summary>
-        /// Нехарактерное заглавие. Подполе u.
+        /// Нехарактерное заглавие. Подполе U.
         /// </summary>
-        [SubField('u')]
-        [XmlAttribute("specific")]
-        [JsonPropertyName("specific")]
-        [Description("Нехарактерное заглавие")]
-        [DisplayName("Нехарактерное заглавие")]
+        [SubField ('u')]
+        [XmlAttribute ("specific")]
+        [JsonPropertyName ("specific")]
+        [Description ("Нехарактерное заглавие")]
+        [DisplayName ("Нехарактерное заглавие")]
         public string? Specific { get; set; }
 
         /// <summary>
-        /// Общее обозначение материала. Подполе b.
+        /// Общее обозначение материала. Подполе B.
+        /// В связи с вводом нового ГОСТ подполе утратило смысл.
         /// </summary>
-        [SubField('b')]
-        [XmlAttribute("general")]
-        [JsonPropertyName("general")]
-        [Description("Общее обозначение материала")]
-        [DisplayName("Общее обозначение материала")]
+        [SubField ('b')]
+        [XmlAttribute ("general")]
+        [JsonPropertyName ("general")]
+        [Description ("Общее обозначение материала")]
+        [DisplayName ("Общее обозначение материала")]
         public string? General { get; set; }
 
         /// <summary>
-        /// Сведения, относящиеся к заглавию. Подполе e.
+        /// Сведения, относящиеся к заглавию. Подполе E.
         /// </summary>
-        [SubField('e')]
-        [XmlAttribute("subtitle")]
-        [JsonPropertyName("subtitle")]
-        [Description("Сведения, относящиеся к заглавию")]
-        [DisplayName("Сведения, относящиеся к заглавию")]
+        [SubField ('e')]
+        [XmlAttribute ("subtitle")]
+        [JsonPropertyName ("subtitle")]
+        [Description ("Сведения, относящиеся к заглавию")]
+        [DisplayName ("Сведения, относящиеся к заглавию")]
         public string? Subtitle { get; set; }
 
         /// <summary>
-        /// Первые сведения об ответственности. Подполе f.
+        /// Первые сведения об ответственности. Подполе F.
         /// </summary>
-        [SubField('f')]
-        [XmlAttribute("first")]
-        [JsonPropertyName("first")]
-        [Description("Первые сведения об ответственности")]
-        [DisplayName("Первые сведения об ответственности")]
+        [SubField ('f')]
+        [XmlAttribute ("first")]
+        [JsonPropertyName ("first")]
+        [Description ("Первые сведения об ответственности")]
+        [DisplayName ("Первые сведения об ответственности")]
         public string? FirstResponsibility { get; set; }
 
         /// <summary>
-        /// Последующие сведения об ответственности. Подполе g.
+        /// Последующие сведения об ответственности. Подполе G.
         /// </summary>
-        [SubField('g')]
-        [XmlAttribute("other")]
-        [JsonPropertyName("other")]
-        [Description("Последующие сведения об ответственности")]
-        [DisplayName("Последующие сведения об ответственности")]
+        [SubField ('g')]
+        [XmlAttribute ("other")]
+        [JsonPropertyName ("other")]
+        [Description ("Последующие сведения об ответственности")]
+        [DisplayName ("Последующие сведения об ответственности")]
         public string? OtherResponsibility { get; set; }
 
         /// <summary>
-        /// Full title.
+        /// Полное заглавие.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
@@ -140,63 +140,45 @@ namespace ManagedIrbis.Fields
         {
             get
             {
-                var result = new StringBuilder();
-                if (!string.IsNullOrEmpty(VolumeNumber))
-                {
-                    result.Append(VolumeNumber);
-                }
+                var builder = StringBuilderPool.Shared.Get();
 
-                if (!string.IsNullOrEmpty(Title))
-                {
-                    if (result.Length != 0)
-                    {
-                        result.Append(". ");
-                    }
+                builder
+                    .Append (VolumeNumber)
+                    .AppendWithDelimiter (Title, ". ")
+                    .AppendWithBrackets (General, " [", "]")
+                    .AppendWithDelimiter (Subtitle, " : ")
+                    .AppendWithDelimiter (FirstResponsibility, " / ")
+                    .AppendWithDelimiter (OtherResponsibility, " ; ");
 
-                    result.Append(Title);
-                }
+                var result = builder.ToString().EmptyToNull().ToVisibleString();
+                StringBuilderPool.Shared.Return (builder);
 
-                if (!string.IsNullOrEmpty(General))
-                {
-                    if (result.Length != 0)
-                    {
-                        result.Append(" ");
-                    }
-
-                    result.Append('[');
-                    result.Append(General);
-                    result.Append(']');
-                }
-
-                if (!string.IsNullOrEmpty(Subtitle))
-                {
-                    if (result.Length != 0)
-                    {
-                        result.Append(": ");
-                        result.Append(Subtitle);
-                    }
-                }
-
-                return result.ToString();
+                return result;
             }
         }
 
         /// <summary>
-        /// Associated field.
+        /// Неизвестные подполя.
+        /// </summary>
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
+        [Browsable (false)]
+        public SubField[]? UnknownSubFields { get; set; }
+
+        /// <summary>
+        /// Ассоциированное поле библиографической записи.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Description("Поле")]
-        [DisplayName("Поле")]
+        [Browsable (false)]
         public Field? Field { get; private set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Description("Произвольные данные")]
-        [DisplayName("Произвольные данные")]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -204,14 +186,14 @@ namespace ManagedIrbis.Fields
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public TitleInfo()
         {
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор с заглавием.
         /// </summary>
         public TitleInfo
             (
@@ -222,7 +204,7 @@ namespace ManagedIrbis.Fields
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор с номером тома и заглавием.
         /// </summary>
         public TitleInfo
             (
@@ -236,143 +218,138 @@ namespace ManagedIrbis.Fields
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
         #region Public methods
 
         /// <summary>
-        /// Parse field 200.
+        /// Разбор указанного поля 200.
         /// </summary>
         public static TitleInfo ParseField200
             (
                 Field field
             )
         {
-            // TODO: support for unknown subfields
-            // TODO: реализовать эффективно
+            Sure.NotNull (field);
 
-            var result = new TitleInfo
+            return new TitleInfo
             {
-                VolumeNumber = field.GetFirstSubFieldValue('v'),
-                Title = field.GetFirstSubFieldValue('a'),
-                Specific = field.GetFirstSubFieldValue('u'),
-                General = field.GetFirstSubFieldValue('b'),
-                Subtitle = field.GetFirstSubFieldValue('e'),
-                FirstResponsibility = field.GetFirstSubFieldValue('f'),
-                OtherResponsibility = field.GetFirstSubFieldValue('g'),
+                VolumeNumber = field.GetFirstSubFieldValue ('v'),
+                Title = field.GetFirstSubFieldValue ('a'),
+                Specific = field.GetFirstSubFieldValue ('u'),
+                General = field.GetFirstSubFieldValue ('b'),
+                Subtitle = field.GetFirstSubFieldValue ('e'),
+                FirstResponsibility = field.GetFirstSubFieldValue ('f'),
+                OtherResponsibility = field.GetFirstSubFieldValue ('g'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
-
-            return result;
         }
 
         /// <summary>
-        /// Parse field 330 or 922.
+        /// Разбор поля 330 или 922.
         /// </summary>
         public static TitleInfo ParseField330
             (
                 Field field
             )
         {
-            // TODO: support for unknown subfields
-            // TODO: реализовать эффективно
+            Sure.NotNull (field);
 
-            var result = new TitleInfo
+            return new TitleInfo
             {
-                Title = field.GetFirstSubFieldValue('c'),
-                Subtitle = field.GetFirstSubFieldValue('e'),
-                FirstResponsibility = field.GetFirstSubFieldValue('g'),
+                Title = field.GetFirstSubFieldValue ('c'),
+                Subtitle = field.GetFirstSubFieldValue ('e'),
+                FirstResponsibility = field.GetFirstSubFieldValue ('g'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
-
-            return result;
         }
 
         /// <summary>
-        /// Разбор записи.
+        /// Разбор библиографической записи.
         /// </summary>
-        public static TitleInfo[] Parse
+        public static TitleInfo[] ParseRecord
             (
                 Record record,
                 int tag = Tag
             )
         {
-            return record.Fields
-                .GetField(tag)
-                .Select(field => ParseField200(field))
+            Sure.NotNull (record);
+            Sure.Positive (tag);
+
+            return record
+                .EnumerateField (tag)
+                .Select (field => ParseField200 (field))
                 .ToArray();
         }
 
         /// <summary>
-        /// Should serialize <see cref="FirstResponsibility"/> field?
+        /// Нужно ли сериализовать свойство <see cref="FirstResponsibility"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeFirstResponsibility()
         {
-            return !ReferenceEquals(FirstResponsibility, null);
+            return FirstResponsibility is not null;
         }
 
         /// <summary>
-        /// Should serialize <see cref="General"/> field?
+        /// Нужно ли сериализовать свойство <see cref="General"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeGeneral()
         {
-            return !ReferenceEquals(General, null);
+            return General is not null;
         }
 
         /// <summary>
-        /// Should serialize <see cref="OtherResponsibility"/> field?
+        /// Нужно ли сериализовать свойство <see cref="OtherResponsibility"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeOtherResponsibility()
         {
-            return !ReferenceEquals(OtherResponsibility, null);
+            return OtherResponsibility is not null;
         }
 
         /// <summary>
-        /// Should serialize <see cref="Title"/> field?
+        /// Нужно ли сериализовать свойство <see cref="Title"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeTitle()
         {
-            return !ReferenceEquals(Title, null);
+            return Title is not null;
         }
 
         /// <summary>
-        /// Should serialize <see cref="Specific"/> field?
+        /// Нужно ли сериализовать свойство <see cref="Specific"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeSpecific()
         {
-            return !ReferenceEquals(Specific, null);
+            return Specific is not null;
         }
 
         /// <summary>
-        /// Should serialize <see cref="Subtitle"/> field?
+        /// Нужно ли сериализовать свойство <see cref="Subtitle"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeSubtitle()
         {
-            return !ReferenceEquals(Subtitle, null);
+            return Subtitle is not null;
         }
 
         /// <summary>
-        /// Should serialize <see cref="VolumeNumber"/> field?
+        /// Нужно ли сериализовать свойство <see cref="VolumeNumber"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeVolumeNumber()
         {
-            return !ReferenceEquals(VolumeNumber, null);
+            return VolumeNumber is not null;
         }
 
         /// <summary>
@@ -387,13 +364,14 @@ namespace ManagedIrbis.Fields
                 .AddNonEmpty ('b', General)
                 .AddNonEmpty ('e', Subtitle)
                 .AddNonEmpty ('f', FirstResponsibility)
-                .AddNonEmpty ('g', OtherResponsibility);
+                .AddNonEmpty ('g', OtherResponsibility)
+                .AddRange (UnknownSubFields);
 
             return result;
         }
 
         /// <summary>
-        /// Convert back to field 330/922.
+        /// Преобразование данных в поле 330/922.
         /// </summary>
         public Field ToField330
             (
@@ -403,10 +381,10 @@ namespace ManagedIrbis.Fields
             var result = new Field (tag)
                 .AddNonEmpty ('c', Title)
                 .AddNonEmpty ('e', Subtitle)
-                .AddNonEmpty ('g', FirstResponsibility);
+                .AddNonEmpty ('g', FirstResponsibility)
+                .AddRange (UnknownSubFields);
 
             return result;
-
         } // method ToField330
 
         #endregion
@@ -428,8 +406,8 @@ namespace ManagedIrbis.Fields
             Subtitle = reader.ReadNullableString();
             FirstResponsibility = reader.ReadNullableString();
             OtherResponsibility = reader.ReadNullableString();
-
-        } // method RestoreFromStream
+            UnknownSubFields = reader.ReadNullableArray<SubField>();
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         void IHandmadeSerializable.SaveToStream
@@ -446,9 +424,9 @@ namespace ManagedIrbis.Fields
                 .WriteNullable (General)
                 .WriteNullable (Subtitle)
                 .WriteNullable (FirstResponsibility)
-                .WriteNullable (OtherResponsibility);
-
-        } // method SaveToStream
+                .WriteNullable (OtherResponsibility)
+                .WriteNullableArray (UnknownSubFields);
+        }
 
         #endregion
 
@@ -460,10 +438,10 @@ namespace ManagedIrbis.Fields
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<TitleInfo>(this, throwOnError);
+            var verifier = new Verifier<TitleInfo> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Title, "Title");
+                .NotNullNorEmpty (Title);
 
             return verifier.Result;
         }
@@ -475,9 +453,7 @@ namespace ManagedIrbis.Fields
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            return string.IsNullOrEmpty (VolumeNumber)
-                ? $"Title: {Title.ToVisibleString()}, Subtitle: {Subtitle.ToVisibleString()}"
-                : $"Volume: {VolumeNumber}, Title: {Title.ToVisibleString()}, Subtitle: {Subtitle.ToVisibleString()}";
+            return FullTitle;
         }
 
         #endregion

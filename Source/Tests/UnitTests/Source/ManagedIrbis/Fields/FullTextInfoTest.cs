@@ -133,16 +133,6 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
-        [Description ("Преобразование в поле записи")]
-        public void FullTextInfo_ToField46_1()
-        {
-            var info = _GetFullTextInfo();
-            var expected = _GetField();
-            var actual = info.ToField();
-            CompareFields (expected, actual);
-        }
-
-        [TestMethod]
         [Description ("Верифцикация")]
         public void FullTextInfo_Verify_1()
         {
@@ -179,7 +169,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
-        [Description ("Текстовое представление")]
+        [Description ("Плоское текстовое представление")]
         public void FullTextInfo_ToString_1()
         {
             var info = new FullTextInfo();
