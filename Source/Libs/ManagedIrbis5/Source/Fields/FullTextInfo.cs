@@ -12,7 +12,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* FullTextInfo.cs -- сведения о полном тексте документа
+/* FullTextInfo.cs -- сведения о полном тексте документа, поле 955
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -74,121 +74,107 @@ namespace ManagedIrbis.Fields
     /// <summary>
     /// Сведения о полном тексте документа (поле 955).
     /// </summary>
+    [XmlRoot ("fulltext")]
     public sealed class FullTextInfo
         : IHandmadeSerializable,
-          IVerifiable
+        IVerifiable
     {
         #region Constants
+
+        /// <summary>
+        /// Метка поля.
+        /// </summary>
+        public const int Tag = 955;
 
         /// <summary>
         /// Известные коды подполей.
         /// </summary>
         public const string KnownCodes = "abnt";
 
-        /// <summary>
-        /// Тег поля.
-        /// </summary>
-        public const int Tag = 955;
-
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// Текст для ссылки. Подполе t.
+        /// Текст для ссылки. Подполе T.
         /// </summary>
-        [SubField('t')]
-        [XmlAttribute("display-text")]
-        [JsonPropertyName("displayText")]
-        [Description("Текст для ссылки")]
-        [DisplayName("Текст для ссылки")]
+        [SubField ('t')]
+        [XmlAttribute ("display-text")]
+        [JsonPropertyName ("displayText")]
+        [Description ("Текст для ссылки")]
+        [DisplayName ("Текст для ссылки")]
         public string? DisplayText { get; set; }
 
         /// <summary>
-        /// Имя файла. Подполе a.
+        /// Имя файла (PDF). Подполе A.
         /// </summary>
-        [SubField('a')]
-        [XmlAttribute("filename")]
-        [JsonPropertyName("filename")]
-        [Description("Имя файла")]
-        [DisplayName("Имя файла")]
+        [SubField ('a')]
+        [XmlAttribute ("filename")]
+        [JsonPropertyName ("filename")]
+        [Description ("Имя файла")]
+        [DisplayName ("Имя файла")]
         public string? FileName { get; set; }
 
         /// <summary>
-        /// Количество страниц. Подполе n.
+        /// Количество страниц. Подполе N.
+        /// Формируется автоматически.
         /// </summary>
-        [SubField('n')]
-        [XmlAttribute("page-count")]
-        [JsonPropertyName("pageCount")]
-        [Description("Количество страниц")]
-        [DisplayName("Количество страниц")]
-        public int? PageCount { get; set; }
+        [SubField ('n')]
+        [XmlAttribute ("page-count")]
+        [JsonPropertyName ("pageCount")]
+        [Description ("Количество страниц")]
+        [DisplayName ("Количество страниц")]
+        public string? PageCount { get; set; }
 
         /// <summary>
-        /// Идентификатор записи права доступа. Подполе b.
+        /// Идентификатор записи права доступа. Подполе B.
+        /// Запись расположена в базе данных RIGHT,
+        /// отыскивается по поисковому префиксу "I=".
         /// </summary>
-        [SubField('b')]
-        [XmlAttribute("access-rights")]
-        [JsonPropertyName("accessRights")]
-        [Description("Идентификатор записи права доступа")]
-        [DisplayName("Идентификатор записи права доступа")]
+        [SubField ('b')]
+        [XmlAttribute ("access-rights")]
+        [JsonPropertyName ("accessRights")]
+        [Description ("Идентификатор записи права доступа")]
+        [DisplayName ("Идентификатор записи права доступа")]
         public string? AccessRights { get; set; }
 
         /// <summary>
-        /// Associated field.
+        /// Неизвестные подполя.
         /// </summary>
-        [XmlIgnore]
-        [JsonIgnore]
-        [Browsable(false)]
-        [Description("Поле")]
-        [DisplayName("Поле")]
-        public Field? Field { get; private set; }
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
+        [Browsable (false)]
+        public SubField[]? UnknownSubFields { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Ассоциированное поле библиографической записи.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
-        [Description("Пользовательские данные")]
-        [DisplayName("Пользовательские данные")]
+        [Browsable (false)]
+        public Field? Field { get; set; }
+
+        /// <summary>
+        /// Произвольные пользовательские данные.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
         public object? UserData { get; set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public FullTextInfo()
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public FullTextInfo
-            (
-                string? fileName
-            )
-        {
-            FileName = fileName;
-        }
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Apply to the field.
+        /// Применение данных к указанному полю библиографической записи.
         /// </summary>
-        public void ApplyToField
+        public void ApplyTo
             (
                 Field field
             )
         {
-            // TODO check the applying
+            Sure.NotNull (field);
 
             field
                 .SetSubFieldValue ('t', DisplayText)
@@ -198,95 +184,91 @@ namespace ManagedIrbis.Fields
         }
 
         /// <summary>
-        /// Parse the field.
+        /// Разбор указанного поля библиографической записи.
         /// </summary>
-        public static FullTextInfo Parse
+        public static FullTextInfo ParseField
             (
                 Field field
             )
         {
-            FullTextInfo result = new FullTextInfo
+            Sure.NotNull (field);
+
+            return new FullTextInfo ()
             {
-                DisplayText = field.GetFirstSubFieldValue('t'),
-                FileName = field.GetFirstSubFieldValue('a'),
-                PageCount = Map.ToInt32(field, 'n'),
-                AccessRights = field.GetFirstSubFieldValue('b'),
+                DisplayText = field.GetFirstSubFieldValue ('t'),
+                FileName = field.GetFirstSubFieldValue ('a'),
+                PageCount = field.GetFirstSubFieldValue ('n'),
+                AccessRights = field.GetFirstSubFieldValue ('b'),
                 Field = field
             };
-
-            return result;
         }
 
         /// <summary>
-        /// Разбор записи.
+        /// Разбор указанной библиографической записи.
         /// </summary>
-        public static FullTextInfo[] Parse
+        public static FullTextInfo[] ParseRecord
             (
                 Record record,
                 int tag = Tag
             )
         {
-            return record.Fields
-                .GetField(tag)
-                .Select(field => Parse(field))
+            Sure.NotNull (record);
+            Sure.Positive (tag);
+
+            return record
+                .EnumerateField (tag)
+                .Select (field => ParseField (field))
                 .ToArray();
         }
 
         /// <summary>
-        /// Превращение обратно в поле.
+        /// Преобразование данных в поле библиографической записи.
         /// </summary>
         public Field ToField()
         {
-            var result = new Field(Tag)
-                .AddNonEmpty ('t', FileName)
+            var result = new Field (Tag)
+                .AddNonEmpty ('t', DisplayText)
                 .AddNonEmpty ('a', FileName)
-                .AddNonEmpty ('n', PageCount.ToString())
+                .AddNonEmpty ('n', PageCount)
                 .AddNonEmpty ('b', AccessRights);
 
             return result;
-
-        } // method ToField
+        }
 
         #endregion
 
         #region IHandmadeSerializable members
 
         /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        void IHandmadeSerializable.RestoreFromStream
+        public void RestoreFromStream
             (
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             DisplayText = reader.ReadNullableString();
             FileName = reader.ReadNullableString();
             AccessRights = reader.ReadNullableString();
-            PageCount = null;
-
-            if (reader.ReadBoolean())
-            {
-                PageCount = reader.ReadPackedInt32();
-            }
-
-        } // method RestoreFromStream
+            PageCount = reader.ReadNullableString();
+            UnknownSubFields = reader.ReadNullableArray<SubField>();
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        void IHandmadeSerializable.SaveToStream
+        public void SaveToStream
             (
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullable(DisplayText)
-                .WriteNullable(FileName)
-                .WriteNullable(AccessRights);
-            writer.Write(PageCount.HasValue);
-
-            if (PageCount.HasValue)
-            {
-                writer.WritePackedInt32(PageCount.Value);
-            }
-
-        } // method SaveToStream
+                .WriteNullable (DisplayText)
+                .WriteNullable (FileName)
+                .WriteNullable (AccessRights)
+                .WriteNullable (PageCount)
+                .WriteNullableArray (UnknownSubFields);
+        }
 
         #endregion
 
@@ -298,18 +280,13 @@ namespace ManagedIrbis.Fields
                 bool throwOnError
             )
         {
-            Verifier<FullTextInfo> verifier
-                = new Verifier<FullTextInfo>(this, throwOnError);
+            var verifier = new Verifier<FullTextInfo> (this, throwOnError);
 
-            verifier.Assert
-                (
-                    !string.IsNullOrEmpty(FileName),
-                    "FileName"
-                );
+            verifier
+                .NotNullNorEmpty (FileName);
 
             return verifier.Result;
-
-        } // method Verify
+        }
 
         #endregion
 

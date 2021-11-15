@@ -498,7 +498,7 @@ namespace ManagedIrbis.Fields
         #region IHandmadeSerializable members
 
         /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        void IHandmadeSerializable.RestoreFromStream
+        public void RestoreFromStream
             (
                 BinaryReader reader
             )
@@ -532,7 +532,7 @@ namespace ManagedIrbis.Fields
         }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        void IHandmadeSerializable.SaveToStream
+        public void SaveToStream
             (
                 BinaryWriter writer
             )
