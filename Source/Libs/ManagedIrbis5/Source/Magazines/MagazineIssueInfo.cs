@@ -186,13 +186,15 @@ namespace ManagedIrbis.Magazines
         #region Public methods
 
         /// <summary>
-        /// Разбор записи.
+        /// Разбор библиографической записи.
         /// </summary>
         public static MagazineIssueInfo Parse
             (
                 Record record
             )
         {
+            Sure.NotNull (record);
+
             // TODO: реализовать оптимально
 
             var result = new MagazineIssueInfo
@@ -207,13 +209,13 @@ namespace ManagedIrbis.Magazines
                 Supplement = record.FM (931, 'c'),
                 Worksheet = record.FM (920),
 
-                Articles = record.Fields
-                    .GetField (922)
+                Articles = record
+                    .EnumerateField (922)
                     .Select (field => MagazineArticleInfo.ParseField330 (field))
                     .ToArray(),
 
-                Exemplars = record.Fields
-                    .GetField (910)
+                Exemplars = record
+                    .EnumerateField (910)
                     .Select (field => ExemplarInfo.Parse (field))
                     .ToArray(),
 
@@ -224,10 +226,10 @@ namespace ManagedIrbis.Magazines
 
             return result;
 
-        } // method Parse
+        }
 
         /// <summary>
-        /// Превращение в запись.
+        /// Создание библиографической записи по данным о номере журнала.
         /// </summary>
         public Record ToRecord()
         {

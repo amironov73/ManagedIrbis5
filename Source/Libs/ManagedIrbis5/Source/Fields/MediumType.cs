@@ -18,6 +18,7 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -38,17 +39,20 @@ namespace ManagedIrbis.Fields
     /// Поле 182 - тип средства.
     /// Введено в связи с ГОСТ 7.0.100-2018.
     /// </summary>
+    [XmlRoot ("medium")]
     public sealed class MediumType
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Constants
 
         /// <summary>
-        /// Tag number.
+        /// Метка поля.
         /// </summary>
         public const int Tag = 182;
 
         /// <summary>
-        /// Known subfield codes.
+        /// Известные коды подполей.
         /// </summary>
         public const string KnownCodes = "a";
 
@@ -57,53 +61,84 @@ namespace ManagedIrbis.Fields
         #region Properties
 
         /// <summary>
-        /// Код типа средства. Подполе a.
+        /// Код типа средства. Подполе A.
         /// </summary>
-        [SubField('a')]
-        [XmlAttribute("medium")]
-        [JsonPropertyName("medium")]
+        [SubField ('a')]
+        [XmlText]
+        [JsonPropertyName ("medium")]
+        [Description ("Код типа средства")]
+        [DisplayName ("Код типа средства")]
         public string? MediumCode { get; set; }
+
+        /// <summary>
+        /// Неизвестные подполя.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public SubField[]? UnknownSubFields { get; set; }
+
+        /// <summary>
+        /// Связанное поле в нераскодированном виде.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public Field? Field { get; set; }
+
+        /// <summary>
+        /// Произвольные пользовательские данные.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public object? UserData { get; set; }
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Apply the <see cref="ContentType"/>
-        /// to the <see cref="Field"/>.
+        /// Применение данных к указанному полю библиографической записи <see cref="Field"/>.
         /// </summary>
-        public Field ApplyToField (Field field) => field
-            .SetSubFieldValue ('a', MediumCode);
-
-        /// <summary>
-        /// Parse the field.
-        /// </summary>
-        public static MediumType Parse
+        public Field ApplyTo
             (
                 Field field
             )
         {
-            var result = new MediumType
-            {
-                MediumCode = field.GetFirstSubFieldValue('a')
-            };
+            Sure.NotNull (field);
 
-            return result;
-
-        } // method Parse
+            return field
+                .SetSubFieldValue ('a', MediumCode);
+        }
 
         /// <summary>
-        /// Convert <see cref="ContentType"/>
-        /// back to <see cref="Field"/>.
+        /// Разбор указанного поля библиографической записи.
+        /// </summary>
+        public static MediumType ParseField
+            (
+                Field field
+            )
+        {
+            Sure.NotNull (field);
+
+            return new MediumType
+            {
+                MediumCode = field.GetFirstSubFieldValue ('a'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
+                Field = field
+            };
+        }
+
+        /// <summary>
+        /// Преобразование данных в поле библиографической записи <see cref="Field"/>.
         /// </summary>
         public Field ToField()
         {
-            var result = new Field(Tag)
-                .AddNonEmpty ('a', MediumCode);
-
-            return result;
-
-        } // method ToField
+            return new Field (Tag)
+                .AddNonEmpty ('a', MediumCode)
+                .AddRange (UnknownSubFields);
+        }
 
         #endregion
 
@@ -115,9 +150,11 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
-            MediumCode = reader.ReadNullableString();
+            Sure.NotNull (reader);
 
-        } // method RestoreFromStream
+            MediumCode = reader.ReadNullableString();
+            UnknownSubFields = reader.ReadNullableArray<SubField>();
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -125,16 +162,39 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
-            writer.WriteNullable(MediumCode);
+            Sure.NotNull (writer);
 
-        } // method SaveToStream
+            writer.WriteNullable (MediumCode);
+            writer.WriteNullableArray (UnknownSubFields);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<MediumType>(this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (MediumCode);
+
+            return verifier.Result;
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => $"MediumCode: {MediumCode.ToVisibleString()}";
+        public override string ToString()
+        {
+            return MediumCode.EmptyToNull().ToVisibleString();
+        }
 
         #endregion
 

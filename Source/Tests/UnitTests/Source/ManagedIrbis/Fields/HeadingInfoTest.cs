@@ -20,6 +20,7 @@ namespace UnitTests.ManagedIrbis.Fields
 {
     [TestClass]
     public sealed class HeadingInfoTest
+        : Common.CommonUnitTest
     {
         private HeadingInfo _GetHeading() => new ()
         {
@@ -32,12 +33,30 @@ namespace UnitTests.ManagedIrbis.Fields
 
         private Field _GetField() => new Field (HeadingInfo.Tag)
             .Add ('a', "Русская литература")
-            .Add ('a', "Проза")
-            .Add ('a', "Санкт-Петербург")
-            .Add ('a', "19 в.")
-            .Add ('a', "Сборники");
+            .Add ('b', "Проза")
+            .Add ('g', "Санкт-Петербург")
+            .Add ('h', "19 в.")
+            .Add ('9', "Сборники");
+
+        private void _Compare
+            (
+                HeadingInfo first,
+                HeadingInfo second
+            )
+        {
+            Assert.AreEqual (first.Title, second.Title);
+            Assert.AreEqual (first.Subtitle1, second.Subtitle1);
+            Assert.AreEqual (first.Subtitle2, second.Subtitle2);
+            Assert.AreEqual (first.Subtitle3, second.Subtitle3);
+            Assert.AreEqual (first.GeographicalSubtitle1, second.GeographicalSubtitle1);
+            Assert.AreEqual (first.GeographicalSubtitle2, second.GeographicalSubtitle2);
+            Assert.AreEqual (first.GeographicalSubtitle3, second.GeographicalSubtitle3);
+            Assert.AreEqual (first.ChronologicalSubtitle, second.ChronologicalSubtitle);
+            Assert.AreEqual (first.Aspect, second.Aspect);
+        }
 
         [TestMethod]
+        [Description ("Конструктор по умолчанию")]
         public void HeadingInfo_Construction_1()
         {
             var heading = new HeadingInfo();
@@ -49,8 +68,8 @@ namespace UnitTests.ManagedIrbis.Fields
             Assert.IsNull (heading.GeographicalSubtitle2);
             Assert.IsNull (heading.GeographicalSubtitle3);
             Assert.IsNull (heading.ChronologicalSubtitle);
-            Assert.IsNull (heading.UnknownSubFields);
             Assert.IsNull (heading.Aspect);
+            Assert.IsNull (heading.UnknownSubFields);
             Assert.IsNull (heading.Field);
             Assert.IsNull (heading.UserData);
         }
@@ -63,21 +82,14 @@ namespace UnitTests.ManagedIrbis.Fields
             var bytes = first.SaveToMemory();
             var second = bytes.RestoreObjectFromMemory<HeadingInfo>();
             Assert.IsNotNull (second);
-            Assert.AreEqual (first.Title, second.Title);
-            Assert.AreEqual (first.Subtitle1, second.Subtitle1);
-            Assert.AreEqual (first.Subtitle2, second.Subtitle2);
-            Assert.AreEqual (first.Subtitle3, second.Subtitle3);
-            Assert.AreEqual (first.GeographicalSubtitle1, second.GeographicalSubtitle1);
-            Assert.AreEqual (first.GeographicalSubtitle2, second.GeographicalSubtitle2);
-            Assert.AreEqual (first.GeographicalSubtitle3, second.GeographicalSubtitle3);
-            Assert.AreEqual (first.ChronologicalSubtitle, second.ChronologicalSubtitle);
-            Assert.AreEqual (first.Aspect, second.Aspect);
+            _Compare (first, second);
             Assert.AreSame (first.UnknownSubFields, second.UnknownSubFields);
             Assert.IsNull (second.Field);
             Assert.IsNull (second.UserData);
         }
 
         [TestMethod]
+        [Description ("Сериализация")]
         public void HeadingInfo_Serialization_1()
         {
             var heading = new HeadingInfo();
@@ -91,87 +103,58 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("Разбор указанного поля библиографической записи")]
         public void HeadingInfo_ParseField_1()
         {
+            var expected = _GetHeading();
             var field = _GetField();
-            var heading = HeadingInfo.ParseField (field);
-            Assert.AreSame (field, heading.Field);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('a'), heading.Title);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('b'), heading.Subtitle1);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('c'), heading.Subtitle2);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('d'), heading.Subtitle3);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('g'), heading.GeographicalSubtitle1);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('e'), heading.GeographicalSubtitle2);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('o'), heading.GeographicalSubtitle3);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('h'), heading.ChronologicalSubtitle);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('9'), heading.Aspect);
-            Assert.IsNotNull (heading.UnknownSubFields);
-            Assert.AreEqual (0, heading.UnknownSubFields!.Length);
-            Assert.IsNull (heading.UserData);
+            var actual = HeadingInfo.ParseField (field);
+            Assert.AreSame (field, actual.Field);
+            _Compare (expected, actual);
+            Assert.IsNotNull (actual.UnknownSubFields);
+            Assert.AreEqual (0, actual.UnknownSubFields!.Length);
+            Assert.IsNull (actual.UserData);
         }
 
         [TestMethod]
+        [Description ("Разбор библиографической записи")]
         public void HeadingInfo_ParseRecord_1()
         {
-            var record = new Record();
-            var field = _GetField();
-            record.Fields.Add (field);
-            var heading = HeadingInfo.ParseRecord (record);
-            Assert.AreEqual (1, heading.Length);
-            Assert.AreSame (field, heading[0].Field);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('a'), heading[0].Title);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('b'), heading[0].Subtitle1);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('c'), heading[0].Subtitle2);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('d'), heading[0].Subtitle3);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('g'), heading[0].GeographicalSubtitle1);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('e'), heading[0].GeographicalSubtitle2);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('o'), heading[0].GeographicalSubtitle3);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('h'), heading[0].ChronologicalSubtitle);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('9'), heading[0].Aspect);
-            Assert.IsNotNull (heading[0].UnknownSubFields);
-            Assert.AreEqual (0, heading[0].UnknownSubFields!.Length);
-            Assert.IsNull (heading[0].UserData);
+            var expected = _GetHeading();
+            var record = new Record().Add (_GetField());
+            var actual = HeadingInfo.ParseRecord (record);
+            Assert.AreEqual (1, actual.Length);
+            _Compare (expected, actual[0]);
+            Assert.IsNotNull (actual[0].UnknownSubFields);
+            Assert.AreEqual (0, actual[0].UnknownSubFields!.Length);
+            Assert.IsNull (actual[0].UserData);
         }
 
         [TestMethod]
+        [Description ("Преобразование данных в поле библиографической записи")]
         public void HeadingInfo_ToField_1()
         {
+            var expected = _GetField();
             var heading = _GetHeading();
-            var field = heading.ToField();
-            Assert.AreEqual (HeadingInfo.Tag, field.Tag);
-            Assert.AreEqual (5, field.Subfields.Count);
-            Assert.AreEqual (heading.Title, field.GetFirstSubFieldValue ('a'));
-            Assert.AreEqual (heading.Subtitle1, field.GetFirstSubFieldValue ('b'));
-            Assert.AreEqual (heading.Subtitle2, field.GetFirstSubFieldValue ('c'));
-            Assert.AreEqual (heading.Subtitle3, field.GetFirstSubFieldValue ('d'));
-            Assert.AreEqual (heading.GeographicalSubtitle1, field.GetFirstSubFieldValue ('g'));
-            Assert.AreEqual (heading.GeographicalSubtitle2, field.GetFirstSubFieldValue ('e'));
-            Assert.AreEqual (heading.GeographicalSubtitle3, field.GetFirstSubFieldValue ('o'));
-            Assert.AreEqual (heading.ChronologicalSubtitle, field.GetFirstSubFieldValue ('h'));
-            Assert.AreEqual (heading.Aspect, field.GetFirstSubFieldValue ('9'));
+            var actual = heading.ToField();
+            Assert.AreEqual (expected.Tag, actual.Tag);
+            CompareFields (expected, actual);
         }
 
         [TestMethod]
+        [Description ("Применение данных к указанному полю библиографической записи")]
         public void HeadingInfo_ApplyToField_1()
         {
-            var field = new Field (HeadingInfo.Tag)
+            var expected = _GetField();
+            var actual = new Field (HeadingInfo.Tag)
                 .Add ('a', "???")
                 .Add ('b', "???");
-            var heading = _GetHeading();
-            heading.ApplyToField (field);
-            Assert.AreEqual (5, field.Subfields.Count);
-            Assert.AreEqual (heading.Title, field.GetFirstSubFieldValue ('a'));
-            Assert.AreEqual (heading.Subtitle1, field.GetFirstSubFieldValue ('b'));
-            Assert.AreEqual (heading.Subtitle2, field.GetFirstSubFieldValue ('c'));
-            Assert.AreEqual (heading.Subtitle3, field.GetFirstSubFieldValue ('d'));
-            Assert.AreEqual (heading.GeographicalSubtitle1, field.GetFirstSubFieldValue ('g'));
-            Assert.AreEqual (heading.GeographicalSubtitle2, field.GetFirstSubFieldValue ('e'));
-            Assert.AreEqual (heading.GeographicalSubtitle3, field.GetFirstSubFieldValue ('o'));
-            Assert.AreEqual (heading.ChronologicalSubtitle, field.GetFirstSubFieldValue ('h'));
-            Assert.AreEqual (heading.Aspect, field.GetFirstSubFieldValue ('9'));
+            _GetHeading().ApplyToField (actual);
+            CompareFields (expected, actual);
         }
 
         [TestMethod]
+        [Description ("Верификация")]
         public void HeadingInfo_Verify_1()
         {
             var heading = new HeadingInfo();
@@ -182,30 +165,31 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
+        [Description ("XML-представление")]
         public void HeadingInfo_ToXml_1()
         {
             var heading = new HeadingInfo();
             Assert.AreEqual ("<heading />", XmlUtility.SerializeShort (heading));
 
             heading = _GetHeading();
-            Assert.AreEqual (
-                "<heading><title>Русская литература</title><subtitle1>Проза</subtitle1><geoSubtitle1>Санкт-Петербург</geoSubtitle1><chronoSubtitle>19 в.</chronoSubtitle><aspect>Сборники</aspect></heading>",
+            Assert.AreEqual ("<heading><title>Русская литература</title><subtitle1>Проза</subtitle1><geoSubtitle1>Санкт-Петербург</geoSubtitle1><chronoSubtitle>19 в.</chronoSubtitle><aspect>Сборники</aspect></heading>",
                 XmlUtility.SerializeShort (heading));
         }
 
         [TestMethod]
+        [Description ("JSON-представление")]
         public void HeadingInfo_ToJson_1()
         {
             var heading = new HeadingInfo();
             Assert.AreEqual ("{}", JsonUtility.SerializeShort (heading));
 
             heading = _GetHeading();
-            Assert.AreEqual (
-                "{\"title\":\"\\u0420\\u0443\\u0441\\u0441\\u043A\\u0430\\u044F \\u043B\\u0438\\u0442\\u0435\\u0440\\u0430\\u0442\\u0443\\u0440\\u0430\",\"subtitle1\":\"\\u041F\\u0440\\u043E\\u0437\\u0430\",\"geoSubtitle1\":\"\\u0421\\u0430\\u043D\\u043A\\u0442-\\u041F\\u0435\\u0442\\u0435\\u0440\\u0431\\u0443\\u0440\\u0433\",\"chronoSubtitle\":\"19 \\u0432.\",\"aspect\":\"\\u0421\\u0431\\u043E\\u0440\\u043D\\u0438\\u043A\\u0438\"}",
+            Assert.AreEqual ("{\"title\":\"\\u0420\\u0443\\u0441\\u0441\\u043A\\u0430\\u044F \\u043B\\u0438\\u0442\\u0435\\u0440\\u0430\\u0442\\u0443\\u0440\\u0430\",\"subtitle1\":\"\\u041F\\u0440\\u043E\\u0437\\u0430\",\"geoSubtitle1\":\"\\u0421\\u0430\\u043D\\u043A\\u0442-\\u041F\\u0435\\u0442\\u0435\\u0440\\u0431\\u0443\\u0440\\u0433\",\"chronoSubtitle\":\"19 \\u0432.\",\"aspect\":\"\\u0421\\u0431\\u043E\\u0440\\u043D\\u0438\\u043A\\u0438\"}",
                 JsonUtility.SerializeShort (heading));
         }
 
         [TestMethod]
+        [Description ("Плоское текстовое представление")]
         public void HeadingInfo_ToString_1()
         {
             var heading = new HeadingInfo();

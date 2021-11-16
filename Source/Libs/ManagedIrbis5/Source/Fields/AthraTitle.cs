@@ -200,6 +200,14 @@ namespace ManagedIrbis.Fields
         public string? RelationCode { get; set; }
 
         /// <summary>
+        /// Неизвестные подполя.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public SubField[]? UnknownSubFields { get; set; }
+
+        /// <summary>
         /// Связанное поле библиографической записи <see cref="Field"/>.
         /// </summary>
         [XmlIgnore]
@@ -255,6 +263,7 @@ namespace ManagedIrbis.Fields
                 Language = field.GetFirstSubFieldValue ('8'),
                 Mark = field.GetFirstSubFieldValue ('9'),
                 RelationCode = field.GetFirstSubFieldValue ('4'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
 
@@ -274,7 +283,8 @@ namespace ManagedIrbis.Fields
             .AddNonEmpty ('7', Graphics)
             .AddNonEmpty ('8', Language)
             .AddNonEmpty ('9', Mark)
-            .AddNonEmpty ('4', RelationCode);
+            .AddNonEmpty ('4', RelationCode)
+            .AddRange (UnknownSubFields);
 
         #endregion
 
@@ -301,8 +311,8 @@ namespace ManagedIrbis.Fields
             Language = reader.ReadNullableString();
             Mark = reader.ReadNullableString();
             RelationCode = reader.ReadNullableString();
-
-        } // method RestoreFromStream
+            UnknownSubFields = reader.ReadNullableArray<SubField>();
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
         public void SaveToStream
@@ -325,9 +335,9 @@ namespace ManagedIrbis.Fields
                 .WriteNullable (Graphics)
                 .WriteNullable (Language)
                 .WriteNullable (Mark)
-                .WriteNullable (RelationCode);
-
-        } // method SaveToStream
+                .WriteNullable (RelationCode)
+                .WriteNullableArray (UnknownSubFields);
+        }
 
         #endregion
 

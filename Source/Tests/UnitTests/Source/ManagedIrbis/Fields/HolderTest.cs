@@ -20,6 +20,7 @@ namespace UnitTests.ManagedIrbis.Fields
 {
     [TestClass]
     public sealed class HolderTest
+        : Common.CommonUnitTest
     {
         private Holder _GetHolder() => new ()
         {
@@ -34,6 +35,18 @@ namespace UnitTests.ManagedIrbis.Fields
             .Add ('b', "123298, Москва, 3-я Хорошевская ул., д.17")
             .Add ('d', "gpntb@gpntb.ru")
             .Add ('s', "10010033");
+
+        private void _Compare
+            (
+                Holder first,
+                Holder second
+            )
+        {
+            Assert.AreEqual (first.Organization, second.Organization);
+            Assert.AreEqual (first.Address, second.Address);
+            Assert.AreEqual (first.Communication, second.Communication);
+            Assert.AreEqual (first.Sigla, second.Sigla);
+        }
 
         [TestMethod]
         [Description ("Конструктор по умолчанию")]
@@ -57,10 +70,7 @@ namespace UnitTests.ManagedIrbis.Fields
             var bytes = first.SaveToMemory();
             var second = bytes.RestoreObjectFromMemory<Holder>();
             Assert.IsNotNull (second);
-            Assert.AreEqual (first.Organization, second.Organization);
-            Assert.AreEqual (first.Address, second.Address);
-            Assert.AreEqual (first.Communication, second.Communication);
-            Assert.AreEqual (first.Sigla, second.Sigla);
+            _Compare (first, second);
             Assert.AreSame (first.UnknownSubFields, second.UnknownSubFields);
             Assert.IsNull (second.Field);
             Assert.IsNull (second.UserData);
@@ -84,16 +94,14 @@ namespace UnitTests.ManagedIrbis.Fields
         [Description ("Разбор поля записи")]
         public void Holder_ParseField_1()
         {
+            var expected = _GetHolder();
             var field = _GetField();
-            var holder = Holder.ParseField (field);
-            Assert.AreSame (field, holder.Field);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('a'), holder.Organization);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('b'), holder.Address);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('d'), holder.Communication);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('s'), holder.Sigla);
-            Assert.IsNotNull (holder.UnknownSubFields);
-            Assert.AreEqual (0, holder.UnknownSubFields!.Length);
-            Assert.IsNull (holder.UserData);
+            var actual = Holder.ParseField (field);
+            Assert.AreSame (field, actual.Field);
+            _Compare (expected, actual);
+            Assert.IsNotNull (actual.UnknownSubFields);
+            Assert.AreEqual (0, actual.UnknownSubFields!.Length);
+            Assert.IsNull (actual.UserData);
         }
 
         [TestMethod]
@@ -106,10 +114,7 @@ namespace UnitTests.ManagedIrbis.Fields
             var holders = Holder.ParseRecord (record);
             Assert.AreEqual (1, holders.Length);
             Assert.AreSame (field, holders[0].Field);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('a'), holders[0].Organization);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('b'), holders[0].Address);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('d'), holders[0].Communication);
-            Assert.AreEqual (field.GetFirstSubFieldValue ('s'), holders[0].Sigla);
+
             Assert.IsNotNull (holders[0].UnknownSubFields);
             Assert.AreEqual (0, holders[0].UnknownSubFields!.Length);
             Assert.IsNull (holders[0].UserData);
@@ -119,30 +124,24 @@ namespace UnitTests.ManagedIrbis.Fields
         [Description ("Создание поля записи по информации о держателе")]
         public void Holder_ToField_1()
         {
+            var expected = _GetField();
             var holder = _GetHolder();
-            var field = holder.ToField();
-            Assert.AreEqual (Holder.Tag, field.Tag);
-            Assert.AreEqual (4, field.Subfields.Count);
-            Assert.AreEqual (holder.Organization, field.GetFirstSubFieldValue ('a'));
-            Assert.AreEqual (holder.Address, field.GetFirstSubFieldValue ('b'));
-            Assert.AreEqual (holder.Communication, field.GetFirstSubFieldValue ('d'));
-            Assert.AreEqual (holder.Sigla, field.GetFirstSubFieldValue ('s'));
+            var actual = holder.ToField();
+            Assert.AreEqual (Holder.Tag, actual.Tag);
+            CompareFields (expected, actual);
         }
 
         [TestMethod]
         [Description ("Применение информации к полю записи")]
         public void Holder_ApplyToField_1()
         {
-            var field = new Field (Holder.Tag)
+            var expected = _GetField();
+            var actual = new Field (Holder.Tag)
                 .Add ('a', "???")
                 .Add ('b', "???");
             var holder = _GetHolder();
-            holder.ApplyToField (field);
-            Assert.AreEqual (4, field.Subfields.Count);
-            Assert.AreEqual (holder.Organization, field.GetFirstSubFieldValue ('a'));
-            Assert.AreEqual (holder.Address, field.GetFirstSubFieldValue ('b'));
-            Assert.AreEqual (holder.Communication, field.GetFirstSubFieldValue ('d'));
-            Assert.AreEqual (holder.Sigla, field.GetFirstSubFieldValue ('s'));
+            holder.ApplyToField (actual);
+            CompareFields (expected, actual);
         }
 
         [TestMethod]

@@ -72,6 +72,7 @@ namespace UnitTests.ManagedIrbis.Fields
             Assert.IsNull (athra.Language);
             Assert.IsNull (athra.Mark);
             Assert.IsNull (athra.RelationCode);
+            Assert.IsNull (athra.UnknownSubFields);
             Assert.IsNull (athra.Field);
             Assert.IsNull (athra.UserData);
         }
@@ -101,7 +102,7 @@ namespace UnitTests.ManagedIrbis.Fields
 
         [TestMethod]
         [Description ("Преобразование в поле записи")]
-        public void Atrha_ToField_1()
+        public void AthraTitle_ToField_1()
         {
             var athra = _GetAthraTitle();
             var actual = athra.ToField();
