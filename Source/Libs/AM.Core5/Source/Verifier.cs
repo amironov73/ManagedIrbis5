@@ -258,7 +258,30 @@ namespace AM
                     name
                 );
 
-        } // method NotNull
+        }
+
+        /// <summary>
+        /// Проверка, что среди перечисленных строк хотя бы одна
+        /// не <c>null</c> и не пустая.
+        /// </summary>
+        public Verifier<T> AnyNotNullNorEmpty
+            (
+                params string?[] values
+            )
+        {
+
+            foreach (var value in values)
+            {
+                if (!string.IsNullOrEmpty (value))
+                {
+                    return this;
+                }
+            }
+
+            Failure ("All string values are null or empty");
+
+            return this;
+        }
 
         /// <summary>
         /// Проверка, что заданная строка не <c>null</c> и не пустая.
@@ -271,7 +294,7 @@ namespace AM
         {
             return Assert (!string.IsNullOrEmpty (value), name);
 
-        } // method NotNullNorEmpty
+        }
 
         /// <summary>
         /// Проверка, что заданный массив не <c>null</c> и не пустой.
