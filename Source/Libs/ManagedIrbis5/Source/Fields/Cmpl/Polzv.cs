@@ -111,9 +111,9 @@ namespace ManagedIrbis.Fields
         public string? MaxAct2 { get; set; }
 
         /// <summary>
-        /// Шифр документа в базе
+        /// Шифр документа в базе. Поле 903
         /// </summary>
-        [Field (920)]
+        [Field (903)]
         public string? Index { get; set; }
 
         #endregion
