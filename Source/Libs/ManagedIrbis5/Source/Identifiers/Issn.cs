@@ -71,7 +71,7 @@ namespace ManagedIrbis.Identifiers
         #region Private data
 
         /// <summary>
-        /// Coefficients for control digit calculation.
+        /// Коэффициенты для вычисления контрольной цифры.
         /// </summary>
         private static readonly int[] _coefficients
             = { 8, 7, 6, 5, 4, 3, 2, 1 };
@@ -80,9 +80,9 @@ namespace ManagedIrbis.Identifiers
 
         #region Private members
 
-        private static int ConvertDigit(char c) => c == 'X' || c == 'x' ? 10 : c - '0';
+        private static int ConvertDigit (char c) => c == 'X' || c == 'x' ? 10 : c - '0';
 
-        private static char ConvertDigit(int n) => n == 10 ? 'X' : (char)('0' + n);
+        private static char ConvertDigit (int n) => n == 10 ? 'X' : (char)('0' + n);
 
         // private static bool IsDigitX(char c) => c >= '0' && c <= '9' || c == 'X';
 
@@ -91,7 +91,7 @@ namespace ManagedIrbis.Identifiers
         #region Public methods
 
         /// <summary>
-        /// Compute check digit.
+        /// Вычисление контрольной цифры.
         /// </summary>
         public static char ComputeCheckDigit
             (
@@ -101,16 +101,16 @@ namespace ManagedIrbis.Identifiers
             var sum = 0;
             for (var i = 0; i < 7; i++)
             {
-                sum = sum + ConvertDigit(digits[i]) * _coefficients[i];
+                sum = sum + ConvertDigit (digits[i]) * _coefficients[i];
             }
-            var result = ConvertDigit(11 - sum % 11);
+
+            var result = ConvertDigit (11 - sum % 11);
 
             return result;
-
-        } // method ComputeCheckDigit
+        }
 
         /// <summary>
-        /// Check control digit.
+        /// Проверка контрольной цифры.
         /// </summary>
         public static bool CheckControlDigit
             (
@@ -125,18 +125,16 @@ namespace ManagedIrbis.Identifiers
             var sum = 0;
             for (var i = 0; i < 8; i++)
             {
-                var n = ConvertDigit(digits[i]);
+                var n = ConvertDigit (digits[i]);
                 sum = sum + n * _coefficients[i];
             }
 
             var result = sum % 11 == 0;
 
             return result;
-
-        } // method CheckControlDigit
+        }
 
         #endregion
 
-    } // class Issn
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

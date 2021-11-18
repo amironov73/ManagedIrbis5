@@ -5,6 +5,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 
 /* CodeDigit.cs -- элемент ISBN/ISSN и аналогичных идентификаторов
  * Ars Magna project, http://arsmagna.ru
@@ -29,12 +30,12 @@ namespace ManagedIrbis.Identifiers
         #region Properties
 
         /// <summary>
-        /// Digit.
+        /// Цифра как текст.
         /// </summary>
         public char Digit;
 
         /// <summary>
-        /// Value.
+        /// Числовое значение.
         /// </summary>
         public int Value;
 
@@ -43,7 +44,7 @@ namespace ManagedIrbis.Identifiers
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public CodeDigit
             (
@@ -53,14 +54,14 @@ namespace ManagedIrbis.Identifiers
         {
             Digit = digit;
             Value = value;
-        } // constructor
+        }
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Find the digit.
+        /// Поиск цифры в массиве.
         /// </summary>
         public static CodeDigit? FindDigit
             (
@@ -68,7 +69,7 @@ namespace ManagedIrbis.Identifiers
                 ReadOnlySpan<CodeDigit> allowedDigits
             )
         {
-            foreach (CodeDigit current in allowedDigits)
+            foreach (var current in allowedDigits)
             {
                 if (current.Digit == digit)
                 {
@@ -77,10 +78,10 @@ namespace ManagedIrbis.Identifiers
             }
 
             return null;
-        } // method FindDigit
+        }
 
         /// <summary>
-        /// Extract all the digits from the identifier.
+        /// Извлечение цифр из идентификатора.
         /// </summary>
         public static CodeDigit[] ExtractDigits
             (
@@ -88,19 +89,19 @@ namespace ManagedIrbis.Identifiers
                 ReadOnlySpan<CodeDigit> allowedDigits
             )
         {
-            var result = new List<CodeDigit>(identifier.Length);
+            var result = new List<CodeDigit> (identifier.Length);
 
             foreach (var c in identifier)
             {
-                var found = FindDigit(c, allowedDigits);
+                var found = FindDigit (c, allowedDigits);
                 if (found is not null)
                 {
-                    result.Add(found.Value);
+                    result.Add (found.Value);
                 }
             }
 
             return result.ToArray();
-        } // method ExtractDigits
+        }
 
         #endregion
 
@@ -110,10 +111,9 @@ namespace ManagedIrbis.Identifiers
         public override string ToString()
         {
             return Digit.ToString();
-        } // method ToString
+        }
 
         #endregion
 
-    } // struct CodeDigit
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

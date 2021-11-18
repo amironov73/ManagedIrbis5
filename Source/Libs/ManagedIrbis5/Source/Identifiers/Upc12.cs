@@ -10,13 +10,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
-// ReSharper disable ParameterOnlyUsedForPreconditionCheck.Local
-// ReSharper disable RedundantAssignment
-// ReSharper disable ReturnValueOfPureMethodIsNotUsed
-// ReSharper disable UnusedMember.Local
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UnusedType.Global
+using System;
 
 #pragma warning disable 649
 
@@ -60,9 +54,9 @@ namespace ManagedIrbis.Identifiers
         #region Public data
 
         /// <summary>
-        /// Coefficients for control digit calculation.
+        /// Коэффициенты для вычисления контрольной цифры.
         /// </summary>
-        private static readonly int[] Coefficients
+        private static readonly int[] _coefficients
             = { 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
 
         #endregion
@@ -70,47 +64,44 @@ namespace ManagedIrbis.Identifiers
         #region Public methods
 
         /// <summary>
-        /// Compute check digit.
+        /// Вычисление контрольной цифры.
         /// </summary>
         public static char ComputeCheckDigit
             (
-                char[] digits
+                ReadOnlySpan<char> digits
             )
         {
             var sum = 0;
             for (var i = 0; i < 11; i++)
             {
-                sum += (digits[i] - '0') * Coefficients[i];
+                sum += (digits[i] - '0') * _coefficients[i];
             }
 
             var result = (char)(10 - sum % 10 + '0');
 
             return result;
-
-        } // method ComputeCheckDigit
+        }
 
         /// <summary>
-        /// Check control digit.
+        /// Проверка контрольной цифры.
         /// </summary>
         public static bool CheckControlDigit
             (
-                char[] digits
+                ReadOnlySpan<char> digits
             )
         {
             var sum = 0;
             for (var i = 0; i < 12; i++)
             {
-                sum += (digits[i] - '0') * Coefficients[i];
+                sum += (digits[i] - '0') * _coefficients[i];
             }
 
             var result = sum % 10 == 0;
 
             return result;
-
-        } // method CheckControlDigit
+        }
 
         #endregion
 
-    } // class Upc12
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

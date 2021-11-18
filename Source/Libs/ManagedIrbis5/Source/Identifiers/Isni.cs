@@ -10,7 +10,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
-/* Isni.cs -- International Standard Name Identifier.
+/* Isni.cs -- International Standard Name Identifier
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -63,14 +63,14 @@ namespace ManagedIrbis.Identifiers
         #region Public methods
 
         ///<summary>
-        /// Generates check digit as per ISO 7064 11,2.
+        /// Генерация контрольной цифры согласно ISO 7064 11,2.
         /// </summary>
         public static string GenerateCheckDigit
             (
                 string baseDigits
             )
         {
-            Sure.NotNullNorEmpty (baseDigits, nameof (baseDigits));
+            Sure.NotNullNorEmpty (baseDigits);
 
             var total = 0;
             foreach (var c in baseDigits)
@@ -83,11 +83,9 @@ namespace ManagedIrbis.Identifiers
             var result = (12 - remainder) % 11;
 
             return result == 10 ? "X" : result.ToInvariantString();
-
-        } // method GenerateCheckDigit
+        }
 
         #endregion
 
-    } // class Isni
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

@@ -115,55 +115,55 @@ namespace ManagedIrbis.Identifiers
         #region Properties
 
         /// <summary>
-        /// Allowed digits.
+        /// Разрешенные символы при префиксе М.
         /// </summary>
         public static CodeDigit[] IsoIsmn =
         {
-            new CodeDigit('M', 3),
-            new CodeDigit('m', 3),
-            new CodeDigit('0', 0),
-            new CodeDigit('1', 1),
-            new CodeDigit('2', 2),
-            new CodeDigit('3', 3),
-            new CodeDigit('4', 4),
-            new CodeDigit('5', 5),
-            new CodeDigit('6', 6),
-            new CodeDigit('7', 7),
-            new CodeDigit('8', 8),
-            new CodeDigit('9', 9)
+            new CodeDigit ('M', 3),
+            new CodeDigit ('m', 3),
+            new CodeDigit ('0', 0),
+            new CodeDigit ('1', 1),
+            new CodeDigit ('2', 2),
+            new CodeDigit ('3', 3),
+            new CodeDigit ('4', 4),
+            new CodeDigit ('5', 5),
+            new CodeDigit ('6', 6),
+            new CodeDigit ('7', 7),
+            new CodeDigit ('8', 8),
+            new CodeDigit ('9', 9)
         };
 
         /// <summary>
-        /// Allowed digits.
+        /// Разрешенные символы при префиксе 979.
         /// </summary>
         public static CodeDigit[] EanIsmn =
         {
-            new CodeDigit('0', 0),
-            new CodeDigit('1', 1),
-            new CodeDigit('2', 2),
-            new CodeDigit('3', 3),
-            new CodeDigit('4', 4),
-            new CodeDigit('5', 5),
-            new CodeDigit('6', 6),
-            new CodeDigit('7', 7),
-            new CodeDigit('8', 8),
-            new CodeDigit('9', 9)
+            new CodeDigit ('0', 0),
+            new CodeDigit ('1', 1),
+            new CodeDigit ('2', 2),
+            new CodeDigit ('3', 3),
+            new CodeDigit ('4', 4),
+            new CodeDigit ('5', 5),
+            new CodeDigit ('6', 6),
+            new CodeDigit ('7', 7),
+            new CodeDigit ('8', 8),
+            new CodeDigit ('9', 9)
         };
 
         #endregion
 
         #region Private members
 
-        private static int[] _isoWeight = { 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
+        private static readonly int[] _isoWeight = { 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
 
-        private static int[] _eanWeight = { 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
+        private static readonly int[] _eanWeight = { 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Проверяет контрольную цифру ISMN.
+        /// Проверка контрольной цифры ISMN.
         /// </summary>
         public static bool CheckControlDigit
             (
@@ -177,13 +177,13 @@ namespace ManagedIrbis.Identifiers
             {
                 // ISO, i. e. M-060-11561-5
 
-                digits = CodeDigit.ExtractDigits(ismn, IsoIsmn);
+                digits = CodeDigit.ExtractDigits (ismn, IsoIsmn);
                 if (digits.Length != 10)
                 {
                     return false;
                 }
 
-                var firstDigit = char.ToUpper(digits[0].Digit);
+                var firstDigit = char.ToUpper (digits[0].Digit);
                 if (firstDigit != 'M')
                 {
                     return false;
@@ -195,7 +195,7 @@ namespace ManagedIrbis.Identifiers
             {
                 // EAN, i. e. 979-0-060-11561-5
 
-                digits = CodeDigit.ExtractDigits(ismn, EanIsmn);
+                digits = CodeDigit.ExtractDigits (ismn, EanIsmn);
                 if (digits.Length != 13
                     || digits[0].Digit != '9'
                     || digits[1].Digit != '7'
@@ -221,7 +221,7 @@ namespace ManagedIrbis.Identifiers
         }
 
         /// <summary>
-        /// Проверяем дефисы.
+        /// Проверка расстановки дефисов.
         /// </summary>
         /// <param name="ismn">Проверяемая строка.</param>
         /// <param name="hyphen">Символ дефиса.</param>
@@ -239,7 +239,7 @@ namespace ManagedIrbis.Identifiers
                 || ismn[0] == hyphen
                 || ismn[^1] == hyphen
                 || ismn[^2] != hyphen
-               )
+                )
             {
                 return false;
             }
@@ -280,7 +280,7 @@ namespace ManagedIrbis.Identifiers
         }
 
         /// <summary>
-        /// Verify the ISMN.
+        /// Верификация ISMN.
         /// </summary>
         public static bool Verify
             (
@@ -288,14 +288,14 @@ namespace ManagedIrbis.Identifiers
                 bool throwOnError
             )
         {
-            var result = CheckControlDigit(ismn)
-                         && CheckHyphens(ismn);
+            var result = CheckControlDigit (ismn)
+                         && CheckHyphens (ismn);
 
             if (!result)
             {
                 Magna.Error
                     (
-                        nameof(Ismn) + "::" + nameof(Verify)
+                        nameof (Ismn) + "::" + nameof (Verify)
                         + ": failed for "
                         + ismn.ToString()
                     );
@@ -311,11 +311,9 @@ namespace ManagedIrbis.Identifiers
             }
 
             return result;
-
-        } // method Verify
+        }
 
         #endregion
 
-    } // class Ismn
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

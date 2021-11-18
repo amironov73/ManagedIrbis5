@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Identifiers
 {
     [TestClass]
-    public class IsbnTest
+    public sealed class IsbnTest
     {
         [TestMethod]
         [Description ("Проверка расстановки дефисов: простейший случай")]
