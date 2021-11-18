@@ -210,8 +210,7 @@ namespace ManagedIrbis.Identifiers
             }
 
             return result;
-
-        } // method Parse
+        }
 
         #endregion
 
@@ -229,8 +228,7 @@ namespace ManagedIrbis.Identifiers
             Form = reader.ReadNullableString();
             Year = reader.ReadNullableString();
             Number = reader.ReadNullableString();
-
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -245,8 +243,7 @@ namespace ManagedIrbis.Identifiers
                 .WriteNullable (Form)
                 .WriteNullable (Year)
                 .WriteNullable (Number);
-
-        } // method SaveToStream
+        }
 
         #endregion
 
@@ -269,19 +266,18 @@ namespace ManagedIrbis.Identifiers
                 .Assert (Number.ConsistOfDigits());
 
             return verifier.Result;
-
-        } // method Verify
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            $"{Type.ToVisibleString()}-{Form.ToVisibleString()}-{Year.ToVisibleString()}-{Number.ToVisibleString()}";
+        public override string ToString()
+        {
+            return $"{Type.ToVisibleString()}-{Form.ToVisibleString()}-{Year.ToVisibleString()}-{Number.ToVisibleString()}";
+        }
 
         #endregion
-
-    } // class Ngroe
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

@@ -188,7 +188,5 @@ namespace ManagedIrbis.Identifiers
         }
 
         #endregion
-
-    } // class Grid
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

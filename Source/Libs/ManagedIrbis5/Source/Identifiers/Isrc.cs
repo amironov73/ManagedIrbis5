@@ -14,6 +14,8 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+using System.Xml.Serialization;
+
 #nullable enable
 
 namespace ManagedIrbis.Identifiers
@@ -78,6 +80,7 @@ namespace ManagedIrbis.Identifiers
     /// <summary>
     /// International Standard Recording Code.
     /// </summary>
+    [XmlRoot ("isrc")]
     public sealed class Isrc
     {
         #region Properties
@@ -103,7 +106,5 @@ namespace ManagedIrbis.Identifiers
         public string? Number { get; set; }
 
         #endregion
-
-    } // class Isrc
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

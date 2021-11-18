@@ -102,6 +102,5 @@ namespace ManagedIrbis.Identifiers
         }
 
         #endregion
-
     }
 }
