@@ -115,7 +115,7 @@ namespace ManagedIrbis.Identifiers
     // http://pdf.livejournal.com/438166.html
 
     /// <summary>
-    /// DOI
+    /// DOI - Digital Object Identifier.
     /// </summary>
     [XmlRoot ("doi")]
     public sealed class Doi
@@ -247,11 +247,11 @@ namespace ManagedIrbis.Identifiers
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            $"{Prefix.ToVisibleString()}/{Suffix.ToVisibleString()}";
+        public override string ToString()
+        {
+            return $"{Prefix.ToVisibleString()}/{Suffix.ToVisibleString()}";
+        }
 
         #endregion
-
-    } // class Doi
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

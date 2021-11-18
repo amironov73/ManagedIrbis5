@@ -76,7 +76,5 @@ namespace ManagedIrbis.Identifiers
         public int Version { get; set; }
 
         #endregion
-
-    } // class Isan
-
-} // namespace ManagedIrbis.Identfiers
+    }
+}
