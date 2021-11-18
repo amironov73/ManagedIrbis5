@@ -48,7 +48,7 @@ namespace ManagedIrbis.Identifiers
         #region Private data
 
         /// <summary>
-        /// Coefficients for control digit calculation.
+        /// Коэффициенты для вычисления контрольной цифры.
         /// </summary>
         private static readonly int[] _coefficients
             = { 3, 1, 3, 1, 3, 1, 3, 1 };
@@ -58,7 +58,7 @@ namespace ManagedIrbis.Identifiers
         #region Public methods
 
         /// <summary>
-        /// Compute check digit.
+        /// Вычисление контрольной цифры.
         /// </summary>
         public static char ComputeCheckDigit
             (
@@ -74,10 +74,10 @@ namespace ManagedIrbis.Identifiers
             var result = (char)(10 - sum % 10 + '0');
 
             return result;
-        } // method ComputeCheckDigit
+        }
 
         /// <summary>
-        /// Check control digit.
+        /// Проверка контрольной цифры.
         /// </summary>
         public static bool CheckControlDigit
             (
@@ -93,10 +93,9 @@ namespace ManagedIrbis.Identifiers
             var result = sum % 10 == 0;
 
             return result;
-        } // method CheckControlDigit
+        }
 
         #endregion
 
-    } // class Ean8
-
-} // namespace ManagedIrbis.Identifiers
+    }
+}

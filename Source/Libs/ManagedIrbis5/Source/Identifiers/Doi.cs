@@ -24,8 +24,8 @@
 
 #region Using directives
 
+using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
@@ -33,6 +33,7 @@ using System.Xml.Serialization;
 using AM;
 using AM.IO;
 using AM.Runtime;
+using AM.Text;
 
 #endregion
 
@@ -117,9 +118,9 @@ namespace ManagedIrbis.Identifiers
     /// DOI
     /// </summary>
     [XmlRoot ("doi")]
-    [DebuggerDisplay ("{" + nameof (Prefix) + "} {" + nameof (Suffix) + "}")]
     public sealed class Doi
-        : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
@@ -154,6 +155,43 @@ namespace ManagedIrbis.Identifiers
         #region Public methods
 
         /// <summary>
+        /// Разбор текстового представления.
+        /// </summary>
+        public void ParseText
+            (
+                ReadOnlySpan<char> text
+            )
+        {
+            Sure.NotEmpty (text);
+
+            var navigator = new ValueTextNavigator (text.Trim());
+            Prefix = navigator.ReadUntil ('/').Trim().ThrowIfEmpty ().ToString();
+            navigator.ReadChar();
+            Suffix = navigator.GetRemainingText().Trim().ThrowIfNullOrEmpty().ToString();
+        }
+
+        /// <summary>
+        /// Разбор URL вида https://doi.org/xxx/yyy.
+        /// </summary>
+        public void ParseUrl
+            (
+                ReadOnlySpan<char> url
+            )
+        {
+            Sure.NotEmpty (url);
+
+            var navigator = new ValueTextNavigator (url.Trim());
+            if (navigator.ReadToString ("://").IsEmpty // http(s)://
+                || navigator.ReadTo ('/').IsEmpty // doi.org/
+                )
+            {
+                throw new FormatException (nameof (url));
+            }
+
+            ParseText (navigator.GetRemainingText().ThrowIfEmpty ());
+        }
+
+        /// <summary>
         /// Получение URL, соответствюущего данному DOI.
         /// </summary>
         public string ToUri() => $"https://doi.org/{Prefix}/{Suffix}";
@@ -170,8 +208,7 @@ namespace ManagedIrbis.Identifiers
         {
             Prefix = reader.ReadNullableString();
             Suffix = reader.ReadNullableString();
-
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -184,8 +221,26 @@ namespace ManagedIrbis.Identifiers
             writer
                 .WriteNullable (Prefix)
                 .WriteNullable (Suffix);
+        }
 
-        } // method SaveToStream
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<Doi> (this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (Prefix)
+                .NotNullNorEmpty (Suffix);
+
+            return verifier.Result;
+        }
 
         #endregion
 

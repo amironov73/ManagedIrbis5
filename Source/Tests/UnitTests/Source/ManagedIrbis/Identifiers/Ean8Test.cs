@@ -10,21 +10,21 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Identifiers
 {
     [TestClass]
-    public sealed class Ean13Test
+    public sealed class Ean8Test
     {
         [TestMethod]
         [Description ("Вычисление контрольной цифры")]
-        public void Ean13_ComputeCheckDigit_1()
+        public void Ean8_ComputeCheckDigit_1()
         {
-            Assert.AreEqual ('7', Ean13.ComputeCheckDigit ("4600051000057"));
+            Assert.AreEqual ('3', Ean8.ComputeCheckDigit ("46009333"));
         }
 
         [TestMethod]
         [Description ("Проверка контрольной цифры")]
-        public void Ean13_CheckControlDigit_1()
+        public void Ean8_CheckControlDigit_1()
         {
-            Assert.IsTrue (Ean13.CheckControlDigit ("4600051000057"));
-            Assert.IsFalse (Ean13.CheckControlDigit ("4600051000056"));
+            Assert.IsTrue (Ean8.CheckControlDigit ("46009333"));
+            Assert.IsFalse (Ean8.CheckControlDigit ("46009332"));
         }
     }
 }

@@ -189,7 +189,7 @@ namespace ManagedIrbis.Identifiers
                 char hyphen = StandardHyphen
             )
         {
-            if (string.IsNullOrEmpty(isbn))
+            if (string.IsNullOrEmpty (isbn))
             {
                 return false;
             }
@@ -199,7 +199,7 @@ namespace ManagedIrbis.Identifiers
             var hyphens = 0;
             foreach (var c in isbn)
             {
-                if (c >= '0' && c <= '9')
+                if (c is >= '0' and <= '9')
                 {
                     sum += (c - '0') * (10 - index);
                     ++index;
@@ -210,6 +210,7 @@ namespace ManagedIrbis.Identifiers
                     {
                         return false;
                     }
+
                     --sum;
                     ++index;
                 }
@@ -218,7 +219,9 @@ namespace ManagedIrbis.Identifiers
                     ++hyphens;
                 }
             }
+
             sum %= 11;
+
             return index == 10 && sum == 0 && (hyphens == 3 || hyphens == 0);
         }
 
@@ -237,12 +240,12 @@ namespace ManagedIrbis.Identifiers
         {
             var count = 0;
 
-            if (ReferenceEquals(isbn, null)
-                ||isbn.Length == 0
+            if (ReferenceEquals (isbn, null)
+                || isbn.Length == 0
                 || isbn[0] == hyphen
                 || isbn[^1] == hyphen
                 || isbn[^2] != hyphen
-               )
+                )
             {
                 return false;
             }
@@ -255,6 +258,7 @@ namespace ManagedIrbis.Identifiers
                     {
                         return false;
                     }
+
                     count++;
                 }
             }
@@ -273,20 +277,20 @@ namespace ManagedIrbis.Identifiers
                 bool throwException
             )
         {
-            var result = CheckHyphens(isbn)
-                && CheckControlDigit(isbn);
+            var result = CheckHyphens (isbn)
+                         && CheckControlDigit (isbn);
 
             if (!result)
             {
                 Magna.Error
                     (
-                        nameof(Isbn) + "::" + nameof(Validate) + ": isbn="
+                        nameof (Isbn) + "::" + nameof (Validate) + ": isbn="
                         + isbn.ToVisibleString()
                     );
 
                 if (throwException)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(isbn));
+                    throw new ArgumentOutOfRangeException (nameof (isbn));
                 }
             }
 
@@ -301,7 +305,7 @@ namespace ManagedIrbis.Identifiers
                 string? isbn
             )
         {
-            if (ReferenceEquals(isbn, null)
+            if (ReferenceEquals (isbn, null)
                 || isbn.Length != 13)
             {
                 return null;
@@ -315,14 +319,15 @@ namespace ManagedIrbis.Identifiers
             for (int i = 0, j = 2; i < isbn.Length; i++)
             {
                 var chr = isbn[i];
-                if (chr >= '0' && chr <= '9')
+                if (chr is >= '0' and <= '9')
                 {
                     digits[++j] = chr;
                 }
             }
-            digits[12] = Ean13.ComputeCheckDigit(digits);
 
-            return new string(digits);
+            digits[12] = Ean13.ComputeCheckDigit (digits);
+
+            return new string (digits);
         }
 
         /// <summary>
@@ -335,37 +340,42 @@ namespace ManagedIrbis.Identifiers
                 string? ean
             )
         {
-            if (ReferenceEquals(ean, null) || ean.Length != 13)
+            if (ReferenceEquals (ean, null) || ean.Length != 13)
             {
                 return null;
             }
 
             char[] digits = { ' ', '-', ' ', ' ', ' ', '-', ' ', ' ', ' ', ' ', ' ', '-', ' ' };
             char[] possible = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'X' };
+
             // Пропускаем начальные 978
             // страна
             digits[0] = ean[3];
+
             // издательство
             digits[2] = ean[4];
             digits[3] = ean[5];
             digits[4] = ean[6];
+
             // номер в темплане
             digits[6] = ean[7];
             digits[7] = ean[8];
             digits[8] = ean[9];
             digits[9] = ean[10];
             digits[10] = ean[11];
+
             // контрольная цифра
             string? result = null;
             foreach (var chr in possible)
             {
                 digits[12] = chr;
-                result = new string(digits);
-                if (CheckControlDigit(result))
+                result = new string (digits);
+                if (CheckControlDigit (result))
                 {
                     break;
                 }
             }
+
             return result;
         }
 

@@ -716,7 +716,7 @@ namespace AM.Text
                 ReadOnlySpan<char> stopString
             )
         {
-            // Sure.NotNullNorEmpty(stopString, nameof(stopString));
+            Sure.NotEmpty (stopString);
 
             var savePosition = _position;
             var length = 0;
@@ -751,7 +751,56 @@ namespace AM.Text
                     savePosition,
                     _position - savePosition - stopString.Length
                 );
-        } // method ReadTo
+        }
+
+        /// <summary>
+        /// Считывание вплоть до указанного разделителя
+        /// (разделитель не помещается в возвращаемое значение,
+        /// однако, считывается). Регистр символов не учитывается.
+        /// </summary>
+        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
+        /// </remarks>
+        public ReadOnlySpan<char> ReadToStringIgnoreCase
+            (
+                ReadOnlySpan<char> stopString
+            )
+        {
+            Sure.NotEmpty (stopString);
+
+            var savePosition = _position;
+            var length = 0;
+            while (true)
+            {
+                AGAIN:
+                var c = ReadChar();
+                if (c == EOF)
+                {
+                    _position = savePosition;
+                    return ReadOnlySpan<char>.Empty;
+                }
+
+                length++;
+                if (length >= stopString.Length)
+                {
+                    var start = _position - stopString.Length;
+                    for (var i = 0; i < stopString.Length; i++)
+                    {
+                        if (!_text[start + i].SameChar (stopString[i]))
+                        {
+                            goto AGAIN;
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            return Substring
+                (
+                    savePosition,
+                    _position - savePosition - stopString.Length
+                );
+        }
 
         /// <summary>
         /// Считывание вплоть до указанного символа

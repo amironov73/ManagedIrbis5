@@ -815,8 +815,7 @@ namespace AM
             } // if
 
             return memory;
-
-        } // method ThrowIfEmpty
+        }
 
         /// <summary>
         /// Бросает исключение, если переданное значение равно <c>null</c>,

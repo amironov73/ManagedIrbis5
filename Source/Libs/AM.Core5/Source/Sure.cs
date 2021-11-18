@@ -276,10 +276,31 @@ namespace AM
                 }
 
                 throw new ArgumentOutOfRangeException();
+            }
+        }
 
-            } // if
+        /// <summary>
+        /// Проверка, что переданный в качестве аргумента фрагмент не пустой.
+        /// </summary>
+        [DebuggerHidden]
+        public static void NotEmpty<T>
+            (
+                ReadOnlySpan<T> span,
+                [CallerArgumentExpression ("span")] string? argumentName = null
+            )
+            where T: struct
+        {
+            if (span.IsEmpty)
+            {
+                if (!string.IsNullOrEmpty (argumentName))
+                {
+                    // .NET 5 SDK подставляет в argumentName значение null, .NET 6 делает по-человечески
+                    throw new ArgumentOutOfRangeException (argumentName);
+                }
 
-        } // method NonNegative
+                throw new ArgumentOutOfRangeException();
+            }
+        }
 
         /// <summary>
         /// Проверка, что указатель <paramref name="argument" /> не <c>null</c>.

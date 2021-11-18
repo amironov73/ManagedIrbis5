@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
 
 #endregion
 
@@ -49,7 +48,7 @@ namespace ManagedIrbis.Identifiers
         #region Private data
 
         /// <summary>
-        /// Coefficients for control digit calculation.
+        /// Коэффициенты для вычисления контрольной цифры.
         /// </summary>
         private static readonly int[] _coefficients
             = { 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
@@ -59,7 +58,7 @@ namespace ManagedIrbis.Identifiers
         #region Public methods
 
         /// <summary>
-        /// Compute check digit.
+        /// Вычисление контрольной цифры.
         /// </summary>
         public static char ComputeCheckDigit
             (
@@ -71,13 +70,14 @@ namespace ManagedIrbis.Identifiers
             {
                 sum = sum + (digits[i] - '0') * _coefficients[i];
             }
+
             var result = (char)((10 - sum % 10) % 10 + '0');
 
             return result;
         }
 
         /// <summary>
-        /// Check control digit.
+        /// Проверка контрольной цифры.
         /// </summary>
         public static bool CheckControlDigit
             (
@@ -89,6 +89,7 @@ namespace ManagedIrbis.Identifiers
             {
                 sum = sum + (digits[i] - '0') * _coefficients[i];
             }
+
             var result = sum % 10 == 0;
 
             return result;
