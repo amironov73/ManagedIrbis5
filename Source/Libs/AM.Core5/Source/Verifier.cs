@@ -340,13 +340,36 @@ namespace AM
         /// </summary>
         public Verifier<T> Positive
             (
+                long value,
+                [CallerArgumentExpression("value")] string? name = null
+            )
+        {
+            return Assert (value > 0, name!);
+        }
+
+        /// <summary>
+        /// Проверка, что указанное число положительное.
+        /// </summary>
+        public Verifier<T> Positive
+            (
                 int value,
                 [CallerArgumentExpression("value")] string? name = null
             )
         {
             return Assert (value > 0, name!);
+        }
 
-        } // method Positive
+        /// <summary>
+        /// Проверка, что указанное число положительное.
+        /// </summary>
+        public Verifier<T> Positive
+            (
+                short value,
+                [CallerArgumentExpression("value")] string? name = null
+            )
+        {
+            return Assert (value > 0, name!);
+        }
 
         /// <summary>
         /// Проверка, что указатели на объекты совпадают.

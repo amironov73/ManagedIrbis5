@@ -18,6 +18,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 
@@ -58,27 +59,27 @@ namespace ManagedIrbis.Infrastructure
         #region Properties
 
         /// <summary>
-        /// Is the file binary or text?
+        /// Признак бинарного (двоичного) файла.
         /// </summary>
         public bool BinaryFile { get; set; }
 
         /// <summary>
-        /// Path.
+        /// Путь на сервере ИРБИС64.
         /// </summary>
         public IrbisPath Path { get; set; }
 
         /// <summary>
-        /// Database name.
+        /// Имя базы данных (имеет смысл не для всех путей).
         /// </summary>
         public string? Database { get; set; }
 
         /// <summary>
-        /// File name.
+        /// Имя файла (с расширением).
         /// </summary>
         public string? FileName { get; set; }
 
         /// <summary>
-        /// File content (when we want write the file).
+        /// Содержимое файла (для отправки на сервер).
         /// </summary>
         public string? Content { get; set; }
 
@@ -92,14 +93,9 @@ namespace ManagedIrbis.Infrastructure
                 string? second
             )
         {
-            if (string.IsNullOrEmpty(first) && string.IsNullOrEmpty(second))
-            {
-                return true;
-            }
+            return string.IsNullOrEmpty (first) && string.IsNullOrEmpty (second) || first.SameString (second);
 
-            return first.SameString(second);
-
-        } // method CompareDatabases
+        }
 
         #endregion
 
@@ -121,42 +117,46 @@ namespace ManagedIrbis.Infrastructure
                     + "."
                     + fileName;
 
-         } // method Build
+         }
 
          /// <summary>
          /// Клонирование спецификации.
          /// </summary>
-         public FileSpecification Clone() => (FileSpecification) MemberwiseClone();
+         public FileSpecification Clone()
+         {
+             return (FileSpecification)MemberwiseClone();
+         }
 
-        /// <summary>
-        /// Parse the text specification.
+         /// <summary>
+        /// Разбор текста.
         /// </summary>
         public static FileSpecification Parse
             (
                 string text
             )
         {
-            var navigator = new TextNavigator(text);
+            var navigator = new TextNavigator (text);
             var path = int.Parse
                 (
-                    navigator.ReadTo(".").ToString(),
+                    navigator.ReadTo (".").ToString(),
                     CultureInfo.InvariantCulture
                 );
-            var database = navigator.ReadTo(".").ToString().EmptyToNull();
+            var database = navigator.ReadTo (".").ToString().EmptyToNull();
             var fileName = navigator.GetRemainingText().ToString();
-            var binaryFile = fileName.StartsWith("@");
+            var binaryFile = fileName.StartsWith ("@");
             if (binaryFile)
             {
-                fileName = fileName.Substring(1);
+                fileName = fileName.Substring (1);
             }
 
             string? content = null;
-            var position = fileName.IndexOf("&", StringComparison.InvariantCulture);
+            var position = fileName.IndexOf ("&", StringComparison.InvariantCulture);
             if (position >= 0)
             {
-                content = fileName.Substring(position + 1);
-                fileName = fileName.Substring(0, position);
+                content = fileName.Substring (position + 1);
+                fileName = fileName.Substring (0, position);
             }
+
             var result = new FileSpecification
             {
                 BinaryFile = binaryFile,
@@ -167,8 +167,7 @@ namespace ManagedIrbis.Infrastructure
             };
 
             return result;
-
-        } // method Parse
+        }
 
         #endregion
 
@@ -277,6 +276,7 @@ namespace ManagedIrbis.Infrastructure
         } // method Equals
 
         /// <inheritdoc cref="object.GetHashCode" />
+        [ExcludeFromCodeCoverage]
         public override int GetHashCode()
         {
             unchecked

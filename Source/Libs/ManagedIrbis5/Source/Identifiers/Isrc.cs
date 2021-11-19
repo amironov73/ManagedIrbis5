@@ -14,7 +14,16 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+
+using AM;
+using AM.IO;
+using AM.Runtime;
+using AM.Text;
 
 #nullable enable
 
@@ -82,28 +91,147 @@ namespace ManagedIrbis.Identifiers
     /// </summary>
     [XmlRoot ("isrc")]
     public sealed class Isrc
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Country code.
+        /// Код страны.
         /// </summary>
+        [XmlElement ("country")]
+        [JsonPropertyName ("country")]
+        [Description ("Код страны")]
+        [DisplayName ("Код страны")]
         public string? Country { get; set; }
 
         /// <summary>
-        /// Registrant code.
+        /// Код регистрирующей организации.
         /// </summary>
+        [XmlElement ("registrant")]
+        [JsonPropertyName ("registrant")]
+        [Description ("Код регистрирующей организации")]
+        [DisplayName ("Код регистрирующей организации")]
         public string? Registrant { get; set; }
 
         /// <summary>
-        /// Last two digits of the reference year.
+        /// Две последние цифры года.
         /// </summary>
+        [XmlElement ("year")]
+        [JsonPropertyName ("year")]
+        [Description ("Две последние цифры года")]
+        [DisplayName ("Две последние цифры года")]
         public string? Year { get; set; }
 
         /// <summary>
-        /// Number.
+        /// Регистрационный номер.
         /// </summary>
+        [XmlElement ("number")]
+        [JsonPropertyName ("number")]
+        [Description ("Регистрационный номер")]
+        [DisplayName ("Регистрационный номер")]
         public string? Number { get; set; }
+
+        /// <summary>
+        /// Произвольные пользовательские данные.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public object? UserData { get; set; }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Разбор текстового представления.
+        /// </summary>
+        public void ParseText
+            (
+                ReadOnlySpan<char> text
+            )
+        {
+            Sure.NotEmpty (text);
+
+            var navigator = new ValueTextNavigator (text);
+            navigator.SkipWhitespace();
+            Country = navigator.ReadString (2).ThrowIfEmpty().ToString();
+            navigator.SkipChar ('-');
+            Registrant = navigator.ReadString (3).ThrowIfEmpty().ToString();
+            navigator.SkipChar ('-');
+            Year = navigator.ReadString (2).ThrowIfEmpty().ToString();
+            navigator.SkipChar ('-');
+            Number = navigator.ReadString (5).ThrowIfEmpty().ToString();
+        }
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            Country = reader.ReadNullableString();
+            Registrant = reader.ReadNullableString();
+            Year = reader.ReadNullableString();
+            Number = reader.ReadNullableString();
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer
+                .WriteNullable (Country)
+                .WriteNullable (Registrant)
+                .WriteNullable (Year)
+                .WriteNullable (Number);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<Isrc> (this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (Country)
+                .Assert (Country?.Length == 2)
+                .NotNullNorEmpty (Registrant)
+                .Assert (Registrant?.Length == 3)
+                .NotNullNorEmpty (Year)
+                .Assert (Year?.Length == 2)
+                .NotNullNorEmpty (Number)
+                .Assert (Number?.Length == 5);
+
+            return verifier.Result;
+        }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString()
+        {
+            return $"{Country}-{Registrant}-{Year}-{Number}";
+        }
 
         #endregion
     }
