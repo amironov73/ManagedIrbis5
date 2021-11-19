@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE ONIXMessage SYSTEM "http://www.editeur.org/onix/2.1/reference/onix-international.dtd">
+<ONIXMessage>
+  <Header>
+    <FromCompany>TitlePage</FromCompany>
+    <FromPerson>TitlePage 02 92819788</FromPerson>
+    <FromEmail>titlepage@publishers.asn.au</FromEmail>
+    <SentDate>20080519</SentDate>
+    <MessageNote>This data is copyright to TitlePage. TitlePage makes no guarantee of the accuracy or the timeliness of production. It is supplied for your exclusive use as our customer and is only to be used for advising on the pricing and availability of publications (Authorised Purpose). You must not charge a fee for this service. TitlePage and its content may not be used for any other purpose. While it may be copied once for the authorised purpose, written permission from TitlePage must be obtained for any other use. If you were not an intended recipient, you must notify the sender and delete all copies.</MessageNote>
+  </Header>
+  <Product>
+    <RecordReference>365-9780194351898</RecordReference>
+    <NotificationType>03</NotificationType>
+    <ProductIdentifier>
+      <ProductIDType>02</ProductIDType>
+      <IDValue>0194351890</IDValue>
+    </ProductIdentifier>
+    <ProductIdentifier>
+      <ProductIDType>03</ProductIDType>
+      <IDValue>9780194351898</IDValue>
+    </ProductIdentifier>
+    <ProductIdentifier>
+      <ProductIDType>15</ProductIDType>
+      <IDValue>9780194351898</IDValue>
+    </ProductIdentifier>
+    <ProductForm>BC</ProductForm>
+    <Series>
+      <TitleOfSeries>DICTIONARIES BEGINNER TO PRE-INTERMED</TitleOfSeries>
+    </Series>
+    <Title>
+      <TitleType>01</TitleType>
+      <TitleText>OXFORD PICTURE DICTIONARY CHINESE</TitleText>
+    </Title>
+    <Website>
+      <WebsiteLink>http://www.oup.com.au/searchbuy/product.asp?ISBN=9780194351898</WebsiteLink>
+    </Website>
+    <Contributor>
+      <ContributorRole>A01</ContributorRole>
+      <PersonNameInverted>SHAPIRO</PersonNameInverted>
+    </Contributor>
+    <BICMainSubject>EB</BICMainSubject>
+    <Subject>
+      <SubjectSchemeIdentifier>14</SubjectSchemeIdentifier>
+      <SubjectCode>2ABM</SubjectCode>
+    </Subject>
+    <AudienceCode>07</AudienceCode>
+    <Imprint>
+      <ImprintName>Oxford University Press UK</ImprintName>
+    </Imprint>
+    <Publisher>
+      <PublishingRole>01</PublishingRole>
+      <PublisherName>Oxford University Press</PublisherName>
+    </Publisher>
+    <PublishingStatus>04</PublishingStatus>
+    <PublicationDate>19980901</PublicationDate>
+    <YearFirstPublished>1998</YearFirstPublished>
+    <Measure>
+      <MeasureTypeCode>08</MeasureTypeCode>
+      <Measurement>720   </Measurement>
+      <MeasureUnitCode>gr</MeasureUnitCode>
+    </Measure>
+    <SupplyDetail>
+      <SupplierName>Oxford University Press Australia and New Zealand</SupplierName>
+      <ProductAvailability>21</ProductAvailability>
+      <Stock>
+        <OnHand>70</OnHand>
+      </Stock>
+      <Price>
+        <PriceTypeCode>02</PriceTypeCode>
+        <PriceAmount>59.95</PriceAmount>
+      </Price>
+    </SupplyDetail>
+  </Product>
+  <Product>
+    <RecordReference>9780754672326</RecordReference>
+    <NotificationType>03</NotificationType>
+    <ProductIdentifier>
+      <ProductIDType>03</ProductIDType>
+      <IDValue>9780754672326</IDValue>
+    </ProductIdentifier>
+    <ProductForm>BB</ProductForm>
+    <NoSeries/>
+    <Title>
+      <TitleType>01</TitleType>
+      <TitleText>Air Transport and Globalisation</TitleText>
+    </Title>
+    <Contributor>
+      <SequenceNumber>01</SequenceNumber>
+      <ContributorRole>A01</ContributorRole>
+      <PersonNameInverted>Professor B. Graham</PersonNameInverted>
+    </Contributor>
+    <NoEdition/>
+    <OtherText>
+      <TextTypeCode>01</TextTypeCode>
+      <Text>'Time-space compression' as theorized by David Harvey and Manuel Castells, has been accompanied by an exponential growth in global air transport. Yet, despite the importance of aviation in the functioning of globalizing economies and transnational societies, it has been little more than an assumption in the existing literature concerning globalisation.*While also addressing key issues such as the geopolitics and economics of air transport and the very significant changes which have occurred in the world air transport industry over the past decade, this book focuses on the globalization of air transport and its impacts on globalization. It shows how this interconnects with the processes of liberalization and deregulation, as well as examining the ever more vital interaction with issues of sustainability. *The dominant theme of the book is that globalization and transnationalism are increasingly dependent on the growth of a transport mode that is, in itself, incompatible with the attainment of the greater social good of a sustainable environment.</Text>
+    </OtherText>
+    <Publisher>
+      <PublishingRole>01</PublishingRole>
+      <PublisherName>Ashgate</PublisherName>
+    </Publisher>
+    <SupplyDetail>
+      <SupplierName>Ashgate</SupplierName>
+      <AvailabilityCode>CS</AvailabilityCode>
+      <Price>
+        <PriceAmount>124.95</PriceAmount>
+        <PriceTypeCode>02</PriceTypeCode>
+      </Price>
+    </SupplyDetail>
+    <SalesRestriction>
+      <SalesRestrictionType>00</SalesRestrictionType>
+      <SalesRestrictionDetail>Unknown</SalesRestrictionDetail>
+    </SalesRestriction>
+  </Product>
+</ONIXMessage>
