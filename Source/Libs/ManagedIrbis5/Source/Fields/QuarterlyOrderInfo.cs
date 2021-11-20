@@ -38,10 +38,10 @@ namespace ManagedIrbis.Fields
     /// <summary>
     /// Поквартальные сведения о заказах, поле 938.
     /// </summary>
-    [XmlRoot("order")]
+    [XmlRoot ("order")]
     public sealed class QuarterlyOrderInfo
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
 
@@ -60,91 +60,100 @@ namespace ManagedIrbis.Fields
         #region Properties
 
         /// <summary>
-        /// Период заказа. Подполе q.
+        /// Период заказа. Подполе Q.
         /// </summary>
-        [SubField('q')]
-        [XmlAttribute("period")]
-        [JsonPropertyName("period")]
+        [SubField ('q')]
+        [XmlAttribute ("period")]
+        [JsonPropertyName ("period")]
+        [DisplayName ("Период заказа")]
         public string? Period { get; set; }
 
         /// <summary>
-        /// Число номеров. Подполе n.
+        /// Число номеров. Подполе N.
         /// </summary>
-        [SubField('n')]
-        [XmlAttribute("issues")]
-        [JsonPropertyName("issues")]
+        [SubField ('n')]
+        [XmlAttribute ("issues")]
+        [JsonPropertyName ("issues")]
+        [DisplayName ("Число номеров")]
         public string? NumberOfIssues { get; set; }
 
         /// <summary>
-        /// Первый номер. Подполе a.
+        /// Первый номер. Подполе A.
         /// </summary>
-        [SubField('a')]
-        [XmlAttribute("first")]
-        [JsonPropertyName("first")]
+        [SubField ('a')]
+        [XmlAttribute ("first")]
+        [JsonPropertyName ("first")]
+        [DisplayName ("Первый номер")]
         public string? FirstIssue { get; set; }
 
         /// <summary>
-        /// Последний номер. Подполе b.
+        /// Последний номер. Подполе B.
         /// </summary>
-        [SubField('b')]
-        [XmlAttribute("last")]
-        [JsonPropertyName("last")]
+        [SubField ('b')]
+        [XmlAttribute ("last")]
+        [JsonPropertyName ("last")]
+        [DisplayName ("Последний номер")]
         public string? LastIssue { get; set; }
 
         /// <summary>
-        /// Цена заказа. Подполе y.
+        /// Цена заказа. Подполе Y.
         /// </summary>
-        [SubField('y')]
-        [XmlAttribute("totalPrice")]
-        [JsonPropertyName("totalPrice")]
+        [SubField ('y')]
+        [XmlAttribute ("totalPrice")]
+        [JsonPropertyName ("totalPrice")]
+        [DisplayName ("Цена заказа")]
         public string? TotalPrice { get; set; }
 
         /// <summary>
-        /// Цена номера по комплектам. Подполе e.
+        /// Цена номера по комплектам. Подполе E.
         /// </summary>
-        [SubField('e')]
-        [XmlAttribute("issuePrice")]
-        [JsonPropertyName("issuePrice")]
+        [SubField ('e')]
+        [XmlAttribute ("issuePrice")]
+        [JsonPropertyName ("issuePrice")]
+        [DisplayName ("Цена номера по комплектам")]
         public string? IssuePrice { get; set; }
 
         /// <summary>
-        /// Валюта. Подполе v.
+        /// Валюта. Подполе V.
         /// </summary>
-        [SubField('v')]
-        [XmlAttribute("currency")]
-        [JsonPropertyName("currency")]
+        [SubField ('v')]
+        [XmlAttribute ("currency")]
+        [JsonPropertyName ("currency")]
+        [DisplayName ("Валюта")]
         public string? Currency { get; set; }
 
         /// <summary>
-        /// Периодичность (код). Подполе d.
+        /// Периодичность (код). Подполе D.
         /// </summary>
-        [SubField('d')]
-        [XmlAttribute("code")]
-        [JsonPropertyName("code")]
+        [SubField ('d')]
+        [XmlAttribute ("code")]
+        [JsonPropertyName ("code")]
+        [DisplayName ("Периодичность (код)")]
         public string? PeriodicityCode { get; set; }
 
         /// <summary>
-        /// Периодичность (код). Подполе x.
+        /// Периодичность (число). Подполе X.
         /// </summary>
-        [SubField('x')]
-        [XmlAttribute("periodicity")]
-        [JsonPropertyName("periodicity")]
+        [SubField ('x')]
+        [XmlAttribute ("periodicity")]
+        [JsonPropertyName ("periodicity")]
+        [DisplayName ("Периодичность (число)")]
         public string? PeriodicityNumber { get; set; }
 
         /// <summary>
         /// Неизвестные подполя.
         /// </summary>
-        [Browsable(false)]
-        [XmlElement("unknown")]
-        [JsonPropertyName("unknown")]
+        [Browsable (false)]
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
         public SubField[]? UnknownSubfields { get; set; }
 
         /// <summary>
-        /// Связанное поле.
+        /// Связанное поле библиографической записи.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
@@ -152,7 +161,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -160,7 +169,7 @@ namespace ManagedIrbis.Fields
         #region Public methods
 
         /// <summary>
-        /// Применение к уже имеющемуся полю.
+        /// Применение данных к указанному полю библиографической записи.
         /// </summary>
         public Field ApplyTo (Field field) => field
             .SetSubFieldValue ('q', Period)
@@ -174,66 +183,70 @@ namespace ManagedIrbis.Fields
             .SetSubFieldValue ('x', PeriodicityNumber);
 
         /// <summary>
-        /// Разбор поля.
+        /// Разбор указанного поля библиографической записи.
         /// </summary>
-        public static QuarterlyOrderInfo Parse
+        public static QuarterlyOrderInfo ParseField
             (
                 Field field
             )
         {
-            // TODO: реализовать эффективно
+            Sure.NotNull (field);
 
             var result = new QuarterlyOrderInfo
             {
-                Period = field.GetFirstSubFieldValue('q'),
-                NumberOfIssues = field.GetFirstSubFieldValue('n'),
-                FirstIssue = field.GetFirstSubFieldValue('a'),
-                LastIssue = field.GetFirstSubFieldValue('b'),
-                TotalPrice = field.GetFirstSubFieldValue('y'),
-                IssuePrice = field.GetFirstSubFieldValue('e'),
-                Currency = field.GetFirstSubFieldValue('v'),
-                PeriodicityCode = field.GetFirstSubFieldValue('d'),
-                PeriodicityNumber = field.GetFirstSubFieldValue('x'),
-                UnknownSubfields = field.Subfields.GetUnknownSubFields(KnownCodes),
+                Period = field.GetFirstSubFieldValue ('q'),
+                NumberOfIssues = field.GetFirstSubFieldValue ('n'),
+                FirstIssue = field.GetFirstSubFieldValue ('a'),
+                LastIssue = field.GetFirstSubFieldValue ('b'),
+                TotalPrice = field.GetFirstSubFieldValue ('y'),
+                IssuePrice = field.GetFirstSubFieldValue ('e'),
+                Currency = field.GetFirstSubFieldValue ('v'),
+                PeriodicityCode = field.GetFirstSubFieldValue ('d'),
+                PeriodicityNumber = field.GetFirstSubFieldValue ('x'),
+                UnknownSubfields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
 
             return result;
-        } // method Parse
+        }
 
         /// <summary>
-        /// Разбор записи.
+        /// Разбор указанной библиографической записи.
         /// </summary>
-        public static QuarterlyOrderInfo[] Parse
+        public static QuarterlyOrderInfo[] ParseRecord
             (
                 Record record
             )
         {
+            Sure.NotNull (record);
+
             var result = new List<QuarterlyOrderInfo>();
             foreach (var field in record.Fields)
             {
                 if (field.Tag == Tag)
                 {
-                    result.Add(Parse(field));
+                    result.Add (ParseField (field));
                 }
             }
 
             return result.ToArray();
-        } // method Parse
+        }
 
         /// <summary>
-        /// Should serialize <see cref="UnknownSubfields"/> array?
+        /// Нужно ли сериализовать свойство <see cref="UnknownSubfields"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeUnknownSubfields() =>
-            !UnknownSubfields.IsNullOrEmpty();
+        public bool ShouldSerializeUnknownSubfields()
+        {
+            return !UnknownSubfields.IsNullOrEmpty();
+        }
 
         /// <summary>
-        /// Преобразование обратно в поле.
+        /// Преобразование данных в поле библиографической записи.
         /// </summary>
         public Field ToField()
         {
-             var result = new Field (Tag)
+            var result = new Field (Tag)
                 .AddNonEmpty ('q', Period)
                 .AddNonEmpty ('n', NumberOfIssues)
                 .AddNonEmpty ('a', FirstIssue)
@@ -246,7 +259,7 @@ namespace ManagedIrbis.Fields
                 .AddRange (UnknownSubfields);
 
             return result;
-        } // class ToFields
+        }
 
         #endregion
 
@@ -258,6 +271,8 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Period = reader.ReadNullableString();
             NumberOfIssues = reader.ReadNullableString();
             FirstIssue = reader.ReadNullableString();
@@ -268,7 +283,7 @@ namespace ManagedIrbis.Fields
             PeriodicityCode = reader.ReadNullableString();
             PeriodicityNumber = reader.ReadNullableString();
             UnknownSubfields = reader.ReadNullableArray<SubField>();
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -276,18 +291,20 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullable(Period)
-                .WriteNullable(NumberOfIssues)
-                .WriteNullable(FirstIssue)
-                .WriteNullable(LastIssue)
-                .WriteNullable(TotalPrice)
-                .WriteNullable(IssuePrice)
-                .WriteNullable(Currency)
-                .WriteNullable(PeriodicityCode)
-                .WriteNullable(PeriodicityNumber)
-                .WriteNullableArray(UnknownSubfields);
-        } // method SaveToStream
+                .WriteNullable (Period)
+                .WriteNullable (NumberOfIssues)
+                .WriteNullable (FirstIssue)
+                .WriteNullable (LastIssue)
+                .WriteNullable (TotalPrice)
+                .WriteNullable (IssuePrice)
+                .WriteNullable (Currency)
+                .WriteNullable (PeriodicityCode)
+                .WriteNullable (PeriodicityNumber)
+                .WriteNullableArray (UnknownSubfields);
+        }
 
         #endregion
 
@@ -299,13 +316,12 @@ namespace ManagedIrbis.Fields
                 bool throwOnError
             )
         {
-            Verifier<QuarterlyOrderInfo> verifier
-                = new Verifier<QuarterlyOrderInfo>(this, throwOnError);
+            var verifier = new Verifier<QuarterlyOrderInfo> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Period, "Period")
-                .NotNullNorEmpty(FirstIssue, "FirstIssue")
-                .NotNullNorEmpty(LastIssue, "LastIssue");
+                .NotNullNorEmpty (Period)
+                .NotNullNorEmpty (FirstIssue)
+                .NotNullNorEmpty (LastIssue);
 
             return verifier.Result;
         }
@@ -315,10 +331,11 @@ namespace ManagedIrbis.Fields
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Period.ToVisibleString();
+        public override string ToString()
+        {
+            return Period.ToVisibleString();
+        }
 
         #endregion
-
-    } // class QuarterlyOrderInfo
-
-} // namespace ManagedIrbis.Fields
+    }
+}
