@@ -21,6 +21,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Resources;
+
 using AM.Core.Properties;
 
 #endregion
@@ -44,6 +45,8 @@ namespace AM.Reflection
                 string propertyName
             )
         {
+            Sure.NotNullNorEmpty (propertyName);
+
             const BindingFlags bindingFlags = BindingFlags.Instance
                 | BindingFlags.Public | BindingFlags.NonPublic;
             var propertyInfo = typeof (TObject).GetProperty (propertyName, bindingFlags);
@@ -52,9 +55,8 @@ namespace AM.Reflection
                 throw new ArgumentException (string.Format (Resources.Can_t_get_property, propertyName));
             }
 
-            return CreateGetter<TObject, TValue>(propertyInfo);
-
-        } // method CreateGetter
+            return CreateGetter<TObject, TValue> (propertyInfo);
+        }
 
         /// <summary>
         /// Создание типизированного геттера для указанного свойства объекта.
@@ -64,6 +66,8 @@ namespace AM.Reflection
                 this PropertyInfo propertyInfo
             )
         {
+            Sure.NotNull (propertyInfo);
+
             var method = propertyInfo.GetMethod;
             if (method is null)
             {
@@ -71,8 +75,7 @@ namespace AM.Reflection
             }
 
             return method.CreateDelegate<Func<TObject, TValue>>();
-
-        } // method CreateGetter
+        }
 
         /// <summary>
         /// Создание типизированного сеттера для указанного свойства объекта.
@@ -82,15 +85,17 @@ namespace AM.Reflection
                 string propertyName
             )
         {
+            Sure.NotNullNorEmpty (propertyName);
+
             const BindingFlags bindingFlags = BindingFlags.Instance
-                                              | BindingFlags.Public | BindingFlags.NonPublic;
-            var propertyInfo = typeof(TObject).GetProperty(propertyName, bindingFlags);
+                | BindingFlags.Public | BindingFlags.NonPublic;
+            var propertyInfo = typeof (TObject).GetProperty (propertyName, bindingFlags);
             if (propertyInfo is null)
             {
-                throw new ArgumentException(string.Format(Resources.Can_t_get_property, propertyName));
+                throw new ArgumentException (string.Format (Resources.Can_t_get_property, propertyName));
             }
 
-            return CreateSetter<TObject, TValue>(propertyInfo);
+            return CreateSetter<TObject, TValue> (propertyInfo);
         }
 
         /// <summary>
@@ -101,10 +106,12 @@ namespace AM.Reflection
                 PropertyInfo propertyInfo
             )
         {
+            Sure.NotNull (propertyInfo);
+
             var method = propertyInfo.SetMethod;
             if (method is null)
             {
-                throw new ArgumentException(string.Format(Resources.No_method_for, propertyInfo.Name));
+                throw new ArgumentException (string.Format (Resources.No_method_for, propertyInfo.Name));
             }
 
             return method.CreateDelegate<Action<TObject, TValue>>();
@@ -119,17 +126,19 @@ namespace AM.Reflection
                 string propertyName
             )
         {
+            Sure.NotNull (type);
+            Sure.NotNullNorEmpty (propertyName);
+
             const BindingFlags bindingFlags = BindingFlags.Instance
                 | BindingFlags.Public | BindingFlags.NonPublic;
-            var propertyInfo = type.GetProperty(propertyName, bindingFlags);
+            var propertyInfo = type.GetProperty (propertyName, bindingFlags);
             if (propertyInfo is null)
             {
-                throw new ArgumentException(string.Format(Resources.Can_t_get_property, propertyName));
+                throw new ArgumentException (string.Format (Resources.Can_t_get_property, propertyName));
             }
 
-            return CreateUntypedGetter(propertyInfo);
-
-        } // method CreateUntypedGetter
+            return CreateUntypedGetter (propertyInfo);
+        }
 
         /// <summary>
         /// Построение нетипизированного геттера для указанного свойства объекта.
@@ -139,28 +148,29 @@ namespace AM.Reflection
                 PropertyInfo propertyInfo
             )
         {
+            Sure.NotNull (propertyInfo);
+
             var method = propertyInfo.GetMethod;
             if (method is null)
             {
-                throw new ArgumentException(string.Format(Resources.No_method_for, propertyInfo.Name));
+                throw new ArgumentException (string.Format (Resources.No_method_for, propertyInfo.Name));
             }
 
             // Конструируем лямбду
             // (object instance) => (object) method ((T) instance)
 
-            var declaringType = propertyInfo.DeclaringType.ThrowIfNull ();
-            var instance = Expression.Parameter (typeof(object));
+            var declaringType = propertyInfo.DeclaringType.ThrowIfNull();
+            var instance = Expression.Parameter (typeof (object));
             var argument = Expression.Convert (instance, declaringType);
             var call = Expression.Convert
                 (
                     Expression.Call (argument, method),
-                    typeof(object)
+                    typeof (object)
                 );
             var lambda = Expression.Lambda<Func<object, object?>> (call, instance);
 
             return lambda.Compile();
-
-        } // method CreateUntypedGetter
+        }
 
         /// <summary>
         /// Построение сеттера для указанного свойства объекта.
@@ -171,17 +181,19 @@ namespace AM.Reflection
                 string propertyName
             )
         {
+            Sure.NotNull (type);
+            Sure.NotNullNorEmpty (propertyName);
+
             const BindingFlags bindingFlags = BindingFlags.Instance
                 | BindingFlags.Public | BindingFlags.NonPublic;
-            var propertyInfo = type.GetProperty(propertyName, bindingFlags);
+            var propertyInfo = type.GetProperty (propertyName, bindingFlags);
             if (propertyInfo is null)
             {
-                throw new ArgumentException(string.Format(Resources.Can_t_get_property, propertyName));
+                throw new ArgumentException (string.Format (Resources.Can_t_get_property, propertyName));
             }
 
-            return CreateUntypedSetter(propertyInfo);
-
-        } // method CreateUntypedSetter
+            return CreateUntypedSetter (propertyInfo);
+        }
 
         /// <summary>
         /// Построение нетипизированного сеттера для указанного свойства объекта.
@@ -191,80 +203,45 @@ namespace AM.Reflection
                 PropertyInfo propertyInfo
             )
         {
+            Sure.NotNull (propertyInfo);
+
             var method = propertyInfo.SetMethod;
             if (method is null)
             {
-                throw new ArgumentException(string.Format(Resources.No_method_for, propertyInfo.Name));
+                throw new ArgumentException (string.Format (Resources.No_method_for, propertyInfo.Name));
             }
 
             // Конструируем лямбду
             // method ((T1) instance, (T2) value)
 
-            var declaringType = propertyInfo.DeclaringType.ThrowIfNull ();
-            var instance = Expression.Parameter(typeof(object), "instance");
-            var value = Expression.Parameter(typeof(object), "value");
-            var convert1 = Expression.Convert(instance, declaringType);
-            var convert2 = Expression.Convert(value, propertyInfo.PropertyType);
-            var call = Expression.Call(convert1, method, convert2);
+            var declaringType = propertyInfo.DeclaringType.ThrowIfNull();
+            var instance = Expression.Parameter (typeof (object), "instance");
+            var value = Expression.Parameter (typeof (object), "value");
+            var convert1 = Expression.Convert (instance, declaringType);
+            var convert2 = Expression.Convert (value, propertyInfo.PropertyType);
+            var call = Expression.Call (convert1, method, convert2);
 
             var lambda = Expression.Lambda<Action<object, object?>> (call, instance, value);
 
             return lambda.Compile();
-
-        } // method CreateUntypedSetter
-
-        ///// <summary>
-        ///// Получение списка всех типов, загруженных на данный момент
-        ///// в текущий домен.
-        ///// </summary>
-        ///// <returns></returns>
-        ///// <remarks>Осторожно: могут быть загружены сборки только
-        ///// для рефлексии. Типы в них непригодны для использования.
-        ///// </remarks>
-        //public static Type[] GetAllTypes()
-        //{
-        //    Assembly[] assemblies = AppDomain.CurrentDomain
-        //        .GetAssemblies();
-        //    List<Type> result = new List<Type>();
-        //    foreach (Assembly assembly in assemblies)
-        //    {
-        //        result.AddRange(assembly.GetTypes());
-        //    }
-
-        //    return result.ToArray();
-        //}
-
-        /// <summary>
-        /// Get the custom attribute.
-        /// </summary>
-        public static T? GetCustomAttribute<T>
-            (
-                Type classType
-            )
-            where T : Attribute
-        {
-            var all = classType.GetCustomAttributes
-                (
-                    typeof(T),
-                    false
-                );
-
-            return (T?)all.FirstOrDefault();
         }
 
         /// <summary>
-        /// Get the custom attribute.
+        /// Получение кастомного атрибута (типизированное).
+        /// Простая обертка над стандартным методом.
         /// </summary>
         public static T? GetCustomAttribute<T>
             (
                 Type classType,
-                bool inherit
+                bool inherit = false
             )
             where T : Attribute
         {
+            Sure.NotNull (classType);
+
             var all = classType.GetCustomAttributes
                 (
-                    typeof(T),
+                    typeof (T),
                     inherit
                 );
 
@@ -272,94 +249,74 @@ namespace AM.Reflection
         }
 
         /// <summary>
-        /// Gets the custom attribute.
+        /// Получение кастомного атрибута (типизированное).
+        /// Простая обертка над стандартным методом.
         /// </summary>
         public static T? GetCustomAttribute<T>
             (
-                MemberInfo member
+                MemberInfo member,
+                bool inhertit = false
             )
             where T : Attribute
         {
+            Sure.NotNull (member);
+
             var all = member.GetCustomAttributes
                 (
-                    typeof(T),
-                    false
-                );
-
-            return (T?)all.FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Gets the custom attribute.
-        /// </summary>
-        public static T? GetCustomAttribute<T>
-            (
-                FieldInfo fieldInfo
-            )
-            where T : Attribute
-        {
-            var all = fieldInfo.GetCustomAttributes
-                (
-                    typeof(T),
-                    false
-                );
-
-            return (T?)all.FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Gets the custom attribute.
-        /// </summary>
-        public static T? GetCustomAttribute<T>
-            (
-                PropertyInfo propertyInfo
-            )
-            where T : Attribute
-        {
-            var all = propertyInfo.GetCustomAttributes
-                (
-                    typeof(T),
-                    false
+                    typeof (T),
+                    inhertit
                 );
 
             return (T?) all.FirstOrDefault();
         }
 
-        ///// <summary>
-        ///// Gets the custom attribute.
-        ///// </summary>
-        //[CanBeNull]
-        //public static T GetCustomAttribute<T>
-        //    (
-        //        [NotNull] PropertyDescriptor propertyDescriptor
-        //    )
-        //    where T : Attribute
-        //{
-        //    return (T)propertyDescriptor.Attributes[typeof(T)];
-        //}
+        /// <summary>
+        /// Получение кастомного атрибута (типизированное).
+        /// Простая обертка над стандартным методом.
+        /// </summary>
+        public static T? GetCustomAttribute<T>
+            (
+                FieldInfo fieldInfo,
+                bool inherit = false
+            )
+            where T : Attribute
+        {
+            Sure.NotNull (fieldInfo);
 
-        ///// <summary>
-        ///// Get default constructor for given type.
-        ///// </summary>
-        ///// <param name="type"></param>
-        ///// <returns></returns>
-        //public static ConstructorInfo GetDefaultConstructor
-        //    (
-        //        [NotNull] Type type
-        //    )
-        //{
-        //    ConstructorInfo result = type.GetConstructor
-        //        (
-        //            BindingFlags.Instance | BindingFlags.Public,
-        //            null,
-        //            Type.EmptyTypes,
-        //            null
-        //        );
-        //    return result;
-        //}
+            var all = fieldInfo.GetCustomAttributes
+                (
+                    typeof (T),
+                    inherit
+                );
+
+            return (T?) all.FirstOrDefault();
+        }
 
         /// <summary>
-        /// Get field value either public or private.
+        /// Получение кастомного атрибута (типизированное).
+        /// Простая обертка над стандартным методом.
+        /// </summary>
+        public static T? GetCustomAttribute<T>
+            (
+                PropertyInfo propertyInfo,
+                bool inherit = false
+            )
+            where T : Attribute
+        {
+            Sure.NotNull (propertyInfo);
+
+            var all = propertyInfo.GetCustomAttributes
+                (
+                    typeof (T),
+                    inherit
+                );
+
+            return (T?) all.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Получение значения поля (неважно, публичного или приватного,
+        /// статического или нет).
         /// </summary>
         public static object? GetFieldValue<T>
             (
@@ -367,13 +324,15 @@ namespace AM.Reflection
                 string fieldName
             )
         {
-            var fieldInfo = typeof(T).GetField
+            Sure.NotNullNorEmpty (fieldName);
+
+            var fieldInfo = typeof (T).GetField
                 (
                     fieldName,
                     BindingFlags.Public | BindingFlags.NonPublic
                     | BindingFlags.Instance | BindingFlags.Static
                 );
-            if (ReferenceEquals(fieldInfo, null))
+            if (fieldInfo is null)
             {
                 Magna.Error
                     (
@@ -386,8 +345,7 @@ namespace AM.Reflection
             }
 
             return fieldInfo.GetValue (target);
-
-        } // method GetFieldValue
+        }
 
         /// <summary>
         /// Чтение строки из ресурсов манифеста сборки.
@@ -398,6 +356,9 @@ namespace AM.Reflection
                 string resourceName
             )
         {
+            Sure.NotNull (assembly);
+            Sure.NotNullNorEmpty (resourceName);
+
             var stream = assembly.GetManifestResourceStream (resourceName);
             if (stream is null)
             {
@@ -412,44 +373,39 @@ namespace AM.Reflection
             {
                 return reader.ReadToEnd();
             }
-
-        } // method GetManifestResourceString
+        }
 
         /// <summary>
-        /// Determines whether the specified type has the attribute.
+        /// Простая проверка, содержит ли данный тип интересующий нас атрибут.
         /// </summary>
         public static bool HasAttribute<T>
             (
                 Type type,
-                bool inherit
+                bool inherit = false
             )
             where T : Attribute
         {
-            return !ReferenceEquals
-                (
-                    GetCustomAttribute<T>(type, inherit),
-                    null
-                );
+            Sure.NotNull (type);
+
+            return GetCustomAttribute<T> (type, inherit) is not null;
         }
 
         /// <summary>
-        /// Determines whether the specified member has the attribute.
+        /// Простая проверка, содержит ли данный член интересующий нас атрибут.
         /// </summary>
         public static bool HasAttribute<T>
             (
-                this MemberInfo member
+                this MemberInfo member,
+                bool inherit = false
             )
             where T : Attribute
         {
-            return !ReferenceEquals
-                (
-                    GetCustomAttribute<T>(member),
-                    null
-                );
+            return GetCustomAttribute<T> (member, inherit) is not null;
         }
 
         /// <summary>
-        /// Set field value either public or private.
+        /// Установка значения поля (неважно, публичного или приватного,
+        /// статического или нет).
         /// </summary>
         public static void SetFieldValue<TTarget, TValue>
             (
@@ -459,13 +415,15 @@ namespace AM.Reflection
             )
             where TTarget : class
         {
-            var fieldInfo = typeof(TTarget).GetField
+            Sure.NotNullNorEmpty (fieldName);
+
+            var fieldInfo = typeof (TTarget).GetField
                 (
                     fieldName,
                     BindingFlags.Public | BindingFlags.NonPublic
                     | BindingFlags.Instance | BindingFlags.Static
                 );
-            if (ReferenceEquals(fieldInfo, null))
+            if (fieldInfo is null)
             {
                 Magna.Error
                     (
@@ -475,15 +433,16 @@ namespace AM.Reflection
                     );
 
                 throw new ArgumentException (nameof (fieldName));
-
-            } // if
+            }
 
             fieldInfo.SetValue (target, value);
-
-        } // method SetFieldValue
+        }
 
         /// <summary>
-        /// Get property value either public or private.
+        /// Получение значения свойства (неважно, публичного или приватного,
+        /// статического или нет).
+        /// Не использует кеширование!
+        /// Для эффективного многоразового применения см. <see cref="CreateGetter{TObject,TValue}(string)"/>.
         /// </summary>
         public static object? GetPropertyValue<T>
             (
@@ -491,13 +450,15 @@ namespace AM.Reflection
                 string propertyName
             )
         {
-            var propertyInfo = typeof(T).GetProperty
+            Sure.NotNullNorEmpty (propertyName);
+
+            var propertyInfo = typeof (T).GetProperty
                 (
                     propertyName,
                     BindingFlags.Public | BindingFlags.NonPublic
-                    | BindingFlags.Instance | BindingFlags.Static
+                        | BindingFlags.Instance | BindingFlags.Static
                 );
-            if (ReferenceEquals (propertyInfo, null))
+            if (propertyInfo is null)
             {
                 Magna.Error
                     (
@@ -506,13 +467,11 @@ namespace AM.Reflection
                         + propertyName
                     );
 
-                throw new ArgumentException (nameof(propertyName));
-
-            } // if
+                throw new ArgumentException (nameof (propertyName));
+            }
 
             return propertyInfo.GetValue (target, null);
-
-        } // method GetPropertyValue
+        }
 
         /// <summary>
         /// Получение массива свойств и полей для указанного типа.
@@ -523,23 +482,27 @@ namespace AM.Reflection
                 BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance
             )
         {
+            Sure.NotNull (type);
+
             var result = new List<PropertyOrField>();
             foreach (var property in type.GetProperties (bindingFlags))
             {
-                result.Add (new PropertyOrField(property));
+                result.Add (new PropertyOrField (property));
             }
 
-            foreach (var field in type.GetFields(bindingFlags))
+            foreach (var field in type.GetFields (bindingFlags))
             {
-                result.Add (new PropertyOrField(field));
+                result.Add (new PropertyOrField (field));
             }
 
             return result.ToArray();
-
-        } // method GetPropertiesAndFields
+        }
 
         /// <summary>
-        /// Установка значения свойства (неважно, публичного или приватного).
+        /// Установка значения свойства (неважно, публичного или приватного,
+        /// статического или нет).
+        /// Не использует кеширование!
+        /// Для эффективного многоразового применения см. <see cref="CreateSetter{TObject,TValue}(string)"/>.
         /// </summary>
         public static void SetPropertyValue<TTarget, TValue>
             (
@@ -548,13 +511,17 @@ namespace AM.Reflection
                 TValue value
             )
         {
-            var propertyInfo = typeof(TTarget).GetProperty
+            Sure.NotNullNorEmpty (propertyName);
+
+            var propertyInfo = typeof (TTarget).GetProperty
                 (
                     propertyName,
-                    BindingFlags.Public | BindingFlags.NonPublic
-                    | BindingFlags.Instance | BindingFlags.Static
+                    BindingFlags.Public
+                        | BindingFlags.NonPublic
+                        | BindingFlags.Instance
+                        | BindingFlags.Static
                 );
-            if (ReferenceEquals (propertyInfo, null))
+            if (propertyInfo is null)
             {
                 Magna.Error
                     (
@@ -564,16 +531,58 @@ namespace AM.Reflection
                     );
 
                 throw new ArgumentException (nameof (propertyName));
-
-            } // if
+            }
 
             propertyInfo.SetValue (target, value, null);
+        }
 
-        } // method SetPropertyValue
+        /// <summary>
+        /// Получение массива имен констант, заданных в указанном типе.
+        /// </summary>
+        public static string[] ListConstantNames
+            (
+                Type type,
+                bool inherit = false
+            )
+        {
+            Sure.NotNull (type);
+
+            var flags = BindingFlags.Public | BindingFlags.Static;
+            if (inherit)
+            {
+                flags |= BindingFlags.FlattenHierarchy;
+            }
+
+            return type.GetFields (flags)
+                .Where (field => field.IsLiteral && !field.IsInitOnly)
+                .Select (field => field.Name)
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Получение массива с информацией о константах, заданных в указанном типе.
+        /// </summary>
+        public static ConstantInfo<T>[] ListConstants<T>
+            (
+                Type type,
+                bool inherit = false
+            )
+        {
+            Sure.NotNull (type);
+
+            var flags = BindingFlags.Public | BindingFlags.Static;
+            if (inherit)
+            {
+                flags |= BindingFlags.FlattenHierarchy;
+            }
+
+            return type.GetFields (flags)
+                .Where (field => field.IsLiteral && !field.IsInitOnly)
+                .Where (field => field.FieldType == typeof(T))
+                .Select (field => new ConstantInfo<T>(field.Name, (T) field.GetValue (null)!))
+                .ToArray();
+        }
 
         #endregion
-
-    } // class ReflectionUtility
-
-} // namespace AM.Reflection
-
+    }
+}
