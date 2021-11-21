@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Код, обозначающий физическую величину.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class MeasureType
     {
         #region Constants
@@ -56,6 +55,18 @@ namespace ManagedIrbis.Onix
         /// Диаметр тубы или цилиндра.
         /// </summary>
         public const string Diameter = "12";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (MeasureType));
+        }
 
         #endregion
     }

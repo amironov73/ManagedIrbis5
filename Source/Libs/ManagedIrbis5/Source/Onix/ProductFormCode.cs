@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Код формы продукции.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class ProductFormCode
     {
         #region Constants
@@ -431,6 +430,18 @@ namespace ManagedIrbis.Onix
         /// Игра.
         /// </summary>
         public const string Game = "ZE";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (ProductFormCode));
+        }
 
         #endregion
     }

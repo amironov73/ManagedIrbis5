@@ -15,7 +15,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -26,7 +26,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Код вида международного стандартного номера издания или его эквивалента.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class ProductIdType
     {
         #region Constants
@@ -85,6 +84,18 @@ namespace ManagedIrbis.Onix
         /// JP e-code (идентификатор электронной публикации).
         /// </summary>
         public const string JpEcode = "27";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (ProductIdType));
+        }
 
         #endregion
     }

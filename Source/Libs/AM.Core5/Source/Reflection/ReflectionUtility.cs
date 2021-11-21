@@ -560,6 +560,30 @@ namespace AM.Reflection
         }
 
         /// <summary>
+        /// Получение массива значений констант, заданных в указанном типе.
+        /// </summary>
+        public static T[] ListConstantValues<T>
+            (
+                Type type,
+                bool inherit = false
+            )
+        {
+            Sure.NotNull (type);
+
+            var flags = BindingFlags.Public | BindingFlags.Static;
+            if (inherit)
+            {
+                flags |= BindingFlags.FlattenHierarchy;
+            }
+
+            return type.GetFields (flags)
+                .Where (field => field.IsLiteral && !field.IsInitOnly)
+                .Where (field => field.FieldType == typeof (T))
+                .Select (field => (T) field.GetValue (null)!)
+                .ToArray();
+        }
+
+        /// <summary>
         /// Получение массива с информацией о константах, заданных в указанном типе.
         /// </summary>
         public static ConstantInfo<T>[] ListConstants<T>

@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Вид идентификационного номера многочастного издания.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class CollectionIdType
     {
         #region Constants
@@ -46,6 +45,18 @@ namespace ManagedIrbis.Onix
         /// Международный стандартный книжный номер (ISBN) издания в целом.
         /// </summary>
         public const string Isbn = "15";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (CollectionIdType));
+        }
 
         #endregion
     }

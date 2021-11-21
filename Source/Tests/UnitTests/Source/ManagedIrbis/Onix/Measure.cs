@@ -15,7 +15,7 @@ namespace UnitTests.ManagedIrbis.Onix
     {
         [TestMethod]
         [Description ("Конструктор по умолчанию")]
-        public void Addressee_Construction_1()
+        public void Measure_Construction_1()
         {
             var measure = new Measure();
             Assert.IsNull (measure.Measurement);

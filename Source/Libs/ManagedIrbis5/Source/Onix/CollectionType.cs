@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Вид многочастного издания.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class CollectionType
     {
         #region Constants
@@ -49,6 +48,18 @@ namespace ManagedIrbis.Onix
         /// не издателем, а книготорговой организацией, распространителем.
         /// </summary>
         public const string ByDistributor = "20";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (CollectionType));
+        }
 
         #endregion
     }

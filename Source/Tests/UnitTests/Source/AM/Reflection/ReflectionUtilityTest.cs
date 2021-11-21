@@ -123,7 +123,7 @@ namespace UnitTests.AM.Reflection
 
         [TestMethod]
         [Description ("Получение массива имен констант")]
-        public void ReflectionUtility_ListConstantsNames_1()
+        public void ReflectionUtility_ListConstantNames_1()
         {
             var names = ReflectionUtility.ListConstantNames (typeof (Dummy));
             Assert.AreEqual (3, names.Length);
@@ -132,6 +132,19 @@ namespace UnitTests.AM.Reflection
             Assert.AreEqual ("Final", names[0]);
             Assert.AreEqual ("Initial", names[1]);
             Assert.AreEqual ("Intermediate", names[2]);
+        }
+
+        [TestMethod]
+        [Description ("Получение массива значений констант")]
+        public void ReflectionUtility_ListConstantValues_1()
+        {
+            var values = ReflectionUtility.ListConstantValues<string> (typeof (Dummy));
+            Assert.AreEqual (3, values.Length);
+            // интроспекция может перечислить константы в произвольном порядке
+            Array.Sort (values);
+            Assert.AreEqual ("Начальное", values[0]);
+            Assert.AreEqual ("Окончательное", values[1]);
+            Assert.AreEqual ("Промежуточное", values[2]);
         }
 
         [TestMethod]

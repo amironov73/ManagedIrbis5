@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Код доступности издания.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class NotificationType
     {
         #region Constants
@@ -56,6 +55,18 @@ namespace ManagedIrbis.Onix
         /// Код удаления записи.
         /// </summary>
         public const string Deletion = "05";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (NotificationType));
+        }
 
         #endregion
     }

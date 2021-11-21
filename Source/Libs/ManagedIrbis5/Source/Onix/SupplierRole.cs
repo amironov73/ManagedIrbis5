@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Статус поставщика изданий.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class SupplierRole
     {
         #region Constants
@@ -51,6 +50,18 @@ namespace ManagedIrbis.Onix
         /// Торговый агент (посредник).
         /// </summary>
         public const string Agent = "03";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (SupplierRole));
+        }
 
         #endregion
     }

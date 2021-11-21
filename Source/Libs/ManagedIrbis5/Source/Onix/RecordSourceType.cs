@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Коды видов организаций, содающих библиографические записи.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class RecordSourceType
     {
         #region Constants
@@ -61,6 +60,18 @@ namespace ManagedIrbis.Onix
         /// Библиотечный коллектор.
         /// </summary>
         public const string Collector = "05";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (RecordSourceType));
+        }
 
         #endregion
     }

@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Код вида цены.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class PriceTypeCode
     {
         #region Constants
@@ -51,6 +50,18 @@ namespace ManagedIrbis.Onix
         /// Оптовая цена с учетом налогов.
         /// </summary>
         public const string WhilesalePriceIncludingTaxes = "06";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (PriceTypeCode));
+        }
 
         #endregion
     }

@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -27,7 +27,6 @@ namespace ManagedIrbis.Onix
     /// <summary>
     /// Единица измерения физической величины.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class MeasureUnitCode
     {
         #region Constants
@@ -51,6 +50,18 @@ namespace ManagedIrbis.Onix
         /// Килограмм.
         /// </summary>
         public const string Weight = "kg";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (MeasureUnitCode));
+        }
 
         #endregion
     }

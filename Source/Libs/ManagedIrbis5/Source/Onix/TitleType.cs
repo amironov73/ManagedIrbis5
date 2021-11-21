@@ -16,7 +16,7 @@
 
 #region Using directives
 
-using System.Diagnostics.CodeAnalysis;
+using AM.Reflection;
 
 #endregion
 
@@ -29,7 +29,6 @@ namespace ManagedIrbis.Onix
     /// плюс
     /// Вид заглавия многочастного издания в целом.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public static class TitleType
     {
         #region Constants
@@ -91,6 +90,18 @@ namespace ManagedIrbis.Onix
         /// последней странице обложки.
         /// </summary>
         public const string LastCoverPage = "13";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Получение массива значений констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (TitleType));
+        }
 
         #endregion
     }
