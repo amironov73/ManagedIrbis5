@@ -17,6 +17,15 @@
 #region Using directives
 
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+
+using AM;
+using AM.IO;
+using AM.Runtime;
 
 #endregion
 
@@ -34,30 +43,103 @@ namespace ManagedIrbis.BibTex
     /// <summary>
     /// Файл с BibTex-записями.
     /// </summary>
+    [XmlRoot ("bibtex")]
     public sealed class BibTexFile
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
         /// Записи.
         /// </summary>
-        public List<BibTexRecord> Records { get; }
-
-        #endregion
-
-        #region Construction
+        [XmlElement ("record")]
+        [JsonPropertyName ("records")]
+        [Description ("Записи")]
+        public List<BibTexRecord> Records { get; } = new ();
 
         /// <summary>
-        /// Конструктор.
+        /// Произвольные пользовательские данные
         /// </summary>
-        public BibTexFile()
-        {
-            Records = new List<BibTexRecord>();
-
-        } // constructor
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public object? UserData { get; set; }
 
         #endregion
 
-    } // class BibTexFile
+        #region Public methods
 
-} // namespace ManagedIrbis.BibTex
+        /// <summary>
+        /// Нужно ли сериализовать свойство <see cref="Records"/>?
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        [EditorBrowsable (EditorBrowsableState.Never)]
+        public bool ShouldSerializeFields()
+        {
+            return Records.Count != 0;
+        }
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            reader.ReadList (Records);
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer
+                .WriteList (Records);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<BibTexFile> (this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (Records);
+
+            foreach (var record in Records)
+            {
+                verifier.VerifySubObject (record);
+            }
+
+            return verifier.Result;
+        }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString()
+        {
+            return $"Records: {Records.Count}";
+        }
+
+        #endregion
+    }
+}

@@ -14,6 +14,19 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using System.ComponentModel;
+using System.IO;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
+
+using AM;
+using AM.IO;
+using AM.Runtime;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.BibTex
@@ -27,29 +40,95 @@ namespace ManagedIrbis.BibTex
     /// <summary>
     /// Поле BibText-записи.
     /// </summary>
+    [XmlRoot ("field")]
     public sealed class BibTexField
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Тег поля, см. <see cref="KnownTags"/>.
+        /// Метка поля, см. <see cref="KnownTags"/>.
         /// </summary>
+        [XmlAttribute ("tag")]
+        [JsonPropertyName ("tag")]
+        [Description ("Метка поля")]
         public string? Tag { get; set; }
 
         /// <summary>
         /// Значение поля.
         /// </summary>
+        [XmlAttribute ("value")]
+        [JsonPropertyName ("value")]
+        [Description ("Значение поля")]
         public string? Value { get; set; }
+
+        /// <summary>
+        /// Произвольные пользовательские данные
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public object? UserData { get; set; }
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            Tag = reader.ReadNullableString();
+            Value = reader.ReadNullableString();
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer
+                .WriteNullable (Tag)
+                .WriteNullable (Value);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<BibTexField> (this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (Tag)
+                .IsOneOf (Tag, KnownTags.ListValues());
+
+            return verifier.Result;
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"{Tag}={Value}";
+        public override string ToString()
+        {
+            return $"{Tag.ToVisibleString()}={Value.ToVisibleString()}";
+        }
 
         #endregion
-
-    } // class BibTexField
-
-} // namespace ManagedIbris.BibTex
+    }
+}

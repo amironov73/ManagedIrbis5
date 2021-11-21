@@ -14,6 +14,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using direct
+
+using AM.Reflection;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.BibTex
@@ -176,21 +182,17 @@ namespace ManagedIrbis.BibTex
 
         #endregion
 
-        #region Properties
+        #region Public methods
 
         /// <summary>
-        /// All known record types.
+        /// Получение массива значение констант.
         /// </summary>
-        public static string[] AllKnown =
+        public static string[] ListValues()
         {
-            Article, Book, Booklet, Conference, InBook, InCollection,
-            InProceedings, Manual, MasterThesis, Misc, PhdThesis,
-            Proceedings, TechReport, Unpublished
-        };
+            return ReflectionUtility.ListConstantValues<string> (typeof (RecordType));
+        }
 
         #endregion
-
-    } // class RecordType
-
-} // namespace ManagedIrbs.BibTex
+    }
+}
 

@@ -14,6 +14,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using direct
+
+using AM.Reflection;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.BibTex
@@ -169,22 +175,16 @@ namespace ManagedIrbis.BibTex
 
         #endregion
 
-        #region Properties
+        #region Public methods
 
         /// <summary>
-        /// Все вышеперечисленные теги.
+        /// Получение массива значение констант.
         /// </summary>
-        public static string[] All =
+        public static string[] ListValues()
         {
-            "address", "annote", "abstract", "author", "booktitle",
-            "chapter", "crossref", "edition", "editor", "eprint",
-            "howpublished", "institution", "journal", "key", "month",
-            "note", "number", "organization", "pages", "publisher",
-            "school", "series", "title", "type", "url", "volume", "year"
-        };
+            return ReflectionUtility.ListConstantValues<string> (typeof (KnownTags));
+        }
 
         #endregion
-
-    } // class KnownTags
-
-} // namespace ManagedIrbis.BibTex
+    }
+}

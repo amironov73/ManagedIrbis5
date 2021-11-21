@@ -197,7 +197,8 @@ namespace AM.IO
         }
 
         /// <summary>
-        /// Reads list of items from the stream.
+        /// Создание с последующим чтением списка сериализованных
+        /// элементов из потока.
         /// </summary>
         public static List<T> ReadList<T>
             (
@@ -207,7 +208,6 @@ namespace AM.IO
         {
             var count = reader.ReadPackedInt32();
             var result = new List<T>(count);
-
             for (var i = 0; i < count; i++)
             {
                 var item = new T();
@@ -216,6 +216,27 @@ namespace AM.IO
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Чтение списка сериализованных элементов из потока.
+        /// </summary>
+        public static BinaryReader ReadList<T>
+            (
+                this BinaryReader reader,
+                List<T> list
+            )
+            where T : IHandmadeSerializable, new()
+        {
+            var count = reader.ReadPackedInt32();
+            for (var i = 0; i < count; i++)
+            {
+                var item = new T();
+                item.RestoreFromStream(reader);
+                list.Add(item);
+            }
+
+            return reader;
         }
 
         /// <summary>
