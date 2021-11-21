@@ -4,6 +4,8 @@
 
 #region Using directives
 
+using System;
+
 using ManagedIrbis.BibTex;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,14 +17,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.BibTex
 {
     [TestClass]
-    public sealed class KnownTagsTest
+    public sealed class BibTexTokenizerTest
+        : Common.CommonUnitTest
     {
         [TestMethod]
-        [Description ("Получение массива значений констант")]
-        public void KnownTags_ListValues_1()
+        [ExpectedException (typeof (NotImplementedException))]
+        public void BibTexTokenizer_Tokenize_1()
         {
-            var values = KnownTags.ListValues();
-            Assert.AreEqual (27, values.Length);
+            var tokenizer = new BibTexTokenizer();
+            tokenizer.Tokenize ("this is a test");
         }
     }
 }

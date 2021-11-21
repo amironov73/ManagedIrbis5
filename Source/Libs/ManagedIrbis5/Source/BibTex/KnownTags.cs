@@ -54,6 +54,11 @@ namespace ManagedIrbis.BibTex
         public const string Abstract = "abstract";
 
         /// <summary>
+        /// Автор.
+        /// </summary>
+        public const string Author = "author";
+
+        /// <summary>
         /// Наименование книги, содержащей данную работу.
         /// </summary>
         public const string BookTitle = "booktitle";
