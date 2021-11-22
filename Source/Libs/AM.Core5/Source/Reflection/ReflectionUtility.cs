@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -581,6 +582,37 @@ namespace AM.Reflection
                 .Where (field => field.FieldType == typeof (T))
                 .Select (field => (T) field.GetValue (null)!)
                 .ToArray();
+        }
+
+        /// <summary>
+        /// Получение словаря "значение - описание" для строковых констант
+        /// в указанном типе.
+        /// </summary>
+        public static Dictionary<string, string> ListConstantValuesWithDescriptions
+            (
+                Type type,
+                bool inherit = false
+            )
+        {
+            Sure.NotNull (type);
+
+            var flags = BindingFlags.Public | BindingFlags.Static;
+            if (inherit)
+            {
+                flags |= BindingFlags.FlattenHierarchy;
+            }
+
+            return type.GetFields (flags)
+                .Where
+                    (
+                        field => field.IsLiteral && !field.IsInitOnly
+                                                 && field.FieldType == typeof (string)
+                    )
+                .ToDictionary
+                    (
+                        field => (string) field.GetValue (null)!,
+                        field => GetCustomAttribute<DescriptionAttribute> (field)?.Description!
+                    );
         }
 
         /// <summary>
