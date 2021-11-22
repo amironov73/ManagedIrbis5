@@ -107,7 +107,5 @@ namespace ManagedIrbis
         public const string Spec = "SPEC";
 
         #endregion
-
-    } // class Constants
-
-} // namespace ManagedIrbis
+    }
+}

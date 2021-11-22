@@ -14,6 +14,12 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+#region Using directives
+
+using AM.Reflection;
+
+#endregion
+
 #nullable enable
 
 namespace ManagedIrbis.Drm
@@ -62,6 +68,16 @@ namespace ManagedIrbis.Drm
 
         #endregion
 
-    } // class AccessElement
+        #region Public methods
 
-} // namespace ManagedIrbis.Drm
+        /// <summary>
+        /// Получение массива значение констант.
+        /// </summary>
+        public static string[] ListValues()
+        {
+            return ReflectionUtility.ListConstantValues<string> (typeof (AccessElement));
+        }
+
+        #endregion
+    }
+}

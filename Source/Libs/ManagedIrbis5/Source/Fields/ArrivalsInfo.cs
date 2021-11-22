@@ -7,6 +7,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
+// ReSharper disable UseStringInterpolation
 
 /* ArrivalsInfo.cs -- информация о поступлениях в базе CMPL
  * Ars Magna project, http://arsmagna.ru
@@ -37,20 +38,20 @@ namespace ManagedIrbis.Fields
     /// Число наименований, поступивших впервые (на баланс,
     /// не на баланс, учебников), поле 17 в БД CMPL.
     /// </summary>
-    [XmlRoot("arrivals")]
+    [XmlRoot ("arrivals")]
     public sealed class ArrivalsInfo
         : IHandmadeSerializable,
-        IVerifiable
+            IVerifiable
     {
         #region Constants
 
         /// <summary>
-        /// Tag number.
+        /// Метка поля.
         /// </summary>
         public const int Tag = 17;
 
         /// <summary>
-        /// Known subfield codes.
+        /// Известные коды подполей.
         /// </summary>
         public const string KnownCodes = "ab123";
 
@@ -61,59 +62,59 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Поступило впервые на баланс (без периодики). Подполе 1.
         /// </summary>
-        [SubField('1')]
-        [XmlAttribute("onBalanceWithoutPeriodicals")]
-        [JsonPropertyName("onBalanceWithoutPeriodicals")]
-        [Description("Поступило впервые на баланс (без периодики)")]
-        [DisplayName("Поступило впервые на баланс (без периодики)")]
+        [SubField ('1')]
+        [XmlAttribute ("onBalanceWithoutPeriodicals")]
+        [JsonPropertyName ("onBalanceWithoutPeriodicals")]
+        [Description ("Поступило впервые на баланс (без периодики)")]
+        [DisplayName ("Поступило впервые на баланс (без периодики)")]
         public string? OnBalanceWithoutPeriodicals { get; set; }
 
         /// <summary>
         /// Поступило впервые не на баланс (без периодики). Подполе b.
         /// </summary>
-        [SubField('b')]
-        [XmlAttribute("offBalanceWithoutPeriodicals")]
-        [JsonPropertyName("offBalanceWithoutPeriodicals")]
-        [Description("Поступило впервые не на баланс (без периодики)")]
-        [DisplayName("Поступило впервые не на баланс (без периодики)")]
+        [SubField ('b')]
+        [XmlAttribute ("offBalanceWithoutPeriodicals")]
+        [JsonPropertyName ("offBalanceWithoutPeriodicals")]
+        [Description ("Поступило впервые не на баланс (без периодики)")]
+        [DisplayName ("Поступило впервые не на баланс (без периодики)")]
         public string? OffBalanceWithoutPeriodicals { get; set; }
 
         /// <summary>
         /// Поступило впервые всего (без периодики). Подполе a.
         /// </summary>
-        [SubField('a')]
-        [XmlAttribute("totalWithoutPeriodicals")]
-        [JsonPropertyName("totalWithoutPeriodicals")]
-        [Description("Поступило впервые всего (без периодики)")]
-        [DisplayName("Поступило впервые всего (без периодики)")]
+        [SubField ('a')]
+        [XmlAttribute ("totalWithoutPeriodicals")]
+        [JsonPropertyName ("totalWithoutPeriodicals")]
+        [Description ("Поступило впервые всего (без периодики)")]
+        [DisplayName ("Поступило впервые всего (без периодики)")]
         public string? TotalWithoutPeriodicals { get; set; }
 
         /// <summary>
         /// Поступило впервые не на баланс (с периодикой). Подполе 2.
         /// </summary>
-        [SubField('2')]
-        [XmlAttribute("offBalanceWithPeriodicals")]
-        [JsonPropertyName("offBalanceWithPeriodicals")]
-        [Description("Поступило впервые не на баланс (с периодикой)")]
-        [DisplayName("Поступило впервые не на баланс (с периодикой)")]
+        [SubField ('2')]
+        [XmlAttribute ("offBalanceWithPeriodicals")]
+        [JsonPropertyName ("offBalanceWithPeriodicals")]
+        [Description ("Поступило впервые не на баланс (с периодикой)")]
+        [DisplayName ("Поступило впервые не на баланс (с периодикой)")]
         public string? OffBalanceWithPeriodicals { get; set; }
 
         /// <summary>
         /// Учебные издания. Подполе 3.
         /// </summary>
-        [SubField('3')]
-        [XmlAttribute("educational")]
-        [JsonPropertyName("educational")]
-        [Description("Учебные издания")]
-        [DisplayName("Учебные издания")]
+        [SubField ('3')]
+        [XmlAttribute ("educational")]
+        [JsonPropertyName ("educational")]
+        [Description ("Учебные издания")]
+        [DisplayName ("Учебные издания")]
         public string? Educational { get; set; }
 
         /// <summary>
         /// Unknown subfields.
         /// </summary>
-        [XmlElement("unknown")]
-        [JsonPropertyName("unknown")]
-        [Browsable(false)]
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
+        [Browsable (false)]
         public SubField[]? UnknownSubFields { get; set; }
 
         /// <summary>
@@ -121,7 +122,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
@@ -129,7 +130,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        [Browsable(false)]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -159,12 +160,12 @@ namespace ManagedIrbis.Fields
 
             var result = new ArrivalsInfo
             {
-                OnBalanceWithoutPeriodicals = field.GetFirstSubFieldValue('1'),
-                OffBalanceWithoutPeriodicals = field.GetFirstSubFieldValue('b'),
-                TotalWithoutPeriodicals = field.GetFirstSubFieldValue('a'),
-                OffBalanceWithPeriodicals = field.GetFirstSubFieldValue('2'),
-                Educational = field.GetFirstSubFieldValue('3'),
-                UnknownSubFields = field.Subfields.GetUnknownSubFields(KnownCodes),
+                OnBalanceWithoutPeriodicals = field.GetFirstSubFieldValue ('1'),
+                OffBalanceWithoutPeriodicals = field.GetFirstSubFieldValue ('b'),
+                TotalWithoutPeriodicals = field.GetFirstSubFieldValue ('a'),
+                OffBalanceWithPeriodicals = field.GetFirstSubFieldValue ('2'),
+                Educational = field.GetFirstSubFieldValue ('3'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
 
@@ -184,7 +185,7 @@ namespace ManagedIrbis.Fields
             {
                 if (field.Tag == Tag)
                 {
-                    result.Add(ParseField(field));
+                    result.Add (ParseField (field));
                 }
             }
 
@@ -195,21 +196,21 @@ namespace ManagedIrbis.Fields
         /// Should serialize the <see cref="UnknownSubFields"/> array?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeUnknownSubFields() =>
-            !ArrayUtility.IsNullOrEmpty(UnknownSubFields);
+            !ArrayUtility.IsNullOrEmpty (UnknownSubFields);
 
         /// <summary>
         /// Convert the <see cref="ArrivalsInfo"/>
         /// back to <see cref="Field"/>.
         /// </summary>
         public Field ToField() => new Field (Tag)
-                .AddNonEmpty ('1', OnBalanceWithoutPeriodicals)
-                .AddNonEmpty ('b', OffBalanceWithoutPeriodicals)
-                .AddNonEmpty ('a', TotalWithoutPeriodicals)
-                .AddNonEmpty ('2', OffBalanceWithPeriodicals)
-                .AddNonEmpty ('3', Educational)
-                .AddRange (UnknownSubFields);
+            .AddNonEmpty ('1', OnBalanceWithoutPeriodicals)
+            .AddNonEmpty ('b', OffBalanceWithoutPeriodicals)
+            .AddNonEmpty ('a', TotalWithoutPeriodicals)
+            .AddNonEmpty ('2', OffBalanceWithPeriodicals)
+            .AddNonEmpty ('3', Educational)
+            .AddRange (UnknownSubFields);
 
         #endregion
 
@@ -221,6 +222,8 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             OnBalanceWithoutPeriodicals = reader.ReadNullableString();
             OffBalanceWithoutPeriodicals = reader.ReadNullableString();
             TotalWithoutPeriodicals = reader.ReadNullableString();
@@ -235,13 +238,15 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullable(OnBalanceWithoutPeriodicals)
-                .WriteNullable(OffBalanceWithoutPeriodicals)
-                .WriteNullable(TotalWithoutPeriodicals)
-                .WriteNullable(OffBalanceWithPeriodicals)
-                .WriteNullable(Educational)
-                .WriteNullableArray(UnknownSubFields);
+                .WriteNullable (OnBalanceWithoutPeriodicals)
+                .WriteNullable (OffBalanceWithoutPeriodicals)
+                .WriteNullable (TotalWithoutPeriodicals)
+                .WriteNullable (OffBalanceWithPeriodicals)
+                .WriteNullable (Educational)
+                .WriteNullableArray (UnknownSubFields);
         }
 
         #endregion
@@ -254,15 +259,15 @@ namespace ManagedIrbis.Fields
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<ArrivalsInfo>(this, throwOnError);
+            var verifier = new Verifier<ArrivalsInfo> (this, throwOnError);
 
-            verifier.Assert
+            verifier.AnyNotNullNorEmpty
                 (
-                    !string.IsNullOrEmpty(OnBalanceWithoutPeriodicals)
-                    || !string.IsNullOrEmpty(OffBalanceWithoutPeriodicals)
-                    || !string.IsNullOrEmpty(TotalWithoutPeriodicals)
-                    || !string.IsNullOrEmpty(OffBalanceWithPeriodicals)
-                    || !string.IsNullOrEmpty(Educational)
+                    OnBalanceWithoutPeriodicals,
+                    OffBalanceWithoutPeriodicals,
+                    TotalWithoutPeriodicals,
+                    OffBalanceWithPeriodicals,
+                    Educational
                 );
 
             return verifier.Result;
@@ -273,7 +278,6 @@ namespace ManagedIrbis.Fields
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        // ReSharper disable UseStringInterpolation
         public override string ToString() => string.Format
             (
                 "OnBalanceWithoutPeriodicals: {0}, "
@@ -287,10 +291,7 @@ namespace ManagedIrbis.Fields
                 OffBalanceWithPeriodicals.ToVisibleString(),
                 Educational.ToVisibleString()
             );
-        // ReSharper restore UseStringInterpolation
 
         #endregion
-
-    } // class ArrivalsInfo
-
-} // namespace ManagedIrbis.Fields
+    }
+}

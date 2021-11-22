@@ -16,8 +16,11 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
+
+using AM;
 
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mapping;
@@ -31,9 +34,14 @@ namespace ManagedIrbis.Drm
     /// <summary>
     /// Период действия записи о правах доступа.
     /// </summary>
-    public class ValidityPeriod
+    public sealed class ValidityPeriod
     {
         #region Constants
+
+        /// <summary>
+        /// Метка поля.
+        /// </summary>
+        public const int Tag = 2;
 
         /// <summary>
         /// Known subfield codes.
@@ -45,7 +53,7 @@ namespace ManagedIrbis.Drm
         #region Properties
 
         /// <summary>
-        /// Начальная дата. Подполе d.
+        /// Начальная дата. Подполе D.
         /// </summary>
         [SubField ('d')]
         [XmlAttribute ("from")]
@@ -53,7 +61,7 @@ namespace ManagedIrbis.Drm
         public IrbisDate? From { get; set; }
 
         /// <summary>
-        /// Конечная дата. Подполе e.
+        /// Конечная дата. Подполе E.
         /// </summary>
         [SubField ('e')]
         [XmlAttribute ("till")]
@@ -61,20 +69,37 @@ namespace ManagedIrbis.Drm
         public IrbisDate? Till { get; set; }
 
         /// <summary>
-        /// Associated <see cref="Field"/>.
+        /// Неизвестные подполя.
+        /// </summary>
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
+        [Browsable (false)]
+        public SubField[]? UnknownSubFields { get; set; }
+
+        /// <summary>
+        /// Ассоциированное поле библиографической записи <see cref="Field"/>.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public Field? Field { get; set; }
+
+        /// <summary>
+        /// Произвольные пользовательские данные.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public object? UserData { get; set; }
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Parse the field.
+        /// Разбор поля библиографической записи.
         /// </summary>
-        public static ValidityPeriod? Parse
+        public static ValidityPeriod? ParseField
             (
                 Field? field
             )
@@ -92,11 +117,9 @@ namespace ManagedIrbis.Drm
             };
 
             return result;
-
-        } // method Parse
+        }
 
         #endregion
 
-    } // class ValidityPeriod
-
-} // namespace ManagedIrbis.Drm
+    }
+}

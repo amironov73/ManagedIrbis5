@@ -17,13 +17,16 @@
 
 #region Using directives
 
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
+using AM.IO;
+using AM.Runtime;
 
-using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Mapping;
 
 #endregion
@@ -35,12 +38,19 @@ namespace ManagedIrbis.Drm
     /// <summary>
     /// Право доступа к ресурсу. Поле 3.
     /// </summary>
-    public class AccessRight
+    public sealed class AccessRight
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Constants
 
         /// <summary>
-        /// Known subfield codes.
+        /// Метка поля.
+        /// </summary>
+        public const int Tag = 3;
+
+        /// <summary>
+        /// Известные коды подполей.
         /// </summary>
         public const string KnownCodes = "abcdefg";
 
@@ -49,77 +59,92 @@ namespace ManagedIrbis.Drm
         #region Properties
 
         /// <summary>
-        /// Элемент доступа. Подполе a.
+        /// Элемент доступа. Подполе A.
         /// </summary>
         /// <remarks>
         /// Типичное значение: "02".
         /// </remarks>
         [SubField ('a')]
+        [XmlAttribute ("element-kind")]
         [JsonPropertyName ("elementKind")]
         public string? ElementKind { get; set; }
 
         /// <summary>
-        /// Значение элемента доступа. Подполе b.
+        /// Значение элемента доступа. Подполе B.
         /// </summary>
         /// <remarks>
         /// Типичное значние: "В01".
         /// </remarks>
         [SubField ('b')]
+        [XmlAttribute ("element-value")]
         [JsonPropertyName ("elementValue")]
         public string? ElementValue { get; set; }
 
         /// <summary>
-        /// Значение права доступа. Подполе c.
+        /// Значение права доступа. Подполе C.
         /// </summary>
         /// <remarks>
         /// Типичное значение: "2".
         /// </remarks>
         [SubField ('c')]
+        [XmlAttribute ("access-kind")]
         [JsonPropertyName ("accessKind")]
         public string? AccessKind { get; set; }
 
         /// <summary>
-        /// Количественное ограничение. Подполе f.
+        /// Количественное ограничение. Подполе F.
         /// </summary>
         [SubField ('f')]
+        [XmlAttribute ("limit-value")]
         [JsonPropertyName ("limitValue")]
-        public int LimitValue { get; set; }
+        public string? LimitValue { get; set; }
 
         /// <summary>
-        /// Единицы ограничения. Подполе g.
+        /// Единицы ограничения. Подполе G.
         /// </summary>
         [SubField ('g')]
+        [XmlAttribute ("limit-kind")]
         [JsonPropertyName ("limitKind")]
         public string? LimitKind { get; set; }
 
         /// <summary>
-        /// Начальная дата периода доступа. Подполе d.
+        /// Начальная дата периода доступа. Подполе D.
         /// </summary>
         [SubField ('d')]
         [XmlAttribute ("from")]
         [JsonPropertyName ("from")]
-        public IrbisDate? FromDate { get; set; }
+        public string? FromDate { get; set; }
 
         /// <summary>
-        /// Конечная дата периода доступа. Подполе e.
+        /// Конечная дата периода доступа. Подполе E.
         /// </summary>
         [SubField ('e')]
         [XmlAttribute ("till")]
         [JsonPropertyName ("till")]
-        public IrbisDate? TillDate { get; set; }
+        public string? TillDate { get; set; }
 
         /// <summary>
-        /// Associated <see cref="Field"/>.
+        /// Неизвестные подполя.
+        /// </summary>
+        [XmlElement ("unknown")]
+        [JsonPropertyName ("unknown")]
+        [Browsable (false)]
+        public SubField[]? UnknownSubFields { get; set; }
+
+        /// <summary>
+        /// Ассоциированное поле библиографической записи <see cref="Field"/>.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -127,24 +152,25 @@ namespace ManagedIrbis.Drm
         #region Public methods
 
         /// <summary>
-        /// Parse the field.
+        /// Разбор заданного поля библиографической записи.
         /// </summary>
-        public static AccessRight Parse
+        public static AccessRight ParseField
             (
                 Field field
             )
         {
-            Sure.NotNull (field, nameof(field));
+            Sure.NotNull (field);
 
             var result = new AccessRight
             {
                 ElementKind = field.GetFirstSubFieldValue ('a'),
                 ElementValue = field.GetFirstSubFieldValue ('b'),
                 AccessKind = field.GetFirstSubFieldValue ('c'),
-                LimitValue = field.GetFirstSubFieldValue ('f').SafeToInt32(),
+                LimitValue = field.GetFirstSubFieldValue ('f'),
                 LimitKind = field.GetFirstSubFieldValue ('g'),
-                FromDate = IrbisDate.ConvertStringToDate (field.GetFirstSubFieldValue ('d')),
-                TillDate = IrbisDate.ConvertStringToDate (field.GetFirstSubFieldValue ('e')),
+                FromDate = field.GetFirstSubFieldValue ('d'),
+                TillDate = field.GetFirstSubFieldValue ('e'),
+                UnknownSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
                 Field = field
             };
 
@@ -152,23 +178,92 @@ namespace ManagedIrbis.Drm
         }
 
         /// <summary>
-        /// Parse the record.
+        /// Разбор заданной библиографической записи.
         /// </summary>
-        public static AccessRight[] Parse
+        public static AccessRight[] ParseRecord
             (
                 Record record
             )
         {
-            Sure.NotNull (record, nameof (record));
+            Sure.NotNull (record);
 
-            return record.Fields
-                .GetField(3)
-                .Select(field => Parse (field))
+            return record
+                .EnumerateField (3)
+                .Select (field => ParseField (field))
                 .ToArray();
         }
 
         #endregion
 
-    } // class AccessRight
+        #region IHandmadeSerializable members
 
-} // namespace ManagedIrbis.Drm
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            ElementKind = reader.ReadNullableString();
+            ElementValue = reader.ReadNullableString();
+            AccessKind = reader.ReadNullableString();
+            LimitValue = reader.ReadNullableString();
+            LimitKind = reader.ReadNullableString();
+            FromDate = reader.ReadNullableString();
+            TillDate = reader.ReadNullableString();
+            UnknownSubFields = reader.ReadNullableArray<SubField>();
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer
+                .WriteNullable (ElementKind)
+                .WriteNullable (ElementValue)
+                .WriteNullable (AccessKind)
+                .WriteNullable (LimitValue)
+                .WriteNullable (LimitKind)
+                .WriteNullable (FromDate)
+                .WriteNullable (TillDate)
+                .WriteNullableArray (UnknownSubFields);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<AccessRight> (this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (ElementKind)
+                .NotNullNorEmpty (ElementValue)
+                .NotNullNorEmpty (AccessKind);
+
+            return verifier.Result;
+        }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString()
+        {
+            return $"{ElementKind.ToVisibleString()} {ElementValue.ToVisibleString()} {AccessKind.ToVisibleString()}";
+        }
+
+        #endregion
+    }
+}

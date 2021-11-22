@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 
 /* StandardDatabases.cs -- стандартные базы данных, включенные в поставку
  * Ars Magna project, http://arsmagna.ru
@@ -15,7 +16,7 @@
 namespace ManagedIrbis
 {
     /// <summary>
-    /// SСтандартные базы данных, включенные в поставку ИРБИС64.
+    /// Стандартные базы данных, включенные в поставку ИРБИС64.
     /// </summary>
     public static class StandardDatabases
     {

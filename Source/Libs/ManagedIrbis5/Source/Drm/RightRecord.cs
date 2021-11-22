@@ -16,6 +16,7 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -115,7 +116,7 @@ namespace ManagedIrbis.Drm
     /// <summary>
     /// Запись с правами доступа к ресурсам.
     /// </summary>
-    public class RightRecord
+    public sealed class RightRecord
     {
         #region Properties
 
@@ -166,6 +167,7 @@ namespace ManagedIrbis.Drm
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -173,30 +175,37 @@ namespace ManagedIrbis.Drm
         #region Public methods
 
         /// <summary>
-        /// Parse the record.
+        /// Разбор библиографической записи.
         /// </summary>
-        public static RightRecord Parse
+        public static RightRecord ParseRecord
             (
                 Record record
             )
         {
-            Sure.NotNull (record, nameof (record));
+            Sure.NotNull (record);
 
             var result = new RightRecord
             {
-                Id = record.FM(1),
-                Period = ValidityPeriod.Parse(record.Fields.GetFirstField(2)),
-                Rights = AccessRight.Parse(record),
-                Description = record.FM(4),
+                Id = record.FM (1),
+                Period = ValidityPeriod.ParseField (record.GetFirstField (2)),
+                Rights = AccessRight.ParseRecord (record),
+                Description = record.FM (4),
                 Record = record
             };
 
             return result;
-
-        } // method Parse
+        }
 
         #endregion
 
-    } // class RightRecord
+        #region Object members
 
-} // namespace ManagedIrbis.Drm
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString()
+        {
+            return Id.ToVisibleString();
+        }
+
+        #endregion
+    }
+}
