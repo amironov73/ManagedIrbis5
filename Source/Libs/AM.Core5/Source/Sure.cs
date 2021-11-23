@@ -323,9 +323,8 @@ namespace AM
 
                 throw new ArgumentNullException();
 
-            } // if
-
-        } // method NotNull
+            }
+        }
 
         /// <summary>
         /// Проверка, что указатель <paramref name="argument" /> не <c>null</c>.
@@ -348,9 +347,8 @@ namespace AM
 
                 throw new ArgumentException();
 
-            } // if
-
-        } // method NotNull
+            }
+        }
 
         /// <summary>
         /// Проверка, что строка <paramref name="argument" />
@@ -373,9 +371,8 @@ namespace AM
 
                 throw new ArgumentNullException();
 
-            } // if
-
-        } // method NotNullNorEmpty
+            }
+        }
 
         /// <summary>
         /// Проверка, что число <paramref name="argument"/> положительное.
@@ -397,9 +394,8 @@ namespace AM
 
                 throw new ArgumentOutOfRangeException();
 
-            } // if
-
-        } // method Positive
+            }
+        }
 
         /// <summary>
         /// Проверка, что число <paramref name="argument"/> положительное.
@@ -421,9 +417,8 @@ namespace AM
 
                 throw new ArgumentOutOfRangeException();
 
-            } // if
-
-        } // method Positive
+            }
+        }
 
         /// <summary>
         /// Проверка, что число <paramref name="argument"/> положительное.
@@ -445,9 +440,34 @@ namespace AM
 
                 throw new ArgumentOutOfRangeException();
 
-            } // if
+            }
+        }
 
-        } // method Positive
+        /// <summary>
+        /// Верификация структуры.
+        /// </summary>
+        public static void Verify<T>
+            (
+                T verifiable
+            )
+            where T: struct, IVerifiable
+        {
+            verifiable.Verify (true);
+        }
+
+        /// <summary>
+        /// Верификация объекта.
+        /// </summary>
+        public static void VerifyNotNull<T>
+            (
+                T verifiable
+            )
+            where T: class, IVerifiable
+        {
+            NotNull (verifiable);
+
+            verifiable.Verify (true);
+        }
 
         #endregion
 

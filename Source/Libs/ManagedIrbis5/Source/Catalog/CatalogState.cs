@@ -33,8 +33,8 @@ namespace ManagedIrbis.Catalog
     /// <summary>
     /// State of the catalog.
     /// </summary>
-    [XmlRoot("database")]
-    [DebuggerDisplay("{Database} {Date} {MaxMfn}")]
+    [XmlRoot ("database")]
+    [DebuggerDisplay ("{Database} {Date} {MaxMfn}")]
     public sealed class CatalogState
         : IHandmadeSerializable
     {
@@ -50,38 +50,38 @@ namespace ManagedIrbis.Catalog
         /// <summary>
         /// Date.
         /// </summary>
-        [XmlAttribute("date")]
-        [JsonPropertyName("date")]
+        [XmlAttribute ("date")]
+        [JsonPropertyName ("date")]
         public DateTime Date { get; set; }
 
         /// <summary>
         /// Database name.
         /// </summary>
-        [XmlAttribute("database")]
-        [JsonPropertyName("database")]
+        [XmlAttribute ("database")]
+        [JsonPropertyName ("database")]
         public string? Database { get; set; }
 
         /// <summary>
         /// Maximal MFN.
         /// </summary>
-        [XmlAttribute("maxMfn")]
-        [JsonPropertyName("maxMfn")]
+        [XmlAttribute ("maxMfn")]
+        [JsonPropertyName ("maxMfn")]
         public int MaxMfn { get; set; }
 
         /// <summary>
         /// Records.
         /// </summary>
-        [XmlArray("records")]
-        [XmlArrayItem("record")]
-        [JsonPropertyName("records")]
+        [XmlArray ("records")]
+        [XmlArrayItem ("record")]
+        [JsonPropertyName ("records")]
         public RecordState[]? Records { get; set; }
 
         /// <summary>
         /// Logically deleted records.
         /// </summary>
-        [XmlArray("logicallyDeleted")]
-        [XmlArrayItem("mfn")]
-        [JsonPropertyName("logicallyDeleted")]
+        [XmlArray ("logicallyDeleted")]
+        [XmlArrayItem ("mfn")]
+        [JsonPropertyName ("logicallyDeleted")]
         public int[]? LogicallyDeleted { get; set; }
 
         #endregion
@@ -116,6 +116,8 @@ namespace ManagedIrbis.Catalog
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Id = reader.ReadPackedInt32();
             Date = reader.ReadDateTime();
             Database = reader.ReadNullableString();
@@ -130,13 +132,15 @@ namespace ManagedIrbis.Catalog
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WritePackedInt32(Id)
-                .Write(Date)
-                .WriteNullable(Database)
-                .WritePackedInt32(MaxMfn)
-                .WriteNullableArray(Records)
-                .WriteNullableArray(LogicallyDeleted);
+                .WritePackedInt32 (Id)
+                .Write (Date)
+                .WriteNullable (Database)
+                .WritePackedInt32 (MaxMfn)
+                .WriteNullableArray (Records)
+                .WriteNullableArray (LogicallyDeleted);
         }
 
         #endregion
@@ -144,15 +148,15 @@ namespace ManagedIrbis.Catalog
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            Database.ToVisibleString()
-            + " "
-            + Date.ToLongUniformString()
-            + " "
-            + MaxMfn.ToInvariantString();
+        public override string ToString()
+        {
+            return Database.ToVisibleString()
+                   + " "
+                   + Date.ToLongUniformString()
+                   + " "
+                   + MaxMfn.ToInvariantString();
+        }
 
         #endregion
-
-    } // class CatalogState
-
-} // namespace ManagedIrbis.Client
+    }
+}

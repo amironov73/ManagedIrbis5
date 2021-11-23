@@ -15,16 +15,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-
-using AM;
 using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -44,7 +35,7 @@ namespace ManagedIrbis.Client
         #region Constants
 
         /// <summary>
-        /// Section name.
+        /// Имя секции.
         /// </summary>
         public const string SectionName = "DESKTOP";
 
@@ -183,7 +174,7 @@ namespace ManagedIrbis.Client
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DesktopIniSection()
             : base (new IniFile(), SectionName)
@@ -191,7 +182,7 @@ namespace ManagedIrbis.Client
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DesktopIniSection
             (
@@ -202,7 +193,7 @@ namespace ManagedIrbis.Client
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DesktopIniSection
             (

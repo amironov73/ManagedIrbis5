@@ -11,6 +11,7 @@
 
 #region Using directives
 
+using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -34,7 +35,8 @@ namespace ManagedIrbis.Menus
     [XmlRoot("entry")]
     [DebuggerDisplay("{" + nameof(Code) + "} = {" + nameof(Comment) + "}")]
     public sealed class MenuEntry
-        : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
@@ -90,6 +92,23 @@ namespace ManagedIrbis.Menus
         /// </summary>
         [ExcludeFromCodeCoverage]
         public bool ShouldSerializeComment() => !string.IsNullOrEmpty(Comment);
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<MenuEntry> (this, throwOnError);
+
+            verifier.NotNullNorEmpty (Code);
+
+            return verifier.Result;
+        }
 
         #endregion
 

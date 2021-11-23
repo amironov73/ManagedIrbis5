@@ -40,7 +40,8 @@ namespace ManagedIrbis.Menus
     /// </summary>
     [XmlRoot("menu")]
     public sealed class MenuFile
-        : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Constants
 
@@ -412,9 +413,11 @@ namespace ManagedIrbis.Menus
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             FileName = reader.ReadNullableString();
             reader.ReadCollection(Entries);
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -422,9 +425,32 @@ namespace ManagedIrbis.Menus
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer.WriteNullable(FileName);
             writer.Write(Entries);
-        } // method SaveToStream
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<MenuFile> (this, throwOnError);
+
+            verifier.NotNullNorEmpty (Entries);
+            foreach (var entry in Entries)
+            {
+                verifier.VerifySubObject (entry);
+            }
+
+            return verifier.Result;
+        }
 
         #endregion
 

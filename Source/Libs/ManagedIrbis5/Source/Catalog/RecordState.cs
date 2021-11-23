@@ -33,8 +33,8 @@ namespace ManagedIrbis.Catalog
     /// <summary>
     /// State of the <see cref="Record"/>.
     /// </summary>
-    [XmlRoot("record")]
-    [DebuggerDisplay("{Mfn} {Status} {Version}")]
+    [XmlRoot ("record")]
+    [DebuggerDisplay ("{Mfn} {Status} {Version}")]
     public struct RecordState
         : IHandmadeSerializable
     {
@@ -50,22 +50,22 @@ namespace ManagedIrbis.Catalog
         /// <summary>
         /// MFN.
         /// </summary>
-        [XmlAttribute("mfn")]
-        [JsonPropertyName("mfn")]
+        [XmlAttribute ("mfn")]
+        [JsonPropertyName ("mfn")]
         public int Mfn { get; set; }
 
         /// <summary>
         /// Status.
         /// </summary>
-        [XmlAttribute("status")]
-        [JsonPropertyName("status")]
+        [XmlAttribute ("status")]
+        [JsonPropertyName ("status")]
         public RecordStatus Status { get; set; }
 
         /// <summary>
         /// Version.
         /// </summary>
-        [XmlAttribute("version")]
-        [JsonPropertyName("version")]
+        [XmlAttribute ("version")]
+        [JsonPropertyName ("version")]
         public int Version { get; set; }
 
         #endregion
@@ -86,7 +86,7 @@ namespace ManagedIrbis.Catalog
         /// </summary>
         public static RecordState ParseServerAnswer
             (
-                [NotNull] string line
+                string line
             )
         {
             //
@@ -113,11 +113,11 @@ namespace ManagedIrbis.Catalog
                         + line
                     );
 
-                throw new IrbisException("bad line format");
+                throw new IrbisException ("bad line format");
             }
 
             result.Mfn = parts[1].ParseInt32();
-            result.Status = (RecordStatus) parts[2].ParseInt32();
+            result.Status = (RecordStatus)parts[2].ParseInt32();
             result.Version = parts[4].ParseInt32();
 
             return result;
@@ -160,9 +160,11 @@ namespace ManagedIrbis.Catalog
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Id = reader.ReadPackedInt32();
             Mfn = reader.ReadPackedInt32();
-            Status = (RecordStatus) reader.ReadPackedInt32();
+            Status = (RecordStatus)reader.ReadPackedInt32();
             Version = reader.ReadPackedInt32();
         }
 
@@ -172,11 +174,13 @@ namespace ManagedIrbis.Catalog
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WritePackedInt32(Id)
-                .WritePackedInt32(Mfn)
-                .WritePackedInt32((int) Status)
-                .WritePackedInt32(Version);
+                .WritePackedInt32 (Id)
+                .WritePackedInt32 (Mfn)
+                .WritePackedInt32 ((int)Status)
+                .WritePackedInt32 (Version);
         }
 
         #endregion
@@ -184,10 +188,11 @@ namespace ManagedIrbis.Catalog
         #region Object members
 
         /// <inheritdoc cref="ValueType.ToString" />
-        public override string ToString() => $"{Mfn}:{(int) Status}:{Version}";
+        public override string ToString()
+        {
+            return $"{Mfn}:{(int)Status}:{Version}";
+        }
 
         #endregion
-
-    } // class RecordState
-
-} // namespace ManagedIrbis.Client
+    }
+}

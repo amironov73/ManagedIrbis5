@@ -34,13 +34,13 @@ namespace ManagedIrbis.Client
     /// <summary>
     /// Aliases for databases/servers.
     /// </summary>
-    [DebuggerDisplay("Count={_aliases.Count}")]
+    [DebuggerDisplay ("Count={_aliases.Count}")]
     public sealed class AliasManager
     {
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public AliasManager()
         {
@@ -60,7 +60,7 @@ namespace ManagedIrbis.Client
         {
             foreach (var theAlias in _aliases)
             {
-                if (theAlias.Name.SameString(name))
+                if (theAlias.Name.SameString (name))
                 {
                     return theAlias;
                 }
@@ -91,7 +91,7 @@ namespace ManagedIrbis.Client
                 string fileName
             )
         {
-            using var reader = TextReaderUtility.OpenRead(fileName, IrbisEncoding.Ansi);
+            using var reader = TextReaderUtility.OpenRead (fileName, IrbisEncoding.Ansi);
             var result = new AliasManager();
 
             while (true)
@@ -99,17 +99,18 @@ namespace ManagedIrbis.Client
                 var line1 = reader.ReadLine();
                 var line2 = reader.ReadLine();
 
-                if (string.IsNullOrEmpty(line1)
-                    || string.IsNullOrEmpty(line2))
+                if (string.IsNullOrEmpty (line1)
+                    || string.IsNullOrEmpty (line2))
                 {
                     break;
                 }
+
                 var theAlias = new ConnectionAlias
                 {
                     Name = line1,
                     Value = line2
                 };
-                result._aliases.Add(theAlias);
+                result._aliases.Add (theAlias);
             }
 
             return result;
@@ -118,7 +119,10 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Get alias value if exists.
         /// </summary>
-        public string? GetAliasValue(string name) => _GetAlias(name)?.Value;
+        public string? GetAliasValue (string name)
+        {
+            return _GetAlias (name)?.Value;
+        }
 
         /// <summary>
         /// List aliases.
@@ -126,7 +130,7 @@ namespace ManagedIrbis.Client
         public string[] ListAliases()
         {
             var result = _aliases
-                .Select(alias => alias.Name)
+                .Select (alias => alias.Name)
                 .NonNullItems()
                 .ToArray();
 
@@ -141,11 +145,11 @@ namespace ManagedIrbis.Client
                 string fileName
             )
         {
-            using var writer = TextWriterUtility.Create(fileName, IrbisEncoding.Ansi);
+            using var writer = TextWriterUtility.Create (fileName, IrbisEncoding.Ansi);
             foreach (var theAlias in _aliases)
             {
-                writer.WriteLine(theAlias.Name);
-                writer.WriteLine(theAlias.Value);
+                writer.WriteLine (theAlias.Name);
+                writer.WriteLine (theAlias.Value);
             }
         }
 
@@ -158,24 +162,24 @@ namespace ManagedIrbis.Client
                 string? value
             )
         {
-            var theAlias = _GetAlias(name);
-            if (ReferenceEquals(theAlias, null))
+            var theAlias = _GetAlias (name);
+            if (theAlias is null)
             {
-                if (!string.IsNullOrEmpty(value))
+                if (!string.IsNullOrEmpty (value))
                 {
                     theAlias = new ConnectionAlias
                     {
                         Name = name,
                         Value = value
                     };
-                    _aliases.Add(theAlias);
+                    _aliases.Add (theAlias);
                 }
             }
             else
             {
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty (value))
                 {
-                    _aliases.Remove(theAlias);
+                    _aliases.Remove (theAlias);
                 }
                 else
                 {

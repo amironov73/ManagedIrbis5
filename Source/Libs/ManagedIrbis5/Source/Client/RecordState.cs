@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json.Serialization;
@@ -35,46 +34,38 @@ namespace ManagedIrbis.Client
     /// <summary>
     /// Состояние записи <see cref="Record"/>.
     /// </summary>
-    [XmlRoot("record")]
-    [DebuggerDisplay("{Mfn} {Status} {Version}")]
+    [XmlRoot ("record")]
     public struct RecordState
         : IHandmadeSerializable
     {
         #region Properties
 
-        // /// <summary>
-        // /// Идентификатор для LiteDB.
-        // /// </summary>
-        // [XmlIgnore]
-        // [JsonIgnore]
-        // public int Id { get; set; }
-
         /// <summary>
-        /// MFN.
+        /// MFN записи.
         /// </summary>
-        [XmlAttribute("mfn")]
-        [JsonPropertyName("mfn")]
+        [XmlAttribute ("mfn")]
+        [JsonPropertyName ("mfn")]
         public int Mfn { get; set; }
 
         /// <summary>
-        /// Status.
+        /// Статус записи.
         /// </summary>
-        [XmlAttribute("status")]
-        [JsonPropertyName("status")]
+        [XmlAttribute ("status")]
+        [JsonPropertyName ("status")]
         public RecordStatus Status { get; set; }
 
         /// <summary>
-        /// Version.
+        /// Версия записи.
         /// </summary>
-        [XmlAttribute("version")]
-        [JsonPropertyName("version")]
+        [XmlAttribute ("version")]
+        [JsonPropertyName ("version")]
         public int Version { get; set; }
 
         #endregion
 
         #region Private members
 
-        private static char[] _delimiters =
+        private static readonly char[] _delimiters =
         {
             ' ', '\t', '\r', '\n', '#', '\x1F', '\x1E'
         };
@@ -84,14 +75,14 @@ namespace ManagedIrbis.Client
         #region Public methods
 
         /// <summary>
-        /// Parse server answer.
+        /// Разбор ответа сервера.
         /// </summary>
         public static RecordState ParseServerAnswer
             (
                 string line
             )
         {
-            Sure.NotNullNorEmpty(line, "line");
+            Sure.NotNullNorEmpty (line);
 
             //
             // &uf('G0$',&uf('+0'))
@@ -100,8 +91,7 @@ namespace ManagedIrbis.Client
             // 0 161608#0 0#1 101#
             //
 
-            RecordState result = new RecordState();
-
+            var result = new RecordState();
             var parts = line.Split
                 (
                     _delimiters,
@@ -112,39 +102,47 @@ namespace ManagedIrbis.Client
             {
                 Magna.Error
                     (
-                        nameof(RecordState) + "::" + nameof(ParseServerAnswer)
+                        nameof (RecordState) + "::" + nameof (ParseServerAnswer)
                         + ": bad line format: "
                         + line
                     );
 
-                throw new IrbisException("bad line format");
+                throw new IrbisException ("bad line format");
             }
 
             result.Mfn = parts[1].ParseInt32();
-            result.Status = (RecordStatus) parts[2].ParseInt32();
+            result.Status = (RecordStatus)parts[2].ParseInt32();
             result.Version = parts[4].ParseInt32();
 
             return result;
-
-        } // method ParseServerAnsver
-
-        /// <summary>
-        /// Should serialize the <see cref="Mfn"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeMfn() => Mfn != 0;
+        }
 
         /// <summary>
-        /// Should serialize the <see cref="Status"/> field?
+        /// Нужно ли сериализовать свойство <see cref="Mfn"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeStatus() => Status != 0;
+        public bool ShouldSerializeMfn()
+        {
+            return Mfn != 0;
+        }
 
         /// <summary>
-        /// Should serialize the <see cref="Version"/> field?
+        /// Нужно ли сериализовать свойство <see cref="Status"/>?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeVersion() => Version != 0;
+        public bool ShouldSerializeStatus()
+        {
+            return Status != 0;
+        }
+
+        /// <summary>
+        /// Нужно ли сериализовать свойство <see cref="Version"/>?
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        public bool ShouldSerializeVersion()
+        {
+            return Version != 0;
+        }
 
         #endregion
 
@@ -156,12 +154,12 @@ namespace ManagedIrbis.Client
                 BinaryReader reader
             )
         {
-            // Id = reader.ReadPackedInt32();
+            Sure.NotNull (reader);
+
             Mfn = reader.ReadPackedInt32();
             Status = (RecordStatus) reader.ReadPackedInt32();
             Version = reader.ReadPackedInt32();
-
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -169,23 +167,24 @@ namespace ManagedIrbis.Client
                 BinaryWriter writer
             )
         {
-            writer
-                // .WritePackedInt32(Id)
-                .WritePackedInt32(Mfn)
-                .WritePackedInt32((int) Status)
-                .WritePackedInt32(Version);
+            Sure.NotNull (writer);
 
-        } // method SaveToStream
+            writer
+                .WritePackedInt32 (Mfn)
+                .WritePackedInt32 ((int) Status)
+                .WritePackedInt32 (Version);
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="ValueType.ToString" />
-        public override string ToString() => $"{Mfn}:{(int) Status}:{Version}";
+        public override string ToString()
+        {
+            return $"{Mfn}:{(int) Status}:{Version}";
+        }
 
         #endregion
-
-    } // class RecordState
-
-} // namespace ManagedIrbis.Client
+    }
+}

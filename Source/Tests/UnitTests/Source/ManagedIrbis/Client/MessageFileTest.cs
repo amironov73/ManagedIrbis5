@@ -16,7 +16,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Client
 {
     [TestClass]
-    public class MessageFileTest
+    public sealed class MessageFileTest
         : Common.CommonUnitTest
     {
         private string _GetFileName() => Path.Combine (Irbis64RootPath, MessageFile.DefaultName);

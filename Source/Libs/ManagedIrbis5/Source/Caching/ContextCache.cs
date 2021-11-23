@@ -20,6 +20,8 @@ using System;
 using System.Globalization;
 using System.IO;
 
+using AM;
+
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 using ManagedIrbis.Records;
@@ -65,6 +67,8 @@ namespace ManagedIrbis.Caching
         public ContextCache (ISyncProvider provider, MemoryCacheOptions options)
             : this (provider, new MemoryCache (options))
         {
+            Sure.NotNull (options);
+
             _options = options;
         }
 
@@ -77,6 +81,9 @@ namespace ManagedIrbis.Caching
                 IMemoryCache cache
             )
         {
+            Sure.NotNull (provider);
+            Sure.NotNull (cache);
+
             Provider = provider;
             _options = new MemoryCacheOptions();
             _cache = cache;
@@ -89,7 +96,10 @@ namespace ManagedIrbis.Caching
         private readonly MemoryCacheOptions _options;
         private IMemoryCache _cache;
 
-        private static string GetKey (FileSpecification specification)
+        private static string GetKey
+            (
+                FileSpecification specification
+            )
         {
             return specification.ToString().ToUpperInvariant();
         }
@@ -127,6 +137,8 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
+            Sure.VerifyNotNull (specification);
+
             var key = GetKey (specification);
             if (!_cache.TryGetValue (key, out string? result))
             {
@@ -150,6 +162,8 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
+            Sure.VerifyNotNull (specification);
+
             var document = GetDocument (specification);
             if (document is not null)
             {
@@ -172,6 +186,8 @@ namespace ManagedIrbis.Caching
             )
             where T : class, IRecord, new()
         {
+            Sure.Positive (mfn);
+
             var key = GetKey (mfn);
             if (!_cache.TryGetValue (key, out T? result))
             {
@@ -185,7 +201,7 @@ namespace ManagedIrbis.Caching
                 {
                     _cache.Set (key, result);
                 }
-            } // if
+            }
 
             return result;
         }
@@ -200,6 +216,8 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
+            Sure.VerifyNotNull (specification);
+
             var document = GetDocument (specification);
             if (document is not null)
             {
@@ -221,6 +239,8 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
+            Sure.VerifyNotNull (specification);
+
             var document = GetDocument (specification);
             if (document is not null)
             {
@@ -242,6 +262,8 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
+            Sure.VerifyNotNull (specification);
+
             var document = GetDocument (specification);
             if (document is not null)
             {
@@ -263,6 +285,9 @@ namespace ManagedIrbis.Caching
                 string documentText
             )
         {
+            Sure.VerifyNotNull (specification);
+            Sure.NotNull (documentText);
+
             var withContent = specification.Clone();
             withContent.Content = documentText;
             Provider.WriteTextFile (withContent);
@@ -274,14 +299,30 @@ namespace ManagedIrbis.Caching
         /// <summary>
         /// Обновление меню на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateMenu (FileSpecification specification, MenuFile menu) =>
+        public void UpdateMenu
+            (
+                FileSpecification specification,
+                MenuFile menu
+            )
+        {
+            Sure.VerifyNotNull (specification);
+            Sure.VerifyNotNull (menu);
+
             UpdateDocument (specification, menu.ToText());
+        }
 
         /// <summary>
         /// Обновление "деревянного" меню на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateTree (FileSpecification specification, TreeFile tree)
+        public void UpdateTree
+            (
+                FileSpecification specification,
+                TreeFile tree
+            )
         {
+            Sure.VerifyNotNull (specification);
+            Sure.VerifyNotNull (tree);
+
             UpdateDocument (specification, tree.ToString() ?? string.Empty);
         }
 
@@ -294,6 +335,8 @@ namespace ManagedIrbis.Caching
             )
             where T : class, IRecord
         {
+            Sure.NotNull (record);
+
             var parameters = new WriteRecordParameters()
             {
                 Record = record
@@ -306,16 +349,30 @@ namespace ManagedIrbis.Caching
         /// <summary>
         /// Обновление рабочего листа на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateWs (FileSpecification specification, WsFile worksheet)
+        public void UpdateWs
+            (
+                FileSpecification specification,
+                WsFile worksheet
+            )
         {
+            Sure.VerifyNotNull (specification);
+            Sure.VerifyNotNull (worksheet);
+
             UpdateDocument (specification, worksheet.ToString());
         }
 
         /// <summary>
         /// Обновление рабочего листа на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateWss (FileSpecification specification, WssFile worksheet)
+        public void UpdateWss
+            (
+                FileSpecification specification,
+                WssFile worksheet
+            )
         {
+            Sure.VerifyNotNull (specification);
+            Sure.VerifyNotNull (worksheet);
+
             UpdateDocument (specification, worksheet.ToString());
         }
 

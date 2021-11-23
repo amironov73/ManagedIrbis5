@@ -102,8 +102,10 @@ namespace ManagedIrbis.Client
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            Name.ToVisibleString() + "=" + Value.ToVisibleString();
+        public override string ToString()
+        {
+            return Name.ToVisibleString() + "=" + Value.ToVisibleString();
+        }
 
         #endregion
     }

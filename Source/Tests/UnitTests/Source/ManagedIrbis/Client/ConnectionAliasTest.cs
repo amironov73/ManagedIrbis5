@@ -27,11 +27,12 @@ namespace UnitTests.ManagedIrbis.Client
         }
 
         [TestMethod]
+        [Description ("Конструктор по умолчанию")]
         public void ConnectionAlias_Construction_1()
         {
             var alias = new ConnectionAlias();
-            Assert.IsNull(alias.Name);
-            Assert.IsNull(alias.Value);
+            Assert.IsNull (alias.Name);
+            Assert.IsNull (alias.Value);
         }
 
         private void _TestSerialization
@@ -41,59 +42,64 @@ namespace UnitTests.ManagedIrbis.Client
         {
             var bytes = first.SaveToMemory();
             var second = bytes.RestoreObjectFromMemory<ConnectionAlias>();
-            Assert.IsNotNull(second);
-            Assert.AreEqual(first.Name, second!.Name);
-            Assert.AreEqual(first.Value, second.Value);
+            Assert.IsNotNull (second);
+            Assert.AreEqual (first.Name, second.Name);
+            Assert.AreEqual (first.Value, second.Value);
         }
 
         [TestMethod]
+        [Description ("Сериализация")]
         public void ConnectionAlias_Serialization_1()
         {
             var alias = new ConnectionAlias();
-            _TestSerialization(alias);
+            _TestSerialization (alias);
 
             alias = _GetAlias();
-            _TestSerialization(alias);
+            _TestSerialization (alias);
         }
 
         [TestMethod]
+        [Description ("Верификация")]
         public void ConnectionAlias_Verify_1()
         {
             var alias = new ConnectionAlias();
-            Assert.IsFalse(alias.Verify(false));
+            Assert.IsFalse (alias.Verify (false));
 
             alias = _GetAlias();
-            Assert.IsTrue(alias.Verify(false));
+            Assert.IsTrue (alias.Verify (false));
         }
 
         [TestMethod]
+        [Description ("XML-представление")]
         public void ConnectionAlias_ToXml_1()
         {
             var alias = new ConnectionAlias();
-            Assert.AreEqual("<alias />", XmlUtility.SerializeShort(alias));
+            Assert.AreEqual ("<alias />", XmlUtility.SerializeShort (alias));
 
             alias = _GetAlias();
-            Assert.AreEqual("<alias name=\"Name\" value=\"Value\" />", XmlUtility.SerializeShort(alias));
+            Assert.AreEqual ("<alias name=\"Name\" value=\"Value\" />", XmlUtility.SerializeShort (alias));
         }
 
         [TestMethod]
+        [Description ("JSON-представление")]
         public void ConnectionAlias_ToJson_1()
         {
             var alias = new ConnectionAlias();
-            Assert.AreEqual("{}", JsonUtility.SerializeShort(alias));
+            Assert.AreEqual ("{}", JsonUtility.SerializeShort (alias));
 
             alias = _GetAlias();
-            Assert.AreEqual("{\"name\":\"Name\",\"value\":\"Value\"}", JsonUtility.SerializeShort(alias));
+            Assert.AreEqual ("{\"name\":\"Name\",\"value\":\"Value\"}", JsonUtility.SerializeShort (alias));
         }
 
         [TestMethod]
+        [Description ("Плоское текстовое представление")]
         public void ConnectionAlias_ToString_1()
         {
             var alias = new ConnectionAlias();
-            Assert.AreEqual("(null)=(null)", alias.ToString());
+            Assert.AreEqual ("(null)=(null)", alias.ToString());
 
             alias = _GetAlias();
-            Assert.AreEqual("Name=Value", alias.ToString());
+            Assert.AreEqual ("Name=Value", alias.ToString());
         }
     }
 }

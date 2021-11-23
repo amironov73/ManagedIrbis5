@@ -15,16 +15,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-
-using AM;
 using AM.IO;
-using AM.Runtime;
-using AM.Text;
-
-using ManagedIrbis.Infrastructure;
 
 #endregion
 
@@ -44,7 +35,7 @@ namespace ManagedIrbis.Client
         #region Constants
 
         /// <summary>
-        /// Section name.
+        /// Имя секции.
         /// </summary>
         public const string SectionName = "Display";
 
@@ -57,8 +48,8 @@ namespace ManagedIrbis.Client
         /// </summary>
         public int MaxBriefPortion
         {
-            get => Section.GetValue("MaxBriefPortion", 6);
-            set => Section.SetValue("MaxBriefPortion", value);
+            get => Section.GetValue ("MaxBriefPortion", 6);
+            set => Section.SetValue ("MaxBriefPortion", value);
         }
 
         /// <summary>
@@ -66,8 +57,8 @@ namespace ManagedIrbis.Client
         /// </summary>
         public int MaxMarked
         {
-            get => Section.GetValue("MaxMarked", 100);
-            set => Section.SetValue("MaxMarked", value);
+            get => Section.GetValue ("MaxMarked", 100);
+            set => Section.SetValue ("MaxMarked", value);
         }
 
         #endregion
@@ -75,32 +66,32 @@ namespace ManagedIrbis.Client
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DisplayIniSection()
-            : base(SectionName)
+            : base (SectionName)
         {
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DisplayIniSection
             (
                 IniFile iniFile
             )
-            : base(iniFile, SectionName)
+            : base (iniFile, SectionName)
         {
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public DisplayIniSection
             (
                 IniFile.Section section
             )
-            : base(section)
+            : base (section)
         {
         }
 

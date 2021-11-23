@@ -36,7 +36,7 @@ namespace ManagedIrbis.Catalog
     /// <summary>
     ///
     /// </summary>
-    [XmlRoot("catalogDelta")]
+    [XmlRoot ("catalogDelta")]
     public sealed class CatalogDelta
         : IHandmadeSerializable
     {
@@ -52,50 +52,50 @@ namespace ManagedIrbis.Catalog
         /// <summary>
         /// First date.
         /// </summary>
-        [XmlAttribute("firstDate")]
-        [JsonPropertyName("firstDate")]
+        [XmlAttribute ("firstDate")]
+        [JsonPropertyName ("firstDate")]
         public DateTime FirstDate { get; set; }
 
         /// <summary>
         /// Second date.
         /// </summary>
-        [XmlAttribute("secondDate")]
-        [JsonPropertyName("secondDate")]
+        [XmlAttribute ("secondDate")]
+        [JsonPropertyName ("secondDate")]
         public DateTime SecondDate { get; set; }
 
         /// <summary>
         /// Database name.
         /// </summary>
-        [XmlAttribute("database")]
-        [JsonPropertyName("database")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [XmlAttribute ("database")]
+        [JsonPropertyName ("database")]
+        [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Database { get; set; }
 
         /// <summary>
         /// New records.
         /// </summary>
-        [XmlArray("new")]
-        [XmlArrayItem("mfn")]
-        [JsonPropertyName("new")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [XmlArray ("new")]
+        [XmlArrayItem ("mfn")]
+        [JsonPropertyName ("new")]
+        [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int[]? NewRecords { get; set; }
 
         /// <summary>
         /// Deleted records.
         /// </summary>
-        [XmlArray("deleted")]
-        [XmlArrayItem("mfn")]
-        [JsonPropertyName("deleted")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [XmlArray ("deleted")]
+        [XmlArrayItem ("mfn")]
+        [JsonPropertyName ("deleted")]
+        [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int[]? DeletedRecords { get; set; }
 
         /// <summary>
         /// Altered records.
         /// </summary>
-        [XmlArray("altered")]
-        [XmlArrayItem("mfn")]
-        [JsonPropertyName("altered")]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        [XmlArray ("altered")]
+        [XmlArrayItem ("mfn")]
+        [JsonPropertyName ("altered")]
+        [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingNull)]
         public int[]? AlteredRecords { get; set; }
 
         #endregion
@@ -109,21 +109,21 @@ namespace ManagedIrbis.Catalog
                 string name
             )
         {
-            if (!ReferenceEquals(records, null)
+            if (!ReferenceEquals (records, null)
                 && records.Length != 0)
             {
                 builder.AppendLine
                     (
                         string.Format
-                        (
-                            "{0}: {1}",
-                            name,
-                            string.Join
-                                (
-                                    ", ",
-                                    records
-                                )
-                        )
+                            (
+                                "{0}: {1}",
+                                name,
+                                string.Join
+                                    (
+                                        ", ",
+                                        records
+                                    )
+                            )
                     );
             }
         }
@@ -142,14 +142,14 @@ namespace ManagedIrbis.Catalog
             )
         {
             RecordState[] firstRecords = first.Records
-                .ThrowIfNull("first.Records");
+                .ThrowIfNull ("first.Records");
             RecordState[] secondRecords = second.Records
-                .ThrowIfNull("second.Records");
+                .ThrowIfNull ("second.Records");
 
             int[] firstDeleted = first.LogicallyDeleted
-                .ThrowIfNull("first.LogicallyDeleted");
+                .ThrowIfNull ("first.LogicallyDeleted");
             int[] secondDeleted = second.LogicallyDeleted
-                .ThrowIfNull("second.LogicallyDeleted");
+                .ThrowIfNull ("second.LogicallyDeleted");
 
             // TODO compare first.Database with second.Database?
 
@@ -159,31 +159,31 @@ namespace ManagedIrbis.Catalog
                 SecondDate = second.Date,
                 Database = first.Database,
                 NewRecords = secondRecords.Except
-                    (
-                        firstRecords,
-                        new RecordStateComparer.ByMfn()
-                    )
-                    .Select(state => state.Mfn)
-                    .Where(mfn => mfn != 0)
+                        (
+                            firstRecords,
+                            new RecordStateComparer.ByMfn()
+                        )
+                    .Select (state => state.Mfn)
+                    .Where (mfn => mfn != 0)
                     .ToArray()
             };
 
 
             result.AlteredRecords = secondRecords.Except
-                (
-                    firstRecords,
-                    new RecordStateComparer.ByVersion()
-                )
-                .Select(state => state.Mfn)
-                .Where(mfn => mfn != 0)
-                .Except(result.NewRecords.ThrowIfNull("result.NewRecords"))
-                .Except(secondDeleted)
+                    (
+                        firstRecords,
+                        new RecordStateComparer.ByVersion()
+                    )
+                .Select (state => state.Mfn)
+                .Where (mfn => mfn != 0)
+                .Except (result.NewRecords.ThrowIfNull ("result.NewRecords"))
+                .Except (secondDeleted)
                 .ToArray();
 
             result.DeletedRecords
-                = secondDeleted.Except(firstDeleted)
-                .Where(mfn => mfn != 0)
-                .ToArray();
+                = secondDeleted.Except (firstDeleted)
+                    .Where (mfn => mfn != 0)
+                    .ToArray();
 
             return result;
         }
@@ -232,13 +232,13 @@ namespace ManagedIrbis.Catalog
             )
         {
             writer
-                .WritePackedInt32(Id)
-                .Write(FirstDate)
-                .Write(SecondDate)
-                .WriteNullable(Database)
-                .WriteNullableArray(NewRecords)
-                .WriteNullableArray(DeletedRecords)
-                .WriteNullableArray(AlteredRecords);
+                .WritePackedInt32 (Id)
+                .Write (FirstDate)
+                .Write (SecondDate)
+                .WriteNullable (Database)
+                .WriteNullableArray (NewRecords)
+                .WriteNullableArray (DeletedRecords)
+                .WriteNullableArray (AlteredRecords);
         }
 
         #endregion
@@ -250,9 +250,9 @@ namespace ManagedIrbis.Catalog
         {
             StringBuilder result = new StringBuilder();
 
-            _AppendRecords(result, NewRecords, "New");
-            _AppendRecords(result, DeletedRecords, "Deleted");
-            _AppendRecords(result, AlteredRecords, "Altered");
+            _AppendRecords (result, NewRecords, "New");
+            _AppendRecords (result, DeletedRecords, "Deleted");
+            _AppendRecords (result, AlteredRecords, "Altered");
 
             return result.ToString();
         }

@@ -76,7 +76,7 @@ namespace ManagedIrbis.Client
             get
             {
                 var ini = Ini;
-                var result = ini.GetOrCreateSection("Main");
+                var result = ini.GetOrCreateSection ("Main");
 
                 return result;
             }
@@ -85,12 +85,12 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Организация, на которую куплен ИРБИС.
         /// </summary>
-        public string? Organization => Main ["User"];
+        public string? Organization => Main["User"];
 
         /// <summary>
         /// IP-адрес ИРБИС-сервера.
         /// </summary>
-        public string ServerIP => Main ["ServerIP"] ?? "127.0.0.1";
+        public string ServerIP => Main["ServerIP"] ?? "127.0.0.1";
 
         /// <summary>
         /// Номер порта, на котором ИРБИС-сервер ожидает подключения.
@@ -104,16 +104,14 @@ namespace ManagedIrbis.Client
         {
             get
             {
-                var result = Context.UserName ?? MagnaSection [nameof (UserName)];
+                var result = Context.UserName ?? MagnaSection[nameof (UserName)];
                 if (!string.IsNullOrEmpty (result))
                 {
                     result = IrbisUtility.DecryptConnectionString (result, null);
                 }
 
                 return result;
-
             } // get
-
         } // property UseeName
 
         /// <summary>
@@ -123,16 +121,14 @@ namespace ManagedIrbis.Client
         {
             get
             {
-                var result = Context.Password ?? MagnaSection [nameof (UserPassword)];
+                var result = Context.Password ?? MagnaSection[nameof (UserPassword)];
                 if (!string.IsNullOrEmpty (result))
                 {
                     result = IrbisUtility.DecryptConnectionString (result, null);
                 }
 
                 return result;
-
             } // get
-
         } // property UserPassword
 
         #endregion
@@ -148,8 +144,8 @@ namespace ManagedIrbis.Client
             )
         {
             Ini = iniFile;
-            _contextIniSection = new ContextIniSection(iniFile);
-            _desktopIniSection = new DesktopIniSection(iniFile);
+            _contextIniSection = new ContextIniSection (iniFile);
+            _desktopIniSection = new DesktopIniSection (iniFile);
         }
 
         #endregion
@@ -178,7 +174,6 @@ namespace ManagedIrbis.Client
             };
 
             return settings.ToString();
-
         } // method BuildConnectionString
 
         /// <summary>
@@ -191,8 +186,8 @@ namespace ManagedIrbis.Client
                 string? defaultValue = null
             )
         {
-            Sure.NotNullNorEmpty(sectionName, nameof(sectionName));
-            Sure.NotNullNorEmpty(keyName, nameof(keyName));
+            Sure.NotNullNorEmpty (sectionName, nameof (sectionName));
+            Sure.NotNullNorEmpty (keyName, nameof (keyName));
 
             var result = Ini.GetValue
                 (
@@ -202,7 +197,6 @@ namespace ManagedIrbis.Client
                 );
 
             return result;
-
         } // method GetValue
 
         /// <summary>
@@ -220,11 +214,8 @@ namespace ManagedIrbis.Client
             var result = new LocalCatalogerIniFile (iniFile);
 
             return result;
-
         } // method Load
 
         #endregion
-
     } // class LocalCatalogerIniFile
-
 } // namespace ManagedIrbis.Client

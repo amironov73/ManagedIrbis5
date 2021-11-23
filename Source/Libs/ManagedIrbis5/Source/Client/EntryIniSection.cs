@@ -40,7 +40,7 @@ namespace ManagedIrbis.Client
         #region Constants
 
         /// <summary>
-        /// Section name.
+        /// Имя секции.
         /// </summary>
         public const string SectionName = "Entry";
 
@@ -51,34 +51,34 @@ namespace ManagedIrbis.Client
         /// <summary>
         /// Имя формата для ФЛК документа в целом.
         /// </summary>
-        [XmlElement("dbnflc")]
-        [JsonPropertyName("dbnflc")]
+        [XmlElement ("dbnflc")]
+        [JsonPropertyName ("dbnflc")]
         public string? DbnFlc
         {
-            get => Section.GetValue("DBNFLC", "DBNFLC");
+            get => Section.GetValue ("DBNFLC", "DBNFLC");
             set => Section["DBNFLC"] = value;
         }
 
         /// <summary>
         /// DefFieldNumb.
         /// </summary>
-        [XmlElement("DefFieldNumb")]
-        [JsonPropertyName("DefFieldNumb")]
+        [XmlElement ("DefFieldNumb")]
+        [JsonPropertyName ("DefFieldNumb")]
         public int DefFieldNumb
         {
-            get => Section.GetValue("DefFieldNumb", 10);
-            set => Section.SetValue("DefFieldNumb", value);
+            get => Section.GetValue ("DefFieldNumb", 10);
+            set => Section.SetValue ("DefFieldNumb", value);
         }
 
         /// <summary>
         /// MaxAddFields.
         /// </summary>
-        [XmlElement("MaxAddFields")]
-        [JsonPropertyName("MaxAddFields")]
+        [XmlElement ("MaxAddFields")]
+        [JsonPropertyName ("MaxAddFields")]
         public int MaxAddFields
         {
-            get => Section.GetValue("MaxAddFields", 10);
-            set => Section.SetValue("MaxAddFields", value);
+            get => Section.GetValue ("MaxAddFields", 10);
+            set => Section.SetValue ("MaxAddFields", value);
         }
 
         /// <summary>
@@ -87,8 +87,8 @@ namespace ManagedIrbis.Client
         /// </summary>
         public bool RecordUpdate
         {
-            get => Utility.ToBoolean(Section.GetValue("RECUPDIF", "1").ThrowIfNull());
-            set => Section.SetValue("RECUPDIF", value ? "1" : "0");
+            get => Utility.ToBoolean (Section.GetValue ("RECUPDIF", "1").ThrowIfNull());
+            set => Section.SetValue ("RECUPDIF", value ? "1" : "0");
         }
 
         #endregion
@@ -99,7 +99,7 @@ namespace ManagedIrbis.Client
         /// Constructor.
         /// </summary>
         public EntryIniSection()
-            : base(SectionName)
+            : base (SectionName)
         {
         }
 
@@ -110,7 +110,7 @@ namespace ManagedIrbis.Client
             (
                 IniFile iniFile
             )
-            : base(iniFile, SectionName)
+            : base (iniFile, SectionName)
         {
         }
 
@@ -121,7 +121,7 @@ namespace ManagedIrbis.Client
             (
                 IniFile.Section section
             )
-            : base(section)
+            : base (section)
         {
         }
 

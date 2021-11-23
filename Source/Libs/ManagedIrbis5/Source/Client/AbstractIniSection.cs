@@ -51,15 +51,17 @@ namespace ManagedIrbis.Client
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         protected AbstractIniSection
             (
                 string sectionName
             )
         {
+            Sure.NotNull (sectionName);
+
             _ourIniFile = new IniFile();
-            Section = _ourIniFile.GetOrCreateSection(sectionName);
+            Section = _ourIniFile.GetOrCreateSection (sectionName);
         }
 
         /// <summary>
@@ -71,8 +73,11 @@ namespace ManagedIrbis.Client
                 string sectionName
             )
         {
+            Sure.NotNull (iniFile);
+            Sure.NotNull (sectionName);
+
             _ourIniFile = null;
-            Section = iniFile.GetOrCreateSection(sectionName);
+            Section = iniFile.GetOrCreateSection (sectionName);
         }
 
         /// <summary>
@@ -83,6 +88,8 @@ namespace ManagedIrbis.Client
                 IniFile.Section section
             )
         {
+            Sure.NotNull (section);
+
             _ourIniFile = null;
             Section = section;
         }
@@ -114,12 +121,12 @@ namespace ManagedIrbis.Client
                 string defaultValue
             )
         {
-            Sure.NotNullNorEmpty(name, nameof(name));
-            Sure.NotNullNorEmpty(defaultValue, nameof(defaultValue));
+            Sure.NotNullNorEmpty (name, nameof (name));
+            Sure.NotNullNorEmpty (defaultValue, nameof (defaultValue));
 
             return Utility.ToBoolean
                 (
-                    Section.GetValue(name, defaultValue)
+                    Section.GetValue (name, defaultValue)
                         .ThrowIfNull()
                 );
         }
@@ -133,7 +140,7 @@ namespace ManagedIrbis.Client
                 bool value
             )
         {
-            Sure.NotNullNorEmpty(name, nameof(name));
+            Sure.NotNullNorEmpty (name, nameof (name));
 
             Section.SetValue
                 (
