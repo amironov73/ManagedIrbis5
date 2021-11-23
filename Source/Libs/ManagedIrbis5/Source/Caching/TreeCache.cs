@@ -41,19 +41,25 @@ namespace ManagedIrbis.Caching
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public TreeCache (ISyncProvider provider) : base (provider) {}
+        public TreeCache (ISyncProvider provider) : base (provider)
+        {
+        }
 
         /// <summary>
         /// Конструктор с опциями кэширования.
         /// </summary>
         public TreeCache (ISyncProvider provider, MemoryCacheOptions options)
-            : base (provider, options) {}
+            : base (provider, options)
+        {
+        }
 
         /// <summary>
         /// Конструктор с внешним кэш-провайдером.
         /// </summary>
         public TreeCache (ISyncProvider provider, IMemoryCache cache)
-            : base (provider, cache) {}
+            : base (provider, cache)
+        {
+        }
 
         #endregion
 
@@ -69,7 +75,7 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
-            var document = GetDocument(specification);
+            var document = GetDocument (specification);
             if (document is not null)
             {
                 var reader = new StringReader (document);
@@ -78,17 +84,20 @@ namespace ManagedIrbis.Caching
             }
 
             return null;
-
-        } // method GetTree
+        }
 
         /// <summary>
         /// Обновление "деревянного" меню на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateTree (FileSpecification specification, TreeFile tree) =>
+        public void UpdateTree
+            (
+                FileSpecification specification,
+                TreeFile tree
+            )
+        {
             UpdateDocument (specification, tree.ToString() ?? String.Empty);
+        }
 
         #endregion
-
-    } // class MenuCache
-
-} // namespace ManagedIrbis.Caching
+    }
+}

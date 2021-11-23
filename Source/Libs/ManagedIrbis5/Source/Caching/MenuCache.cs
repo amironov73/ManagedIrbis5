@@ -40,19 +40,25 @@ namespace ManagedIrbis.Caching
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public MenuCache (ISyncProvider provider) : base (provider) {}
+        public MenuCache (ISyncProvider provider) : base (provider)
+        {
+        }
 
         /// <summary>
         /// Конструктор с опциями кэширования.
         /// </summary>
         public MenuCache (ISyncProvider provider, MemoryCacheOptions options)
-            : base (provider, options) {}
+            : base (provider, options)
+        {
+        }
 
         /// <summary>
         /// Конструктор с внешним кэш-провайдером.
         /// </summary>
         public MenuCache (ISyncProvider provider, IMemoryCache cache)
-            : base (provider, cache) {}
+            : base (provider, cache)
+        {
+        }
 
         #endregion
 
@@ -77,17 +83,20 @@ namespace ManagedIrbis.Caching
             }
 
             return null;
-
-        } // method GetMenu
+        }
 
         /// <summary>
         /// Обновление меню на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateMenu (FileSpecification specification, MenuFile menu) =>
+        public void UpdateMenu
+            (
+                FileSpecification specification,
+                MenuFile menu
+            )
+        {
             UpdateDocument (specification, menu.ToText());
+        }
 
         #endregion
-
-    } // class MenuCache
-
-} // namespace ManagedIrbis.Caching
+    }
+}

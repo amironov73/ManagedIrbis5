@@ -55,7 +55,9 @@ namespace ManagedIrbis.Caching
         /// Конструктор.
         /// </summary>
         public ContextCache (ISyncProvider provider)
-            : this (provider, new MemoryCacheOptions()) {}
+            : this (provider, new MemoryCacheOptions())
+        {
+        }
 
         /// <summary>
         /// Конструктор с опциями кэширования.
@@ -64,8 +66,7 @@ namespace ManagedIrbis.Caching
             : this (provider, new MemoryCache (options))
         {
             _options = options;
-
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор с внешним кэш-провайдером.
@@ -79,8 +80,7 @@ namespace ManagedIrbis.Caching
             Provider = provider;
             _options = new MemoryCacheOptions();
             _cache = cache;
-
-        } // constructor
+        }
 
         #endregion
 
@@ -89,15 +89,20 @@ namespace ManagedIrbis.Caching
         private readonly MemoryCacheOptions _options;
         private IMemoryCache _cache;
 
-        private static string GetKey (FileSpecification specification) =>
-            specification.ToString().ToUpperInvariant();
+        private static string GetKey (FileSpecification specification)
+        {
+            return specification.ToString().ToUpperInvariant();
+        }
 
-        private static string GetKey (int mfn) => string.Format
-            (
-                CultureInfo.InvariantCulture,
-                "_record_{0}",
-                mfn
-            );
+        private static string GetKey (int mfn)
+        {
+            return string.Format
+                (
+                    CultureInfo.InvariantCulture,
+                    "_record_{0}",
+                    mfn
+                );
+        }
 
         #endregion
 
@@ -110,8 +115,7 @@ namespace ManagedIrbis.Caching
         {
             _cache.Dispose();
             _cache = new MemoryCache (_options);
-
-        } // method Clear
+        }
 
         /// <summary>
         /// Получение документа из кэша.
@@ -127,15 +131,14 @@ namespace ManagedIrbis.Caching
             if (!_cache.TryGetValue (key, out string? result))
             {
                 result = Provider.ReadTextFile (specification);
-                if (!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty (result))
                 {
                     _cache.Set (key, result);
                 }
             }
 
             return result;
-
-        } // method GetDocument
+        }
 
         /// <summary>
         /// Получение меню из кэша.
@@ -156,8 +159,7 @@ namespace ManagedIrbis.Caching
             }
 
             return null;
-
-        } // method GetMenu
+        }
 
         /// <summary>
         /// Получение записи из кэша.
@@ -168,7 +170,7 @@ namespace ManagedIrbis.Caching
             (
                 int mfn
             )
-            where T: class, IRecord, new()
+            where T : class, IRecord, new()
         {
             var key = GetKey (mfn);
             if (!_cache.TryGetValue (key, out T? result))
@@ -178,17 +180,15 @@ namespace ManagedIrbis.Caching
                     Database = Provider.Database,
                     Mfn = mfn
                 };
-                result = Provider.ReadRecord<T>(parameters);
+                result = Provider.ReadRecord<T> (parameters);
                 if (result is not null)
                 {
                     _cache.Set (key, result);
                 }
-
             } // if
 
             return result;
-
-        } // method GetRecord
+        }
 
         /// <summary>
         /// Получение "деревянного" меню из кэша.
@@ -200,7 +200,7 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
-            var document = GetDocument(specification);
+            var document = GetDocument (specification);
             if (document is not null)
             {
                 var reader = new StringReader (document);
@@ -209,8 +209,7 @@ namespace ManagedIrbis.Caching
             }
 
             return null;
-
-        } // method GetTree
+        }
 
         /// <summary>
         /// Получение рабочего листа из кэша.
@@ -222,7 +221,7 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
-            var document = GetDocument(specification);
+            var document = GetDocument (specification);
             if (document is not null)
             {
                 var reader = new StringReader (document);
@@ -231,8 +230,7 @@ namespace ManagedIrbis.Caching
             }
 
             return null;
-
-        } // method GetWs
+        }
 
         /// <summary>
         /// Получение рабочего листа из кэша.
@@ -244,7 +242,7 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
-            var document = GetDocument(specification);
+            var document = GetDocument (specification);
             if (document is not null)
             {
                 var reader = new StringReader (document);
@@ -253,8 +251,7 @@ namespace ManagedIrbis.Caching
             }
 
             return null;
-
-        } // method GetWss
+        }
 
         /// <summary>
         /// Обновление документа на сервере
@@ -272,8 +269,7 @@ namespace ManagedIrbis.Caching
             var key = GetKey (specification);
 
             _cache.Set (key, documentText);
-
-        } // method UpdateDocument
+        }
 
         /// <summary>
         /// Обновление меню на сервере и заодно в кэше.
@@ -284,8 +280,10 @@ namespace ManagedIrbis.Caching
         /// <summary>
         /// Обновление "деревянного" меню на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateTree (FileSpecification specification, TreeFile tree) =>
-            UpdateDocument (specification, tree.ToString() ?? String.Empty);
+        public void UpdateTree (FileSpecification specification, TreeFile tree)
+        {
+            UpdateDocument (specification, tree.ToString() ?? string.Empty);
+        }
 
         /// <summary>
         /// Обновление записи на сервере.
@@ -294,7 +292,7 @@ namespace ManagedIrbis.Caching
             (
                 T record
             )
-            where T: class, IRecord
+            where T : class, IRecord
         {
             var parameters = new WriteRecordParameters()
             {
@@ -303,30 +301,34 @@ namespace ManagedIrbis.Caching
             Provider.WriteRecord (parameters);
             var key = GetKey (record.Mfn);
             _cache.Set (key, record);
-
-        } // method UpdateRecord
-
-        /// <summary>
-        /// Обновление рабочего листа на сервере и заодно в кэше.
-        /// </summary>
-        public void UpdateWs (FileSpecification specification, WsFile worksheet) =>
-            UpdateDocument (specification, worksheet.ToString());
+        }
 
         /// <summary>
         /// Обновление рабочего листа на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateWss (FileSpecification specification, WssFile worksheet) =>
+        public void UpdateWs (FileSpecification specification, WsFile worksheet)
+        {
             UpdateDocument (specification, worksheet.ToString());
+        }
+
+        /// <summary>
+        /// Обновление рабочего листа на сервере и заодно в кэше.
+        /// </summary>
+        public void UpdateWss (FileSpecification specification, WssFile worksheet)
+        {
+            UpdateDocument (specification, worksheet.ToString());
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => _cache.Dispose();
+        public void Dispose()
+        {
+            _cache.Dispose();
+        }
 
         #endregion
-
-    } // class ContextCache
-
-} // namespace ManagedIrbis.Caching
+    }
+}

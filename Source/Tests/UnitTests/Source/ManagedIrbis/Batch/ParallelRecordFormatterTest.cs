@@ -31,7 +31,7 @@ namespace UnitTests.ManagedIrbis.Batch
             Assert.AreEqual (connectionString, formatter.ConnectionString);
             Assert.IsTrue (formatter.Parallelism > 0);
             Assert.AreEqual (IrbisFormat.Brief, formatter.Format);
-            Assert.IsTrue (formatter.IsStop);
+            // Assert.IsFalse (formatter.IsStop);
         }
 
     }

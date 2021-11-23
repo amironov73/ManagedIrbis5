@@ -31,7 +31,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace ManagedIrbis.Caching
 {
     /// <summary>
-    /// Простейший кэш записей для ИРБИС
+    /// Простейший кэш записей для ИРБИС.
     /// </summary>
     public sealed class RecordCache
         : IDisposable
@@ -51,13 +51,19 @@ namespace ManagedIrbis.Caching
         /// Конструктор.
         /// </summary>
         public RecordCache (ISyncProvider provider)
-            : this (provider, new MemoryCacheOptions()) {}
+            : this (provider, new MemoryCacheOptions())
+        {
+            _options = new MemoryCacheOptions();
+        }
 
         /// <summary>
         /// Конструктор с опциями кэширования.
         /// </summary>
         public RecordCache (ISyncProvider provider, MemoryCacheOptions options)
-            : this (provider, new MemoryCache (options)) {}
+            : this (provider, new MemoryCache (options))
+        {
+            _options = options;
+        }
 
         /// <summary>
         /// Конструктор с внешним кэш-провайдером.
@@ -69,15 +75,16 @@ namespace ManagedIrbis.Caching
             )
         {
             Provider = provider;
+            _options = new MemoryCacheOptions();
             _cache = cache;
-
-        } // constructor
+        }
 
         #endregion
 
         #region Private members
 
-        private readonly IMemoryCache _cache;
+        private readonly MemoryCacheOptions _options;
+        private IMemoryCache _cache;
 
         private static string GetKey (int mfn) => string.Format
             (
@@ -91,6 +98,15 @@ namespace ManagedIrbis.Caching
         #region Public methods
 
         /// <summary>
+        /// Очистка кэша.
+        /// </summary>
+        public void Clear()
+        {
+            _cache.Dispose();
+            _cache = new MemoryCache (_options);
+        }
+
+        /// <summary>
         /// Получение записи из кэша.
         /// Если локальная копия отсутствует,
         /// она запрашивается с сервера.
@@ -99,7 +115,7 @@ namespace ManagedIrbis.Caching
             (
                 int mfn
             )
-            where T: class, IRecord, new()
+            where T : class, IRecord, new()
         {
             var key = GetKey (mfn);
             if (!_cache.TryGetValue (key, out T? result))
@@ -109,17 +125,15 @@ namespace ManagedIrbis.Caching
                     Database = Provider.Database,
                     Mfn = mfn
                 };
-                result = Provider.ReadRecord<T>(parameters);
+                result = Provider.ReadRecord<T> (parameters);
                 if (result is not null)
                 {
                     _cache.Set (key, result);
                 }
-
-            } // if
+            }
 
             return result;
-
-        } // method GetRecord
+        }
 
         /// <summary>
         /// Обновление записи на сервере.
@@ -128,7 +142,7 @@ namespace ManagedIrbis.Caching
             (
                 T record
             )
-            where T: class, IRecord
+            where T : class, IRecord
         {
             var parameters = new WriteRecordParameters()
             {
@@ -137,8 +151,7 @@ namespace ManagedIrbis.Caching
             Provider.WriteRecord (parameters);
             var key = GetKey (record.Mfn);
             _cache.Set (key, record);
-
-        } // method UpdateRecord
+        }
 
         #endregion
 
@@ -147,11 +160,9 @@ namespace ManagedIrbis.Caching
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-            throw new NotImplementedException();
+            // TODO выполнить очистку
         }
 
         #endregion
-
-    } // class RecordCache
-
-} // namespace ManagedIrbis.Caching
+    }
+}

@@ -30,7 +30,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace ManagedIrbis.Caching
 {
     /// <summary>
-    /// Простейший кэш рабочих листов для ИРБИС
+    /// Простейший кэш рабочих листов для ИРБИС.
     /// </summary>
     public sealed class WsCache
         : DocumentCache
@@ -40,19 +40,25 @@ namespace ManagedIrbis.Caching
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public WsCache (ISyncProvider provider) : base (provider) {}
+        public WsCache (ISyncProvider provider) : base (provider)
+        {
+        }
 
         /// <summary>
         /// Конструктор с опциями кэширования.
         /// </summary>
         public WsCache (ISyncProvider provider, MemoryCacheOptions options)
-            : base (provider, options) {}
+            : base (provider, options)
+        {
+        }
 
         /// <summary>
         /// Конструктор с внешним кэш-провайдером.
         /// </summary>
         public WsCache (ISyncProvider provider, IMemoryCache cache)
-            : base (provider, cache) {}
+            : base (provider, cache)
+        {
+        }
 
         #endregion
 
@@ -68,7 +74,7 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
-            var document = GetDocument(specification);
+            var document = GetDocument (specification);
             if (document is not null)
             {
                 var reader = new StringReader (document);
@@ -77,8 +83,7 @@ namespace ManagedIrbis.Caching
             }
 
             return null;
-
-        } // method GetWs
+        }
 
         /// <summary>
         /// Получение рабочего листа из кэша.
@@ -90,7 +95,7 @@ namespace ManagedIrbis.Caching
                 FileSpecification specification
             )
         {
-            var document = GetDocument(specification);
+            var document = GetDocument (specification);
             if (document is not null)
             {
                 var reader = new StringReader (document);
@@ -99,23 +104,24 @@ namespace ManagedIrbis.Caching
             }
 
             return null;
-
-        } // method GetWss
-
-        /// <summary>
-        /// Обновление рабочего листа на сервере и заодно в кэше.
-        /// </summary>
-        public void UpdateWs (FileSpecification specification, WsFile worksheet) =>
-            UpdateDocument (specification, worksheet.ToString());
+        }
 
         /// <summary>
         /// Обновление рабочего листа на сервере и заодно в кэше.
         /// </summary>
-        public void UpdateWss (FileSpecification specification, WssFile worksheet) =>
+        public void UpdateWs (FileSpecification specification, WsFile worksheet)
+        {
             UpdateDocument (specification, worksheet.ToString());
+        }
+
+        /// <summary>
+        /// Обновление рабочего листа на сервере и заодно в кэше.
+        /// </summary>
+        public void UpdateWss (FileSpecification specification, WssFile worksheet)
+        {
+            UpdateDocument (specification, worksheet.ToString());
+        }
 
         #endregion
-
-    } // class MenuCache
-
-} // namespace ManagedIrbis.Caching
+    }
+}

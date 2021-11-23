@@ -49,13 +49,19 @@ namespace ManagedIrbis.Caching
         /// Конструктор.
         /// </summary>
         public DocumentCache (ISyncProvider provider)
-            : this (provider, new MemoryCacheOptions()) {}
+            : this (provider, new MemoryCacheOptions())
+        {
+            _options = new MemoryCacheOptions();
+        }
 
         /// <summary>
         /// Конструктор с опциями кэширования.
         /// </summary>
         public DocumentCache (ISyncProvider provider, MemoryCacheOptions options)
-            : this (provider, new MemoryCache (options)) {}
+            : this (provider, new MemoryCache (options))
+        {
+            _options = options;
+        }
 
         /// <summary>
         /// Конструктор с внешним кэш-провайдером.
@@ -68,24 +74,36 @@ namespace ManagedIrbis.Caching
         {
             Provider = provider;
             _cache = cache;
-
-        } // constructor
+            _options = new MemoryCacheOptions();
+        }
 
         #endregion
 
         #region Private members
 
-        private readonly IMemoryCache _cache;
+        private readonly MemoryCacheOptions _options;
+        private IMemoryCache _cache;
 
         /// <summary>
         /// Получение ключа для указанной спецификации.
         /// </summary>
-        protected static string GetKey (FileSpecification specification) =>
-            specification.ToString().ToUpperInvariant();
+        protected static string GetKey (FileSpecification specification)
+        {
+            return specification.ToString().ToUpperInvariant();
+        }
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Очистка кэша.
+        /// </summary>
+        public void Clear()
+        {
+            _cache.Dispose();
+            _cache = new MemoryCache (_options);
+        }
 
         /// <summary>
         /// Получение документа из кэша.
@@ -101,15 +119,14 @@ namespace ManagedIrbis.Caching
             if (!_cache.TryGetValue (key, out string? result))
             {
                 result = Provider.ReadTextFile (specification);
-                if (!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty (result))
                 {
                     _cache.Set (key, result);
                 }
             }
 
             return result;
-
-        } // method GetDocument
+        }
 
         /// <summary>
         /// Обновление документа на сервере
@@ -127,18 +144,18 @@ namespace ManagedIrbis.Caching
             var key = GetKey (specification);
 
             _cache.Set (key, documentText);
-
-        } // method UpdateDocument
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => _cache.Dispose();
+        public void Dispose()
+        {
+            _cache.Dispose();
+        }
 
         #endregion
-
-    } // class DocumentCache
-
-} // namespace ManagedIrbis.Caching
+    }
+}
