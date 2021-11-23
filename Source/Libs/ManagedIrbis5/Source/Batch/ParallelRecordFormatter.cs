@@ -37,7 +37,7 @@ namespace ManagedIrbis.Batch
     /// </summary>
     public sealed class ParallelRecordFormatter
         : IEnumerable<string>,
-        IDisposable
+            IDisposable
     {
         #region Properties
 
@@ -76,7 +76,6 @@ namespace ManagedIrbis.Batch
                 string format
             )
         {
-
             if (parallelism <= 0)
             {
                 parallelism = Utility.OptimalParallelism;
@@ -84,13 +83,13 @@ namespace ManagedIrbis.Batch
 
             ConnectionString = connectionString;
             Format = format;
-            Parallelism = Math.Min(mfnList.Length / 1000, parallelism);
+            Parallelism = Math.Min (mfnList.Length / 1000, parallelism);
             if (Parallelism < 2)
             {
                 Parallelism = 2;
             }
 
-            _Run(mfnList);
+            _Run (mfnList);
         }
 
         #endregion
@@ -111,7 +110,8 @@ namespace ManagedIrbis.Batch
             )
         {
             _queue = new ConcurrentQueue<string>();
-            _event = new AutoResetEvent(false);
+            _event = new AutoResetEvent (false);
+
             // _lock = new object();
 
             _tasks = new Task[Parallelism];
@@ -129,9 +129,10 @@ namespace ManagedIrbis.Batch
                     );
                 _tasks[i] = task;
             }
+
             foreach (var task in _tasks)
             {
-                Thread.Sleep(50);
+                Thread.Sleep (50);
                 task.Start();
             }
         }
@@ -142,7 +143,7 @@ namespace ManagedIrbis.Batch
             )
         {
             var chunk = (int[]?)state;
-            var first = chunk?.SafeAt(0, -1);
+            var first = chunk?.SafeAt (0, -1);
             var threadId = Thread.CurrentThread.ManagedThreadId;
 
             Magna.Trace
@@ -159,7 +160,7 @@ namespace ManagedIrbis.Batch
             var connectionString = ConnectionString.ThrowIfNull();
             using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
             {
-                connection.ParseConnectionString(connectionString);
+                connection.ParseConnectionString (connectionString);
                 connection.Connect();
 
                 var batch = new BatchRecordFormatter
@@ -172,9 +173,8 @@ namespace ManagedIrbis.Batch
                     );
                 foreach (var line in batch)
                 {
-                    _PutLine(line);
+                    _PutLine (line);
                 }
-
             }
 
             _event?.Set();
@@ -196,14 +196,14 @@ namespace ManagedIrbis.Batch
                 string line
             )
         {
-            _queue?.Enqueue(line);
+            _queue?.Enqueue (line);
             _event?.Set();
         }
 
         private bool _AllDone()
         {
             return _queue.ThrowIfNull().IsEmpty
-                   && _tasks.ThrowIfNull().All(t => t.IsCompleted);
+                   && _tasks.ThrowIfNull().All (t => t.IsCompleted);
         }
 
         #endregion
@@ -219,7 +219,7 @@ namespace ManagedIrbis.Batch
 
             foreach (var line in this)
             {
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
@@ -241,7 +241,7 @@ namespace ManagedIrbis.Batch
 
                 if (_queue is not null)
                 {
-                    while (_queue.TryDequeue(out var line))
+                    while (_queue.TryDequeue (out var line))
                     {
                         yield return line;
                     }
@@ -249,7 +249,7 @@ namespace ManagedIrbis.Batch
 
                 _event?.Reset();
 
-                _event?.WaitOne(10);
+                _event?.WaitOne (10);
             }
         }
 
@@ -277,7 +277,5 @@ namespace ManagedIrbis.Batch
         }
 
         #endregion
-
-    } // class ParallelRecordFormatter
-
-} // namespace ManagedIrbis.Batch
+    }
+}

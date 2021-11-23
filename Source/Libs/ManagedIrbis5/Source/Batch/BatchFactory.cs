@@ -113,7 +113,7 @@ namespace ManagedIrbis.Batch
 
             switch (kind)
             {
-                case "parallel":
+                case Parallel:
                     result = new ParallelRecordFormatter
                         (
                             -1,
@@ -139,7 +139,5 @@ namespace ManagedIrbis.Batch
         }
 
         #endregion
-
-    } // class BatchFactory
-
-} // namespace ManagedIrbis.Batch
+    }
+}

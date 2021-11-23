@@ -64,7 +64,7 @@ namespace ManagedIrbis.Batch
         /// Constructor.
         /// </summary>
         public ParallelRecordReader()
-            : this(-1)
+            : this (-1)
         {
         }
 
@@ -96,7 +96,7 @@ namespace ManagedIrbis.Batch
                 (
                     parallelism,
                     connectionString,
-                    _GetMfnList(connectionString)
+                    _GetMfnList (connectionString)
                 )
         {
         }
@@ -117,13 +117,13 @@ namespace ManagedIrbis.Batch
             }
 
             ConnectionString = connectionString;
-            Parallelism = Math.Min(mfnList.Length / 1000, parallelism);
+            Parallelism = Math.Min (mfnList.Length / 1000, parallelism);
             if (Parallelism < 2)
             {
                 Parallelism = 2;
             }
 
-            _Run(mfnList);
+            _Run (mfnList);
         }
 
         #endregion
@@ -142,19 +142,19 @@ namespace ManagedIrbis.Batch
             )
         {
             using var connection = ConnectionFactory.Shared.CreateSyncConnection();
-            connection.ParseConnectionString(connectionString);
+            connection.ParseConnectionString (connectionString);
             connection.Connect();
 
             var maxMfn = connection.GetMaxMfn() - 1;
             if (maxMfn <= 0)
             {
-                throw new IrbisException("MaxMFN=0");
+                throw new IrbisException ("MaxMFN=0");
             }
-            var result = Enumerable.Range(1, maxMfn).ToArray();
+
+            var result = Enumerable.Range (1, maxMfn).ToArray();
 
             return result;
-
-        } // method _GetMfnList
+        }
 
         private void _Run
             (
@@ -162,7 +162,7 @@ namespace ManagedIrbis.Batch
             )
         {
             _queue = new ConcurrentQueue<Record>();
-            _event = new AutoResetEvent(false);
+            _event = new AutoResetEvent (false);
 
             _tasks = new Task[Parallelism];
             var chunks = ArrayUtility.SplitArray
@@ -183,11 +183,10 @@ namespace ManagedIrbis.Batch
 
             foreach (var task in _tasks)
             {
-                Thread.Sleep(50);
+                Thread.Sleep (50);
                 task.Start();
             }
-
-        } // method _Run
+        }
 
         private void _Worker
             (
@@ -195,12 +194,12 @@ namespace ManagedIrbis.Batch
             )
         {
             var chunk = (int[])state;
-            var first = chunk.SafeAt(0, -1);
+            var first = chunk.SafeAt (0, -1);
             var threadId = Environment.CurrentManagedThreadId;
 
             Magna.Trace
                 (
-                    nameof(ParallelRecordReader) + "::" + nameof(_Worker)
+                    nameof (ParallelRecordReader) + "::" + nameof (_Worker)
                     + ": first="
                     + first
                     + ", length="
@@ -212,16 +211,16 @@ namespace ManagedIrbis.Batch
             var connectionString = ConnectionString.ThrowIfNull();
             using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
             {
-                connection.ParseConnectionString(connectionString);
+                connection.ParseConnectionString (connectionString);
                 connection.Connect();
 
                 var database = connection.EnsureDatabase();
-                var records = connection.ReadRecords(database, chunk);
+                var records = connection.ReadRecords (database, chunk);
                 if (records is not null)
                 {
                     foreach (var record in records)
                     {
-                        _PutRecord(record);
+                        _PutRecord (record);
                     }
                 }
             }
@@ -230,7 +229,7 @@ namespace ManagedIrbis.Batch
 
             Magna.Trace
                 (
-                    nameof(ParallelRecordReader) + "::" + nameof(_Worker)
+                    nameof (ParallelRecordReader) + "::" + nameof (_Worker)
                     + ": first="
                     + first
                     + ", length="
@@ -238,23 +237,21 @@ namespace ManagedIrbis.Batch
                     + ", thread="
                     + threadId
                 );
-
-        } // method _Worker
+        }
 
         private void _PutRecord
             (
                 Record record
             )
         {
-            _queue?.Enqueue(record);
+            _queue?.Enqueue (record);
             _event?.Set();
-
-        } // method _PutRecord
+        }
 
         private bool _AllDone()
         {
             return _queue.ThrowIfNull().IsEmpty
-                   && _tasks.ThrowIfNull().All(t => t.IsCompleted);
+                   && _tasks.ThrowIfNull().All (t => t.IsCompleted);
         }
 
         #endregion
@@ -273,7 +270,7 @@ namespace ManagedIrbis.Batch
 
                 if (_queue is not null)
                 {
-                    while (_queue.TryDequeue(out var record))
+                    while (_queue.TryDequeue (out var record))
                     {
                         yield return record;
                     }
@@ -281,10 +278,9 @@ namespace ManagedIrbis.Batch
 
                 _event?.Reset();
 
-                _event?.WaitOne(10);
+                _event?.WaitOne (10);
             }
-
-        } // method GetEnumerator
+        }
 
         [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator()
@@ -301,12 +297,11 @@ namespace ManagedIrbis.Batch
 
             foreach (var record in this)
             {
-                result.Add(record);
+                result.Add (record);
             }
 
             return result.ToArray();
-
-        } // method ReadAll
+        }
 
         #endregion
 
@@ -323,10 +318,8 @@ namespace ManagedIrbis.Batch
                     task.Dispose();
                 }
             }
-        } // method Dispose
+        }
 
         #endregion
-
-    } // class ParallelRecordReader
-
-} // namespace ManagedIrbis.Batch
+    }
+}

@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ConvertToLocalFunction
 // ReSharper disable DelegateSubtraction
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
@@ -11,6 +12,7 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 
 // get rid of "event never used" warning
+
 #pragma warning disable 67
 
 /* BatchRecordReader.cs -- пакетное чтение записей для ускорения процесса
@@ -113,23 +115,22 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordReader) + "::Constructor"
-                        + ": batchSize="
-                        + batchSize
+                        nameof (BatchRecordReader) + "::Constructor"
+                                                   + ": batchSize="
+                                                   + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
             Connection = connection;
-            Database = connection.EnsureDatabase(database);
+            Database = connection.EnsureDatabase (database);
             BatchSize = batchSize;
             OmitDeletedRecords = omitDeletedRecords;
 
-            _chunks = range.Chunk(batchSize).ToArray();
-            TotalRecords = _chunks.Sum(p => p.Length);
-
-        } // constructor
+            _chunks = range.Chunk (batchSize).ToArray();
+            TotalRecords = _chunks.Sum (p => p.Length);
+        }
 
         #endregion
 
@@ -149,12 +150,11 @@ namespace ManagedIrbis.Batch
                 return false;
             }
 
-            var arguments = new ExceptionEventArgs<Exception>(exception);
-            handler(this, arguments);
+            var arguments = new ExceptionEventArgs<Exception> (exception);
+            handler (this, arguments);
 
             return arguments.Handled;
-
-        } // method _HandleException
+        }
 
         #endregion
 
@@ -178,23 +178,23 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordReader) + "::" + nameof(Interval)
+                        nameof (BatchRecordReader) + "::" + nameof (Interval)
                         + ": batchSize="
                         + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
-            database = connection.EnsureDatabase(database);
+            database = connection.EnsureDatabase (database);
 
-            var maxMfn = connection.GetMaxMfn(database) - 1;
+            var maxMfn = connection.GetMaxMfn (database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<Record>();
             }
 
-            lastMfn = Math.Min(lastMfn, maxMfn);
+            lastMfn = Math.Min (lastMfn, maxMfn);
             if (firstMfn > lastMfn)
             {
                 return Array.Empty<Record>();
@@ -203,7 +203,7 @@ namespace ManagedIrbis.Batch
             var result = new BatchRecordReader
                 (
                     connection,
-                    Enumerable.Range(firstMfn, lastMfn - firstMfn + 1),
+                    Enumerable.Range (firstMfn, lastMfn - firstMfn + 1),
                     batchSize,
                     database,
                     omitDeletedRecords
@@ -211,16 +211,15 @@ namespace ManagedIrbis.Batch
 
             if (action is not null)
             {
-                void BatchHandler(object? o, EventArgs eventArgs) => action(result);
+                void BatchHandler (object? o, EventArgs eventArgs) => action (result);
                 result.BatchRead += BatchHandler;
 
-                void CompleteHandler(object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
+                void CompleteHandler (object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
                 result.ReadComplete += CompleteHandler;
             }
 
             return result;
-
-        } // method Interval
+        }
 
         /// <summary>
         /// Считывает все записи сразу.
@@ -230,7 +229,7 @@ namespace ManagedIrbis.Batch
                 bool omitDeletedRecords = true
             )
         {
-            var result = new List<Record>(TotalRecords);
+            var result = new List<Record> (TotalRecords);
 
             foreach (var record in this)
             {
@@ -239,12 +238,11 @@ namespace ManagedIrbis.Batch
                     continue;
                 }
 
-                result.Add(record);
+                result.Add (record);
             }
 
             return result;
-
-        } // method ReadAll
+        }
 
         /// <summary>
         /// Чтение записей, соответствующих запросу.
@@ -262,12 +260,12 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordReader) + "::" + nameof(Search)
+                        nameof (BatchRecordReader) + "::" + nameof (Search)
                         + ": batchSize="
                         + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
             var parameters = new SearchParameters
@@ -275,13 +273,13 @@ namespace ManagedIrbis.Batch
                 Database = database,
                 Expression = searchExpression
             };
-            var found = connection.Search(parameters);
+            var found = connection.Search (parameters);
             if (found?.Length == 0)
             {
                 return Array.Empty<Record>();
             }
 
-            var range = FoundItem.ToMfn(found);
+            var range = FoundItem.ToMfn (found);
             var result = new BatchRecordReader
                 (
                     connection,
@@ -292,16 +290,15 @@ namespace ManagedIrbis.Batch
 
             if (action is not null)
             {
-                void BatchHandler(object? o, EventArgs eventArgs) => action(result);
+                void BatchHandler (object? o, EventArgs eventArgs) => action (result);
                 result.BatchRead += BatchHandler;
 
-                void CompleteHandler(object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
+                void CompleteHandler (object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
                 result.ReadComplete += CompleteHandler;
             }
 
             return result;
-
-        } // method Search
+        }
 
         /// <summary>
         /// Чтение всей базы данных.
@@ -319,16 +316,16 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordReader) + "::" + nameof(WholeDatabase)
+                        nameof (BatchRecordReader) + "::" + nameof (WholeDatabase)
                         + ": batchSize="
                         + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
-            database = connection.EnsureDatabase(database);
-            var maxMfn = connection.GetMaxMfn(database) - 1;
+            database = connection.EnsureDatabase (database);
+            var maxMfn = connection.GetMaxMfn (database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<Record>();
@@ -337,7 +334,7 @@ namespace ManagedIrbis.Batch
             var result = new BatchRecordReader
                 (
                     connection,
-                    Enumerable.Range(1, maxMfn),
+                    Enumerable.Range (1, maxMfn),
                     batchSize,
                     database,
                     omitDeletedRecords
@@ -345,15 +342,14 @@ namespace ManagedIrbis.Batch
 
             if (action is not null)
             {
-                void BatchHandler(object? o, EventArgs eventArgs) => action(result);
+                void BatchHandler (object? o, EventArgs eventArgs) => action (result);
                 result.BatchRead += BatchHandler;
 
-                void CompleteHandler(object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
+                void CompleteHandler (object? o, EventArgs eventArgs) => result.BatchRead -= BatchHandler;
                 result.ReadComplete += CompleteHandler;
             }
 
             return result;
-
         } // method WholeDatabase
 
         /// <summary>
@@ -374,9 +370,9 @@ namespace ManagedIrbis.Batch
                     batchSize
                 );
 
-            if (!ReferenceEquals(action, null))
+            if (!ReferenceEquals (action, null))
             {
-                EventHandler batchHandler = (object? _, EventArgs _) => action(result);
+                EventHandler batchHandler = (_, _) => action (result);
                 result.BatchRead += batchHandler;
             }
 
@@ -390,7 +386,7 @@ namespace ManagedIrbis.Batch
         /// <inheritdoc cref="IEnumerable{T}.GetEnumerator" />
         public IEnumerator<Record> GetEnumerator()
         {
-            Magna.Trace(nameof(BatchRecordReader) + "::" + nameof(GetEnumerator) + ": start");
+            Magna.Trace (nameof (BatchRecordReader) + "::" + nameof (GetEnumerator) + ": start");
 
             foreach (var package in _chunks)
             {
@@ -403,17 +399,17 @@ namespace ManagedIrbis.Batch
                             package
                         );
                     RecordsRead += records?.Length ?? 0;
-                    BatchRead.Raise(this);
+                    BatchRead.Raise (this);
                 }
                 catch (Exception exception)
                 {
                     Magna.TraceException
                         (
-                            nameof(BatchRecordReader) + "::" + nameof(GetEnumerator),
+                            nameof (BatchRecordReader) + "::" + nameof (GetEnumerator),
                             exception
                         );
 
-                    if (!_HandleException(exception))
+                    if (!_HandleException (exception))
                     {
                         throw;
                     }
@@ -431,20 +427,19 @@ namespace ManagedIrbis.Batch
                         yield return record;
                     }
                 }
+            }
 
-            } // foreach
+            ReadComplete.Raise (this);
 
-            ReadComplete.Raise(this);
-
-            Magna.Trace(nameof(BatchRecordReader) + "::" + nameof(GetEnumerator) + ": end");
-
-        } // method GetEnumerator
+            Magna.Trace (nameof (BatchRecordReader) + "::" + nameof (GetEnumerator) + ": end");
+        }
 
         [ExcludeFromCodeCoverage]
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
         #endregion
-
-    } // class BatchRecordReader
-
-} // namespace ManagedIrbis.Batch
+    }
+}

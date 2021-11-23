@@ -97,7 +97,7 @@ namespace ManagedIrbis.Batch
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public BatchRecordFormatter
             (
@@ -112,12 +112,12 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordFormatter) + "::Constructor: "
-                        + nameof(batchSize) + "="
-                        + batchSize
+                        nameof (BatchRecordFormatter) + "::Constructor: "
+                                                      + nameof (batchSize) + "="
+                                                      + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
             Connection = connection;
@@ -126,9 +126,9 @@ namespace ManagedIrbis.Batch
             Format = format;
 
             range ??= Array.Empty<int>();
-            _packages = range.Chunk(batchSize).ToArray();
-            TotalRecords = _packages.Sum(p => p.Length);
-        } // constructor
+            _packages = range.Chunk (batchSize).ToArray();
+            TotalRecords = _packages.Sum (p => p.Length);
+        }
 
         /// <summary>
         /// Constructor.
@@ -146,24 +146,23 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordFormatter) + "::Constructor: "
-                        + "batchSize="
-                        + batchSize
+                        nameof (BatchRecordFormatter) + "::Constructor: "
+                        + "batchSize=" + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
             Connection = ConnectionFactory.Shared.CreateSyncConnection();
-            Connection.Configure(connectionString);
+            Connection.Configure (connectionString);
             _ownConnection = true;
             Database = database;
             BatchSize = batchSize;
             Format = format;
 
-            _packages = range.Chunk(batchSize).ToArray();
-            TotalRecords = _packages.Sum(p => p.Length);
-        } // constructor
+            _packages = range.Chunk (batchSize).ToArray();
+            TotalRecords = _packages.Sum (p => p.Length);
+        }
 
         #endregion
 
@@ -180,16 +179,16 @@ namespace ManagedIrbis.Batch
         {
             var handler = Exception;
 
-            if (ReferenceEquals(handler, null))
+            if (ReferenceEquals (handler, null))
             {
                 return false;
             }
 
-            var arguments = new ExceptionEventArgs<Exception>(exception);
-            handler(this, arguments);
+            var arguments = new ExceptionEventArgs<Exception> (exception);
+            handler (this, arguments);
 
             return arguments.Handled;
-        } // method _HandleException
+        }
 
         #endregion
 
@@ -212,21 +211,21 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordFormatter) + "::" + nameof(Interval)
+                        nameof (BatchRecordFormatter) + "::" + nameof (Interval)
                         + ": batchSize="
                         + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
-            int maxMfn = connection.GetMaxMfn(database) - 1;
+            int maxMfn = connection.GetMaxMfn (database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<string>();
             }
 
-            lastMfn = Math.Min(lastMfn, maxMfn);
+            lastMfn = Math.Min (lastMfn, maxMfn);
             if (firstMfn > lastMfn)
             {
                 return Array.Empty<string>();
@@ -238,26 +237,26 @@ namespace ManagedIrbis.Batch
                     database,
                     format,
                     batchSize,
-                    Enumerable.Range(firstMfn, lastMfn - firstMfn + 1)
+                    Enumerable.Range (firstMfn, lastMfn - firstMfn + 1)
                 );
 
             return result;
-        } // method Interval
+        }
 
         /// <summary>
         /// Считывает все записи сразу.
         /// </summary>
         public List<string> FormatAll()
         {
-            var result = new List<string>(TotalRecords);
+            var result = new List<string> (TotalRecords);
 
             foreach (var record in this)
             {
-                result.Add(record);
+                result.Add (record);
             }
 
             return result;
-        } // method FormatAll
+        }
 
         /// <summary>
         /// Search and format records.
@@ -275,12 +274,12 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordFormatter) + "::" + nameof(Search)
+                        nameof (BatchRecordFormatter) + "::" + nameof (Search)
                         + ": batchSize="
                         + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
             var parameters = new SearchParameters
@@ -288,13 +287,13 @@ namespace ManagedIrbis.Batch
                 Database = database,
                 Expression = searchExpression
             };
-            var found = connection.Search(parameters);
+            var found = connection.Search (parameters);
             if (found?.Length == 0)
             {
                 return Array.Empty<string>();
             }
 
-            var range = FoundItem.ToMfn(found);
+            var range = FoundItem.ToMfn (found);
             var result = new BatchRecordFormatter
                 (
                     connection,
@@ -305,7 +304,7 @@ namespace ManagedIrbis.Batch
                 );
 
             return result;
-        } // method Search
+        }
 
         /// <summary>
         /// Format whole database
@@ -322,15 +321,15 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordFormatter) + "::" + nameof(WholeDatabase)
-                        + ": " + nameof(batchSize) + "="
+                        nameof (BatchRecordFormatter) + "::" + nameof (WholeDatabase)
+                        + ": " + nameof (batchSize) + "="
                         + batchSize
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(batchSize));
+                throw new ArgumentOutOfRangeException (nameof (batchSize));
             }
 
-            int maxMfn = connection.GetMaxMfn(database) - 1;
+            int maxMfn = connection.GetMaxMfn (database) - 1;
             if (maxMfn == 0)
             {
                 return Array.Empty<string>();
@@ -342,11 +341,11 @@ namespace ManagedIrbis.Batch
                     database,
                     format,
                     batchSize,
-                    Enumerable.Range(1, maxMfn)
+                    Enumerable.Range (1, maxMfn)
                 );
 
             return result;
-        } // method WholeDatabase
+        }
 
         #endregion
 
@@ -357,7 +356,7 @@ namespace ManagedIrbis.Batch
         {
             Magna.Trace
                 (
-                    nameof(BatchRecordFormatter) + "::" + nameof(GetEnumerator)
+                    nameof (BatchRecordFormatter) + "::" + nameof (GetEnumerator)
                     + ": start"
                 );
 
@@ -375,7 +374,7 @@ namespace ManagedIrbis.Batch
                 var records = new string[package.Length];
 
                 RecordsFormatted += records.Length;
-                BatchRead.Raise(this);
+                BatchRead.Raise (this);
                 foreach (string record in records)
                 {
                     yield return record;
@@ -384,7 +383,7 @@ namespace ManagedIrbis.Batch
 
             Magna.Trace
                 (
-                    nameof(BatchRecordFormatter) + "::" + nameof(GetEnumerator)
+                    nameof (BatchRecordFormatter) + "::" + nameof (GetEnumerator)
                     + ": end"
                 );
 
@@ -398,10 +397,8 @@ namespace ManagedIrbis.Batch
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        } // method GetEnumerator
+        }
 
         #endregion
-
-    } // class BatchRecordFormatter
-
-} // namespace ManagedIrbis.Batch
+    }
+}

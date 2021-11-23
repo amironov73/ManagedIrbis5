@@ -99,7 +99,6 @@ namespace ManagedIrbis.Batch
                 string? prefix
             )
         {
-
             BatchSize = DefaultBatchSize;
             Connection = connection;
             Database = database;
@@ -151,26 +150,26 @@ namespace ManagedIrbis.Batch
             }
 
             string[][] packages = terms
-                .Chunk(batchSize)
+                .Chunk (batchSize)
                 .ToArray();
-            int totalSize = packages.Sum(p => p.Length);
+            int totalSize = packages.Sum (p => p.Length);
             if (totalSize == 0)
             {
                 return new int[0];
             }
 
-            var result = new List<int>(totalSize);
+            var result = new List<int> (totalSize);
             foreach (string[] package in packages)
             {
-                var expression = BuildExpression(package);
+                var expression = BuildExpression (package);
                 var parameters = new SearchParameters
                 {
                     Database = Database,
                     Expression = expression
                 };
-                var found = Connection.Search(parameters);
-                var mfns = FoundItem.ToMfn(found);
-                result.AddRange(mfns);
+                var found = Connection.Search (parameters);
+                var mfns = FoundItem.ToMfn (found);
+                result.AddRange (mfns);
             }
 
             return result.ToArray();
@@ -198,18 +197,18 @@ namespace ManagedIrbis.Batch
             }
 
             string[][] packages = terms
-                .Chunk(batchSize)
+                .Chunk (batchSize)
                 .ToArray();
-            int totalSize = packages.Sum(p => p.Length);
+            int totalSize = packages.Sum (p => p.Length);
             if (totalSize == 0)
             {
                 return Array.Empty<Record>();
             }
 
-            var result = new List<Record>(totalSize);
+            var result = new List<Record> (totalSize);
             foreach (string[] package in packages)
             {
-                var expression = BuildExpression(package);
+                var expression = BuildExpression (package);
                 /*
                 var found = Connection.SearchRead(expression);
                 result.AddRange(found);
@@ -220,7 +219,5 @@ namespace ManagedIrbis.Batch
         }
 
         #endregion
-
-    } // class BatchSearcher
-
-} // namespace ManagedIrbis.Batch
+    }
+}

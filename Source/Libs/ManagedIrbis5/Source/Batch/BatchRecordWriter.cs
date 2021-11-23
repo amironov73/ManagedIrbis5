@@ -17,6 +17,7 @@
 // ReSharper disable UnusedType.Global
 
 // field is never assigned to, and will have its default value
+
 #pragma warning disable 649
 
 /* BatchRecordWriter.cs -- накапливает записи для пакетного сохранения
@@ -29,6 +30,7 @@ using System;
 using System.Collections.Generic;
 
 using AM;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -98,19 +100,19 @@ namespace ManagedIrbis.Batch
             {
                 Magna.Error
                     (
-                        nameof(BatchRecordWriter) + "::Constructor"
-                        + ": capacity="
-                        + capacity
+                        nameof (BatchRecordWriter) + "::Constructor"
+                                                   + ": capacity="
+                                                   + capacity
                     );
 
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+                throw new ArgumentOutOfRangeException (nameof (capacity));
             }
 
             Connection = connection;
             Database = database;
             Capacity = capacity;
             Actualize = true;
-            _buffer = new List<Record>(capacity);
+            _buffer = new List<Record> (capacity);
             _syncRoot = new object();
         }
 
@@ -138,13 +140,12 @@ namespace ManagedIrbis.Batch
             {
                 foreach (var record in records)
                 {
-                    Append(record);
+                    Append (record);
                 }
             }
 
             return this;
-
-        } // method AddRange
+        }
 
         /// <summary>
         /// Добавление одной записи.
@@ -154,9 +155,9 @@ namespace ManagedIrbis.Batch
                 Record record
             )
         {
-            lock(_syncRoot)
+            lock (_syncRoot)
             {
-                _buffer.Add(record);
+                _buffer.Add (record);
                 if (_buffer.Count >= Capacity)
                 {
                     Flush();
@@ -164,15 +165,14 @@ namespace ManagedIrbis.Batch
             }
 
             return this;
-
-        } // method Append
+        }
 
         /// <summary>
         /// Принудительная отсылка записей на сервер.
         /// </summary>
         public BatchRecordWriter Flush()
         {
-            lock(_syncRoot)
+            lock (_syncRoot)
             {
                 if (_buffer.Count != 0)
                 {
@@ -197,25 +197,25 @@ namespace ManagedIrbis.Batch
                         Connection.Database = savedDatabase;
                     }
 
-                    BatchWrite.Raise(this);
+                    BatchWrite.Raise (this);
                 }
 
                 _buffer.Clear();
             }
 
             return this;
-
-        } // method Flush
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => Flush();
+        public void Dispose()
+        {
+            Flush();
+        }
 
         #endregion
-
-    } // class BatchRecordWriter
-
-} // namespace ManagedIrbis.Batch
+    }
+}

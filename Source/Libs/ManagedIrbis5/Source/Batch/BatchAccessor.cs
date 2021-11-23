@@ -61,33 +61,28 @@ namespace ManagedIrbis.Batch
 
         #region Construction
 
-        /// <summary>
-        /// Static constructor.
-        /// </summary>
         static BatchAccessor()
         {
             ThrowOnEmptyRecord = true;
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public BatchAccessor
             (
                 ISyncProvider connection
             )
         {
+            Sure.NotNull (connection);
+
             Connection = connection;
-        } // constructor
+        }
 
         #endregion
 
         #region Private members
 
-        /// <summary>
-        /// Throw <see cref="IrbisException"/>
-        /// if the record is empty.
-        /// </summary>
         private static void _ThrowIfEmptyRecord
             (
                 Record record,
@@ -193,7 +188,7 @@ namespace ManagedIrbis.Batch
         #region Public methods
 
         /// <summary>
-        /// Read multiple records.
+        /// Параллельное чтение множества записей.
         /// </summary>
         public Record[] ReadRecords
             (
@@ -201,7 +196,7 @@ namespace ManagedIrbis.Batch
                 IEnumerable<int> mfnList
             )
         {
-            (database ??= Connection.Database).ThrowIfNull();
+            Sure.NotNull (database ??= Connection.Database);
 
             int[] array = mfnList.ToArray();
 
@@ -389,7 +384,5 @@ namespace ManagedIrbis.Batch
         }
 
         #endregion
-
-    } // class BatchAccessor
-
-} // namespace ManagedIrbis.Batch
+    }
+}
