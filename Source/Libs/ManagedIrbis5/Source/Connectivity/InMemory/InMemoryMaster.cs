@@ -92,7 +92,7 @@ namespace ManagedIrbis.InMemory
             if (record.Mfn == 0)
             {
                 // это новая запись, помещаем ее в конец базы
-                Add(record);
+                Add (record);
                 record.Mfn = Count;
             }
             else
@@ -110,7 +110,5 @@ namespace ManagedIrbis.InMemory
         }
 
         #endregion
-
-    } // class InMemoryMaster
-
-} // namespace ManagedIrbis.InMemory
+    }
+}

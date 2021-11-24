@@ -17,6 +17,8 @@
 
 using System.IO;
 
+using AM;
+
 #endregion
 
 #nullable enable
@@ -68,6 +70,8 @@ namespace ManagedIrbis.InMemory
                 bool readOnly = false
             )
         {
+            Sure.NotNullNorEmpty (name);
+
             Name = name;
             ReadOnly = readOnly;
             Master = new InMemoryMaster();
@@ -86,22 +90,38 @@ namespace ManagedIrbis.InMemory
                 TextWriter output
             )
         {
-            Master.Dump(output);
-            Inverted.Dump(output);
+            Sure.NotNull (output);
+
+            Master.Dump (output);
+            Inverted.Dump (output);
         }
 
         /// <summary>
         /// Чтение записи.
         /// </summary>
-        public Record? ReadRecord (int mfn) => Master.ReadRecord(mfn);
+        public Record? ReadRecord
+            (
+                int mfn
+            )
+        {
+            Sure.Positive (mfn);
+
+            return Master.ReadRecord (mfn);
+        }
 
         /// <summary>
         /// Сохранение/обновление записи.
         /// </summary>
-        public bool WriteRecord(Record record) => Master.WriteRecord(record);
+        public bool WriteRecord
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return Master.WriteRecord (record);
+        }
 
         #endregion
-
-    } // class InMemoryDatabase
-
-} // namespace ManagedIrbis.InMemory
+    }
+}

@@ -97,7 +97,7 @@ namespace ManagedIrbis.InMemory
             _cancellation = new CancellationTokenSource();
             Busy = new BusyState();
             Resources = resources;
-            Databases = new();
+            Databases = new ();
             PlatformAbstraction = PlatformAbstractionLayer.Current;
         }
 
@@ -108,14 +108,14 @@ namespace ManagedIrbis.InMemory
         private readonly CancellationTokenSource _cancellation;
         private readonly IServiceProvider _serviceProvider;
 
-        private void SetBusy(bool busy) => Busy.SetState(busy);
+        private void SetBusy (bool busy) => Busy.SetState (busy);
 
         private string TranslateSpecification
             (
                 FileSpecification specification
             )
         {
-            var fileName = specification.FileName.ThrowIfNull("specification.FileName");
+            var fileName = specification.FileName.ThrowIfNull ("specification.FileName");
 
             // TODO: implement
 
@@ -125,8 +125,8 @@ namespace ManagedIrbis.InMemory
         /// <summary>
         /// Текущая база данных.
         /// </summary>
-        private InMemoryDatabase CurrentDatabase => GetDatabase(Database)
-            .ThrowIfNull("CurrentDatabase");
+        private InMemoryDatabase CurrentDatabase => GetDatabase (Database)
+            .ThrowIfNull ("CurrentDatabase");
 
         private InMemoryDatabase? GetDatabase
             (
@@ -134,7 +134,7 @@ namespace ManagedIrbis.InMemory
             )
         {
             databaseName ??= Database ?? throw new IrbisException();
-            if (!Databases.TryGetValue(databaseName, out var result))
+            if (!Databases.TryGetValue (databaseName, out var result))
             {
                 return default;
             }
@@ -156,21 +156,33 @@ namespace ManagedIrbis.InMemory
         {
             foreach (var database in Databases.Values)
             {
-                database.Dump(output);
+                database.Dump (output);
             }
 
-            Resources.Dump(output);
+            Resources.Dump (output);
         }
 
         /// <summary>
         /// Загрузка данных (в нативном для провайдера формате) из указанной папки.
         /// </summary>
-        public void LoadData(string path) => throw new NotImplementedException();
+        public void LoadData
+            (
+                string path
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Сохранение данных (в нативном для провайдера формате) в указанную папку.
         /// </summary>
-        public void SaveData(string path) => throw new NotImplementedException();
+        public void SaveData
+            (
+                string path
+            )
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 
@@ -196,11 +208,12 @@ namespace ManagedIrbis.InMemory
         #region ISupportLogging members
 
         /// <inheritdoc cref="ISupportLogging.Logger"/>
+
         // TODO implement
         public ILogger? Logger => null;
 
         /// <inheritdoc cref="ISupportLogging.SetLogger"/>
-        public void SetLogger(ILogger? logger)
+        public void SetLogger (ILogger? logger)
             => throw new NotImplementedException();
 
         #endregion
@@ -250,7 +263,9 @@ namespace ManagedIrbis.InMemory
                 ActualizeRecordParameters parameters
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (parameters);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -270,18 +285,20 @@ namespace ManagedIrbis.InMemory
                 CreateDatabaseParameters parameters
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (parameters);
+
+            using var guard = new BusyGuard (Busy);
 
             var name = parameters.Database.ThrowIfNullOrWhiteSpace();
 
-            if (Databases.ContainsKey(name))
+            if (Databases.ContainsKey (name))
             {
                 LastError = DontKnowWhatCodeToUse;
                 return false;
             }
 
-            var database = new InMemoryDatabase(name, ReadOnly);
-            Databases.Add(database.Name, database);
+            var database = new InMemoryDatabase (name, ReadOnly);
+            Databases.Add (database.Name, database);
             LastError = SoFarSoGood;
 
             return true;
@@ -293,7 +310,7 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -304,12 +321,12 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             var name = databaseName ?? Database ?? throw new IrbisException();
             LastError = SoFarSoGood;
 
-            return Databases.Remove(name);
+            return Databases.Remove (name);
         }
 
         /// <inheritdoc cref="ISyncProvider.Disconnect"/>
@@ -327,12 +344,14 @@ namespace ManagedIrbis.InMemory
                 FileSpecification specification
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (specification);
 
-            var fileName = TranslateSpecification(specification);
+            using var guard = new BusyGuard (Busy);
+
+            var fileName = TranslateSpecification (specification);
             LastError = SoFarSoGood;
 
-            return Resources.ResourceExists(fileName);
+            return Resources.ResourceExists (fileName);
         }
 
         /// <inheritdoc cref="ISyncProvider.FormatRecords"/>
@@ -341,7 +360,9 @@ namespace ManagedIrbis.InMemory
                 FormatRecordParameters parameters
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (parameters);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -353,7 +374,10 @@ namespace ManagedIrbis.InMemory
                 TextParameters textParameters
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (searchParameters);
+            Sure.NotNull (textParameters);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -364,7 +388,7 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -375,7 +399,7 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             var name = databaseName ?? Database ?? throw new IrbisException();
             var database = Databases[name];
@@ -388,7 +412,7 @@ namespace ManagedIrbis.InMemory
         /// <inheritdoc cref="ISyncProvider.GetServerStat"/>
         public ServerStat? GetServerStat()
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -398,7 +422,7 @@ namespace ManagedIrbis.InMemory
         {
             LastError = SoFarSoGood;
 
-            return new()
+            return new ()
             {
                 Organization = "Open source версия",
                 ConnectedClients = 1,
@@ -413,7 +437,9 @@ namespace ManagedIrbis.InMemory
                 GblSettings settings
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (settings);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -424,7 +450,9 @@ namespace ManagedIrbis.InMemory
                 params FileSpecification[] specifications
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (specifications);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -440,7 +468,7 @@ namespace ManagedIrbis.InMemory
         /// <inheritdoc cref="ISyncProvider.ListUsers"/>
         public UserInfo[]? ListUsers()
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             var specification = new FileSpecification
             {
@@ -448,21 +476,24 @@ namespace ManagedIrbis.InMemory
                 FileName = "client_m.mnu"
             };
 
-            var text = ReadTextFile(specification);
-            if (string.IsNullOrEmpty(text))
+            var text = ReadTextFile (specification);
+            if (string.IsNullOrEmpty (text))
             {
                 LastError = DontKnowWhatCodeToUse;
                 return default;
             }
 
-            var result = UserInfo.Parse(text);
+            var result = UserInfo.Parse (text);
             LastError = SoFarSoGood;
 
             return result;
         }
 
         /// <inheritdoc cref="ISyncProvider.NoOperation"/>
-        public bool NoOperation() => true;
+        public bool NoOperation()
+        {
+            return true;
+        }
 
         /// <inheritdoc cref="ISyncConnection"/>
         public string? PrintTable
@@ -470,7 +501,9 @@ namespace ManagedIrbis.InMemory
                 TableDefinition definition
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (definition);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -481,7 +514,9 @@ namespace ManagedIrbis.InMemory
                 FileSpecification specification
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (specification);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -492,7 +527,9 @@ namespace ManagedIrbis.InMemory
                 PostingParameters parameters
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (parameters);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -502,16 +539,18 @@ namespace ManagedIrbis.InMemory
             (
                 ReadRecordParameters parameters
             )
-            where T: class, IRecord, new()
+            where T : class, IRecord, new()
         {
-            if (typeof(T) != typeof(Record))
+            Sure.NotNull (parameters);
+
+            if (typeof (T) != typeof (Record))
             {
                 throw new NotSupportedException();
             }
 
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
-            var db = GetDatabase(parameters.Database);
+            var db = GetDatabase (parameters.Database);
             if (db is null)
             {
                 LastError = DontKnowWhatCodeToUse;
@@ -520,9 +559,8 @@ namespace ManagedIrbis.InMemory
 
             LastError = SoFarSoGood;
 
-            return (T?) (object?) db.ReadRecord(parameters.Mfn);
-
-        } // method ReadRecord
+            return (T?)(object?)db.ReadRecord (parameters.Mfn);
+        }
 
         /// <inheritdoc cref="ISyncProvider.ReadRecordPostings"/>
         public TermPosting[]? ReadRecordPostings
@@ -531,7 +569,9 @@ namespace ManagedIrbis.InMemory
                 string prefix
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (parameters);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -542,7 +582,9 @@ namespace ManagedIrbis.InMemory
                 TermParameters parameters
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (parameters);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -553,13 +595,15 @@ namespace ManagedIrbis.InMemory
                 FileSpecification specification
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (specification);
 
-            var fileName = TranslateSpecification(specification);
+            using var guard = new BusyGuard (Busy);
+
+            var fileName = TranslateSpecification (specification);
 
             LastError = SoFarSoGood;
 
-            return Resources.ReadResource(fileName);
+            return Resources.ReadResource (fileName);
         }
 
         /// <inheritdoc cref="ISyncProvider.ReloadDictionary"/>
@@ -568,7 +612,7 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -579,7 +623,7 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -598,7 +642,9 @@ namespace ManagedIrbis.InMemory
                 SearchParameters parameters
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (parameters);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -609,7 +655,7 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
             var name = databaseName ?? Database ?? throw new IrbisException();
             var database = Databases[name];
@@ -628,9 +674,9 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            using var guard = new BusyGuard (Busy);
 
-            var database = GetDatabase(databaseName);
+            var database = GetDatabase (databaseName);
             if (database is null)
             {
                 LastError = DontKnowWhatCodeToUse;
@@ -650,7 +696,9 @@ namespace ManagedIrbis.InMemory
                 string? databaseName = default
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (mfnList);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -661,7 +709,9 @@ namespace ManagedIrbis.InMemory
                 IEnumerable<string> lines
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (lines);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -672,7 +722,9 @@ namespace ManagedIrbis.InMemory
                 IEnumerable<UserInfo> users
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (users);
+
+            using var guard = new BusyGuard (Busy);
 
             throw new NotImplementedException();
         }
@@ -683,7 +735,9 @@ namespace ManagedIrbis.InMemory
                 FileSpecification specification
             )
         {
-            using var guard = new BusyGuard(Busy);
+            Sure.NotNull (specification);
+
+            using var guard = new BusyGuard (Busy);
 
             if (ReadOnly)
             {
@@ -691,10 +745,10 @@ namespace ManagedIrbis.InMemory
                 return true;
             }
 
-            var fileName = TranslateSpecification(specification);
+            var fileName = TranslateSpecification (specification);
             LastError = SoFarSoGood;
 
-            return Resources.WriteResource(fileName, specification.Content);
+            return Resources.WriteResource (fileName, specification.Content);
         }
 
         /// <inheritdoc cref="ISyncProvider.WriteRecord"/>
@@ -703,6 +757,8 @@ namespace ManagedIrbis.InMemory
                 WriteRecordParameters parameters
             )
         {
+            Sure.NotNull (parameters);
+
             if (ReadOnly)
             {
                 LastError = DontKnowWhatCodeToUse;
@@ -717,7 +773,7 @@ namespace ManagedIrbis.InMemory
                 return false;
             }
 
-            var db = GetDatabase(record.Database);
+            var db = GetDatabase (record.Database);
             if (db is null)
             {
                 LastError = DontKnowWhatCodeToUse;
@@ -730,7 +786,7 @@ namespace ManagedIrbis.InMemory
                 return true;
             }
 
-            if (!db.WriteRecord(record))
+            if (!db.WriteRecord (record))
             {
                 LastError = DontKnowWhatCodeToUse;
                 return false;
@@ -747,7 +803,7 @@ namespace ManagedIrbis.InMemory
         #region IServiceProvider members
 
         /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService(Type serviceType) => _serviceProvider.GetService(serviceType);
+        public object? GetService (Type serviceType) => _serviceProvider.GetService (serviceType);
 
         #endregion
 
@@ -768,11 +824,9 @@ namespace ManagedIrbis.InMemory
         public void Dispose()
         {
             Busy.Dispose();
-            Disposing?.Invoke(this, EventArgs.Empty);
+            Disposing?.Invoke (this, EventArgs.Empty);
         }
 
         #endregion
-
-    } // class InMemoryProvider
-
-} // namespace ManagedIrbis.InMemory
+    }
+}

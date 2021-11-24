@@ -33,7 +33,7 @@ namespace ManagedIrbis.InMemory
     /// Инвертированный файл, расположенный в оперативной памяти.
     /// </summary>
     public class InMemoryInverted
-        : CaseInsensitiveSortedList <InMemoryTerm>
+        : CaseInsensitiveSortedList<InMemoryTerm>
     {
         #region Public methods
 
@@ -45,6 +45,8 @@ namespace ManagedIrbis.InMemory
                 TextWriter output
             )
         {
+            Sure.NotNull (output);
+
             // TODO: implement
         }
 
@@ -56,6 +58,8 @@ namespace ManagedIrbis.InMemory
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             // TODO: implement
         }
 
@@ -67,11 +71,11 @@ namespace ManagedIrbis.InMemory
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             // TODO: implement
         }
 
         #endregion
-
-    } // class InMemoryInverted
-
-} // namespace ManagedIrbis.InMemory
+    }
+}

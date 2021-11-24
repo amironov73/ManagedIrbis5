@@ -45,7 +45,5 @@ namespace ManagedIrbis.InMemory
         public int Position { get; set; }
 
         #endregion
-
-    } // class InMemoryPosting
-
-} // namespace ManagedIrbis.InMemory
+    }
+}
