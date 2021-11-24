@@ -31,12 +31,8 @@ namespace ManagedIrbis.Biblio
     /// </summary>
     public sealed class ItemCollection
         : NonNullCollection<BiblioItem>,
-        IVerifiable
+            IVerifiable
     {
-        #region Properties
-
-        #endregion
-
         #region Private members
 
         private static void ReadDigit
@@ -46,10 +42,10 @@ namespace ManagedIrbis.Biblio
             )
         {
             var c = navigator.PeekChar();
-            if (char.IsDigit(c))
+            if (char.IsDigit (c))
             {
                 navigator.ReadChar();
-                text.Append(c);
+                text.Append (c);
             }
         }
 
@@ -58,24 +54,24 @@ namespace ManagedIrbis.Biblio
                 string? text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 return text;
             }
 
             var result = new StringBuilder();
-            var navigator = new TextNavigator(text);
-            ReadDigit(navigator, result);
-            ReadDigit(navigator, result);
-            ReadDigit(navigator, result);
-            ReadDigit(navigator, result);
+            var navigator = new TextNavigator (text);
+            ReadDigit (navigator, result);
+            ReadDigit (navigator, result);
+            ReadDigit (navigator, result);
+            ReadDigit (navigator, result);
 
             while (navigator.IsDigit())
             {
                 navigator.ReadChar();
             }
 
-            result.Append(navigator.GetRemainingText());
+            result.Append (navigator.GetRemainingText());
 
             return result.ToString();
         }
@@ -89,17 +85,17 @@ namespace ManagedIrbis.Biblio
 
             var character = new[]
             {
-                record.FM(900, 'c'),
-                record.FM(900, '2'),
-                record.FM(900, '3'),
-                record.FM(900, '4'),
-                record.FM(900, '5'),
-                record.FM(900, '6')
+                record.FM (900, 'c'),
+                record.FM (900, '2'),
+                record.FM (900, '3'),
+                record.FM (900, '4'),
+                record.FM (900, '5'),
+                record.FM (900, '6')
             };
 
-            return character.Contains("n")
-                   || character.Contains("N")
-                   || character.Contains("67");
+            return character.Contains ("n")
+                   || character.Contains ("N")
+                   || character.Contains ("67");
         }
 
         private static bool _IsForeign
@@ -110,13 +106,13 @@ namespace ManagedIrbis.Biblio
             // У иностранных книг язык не rus
             // Если язык не указан, считаем, что rus
 
-            var language = record.FM(101);
+            var language = record.FM (101);
             if (language.IsEmpty())
             {
                 language = "rus";
             }
 
-            return !language.SameString("rus");
+            return !language.SameString ("rus");
         }
 
         private static int _Comparison
@@ -127,12 +123,12 @@ namespace ManagedIrbis.Biblio
         {
             var xrec = x.Record;
             var yrec = y.Record;
-            if (!ReferenceEquals(xrec, null) && !ReferenceEquals(yrec, null))
+            if (!ReferenceEquals (xrec, null) && !ReferenceEquals (yrec, null))
             {
                 // Поднимаем официальные документы
 
-                var xup = _IsOfficial(xrec);
-                var yup = _IsOfficial(yrec);
+                var xup = _IsOfficial (xrec);
+                var yup = _IsOfficial (yrec);
                 if (xup != yup)
                 {
                     return xup ? -1 : 1;
@@ -140,8 +136,8 @@ namespace ManagedIrbis.Biblio
 
                 // Опускаем иностранные документы
 
-                var xdown = _IsForeign(xrec);
-                var ydown = _IsForeign(yrec);
+                var xdown = _IsForeign (xrec);
+                var ydown = _IsForeign (yrec);
                 if (xdown != ydown)
                 {
                     return xdown ? 1 : -1;
@@ -167,11 +163,12 @@ namespace ManagedIrbis.Biblio
             var list = this.ToList();
             foreach (var item in list)
             {
-                item.Order = _TrimOrder(item.Order);
+                item.Order = _TrimOrder (item.Order);
             }
-            list.Sort(_Comparison);
+
+            list.Sort (_Comparison);
             Clear();
-            AddRange(list);
+            AddRange (list);
         }
 
         #endregion
@@ -184,20 +181,15 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            var verifier
-                = new Verifier<ItemCollection>(this, throwOnError);
+            var verifier  = new Verifier<ItemCollection> (this, throwOnError);
 
             foreach (var item in this)
             {
-                verifier.VerifySubObject(item, "item");
+                verifier.VerifySubObject (item, "item");
             }
 
             return verifier.Result;
         }
-
-        #endregion
-
-        #region Object members
 
         #endregion
     }

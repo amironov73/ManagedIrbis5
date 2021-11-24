@@ -132,10 +132,6 @@ namespace ManagedIrbis.Biblio
 
         #endregion
 
-        #region Private members
-
-        #endregion
-
         #region Public methods
 
         /// <summary>
@@ -146,12 +142,11 @@ namespace ManagedIrbis.Biblio
                 string name
             )
         {
-            Dictionary.TryGetValue(name, out var result);
+            Dictionary.TryGetValue (name, out var result);
 
             return result;
         }
 
         #endregion
-
     }
 }

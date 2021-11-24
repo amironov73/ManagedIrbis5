@@ -43,7 +43,7 @@ namespace ManagedIrbis.Biblio
 
         private static char[] _delimiters = { '.', '!', '?', ')', ':', '}' };
 
-        private static Regex _commandRegex = new Regex(@"\\[a-z]\d+$");
+        private static Regex _commandRegex = new Regex (@"\\[a-z]\d+$");
 
         private static void _AddDot
             (
@@ -51,17 +51,17 @@ namespace ManagedIrbis.Biblio
                 string? line
             )
         {
-            if (!string.IsNullOrEmpty(line))
+            if (!string.IsNullOrEmpty (line))
             {
                 line = line.TrimEnd();
-                builder.Append(line);
-                if (!string.IsNullOrEmpty(line))
+                builder.Append (line);
+                if (!string.IsNullOrEmpty (line))
                 {
                     char lastChar = line.LastChar();
-                    if (!lastChar.IsOneOf(_delimiters)
-                        && !_commandRegex.IsMatch(line))
+                    if (!lastChar.IsOneOf (_delimiters)
+                        && !_commandRegex.IsMatch (line))
                     {
-                        builder.Append('.');
+                        builder.Append ('.');
                     }
                 }
             }
@@ -79,41 +79,44 @@ namespace ManagedIrbis.Biblio
                 string text
             )
         {
-            StringBuilder result = new StringBuilder(text.Length + 10);
-            TextNavigator navigator = new TextNavigator(text);
-            string line;
+            Sure.NotNull (text);
+
+            var result = new StringBuilder (text.Length + 10);
+            var navigator = new TextNavigator (text);
+            string? line;
             while (!navigator.IsEOF)
             {
-                line = navigator.ReadTo("\\par").ToString();
-                if (ReferenceEquals(line, null))
+                line = navigator.ReadTo ("\\par").ToString();
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
-                string recent = navigator.RecentText(4).ToString();
+                var recent = navigator.RecentText (4).ToString();
                 bool par = false;
                 if (recent == "\\par")
                 {
                     if (navigator.PeekChar() == 'd')
                     {
-                        result.Append(line);
-                        result.Append("\\par");
-                        result.Append(navigator.ReadChar());
+                        result.Append (line);
+                        result.Append ("\\par");
+                        result.Append (navigator.ReadChar());
                         continue;
                     }
+
                     par = true;
                 }
 
-                _AddDot(result, line);
+                _AddDot (result, line);
 
                 if (par)
                 {
-                    result.Append("\\par");
+                    result.Append ("\\par");
                 }
             }
 
             line = navigator.GetRemainingText().ToString();
-            _AddDot(result, line);
+            _AddDot (result, line);
 
             return result.ToString();
         }

@@ -24,10 +24,10 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 using AM;
-
 using AM.Json;
 
 using System.Runtime.Serialization.Formatters;
+
 using ManagedIrbis.Infrastructure;
 
 #endregion
@@ -37,7 +37,7 @@ using ManagedIrbis.Infrastructure;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    ///
+    /// Формируемый документ.
     /// </summary>
     public class BiblioDocument
         : IVerifiable
@@ -45,9 +45,9 @@ namespace ManagedIrbis.Biblio
         #region Properties
 
         /// <summary>
-        /// Chapters.
+        /// Главы документа.
         /// </summary>
-        [JsonPropertyName("chapters")]
+        [JsonPropertyName ("chapters")]
         public ChapterCollection Chapters { get; private set; }
 
         /*
@@ -65,16 +65,12 @@ namespace ManagedIrbis.Biblio
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public BiblioDocument()
         {
-            Chapters = new ChapterCollection(null);
+            Chapters = new ChapterCollection (null);
         }
-
-        #endregion
-
-        #region Private members
 
         #endregion
 
@@ -88,6 +84,7 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            Sure.NotNull (context);
 
             /*
 
@@ -118,6 +115,8 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            Sure.NotNull (context);
+
             /*
 
             AbstractOutput log = context.Log;
@@ -146,18 +145,20 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            Sure.NotNull (context);
+
             var log = context.Log;
-            log.WriteLine("Begin gather records");
+            log.WriteLine ("Begin gather records");
 
             foreach (BiblioChapter chapter in Chapters)
             {
                 if (chapter.Active)
                 {
-                    chapter.GatherRecords(context);
+                    chapter.GatherRecords (context);
                 }
             }
 
-            log.WriteLine("End gather records");
+            log.WriteLine ("End gather records");
         }
 
         /// <summary>
@@ -168,18 +169,20 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            Sure.NotNull (context);
+
             var log = context.Log;
-            log.WriteLine("Begin gather terms");
+            log.WriteLine ("Begin gather terms");
 
             foreach (BiblioChapter chapter in Chapters)
             {
                 if (chapter.Active)
                 {
-                    chapter.GatherTerms(context);
+                    chapter.GatherTerms (context);
                 }
             }
 
-            log.WriteLine("End gather terms");
+            log.WriteLine ("End gather terms");
         }
 
         /// <summary>
@@ -190,16 +193,18 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            Sure.NotNull (context);
+
             var log = context.Log;
-            log.WriteLine("Begin initialize the document");
+            log.WriteLine ("Begin initialize the document");
 
             foreach (BiblioChapter chapter in Chapters)
             {
                 // Give the chapter a chance
-                chapter.Initialize(context);
+                chapter.Initialize (context);
             }
 
-            log.WriteLine("End initialize the document");
+            log.WriteLine ("End initialize the document");
         }
 
         /// <summary>
@@ -210,6 +215,8 @@ namespace ManagedIrbis.Biblio
                 string fileName
             )
         {
+            Sure.FileExists (fileName);
+
             /*
 
             string contents = File.ReadAllText
@@ -260,20 +267,22 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            Sure.NotNull (context);
+
             var log = context.Log;
-            log.WriteLine("Begin number items");
+            log.WriteLine ("Begin number items");
             context.ItemCount = 0;
 
             foreach (BiblioChapter chapter in Chapters)
             {
                 if (chapter.Active)
                 {
-                    chapter.NumberItems(context);
+                    chapter.NumberItems (context);
                 }
             }
 
-            log.WriteLine("Total items: {0}", context.ItemCount);
-            log.WriteLine("End number items");
+            log.WriteLine ("Total items: {0}", context.ItemCount);
+            log.WriteLine ("End number items");
         }
 
         /// <summary>
@@ -284,18 +293,20 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
+            Sure.NotNull (context);
+
             var log = context.Log;
-            log.WriteLine("Begin render items");
+            log.WriteLine ("Begin render items");
 
             foreach (BiblioChapter chapter in Chapters)
             {
                 if (chapter.Active)
                 {
-                    chapter.Render(context);
+                    chapter.Render (context);
                 }
             }
 
-            log.WriteLine("End render items");
+            log.WriteLine ("End render items");
         }
 
         #endregion
@@ -308,17 +319,14 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            Verifier<BiblioDocument> verifier
-                = new Verifier<BiblioDocument>(this, throwOnError);
+            var verifier = new Verifier<BiblioDocument> (this, throwOnError);
 
             verifier
-                .VerifySubObject(Chapters, "Chapters");
+                .VerifySubObject (Chapters);
 
             return verifier.Result;
         }
 
         #endregion
-
-    } // class BiblioDocument
-
-} // namespace ManagedIrbis.Biblio
+    }
+}

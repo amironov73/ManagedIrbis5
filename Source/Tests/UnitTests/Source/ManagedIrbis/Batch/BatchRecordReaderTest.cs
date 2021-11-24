@@ -29,8 +29,7 @@ namespace UnitTests.ManagedIrbis.Batch
                     connection,
                     Array.Empty<int>(),
                     batchSize,
-                    Constants.Ibis,
-                    true
+                    Constants.Ibis
                 );
             Assert.AreSame (connection, reader.Connection);
             Assert.AreEqual (batchSize, reader.BatchSize);
@@ -44,7 +43,6 @@ namespace UnitTests.ManagedIrbis.Batch
         [Description ("Чтение всех записей")]
         public void BatchRecordReader_ReadAll_1()
         {
-            const int batchSize = 5000;
             var connection = new NullProvider();
             var reader = new BatchRecordReader
                 (

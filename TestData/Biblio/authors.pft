@@ -1,0 +1,35 @@
+(if p(v700) then v700^a, | (|v700^1|) |, if p(v700^g) then |, |v700^g else | |v700^b fi, /, fi),
+(if p(v701) then v701^a, | (|v701^1|) |, if p(v701^g) then |, |v701^g else | |v701^b fi, /, fi),
+(if p(v702) then v702^a, | (|v702^1|) |, if p(v702^g) then |, |v702^g else | |v702^b fi, /, fi),
+
+(if p(v961) then v961^a, | (|v961^1|) |, if p(v961^g) then |, |v961^g else | |v961^b fi, /, fi),
+
+(if p(v600) then
+  if v600^) = '600' then
+    &uf('E1',v600^a),
+    |, |v600^g,
+    if s(v600^c,v600^f) <> '' then
+      ' (',
+      if p(v600^c) then
+        v600^c,
+        if p(v600^f) then '; ', v600^f, fi,
+      else
+        v600^f,
+      fi,
+      ')',
+    fi,
+  fi,
+  /,
+fi),
+
+(if p(v606) then
+  if p(v606^3) then
+    if &uf('DATHRS,/I=', v606^3, '/,v920') = 'ATHRA' then
+       &uf('E1',&uf('DATHRS,/I=', v606^3, '/,@head210')),
+       if &uf('F1',&uf('DATHRS,/I=', v606^3, '/,@head210')) <> '' then
+         ', ',
+         &uf('F1',&uf('DATHRS,/I=', v606^3, '/,@head210')),
+       fi,
+    fi,
+  fi, /,
+fi),

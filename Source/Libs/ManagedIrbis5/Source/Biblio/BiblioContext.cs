@@ -15,18 +15,11 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.CommandLine;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AM;
 using AM.Text.Output;
-using ManagedIrbis.Client;
+
 using ManagedIrbis.Reports;
 
 #endregion
@@ -45,27 +38,27 @@ namespace ManagedIrbis.Biblio
         #region Properties
 
         /// <summary>
-        /// Processor.
+        /// Процессор.
         /// </summary>
         public BiblioProcessor? Processor { get; set; }
 
         /// <summary>
-        /// Document.
+        /// Документ.
         /// </summary>
         public BiblioDocument Document { get; private set; }
 
         /// <summary>
-        /// Provider.
+        /// Синхронный провайдер.
         /// </summary>
         public ISyncProvider Provider { get; private set; }
 
         /// <summary>
-        /// Log.
+        /// Лог.
         /// </summary>
         public AbstractOutput Log { get; private set; }
 
         /// <summary>
-        /// Count of <see cref="BiblioItem"/>s.
+        /// Общее количество <see cref="BiblioItem"/>.
         /// </summary>
         public int ItemCount { get; set; }
 
@@ -89,7 +82,7 @@ namespace ManagedIrbis.Biblio
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public BiblioContext
             (
@@ -98,18 +91,18 @@ namespace ManagedIrbis.Biblio
                 AbstractOutput log
             )
         {
+            Sure.NotNull (document);
+            Sure.NotNull (provider);
+            Sure.NotNull (log);
+
             Document = document;
             Provider = provider;
             Log = log;
             ItemCount = 0;
-            ReportContext = new ReportContext(provider);
+            ReportContext = new ReportContext (provider);
             Records = new RecordCollection();
             BadRecords = new RecordCollection();
         }
-
-        #endregion
-
-        #region Private members
 
         #endregion
 
@@ -123,10 +116,9 @@ namespace ManagedIrbis.Biblio
                 int mfn
             )
         {
-            Sure.Positive(mfn, "mfn");
+            Sure.Positive (mfn);
 
-            var result = Records
-                .FirstOrDefault(record => record.Mfn == mfn);
+            var result = Records.FirstOrDefault (record => record.Mfn == mfn);
 
             return result;
         }
@@ -141,17 +133,12 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            Verifier<BiblioContext> verifier
-                = new Verifier<BiblioContext>(this, throwOnError);
+            var verifier = new Verifier<BiblioContext> (this, throwOnError);
 
             // TODO do something
 
             return verifier.Result;
         }
-
-        #endregion
-
-        #region Object members
 
         #endregion
     }

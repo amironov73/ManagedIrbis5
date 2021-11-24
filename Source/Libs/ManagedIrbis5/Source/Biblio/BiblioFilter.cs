@@ -24,9 +24,8 @@ using AM;
 namespace ManagedIrbis.Biblio
 {
     /// <summary>
-    ///
+    /// Удалить как ненужный ???
     /// </summary>
-
     public class BiblioFilter
         : IVerifiable
     {
@@ -35,19 +34,19 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Expression for record formatting.
         /// </summary>
-        [JsonPropertyName("format")]
+        [JsonPropertyName ("format")]
         public string? FormatExpression { get; set; }
 
         /// <summary>
         /// Expression for record selection.
         /// </summary>
-        [JsonPropertyName("select")]
+        [JsonPropertyName ("select")]
         public string? SelectExpression { get; set; }
 
         /// <summary>
         /// Expression for record sorting.
         /// </summary>
-        [JsonPropertyName("sort")]
+        [JsonPropertyName ("sort")]
         public string? SortExpression { get; set; }
 
         #endregion
@@ -60,8 +59,7 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            var verifier
-                = new Verifier<BiblioFilter>(this, throwOnError);
+            var verifier = new Verifier<BiblioFilter> (this, throwOnError);
 
             // TODO do something
 
@@ -69,6 +67,5 @@ namespace ManagedIrbis.Biblio
         }
 
         #endregion
-
     }
 }

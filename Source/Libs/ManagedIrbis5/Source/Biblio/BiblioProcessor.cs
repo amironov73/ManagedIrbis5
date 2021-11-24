@@ -43,18 +43,17 @@ namespace ManagedIrbis.Biblio
     /// <summary>
     ///
     /// </summary>
-
     public class BiblioProcessor
     {
         #region Properties
 
         /// <summary>
-        /// Output.
+        /// Лог.
         /// </summary>
         public ReportOutput Output { get; private set; }
 
         /// <summary>
-        /// Report.
+        /// Отчет.
         /// </summary>
         public IrbisReport Report { get; private set; }
 
@@ -63,7 +62,7 @@ namespace ManagedIrbis.Biblio
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public BiblioProcessor()
         {
@@ -72,7 +71,7 @@ namespace ManagedIrbis.Biblio
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public BiblioProcessor
             (
@@ -95,9 +94,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            WriteDelimiter(context);
+            WriteDelimiter (context);
             var document = context.Document;
-            document.BuildDictionaries(context);
+            document.BuildDictionaries (context);
         }
 
         /// <summary>
@@ -108,9 +107,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            WriteDelimiter(context);
+            WriteDelimiter (context);
             var document = context.Document;
-            document.BuildItems(context);
+            document.BuildItems (context);
         }
 
         /// <summary>
@@ -122,28 +121,28 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            WriteDelimiter(context);
-            log.WriteLine("Begin final render");
+            WriteDelimiter (context);
+            log.WriteLine ("Begin final render");
 
             var provider = context.Provider
-                .ThrowIfNull("context.Provider");
-            var report = Report.ThrowIfNull("Report");
-            var reportContext = new ReportContext(provider);
+                .ThrowIfNull ("context.Provider");
+            var report = Report.ThrowIfNull ("Report");
+            var reportContext = new ReportContext (provider);
             Output = reportContext.Output;
-            reportContext.SetDriver(new RtfDriver());
+            reportContext.SetDriver (new RtfDriver());
 
-            var prologue = GetText(context, "*prologue.txt");
-            if (!string.IsNullOrEmpty(prologue))
+            var prologue = GetText (context, "*prologue.txt");
+            if (!string.IsNullOrEmpty (prologue))
             {
-                reportContext.Driver.SetPrologue(prologue);
+                reportContext.Driver.SetPrologue (prologue);
             }
 
-            reportContext.Verify(true);
-            report.Verify(true);
+            reportContext.Verify (true);
+            report.Verify (true);
 
-            report.Render(reportContext);
+            report.Render (reportContext);
 
-            log.WriteLine("End final render");
+            log.WriteLine ("End final render");
         }
 
         /// <summary>
@@ -154,9 +153,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            WriteDelimiter(context);
+            WriteDelimiter (context);
             var document = context.Document;
-            document.GatherRecords(context);
+            document.GatherRecords (context);
         }
 
         /// <summary>
@@ -167,9 +166,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            WriteDelimiter(context);
+            WriteDelimiter (context);
             var document = context.Document;
-            document.GatherTerms(context);
+            document.GatherTerms (context);
         }
 
         /// <summary>
@@ -180,9 +179,9 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            WriteDelimiter(context);
+            WriteDelimiter (context);
             var document = context.Document;
-            document.NumberItems(context);
+            document.NumberItems (context);
         }
 
         /// <summary>
@@ -193,10 +192,10 @@ namespace ManagedIrbis.Biblio
                 BiblioContext context
             )
         {
-            WriteDelimiter(context);
+            WriteDelimiter (context);
             Report = new IrbisReport();
             var document = context.Document;
-            document.RenderItems(context);
+            document.RenderItems (context);
         }
 
         private void WriteDelimiter
@@ -205,7 +204,7 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            log.WriteLine(new string('=', 70));
+            log.WriteLine (new string ('=', 70));
         }
 
         #endregion
@@ -247,16 +246,16 @@ namespace ManagedIrbis.Biblio
             )
         {
             var document = context.Document;
-            document.Initialize(context);
+            document.Initialize (context);
 
-            GatherRecords(context);
-            BildItems(context);
-            NumberItems(context);
-            GatherTerms(context);
-            BildDictionaries(context);
-            RenderReport(context);
-            FinalRender(context);
-            WriteDelimiter(context);
+            GatherRecords (context);
+            BildItems (context);
+            NumberItems (context);
+            GatherTerms (context);
+            BildDictionaries (context);
+            RenderReport (context);
+            FinalRender (context);
+            WriteDelimiter (context);
 
             return string.Empty;
         }
@@ -277,11 +276,12 @@ namespace ManagedIrbis.Biblio
             try
             {
                 string fileName;
-                if (path.StartsWith("*"))
+                if (path.StartsWith ("*"))
                 {
-                    fileName = path.Substring(1);
-                    result = File.ReadAllText(fileName, IrbisEncoding.Ansi);
+                    fileName = path.Substring (1);
+                    result = File.ReadAllText (fileName, IrbisEncoding.Ansi);
                 }
+
                 //else if (path.StartsWith("@"))
                 //{
                 //    fileName = path.Substring(1);
@@ -301,7 +301,7 @@ namespace ManagedIrbis.Biblio
             }
             catch (Exception exception)
             {
-                log.WriteLine("Exception: {0}", exception);
+                log.WriteLine ("Exception: {0}", exception);
                 throw;
             }
 
@@ -317,9 +317,9 @@ namespace ManagedIrbis.Biblio
             )
         {
             var log = context.Log;
-            log.WriteLine("Begin initialize the processor");
+            log.WriteLine ("Begin initialize the processor");
             context.Processor = this;
-            log.WriteLine("End initialize the processor");
+            log.WriteLine ("End initialize the processor");
         }
 
         /// <summary>
@@ -340,6 +340,5 @@ namespace ManagedIrbis.Biblio
         }
 
         #endregion
-
     }
 }

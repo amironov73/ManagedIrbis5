@@ -61,9 +61,9 @@ namespace ManagedIrbis.Biblio
         #region IVerifiable members
 
         /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify(bool throwOnError)
+        public bool Verify (bool throwOnError)
         {
-            var verifier = new Verifier<BiblioTerm>(this, throwOnError);
+            var verifier = new Verifier<BiblioTerm> (this, throwOnError);
 
             // TODO do something
 

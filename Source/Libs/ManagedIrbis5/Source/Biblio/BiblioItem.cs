@@ -13,11 +13,11 @@
 
 #region Using directives
 
+using System;
 using System.Text.Json.Serialization;
 
 using AM;
 using AM.Collections;
-using AM.Text;
 
 #endregion
 
@@ -64,7 +64,7 @@ namespace ManagedIrbis.Biblio
         /// <summary>
         /// Соответствующие термины поискового словаря.
         /// </summary>
-        public NonNullCollection<BiblioTerm> Terms { get; private set; }
+        public NonNullCollection<BiblioTerm> Terms { get; }
 
         /// <summary>
         /// Произвольные пользовательские данные.
@@ -82,8 +82,7 @@ namespace ManagedIrbis.Biblio
         public BiblioItem()
         {
             Terms = new NonNullCollection<BiblioTerm>();
-
-        } // constructor
+        }
 
         #endregion
 
@@ -95,14 +94,12 @@ namespace ManagedIrbis.Biblio
                 bool throwOnError
             )
         {
-            Verifier<BiblioItem> verifier
-                = new Verifier<BiblioItem>(this, throwOnError);
+            var verifier = new Verifier<BiblioItem> (this, throwOnError);
 
             // TODO do something
 
             return verifier.Result;
-
-        } // method Verify
+        }
 
         #endregion
 
@@ -111,17 +108,9 @@ namespace ManagedIrbis.Biblio
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            var result = new ValueStringBuilder();
-            result.Append(Order);
-            result.AppendLine();
-            result.Append(Description);
-
-            return result.ToString();
-
-        } // method ToString
+            return Order.ToVisibleString() + Environment.NewLine + Description.ToVisibleString();
+        }
 
         #endregion
-
-    } // class BiblioItem
-
-} // namespace ManagedIrbis.Biblio
+    }
+}
