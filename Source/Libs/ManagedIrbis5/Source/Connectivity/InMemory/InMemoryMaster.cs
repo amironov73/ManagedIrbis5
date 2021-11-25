@@ -14,11 +14,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 
 using AM;
 using AM.Collections;
@@ -45,6 +41,8 @@ namespace ManagedIrbis.InMemory
                 TextWriter output
             )
         {
+            Sure.NotNull (output);
+
             // TODO: implement
         }
 
@@ -56,6 +54,8 @@ namespace ManagedIrbis.InMemory
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             // TODO: implement
         }
 
@@ -67,6 +67,8 @@ namespace ManagedIrbis.InMemory
                 int mfn
             )
         {
+            // TODO: клонировать запись при выдаче
+
             return mfn <= 0 || mfn >= Count ? default : this[mfn - 1];
         }
 
@@ -78,6 +80,8 @@ namespace ManagedIrbis.InMemory
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             // TODO: implement
         }
 
@@ -89,6 +93,10 @@ namespace ManagedIrbis.InMemory
                 Record record
             )
         {
+            Sure.NotNull (record);
+
+            // TODO: клонировать запись при сохранении
+
             if (record.Mfn == 0)
             {
                 // это новая запись, помещаем ее в конец базы

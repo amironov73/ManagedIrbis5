@@ -54,12 +54,12 @@ namespace ManagedIrbis.Infrastructure
     /// </summary>
     public readonly struct SyncQuery
         : IQuery,
-        IDisposable
+            IDisposable
     {
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public SyncQuery
             (
@@ -68,21 +68,20 @@ namespace ManagedIrbis.Infrastructure
             )
             : this()
         {
-            _writer = new ArrayPoolBufferWriter<byte>(1024);
+            _writer = new ArrayPoolBufferWriter<byte> (1024);
 
             // Заголовок запроса
-            AddAnsi(commandCode);
-            AddAnsi(connection.Workstation);
-            AddAnsi(commandCode);
-            Add(connection.ClientId);
-            Add(connection.QueryId);
-            AddAnsi(connection.Password);
-            AddAnsi(connection.Username);
+            AddAnsi (commandCode);
+            AddAnsi (connection.Workstation);
+            AddAnsi (commandCode);
+            Add (connection.ClientId);
+            Add (connection.QueryId);
+            AddAnsi (connection.Password);
+            AddAnsi (connection.Username);
             NewLine();
             NewLine();
             NewLine();
-
-        } // constructor
+        }
 
         #endregion
 
@@ -103,16 +102,18 @@ namespace ManagedIrbis.Infrastructure
             )
         {
             Span<byte> span = stackalloc byte[12];
-            var length = FastNumber.Int32ToBytes(value, span);
-            _writer.Write((ReadOnlySpan<byte>) span.Slice(0, length));
+            var length = FastNumber.Int32ToBytes (value, span);
+            _writer.Write ((ReadOnlySpan<byte>)span.Slice (0, length));
             NewLine();
-
-        } // method Add
+        }
 
         /// <summary>
         /// Добавление строки с флагом "да-нет".
         /// </summary>
-        public void Add(bool value) => Add(value ? 1 : 0);
+        public void Add (bool value)
+        {
+            Add (value ? 1 : 0);
+        }
 
         /// <summary>
         /// Добавление строки в кодировке ANSI (плюс перевод строки).
@@ -128,13 +129,12 @@ namespace ManagedIrbis.Infrastructure
                 Span<byte> span = length < 2048
                     ? stackalloc byte[length]
                     : new byte[length];
-                length = IrbisEncoding.Ansi.GetBytes(value, span);
-                _writer.Write((ReadOnlySpan<byte>) span.Slice(0, length));
+                length = IrbisEncoding.Ansi.GetBytes (value, span);
+                _writer.Write ((ReadOnlySpan<byte>)span.Slice (0, length));
             }
 
             NewLine();
-
-        } // method AddAnsi
+        }
 
         /// <summary>
         /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
@@ -147,17 +147,16 @@ namespace ManagedIrbis.Infrastructure
             if (value is not null)
             {
                 var utf = IrbisEncoding.Utf8;
-                var length = utf.GetByteCount(value);
+                var length = utf.GetByteCount (value);
                 Span<byte> span = length < 2048
                     ? stackalloc byte[length]
                     : new byte[length];
-                length = utf.GetBytes(value, span);
-                _writer.Write((ReadOnlySpan<byte>) span.Slice(0, length));
+                length = utf.GetBytes (value, span);
+                _writer.Write ((ReadOnlySpan<byte>)span.Slice (0, length));
             }
 
             NewLine();
-
-        } // method AddUtf
+        }
 
         /// <summary>
         /// Добавление формата.
@@ -167,32 +166,31 @@ namespace ManagedIrbis.Infrastructure
                 string? format
             )
         {
-            if (string.IsNullOrEmpty(format))
+            if (string.IsNullOrEmpty (format))
             {
                 NewLine();
             }
             else
             {
                 format = format.Trim();
-                if (string.IsNullOrEmpty(format))
+                if (string.IsNullOrEmpty (format))
                 {
                     NewLine();
                 }
                 else
                 {
-                    if (format.StartsWith('@'))
+                    if (format.StartsWith ('@'))
                     {
-                        AddAnsi(format);
+                        AddAnsi (format);
                     }
                     else
                     {
-                        var prepared = IrbisFormat.PrepareFormat(format);
-                        AddUtf("!" + prepared);
+                        var prepared = IrbisFormat.PrepareFormat (format);
+                        AddUtf ("!" + prepared);
                     }
                 }
             }
-
-        } // method AddFormat
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -207,10 +205,9 @@ namespace ManagedIrbis.Infrastructure
             var span = GetBody().Span;
             foreach (var b in span)
             {
-                writer.Write($" {b:X2}");
+                writer.Write ($" {b:X2}");
             }
-
-        } // method Debug
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -223,8 +220,7 @@ namespace ManagedIrbis.Infrastructure
             writer ??= Console.Out;
 
             writer.WriteLine (IrbisEncoding.Ansi.GetString (_writer.WrittenSpan));
-
-        } // method DebugUtf
+        }
 
         /// <summary>
         /// Отладочная печать.
@@ -237,34 +233,43 @@ namespace ManagedIrbis.Infrastructure
             writer ??= Console.Out;
 
             writer.WriteLine (IrbisEncoding.Utf8.GetString (_writer.WrittenSpan));
-
-        } // method DebugUtf
+        }
 
         /// <summary>
         /// Получение массива байтов, из которых состоит
         /// клиентский запрос.
         /// </summary>
-        public ReadOnlyMemory<byte> GetBody() => _writer.WrittenMemory;
+        public ReadOnlyMemory<byte> GetBody()
+        {
+            return _writer.WrittenMemory;
+        }
 
         /// <summary>
         /// Подсчет общей длины запроса (в байтах).
         /// </summary>
-        public int GetLength() => _writer.WrittenCount;
+        public int GetLength()
+        {
+            return _writer.WrittenCount;
+        }
 
         /// <summary>
         /// Добавление одного перевода строки.
         /// </summary>
-        public void NewLine() => _writer.Write((byte) 10);
+        public void NewLine()
+        {
+            _writer.Write ((byte) 10);
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => _writer.Dispose();
+        public void Dispose()
+        {
+            _writer.Dispose();
+        }
 
         #endregion
-
-    } // struct SyncQuery
-
-} // namespace ManagedIrbis.Infrastructure
+    }
+}

@@ -2,14 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
 /* FormatRecordParameters.cs -- параметры форматирования записи на ИРБИС-сервере
  * Ars Magna project, http://arsmagna.ru
@@ -69,7 +63,5 @@ namespace ManagedIrbis.Infrastructure
         public Record[]? Records { get; set; }
 
         #endregion
-
-    } // class FormatRecordParameters
-
-} // namespace ManagedIrbis.Infrastructure
+    }
+}

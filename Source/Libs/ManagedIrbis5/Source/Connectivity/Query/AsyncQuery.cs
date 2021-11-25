@@ -31,12 +31,12 @@ namespace ManagedIrbis.Infrastructure
     /// </summary>
     public sealed class AsyncQuery
         : IQuery,
-        IDisposable
+            IDisposable
     {
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public AsyncQuery
             (
@@ -44,9 +44,9 @@ namespace ManagedIrbis.Infrastructure
                 string commandCode
             )
         {
-           _stream = new QueryStream(1024);
-           _stream.AddHeader(connection, commandCode);
-        } // constructor
+            _stream = new QueryStream (1024);
+            _stream.AddHeader (connection, commandCode);
+        }
 
         #endregion
 
@@ -61,53 +61,80 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         /// Добавление строки с целым числом (плюс перевод строки).
         /// </summary>
-        public void Add (int value) => _stream.Add(value);
+        public void Add (int value) => _stream.Add (value);
 
         /// <summary>
         /// Добавление строки с флагом "да-нет".
         /// </summary>
-        public void Add(bool value) => Add(value ? 1 : 0);
+        public void Add (bool value)
+        {
+            Add (value ? 1 : 0);
+        }
 
         /// <summary>
         /// Добавление строки в кодировке ANSI (плюс перевод строки).
         /// </summary>
-        public void AddAnsi (string? value) => _stream.AddAnsi(value);
+        public void AddAnsi (string? value)
+        {
+            _stream.AddAnsi (value);
+        }
 
         /// <summary>
         /// Добавление строки в кодировке UTF-8 (плюс перевод строки).
         /// </summary>
-        public void AddUtf (string? value) => _stream.AddUtf(value);
+        public void AddUtf (string? value)
+        {
+            _stream.AddUtf (value);
+        }
 
         /// <summary>
         /// Добавление формата.
         /// </summary>
-        public void AddFormat (string? format) => _stream.AddFormat(format);
+        public void AddFormat (string? format)
+        {
+            _stream.AddFormat (format);
+        }
 
         /// <summary>
         /// Отладочная печать.
         /// </summary>
-        public void Debug (TextWriter writer) => _stream.Debug(writer);
+        public void Debug (TextWriter writer)
+        {
+            _stream.Debug (writer);
+        }
 
         /// <summary>
         /// Отладочная печать.
         /// </summary>
-        public void DebugUtf (TextWriter writer) => _stream.DebugUtf(writer);
+        public void DebugUtf (TextWriter writer)
+        {
+            _stream.DebugUtf (writer);
+        }
 
         /// <summary>
         /// Получение массива байтов, из которых состоит
         /// клиентский запрос.
         /// </summary>
-        public ReadOnlyMemory<byte> GetBody() => _stream.GetBody();
+        public ReadOnlyMemory<byte> GetBody()
+        {
+            return _stream.GetBody();
+        }
 
         /// <summary>
         /// Подсчет общей длины запроса (в байтах).
         /// </summary>
-        public int GetLength() => _stream.GetLength();
+        public int GetLength()
+        {
+            return _stream.GetLength();
+        }
 
         /// <summary>
         /// Добавление одного перевода строки.
         /// </summary>
-        public void NewLine() => _stream.NewLine();
+        public void NewLine()
+        {
+            _stream.NewLine();
+        }
 
         #endregion
 
@@ -120,7 +147,5 @@ namespace ManagedIrbis.Infrastructure
         }
 
         #endregion
-
-    } // class AsyncQuery
-
-} // namespace ManagedIrbis.Infrastructure
+    }
+}

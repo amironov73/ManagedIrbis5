@@ -3,8 +3,10 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+using System;
 using System.IO;
 
+using ManagedIrbis;
 using ManagedIrbis.InMemory;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -45,13 +47,58 @@ namespace UnitTests.ManagedIrbis.Connectivity.InMemory
         }
 
         [TestMethod]
+        [Description ("Чтение записи")]
+        public void InMemoryMaster_ReadRecord_1()
+        {
+            var master = new InMemoryMaster();
+            var result = master.ReadRecord (1);
+            Assert.IsNull (result);
+        }
+
+        [TestMethod]
         [Description ("Сохранение в поток")]
-        public void InMemoryInverted_Write_1()
+        public void InMemoryMaster_Write_1()
         {
             var master = new InMemoryMaster();
             using var memory = new MemoryStream();
             using var writer = new BinaryWriter(memory);
             master.Save (writer);
+        }
+
+        [TestMethod]
+        [Description ("Сохранение записи")]
+        public void InMemoryMaster_WriteRecord_1()
+        {
+            var master = new InMemoryMaster();
+            var record = new Record();
+            Assert.IsTrue (master.WriteRecord (record));
+            Assert.AreEqual (1, record.Mfn);
+        }
+
+        [TestMethod]
+        [Description ("Сохранение записи")]
+        public void InMemoryMaster_WriteRecord_2()
+        {
+            var master = new InMemoryMaster();
+            var record = new Record()
+            {
+                Mfn = Int32.MaxValue
+            };
+            Assert.IsFalse (master.WriteRecord (record));
+        }
+
+        [TestMethod]
+        [Description ("Сохранение записи")]
+        public void InMemoryMaster_WriteRecord_3()
+        {
+            var master = new InMemoryMaster();
+            var record = new Record();
+            Assert.IsTrue (master.WriteRecord (record));
+            Assert.AreEqual (1, record.Mfn);
+
+            record.Add (1, "Field1");
+            Assert.IsTrue (master.WriteRecord (record));
+            Assert.AreEqual (1, record.Mfn);
         }
 
     }

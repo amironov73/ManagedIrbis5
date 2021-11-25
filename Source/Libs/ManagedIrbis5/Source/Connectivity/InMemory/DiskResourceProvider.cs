@@ -15,9 +15,7 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 
 using AM;
 
@@ -60,9 +58,11 @@ namespace ManagedIrbis.InMemory
                 bool readOnly = true
             )
         {
-            if (!Directory.Exists(rootPath))
+            Sure.NotNullNorEmpty (rootPath);
+
+            if (!Directory.Exists (rootPath))
             {
-                throw new ArgumentException(nameof(rootPath));
+                throw new ArgumentException (nameof (rootPath));
             }
 
             RootPath = rootPath;
@@ -79,6 +79,8 @@ namespace ManagedIrbis.InMemory
                 TextWriter output
             )
         {
+            Sure.NotNull (output);
+
             throw new NotImplementedException();
         }
 
@@ -88,6 +90,8 @@ namespace ManagedIrbis.InMemory
                 string path
             )
         {
+            Sure.NotNullNorEmpty (path);
+
             throw new NotImplementedException();
         }
 
@@ -97,6 +101,8 @@ namespace ManagedIrbis.InMemory
                 string fileName
             )
         {
+            Sure.NotNullNorEmpty (fileName);
+
             throw new NotImplementedException();
         }
 
@@ -106,6 +112,8 @@ namespace ManagedIrbis.InMemory
                 string fileName
             )
         {
+            Sure.NotNullNorEmpty (fileName);
+
             throw new NotImplementedException();
         }
 
@@ -116,11 +124,11 @@ namespace ManagedIrbis.InMemory
                 string? content
             )
         {
+            Sure.NotNull (fileName);
+
             throw new NotImplementedException();
         }
 
         #endregion
-
-    } // class DiskResourceProvider
-
-} // namespace ManagedIrbis.InMemory
+    }
+}

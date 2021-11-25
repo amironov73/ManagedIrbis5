@@ -18,7 +18,9 @@ using System;
 using System.IO;
 using System.Linq;
 
+using AM;
 using AM.Collections;
+using AM.IO;
 
 using ManagedIrbis.Infrastructure;
 
@@ -54,8 +56,8 @@ namespace ManagedIrbis.InMemory
             )
         {
             ReadOnly = readOnly;
-            _directories = new();
-            _files = new();
+            _directories = new ();
+            _files = new ();
         }
 
         #endregion
@@ -70,16 +72,18 @@ namespace ManagedIrbis.InMemory
                 string path
             )
         {
+            path = PathUtility.ConvertSlashes (path);
+
             var current = this;
             var fileName = path;
-            if (path.Contains(Path.DirectorySeparatorChar))
+            if (path.Contains (Path.DirectorySeparatorChar))
             {
-                var parts = path.Split(Path.DirectorySeparatorChar);
+                var parts = path.Split (Path.DirectorySeparatorChar);
                 var subdirs = parts[..^1];
                 fileName = parts[^1];
                 foreach (var subdir in subdirs)
                 {
-                    if (!current._directories.TryGetValue(subdir, out var inner))
+                    if (!current._directories.TryGetValue (subdir, out var inner))
                     {
                         return default;
                     }
@@ -103,22 +107,24 @@ namespace ManagedIrbis.InMemory
                 string path
             )
         {
+            Sure.NotNullNorEmpty (path);
+
             _directories.Clear();
             _files.Clear();
 
-            foreach (var fileName in Directory.EnumerateFiles(path))
+            foreach (var fileName in Directory.EnumerateFiles (path))
             {
-                var nameWithExtension = Path.GetFileName(fileName);
-                var content = File.ReadAllText(fileName, IrbisEncoding.Ansi);
-                _files.Add(nameWithExtension, content);
+                var nameWithExtension = Path.GetFileName (fileName);
+                var content = File.ReadAllText (fileName, IrbisEncoding.Ansi);
+                _files.Add (nameWithExtension, content);
             }
 
-            foreach (var subdir in Directory.EnumerateDirectories(path))
+            foreach (var subdir in Directory.EnumerateDirectories (path))
             {
-                var nameWithExtension = Path.GetFileName(subdir);
-                var subitem = new InMemoryResourceProvider(ReadOnly);
-                _directories.Add(nameWithExtension, subitem);
-                subitem.RestoreFrom(subdir);
+                var nameWithExtension = Path.GetFileName (subdir);
+                var subitem = new InMemoryResourceProvider (ReadOnly);
+                _directories.Add (nameWithExtension, subitem);
+                subitem.RestoreFrom (subdir);
             }
         }
 
@@ -132,6 +138,8 @@ namespace ManagedIrbis.InMemory
                 TextWriter output
             )
         {
+            Sure.NotNull (output);
+
             throw new NotImplementedException();
         }
 
@@ -141,6 +149,8 @@ namespace ManagedIrbis.InMemory
                 string path
             )
         {
+            // TODO implement properly
+
             return _files.Values.ToArray();
         }
 
@@ -150,10 +160,17 @@ namespace ManagedIrbis.InMemory
                 string fileName
             )
         {
-            InMemoryResourceProvider provider;
-            (fileName, provider) = FindFile(fileName);
+            Sure.NotNullNorEmpty (fileName);
 
-            if (provider._files.TryGetValue(fileName, out var content))
+            InMemoryResourceProvider provider;
+            (fileName, provider) = FindFile (fileName);
+
+            if (string.IsNullOrEmpty (fileName))
+            {
+                return null;
+            }
+
+            if (provider._files.TryGetValue (fileName, out var content))
             {
                 return content;
             }
@@ -167,10 +184,16 @@ namespace ManagedIrbis.InMemory
                 string fileName
             )
         {
-            InMemoryResourceProvider provider;
-            (fileName, provider) = FindFile(fileName);
+            Sure.NotNullNorEmpty (fileName);
 
-            return provider._files.ContainsKey(fileName);
+            InMemoryResourceProvider provider;
+            (fileName, provider) = FindFile (fileName);
+            if (string.IsNullOrEmpty (fileName))
+            {
+                return false;
+            }
+
+            return provider._files.ContainsKey (fileName);
         }
 
         /// <inheritdoc cref="IResourceProvider.WriteResource"/>
@@ -180,16 +203,18 @@ namespace ManagedIrbis.InMemory
                 string? content
             )
         {
+            Sure.NotNullNorEmpty (fileName);
+
             if (ReadOnly)
             {
                 return false;
             }
 
             InMemoryResourceProvider provider;
-            (fileName, provider) = FindFile(fileName);
+            (fileName, provider) = FindFile (fileName);
             if (content is null)
             {
-                return provider._files.Remove(fileName);
+                return provider._files.Remove (fileName);
             }
 
             provider._files[fileName] = content;

@@ -118,15 +118,31 @@ namespace ManagedIrbis.Infrastructure
                 string? format
             )
         {
-            if (string.IsNullOrEmpty(format))
+            if (string.IsNullOrEmpty (format))
             {
                 NewLine();
             }
             else
             {
-                AddAnsi(format);
+                format = format.Trim();
+                if (string.IsNullOrEmpty (format))
+                {
+                    NewLine();
+                }
+                else
+                {
+                    if (format.StartsWith ('@'))
+                    {
+                        AddAnsi (format);
+                    }
+                    else
+                    {
+                        var prepared = IrbisFormat.PrepareFormat (format);
+                        AddUtf ("!" + prepared);
+                    }
+                }
             }
-        } // method AddFormat
+        }
 
         /// <summary>
         /// Отладочная печать.

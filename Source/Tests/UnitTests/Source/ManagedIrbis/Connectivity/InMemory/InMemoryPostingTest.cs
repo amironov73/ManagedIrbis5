@@ -24,5 +24,22 @@ namespace UnitTests.ManagedIrbis.Connectivity.InMemory
             Assert.AreEqual (0, posting.Position);
         }
 
+        [TestMethod]
+        [Description ("Присвоение")]
+        public void InMemoryPosting_Construction_2()
+        {
+            var posting = new InMemoryPosting
+            {
+                Mfn = 1,
+                Occurrence = 2,
+                Position = 3,
+                Tag = 4
+            };
+            Assert.AreEqual (1, posting.Mfn);
+            Assert.AreEqual (2, posting.Occurrence);
+            Assert.AreEqual (3, posting.Position);
+            Assert.AreEqual (4, posting.Tag);
+        }
+
     }
 }

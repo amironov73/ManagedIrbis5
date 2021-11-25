@@ -6,7 +6,6 @@ using System.IO;
 
 using ManagedIrbis;
 using ManagedIrbis.InMemory;
-using ManagedIrbis.Providers;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -62,6 +61,16 @@ namespace UnitTests.ManagedIrbis.Connectivity.InMemory
             var record = new Record();
             var result = database.WriteRecord (record);
             Assert.IsTrue (result);
+        }
+
+        [TestMethod]
+        [Description ("Блокировка")]
+        public void InMemoryDatabase_Locked_1()
+        {
+            var database = _GetDatabase();
+            Assert.IsFalse (database.Locked);
+            database.Locked = true;
+            Assert.IsTrue (database.Locked);
         }
     }
 }
