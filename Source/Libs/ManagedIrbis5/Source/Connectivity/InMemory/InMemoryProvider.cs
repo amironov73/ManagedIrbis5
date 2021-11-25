@@ -401,8 +401,13 @@ namespace ManagedIrbis.InMemory
         {
             using var guard = new BusyGuard (Busy);
 
-            var name = databaseName ?? Database ?? throw new IrbisException();
-            var database = Databases[name];
+            var database = GetDatabase (databaseName);
+            if (database is null)
+            {
+                LastError = DontKnowWhatCodeToUse;
+                return 0;
+            }
+
             var result = database.Master.Count;
             LastError = SoFarSoGood;
 
@@ -468,8 +473,6 @@ namespace ManagedIrbis.InMemory
         /// <inheritdoc cref="ISyncProvider.ListUsers"/>
         public UserInfo[]? ListUsers()
         {
-            using var guard = new BusyGuard (Busy);
-
             var specification = new FileSpecification
             {
                 Path = IrbisPath.Data,
@@ -480,7 +483,7 @@ namespace ManagedIrbis.InMemory
             if (string.IsNullOrEmpty (text))
             {
                 LastError = DontKnowWhatCodeToUse;
-                return default;
+                return null;
             }
 
             var result = UserInfo.Parse (text);
@@ -559,7 +562,7 @@ namespace ManagedIrbis.InMemory
 
             LastError = SoFarSoGood;
 
-            return (T?)(object?)db.ReadRecord (parameters.Mfn);
+            return (T?)(object?) db.ReadRecord (parameters.Mfn);
         }
 
         /// <inheritdoc cref="ISyncProvider.ReadRecordPostings"/>
@@ -657,13 +660,20 @@ namespace ManagedIrbis.InMemory
         {
             using var guard = new BusyGuard (Busy);
 
-            var name = databaseName ?? Database ?? throw new IrbisException();
-            var database = Databases[name];
-            if (!database.ReadOnly)
+            var database = GetDatabase (databaseName);
+            if (database is null)
             {
-                database.Master.Clear();
-                database.Inverted.Clear();
+                LastError = DontKnowWhatCodeToUse;
+                return false;
             }
+
+            if (database.ReadOnly)
+            {
+                return false;
+            }
+
+            database.Master.Clear();
+            database.Inverted.Clear();
 
             return true;
         }

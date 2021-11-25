@@ -198,7 +198,5 @@ namespace ManagedIrbis.InMemory
         }
 
         #endregion
-
-    } // class InMemoryResourceProvider
-
-} // namespace ManagedIrbis.InMemory
+    }
+}
