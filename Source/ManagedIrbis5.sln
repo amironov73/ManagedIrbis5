@@ -109,6 +109,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenumberFiles", "Apps\Renum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountMagazines", "Apps\CountMagazines\CountMagazines.csproj", "{3F3BAB82-95DD-49DD-80DB-B40822DF5D6B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis.Sql", "Libs\ManagedIrbis.Sql\ManagedIrbis.Sql.csproj", "{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -671,6 +673,18 @@ Global
 		{3F3BAB82-95DD-49DD-80DB-B40822DF5D6B}.Release|x64.Build.0 = Release|Any CPU
 		{3F3BAB82-95DD-49DD-80DB-B40822DF5D6B}.Release|x86.ActiveCfg = Release|Any CPU
 		{3F3BAB82-95DD-49DD-80DB-B40822DF5D6B}.Release|x86.Build.0 = Release|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Debug|x64.Build.0 = Debug|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Debug|x86.Build.0 = Debug|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Release|x64.ActiveCfg = Release|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Release|x64.Build.0 = Release|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Release|x86.ActiveCfg = Release|Any CPU
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -722,6 +736,7 @@ Global
 		{1421407B-D750-4B09-9C11-81FAE3824F9C} = {F56FBD0E-5530-4F55-ABE1-9E106B93417F}
 		{70A4D4C5-7151-4EBC-A2DD-2BF256ECA402} = {1E5940AA-0540-4947-8216-45E381E76C72}
 		{3F3BAB82-95DD-49DD-80DB-B40822DF5D6B} = {1E5940AA-0540-4947-8216-45E381E76C72}
+		{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE} = {F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E077767-1AE0-47E0-AEFB-59E4D7464AD4}

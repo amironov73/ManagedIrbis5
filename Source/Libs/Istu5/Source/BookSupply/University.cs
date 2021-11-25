@@ -74,7 +74,7 @@ namespace Istu.BookSupply
             _logger.LogTrace (nameof (University) + "::Constructor");
 
             _booksupplyConnectionString = connectionString ?? _configuration["booksupply"];
-        } // constructor
+        }
 
         #endregion
 
@@ -157,7 +157,10 @@ namespace Istu.BookSupply
         #region IServiceProvider members
 
         /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService (Type serviceType) => _serviceProvider.GetService (serviceType);
+        public object? GetService (Type serviceType)
+        {
+            return _serviceProvider.GetService (serviceType);
+        }
 
         #endregion
 

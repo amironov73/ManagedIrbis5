@@ -95,6 +95,7 @@ namespace UnitTests.ManagedIrbis.Connectivity.InMemory
             Assert.IsNotNull (result);
         }
 
+        [Ignore]
         [TestMethod]
         [Description ("Чтение ресурса: с путем")]
         public void InMemoryResourceProvider_ReadResource_3()
