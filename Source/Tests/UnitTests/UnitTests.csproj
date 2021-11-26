@@ -12,4 +12,8 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
+  </ItemGroup>
+
 </Project>

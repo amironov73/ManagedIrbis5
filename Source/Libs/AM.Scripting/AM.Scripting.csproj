@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Source" />
+    <PackageReference Include="Sprache.Signed" Version="2.3.1" />
   </ItemGroup>
 
 </Project>
