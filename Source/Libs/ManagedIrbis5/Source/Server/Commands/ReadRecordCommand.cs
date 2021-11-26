@@ -69,9 +69,9 @@ namespace ManagedIrbis.Server.Commands
                 (
                     "{0}#{1}",
                     record.Mfn.ToInvariantString(),
-                    ((int) record.Status).ToInvariantString()
+                    ((int)record.Status).ToInvariantString()
                 );
-            builder.Append("\r\n");
+            builder.Append ("\r\n");
             builder.AppendFormat
                 (
                     "0#{0}",
@@ -99,15 +99,14 @@ namespace ManagedIrbis.Server.Commands
                         );
                 }
 
-                builder.Append("\r\n");
+                builder.Append ("\r\n");
             }
 
             var result = builder.ToString();
             StringBuilderPool.Shared.Return (builder);
 
             return result;
-
-        } // method EncodeRecord
+        }
 
         #endregion
 
@@ -160,6 +159,7 @@ namespace ManagedIrbis.Server.Commands
                 }
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 if (record is not null)
@@ -191,12 +191,9 @@ namespace ManagedIrbis.Server.Commands
                 SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
-
-        } // method Execute
+            engine.OnAfterExecute (Data);
+        }
 
         #endregion
-
-    } // class ReadRecordCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

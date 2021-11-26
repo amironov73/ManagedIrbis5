@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -74,6 +74,7 @@ namespace ManagedIrbis.Server.Commands
                 }
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (result).NewLine();
                 SendResponse();
@@ -94,11 +95,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class MaxMfnCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

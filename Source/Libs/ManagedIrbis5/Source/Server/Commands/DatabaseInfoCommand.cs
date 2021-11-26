@@ -66,8 +66,7 @@ namespace ManagedIrbis.Server.Commands
             }
 
             response.NewLine();
-
-        } // method _WriteRecords
+        }
 
         #endregion
 
@@ -95,6 +94,7 @@ namespace ManagedIrbis.Server.Commands
                 }
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 _WriteRecords (response, info.LogicallyDeletedRecords);
@@ -121,11 +121,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class DatabaseInfoCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -65,11 +65,12 @@ namespace ManagedIrbis.Server.Commands
                 UpdateContext();
 
                 var request = Data.Request.ThrowIfNull();
-                request.NotUsed ();
+                request.NotUsed();
 
                 // TODO: implement
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();
@@ -89,11 +90,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class FormatIsoGroupCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

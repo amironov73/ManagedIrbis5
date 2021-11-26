@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -90,6 +90,7 @@ namespace ManagedIrbis.Server.Commands
 
                 var users = engine.Users;
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
 
@@ -109,8 +110,7 @@ namespace ManagedIrbis.Server.Commands
                     response.WriteAnsiString (user.Acquisitions).NewLine();
                     response.WriteAnsiString (user.Provision).NewLine();
                     response.WriteAnsiString (user.Administrator).NewLine();
-
-                } // foreach
+                }
 
                 SendResponse();
             }
@@ -130,11 +130,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class ListUsersCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

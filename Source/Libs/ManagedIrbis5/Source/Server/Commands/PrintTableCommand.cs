@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -66,27 +66,28 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
-                database.NotUsed ();
+                database.NotUsed();
                 var table = request.RequireAnsiString();
-                table.NotUsed ();
+                table.NotUsed();
                 var headers = request.GetUtfString();
-                headers.NotUsed ();
+                headers.NotUsed();
                 var mode = request.GetAnsiString();
-                mode.NotUsed ();
+                mode.NotUsed();
                 var searchQuery = request.GetUtfString();
-                searchQuery.NotUsed ();
+                searchQuery.NotUsed();
                 var minMfn = request.GetInt32();
-                minMfn.NotUsed ();
+                minMfn.NotUsed();
                 var maxMfn = request.GetInt32();
-                maxMfn.NotUsed ();
+                maxMfn.NotUsed();
                 var sequentialQuery = request.GetUtfString();
-                sequentialQuery.NotUsed ();
+                sequentialQuery.NotUsed();
                 var mfnList = Array.Empty<int>(); // TODO get mfnList
-                mfnList.NotUsed ();
+                mfnList.NotUsed();
 
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull (nameof (Data.Response));
+
                 // Код возврата не отправляется
                 response.WriteAnsiString (string.Empty).NewLine();
                 SendResponse();
@@ -107,11 +108,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class PrintTableCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

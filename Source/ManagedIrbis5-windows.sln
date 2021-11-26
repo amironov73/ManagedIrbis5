@@ -159,6 +159,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenumberFiles", "Apps\Renum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountMagazines", "Apps\CountMagazines\CountMagazines.csproj", "{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis.Sql", "Libs\ManagedIrbis.Sql\ManagedIrbis.Sql.csproj", "{6710E9F4-C270-467D-A3C6-5E9C30282DE7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1021,6 +1023,18 @@ Global
 		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|x64.Build.0 = Release|Any CPU
 		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|x86.ActiveCfg = Release|Any CPU
 		{E9D2DA55-AF45-479B-B6CF-0E9E9F2AFAA7}.Release|x86.Build.0 = Release|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Debug|x64.Build.0 = Debug|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Debug|x86.Build.0 = Debug|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Release|x64.ActiveCfg = Release|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Release|x64.Build.0 = Release|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Release|x86.ActiveCfg = Release|Any CPU
+		{6710E9F4-C270-467D-A3C6-5E9C30282DE7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

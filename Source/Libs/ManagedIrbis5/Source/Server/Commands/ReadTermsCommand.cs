@@ -58,7 +58,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -100,18 +100,19 @@ namespace ManagedIrbis.Server.Commands
                 if (terms.Length != 0
                     && terms[0].Text != parameters.StartTerm)
                 {
-                    returnCode = (int) ReturnCode.TermNotExist;
+                    returnCode = (int)ReturnCode.TermNotExist;
                 }
 
                 if (terms.Length < parameters.NumberOfTerms)
                 {
-                    returnCode = (int) ReturnCode.LastTermInList;
+                    returnCode = (int)ReturnCode.LastTermInList;
                 }
 
                 // TODO format
                 // TODO reverse order
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (returnCode).NewLine();
                 foreach (var term in terms)
@@ -137,11 +138,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class ReadTermsCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

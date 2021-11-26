@@ -53,7 +53,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -75,10 +75,10 @@ namespace ManagedIrbis.Server.Commands
 
             string? result;
             var database = specification.Database;
-            var path = (int) specification.Path;
+            var path = (int)specification.Path;
             if (path == 0)
             {
-                result = Path.Combine(engine.SystemPath, fileName);
+                result = Path.Combine (engine.SystemPath, fileName);
             }
             else if (path == 1)
             {
@@ -117,14 +117,11 @@ namespace ManagedIrbis.Server.Commands
                                 fileName
                             );
                     }
-
-                } // else
-
-            } // else
+                }
+            }
 
             return result;
-
-        } // method _ResolveSpecification
+        }
 
         private string[] _ListFiles
             (
@@ -162,8 +159,7 @@ namespace ManagedIrbis.Server.Commands
                 .ToArray();
 
             return result;
-
-        } // method _ListFiles
+        }
 
         #endregion
 
@@ -184,6 +180,7 @@ namespace ManagedIrbis.Server.Commands
                 var request = Data.Request.ThrowIfNull();
                 var lines = request.RemainingAnsiStrings();
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата не отправляется
 
                 foreach (var line in lines)
@@ -213,11 +210,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class ListFilesCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

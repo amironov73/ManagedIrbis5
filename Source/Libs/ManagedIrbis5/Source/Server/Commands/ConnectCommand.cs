@@ -29,7 +29,6 @@ using AM;
 
 namespace ManagedIrbis.Server.Commands
 {
-
     //
     // Начиная с версии 2018.1
     // Для клиентских АРМов реализована авторизация по учетной
@@ -112,7 +111,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -166,10 +165,13 @@ namespace ManagedIrbis.Server.Commands
                 context.Workstation = request.Workstation;
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
+
                 // Интервал подтверждения
                 response.WriteInt32 (engine.IniFile.ClientTimeLive).NewLine();
+
                 // INI-файл
                 response.WriteAnsiString (iniFile).NewLine();
 
@@ -191,11 +193,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class ConnectCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

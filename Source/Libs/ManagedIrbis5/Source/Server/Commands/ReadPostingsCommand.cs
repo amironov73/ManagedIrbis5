@@ -49,7 +49,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace ManagedIrbis.Server.Commands
                     NumberOfPostings = request.GetInt32(),
                     FirstPosting = request.GetInt32(),
                     Format = request.GetAutoString(),
-                    Terms = new []{ request.RequireUtfString() }
+                    Terms = new[] { request.RequireUtfString() }
                 };
 
                 // TODO shift and number
@@ -94,10 +94,11 @@ namespace ManagedIrbis.Server.Commands
 
                 if (links.Count == 0)
                 {
-                    returnCode = (int) ReturnCode.TermNotExist;
+                    returnCode = (int)ReturnCode.TermNotExist;
                 }
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (returnCode).NewLine();
                 foreach (var link in links)
@@ -124,11 +125,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class ReadPostingsCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

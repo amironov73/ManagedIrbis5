@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -66,11 +66,11 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
-                database.NotUsed ();
+                database.NotUsed();
                 var description = request.GetAnsiString();
-                description.NotUsed ();
+                description.NotUsed();
                 var readerAccess = request.GetInt32();
-                readerAccess.NotUsed ();
+                readerAccess.NotUsed();
 
                 // Response is (ANSI):
                 // 0
@@ -81,6 +81,7 @@ namespace ManagedIrbis.Server.Commands
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();
@@ -101,11 +102,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class CreateDatabaseCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

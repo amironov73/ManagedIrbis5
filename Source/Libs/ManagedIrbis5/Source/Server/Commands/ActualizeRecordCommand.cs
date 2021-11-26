@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -66,13 +66,14 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
-                database.NotUsed ();
+                database.NotUsed();
                 var mfn = request.GetInt32();
-                mfn.NotUsed ();
+                mfn.NotUsed();
 
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();
@@ -93,11 +94,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class ActualizeRecordCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

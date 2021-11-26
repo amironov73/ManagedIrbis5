@@ -58,7 +58,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -94,8 +94,10 @@ namespace ManagedIrbis.Server.Commands
                 {
                     var expression = Parameters.Expression ?? string.Empty;
                     var found = provider.Search (expression);
+
                     // Код возврата
                     response.WriteInt32 (0).NewLine();
+
                     // Общее количество найденных записей
                     response.WriteInt32 (found.Length).NewLine();
                     var howMany = found.Length;
@@ -115,9 +117,10 @@ namespace ManagedIrbis.Server.Commands
                         {
                             howMany = found.Length - shift;
                         }
+
                         for (var i = 0; i < howMany; i++)
                         {
-                            var mfn = found [i + shift];
+                            var mfn = found[i + shift];
                             response.WriteInt32 (mfn);
                             if (!string.IsNullOrEmpty (Parameters.Format))
                             {
@@ -158,11 +161,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class SearchCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

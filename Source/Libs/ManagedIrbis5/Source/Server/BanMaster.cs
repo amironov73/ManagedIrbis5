@@ -39,6 +39,15 @@ namespace ManagedIrbis.Server
     /// </summary>
     public sealed class BanMaster
     {
+        #region Properties
+
+        /// <summary>
+        /// Общее количество забаненых адресов.
+        /// </summary>
+        public int Count => _dictionary.Count;
+
+        #endregion
+
         #region Private members
 
         private readonly ConcurrentDictionary<string, object?> _dictionary = new ();
@@ -59,14 +68,18 @@ namespace ManagedIrbis.Server
             {
                 _dictionary[address] = null;
             }
-
-        } // method BanTheAddress
+        }
 
         /// <summary>
         /// Проверка, содержится ли указанный адрес в бан-листе.
         /// </summary>
-        public bool IsAddressBanned (string? address) =>
-            !string.IsNullOrEmpty (address) && _dictionary.ContainsKey (address);
+        public bool IsAddressBanned
+            (
+                string? address
+            )
+        {
+            return !string.IsNullOrEmpty (address) && _dictionary.ContainsKey (address);
+        }
 
         /// <summary>
         /// Проверка, забанен ли адрес.
@@ -79,13 +92,12 @@ namespace ManagedIrbis.Server
             var address = socket.GetRemoteAddress();
 
             return IsAddressBanned (address);
-
-        } // method IsAddressBanned
+        }
 
         /// <summary>
         /// Загрузка бан-листа из указанного файла.
         /// </summary>
-        public void LoadBanList
+        public void LoadFile
             (
                 string fileName
             )
@@ -94,15 +106,17 @@ namespace ManagedIrbis.Server
 
             foreach (var line in File.ReadLines (fileName, IrbisEncoding.Utf8))
             {
-                _dictionary[line] = null;
+                if (!string.IsNullOrEmpty (line))
+                {
+                    _dictionary[line] = null;
+                }
             }
-
-        } // method LoadBanList
+        }
 
         /// <summary>
         /// Сохранение бан-листа в указанный файл.
         /// </summary>
-        public void SaveBanList
+        public void SaveToFile
             (
                 string fileName
             )
@@ -111,8 +125,7 @@ namespace ManagedIrbis.Server
 
             var lines = _dictionary.Keys.ToArray();
             File.WriteAllLines (fileName, lines, IrbisEncoding.Utf8);
-
-        } // method SaveBanList
+        }
 
         /// <summary>
         /// Разбан раскаявшегося адреса.
@@ -126,8 +139,7 @@ namespace ManagedIrbis.Server
             {
                 _dictionary.TryRemove (address, out _);
             }
-
-        } // method UnbanTheAddress
+        }
 
         /// <summary>
         /// Разбан всех в честь праздника.
@@ -138,11 +150,8 @@ namespace ManagedIrbis.Server
             {
                 _dictionary.Clear();
             }
-
-        } // method UnbanAll
+        }
 
         #endregion
-
-    } // class BanMaster
-
-} // namespace ManagedIrbis.Server
+    }
+}

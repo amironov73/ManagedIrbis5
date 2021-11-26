@@ -48,7 +48,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -65,7 +65,7 @@ namespace ManagedIrbis.Server.Commands
             result.Mfn = FastNumber.ParseInt32 (parts[0]);
             if (parts.Length != 1)
             {
-                result.Status = (RecordStatus) FastNumber.ParseInt32(parts[1]);
+                result.Status = (RecordStatus)FastNumber.ParseInt32 (parts[1]);
             }
 
             parts = lines[1].Split ('#');
@@ -83,8 +83,7 @@ namespace ManagedIrbis.Server.Commands
             }
 
             return result;
-
-        } // method _ParseRecord
+        }
 
         #endregion
 
@@ -109,7 +108,7 @@ namespace ManagedIrbis.Server.Commands
                 var count = request.GetInt32();
 
                 // Код возврата
-                response.WriteInt32(0).NewLine();
+                response.WriteInt32 (0).NewLine();
 
                 using (var provider = engine.GetProvider (database))
                 {
@@ -128,8 +127,7 @@ namespace ManagedIrbis.Server.Commands
                         text = formatParameters.Result.AsSingle();
                         text = IrbisText.WindowsToIrbis (text);
                         response.WriteUtfString (text).NewLine();
-
-                    } // if
+                    }
 
                     else
                     {
@@ -158,12 +156,9 @@ namespace ManagedIrbis.Server.Commands
                                 text = IrbisText.WindowsToIrbis (text);
                                 response.WriteUtfString (text).NewLine();
                             }
-
-                        } // for
-
-                    } // else
-
-                } // using
+                        }
+                    }
+                }
 
                 SendResponse();
             }
@@ -182,11 +177,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class FormatCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

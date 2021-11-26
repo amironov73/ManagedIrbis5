@@ -49,7 +49,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -69,11 +69,12 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
-                database.NotUsed ();
+                database.NotUsed();
 
                 // TODO implement
 
                 ServerResponse response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();
@@ -93,11 +94,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class ReloadMasterFileCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

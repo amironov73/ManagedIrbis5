@@ -59,8 +59,7 @@ namespace ManagedIrbis.Server.Commands
             )
         {
             Data = data;
-
-        } // constructor
+        }
 
         #endregion
 
@@ -82,11 +81,11 @@ namespace ManagedIrbis.Server.Commands
             var request = Data.Request.ThrowIfNull();
             var response = new ServerResponse (request);
             Data.Response = response;
+
             // Код возврата
             response.WriteInt32 (errorCode).NewLine();
             SendResponse();
-
-        } // method SendError
+        }
 
         /// <summary>
         /// Отправка клиенту нормального ответа.
@@ -104,8 +103,7 @@ namespace ManagedIrbis.Server.Commands
             var packet = response.Encode (versionString);
             var socket = Data.Socket.ThrowIfNull();
             socket.SendAsync (packet);
-
-        } // method SendResponse
+        }
 
         /// <summary>
         /// Обновление контекста.
@@ -116,8 +114,7 @@ namespace ManagedIrbis.Server.Commands
             context.LastActivity = DateTime.Now;
             context.LastCommand = Data.Request!.CommandCode1;
             context.CommandCount++;
-
-        } // method UpdateContext
+        }
 
         /// <summary>
         /// Собственно исполнение команды.
@@ -125,7 +122,5 @@ namespace ManagedIrbis.Server.Commands
         public abstract void Execute();
 
         #endregion
-
-    } // class WorkData
-
-} // namespace ManagedIrbis.Server
+    }
+}

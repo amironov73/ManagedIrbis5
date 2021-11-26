@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -66,11 +66,12 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var database = request.RequireAnsiString();
-                database.NotUsed ();
+                database.NotUsed();
 
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();
@@ -83,19 +84,16 @@ namespace ManagedIrbis.Server.Commands
             {
                 Magna.TraceException
                     (
-                        nameof(CreateDictionaryCommand) + "::" + nameof(Execute),
+                        nameof (CreateDictionaryCommand) + "::" + nameof (Execute),
                         exception
                     );
 
-                SendError(-8888);
+                SendError (-8888);
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class CreateDictionaryCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

@@ -46,7 +46,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -65,11 +65,12 @@ namespace ManagedIrbis.Server.Commands
                 UpdateContext();
 
                 var request = Data.Request.ThrowIfNull();
-                request.NotUsed ();
+                request.NotUsed();
 
                 // TODO implement
 
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата
                 response.WriteInt32 (0).NewLine();
                 SendResponse();
@@ -89,12 +90,9 @@ namespace ManagedIrbis.Server.Commands
                 SendError (-8888);
             }
 
-            engine.OnAfterExecute(Data);
-
-        } // method Execute
+            engine.OnAfterExecute (Data);
+        }
 
         #endregion
-
-    } // class BackupCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}

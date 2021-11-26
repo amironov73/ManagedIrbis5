@@ -63,7 +63,7 @@ namespace ManagedIrbis.Server.Commands
             )
             : base (data)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -83,6 +83,7 @@ namespace ManagedIrbis.Server.Commands
 
                 var request = Data.Request.ThrowIfNull();
                 var response = Data.Response.ThrowIfNull();
+
                 // Код возврата не отправляется
                 var lines = request.RemainingAnsiStrings();
                 foreach (var line in lines)
@@ -114,7 +115,6 @@ namespace ManagedIrbis.Server.Commands
                                 response.Memory.Write (content, 0, content.Length);
                                 response.NewLine();
                             }
-
                         } // else
                     }
                     catch (Exception exception)
@@ -126,7 +126,6 @@ namespace ManagedIrbis.Server.Commands
                             );
                         response.NewLine();
                     }
-
                 } // foreach
 
                 SendResponse();
@@ -147,11 +146,8 @@ namespace ManagedIrbis.Server.Commands
             }
 
             engine.OnAfterExecute (Data);
-
-        } // method Execute
+        }
 
         #endregion
-
-    } // class ReadFileCommand
-
-} // namespace ManagedIrbis.Server.Commands
+    }
+}
