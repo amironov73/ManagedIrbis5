@@ -109,7 +109,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RenumberFiles", "Apps\Renum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CountMagazines", "Apps\CountMagazines\CountMagazines.csproj", "{3F3BAB82-95DD-49DD-80DB-B40822DF5D6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis.Sql", "Libs\ManagedIrbis.Sql\ManagedIrbis.Sql.csproj", "{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5.Sql", "Libs\ManagedIrbis5.Sql\ManagedIrbis5.Sql.csproj", "{DE6A4DBD-4701-409F-B5A1-D632DCBB58FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

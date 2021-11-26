@@ -27,48 +27,48 @@ namespace UnitTests.ManagedIrbis
         {
             var tree = new TreeFile();
 
-            Assert.AreEqual(0, tree.Roots.Count);
+            Assert.AreEqual (0, tree.Roots.Count);
 
-            var root = tree.AddRoot("1 - First root");
-            Assert.AreEqual(1, tree.Roots.Count);
-            Assert.AreEqual("1", root.Prefix);
-            Assert.AreEqual("First root", root.Suffix);
-            Assert.AreEqual("1 - First root", root.Value);
-            Assert.AreEqual(0, root.Children.Count);
+            var root = tree.AddRoot ("1 - First root");
+            Assert.AreEqual (1, tree.Roots.Count);
+            Assert.AreEqual ("1", root.Prefix);
+            Assert.AreEqual ("First root", root.Suffix);
+            Assert.AreEqual ("1 - First root", root.Value);
+            Assert.AreEqual (0, root.Children.Count);
 
-            var child = root.AddChild("1.1 - First - child");
-            Assert.AreEqual(1, root.Children.Count);
-            Assert.AreEqual(0, child.Children.Count);
-            Assert.AreEqual("1.1 - First - child", child.Value);
-            Assert.AreEqual("1.1", child.Prefix);
-            Assert.AreEqual("First - child", child.Suffix);
+            var child = root.AddChild ("1.1 - First - child");
+            Assert.AreEqual (1, root.Children.Count);
+            Assert.AreEqual (0, child.Children.Count);
+            Assert.AreEqual ("1.1 - First - child", child.Value);
+            Assert.AreEqual ("1.1", child.Prefix);
+            Assert.AreEqual ("First - child", child.Suffix);
 
-            _TestSerialization(tree);
+            _TestSerialization (tree);
         }
 
         [TestMethod]
         public void TreeFile_ParseStream_1()
         {
             var reader = TextReader.Null;
-            var tree = TreeFile.ParseStream(reader);
-            Assert.AreEqual(0, tree.Roots.Count);
+            var tree = TreeFile.ParseStream (reader);
+            Assert.AreEqual (0, tree.Roots.Count);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
+        [ExpectedException (typeof (FormatException))]
         public void TreeFile_ParseStream_2()
         {
-            TextReader reader = new StringReader(TreeFile.Indent + "HELLO");
-            TreeFile.ParseStream(reader);
+            TextReader reader = new StringReader (TreeFile.Indent + "HELLO");
+            TreeFile.ParseStream (reader);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FormatException))]
+        [ExpectedException (typeof (FormatException))]
         public void IrbiTreeFile_ParseStream_3()
         {
             var text = "Hello\n\t\tWorld";
-            TextReader reader = new StringReader(text);
-            TreeFile.ParseStream(reader);
+            TextReader reader = new StringReader (text);
+            TreeFile.ParseStream (reader);
         }
 
         [TestMethod]
@@ -85,15 +85,15 @@ namespace UnitTests.ManagedIrbis
                     fileName,
                     IrbisEncoding.Ansi
                 );
-            Assert.AreEqual(4, tree.Roots.Count);
-            Assert.AreEqual("1", tree.Roots[0].Prefix);
+            Assert.AreEqual (4, tree.Roots.Count);
+            Assert.AreEqual ("1", tree.Roots[0].Prefix);
             Assert.AreEqual
                 (
                     "БИБЛИОТЕЧНОЕ ДЕЛО. БИБЛИОТЕКОВЕДЕНИЕ",
                     tree.Roots[0].Suffix
                 );
 
-            _TestSerialization(tree);
+            _TestSerialization (tree);
         }
 
         [TestMethod]
@@ -111,17 +111,17 @@ namespace UnitTests.ManagedIrbis
                     IrbisEncoding.Ansi
                 );
 
-            Assert.AreEqual(4, tree.Roots.Count);
-            Assert.AreEqual(0, tree.Roots[0].Children.Count);
-            Assert.AreEqual(3, tree.Roots[1].Children.Count);
-            Assert.AreEqual(0, tree.Roots[1].Children[0].Children.Count);
-            Assert.AreEqual(1, tree.Roots[1].Children[1].Children.Count);
-            Assert.AreEqual(0, tree.Roots[1].Children[1].Children[0].Children.Count);
-            Assert.AreEqual(1, tree.Roots[2].Children.Count);
-            Assert.AreEqual(0, tree.Roots[3].Children.Count);
+            Assert.AreEqual (4, tree.Roots.Count);
+            Assert.AreEqual (0, tree.Roots[0].Children.Count);
+            Assert.AreEqual (3, tree.Roots[1].Children.Count);
+            Assert.AreEqual (0, tree.Roots[1].Children[0].Children.Count);
+            Assert.AreEqual (1, tree.Roots[1].Children[1].Children.Count);
+            Assert.AreEqual (0, tree.Roots[1].Children[1].Children[0].Children.Count);
+            Assert.AreEqual (1, tree.Roots[2].Children.Count);
+            Assert.AreEqual (0, tree.Roots[3].Children.Count);
 
 
-            _TestSerialization(tree);
+            _TestSerialization (tree);
         }
 
         [TestMethod]
@@ -130,7 +130,7 @@ namespace UnitTests.ManagedIrbis
             var tree1 = _CreateTree();
 
             var writer = new StringWriter();
-            tree1.Save(writer);
+            tree1.Save (writer);
             var actual = writer.ToString();
             var expected = string.Format
                 (
@@ -146,27 +146,27 @@ namespace UnitTests.ManagedIrbis
                     + "4 - Fourth{0}",
                     Environment.NewLine
                 );
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual (expected, actual);
 
-            var reader = new StringReader(actual);
-            var tree2 = TreeFile.ParseStream(reader);
+            var reader = new StringReader (actual);
+            var tree2 = TreeFile.ParseStream (reader);
 
-            Assert.AreEqual(tree1.Roots.Count, tree2.Roots.Count);
+            Assert.AreEqual (tree1.Roots.Count, tree2.Roots.Count);
         }
 
         private TreeFile _CreateTree()
         {
             var tree1 = new TreeFile();
-            tree1.AddRoot("1 - First");
-            var root2 = tree1.AddRoot("2 - Second");
-            root2.AddChild("2.1 - Second first");
-            var child = root2.AddChild("2.2 - Second second");
-            child.AddChild("2.2.1 - Second second first");
-            root2.AddChild("2.3 - Second third");
-            var root3 = tree1.AddRoot("3 - Third");
-            child = root3.AddChild("3.1 - Third first");
-            child.AddChild("3.1.1 - Third first first");
-            tree1.AddRoot("4 - Fourth");
+            tree1.AddRoot ("1 - First");
+            var root2 = tree1.AddRoot ("2 - Second");
+            root2.AddChild ("2.1 - Second first");
+            var child = root2.AddChild ("2.2 - Second second");
+            child.AddChild ("2.2.1 - Second second first");
+            root2.AddChild ("2.3 - Second third");
+            var root3 = tree1.AddRoot ("3 - Third");
+            child = root3.AddChild ("3.1 - Third first");
+            child.AddChild ("3.1.1 - Third first first");
+            tree1.AddRoot ("4 - Fourth");
 
             return tree1;
         }
@@ -179,39 +179,39 @@ namespace UnitTests.ManagedIrbis
             var bytes = first.SaveToMemory();
             var second = bytes.RestoreObjectFromMemory<TreeFile>();
 
-            Assert.AreEqual(first.FileName, second!.FileName);
-            Assert.AreEqual(first.Roots.Count, second.Roots.Count);
+            Assert.AreEqual (first.FileName, second!.FileName);
+            Assert.AreEqual (first.Roots.Count, second.Roots.Count);
         }
 
         [TestMethod]
         public void TreeFile_Serialization_1()
         {
             var tree = new TreeFile();
-            _TestSerialization(tree);
+            _TestSerialization (tree);
 
             tree = _CreateTree();
-            _TestSerialization(tree);
+            _TestSerialization (tree);
         }
 
         [TestMethod]
         public void TreeFile_Verify_1()
         {
             var tree = _CreateTree();
-            Assert.IsTrue(tree.Verify(false));
-            Assert.IsTrue(tree.Verify(true));
+            Assert.IsTrue (tree.Verify (false));
+            Assert.IsTrue (tree.Verify (true));
 
             tree = new TreeFile();
-            Assert.IsFalse(tree.Verify(false));
+            Assert.IsFalse (tree.Verify (false));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(VerificationException))]
+        [ExpectedException (typeof (VerificationException))]
         public void TreeFile_Verify_2()
         {
             var tree = new TreeFile();
             var item = new TreeLine();
-            tree.Roots.Add(item);
-            tree.Verify(true);
+            tree.Roots.Add (item);
+            tree.Verify (true);
         }
 
         [TestMethod]
@@ -219,8 +219,8 @@ namespace UnitTests.ManagedIrbis
         {
             var tree = new TreeFile();
             var item = new TreeLine();
-            tree.Roots.Add(item);
-            Assert.IsFalse(tree.Verify(false));
+            tree.Roots.Add (item);
+            Assert.IsFalse (tree.Verify (false));
         }
 
         [TestMethod]
@@ -228,9 +228,9 @@ namespace UnitTests.ManagedIrbis
         {
             var tree = _CreateTree();
             var fileName = Path.GetTempFileName();
-            tree.SaveToLocalFile(fileName, IrbisEncoding.Ansi);
-            var length = File.ReadAllText(fileName, IrbisEncoding.Ansi).DosToUnix()!.Length;
-            Assert.AreEqual(180, length);
+            tree.SaveToLocalFile (fileName, IrbisEncoding.Ansi);
+            var length = File.ReadAllText (fileName, IrbisEncoding.Ansi).DosToUnix()!.Length;
+            Assert.AreEqual (180, length);
         }
 
         [TestMethod]
@@ -238,7 +238,7 @@ namespace UnitTests.ManagedIrbis
         {
             var tree = _CreateTree();
             var menu = tree.ToMenu();
-            Assert.AreEqual(10, menu.Entries.Count);
+            Assert.AreEqual (10, menu.Entries.Count);
         }
 
         [TestMethod]
@@ -247,8 +247,8 @@ namespace UnitTests.ManagedIrbis
             var tree = _CreateTree();
             var count = 0;
             Action<TreeLine> action = _ => count++;
-            tree.Walk(action);
-            Assert.AreEqual(10, count);
+            tree.Walk (action);
+            Assert.AreEqual (10, count);
         }
 
         [TestMethod]
@@ -256,7 +256,7 @@ namespace UnitTests.ManagedIrbis
         {
             var saveDelimiter = TreeLine.Delimiter;
             TreeLine.Delimiter = "!";
-            Assert.AreEqual("!", TreeLine.Delimiter);
+            Assert.AreEqual ("!", TreeLine.Delimiter);
             TreeLine.Delimiter = saveDelimiter;
         }
     }

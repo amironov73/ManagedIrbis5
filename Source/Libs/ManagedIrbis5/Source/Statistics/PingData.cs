@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PingData.cs --
+/* PingData.cs -- данные об успешности выполнения пинга до ИРБИС-сервера
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,11 +15,11 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
+using AM;
 using AM.IO;
 using AM.Runtime;
 
@@ -28,48 +28,38 @@ using AM.Runtime;
 namespace ManagedIrbis.Statistics
 {
     /// <summary>
-    ///
+    /// Данные об успешности выполнения пинга до ИРБИС-сервера.
     /// </summary>
-    [XmlRoot("ping")]
+    [XmlRoot ("ping")]
     public struct PingData
-        : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Moment.
+        /// Момент времени, когда выполнялся пинг.
         /// </summary>
-        [XmlElement("moment")]
-        [JsonPropertyName("moment")]
+        [XmlAttribute ("moment")]
+        [JsonPropertyName ("moment")]
+        [Description ("Момент времени")]
         public DateTime Moment { get; set; }
 
         /// <summary>
-        /// Success.
+        /// Признак успешного выполнения.
         /// </summary>
-        [XmlElement("success")]
-        [JsonPropertyName("success")]
+        [XmlAttribute ("success")]
+        [JsonPropertyName ("success")]
+        [Description ("Признак успешного выполнения")]
         public bool Success { get; set; }
 
         /// <summary>
-        /// Roundtrip time.
+        /// Полное время обращения пакета, миллисекунды.
         /// </summary>
-        [XmlElement("roundtrip")]
-        [JsonPropertyName("roundtrip")]
+        [XmlAttribute ("roundtrip")]
+        [JsonPropertyName ("roundtrip")]
+        [Description ("Полное время обращения пакета")]
         public int RoundTripTime { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Should serialize the <see cref="Success"/> field?
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool ShouldSerializeSuccess()
-        {
-            return Success;
-        }
 
         #endregion
 
@@ -81,7 +71,9 @@ namespace ManagedIrbis.Statistics
                 BinaryReader reader
             )
         {
-            Moment = new DateTime(reader.ReadPackedInt64());
+            Sure.NotNull (reader);
+
+            Moment = new DateTime (reader.ReadPackedInt64());
             Success = reader.ReadBoolean();
             RoundTripTime = reader.ReadPackedInt32();
         }
@@ -92,9 +84,30 @@ namespace ManagedIrbis.Statistics
                 BinaryWriter writer
             )
         {
-            writer.WritePackedInt64(Moment.Ticks);
-            writer.Write(Success);
-            writer.WritePackedInt32(RoundTripTime);
+            Sure.NotNull (writer);
+
+            writer.WritePackedInt64 (Moment.Ticks);
+            writer.Write (Success);
+            writer.WritePackedInt32 (RoundTripTime);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<PingData> (this, throwOnError);
+
+            verifier
+                .Assert (Moment != default)
+                .Assert (!Success || RoundTripTime > 0);
+
+            return verifier.Result;
         }
 
         #endregion
@@ -102,7 +115,10 @@ namespace ManagedIrbis.Statistics
         #region Object members
 
         /// <inheritdoc cref="ValueType.ToString" />
-        public override string ToString() => $"{Moment:HH:mm:ss} {Success} {RoundTripTime}";
+        public override string ToString()
+        {
+            return $"{Moment:HH:mm:ss} {Success} {RoundTripTime}";
+        }
 
         #endregion
     }
