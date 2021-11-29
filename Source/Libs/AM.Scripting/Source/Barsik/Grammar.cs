@@ -38,6 +38,23 @@ namespace AM.Scripting.Barsik
             return Program.End().Parse (sourceCode);
         }
 
+        private static readonly Parser<string> DirectiveCode =
+            from hash in Parse.Char ('#')
+            from code in Parse.Chars ("lru").Once().Text()
+            select code;
+
+        private static readonly Parser<string> DirectiveArgument =
+            Parse.AnyChar.Until (Parse.LineEnd).Text();
+
+        private static readonly Parser<Directive> Directive =
+            from code in DirectiveCode
+            from ws in Parse.WhiteSpace.AtLeastOnce()
+            from argument in DirectiveArgument
+            select new Directive (code, argument);
+
+        private static readonly Parser<IEnumerable<Directive>> Directives =
+            Directive.Token().Many();
+
         private static readonly Parser<ConstantNode> NullLiteral =
             from _ in Parse.String ("null")
             select new ConstantNode (null);
@@ -199,7 +216,8 @@ namespace AM.Scripting.Barsik
             select statements;
 
         private static readonly Parser<ProgramNode> Program =
+            from directives in Directives.Optional()
             from block in Block
-            select new ProgramNode (block);
+            select new ProgramNode (directives.GetOrDefault(), block);
     }
 }

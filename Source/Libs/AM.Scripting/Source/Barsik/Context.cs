@@ -41,6 +41,11 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public TextWriter Output { get; }
 
+        /// <summary>
+        /// Используемые пространства имен.
+        /// </summary>
+        public Dictionary<string, object?> Namespaces { get; }
+
         #endregion
 
         #region Constructor
@@ -56,6 +61,7 @@ namespace AM.Scripting.Barsik
         {
             Variables = variables;
             Output = output;
+            Namespaces = new ();
         }
 
         #endregion

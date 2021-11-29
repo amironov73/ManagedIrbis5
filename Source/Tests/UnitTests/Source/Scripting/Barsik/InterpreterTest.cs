@@ -20,6 +20,7 @@ namespace UnitTests.Scripting.Barsik
         : Common.CommonUnitTest
     {
         [TestMethod]
+        [Description ("Простое сложение двух чисел")]
         public void Interpreter_Execute_1()
         {
             var interpreter = new Interpreter();
@@ -32,6 +33,7 @@ namespace UnitTests.Scripting.Barsik
         }
 
         [TestMethod]
+        [Description ("Блок if-then-else")]
         public void Interpreter_Execute_2()
         {
             var variables = new Dictionary<string, dynamic?>();
@@ -45,6 +47,7 @@ namespace UnitTests.Scripting.Barsik
         }
 
         [TestMethod]
+        [Description ("Сравнение на неравенство")]
         public void Interpreter_Execute_3()
         {
             var variables = new Dictionary<string, dynamic?>();
@@ -55,6 +58,22 @@ namespace UnitTests.Scripting.Barsik
             interpreter.Execute (@"if (x != y) { print ""x is not equal y""; } else { print ""x is equal to y""; }");
             var actual = output.ToString();
             Assert.AreEqual ("x is not equal y", actual);
+        }
+
+        [TestMethod]
+        [Description ("Директивы")]
+        public void Interpreter_Execute_4()
+        {
+            var interpreter = new Interpreter();
+            interpreter.Execute (@"#u Namespace1
+
+#u Namespace2
+
+x = 1;
+");
+            Assert.AreEqual (2, interpreter.Context.Namespaces.Count);
+            var actual = (double) (object) interpreter.Context.Variables["x"]!;
+            Assert.AreEqual (1, actual);
         }
     }
 }

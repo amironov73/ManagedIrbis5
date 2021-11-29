@@ -505,6 +505,11 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public List<StatementNode> Statements { get; }
 
+        /// <summary>
+        /// Директивы
+        /// </summary>
+        public List<Directive> Directives { get; }
+
         #endregion
 
         #region Construction
@@ -512,9 +517,36 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public ProgramNode (IEnumerable<StatementNode> collection)
+        public ProgramNode
+            (
+                IEnumerable<Directive>? directives,
+                IEnumerable<StatementNode> statements
+            )
         {
-            Statements = new List<StatementNode> (collection);
+            Statements = new List<StatementNode> (statements);
+            Directives = new ();
+            if (directives is not null)
+            {
+                Directives.AddRange (directives);
+            }
+        }
+
+        #endregion
+
+        #region Private methods
+
+        /// <summary>
+        /// Выполнение директив перед скриптом.
+        /// </summary>
+        internal void ExecuteDirectives
+            (
+                Context context
+            )
+        {
+            foreach (var directive in Directives)
+            {
+                directive.Execute (context);
+            }
         }
 
         #endregion
@@ -524,6 +556,8 @@ namespace AM.Scripting.Barsik
         /// <inheritdoc cref="AstNode.Execute"/>
         public override void Execute (Context context)
         {
+            ExecuteDirectives (context);
+
             foreach (var statement in Statements)
             {
                 statement.Execute (context);
