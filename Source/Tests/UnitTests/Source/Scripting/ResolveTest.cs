@@ -11,7 +11,7 @@ using Sprache;
 
 #nullable enable
 
-namespace UnitTests.Source.Scripting
+namespace UnitTests.Scripting
 {
     [TestClass]
     public sealed class ResolveTest
