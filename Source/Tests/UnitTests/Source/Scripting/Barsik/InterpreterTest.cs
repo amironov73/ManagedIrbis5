@@ -73,7 +73,40 @@ x = 1;
 ");
             Assert.AreEqual (2, interpreter.Context.Namespaces.Count);
             var actual = (double) (object) interpreter.Context.Variables["x"]!;
-            Assert.AreEqual (1, actual);
+            Assert.AreEqual (1.0, actual);
+        }
+
+        [TestMethod]
+        [Description ("Комментарии")]
+        public void Interpreter_Exectute_5()
+        {
+            var interpreter = new Interpreter();
+            interpreter.Execute (@"// opening comment
+x = 1;
+// closing comment
+");
+            var actual = (double) (object) interpreter.Context.Variables["x"]!;
+            Assert.AreEqual (1.0, actual);
+        }
+
+        [TestMethod]
+        [Description ("Комментарии")]
+        public void Interpreter_Exectute_6()
+        {
+            var interpreter = new Interpreter();
+            interpreter.Execute ("x /* c1 */ = /* c2 */ 1 /* c3 */;");
+            var actual = (double) (object) interpreter.Context.Variables["x"]!;
+            Assert.AreEqual (1.0, actual);
+        }
+
+        [TestMethod]
+        [Description ("Вызов функции")]
+        public void Interpreter_Execute_7()
+        {
+            var interpreter = new Interpreter();
+            interpreter.Execute ("l = list();");
+            var actual = (List<dynamic?>)interpreter.Context.Variables["l"]!;
+            Assert.AreEqual (0, actual.Count);
         }
     }
 }

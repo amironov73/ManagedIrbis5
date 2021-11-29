@@ -17,6 +17,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 
+using AM.Text;
+
 using Sprache;
 
 #endregion
@@ -33,9 +35,79 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Разбор текста программы.
         /// </summary>
-        public static ProgramNode ParseProgram (string sourceCode)
+        public static ProgramNode ParseProgram
+            (
+                string sourceCode
+            )
         {
+            Sure.NotNull (sourceCode);
+
+            sourceCode = RemoveComments (sourceCode);
+
             return Program.End().Parse (sourceCode);
+        }
+
+        /// <summary>
+        /// Замена в исходном тексте комментариев в стиле C/C++ на пробелы.
+        /// </summary>
+        private static string RemoveComments
+            (
+                string sourceCode
+            )
+        {
+            if (!sourceCode.Contains ("//") && !sourceCode.Contains ("/*"))
+            {
+                return sourceCode;
+            }
+
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (sourceCode.Length);
+
+            var navigator = new ValueTextNavigator (sourceCode);
+            while (!navigator.IsEOF)
+            {
+                var line = navigator.ReadUntil ('/');
+                builder.Append (line);
+                if (navigator.IsEOF)
+                {
+                    break;
+                }
+
+                var first = navigator.ReadChar();
+                var second = navigator.ReadChar();
+                if (second == '/')
+                {
+                    navigator.ReadLine();
+                    builder.AppendLine();
+                }
+                else if (second == '*')
+                {
+                    var commented = navigator.ReadToString ("*/");
+                    builder.Append ("  "); // заменяем "/*"
+                    foreach (var c1 in commented)
+                    {
+                        var c2 = c1 switch
+                        {
+                            '\r' => '\r',
+                            '\n' => '\n',
+                            '\t' => '\t',
+                            _ => ' '
+                        };
+                        builder.Append (c2);
+                    }
+
+                    builder.Append ("  "); // заменяем "*/"
+                }
+                else
+                {
+                    builder.Append (first);
+                }
+            }
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
         }
 
         private static readonly Parser<string> DirectiveCode =
@@ -105,6 +177,13 @@ namespace AM.Scripting.Barsik
             from close in Parse.Char (')').Token()
             select new ParenthesisNode (inner);
 
+        private static readonly Parser<AtomNode> FunctionCall =
+            from name in Identifier
+            from open in Parse.Char ('(').Token()
+            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
+            from close in Parse.Char (')')
+            select new CallNode (name, args.GetOrDefault());
+
         private static readonly Parser<string> AndOr =
             Parse.String ("and").Token().Or (Parse.String ("or").Token()).Text();
 
@@ -125,7 +204,7 @@ namespace AM.Scripting.Barsik
             select condition;
 
         private static readonly Parser<AtomNode> Atom =
-            Parenthesis.XOr (Constant).XOr (Variable).XOr (Negation);
+            Parenthesis.Or (Constant).Or (FunctionCall).Or (Variable).Or (Negation);
 
         private static readonly Parser<string> Compare =
             Parse.String ("<=").Token()
@@ -160,7 +239,7 @@ namespace AM.Scripting.Barsik
             select atom;
 
         private static readonly Parser<StatementNode> Assignment =
-            from variable in Identifier.Text()
+            from variable in Identifier.Token().Text()
             from eq in Parse.Char ('=').Token()
             from expression in ArithmeticExpression
             select new AssignmentNode (variable, expression);
@@ -198,8 +277,13 @@ namespace AM.Scripting.Barsik
             from close2 in Parse.Char ('}').Token()
             select new WhileNode (condition, statements);
 
+        // костыль
+        private static readonly Parser<StatementNode> Nop =
+            from _ in Parse.Chars (" \t").Until (Parse.LineEnd)
+            select new StatementNode();
+
         private static readonly Parser<StatementNode> NoSemicolon =
-            from statement in While.Or (If)
+            from statement in Nop.Or (While).Or (If)
             select statement;
 
         private static readonly Parser<StatementNode> RequireSemicolon =

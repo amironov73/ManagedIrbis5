@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using AM.Collections;
+
 #endregion
 
 #nullable enable
@@ -30,6 +32,16 @@ namespace AM.Scripting.Barsik
     public sealed class Context
     {
         #region Properties
+
+        /// <summary>
+        /// Родительский контекст.
+        /// </summary>
+        public Context? Parent { get; }
+
+        /// <summary>
+        /// Функции.
+        /// </summary>
+        public Dictionary<string, FunctionDescriptor> Functions { get; }
 
         /// <summary>
         /// Переменные.
@@ -56,9 +68,12 @@ namespace AM.Scripting.Barsik
         public Context
             (
                 Dictionary<string, dynamic?> variables,
-                TextWriter output
+                TextWriter output,
+                Context? parent = null
             )
         {
+            Parent = parent;
+            Functions = new ();
             Variables = variables;
             Output = output;
             Namespaces = new ();
@@ -74,6 +89,12 @@ namespace AM.Scripting.Barsik
         public void DumpVariables()
         {
             var keys = Variables.Keys.ToArray();
+            if (keys.IsNullOrEmpty())
+            {
+                Output.WriteLine ("(no variables)");
+                return;
+            }
+
             Array.Sort (keys);
             foreach (var key in keys)
             {
@@ -87,6 +108,33 @@ namespace AM.Scripting.Barsik
                     Output.WriteLine ($"{key}: {value.GetType().Name} = {value}");
                 }
             }
+        }
+
+        /// <summary>
+        /// Поиск переменной в текущем и в родительских контекстах.
+        /// </summary>
+        public bool TryGetVariable
+            (
+                string name,
+                out dynamic? value
+            )
+        {
+            Sure.NotNullNorEmpty (name);
+
+            if (Variables.TryGetValue (name, out value))
+            {
+                return true;
+            }
+
+            for (var context = Parent; context is not null; context = context.Parent)
+            {
+                if (context.Variables.TryGetValue (name, out value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         #endregion

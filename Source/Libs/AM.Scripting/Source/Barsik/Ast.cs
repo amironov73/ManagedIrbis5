@@ -251,6 +251,91 @@ namespace AM.Scripting.Barsik
     }
 
     /// <summary>
+    /// Вызов функции.
+    /// </summary>
+    sealed class CallNode : AtomNode
+    {
+        #region Construction
+
+        public CallNode(string name, IEnumerable<AtomNode>? args)
+        {
+            _name = name;
+            _args = new List<AtomNode> ();
+            if (args is not null)
+            {
+                _args.AddRange (args);
+            }
+        }
+
+        #endregion
+
+        #region Private members
+
+        private readonly string _name;
+        private readonly List<AtomNode> _args;
+        private FunctionDescriptor? _function;
+
+        #endregion
+
+        #region AtomNode members
+
+        public override dynamic? Compute (Context context)
+        {
+            if (_function is null)
+            {
+                if (!context.Functions.TryGetValue (_name, out _function))
+                {
+                    if (!Builtins.Registry.TryGetValue (_name, out _function))
+                    {
+                        throw new Exception ($"function '{_name}' not found");
+                    }
+                }
+            }
+
+            var args = new List<dynamic?>();
+            foreach (var node in _args)
+            {
+                var arg = node.Compute (context);
+                args.Add (arg);
+            }
+
+            var result = _function.CallPoint (args.ToArray());
+
+            return result;
+        }
+
+        #endregion
+
+        #region Object members
+
+        public override string ToString()
+        {
+            var builder = StringBuilderPool.Shared.Get();
+            builder.Append ($"function '{_name}' (");
+            var first = true;
+            foreach (var node in _args)
+            {
+                if (!first)
+                {
+                    builder.Append (", ");
+                }
+
+                builder.Append (node);
+
+                first = false;
+            }
+            builder.Append (')');
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
     /// Условие, состоящие из серии сравнений.
     /// </summary>
     sealed class ConditionNode : AtomNode
@@ -284,7 +369,7 @@ namespace AM.Scripting.Barsik
     /// <summary>
     /// Базовый класс для стейтментов.
     /// </summary>
-    abstract class StatementNode : AstNode
+    class StatementNode : AstNode
     {
     }
 
