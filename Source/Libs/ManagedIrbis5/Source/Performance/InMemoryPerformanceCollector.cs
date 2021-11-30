@@ -58,7 +58,10 @@ namespace ManagedIrbis.Performance
         /// <summary>
         /// Конструктор по умолчанию.
         /// </summary>
-        public InMemoryPerformanceCollector() : this(0) {}
+        public InMemoryPerformanceCollector()
+            : this (0)
+        {
+        }
 
         /// <summary>
         /// Конструктор.
@@ -70,8 +73,7 @@ namespace ManagedIrbis.Performance
         {
             _list = new ConcurrentQueue<PerfRecord>();
             Limit = limit;
-
-        } // constructor
+        }
 
         #endregion
 
@@ -93,7 +95,7 @@ namespace ManagedIrbis.Performance
             {
                 while (_list.Count >= Limit)
                 {
-                    if (!_list.TryDequeue(out _))
+                    if (!_list.TryDequeue (out _))
                     {
                         break;
                     }
@@ -102,18 +104,18 @@ namespace ManagedIrbis.Performance
 
             _list.Enqueue (record);
             RecordCollected?.Invoke (this, EventArgs.Empty);
-
-        } // method Collect
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() {}
+        public void Dispose()
+        {
+            // nothing to do here
+        }
 
         #endregion
-
-    } // class InMemoryPerformanceCollector
-
-} // namespace ManagedIrbis.Performance
+    }
+}

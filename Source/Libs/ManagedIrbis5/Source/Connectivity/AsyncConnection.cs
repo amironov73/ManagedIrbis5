@@ -224,7 +224,7 @@ namespace ManagedIrbis
                     Debug.WriteLine(exception.Message);
                     if (perfRecord is not null)
                     {
-                        perfRecord.ElapsedTime = stopwatch!.ElapsedMilliseconds;
+                        perfRecord.ElapsedTime = (int) stopwatch!.ElapsedMilliseconds;
                         perfRecord.ErrorMessage = exception.Message;
                         _performanceCollector!.Collect (perfRecord);
                     }
@@ -236,7 +236,7 @@ namespace ManagedIrbis
                 {
                     if (perfRecord is not null)
                     {
-                        perfRecord.ElapsedTime = stopwatch!.ElapsedMilliseconds;
+                        perfRecord.ElapsedTime = (int) stopwatch!.ElapsedMilliseconds;
                         perfRecord.ErrorMessage = "No response";
                         _performanceCollector!.Collect (perfRecord);
                     }
@@ -247,7 +247,7 @@ namespace ManagedIrbis
                 result.Parse();
                 if (perfRecord is not null)
                 {
-                    perfRecord.ElapsedTime = stopwatch!.ElapsedMilliseconds;
+                    perfRecord.ElapsedTime = (int) stopwatch!.ElapsedMilliseconds;
                     perfRecord.IncomingSize = result.AnswerSize;
                     _performanceCollector!.Collect (perfRecord);
                 }

@@ -31,7 +31,5 @@ namespace ManagedIrbis.Performance
         /// Сбор одной записи о сетевой транзакции.
         /// </summary>
         void Collect (PerfRecord record);
-
-    } // interface IPerformanceCollector
-
-} // namespace ManagedIrbis.Performance
+    }
+}

@@ -50,11 +50,12 @@ namespace ManagedIrbis.Performance
                 TextWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             _syncRoot = new object();
             _ownStream = false;
             _writer = writer;
-
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -64,12 +65,13 @@ namespace ManagedIrbis.Performance
                 Stream stream
             )
         {
+            Sure.NotNull (stream);
+
             _syncRoot = new object();
             _ownStream = false;
             stream.Seek (0, SeekOrigin.End);
             _writer = new StreamWriter (stream);
-
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -79,13 +81,14 @@ namespace ManagedIrbis.Performance
                 string fileName
             )
         {
+            Sure.NotNullNorEmpty (fileName);
+
             _syncRoot = new object();
             _ownStream = true;
             var stream = File.Open (fileName, FileMode.OpenOrCreate);
             stream.Seek (0, SeekOrigin.End);
             _writer = new StreamWriter (stream);
-
-        } // constructor
+        }
 
         #endregion
 
@@ -105,14 +108,13 @@ namespace ManagedIrbis.Performance
                 PerfRecord record
             )
         {
-            Sure.NotNull (record, nameof (record));
+            Sure.NotNull (record);
 
             lock (_syncRoot)
             {
                 _writer.WriteLine (record.ToString());
             }
-
-        } // method Collect
+        }
 
         #endregion
 
@@ -128,11 +130,8 @@ namespace ManagedIrbis.Performance
                     _writer.Dispose();
                 }
             }
-
-        } // method Dispose
+        }
 
         #endregion
-
-    } // class TextPerformanceCollector
-
-} // namespace ManagedIrbis.Performance
+    }
+}
