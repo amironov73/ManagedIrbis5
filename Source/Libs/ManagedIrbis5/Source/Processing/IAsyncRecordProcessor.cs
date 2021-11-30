@@ -42,7 +42,5 @@ namespace ManagedIrbis.Processing
                 ISyncRecordSource source,
                 ISyncRecordSink sync
             );
-
-    } // interface IAsyncRecordProcessor
-
-} // namespace ManagedIrbis.Processing
+    }
+}

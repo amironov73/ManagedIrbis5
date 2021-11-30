@@ -34,8 +34,7 @@ namespace AM.PlatformAbstraction
         /// <summary>
         /// Current PAL.
         /// </summary>
-        public static PlatformAbstractionLayer Current
-            = new PlatformAbstractionLayer();
+        public static PlatformAbstractionLayer Current = new ();
 
         #endregion
 
@@ -49,7 +48,7 @@ namespace AM.PlatformAbstraction
                 int exitCode
             )
         {
-            Environment.Exit(exitCode);
+            Environment.Exit (exitCode);
         }
 
         /// <summary>
@@ -60,7 +59,7 @@ namespace AM.PlatformAbstraction
                 string message
             )
         {
-            Environment.FailFast(message);
+            Environment.FailFast (message);
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace AM.PlatformAbstraction
                 string variableName
             )
         {
-            return Environment.GetEnvironmentVariable(variableName);
+            return Environment.GetEnvironmentVariable (variableName);
         }
 
         /// <summary>

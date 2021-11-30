@@ -100,14 +100,14 @@ namespace ManagedIrbis.Processing
                 string line
             )
         {
-            Sure.NotNullNorEmpty (line, nameof (line));
+            Sure.NotNullNorEmpty (line);
 
             Text = line;
             Success = true;
-            var parts = line.Split('#');
+            var parts = line.Split ('#');
             foreach (var part in parts)
             {
-                var p = part.Split('=');
+                var p = part.Split ('=');
                 if (p.Length > 0)
                 {
                     var name = p[0].ToUpper();
@@ -147,14 +147,10 @@ namespace ManagedIrbis.Processing
                             Error = value;
                             Success = false;
                             break;
-
-                    } // switch
-
-                } // if
-
-            } // foreach
-
-        } // method Decode
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Parse server response.
@@ -169,29 +165,29 @@ namespace ManagedIrbis.Processing
             while (true)
             {
                 var line = response.ReadAnsi();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     break;
                 }
 
                 var item = new ProtocolLine();
-                item.Decode(line);
-                result.Add(item);
-            } // while
+                item.Decode (line);
+                result.Add (item);
+            }
 
             return result.ToArray();
-
-        } // method Decode
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Text.ToVisibleString();  // method ToString
+        public override string ToString()
+        {
+            return Text.ToVisibleString();
+        }
 
         #endregion
-
-    } // class ProtocolLine
-
-} // namespace ManagedIrbis.Processing
+    }
+}

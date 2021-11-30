@@ -93,8 +93,7 @@ namespace ManagedIrbis.Infrastructure
         {
             _connection = connection;
             _memory = new List<ArraySegment<byte>>();
-
-        } // constructor
+        }
 
         #endregion
 
@@ -117,7 +116,7 @@ namespace ManagedIrbis.Infrastructure
                 ArraySegment<byte> chunk
             )
         {
-            _memory.Add(chunk);
+            _memory.Add (chunk);
         }
 
         /// <summary>
@@ -127,12 +126,11 @@ namespace ManagedIrbis.Infrastructure
         {
             if (GetReturnCode() < 0)
             {
-                _connection.SetLastError(ReturnCode);
+                _connection.SetLastError (ReturnCode);
                 return false;
             }
 
             return true;
-
         } // method CheckReturnCode
 
         /// <summary>
@@ -145,15 +143,14 @@ namespace ManagedIrbis.Infrastructure
         {
             if (GetReturnCode() < 0)
             {
-                if (Array.IndexOf(goodCodes, ReturnCode) < 0)
+                if (Array.IndexOf (goodCodes, ReturnCode) < 0)
                 {
-                    _connection.SetLastError(ReturnCode);
+                    _connection.SetLastError (ReturnCode);
                     return false;
                 }
             }
 
             return true;
-
         } // method CheckReturnCode
 
         /// <summary>
@@ -184,7 +181,6 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return false;
-
         } // method FindPreamble
 
         /// <summary>
@@ -214,7 +210,6 @@ namespace ManagedIrbis.Infrastructure
                 ReadAnsi();
                 ReadAnsi();
             }
-
         } // method Parse
 
         /// <summary>
@@ -241,7 +236,6 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return _currentChunk[_currentOffset];
-
         } // method Peek
 
         /// <summary>
@@ -285,7 +279,6 @@ namespace ManagedIrbis.Infrastructure
             }
 
             return result;
-
         } // method ReadByte
 
         /// <summary>
@@ -317,11 +310,10 @@ namespace ManagedIrbis.Infrastructure
                     break;
                 }
 
-                result.WriteByte(one);
+                result.WriteByte (one);
             }
 
             return result.ToArray();
-
         } // method ReadLine
 
         /// <summary>
@@ -338,8 +330,7 @@ namespace ManagedIrbis.Infrastructure
                 return string.Empty;
             }
 
-            return encoding.GetString(bytes);
-
+            return encoding.GetString (bytes);
         } // method ReadLine
 
         /// <summary>
@@ -368,17 +359,16 @@ namespace ManagedIrbis.Infrastructure
 
             var result = new byte[length];
             var offset = 0;
-            _currentChunk.Slice(_currentOffset).CopyTo(result);
+            _currentChunk.Slice (_currentOffset).CopyTo (result);
             offset += _currentChunk.Count - _currentOffset;
             for (var i = _currentIndex + 1; i < _memory.Count; i++)
             {
                 var chunk = _memory[i];
-                chunk.CopyTo(result, offset);
+                chunk.CopyTo (result, offset);
                 offset += chunk.Count;
             }
 
             return result;
-
         } // method RemainingBytes
 
         /// <summary>
@@ -395,8 +385,7 @@ namespace ManagedIrbis.Infrastructure
                 return string.Empty;
             }
 
-            return encoding.GetString(bytes);
-
+            return encoding.GetString (bytes);
         } // method RemainingText
 
         /// <summary>
@@ -413,10 +402,9 @@ namespace ManagedIrbis.Infrastructure
             {
                 foreach (var b in memory)
                 {
-                    writer.Write($" {b:X2}");
+                    writer.Write ($" {b:X2}");
                 }
             }
-
         } // method Debug
 
         /// <summary>
@@ -427,9 +415,8 @@ namespace ManagedIrbis.Infrastructure
                 string fileName
             )
         {
-            using var writer = File.CreateText(fileName);
-            Debug(writer);
-
+            using var writer = File.CreateText (fileName);
+            Debug (writer);
         } // method Debug
 
         /// <summary>
@@ -444,9 +431,8 @@ namespace ManagedIrbis.Infrastructure
 
             foreach (var memory in _memory)
             {
-                writer.Write(IrbisEncoding.Utf8.GetString(memory));
+                writer.Write (IrbisEncoding.Utf8.GetString (memory));
             }
-
         } // method DebugUtf
 
         /// <summary>
@@ -457,9 +443,8 @@ namespace ManagedIrbis.Infrastructure
                 string fileName
             )
         {
-            using var writer = File.CreateText(fileName);
-            DebugUtf(writer);
-
+            using var writer = File.CreateText (fileName);
+            DebugUtf (writer);
         } // method DebugUtf
 
         /// <summary>
@@ -474,9 +459,8 @@ namespace ManagedIrbis.Infrastructure
 
             foreach (var memory in _memory)
             {
-                writer.Write(IrbisEncoding.Ansi.GetString(memory));
+                writer.Write (IrbisEncoding.Ansi.GetString (memory));
             }
-
         } // method DebugAnsi
 
         /// <summary>
@@ -487,9 +471,8 @@ namespace ManagedIrbis.Infrastructure
                 string fileName
             )
         {
-            using var writer = File.CreateText(fileName);
-            Debug(writer);
-
+            using var writer = File.CreateText (fileName);
+            Debug (writer);
         } // method DebugAnsi
 
         /// <summary>
@@ -500,18 +483,17 @@ namespace ManagedIrbis.Infrastructure
             ReturnCode = ReadInteger();
 
             return ReturnCode;
-
         } // method GetReturnCode
 
         /// <summary>
         ///
         /// </summary>
-        public string ReadAnsi() => ReadLine(IrbisEncoding.Ansi);
+        public string ReadAnsi() => ReadLine (IrbisEncoding.Ansi);
 
         /// <summary>
         ///
         /// </summary>
-        public int ReadInteger() => ReadLine(IrbisEncoding.Ansi).SafeToInt32();
+        public int ReadInteger() => ReadLine (IrbisEncoding.Ansi).SafeToInt32();
 
         /// <summary>
         ///
@@ -521,18 +503,18 @@ namespace ManagedIrbis.Infrastructure
                 int count
             )
         {
-            Sure.Positive(count, nameof(count));
+            Sure.Positive (count, nameof (count));
 
-            var result = new List<string>(count);
+            var result = new List<string> (count);
             for (var i = 0; i < count; i++)
             {
                 var line = ReadAnsi();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     return null;
                 }
 
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
@@ -549,25 +531,26 @@ namespace ManagedIrbis.Infrastructure
                 int count
             )
         {
-            Sure.Positive(count, nameof(count));
+            Sure.Positive (count, nameof (count));
 
-            var result = new List<string>(count);
+            var result = new List<string> (count);
             var index = 0;
             string line;
             for (; index < 1; index++)
             {
                 line = ReadAnsi();
-                if (string.IsNullOrEmpty(line))
+                if (string.IsNullOrEmpty (line))
                 {
                     return null;
                 }
-                result.Add(line);
+
+                result.Add (line);
             }
 
             for (; index < count; index++)
             {
                 line = ReadAnsi();
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
@@ -579,7 +562,7 @@ namespace ManagedIrbis.Infrastructure
         public string RequireAnsi()
         {
             var result = ReadAnsi();
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
                 throw new IrbisException();
             }
@@ -593,7 +576,7 @@ namespace ManagedIrbis.Infrastructure
         public string RequireUtf()
         {
             var result = ReadUtf();
-            if (string.IsNullOrEmpty(result))
+            if (string.IsNullOrEmpty (result))
             {
                 throw new IrbisException();
             }
@@ -607,7 +590,7 @@ namespace ManagedIrbis.Infrastructure
         public int RequireInteger()
         {
             var line = ReadAnsi();
-            var result = int.Parse(line);
+            var result = int.Parse (line);
             return result;
         }
 
@@ -625,7 +608,7 @@ namespace ManagedIrbis.Infrastructure
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -647,7 +630,7 @@ namespace ManagedIrbis.Infrastructure
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -669,7 +652,7 @@ namespace ManagedIrbis.Infrastructure
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -691,7 +674,7 @@ namespace ManagedIrbis.Infrastructure
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -713,7 +696,7 @@ namespace ManagedIrbis.Infrastructure
                 }
                 catch (Exception exception)
                 {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
                     continue;
                 }
 
@@ -739,11 +722,10 @@ namespace ManagedIrbis.Infrastructure
                 }
 
                 var line = ReadAnsi();
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
-
         } // method GetAnsiStrings
 
         /// <summary>
@@ -756,17 +738,16 @@ namespace ManagedIrbis.Infrastructure
             while (!EOT)
             {
                 var line = ReadAnsi();
-                result.Add(line);
+                result.Add (line);
             }
 
             return result.ToArray();
-
         } // method ReadRemainingAnsiLines
 
         /// <summary>
         ///
         /// </summary>
-        public string ReadRemainingAnsiText() => RemainingText(IrbisEncoding.Ansi);
+        public string ReadRemainingAnsiText() => RemainingText (IrbisEncoding.Ansi);
 
         /// <summary>
         ///
@@ -777,8 +758,8 @@ namespace ManagedIrbis.Infrastructure
 
             while (!EOT)
             {
-                string line = ReadLine(IrbisEncoding.Utf8);
-                result.Add(line);
+                string line = ReadLine (IrbisEncoding.Utf8);
+                result.Add (line);
             }
 
             return result.ToArray();
@@ -787,12 +768,12 @@ namespace ManagedIrbis.Infrastructure
         /// <summary>
         ///
         /// </summary>
-        public string ReadRemainingUtfText() => RemainingText(IrbisEncoding.Utf8);
+        public string ReadRemainingUtfText() => RemainingText (IrbisEncoding.Utf8);
 
         /// <summary>
         /// Чтение строки в кодировке UTF-8.
         /// </summary>
-        public string ReadUtf() => ReadLine(IrbisEncoding.Utf8);
+        public string ReadUtf() => ReadLine (IrbisEncoding.Utf8);
 
         /// <summary>
         /// Чтение целого числа.
@@ -801,13 +782,12 @@ namespace ManagedIrbis.Infrastructure
         {
             if (EOT)
             {
-                throw new IrbisException("Unexpected end of response");
+                throw new IrbisException ("Unexpected end of response");
             }
 
-            var line = ReadLine(IrbisEncoding.Ansi);
+            var line = ReadLine (IrbisEncoding.Ansi);
 
-            return int.Parse(line, CultureInfo.InvariantCulture);
-
+            return int.Parse (line, CultureInfo.InvariantCulture);
         } // method RequireInt32
 
         #endregion
@@ -822,7 +802,5 @@ namespace ManagedIrbis.Infrastructure
         }
 
         #endregion
-
-    } // class Response
-
-} // namespace ManagedIrbis.Infrastructure
+    }
+}

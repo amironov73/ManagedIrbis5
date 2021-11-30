@@ -27,43 +27,59 @@ namespace ManagedIrbis.Processing
     /// </summary>
     public sealed class NullRecordSource
         : ISyncRecordSource,
-          IAsyncRecordSource
+        IAsyncRecordSource
     {
         #region ISyncRecordSource members
 
         /// <inheritdoc cref="ISyncRecordSource.GetNextRecord"/>
-        public Record? GetNextRecord() => null;
+        public Record? GetNextRecord()
+        {
+            return null;
+        }
 
         /// <inheritdoc cref="ISyncRecordSource.GetRecordCount"/>
-        public int GetRecordCount() => 0;
+        public int GetRecordCount()
+        {
+            return 0;
+        }
 
         #endregion
 
         #region IAsyncRecordSource members
 
         /// <inheritdoc cref="IAsyncRecordSource.GetNextRecordAsync"/>
-        public Task<Record?> GetNextRecordAsync() => Task.FromResult<Record?> (null);
+        public Task<Record?> GetNextRecordAsync()
+        {
+            return Task.FromResult<Record?> (null);
+        }
 
         /// <inheritdoc cref="IAsyncRecordSource.GetRecordCountAsync"/>
         /// <returns></returns>
-        public Task<int> GetRecordCountAsync() => Task.FromResult (0);
+        public Task<int> GetRecordCountAsync()
+        {
+            return Task.FromResult (0);
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() {}
+        public void Dispose()
+        {
+            // nothing to do here
+        }
 
         #endregion
 
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync()
+        {
+            return ValueTask.CompletedTask;
+        }
 
         #endregion
-
-    } // class NullRecordSource
-
-} // namespace ManagedIrbis.Processing
+    }
+}

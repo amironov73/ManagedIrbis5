@@ -27,51 +27,84 @@ namespace ManagedIrbis.Processing
     /// </summary>
     public sealed class NullRecordSink
         : ISyncRecordSink,
-          IAsyncRecordSink
+        IAsyncRecordSink
     {
         #region ISyncRecordSink members
 
         /// <inheritdoc cref="ISyncRecordSink.PostRecord"/>
-        public void PostRecord (Record record, string? message = null) {}
+        public void PostRecord
+            (
+                Record record,
+                string? message = null
+            )
+        {
+            // nothing to do here
+        }
 
         /// <inheritdoc cref="ISyncRecordSink.Complete"/>
-        public void Complete() {}
+        public void Complete()
+        {
+            // nothing to do here
+        }
 
         /// <inheritdoc cref="ISyncRecordSink.GetProtocol"/>
-        public IReadOnlyList<ProtocolLine> GetProtocol() => Array.Empty<ProtocolLine>();
+        public IReadOnlyList<ProtocolLine> GetProtocol()
+        {
+            return Array.Empty<ProtocolLine>();
+        }
 
         /// <inheritdoc cref="ISyncRecordSink.GetProtocol"/>
-        ProtocolLine[] ISyncRecordSink.GetProtocol() => Array.Empty<ProtocolLine>();
+        ProtocolLine[] ISyncRecordSink.GetProtocol()
+        {
+            return Array.Empty<ProtocolLine>();
+        }
 
         #endregion
 
         #region IAsyncRecordSink members
 
         /// <inheritdoc cref="IAsyncRecordSink.PostRecordAsync"/>
-        public Task PostRecordAsync (Record record, string? message = null) => Task.CompletedTask;
+        public Task PostRecordAsync
+            (
+                Record record,
+                string? message = null
+            )
+        {
+            return Task.CompletedTask;
+        }
 
         /// <inheritdoc cref="IAsyncRecordSink.CompleteAsync"/>
-        public Task CompleteAsync() => Task.CompletedTask;
+        public Task CompleteAsync()
+        {
+            return Task.CompletedTask;
+        }
 
         /// <inheritdoc cref="IAsyncRecordSink.GetProtocolAsync"/>
-        public Task<ProtocolLine[]> GetProtocolAsync() => Task.FromResult(Array.Empty<ProtocolLine>());
+        public Task<ProtocolLine[]> GetProtocolAsync()
+        {
+            return Task.FromResult (Array.Empty<ProtocolLine>());
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() {}
+        public void Dispose()
+        {
+            // nothing to do here
+        }
 
         #endregion
 
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync()
+        {
+            return ValueTask.CompletedTask;
+        }
 
         #endregion
-
-    } // class NullRecordSink
-
-} // namespace ManagedIrbis.Processing
+    }
+}

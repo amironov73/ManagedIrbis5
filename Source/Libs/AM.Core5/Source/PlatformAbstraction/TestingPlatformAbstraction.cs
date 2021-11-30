@@ -28,7 +28,7 @@ namespace AM.PlatformAbstraction
     /// <summary>
     /// Заглушки для юнит-тестирования.
     /// </summary>
-    public class TestingPlatformAbstraction
+    public sealed class TestingPlatformAbstraction
         : PlatformAbstractionLayer
     {
         #region Properties
@@ -75,7 +75,7 @@ namespace AM.PlatformAbstraction
                 string variableName
             )
         {
-            Variables.TryGetValue(variableName, out string? result);
+            Variables.TryGetValue (variableName, out string? result);
 
             return result;
         }
@@ -89,7 +89,7 @@ namespace AM.PlatformAbstraction
         /// <inheritdoc cref="PlatformAbstractionLayer.GetRandomGenerator" />
         public override Random GetRandomGenerator()
         {
-            return new Random(123);
+            return new Random (123);
         }
 
         /// <inheritdoc cref="PlatformAbstractionLayer.Now" />
@@ -99,13 +99,13 @@ namespace AM.PlatformAbstraction
         }
 
         /// <inheritdoc cref="PlatformAbstractionLayer.Exit" />
-        public override void Exit(int exitCode)
+        public override void Exit (int exitCode)
         {
             ExitFlag = true;
         }
 
         /// <inheritdoc cref="PlatformAbstractionLayer.FailFast" />
-        public override void FailFast(string message)
+        public override void FailFast (string message)
         {
             FailFastFlag = true;
         }
@@ -113,7 +113,7 @@ namespace AM.PlatformAbstraction
         /// <inheritdoc cref="PlatformAbstractionLayer.OsVersion" />
         public override OperatingSystem OsVersion()
         {
-            Version windows7sp1 = new Version(6, 1, 7601, 65536);
+            Version windows7sp1 = new Version (6, 1, 7601, 65536);
             OperatingSystem result = new OperatingSystem
                 (
                     PlatformID.Win32NT,

@@ -35,7 +35,7 @@ namespace ManagedIrbis.Systematization
         /// Методические рекомендации / описания.
         /// Подполе a.
         /// </summary>
-        [SubField('a')]
+        [SubField ('a')]
         public string? Guidelines { get; set; }
 
         #endregion
@@ -52,7 +52,7 @@ namespace ManagedIrbis.Systematization
         {
             var result = new AthrbGuidelines
             {
-                Guidelines = field.GetFirstSubFieldValue('a')
+                Guidelines = field.GetFirstSubFieldValue ('a')
             };
 
             return result;

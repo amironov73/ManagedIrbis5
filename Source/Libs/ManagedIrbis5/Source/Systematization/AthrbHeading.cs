@@ -35,42 +35,42 @@ namespace ManagedIrbis.Systematization
         /// Основной заголовок рубрики.
         /// Подполе a.
         /// </summary>
-        [SubField('a')]
+        [SubField ('a')]
         public string? Heading { get; set; }
 
         /// <summary>
         /// Код рубрики.
         /// Подполе b.
         /// </summary>
-        [SubField('b')]
+        [SubField ('b')]
         public string? Code1 { get; set; }
 
         /// <summary>
         /// Код рубрики.
         /// Подполе c.
         /// </summary>
-        [SubField('c')]
+        [SubField ('c')]
         public string? Code2 { get; set; }
 
         /// <summary>
         /// Код рубрики.
         /// Подполе d.
         /// </summary>
-        [SubField('d')]
+        [SubField ('d')]
         public string? Code3 { get; set; }
 
         /// <summary>
         /// Код рубрики.
         /// Подполе e.
         /// </summary>
-        [SubField('e')]
+        [SubField ('e')]
         public string? Code4 { get; set; }
 
         /// <summary>
         /// Код рубрики.
         /// Подполе f.
         /// </summary>
-        [SubField('f')]
+        [SubField ('f')]
         public string? Code5 { get; set; }
 
         #endregion
@@ -85,7 +85,7 @@ namespace ManagedIrbis.Systematization
                 Field? field
             )
         {
-            if (ReferenceEquals(field, null))
+            if (ReferenceEquals (field, null))
             {
                 return null;
             }
@@ -94,12 +94,12 @@ namespace ManagedIrbis.Systematization
 
             var result = new AthrbHeading
             {
-                Heading = field.GetFirstSubFieldValue('a'),
-                Code1 = field.GetFirstSubFieldValue('b'),
-                Code2 = field.GetFirstSubFieldValue('c'),
-                Code3 = field.GetFirstSubFieldValue('d'),
-                Code4 = field.GetFirstSubFieldValue('e'),
-                Code5 = field.GetFirstSubFieldValue('f'),
+                Heading = field.GetFirstSubFieldValue ('a'),
+                Code1 = field.GetFirstSubFieldValue ('b'),
+                Code2 = field.GetFirstSubFieldValue ('c'),
+                Code3 = field.GetFirstSubFieldValue ('d'),
+                Code4 = field.GetFirstSubFieldValue ('e'),
+                Code5 = field.GetFirstSubFieldValue ('f'),
             };
 
             return result;

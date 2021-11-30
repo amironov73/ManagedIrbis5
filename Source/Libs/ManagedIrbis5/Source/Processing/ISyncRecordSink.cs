@@ -48,7 +48,5 @@ namespace ManagedIrbis.Processing
         /// Получение протокола.
         /// </summary>
         ProtocolLine[] GetProtocol();
-
-    } // interface ISyncRecordSink
-
-} // namespace ManagedIrbis.Processing
+    }
+}

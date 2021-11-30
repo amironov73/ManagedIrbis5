@@ -33,29 +33,42 @@ namespace ManagedIrbis.Processing
         #region ISyncRecordProcessor members
 
         /// <inheritdoc cref="ISyncRecordProcessor.ProcessOneRecord"/>
-        public ProtocolLine ProcessOneRecord (Record record) => new ();
+        public ProtocolLine ProcessOneRecord (Record record)
+        {
+            return new ();
+        }
 
         /// <inheritdoc cref="ISyncRecordProcessor.ProcessRecords"/>
-        public GblResult ProcessRecords (ISyncRecordSource source, ISyncRecordSink sync) => new ();
+        public GblResult ProcessRecords (ISyncRecordSource source, ISyncRecordSink sync)
+        {
+            return new ();
+        }
 
         #endregion
 
         #region IAsyncRecordProcessor members
 
         /// <inheritdoc cref="IAsyncRecordProcessor.ProcessOneRecordAsync"/>
-        public Task<ProtocolLine> ProcessOneRecordAsync (Record record) =>
-            Task.FromResult (new ProtocolLine());
+        public Task<ProtocolLine> ProcessOneRecordAsync (Record record)
+        {
+            return Task.FromResult (new ProtocolLine());
+        }
 
         /// <inheritdoc cref="IAsyncRecordProcessor.ProcessRecordsAsync"/>
-        public Task<GblResult> ProcessRecordsAsync (ISyncRecordSource source, ISyncRecordSink sync) =>
-            Task.FromResult (new GblResult());
+        public Task<GblResult> ProcessRecordsAsync (ISyncRecordSource source, ISyncRecordSink sync)
+        {
+            return Task.FromResult (new GblResult());
+        }
 
         #endregion
 
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync()
+        {
+            return ValueTask.CompletedTask;
+        }
 
         #endregion
 
@@ -64,10 +77,9 @@ namespace ManagedIrbis.Processing
         /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
-        } // method Dispose
+            // nothing to do here
+        }
 
         #endregion
-
-    } // class NullRecordProcessor
-
-} // namespace ManagedIrbis.Processing
+    }
+}

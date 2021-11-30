@@ -42,7 +42,5 @@ namespace ManagedIrbis.Processing
         /// Отрицательное число означает, что количество записей неизвестно.
         /// </returns>
         int GetRecordCount();
-
-    } // interface ISyncRecordSource
-
-} // namespace ManagedIrbis.Processing
+    }
+}

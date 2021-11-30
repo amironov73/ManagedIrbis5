@@ -15,8 +15,6 @@
 using System;
 using System.Threading.Tasks;
 
-using ManagedIrbis.Gbl;
-
 #endregion
 
 #nullable enable
@@ -51,7 +49,5 @@ namespace ManagedIrbis.Processing
         /// Получение протокола.
         /// </summary>
         Task<ProtocolLine[]> GetProtocolAsync();
-
-    } // interface IAsyncRecordSink
-
-} // namespace ManagedIrbis.Processing
+    }
+}

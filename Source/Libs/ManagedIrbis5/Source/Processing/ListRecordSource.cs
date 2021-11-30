@@ -28,7 +28,7 @@ namespace ManagedIrbis.Processing
     /// </summary>
     public sealed class ListRecordSource
         : ISyncRecordSource,
-          IAsyncRecordSource
+        IAsyncRecordSource
     {
         #region Properties
 
@@ -57,8 +57,7 @@ namespace ManagedIrbis.Processing
             _syncRoot = new object();
             RecordList = recordList;
             Index = -1;
-
-        } // constructor
+        }
 
         #endregion
 
@@ -75,18 +74,16 @@ namespace ManagedIrbis.Processing
         {
             lock (_syncRoot)
             {
-                if (Index >= RecordList.Count)
+                if (++Index >= RecordList.Count)
                 {
                     return null;
                 }
 
-                var result = RecordList [Index];
-                ++Index;
+                var result = RecordList[Index];
 
                 return result;
             }
-
-        } // method GetNextRecord
+        }
 
         /// <inheritdoc cref="ISyncRecordSource.GetRecordCount"/>
         public int GetRecordCount()
@@ -95,8 +92,7 @@ namespace ManagedIrbis.Processing
             {
                 return RecordList.Count;
             }
-
-        } // method GetRecordCount
+        }
 
         #endregion
 
@@ -107,18 +103,16 @@ namespace ManagedIrbis.Processing
         {
             lock (_syncRoot)
             {
-                if (Index >= RecordList.Count)
+                if (++Index >= RecordList.Count)
                 {
                     return Task.FromResult<Record?> (null);
                 }
 
-                var result = RecordList [Index];
-                ++Index;
+                var result = RecordList[Index];
 
                 return Task.FromResult<Record?> (result);
             }
-
-        } // method GetNextRecordAsync
+        }
 
         /// <inheritdoc cref="IAsyncRecordSource.GetRecordCountAsync"/>
         public Task<int> GetRecordCountAsync()
@@ -127,25 +121,28 @@ namespace ManagedIrbis.Processing
             {
                 return Task.FromResult (RecordList.Count);
             }
-
-        } // method GetRecordCountAsync
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() {}
+        public void Dispose()
+        {
+            // nothing to do here
+        }
 
         #endregion
 
         #region IAsyncDisposable members
 
         /// <inheritdoc cref="IAsyncDisposable.DisposeAsync"/>
-        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+        public ValueTask DisposeAsync()
+        {
+            return ValueTask.CompletedTask;
+        }
 
         #endregion
-
-    } // class ListRecordSource
-
-} // namespace ManagedIrbis.Processing
+    }
+}

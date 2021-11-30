@@ -7,7 +7,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* PingStatistics.cs --
+/* PingStatistics.cs -- статистика пинга до сервера ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,6 +16,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using AM.Linq;
+
 #endregion
 
 #nullable enable
@@ -23,7 +25,7 @@ using System.Linq;
 namespace ManagedIrbis.Statistics
 {
     /// <summary>
-    ///
+    /// Статистика пинга до сервера ИРБИС64.
     /// </summary>
     public sealed class PingStatistics
     {
@@ -36,9 +38,9 @@ namespace ManagedIrbis.Statistics
         {
             get
             {
-                return (int)Data
-                    .Where(item => item.Success)
-                    .Select(item => item.RoundTripTime)
+                return (int) Data
+                    .Where (item => item.Success)
+                    .Select (item => item.RoundTripTime)
                     .DefaultIfEmpty()
                     .Average();
             }
@@ -52,10 +54,10 @@ namespace ManagedIrbis.Statistics
             get
             {
                 return Data
-                    .Where(item => item.Success)
-                    .Select(item => item.RoundTripTime)
+                    .Where (item => item.Success)
+                    .Select (item => item.RoundTripTime)
                     .DefaultIfEmpty()
-                    .Max();
+                    .Max ();
             }
         }
 
@@ -67,8 +69,8 @@ namespace ManagedIrbis.Statistics
             get
             {
                 return Data
-                    .Where(item => item.Success)
-                    .Select(item => item.RoundTripTime)
+                    .Where (item => item.Success)
+                    .Select (item => item.RoundTripTime)
                     .DefaultIfEmpty()
                     .Min();
             }
@@ -77,19 +79,7 @@ namespace ManagedIrbis.Statistics
         /// <summary>
         /// Data.
         /// </summary>
-        public Queue<PingData> Data { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public PingStatistics()
-        {
-            Data = new Queue<PingData>();
-        }
+        public Queue<PingData> Data { get; } = new ();
 
         #endregion
 
@@ -103,7 +93,7 @@ namespace ManagedIrbis.Statistics
                 PingData item
             )
         {
-            Data.Enqueue(item);
+            Data.Enqueue (item);
         }
 
         /// <summary>
@@ -115,6 +105,5 @@ namespace ManagedIrbis.Statistics
         }
 
         #endregion
-
     }
 }

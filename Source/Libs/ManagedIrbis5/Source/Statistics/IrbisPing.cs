@@ -9,7 +9,7 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* IrbisPing.cs --
+/* IrbisPing.cs -- проверяет доступность сервера ИРБИС64 и скорость связи с ним
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -29,7 +29,7 @@ using AM.PlatformAbstraction;
 namespace ManagedIrbis.Statistics
 {
     /// <summary>
-    ///
+    /// Проверяет доступность сервера ИРБИС64 и скорость связи с ним.
     /// </summary>
     public sealed class IrbisPing
         : IDisposable
@@ -70,17 +70,17 @@ namespace ManagedIrbis.Statistics
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public IrbisPing
             (
                 ISyncConnection connection
             )
         {
-            PlatformAbstraction = new PlatformAbstractionLayer();
+            PlatformAbstraction = PlatformAbstractionLayer.Current;
             Connection = connection;
             Statistics = new PingStatistics();
-            _timer = new Timer(_timer_Elapsed, null, 1000, 1000);
+            _timer = new Timer (_timer_Elapsed, null, 1000, 1000);
         }
 
         #endregion
@@ -96,9 +96,7 @@ namespace ManagedIrbis.Statistics
                 object? state
             )
         {
-            if (!Active
-                || _busy
-                || Connection.Busy)
+            if (!Active || _busy || Connection.Busy)
             {
                 return;
             }
@@ -107,8 +105,8 @@ namespace ManagedIrbis.Statistics
             try
             {
                 var ping = PingOnce();
-                Statistics.Add(ping);
-                StatisticsUpdated.Raise(this);
+                Statistics.Add (ping);
+                StatisticsUpdated.Raise (this);
             }
             finally
             {
@@ -125,7 +123,7 @@ namespace ManagedIrbis.Statistics
         /// </summary>
         public PingData PingOnce()
         {
-            PingData result = new PingData
+            var result = new PingData
             {
                 Moment = PlatformAbstraction.Now()
             };
@@ -135,14 +133,13 @@ namespace ManagedIrbis.Statistics
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
 
-                Connection.NoOperation();
+                result.Success = Connection.NoOperation();
 
                 stopwatch.Stop();
                 unchecked
                 {
                     result.RoundTripTime = (int) stopwatch.ElapsedMilliseconds;
                 }
-                result.Success = true;
             }
             catch
             {
@@ -163,6 +160,5 @@ namespace ManagedIrbis.Statistics
         }
 
         #endregion
-
     }
 }
