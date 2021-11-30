@@ -16,12 +16,15 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
 using AM.Collections;
+using AM.IO;
+using AM.Runtime;
 
 #endregion
 
@@ -39,14 +42,17 @@ namespace ManagedIrbis.Tables
     /// </summary>
     [XmlRoot ("selTabPar")]
     public sealed class SelTabPar64
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
-        /// Tables.
+        /// Таблицы.
         /// </summary>
         [XmlElement ("table")]
         [JsonPropertyName ("tables")]
+        [Description ("Таблицы")]
         public NonNullCollection<AcquisitionTable> Tables { get; } = new ();
 
         #endregion
@@ -54,20 +60,22 @@ namespace ManagedIrbis.Tables
         #region Public methods
 
         /// <summary>
-        /// Parse the specified stream.
+        /// Разбор текстового потока.
         /// </summary>
         public static SelTabPar64 ParseStream
             (
                 TextReader reader
             )
         {
-            Sure.NotNull (reader, nameof (reader));
+            Sure.NotNull (reader);
+
+            // TODO проверить, правильно ли считывает
 
             var result = new SelTabPar64();
             while (true)
             {
                 var name = reader.ReadLine();
-                if (string.IsNullOrEmpty(name))
+                if (string.IsNullOrEmpty (name))
                 {
                     break;
                 }
@@ -81,27 +89,76 @@ namespace ManagedIrbis.Tables
                     Filter = reader.ReadLine().EmptyToNull(),
                     ModelField = reader.ReadLine().EmptyToNull()
                 };
-                result.Tables.Add(table);
+                result.Tables.Add (table);
 
-                // абор строк, описывающих таблицу,
+                // набор строк, описывающих таблицу,
                 // заканчивается строкой ‘*****’.
 
                 reader.ReadLine();
             }
 
             return result;
+        }
 
-        } // method ParseStream
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            reader.ReadCollection (Tables);
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer.WriteCollection (Tables);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<SelTabPar64> (this, throwOnError);
+
+            verifier
+                .Positive (Tables.Count);
+
+            foreach (var table in Tables)
+            {
+                verifier.VerifySubObject (table);
+            }
+
+            return verifier.Result;
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => "Tables: " + Tables.Count.ToInvariantString();
+        public override string ToString()
+        {
+            return "Tables: " + Tables.Count.ToInvariantString();
+        }
 
         #endregion
-
-    } // class SelTabPar64
-
-} // namespace ManagedIrbis.Tables
+    }
+}

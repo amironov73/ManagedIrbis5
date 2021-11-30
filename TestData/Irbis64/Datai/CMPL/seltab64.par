@@ -1,0 +1,716 @@
+1 - имя таблицы
+2 - метод 1 - поиск по элементам опроса; 2 - по отмеченным
+3 - имя РЛ опроса
+4 - для метод 1 формат на временной записи с элементами опроса, дает поисковое выражение на отбор записей в таблицу; для метода 2 формат на отмеченных записях, результаты складываются логикой ИЛИ и дают выражение на отбор записей в таблицу
+5 - формат, выполняющийся на найденных записях п.4; сли результат 1 - запись идет в таблицу
+6 - формат на временной записи с элементами опроса, дает значение модельного поля 991, которое добавляется к каждой записи, идущей в таблицу, при форматировании
+
+TAB4Oinv - Инв.Кн.- НОВЫЕ, СКВОЗНАЯ СОРТИРОВКА - ОБЩИЙ (интервал инв. номеров/штрих-кодов)
+1
+tab4oinv.ws
+if p(v7)or p(v3) then '"IN=$"' fi,
+if s(v215^y)=''then if v991^a<>'' and rsum((if p(v910) then if val(v910^b) >= val(&unifor('Av991^a#1')) and val(v910^b)<=val(&unifor('Av991^b#1')) then if val(&unifor('Av991^a.1#1'))=0 and (not('0 1 2 3 4 5 6 7 8 9 ':&unifor('Av991^a.1#1'))) and val(&unifor('Av991^b.1#1'))=0 and (not('0 1 2 3 4 5 6 7 8 9 ':&unifor('Av991^b.1#1'))) and &uf('+97'v910^b.1)=&uf('+97'&unifor('Av991^a.1#1')) and &uf('+97'v910^b.1)=&uf('+97'&unifor('Av991^b.1#1')) or val(&unifor('Av991^a.1#1'))>0 and val(&unifor('Av991^b.1#1'))>0 then '1;' fi fi fi))>0 or v991^c<>'' and rsum((if p(v910) then if val(v910^h) >= val(&unifor('Av991^c#1')) and val(v910^h)<=val(&unifor('Av991^d#1')) then '1;' fi fi))>0 then '1' fi fi
+"^A"v7,"^B"v2,"^C"v3,"^D"v4
+*****
+TAB4Odat - Инв.Кн.- НОВЫЕ, СКВОЗНАЯ СОРТИРОВКА - ОБЩИЙ (интервал дат)
+1
+tab4odat.ws
+if p(v7) then '"IN=$"' fi,
+&uf('+7W991#'v991),if s(v215^y)=''then if rsum((if p(v910) then if val(&uf('D,!KSU='v910^u|!,if val(v88^b) >= val(&unifor('Ag991^a#1')) and val(v88^b)<=val(&unifor('Ag991^b#1')) then '1;' fi|)) >0 then '1' fi fi)) >0 then '1' fi fi
+"^A"v1,"^B"v2
+*****
+
+
+
+
+
+NPREESTR - Выполнение заказа по Суммарному заказу 
+1
+reestr.ws
+'"VSZK='v62'"'
+
+"^B"v62,"^I"v7,"^A"v8,"^Z"v9
+*****
+KSU_FOND
+4
+
+
+
+*****
+KSU_ITOG
+4
+
+
+
+*****
+REESTR
+1
+reestr.ws
+'"VSZK='v62'"'
+
+"^B"v62,"^I"v7,"^A"v8,"^Z"v9
+*****
+
+TABX
+2
+dp1s.ws
+|"NKSU=|V88^A| $"|
+
+V1V2,if p(v13) then "^B"v13,'^C1' fi,if p(v14) then '^B'&unifor('G0-'v14*3),'!' fi
+*****
+KSUIT  -  Лист КСУ Ч.3 Состояние фонда
+1
+kd3.ws
+'"KS3='v880'"'
+
+"^A"v880
+*****
+
+         ЗАКАЗ КНИГ 
+
+
+TPNZW - Адрес и конверт для поля 30 (карточки)
+1
+pz.ws
+'"NZ='v89'"'
+
+'^A',&unifor('G0!'v89),'^B',&unifor('G1!'v89)
+*****
+TABSZW - Адрес и конверт для поля 30 (список)
+1
+pz.ws
+if p(v89) then '"NZ=',v89,'"' fi
+
+'^A',&unifor('G0!'v89),'^B',&unifor('G1!'v89)
+*****
+TABSPW - Список по отмеченным
+2
+
+
+
+
+*****
+TABZW - Лист ("счет-фактура") для одной организации
+1
+org.ws
+if p(v83) then '"NOR=',v83,'"'  if p(v162) then '*"SZK=',,v162,'"' fi else if p(v162) then '"SZK=',v162,'"' fi fi,,,
+
+"^A"V83,,"^B"V162
+*****
+TABZSW - Лист ("счет-фактура") для одного суммарного заказа
+1
+tabzsw.ws
+ref(l("SZ="v62),if p(v62^k) then'"KOR=',v62^k,'"' fi,if p(v62^6) then '+"SZK=',v62^6,'"' fi)
+
+"^A"v62,"^B"v13
+*****
+TABF1W - контроль выполнения заказов
+2
+
+
+
+
+*****
+TABF2W - контроль выполнения заказов
+1
+krz.ws
+if p(v83) then '"NOR=',v83,'"' fi
+
+
+"^A"V83
+*****
+
+       ПОСТУПЛЕНИЕ КНИГ
+
+ACT - на отдельный акт
+1
+act.ws
+if p(v30) then '"AS=',v30,'"' fi
+
+if p(v30) then'^A'&unifor('G0-'v30*3),"^B"v30.2 fi,"^C"v12
+*****
+
+ACTS - на КСУ (может быть несколько актов)
+1
+acts.ws
+if p(v88) then '"KSU=',v88,'"' fi
+
+"^A"v88,"^B"v12
+*****
+
+       ИНВЕНТАРНЫЕ СПИСКИ
+
+
+TABIUW - Инв.Кн.- НОВЫЕ, ИНД. УЧЕТ (КСУ/МХР/№ Акта)
+1
+in11.ws
+if p(v911) then '"NKSU=',v911,'$"' fi,if p(v130) then '"NAS=',v130,'"' fi,if s(v911,v130)<>'' and p(v87) then '*' fi,if v87<>'' then '"MHR=',v87,'"' fi
+
+"^A"v911,"^B"v87,if p(v130) then'^C',&unifor('G0-'v130*3),'^D'v130.2 fi
+*****
+
+TABIUDW - Инв.Кн.- НОВЫЕ, ИНД. УЧЕТ (Интервал дат + МХР)
+3
+dp1s.ws
+'DP='
+if p(v88^A) then '"NKSUK=',v88^A,'"' fi
+V1V2,"^B"v13
+*****
+
+TABUOW - Инв.Кн.- НОВЫЕ, ИНД. УЧЕТ (по отмеченным)
+2
+
+
+
+
+*****
+
+TABINW - Инв.Кн. - НОВЫЕ, ОБЩИЙ (КСУ/МХР)
+1
+in11.ws
+if p(v911) then '"NKSU=',v911,'$"' fi,if p(v911) and p(v87) then '*' fi,if v87<>'' then '"MHR=',v87,'"' fi
+
+"^A"v911,"^B"v87
+*****
+
+TABING - Инв.Кн. - НОВЫЕ, ОБЩИЙ (КСУ/МХР/№ Акта) (TABGEN)
+1
+in11.ws
+if p(v911) then '"NKSU=',v911,'$"' fi,if p(v130) then '"NAS=',v130,'"' fi,if s(v911,v130)<>'' and p(v87) then '*' fi,if v87<>'' then '"MHR=',v87,'"' fi
+
+"^A"v911,"^B"v87,if p(v130) then'^C',&unifor('G0-'v130*3),'^D'v130.2 fi
+*****
+
+TABINDW - Инв.Кн. - НОВЫЕ, ОБЩИЙ (Интервал дат + МХР)
+3
+dp1s.ws
+'DP='
+if p(v88^A) then '"NKSUK=',v88^A,'"' fi
+V1V2,"^B"v13
+*****
+
+TABIOW - Инв.Кн. - НОВЫЕ, ОБЩИЙ (по отмеченным)
+2
+
+
+
+
+*****
+TAB4BSW - Инв.Кн.- НОВЫЕ, СКВОЗНАЯ СОРТИРОВКА - ИНД.УЧЕТ (КСУ/МХР/№ Акта)
+1
+in11.ws
+if p(v911) then '"NKSU=',v911,'$"' fi,if p(v130) then '"NAS=',v130,'"' fi,if s(v911,v130)<>'' and p(v87) then '*' fi,if v87<>'' then '"MHR=',v87,'"' fi
+
+"^A"v911,"^B"v87,if p(v130) then'^C',&unifor('G0-'v130*3),'^D'v130.2 fi
+*****
+
+TAB4BW - Инв.Кн.- НОВЫЕ, СКВОЗНАЯ СОРТИРОВКА - ИНД.УЧЕТ (по отмеченным)
+2
+
+
+
+
+*****
+
+TAB4OSW - Инв.Кн.- НОВЫЕ, СКВОЗНАЯ СОРТИРОВКА - ОБЩИЙ (КСУ/МХР/№ Акта)
+1
+in11.ws
+if p(v911) then '"NKSU=',v911,'$"' fi,if p(v130) then '"NAS=',v130,'"' fi,if s(v911,v130)<>'' and p(v87) then '*' fi,if v87<>'' then '"MHR=',v87,'"' fi
+
+"^A"v911,"^B"v87,if p(v130) then'^C',&unifor('G0-'v130*3),'^D'v130.2 fi
+*****
+
+TAB4OW - Инв.Кн.- НОВЫЕ, СКВОЗНАЯ СОРТИРОВКА - ОБЩИЙ (по отмеченным)
+2
+
+
+
+
+*****
+
+TABF3G  - Лист актового учета книг (по номеру акта)
+1
+na11.ws
+ref(l("AS="v30),if p(v88^A) then '"KSU=',v88^A,'"' fi,(if p(v88) then if p(v88^y) then '+"NA=',v88^y,|-|v88^A*2.2|-|,' $"' fi fi))
+if V920: 'KSU' or rsum((if p(v910) then if p(v910^y) then if v910^y=&unifor('G0-',&unifor('Av991*3#1')) and v910^u*2.2=&unifor('Av991.2#1')then  '1 ' else '0 ' fi fi fi))>0 then '1' else '0' fi
+V30
+*****
+
+TABF4W - АКТ о приеме книг в библиотеку
+1
+na11.ws
+ref(l("AS="v30),if p(v88^A) then '"KSU=',v88^A,'"' fi,(if p(v88) then if p(v88^y) then '+"NA=',v88^y,|-|v88^A*2.2|-|,' $"' fi fi))
+if V920: 'KSU' or rsum((if p(v910) then if p(v910^y) then if v910^y=&unifor('G0-',&unifor('Av991*3#1')) and v910^u*2.2=&unifor('Av991.2#1')then  '1 ' else '0 ' fi fi fi))>0 then '1' else '0' fi
+V30
+
+*****
+TABF3W
+1
+na11.ws
+if p(v30) then '"NA=',&unifor('G0-'&unifor('Av30*3#1')),' $"' fi
+
+V30
+
+*****
+
+
+
+	     ЛИСТЫ КСУ
+
+
+
+TKSUW - Форма КСУ краткая (Интервал дат / КСУ)
+1
+kd11.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+if p(v88) then "^A"v88 else v1v2 fi
+*****
+
+TKSUPW - Форма КСУ полная (Интервал дат / КСУ)
+1
+kd11.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88
+*****
+
+TKSUMW - для одного подразделения (Интервал дат / КСУ)
+1
+kd1s.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88,"^B"v13
+*****
+
+TKSUMWG - для одного подразделения (Интервал дат / КСУ - 15 РЗН, ГТФ)
+1
+kd1s.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88,"^B"v13
+*****
+TKSUKW - для одного источника (Интервал дат / КСУ)
+1
+kd1k.ws
+'"KSU=$"'
+if v991.2:'^B' then if &uf('Av88^k#1')=v13 then '1' else '0' fi else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6  and (p(v13) and &uf('Av88^k#1')=v13 or a(v13)) then '1' else '0' fi else '1' fi fi
+V1V2,"^B"v13
+*****
+
+TSU2IW - Итоговые данные - Форма КСУ полная (Интервал дат / КСУ)
+1
+kd1s.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88,"^B"v13
+*****
+
+KSU1W - Распределение по видам документов
+1
+kd11.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88
+*****
+
+KSU2W - Распределение по характеру, языкам и др.
+1
+kd11.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88
+*****
+
+KSU3W - Распределение по разделам знаний
+1
+kd11.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88
+*****
+
+KSUN1 - Общие данные (получено GENPFT)
+1
+kd11.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88
+*****
+
+KSUN2 - Печатные док-ты по видам (получено GENPFT)
+1
+kd11.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88
+*****
+
+KSUN3 - Нетрадиционные по видам (получено GENPFT)
+1
+kd11.ws
+if p(v88) then '"KSU=',v88,'"' else '"KSU=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av88^B.6#1')>=v991.6 and &unifor('Av88^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+v1v2,"^A"v88
+*****
+
+
+      ВЫБЫТИЕ
+
+TABNJW - Список выбывших журналов
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'"' fi
+
+v910
+*****
+
+
+KS21W - Лист КСУ выбытия (страница 1)
+1
+kd22.ws
+if p(v888) then '"KS2=',v888,'"' else '"KS2=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av888^B.6#1')>=v991.6 and &unifor('Av888^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+if p(v888) then "^A"v888 else v5v6 fi
+*****
+
+KS22W - Лист КСУ выбытия (страница 2)
+1
+kd22.ws
+if p(v888) then '"KS2=',v888,'"' else '"KS2=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av888^B.6#1')>=v991.6 and &unifor('Av888^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+if p(v888) then "^A"v888 else v5v6 fi
+*****
+
+KS23W - Лист КСУ выбытия (страница 3)
+1
+kd22.ws
+if p(v888) then '"KS2=',v888,'"' else '"KS2=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av888^B.6#1')>=v991.6 and &unifor('Av888^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+if p(v888) then "^A"v888 else v5v6 fi
+*****
+
+KS24W - Лист КСУ выбытия (страница 4)
+1
+kd22.ws
+if p(v888) then '"KS2=',v888,'"' else '"KS2=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av888^B.6#1')>=v991.6 and &unifor('Av888^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+if p(v888) then "^A"v888 else v5v6 fi
+*****
+
+TKS2W - Лист КСУ выбытия (краткая форма)
+1
+kd22.ws
+if p(v888) then '"KS2=',v888,'"' else '"KS2=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av888^B.6#1')>=v991.6 and &unifor('Av888^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+if p(v888) then "^A"v888 else v5v6 fi
+*****
+
+TKS2PW - Лист КСУ выбытия (полная форма)
+1
+kd22.ws
+if p(v888) then '"KS2=',v888,'"' else '"KS2=$"' fi
+if p(v991^a) then '1' else if p(v991) then if &unifor('Av888^B.6#1')>=v991.6 and &unifor('Av888^B.6#1')<=v991*6.6 then '1' else '0' fi else '1' fi fi fi
+if p(v888) then "^A"v888 else v5v6 fi
+*****
+
+TABDFW - Движение фонда
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'$"' fi
+
+v910
+*****
+
+TABDKW - Книги для докомплектования
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'$"' fi
+
+v910
+*****
+
+TABWBW - Выбытие книг(без передачи)
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'$"' fi
+
+v910
+*****
+
+TABWPW - Исключение книг(с учетом передачи)
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'$"' fi
+
+v910
+*****
+
+TACTIW - Акт на исключение книг
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'$"' fi
+
+v910
+*****
+
+SPACTW - Список по акту на исключение книг
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'$"' fi
+
+v910
+*****
+SPACTWJ - Список по акту на исключение журналов
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'$"' fi
+
+v910
+*****
+
+ITOGS - ??? нет в списках
+2
+dp1.ws
+
+
+V1V2
+*****
+
+TABCT - ??? нет в списках
+???
+dks1.ws
+V3*2.2
+
+"NA="V88^Y"$"
+*****
+
+
+     ПОДПИСКА
+
+
+TABLOW
+1
+abo.ws
+if p(v39) then '"AP=',v39,'"' fi,if p(v39) and (p(v36)or p(v99)) then '*' fi,if p(v36) then '"KAT=',v36,'"' fi,if p(v99)and p(v36) then '*' fi,if p(v99) then '"VD=',v99,'"' fi
+
+"^A"v36,"^B"v99.2,"^E"v39
+*****
+TABLOW1 - Лист подписки для всех подразделений (с указанием подразделения)
+0
+abo.ws
+if p(v39) then '"AP=',v39,'"' fi,if p(v39) and (p(v36)or p(v99)) then '*' fi,if p(v36) then '"KAT=',v36,'"' fi,if p(v99)and p(v36) then '*' fi,if p(v99) then '"VD=',v99,'"' fi
+
+"^A"v36,"^B"v99.2,"^E"v39
+*****
+TABODW
+1
+abo.ws
+if p(v39) then '"AP=',v39,'"' fi,if p(v39) and (p(v36)or p(v99)) then '*' fi,if p(v36) then '"KAT=',v36,'"' fi,if p(v99)and p(v36) then '*' fi,if p(v99) then '"VD=',v99,'"' fi
+
+"^A"v36,"^B"v99.2,"^E"v39
+*****
+TABLLW
+1
+abo.ws
+if p(v39) then '"AP=',v39,'"' fi,if p(v39) and (p(v36)or p(v99)) then '*' fi,if p(v36) then '"KAT=',v36,'"' fi,if p(v99)and p(v36) then '*' fi,if p(v99) then '"VD=',v99,'"' fi
+
+"^A"v36,"^B"v99.2,"^E"v39
+*****
+TABLDW
+1
+abo.ws
+if p(v39) then '"AP=',v39,'"' fi,if p(v39) and (p(v36)or p(v99)) then '*' fi,if p(v36) then '"KAT=',v36,'"' fi,if p(v99)and p(v36) then '*' fi,if p(v99) then '"VD=',v99,'"' fi
+
+"^A"v36,"^B"v99.2,"^E"v39
+*****
+TABLPPW - СПРАВКА О ПОДПИСКЕ ПОДРАЗДЕЛЕНИЯ ЗА ПОСЛЕДНИЙ (ТЕКУЩИЙ) ПЕРИОД
+2
+abopp.ws
+
+
+"^A"v8
+*****
+TABLPW -
+1
+abp.ws
+if p(v38) then '"ZP=',v38,'"' fi,if p(v38) and (p(v36) or p(v99) or p(v33)) then '*' fi,if p(v36) then '"KAT=',v36,'"' fi,if p(v36) and (p(v99) or p(v33)) then '*' fi,if p(v99) then '"VD=',v99,'"' fi,if p(v99) and p(v33) then '*' fi,if p(v33) then '"PP=',v33,'"' fi
+
+"^A"v36,"^B"v99.2,'^C'&unifor('G0/'v33),'^D'&unifor('G1/'v33),"^E"v38
+*****
+TABLSW
+1
+abs.ws
+if p(v99) then '"VD=',v99,'"' fi,if p(v99) and p(v33) then '*' fi,if p(v33) then '"PP=',v33,'"' fi
+
+"^B"v99.2,'^C'&unifor('G0/'v33),'^D'&unifor('G1/'v33)
+*****
+TABLZW -
+1
+abz.ws
+if p(v99) then '"VD=',v99,'"' fi,if p(v99) and p(v33) then '*' fi,if p(v33) then '"PP=',v33,'"' fi
+
+"^B"v99.2,'^C'&unifor('G0/'v33),'^D'&unifor('G1/'v33),"^E"v13
+*****
+TABPIW -
+2
+tabpiw.ws
+
+
+"^A"v9,"^B"v10,"^C"v11,"^D"v12
+*****
+TABA1W
+1
+abo.ws
+if p(v39) then '"AP=',v39,'"' fi,if p(v39) and (p(v36)or p(v99)) then '*' fi,if p(v36) then '"KAT=',v36,'"' fi,if p(v99)and p(v36) then '*' fi,if p(v99) then '"VD=',v99,'"' fi
+
+"^A"v36,"^E"v99.2,'^C'&unifor('G0/'v33),'^D'&unifor('G1/'v33),"^B"v39
+*****
+TABA3W
+2
+abo.ws
+
+
+"^A"v36,"^E"v99.2,'^C'&unifor('G0/'v33),'^D'&unifor('G1/'v33),"^B"v39
+*****
+TABA2W
+1
+aboi.ws
+if p(v201) then '"T=J=',v201,'"' fi,if p(v201) and p(v86) then '*' fi,if p(v86) then '"IP=',v86,'"' fi
+
+"^B"v40
+*****
+TABABW
+2
+
+
+
+
+*****
+ITP
+2
+
+
+
+
+*****
+Podpiska
+2
+
+
+
+
+*****
+Parli
+2
+
+
+
+
+*****
+Inv_Spi
+2
+
+
+
+
+*****
+UCHET
+1
+uchet.ws
+'"KSU=',,v88,'"'
+
+"^A"v1,,"^B"v88
+
+*****
+DUMA2
+1
+otb.ws
+'"NKSUK=',v911,'"'
+
+"^A"v911,"^B"v12
+*****
+KSUITPeriod
+2
+
+
+
+
+*****
+KSUItogCHECK
+2
+
+
+
+
+*****
+SPACTJ
+1
+ks22.ws
+if p(v910) then '"NKS2=',v910,'$"' fi
+
+v910
+*****
+TPRFA
+1
+tprf.ws
+'"INPR=','$"',if p(v87) then '*' fi,if v87<>''then '"INPF=',v87,'"' fi
+
+"^A"v991,"^B"v87
+*****
+NASPI
+4
+
+
+
+
+*****
+BRDAT_TAB
+2
+
+
+
+
+*****
+BRYEAR_TAB
+2
+
+
+
+
+*****
+BRIEF_TAB
+2
+
+
+
+
+*****
+PRFI
+1
+tprf.ws
+'"INPR=','$"',if p(v87) then '*' fi,if v87<>''then '"INPF=',v87,'"' fi
+
+"^A"v991,"^B"v87
+*****
+PRFSH
+1
+tprf.ws
+'"INPR=','$"',if p(v87) then '*' fi,if v87<>''then '"INPF=',v87,'"' fi
+
+"^A"v991,"^B"v87
+*****
+PRFNI
+1
+tprf.ws
+'"IN=','$"',if p(v87) then '*' fi,if v87<>''then '"MHR=',v87,'"' fi
+
+"^A"v991,"^B"v87
+*****
+PRFNSH
+1
+tprf.ws
+'"IN=','$"',if p(v87) then '*' fi,if v87<>''then '"MHR=',v87,'"' fi
+
+"^A"v991,"^B"v87
+*****

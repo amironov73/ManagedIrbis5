@@ -16,10 +16,14 @@
 
 #region Using directives
 
+using System.ComponentModel;
+using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
 using AM;
+using AM.IO;
+using AM.Runtime;
 
 #endregion
 
@@ -32,6 +36,8 @@ namespace ManagedIrbis.Tables
     /// </summary>
     [XmlRoot ("table")]
     public sealed class AcquisitionTable
+        : IHandmadeSerializable,
+            IVerifiable
     {
         #region Properties
 
@@ -40,13 +46,15 @@ namespace ManagedIrbis.Tables
         /// </summary>
         [XmlElement ("name")]
         [JsonPropertyName ("name")]
+        [Description ("Имя таблицы")]
         public string? TableName { get; set; }
 
         /// <summary>
         /// 2-я строка - способ отбора записей.
         /// </summary>
-        [XmlElement ("selectionMethod")]
+        [XmlAttribute ("selectionMethod")]
         [JsonPropertyName ("selectionMethod")]
+        [Description ("Способ отбора записей")]
         public int SelectionMethod { get; set; }
 
         /// <summary>
@@ -56,6 +64,7 @@ namespace ManagedIrbis.Tables
         /// </summary>
         [XmlElement ("worksheet")]
         [JsonPropertyName ("worksheet")]
+        [Description ("Имя опросного рабочего листа")]
         public string? Worksheet { get; set; }
 
         /// <summary>
@@ -63,6 +72,7 @@ namespace ManagedIrbis.Tables
         /// </summary>
         [XmlElement ("format")]
         [JsonPropertyName ("format")]
+        [Description ("Формат")]
         public string? Format { get; set; }
 
         /// <summary>
@@ -70,6 +80,7 @@ namespace ManagedIrbis.Tables
         /// </summary>
         [XmlElement ("filter")]
         [JsonPropertyName ("filter")]
+        [Description ("Фильтрующий формат")]
         public string? Filter { get; set; }
 
         /// <summary>
@@ -78,17 +89,86 @@ namespace ManagedIrbis.Tables
         /// </summary>
         [XmlElement ("modelField")]
         [JsonPropertyName ("modelField")]
+        [Description ("Формат для поля 991")]
         public string? ModelField { get; set; }
+
+        /// <summary>
+        /// Произвольные пользовательские данные.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public object? UserData { get; set; }
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            TableName = reader.ReadNullableString();
+            SelectionMethod = reader.ReadPackedInt32();
+            Worksheet = reader.ReadNullableString();
+            Format = reader.ReadNullableString();
+            Filter = reader.ReadNullableString();
+            ModelField = reader.ReadNullableString();
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer
+                .WriteNullable (TableName)
+                .WritePackedInt32 (SelectionMethod)
+                .WriteNullable (Worksheet)
+                .WriteNullable (Format)
+                .WriteNullable (Filter)
+                .WriteNullable (ModelField);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<AcquisitionTable> (this, throwOnError);
+
+            // TODO implement
+
+            verifier
+                .NotNullNorEmpty (TableName)
+                .NotNullNorEmpty (Worksheet)
+                .NotNullNorEmpty (Format);
+
+            return verifier.Result;
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => TableName.ToVisibleString();
+        public override string ToString()
+        {
+            return TableName.ToVisibleString();
+        }
 
         #endregion
-
-    } // class AcquisitionTable
-
-} // namespace ManagedIrbis.Tables
+    }
+}

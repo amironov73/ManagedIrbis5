@@ -34,7 +34,7 @@ namespace AM.Scripting.Barsik
         public string Name { get; }
 
         /// <summary>
-        /// Описания в произвольной форме.
+        /// Описание в произвольной форме.
         /// </summary>
         public string? Description { get; }
 

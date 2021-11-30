@@ -16,10 +16,15 @@
 
 #region Using directives
 
+using System.ComponentModel;
+using System.IO;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
+using AM;
 using AM.Collections;
+using AM.IO;
+using AM.Runtime;
 
 #endregion
 
@@ -71,6 +76,8 @@ namespace ManagedIrbis.Tables
     /// </summary>
     [XmlRoot ("sorting")]
     public sealed class SrwFile
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
@@ -79,10 +86,79 @@ namespace ManagedIrbis.Tables
         /// </summary>
         [XmlElement ("key")]
         [JsonPropertyName ("keys")]
+        [Description ("Ключи сортировки")]
         public NonNullCollection<KeyDefinition> Keys { get; } = new ();
+
+        /// <summary>
+        /// Произвольные пользовательские данные.
+        /// </summary>
+        [XmlIgnore]
+        [JsonIgnore]
+        [Browsable (false)]
+        public object? UserData { get; set; }
 
         #endregion
 
-    } // class SrwFile
+        #region IHandmadeSerializable members
 
-} // namespace ManagedIrbis.Tables
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            reader.ReadCollection (Keys);
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            writer
+                .WriteCollection (Keys);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<SrwFile> (this, throwOnError);
+
+            // TODO implement
+
+            verifier
+                .Positive (Keys.Count);
+
+            foreach (var key in Keys)
+            {
+                verifier.VerifySubObject (key);
+            }
+
+            return verifier.Result;
+        }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString()
+        {
+            return $"Keys: {Keys.Count}";
+        }
+
+        #endregion
+    }
+}

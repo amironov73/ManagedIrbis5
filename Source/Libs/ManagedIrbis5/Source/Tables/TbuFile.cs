@@ -104,7 +104,5 @@ namespace ManagedIrbis.Tables
         public string? Header { get; set; }
 
         #endregion
-
-    } // class TbuFile
-
-} // namespace ManagedIrbis.Tables
+    }
+}

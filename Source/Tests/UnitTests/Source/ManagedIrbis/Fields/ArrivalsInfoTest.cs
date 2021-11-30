@@ -219,7 +219,7 @@ namespace UnitTests.ManagedIrbis.Fields
         }
 
         [TestMethod]
-        [Description ("Текстовое представление")]
+        [Description ("Плоское текстовое представление")]
         public void ArrivalsInfo_ToString_1()
         {
             var arrivals = new ArrivalsInfo();
