@@ -15,10 +15,16 @@
 
 #region Using directives
 
+using System;
+using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 using AM;
 using AM.Linq;
+using AM.Runtime;
 
 using ManagedIrbis.Mapping;
 
@@ -31,7 +37,10 @@ namespace ManagedIrbis.Systematization
     /// <summary>
     /// Запись в базе данных ATHRU.
     /// </summary>
+    [XmlRoot ("athru")]
     public sealed class AthruRecord
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
@@ -39,21 +48,30 @@ namespace ManagedIrbis.Systematization
         /// Основной заголовок рубрики.
         /// Поле 210.
         /// </summary>
-        [Field(210)]
+        [Field (210)]
+        [XmlElement ("main-heading")]
+        [JsonPropertyName ("mainHeading")]
+        [Description ("Основной заголовок рубрики")]
         public AthrbHeading? MainHeading { get; set; }
 
         /// <summary>
         /// Связанные заголовки рубрики.
         /// Поле 510.
         /// </summary>
-        [Field(510)]
+        [Field (510)]
+        [XmlElement ("linked-heading")]
+        [JsonPropertyName ("linkedHeading")]
+        [Description ("Связанные заголовки рубрики")]
         public AthrbHeading[]? LinkedHeadings { get; set; }
 
         /// <summary>
         /// Методические указания / описания.
         /// Поле 300.
         /// </summary>
-        [Field(300)]
+        [Field (300)]
+        [XmlElement ("guidelines")]
+        [JsonPropertyName ("guidelines")]
+        [Description ("Методические указания")]
         public AthrbGuidelines[]? Guidelines { get; set; }
 
         #endregion
@@ -61,30 +79,84 @@ namespace ManagedIrbis.Systematization
         #region Public methods
 
         /// <summary>
-        /// Parse the record.
+        /// Разбор библиографической записи.
         /// </summary>
-        public static AthrbRecord Parse
+        public static AthrbRecord ParseRecord
             (
                 Record record
             )
         {
+            Sure.NotNull (record);
+
             var result = new AthrbRecord
             {
-                MainHeading = AthrbHeading.Parse(record.Fields.GetFirstField(210)),
+                MainHeading = AthrbHeading.Parse (record.Fields.GetFirstField (210)),
 
                 LinkedHeadings = record.Fields
-                    .GetField(510)
-                    .Select(AthrbHeading.Parse)
+                    .GetField (510)
+                    .Select (AthrbHeading.Parse)
                     .NonNullItems()
                     .ToArray(),
 
                 Guidelines = record.Fields
-                    .GetField(300)
-                    .Select(AthrbGuidelines.Parse)
+                    .GetField (300)
+                    .Select (AthrbGuidelines.Parse)
                     .ToArray()
             };
 
             return result;
+        }
+
+        /// <summary>
+        /// Преобразование информации в библиографическую запись.
+        /// </summary>
+        public Record ToRecord()
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region IHandmadeSerializable members
+
+        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+        public void RestoreFromStream
+            (
+                BinaryReader reader
+            )
+        {
+            Sure.NotNull (reader);
+
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+        public void SaveToStream
+            (
+                BinaryWriter writer
+            )
+        {
+            Sure.NotNull (writer);
+
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<AthruRecord> (this, throwOnError);
+
+            verifier
+                .NotNull (MainHeading);
+
+            return verifier.Result;
         }
 
         #endregion
@@ -92,10 +164,11 @@ namespace ManagedIrbis.Systematization
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => MainHeading.ToVisibleString();
+        public override string ToString()
+        {
+            return MainHeading.ToVisibleString();
+        }
 
         #endregion
-
-    } // class AthruRecord
-
-} // namespace ManagedIrbis.Systematization
+    }
+}

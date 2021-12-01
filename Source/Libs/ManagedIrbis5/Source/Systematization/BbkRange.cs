@@ -62,7 +62,7 @@ namespace ManagedIrbis.Systematization
         {
             OriginalIndex = originalIndex;
 
-            var slashPosition = OriginalIndex.IndexOf('/');
+            var slashPosition = OriginalIndex.IndexOf ('/');
             if (slashPosition < 0)
             {
                 FirstIndex = OriginalIndex;
@@ -85,7 +85,7 @@ namespace ManagedIrbis.Systematization
                     );
             }
 
-            if (OriginalIndex.LastIndexOf('/') != slashPosition)
+            if (OriginalIndex.LastIndexOf ('/') != slashPosition)
             {
                 Magna.Error
                     (
@@ -94,8 +94,8 @@ namespace ManagedIrbis.Systematization
                         + originalIndex
                     );
 
-                throw new BbkException("Индекс не может содержать "
-                    + "больше одного слэша");
+                throw new BbkException ("Индекс не может содержать "
+                                        + "больше одного слэша");
             }
 
             var totalLength = OriginalIndex.Length;
@@ -109,8 +109,8 @@ namespace ManagedIrbis.Systematization
                         + originalIndex
                     );
 
-                throw new BbkException("Индекс не может "
-                                      + "заканчиваться слэшом");
+                throw new BbkException ("Индекс не может "
+                                        + "заканчиваться слэшом");
             }
 
             var prefixLenght = slashPosition - suffixLength;
@@ -123,7 +123,7 @@ namespace ManagedIrbis.Systematization
                         + originalIndex
                     );
 
-                throw new BbkException("Префикс короче суффикса!");
+                throw new BbkException ("Префикс короче суффикса!");
             }
 
             FirstIndex = OriginalIndex.Substring
@@ -132,15 +132,15 @@ namespace ManagedIrbis.Systematization
                     slashPosition
                 );
             LastIndex = OriginalIndex.Substring
-                (
-                    0,
-                    prefixLenght
-                )
-                + OriginalIndex.Substring
-                (
-                    slashPosition + 1,
-                    suffixLength
-                );
+                            (
+                                0,
+                                prefixLenght
+                            )
+                        + OriginalIndex.Substring
+                            (
+                                slashPosition + 1,
+                                suffixLength
+                            );
         }
 
         #endregion
@@ -159,7 +159,7 @@ namespace ManagedIrbis.Systematization
             NumberText current = first.Clone();
             while (current <= last)
             {
-                result.Add(current.ToString());
+                result.Add (current.ToString());
                 current = current.Increment();
             }
 
@@ -171,7 +171,10 @@ namespace ManagedIrbis.Systematization
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => OriginalIndex;
+        public override string ToString()
+        {
+            return OriginalIndex;
+        }
 
         #endregion
     }

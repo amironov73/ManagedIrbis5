@@ -98,6 +98,5 @@ namespace ManagedIrbis.Systematization
         public string? Announcement { get; set; }
 
         #endregion
-    } // class BookSellingIndex
-
-} // namespace ManagedIrbis.Systematization
+    }
+}

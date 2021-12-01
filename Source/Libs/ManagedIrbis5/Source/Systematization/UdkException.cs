@@ -30,7 +30,7 @@ namespace ManagedIrbis.Systematization
         #region Construciton
 
         /// <summary>
-        /// Конструктор.
+        /// Конструктор по умолчанию.
         /// </summary>
         public UdkException()
         {
@@ -45,7 +45,7 @@ namespace ManagedIrbis.Systematization
             (
                 string message
             )
-            : base(message)
+            : base (message)
         {
         }
 
@@ -57,7 +57,7 @@ namespace ManagedIrbis.Systematization
                 string message,
                 Exception innerException
             )
-            : base(message, innerException)
+            : base (message, innerException)
         {
         }
     }
