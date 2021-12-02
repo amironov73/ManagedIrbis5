@@ -4,6 +4,7 @@
 // ReSharper disable StringLiteralTypo
 
 using System;
+using System.IO;
 
 using ManagedIrbis.Mx;
 using ManagedIrbis.Mx.Commands;
@@ -15,23 +16,24 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Mx.Commands
 {
     [TestClass]
-    public sealed class LimitCommandTest
+    public sealed class ClsCommandTest
         : CommonMxCommandTest
     {
         [TestMethod]
         [Description ("Конструктор по умолчанию")]
-        public void LimitCommand_Construction_1()
+        public void ClsCommand_Construction_1()
         {
-            var command = new LimitCommand();
-            Assert.AreEqual ("Limit", command.Name);
+            var command = new ClsCommand();
+            Assert.AreEqual ("cls", command.Name);
         }
 
         [TestMethod]
         [Description ("Выполнение команды")]
-        public void LimitCommand_Execute_1()
+        [ExpectedException (typeof(IOException))]
+        public void ClsCommand_Execute_1()
         {
             using var executive = GetExecutive();
-            using var command = new LimitCommand();
+            using var command = new ClsCommand();
             command.Initialize (executive);
 
             var arguments = Array.Empty<MxArgument>();
@@ -40,10 +42,10 @@ namespace UnitTests.ManagedIrbis.Mx.Commands
 
         [TestMethod]
         [Description ("Плоское текстовое представление")]
-        public void LimitCommand_ToString_1()
+        public void ClsCommand_ToString_1()
         {
-            var command = new LimitCommand();
-            Assert.AreEqual ("Limit", command.ToString());
+            var command = new ClsCommand();
+            Assert.AreEqual ("cls", command.ToString());
         }
     }
 }

@@ -3,6 +3,8 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+using System;
+
 using ManagedIrbis.Mx;
 using ManagedIrbis.Mx.Commands;
 
@@ -13,36 +15,35 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Mx.Commands
 {
     [TestClass]
-    public class SearchCommandTest
+    public sealed class SearchCommandTest
         : CommonMxCommandTest
     {
         [TestMethod]
+        [Description ("Конструктор по умолчанию")]
         public void SearchCommand_Construction_1()
         {
             var command = new SearchCommand();
-            Assert.AreEqual("Search", command.Name);
+            Assert.AreEqual ("Search", command.Name);
         }
 
         [TestMethod]
+        [Description ("Выполнение команды")]
         public void SearchCommand_Execute_1()
         {
-            using (var executive = GetExecutive())
-            {
-                using (var command = new SearchCommand())
-                {
-                    command.Initialize(executive);
+            using var executive = GetExecutive();
+            using var command = new SearchCommand();
+            command.Initialize (executive);
 
-                    var arguments = new MxArgument[0];
-                    command.Execute(executive, arguments);
-                }
-            }
+            var arguments = Array.Empty<MxArgument>();
+            command.Execute (executive, arguments);
         }
 
         [TestMethod]
+        [Description ("Плоское текстовое представление")]
         public void SearchCommand_ToString_1()
         {
             var command = new SearchCommand();
-            Assert.AreEqual("Search", command.ToString());
+            Assert.AreEqual ("Search", command.ToString());
         }
     }
 }

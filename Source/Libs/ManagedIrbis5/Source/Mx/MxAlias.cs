@@ -66,21 +66,24 @@ namespace ManagedIrbis.Mx
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public MxAlias()
         {
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор со значениями.
         /// </summary>
         public MxAlias
             (
-                string? name,
-                string? value
+                string name,
+                string value
             )
         {
+            Sure.NotNull (name);
+            Sure.NotNull (value);
+
             Name = name;
             Value = value;
         }
@@ -232,8 +235,10 @@ namespace ManagedIrbis.Mx
         }
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() =>
-            Name.ToVisibleString() + "=" + Value.ToVisibleString();
+        public override string ToString()
+        {
+            return Name.ToVisibleString() + "=" + Value.ToVisibleString();
+        }
 
         #endregion
     }

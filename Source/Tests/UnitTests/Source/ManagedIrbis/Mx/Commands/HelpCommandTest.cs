@@ -15,23 +15,23 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis.Mx.Commands
 {
     [TestClass]
-    public sealed class LimitCommandTest
+    public sealed class HelpCommandTest
         : CommonMxCommandTest
     {
         [TestMethod]
         [Description ("Конструктор по умолчанию")]
-        public void LimitCommand_Construction_1()
+        public void HelpCommand_Construction_1()
         {
-            var command = new LimitCommand();
-            Assert.AreEqual ("Limit", command.Name);
+            var command = new HelpCommand();
+            Assert.AreEqual ("help", command.Name);
         }
 
         [TestMethod]
         [Description ("Выполнение команды")]
-        public void LimitCommand_Execute_1()
+        public void HelpCommand_Execute_1()
         {
             using var executive = GetExecutive();
-            using var command = new LimitCommand();
+            using var command = new HelpCommand();
             command.Initialize (executive);
 
             var arguments = Array.Empty<MxArgument>();
@@ -40,10 +40,10 @@ namespace UnitTests.ManagedIrbis.Mx.Commands
 
         [TestMethod]
         [Description ("Плоское текстовое представление")]
-        public void LimitCommand_ToString_1()
+        public void HelpCommand_ToString_1()
         {
-            var command = new LimitCommand();
-            Assert.AreEqual ("Limit", command.ToString());
+            var command = new HelpCommand();
+            Assert.AreEqual ("help", command.ToString());
         }
     }
 }
