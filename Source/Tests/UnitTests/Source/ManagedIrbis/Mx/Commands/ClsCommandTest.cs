@@ -1,4 +1,5 @@
 ﻿// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
 // ReSharper disable EqualExpressionComparison
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo

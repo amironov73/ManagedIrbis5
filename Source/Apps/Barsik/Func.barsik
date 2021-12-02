@@ -1,0 +1,7 @@
+﻿func test (a, b, c)
+{
+    println "Hello from function";
+}
+
+println "Hello from main";
+println test (1, 2, 3);

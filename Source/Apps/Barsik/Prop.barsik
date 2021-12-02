@@ -1,0 +1,4 @@
+﻿text = "Привет, Барсик!";
+println text.Length;
+println text.ToLower();
+println text.Substring(8, 6);

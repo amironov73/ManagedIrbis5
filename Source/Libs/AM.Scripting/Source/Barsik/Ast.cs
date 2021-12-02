@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 using AM.Text;
 
@@ -251,19 +252,218 @@ namespace AM.Scripting.Barsik
     }
 
     /// <summary>
-    /// Вызов функции.
+    /// Обращение к свойству объекта.
+    /// </summary>
+    sealed class PropertyNode : AtomNode
+    {
+        #region Construction
+
+        public PropertyNode (string objectName, string propertyName)
+        {
+            _objectName = objectName;
+            _propertyName = propertyName;
+        }
+
+        #endregion
+
+        #region Private members
+
+        private readonly string _objectName;
+        private readonly string _propertyName;
+
+        #endregion
+
+        #region AtomNode members
+
+        public override dynamic? Compute (Context context)
+        {
+            if (!context.TryGetVariable (_objectName, out var obj))
+            {
+                return null;
+            }
+
+            if (obj is null)
+            {
+                return null;
+            }
+
+            var type = ((object) obj).GetType();
+            var property = type.GetProperty (_propertyName);
+            if (property is not null)
+            {
+                return property.GetValue (obj);
+            }
+
+            var field = type.GetField (_propertyName);
+            if (field is not null)
+            {
+                return field.GetValue (obj);
+            }
+
+            return null;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Вызов функции-члена.
+    /// </summary>
+    sealed class MethodNode : AtomNode
+    {
+        #region Construction
+
+        public MethodNode(string thisName, string methodName, IEnumerable<AtomNode>? arguments)
+        {
+            _thisName = thisName;
+            _methodName = methodName;
+            _arguments = new ();
+            if (arguments is not null)
+            {
+                _arguments.AddRange (arguments);
+            }
+        }
+
+        #endregion
+
+        #region Private members
+
+        private readonly string _thisName;
+        private readonly string _methodName;
+        private readonly List<AtomNode> _arguments;
+
+        #endregion
+
+        #region AtomNode members
+
+        public override dynamic? Compute (Context context)
+        {
+            if (!context.TryGetVariable (_thisName, out var thisValue))
+            {
+                return null;
+            }
+
+            if (thisValue is null)
+            {
+                return null;
+            }
+
+            var argumentValues = new List<dynamic>();
+            var argumentTypes = new List<Type>();
+            foreach (var argument in _arguments)
+            {
+                var value = argument.Compute (context);
+                argumentValues.Add (value);
+                var argType = value is null
+                    ? typeof (object)
+                    : value.GetType();
+                argumentTypes.Add (argType);
+            }
+
+            var type = ((object) thisValue).GetType();
+            var method = type.GetMethod (_methodName, argumentTypes.ToArray());
+            method ??= type.GetMethod (_methodName);
+            if (method is null)
+            {
+                return null;
+            }
+
+            var result = method.Invoke (thisValue, argumentValues.ToArray());
+
+            return result;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Обращение по индексу.
+    /// </summary>
+    sealed class IndexNode : AtomNode
+    {
+        // TODO: сделать индексацию произвольного выражения
+
+        #region Construction
+
+        public IndexNode (string variableName, AtomNode index)
+        {
+            _variableName = variableName;
+            _index = index;
+        }
+
+        #endregion
+
+        #region Private members
+
+        private readonly string _variableName;
+        private readonly AtomNode _index;
+
+        #endregion
+
+        #region AtomNode members
+
+        public override dynamic? Compute (Context context)
+        {
+            if (!context.TryGetVariable (_variableName, out var obj))
+            {
+                return null;
+            }
+
+            if (obj is null)
+            {
+                return null;
+            }
+
+            // TODO: в классе может быть больше одного индексера
+
+            var index = _index.Compute (context);
+
+            var type = ((object) obj).GetType();
+            ParameterInfo[]? parameters;
+            PropertyInfo? indexer = null;
+            foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public))
+            {
+                parameters = property.GetIndexParameters();
+                if (parameters.Length != 0)
+                {
+                    indexer = property;
+                    break;
+                }
+            }
+
+            if (indexer is null)
+            {
+                return null;
+            }
+
+            var method = indexer.GetGetMethod();
+            if (method is null)
+            {
+                return null;
+            }
+
+            var result = method.Invoke (obj, new object? [] { index });
+
+            return result;
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Вызов свободной функции.
     /// </summary>
     sealed class CallNode : AtomNode
     {
         #region Construction
 
-        public CallNode(string name, IEnumerable<AtomNode>? args)
+        public CallNode (string name, IEnumerable<AtomNode>? arguments)
         {
             _name = name;
-            _args = new List<AtomNode> ();
-            if (args is not null)
+            _arguments = new ();
+            if (arguments is not null)
             {
-                _args.AddRange (args);
+                _arguments.AddRange (arguments);
             }
         }
 
@@ -272,7 +472,7 @@ namespace AM.Scripting.Barsik
         #region Private members
 
         private readonly string _name;
-        private readonly List<AtomNode> _args;
+        private readonly List<AtomNode> _arguments;
         private FunctionDescriptor? _function;
 
         #endregion
@@ -293,7 +493,7 @@ namespace AM.Scripting.Barsik
             }
 
             var args = new List<dynamic?>();
-            foreach (var node in _args)
+            foreach (var node in _arguments)
             {
                 var arg = node.Compute (context);
                 args.Add (arg);
@@ -313,7 +513,7 @@ namespace AM.Scripting.Barsik
             var builder = StringBuilderPool.Shared.Get();
             builder.Append ($"function '{_name}' (");
             var first = true;
-            foreach (var node in _args)
+            foreach (var node in _arguments)
             {
                 if (!first)
                 {
@@ -371,6 +571,52 @@ namespace AM.Scripting.Barsik
     /// </summary>
     class StatementNode : AstNode
     {
+    }
+
+    /// <summary>
+    /// Псевдо-узел, предназначенный для функций.
+    /// </summary>
+    class PseudoNode : StatementNode
+    {
+
+    }
+
+    sealed class DefinitionNode : PseudoNode
+    {
+        public DefinitionNode
+            (
+                string theName,
+                IEnumerable<string>? argumentNames,
+                IEnumerable<StatementNode>? body
+            )
+        {
+            this.theName = theName;
+            theArguments = new ();
+            theBody = new ();
+            if (argumentNames is not null)
+            {
+                theArguments.AddRange (argumentNames);
+            }
+
+            if (body is not null)
+            {
+                theBody.AddRange (body);
+            }
+        }
+
+        internal readonly string theName;
+        public readonly List<string> theArguments;
+        internal readonly List<StatementNode> theBody;
+
+        public override void Execute (Context context)
+        {
+            context.Output.WriteLine ($"Function {theName} ({string.Join (',', theArguments)})");
+            foreach (var statement in theBody)
+            {
+                context.Output.WriteLine (statement);
+            }
+
+        }
     }
 
     /// <summary>

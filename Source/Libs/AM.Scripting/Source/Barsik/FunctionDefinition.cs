@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #endregion
 
@@ -29,14 +30,27 @@ namespace AM.Scripting.Barsik
     {
         #region Construction
 
-        public FunctionDefinition(IEnumerable<StatementNode> body)
+        public FunctionDefinition
+            (
+                string name,
+                IEnumerable<string> arguments,
+                IEnumerable<StatementNode> body
+            )
         {
+            _name = name;
+            _arguments = arguments.ToArray();
             _body = new List<StatementNode> (body);
         }
 
         #endregion
 
         #region Private members
+
+        // имя функции
+        private readonly string _name;
+
+        // имена аргументов
+        private readonly string[] _arguments;
 
         // тело функции
         private readonly List<StatementNode> _body;
@@ -52,7 +66,12 @@ namespace AM.Scripting.Barsik
         {
             // TODO implement
 
-            throw new NotImplementedException();
+            return _ =>
+            {
+                Console.WriteLine ("This is a stub");
+
+                return "(null)";
+            };
         }
 
         /// <summary>

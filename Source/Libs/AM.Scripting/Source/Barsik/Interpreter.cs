@@ -70,6 +70,27 @@ namespace AM.Scripting.Barsik
             Sure.NotNull (sourceCode);
 
             var program = Grammar.ParseProgram (sourceCode);
+
+            foreach (var statement in program.Statements)
+            {
+                if (statement is DefinitionNode node)
+                {
+                    var name = node.theName;
+                    var definition = new FunctionDefinition
+                        (
+                            name,
+                            node.theArguments,
+                            node.theBody
+                        );
+                    var descriptor = new FunctionDescriptor
+                        (
+                            name,
+                            definition.CreateCallPoint()
+                        );
+                    Context.Functions[name] = descriptor;
+                }
+            }
+
             program.Execute (Context);
         }
 

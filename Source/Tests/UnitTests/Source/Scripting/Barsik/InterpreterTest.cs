@@ -72,8 +72,8 @@ namespace UnitTests.Scripting.Barsik
 x = 1;
 ");
             Assert.AreEqual (2, interpreter.Context.Namespaces.Count);
-            var actual = (double) (object) interpreter.Context.Variables["x"]!;
-            Assert.AreEqual (1.0, actual);
+            var actual = (int) (object) interpreter.Context.Variables["x"]!;
+            Assert.AreEqual (1, actual);
         }
 
         [TestMethod]
@@ -85,8 +85,8 @@ x = 1;
 x = 1;
 // closing comment
 ");
-            var actual = (double) (object) interpreter.Context.Variables["x"]!;
-            Assert.AreEqual (1.0, actual);
+            var actual = (int) (object) interpreter.Context.Variables["x"]!;
+            Assert.AreEqual (1, actual);
         }
 
         [TestMethod]
@@ -95,8 +95,8 @@ x = 1;
         {
             var interpreter = new Interpreter();
             interpreter.Execute ("x /* c1 */ = /* c2 */ 1 /* c3 */;");
-            var actual = (double) (object) interpreter.Context.Variables["x"]!;
-            Assert.AreEqual (1.0, actual);
+            var actual = (int) (object) interpreter.Context.Variables["x"]!;
+            Assert.AreEqual (1, actual);
         }
 
         [TestMethod]

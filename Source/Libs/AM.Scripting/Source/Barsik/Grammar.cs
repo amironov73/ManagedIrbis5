@@ -148,8 +148,10 @@ namespace AM.Scripting.Barsik
             select new ConstantNode (text);
 
         private static readonly Parser<ConstantNode> DoubleLiteral =
-            from number in Parse.DecimalInvariant
-            select new ConstantNode (double.Parse (number, CultureInfo.InvariantCulture));
+            from whole in Parse.Number
+            from dot in Parse.Char ('.')
+            from frac in Parse.Number
+            select new ConstantNode (double.Parse (whole + '.' + frac, CultureInfo.InvariantCulture));
 
         private static readonly Parser<ConstantNode> Int32Literal =
             from number in Parse.Number
@@ -184,6 +186,28 @@ namespace AM.Scripting.Barsik
             from close in Parse.Char (')')
             select new CallNode (name, args.GetOrDefault());
 
+        private static readonly Parser<AtomNode> Property =
+            from objectName in Identifier
+            from dot in Parse.Char ('.')
+            from propertyName in Identifier
+            select new PropertyNode (objectName, propertyName);
+
+        private static readonly Parser<AtomNode> Method =
+            from objectName in Identifier
+            from dot in Parse.Char ('.')
+            from memberName in Identifier
+            from open in Parse.Char ('(').Token()
+            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
+            from close in Parse.Char (')').Token()
+            select new MethodNode (objectName, memberName, args.GetOrDefault());
+
+        private static readonly Parser<AtomNode> Index =
+            from objectName in Identifier
+            from open in Parse.Char ('[').Token()
+            from index in Parse.Ref (() => Atom)
+            from close in Parse.Char (']').Token()
+            select new IndexNode (objectName, index);
+
         private static readonly Parser<string> AndOr =
             Parse.String ("and").Token().Or (Parse.String ("or").Token()).Text();
 
@@ -204,7 +228,8 @@ namespace AM.Scripting.Barsik
             select condition;
 
         private static readonly Parser<AtomNode> Atom =
-            Parenthesis.Or (Constant).Or (FunctionCall).Or (Variable).Or (Negation);
+            Method. Or (Parenthesis).Or (Index).Or (Property).Or (Constant)
+                .Or (FunctionCall).Or (Variable).Or (Negation);
 
         private static readonly Parser<string> Compare =
             Parse.String ("<=").Token()
@@ -277,13 +302,25 @@ namespace AM.Scripting.Barsik
             from close2 in Parse.Char ('}').Token()
             select new WhileNode (condition, statements);
 
+        // определение функции
+        private static readonly Parser<DefinitionNode> Definition =
+            from _ in Parse.String ("func").Token()
+            from name in Identifier
+            from open1 in Parse.Char ('(').Token()
+            from args in Identifier.DelimitedBy (Parse.Char (',').Token())
+            from close1 in Parse.Char (')').Token()
+            from open2 in Parse.Char ('{')
+            from body in Parse.Ref (() => Block)
+            from close2 in Parse.Char ('}')
+            select new DefinitionNode (name, args, body);
+
         // костыль
         private static readonly Parser<StatementNode> Nop =
             from _ in Parse.Chars (" \t").Until (Parse.LineEnd)
             select new StatementNode();
 
         private static readonly Parser<StatementNode> NoSemicolon =
-            from statement in Nop.Or (While).Or (If)
+            from statement in Nop.Or (Definition).Or (While).Or (If)
             select statement;
 
         private static readonly Parser<StatementNode> RequireSemicolon =
