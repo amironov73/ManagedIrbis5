@@ -46,7 +46,6 @@ namespace AM.Scripting.Barsik
             { "error", new FunctionDescriptor ("error", Error) },
             { "italic", new FunctionDescriptor ("italic", Italic) },
             { "len", new FunctionDescriptor ("len", Len) },
-            { "list", new FunctionDescriptor ("list", List) },
             { "now", new FunctionDescriptor ("now", Now) },
             { "open", new FunctionDescriptor ("open", Open) },
             { "read", new FunctionDescriptor ("read", Read) },
@@ -60,19 +59,19 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выделение текста жирным шрифтом.
         /// </summary>
-        public static dynamic Bold (dynamic?[] args) =>
+        public static dynamic Bold (Context context, dynamic?[] args) =>
             "<b>" + args.FirstOrDefault() + "</b>";
 
         /// <summary>
         /// Чтение содержимого файла.
         /// </summary>
-        public static dynamic Cat (dynamic?[] args) =>
+        public static dynamic Cat (Context context, dynamic?[] args) =>
             File.ReadAllText ((string) args.FirstOrDefault()!);
 
         /// <summary>
         /// Выдача отладочного сообщения.
         /// </summary>
-        public static dynamic? Debug (dynamic?[] args)
+        public static dynamic? Debug (Context context, dynamic?[] args)
         {
             global::System.Diagnostics.Debug.WriteLine ((object?)args.FirstOrDefault());
 
@@ -82,13 +81,13 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Создание словаря.
         /// </summary>
-        public static dynamic Dict (dynamic?[] args) =>
+        public static dynamic Dict (Context context, dynamic?[] args) =>
             new Dictionary<dynamic, dynamic?>();
 
         /// <summary>
         /// Освобождение ресурса.
         /// </summary>
-        public static dynamic? Dispose (dynamic?[] args)
+        public static dynamic? Dispose (Context context, dynamic?[] args)
         {
             if (args.FirstOrDefault() is IDisposable disposable)
             {
@@ -101,19 +100,19 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выдача сообщения в поток ошибок.
         /// </summary>
-        public static dynamic Error (dynamic?[] args) =>
+        public static dynamic Error (Context context, dynamic?[] args) =>
             Console.Error.WriteLine (args.FirstOrDefault());
 
         /// <summary>
         /// Выделение текста курсивом.
         /// </summary>
-        public static dynamic Italic (dynamic?[] args) =>
+        public static dynamic Italic (Context context, dynamic?[] args) =>
             "<i>" + args.FirstOrDefault() + "</i>";
 
         /// <summary>
         /// Вычисление длины.
         /// </summary>
-        public static dynamic? Len (dynamic?[] args)
+        public static dynamic Len (Context context, dynamic?[] args)
         {
             var obj = args.FirstOrDefault();
 
@@ -128,21 +127,16 @@ namespace AM.Scripting.Barsik
         }
 
         /// <summary>
-        /// Список.
-        /// </summary>
-        public static dynamic List (dynamic?[] args) => new List<dynamic?>();
-
-        /// <summary>
         /// Текущие дата и время.
         /// </summary>
-        public static dynamic Now (dynamic?[] args) => DateTime.Now;
+        public static dynamic Now (Context context, dynamic?[] args) => DateTime.Now;
 
         /// <summary>
         /// Открытие файла.
         /// </summary>
-        public static dynamic Open (dynamic?[] args)
+        public static dynamic Open (Context context, dynamic?[] args)
         {
-            var fileName = (string)args.FirstOrDefault()!;
+            var fileName = (string) args.FirstOrDefault()!;
 
             // TODO разные режимы
 
@@ -154,17 +148,17 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Чтение данных из файла.
         /// </summary>
-        public static dynamic Read (dynamic?[] args) => throw new NotImplementedException();
+        public static dynamic Read (Context context, dynamic?[] args) => throw new NotImplementedException();
 
         /// <summary>
         /// Выполнение внешней программы и получение ее выходного потока.
         /// </summary>
-        public static dynamic System (dynamic?[] args) => throw new NotImplementedException();
+        public static dynamic System (Context context, dynamic?[] args) => throw new NotImplementedException();
 
         /// <summary>
         /// Трассировочное сообщение.
         /// </summary>
-        public static dynamic? Trace (dynamic?[] args)
+        public static dynamic? Trace (Context context, dynamic?[] args)
         {
             Magna.Trace ((string) args.FirstOrDefault()!);
 
@@ -174,7 +168,7 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Обрезка начальных и конечных пробелов в строке.
         /// </summary>
-        public static dynamic? Trim (dynamic?[] args)
+        public static dynamic? Trim (Context context, dynamic?[] args)
         {
             var text = (string?) args.FirstOrDefault();
 
@@ -186,13 +180,13 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Предупреждающее сообщение.
         /// </summary>
-        public static dynamic Warn (dynamic?[] args) =>
+        public static dynamic Warn (Context context, dynamic?[] args) =>
             Magna.Warning (args.FirstOrDefault());
 
         /// <summary>
         /// Запись данных в файл.
         /// </summary>
-        public static dynamic Write (dynamic?[] args) => throw new NotImplementedException();
+        public static dynamic Write (Context context, dynamic?[] args) => throw new NotImplementedException();
 
 
         #endregion

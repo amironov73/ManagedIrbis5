@@ -62,13 +62,13 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Создание точки вызова.
         /// </summary>
-        public Func<dynamic?[], dynamic?> CreateCallPoint()
+        public Func<Context, dynamic?[], dynamic?> CreateCallPoint()
         {
             // TODO implement
 
-            return _ =>
+            return (context, _) =>
             {
-                Console.WriteLine ("This is a stub");
+                context.Output.WriteLine ("This is a stub");
 
                 return "(null)";
             };

@@ -15,6 +15,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -377,6 +378,35 @@ namespace AM.Scripting.Barsik
     }
 
     /// <summary>
+    /// Список вида <c>[1, 2, 3]</c>.
+    /// </summary>
+    sealed class ListNode : AtomNode
+    {
+        public ListNode(IEnumerable<AtomNode>? items)
+        {
+            _items = new ();
+            if (items is not null)
+            {
+                _items.AddRange (items);
+            }
+        }
+
+        private readonly List<AtomNode> _items;
+
+        public override dynamic? Compute (Context context)
+        {
+            var result = new List<dynamic?>();
+            foreach (var item in _items)
+            {
+                var value = item.Compute (context);
+                result.Add (value);
+            }
+
+            return result;
+        }
+    }
+
+    /// <summary>
     /// Обращение по индексу.
     /// </summary>
     sealed class IndexNode : AtomNode
@@ -453,11 +483,11 @@ namespace AM.Scripting.Barsik
     /// <summary>
     /// Вызов свободной функции.
     /// </summary>
-    sealed class CallNode : AtomNode
+    sealed class FreeCallNode : AtomNode
     {
         #region Construction
 
-        public CallNode (string name, IEnumerable<AtomNode>? arguments)
+        public FreeCallNode (string name, IEnumerable<AtomNode>? arguments)
         {
             _name = name;
             _arguments = new ();
@@ -499,7 +529,7 @@ namespace AM.Scripting.Barsik
                 args.Add (arg);
             }
 
-            var result = _function.CallPoint (args.ToArray());
+            var result = _function.CallPoint (context, args.ToArray());
 
             return result;
         }
@@ -578,7 +608,6 @@ namespace AM.Scripting.Barsik
     /// </summary>
     class PseudoNode : StatementNode
     {
-
     }
 
     sealed class DefinitionNode : PseudoNode
@@ -642,22 +671,100 @@ namespace AM.Scripting.Barsik
     }
 
     /// <summary>
+    /// Простой вызов функции, без присваивания.
+    /// </summary>
+    sealed class NotAssignmentNode : StatementNode
+    {
+        #region Construction
+
+        public NotAssignmentNode (AtomNode expression)
+        {
+            _expression = expression;
+        }
+
+        #endregion
+
+        #region Private members
+
+        private readonly AtomNode _expression;
+
+        #endregion
+
+        #region AstNode members
+
+        public override void Execute (Context context)
+        {
+            _expression.Compute (context);
+        }
+
+        #endregion
+    }
+
+    /// <summary>
     /// Распечатка (дамп) значений переменных.
     /// </summary>
     sealed class PrintNode : StatementNode
     {
+        public PrintNode (IEnumerable<AtomNode>? nodes, bool newLine)
+        {
+            _nodes = new List<AtomNode> ();
+            if (nodes is not null)
+            {
+                _nodes.AddRange (nodes);
+            }
+            _newLine = newLine;
+        }
+
         private readonly List<AtomNode> _nodes;
         private readonly bool _newLine;
 
-        public PrintNode (IEnumerable<AtomNode> collection, bool newLine)
+        private void Print (IEnumerable sequence, Context context)
         {
-            _nodes = new List<AtomNode> (collection);
-            _newLine = newLine;
+            var first = true;
+            foreach (var item in sequence)
+            {
+                if (!first)
+                {
+                    context.Output.Write (", ");
+                }
+
+                context.Output.Write (item);
+                first = false;
+            }
         }
 
         private void Print (AtomNode node, Context context)
         {
-            context.Output.Write (node.Compute (context));
+            var value = node.Compute (context);
+            if (value is null)
+            {
+                context.Output.Write ("(null)");
+                return;
+            }
+
+            if (value is string)
+            {
+                context.Output.Write (value);
+                return;
+            }
+
+            var type = ((object) value).GetType();
+            if (type.IsPrimitive)
+            {
+                context.Output.Write (value);
+                return;
+            }
+
+            switch (value)
+            {
+                case IEnumerable sequence:
+                    Print (sequence, context);
+                    break;
+
+                default:
+                    context.Output.Write (value);
+                    break;
+            }
         }
 
         public override void Execute (Context context)
@@ -821,6 +928,84 @@ namespace AM.Scripting.Barsik
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Цикл for.
+    /// </summary>
+    sealed class ForNode : StatementNode
+    {
+        public ForNode(StatementNode init, AtomNode condition,
+            StatementNode step, IEnumerable<StatementNode>? body)
+        {
+            _init = init;
+            _condition = condition;
+            _step = step;
+            _body = new ();
+            if (body is not null)
+            {
+                _body.AddRange (body);
+            }
+        }
+
+        private readonly StatementNode _init;
+        private readonly AtomNode _condition;
+        private readonly StatementNode _step;
+        private readonly List<StatementNode> _body;
+
+        public override void Execute (Context context)
+        {
+            _init.Execute (context);
+            while (_condition.Compute (context))
+            {
+                foreach (var statement in _body)
+                {
+                    statement.Execute (context);
+                }
+
+                _step.Execute (context);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Цикл foreach.
+    /// </summary>
+    sealed class ForEachNode : StatementNode
+    {
+        public ForEachNode(string variableName, AtomNode enumerable,
+            IEnumerable<StatementNode>? body)
+        {
+            _variableName = variableName;
+            _enumerable = enumerable;
+            _body = new ();
+            if (body is not null)
+            {
+                _body.AddRange (body);
+            }
+        }
+
+        private readonly string _variableName;
+        private readonly AtomNode _enumerable;
+        private readonly List<StatementNode> _body;
+
+        public override void Execute (Context context)
+        {
+            var enumerable = _enumerable.Compute (context);
+            if (enumerable is null || enumerable is not IEnumerable)
+            {
+                return;
+            }
+
+            foreach (var value in enumerable)
+            {
+                context.Variables[_variableName] = value;
+                foreach (var statement in _body)
+                {
+                    statement.Execute (context);
+                }
+            }
+        }
     }
 
     /// <summary>

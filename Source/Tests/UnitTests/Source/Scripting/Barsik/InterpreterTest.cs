@@ -104,7 +104,7 @@ x = 1;
         public void Interpreter_Execute_7()
         {
             var interpreter = new Interpreter();
-            interpreter.Execute ("l = list();");
+            interpreter.Execute ("l = [];");
             var actual = (List<dynamic?>)interpreter.Context.Variables["l"]!;
             Assert.AreEqual (0, actual.Count);
         }

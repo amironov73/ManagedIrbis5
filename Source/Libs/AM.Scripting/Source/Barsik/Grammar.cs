@@ -162,7 +162,8 @@ namespace AM.Scripting.Barsik
                 .Or (DoubleLiteral).Or (StringLiteral).Or (Int32Literal);
 
         private static readonly Parser<string> Identifier =
-            Parse.Identifier (Parse.Letter, Parse.LetterOrDigit);
+            Parse.Identifier (Parse.Letter.Or (Parse.Char ('_')),
+                Parse.LetterOrDigit.Or (Parse.Char ('_')));
 
         private static readonly Parser<AtomNode> Variable =
             from identifier in Identifier.Text()
@@ -184,7 +185,7 @@ namespace AM.Scripting.Barsik
             from open in Parse.Char ('(').Token()
             from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
             from close in Parse.Char (')')
-            select new CallNode (name, args.GetOrDefault());
+            select new FreeCallNode (name, args.GetOrDefault());
 
         private static readonly Parser<AtomNode> Property =
             from objectName in Identifier
@@ -192,7 +193,7 @@ namespace AM.Scripting.Barsik
             from propertyName in Identifier
             select new PropertyNode (objectName, propertyName);
 
-        private static readonly Parser<AtomNode> Method =
+        private static readonly Parser<AtomNode> MethodCall =
             from objectName in Identifier
             from dot in Parse.Char ('.')
             from memberName in Identifier
@@ -200,6 +201,12 @@ namespace AM.Scripting.Barsik
             from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
             from close in Parse.Char (')').Token()
             select new MethodNode (objectName, memberName, args.GetOrDefault());
+
+        private static readonly Parser<AtomNode> List =
+            from open in Parse.Char ('[').Token()
+            from items in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
+            from close in Parse.Char (']').Token()
+            select new ListNode (items.GetOrDefault());
 
         private static readonly Parser<AtomNode> Index =
             from objectName in Identifier
@@ -228,7 +235,7 @@ namespace AM.Scripting.Barsik
             select condition;
 
         private static readonly Parser<AtomNode> Atom =
-            Method. Or (Parenthesis).Or (Index).Or (Property).Or (Constant)
+            MethodCall. Or (Parenthesis).Or (List).Or (Index).Or (Property).Or (Constant)
                 .Or (FunctionCall).Or (Variable).Or (Negation);
 
         private static readonly Parser<string> Compare =
@@ -269,10 +276,14 @@ namespace AM.Scripting.Barsik
             from expression in ArithmeticExpression
             select new AssignmentNode (variable, expression);
 
+        private static readonly Parser<StatementNode> NotAssignment =
+            from expression in MethodCall.Or (FunctionCall)
+            select new NotAssignmentNode (expression);
+
         private static readonly Parser<StatementNode> Print =
             from print in (Parse.String ("println").Or (Parse.String ("print"))).Token().Text()
-            from variables in Atom.DelimitedBy (Parse.Char (',').Token())
-            select new PrintNode (variables, print == "println");
+            from variables in Atom.DelimitedBy (Parse.Char (',').Token()).Optional()
+            select new PrintNode (variables.GetOrDefault(), print == "println");
 
         private static readonly Parser<IEnumerable<StatementNode>> Else =
             from _ in Parse.String ("else")
@@ -302,6 +313,32 @@ namespace AM.Scripting.Barsik
             from close2 in Parse.Char ('}').Token()
             select new WhileNode (condition, statements);
 
+        private static readonly Parser<StatementNode> ForEach =
+            from _1 in Parse.String ("foreach")
+            from open1 in Parse.Char ('(').Token()
+            from variableName in Identifier
+            from _2 in Parse.String ("in").Token()
+            from enumerable in Atom
+            from close1 in Parse.Char (')').Token()
+            from open2 in Parse.Char ('{').Token()
+            from statements in Block
+            from close2 in Parse.Char ('}').Token()
+            select new ForEachNode (variableName, enumerable, statements);
+
+        private static readonly Parser<StatementNode> For =
+            from _1 in Parse.String ("for")
+            from open1 in Parse.Char ('(').Token()
+            from init in Assignment
+            from _2 in Parse.Char (';').Token()
+            from condition in Condition
+            from _3 in Parse.Char (';').Token()
+            from step in Assignment
+            from close1 in Parse.Char (')').Token()
+            from open2 in Parse.Char ('{').Token()
+            from statements in Block
+            from close2 in Parse.Char ('}').Token()
+            select new ForNode (init, condition, step, statements);
+
         // определение функции
         private static readonly Parser<DefinitionNode> Definition =
             from _ in Parse.String ("func").Token()
@@ -320,11 +357,11 @@ namespace AM.Scripting.Barsik
             select new StatementNode();
 
         private static readonly Parser<StatementNode> NoSemicolon =
-            from statement in Nop.Or (Definition).Or (While).Or (If)
+            from statement in Nop.Or (Definition).Or (ForEach).Or (For).Or (While).Or (If)
             select statement;
 
         private static readonly Parser<StatementNode> RequireSemicolon =
-            from statement in Print.XOr (Assignment)
+            from statement in Print.Or (Assignment).Or (NotAssignment)
             from semicolon in Parse.Char (';').Token()
             select statement;
 

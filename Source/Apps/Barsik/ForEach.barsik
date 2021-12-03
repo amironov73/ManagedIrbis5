@@ -1,0 +1,7 @@
+﻿l = ["Hello", "World", "!"];
+i = 0;
+foreach (x in l)
+{
+    i = i + 1;
+    println i, " => ", x;
+}

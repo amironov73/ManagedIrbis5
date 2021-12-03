@@ -41,7 +41,7 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Точка вызова.
         /// </summary>
-        public Func<dynamic?[],dynamic?> CallPoint { get; }
+        public Func<Context, dynamic?[],dynamic?> CallPoint { get; }
 
         #endregion
 
@@ -53,7 +53,7 @@ namespace AM.Scripting.Barsik
         public FunctionDescriptor
             (
                 string name,
-                Func<dynamic?[], dynamic?> callPoint,
+                Func<Context, dynamic?[], dynamic?> callPoint,
                 string? description = null
             )
         {
