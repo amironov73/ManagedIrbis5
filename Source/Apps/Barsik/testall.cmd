@@ -1,3 +1,8 @@
 @echo off
 
-for %%q in (*.barsik) do barsik %%q
+for %%q in (*.barsik) do (
+echo ======================
+echo %%q
+barsik %%q
+echo ======================
+)

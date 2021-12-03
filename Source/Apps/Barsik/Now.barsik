@@ -1,6 +1,9 @@
+#u System
+
 /*
  * Первая успешно вызванная функция :)
  */
 
-today = now();
-print "Сегодня и сейчас: ", today;
+today = DateTime.Now;
+today = format ("{0:d}", today);
+println "Сегодня: ", today;

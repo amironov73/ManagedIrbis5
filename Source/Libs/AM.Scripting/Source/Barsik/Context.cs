@@ -49,9 +49,14 @@ namespace AM.Scripting.Barsik
         public Dictionary<string, dynamic?> Variables { get; }
 
         /// <summary>
-        /// Выходной поток.
+        /// Стандартный выходной поток.
         /// </summary>
         public TextWriter Output { get; }
+
+        /// <summary>
+        /// Выходной поток ошибок.
+        /// </summary>
+        public TextWriter Error { get; }
 
         /// <summary>
         /// Используемые пространства имен.
@@ -69,6 +74,7 @@ namespace AM.Scripting.Barsik
             (
                 Dictionary<string, dynamic?> variables,
                 TextWriter output,
+                TextWriter error,
                 Context? parent = null
             )
         {
@@ -76,12 +82,27 @@ namespace AM.Scripting.Barsik
             Functions = new ();
             Variables = variables;
             Output = output;
+            Error = error;
             Namespaces = new ();
         }
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Создание контекста-потомка.
+        /// </summary>
+        public Context CreateChild ()
+        {
+            return new Context
+                (
+                    new (),
+                    Output,
+                    Error,
+                    this
+                );
+        }
 
         /// <summary>
         /// Дамп переменных.
@@ -108,6 +129,64 @@ namespace AM.Scripting.Barsik
                     Output.WriteLine ($"{key}: {value.GetType().Name} = {value}");
                 }
             }
+        }
+
+        /// <summary>
+        /// Получение типа по его имени.
+        /// </summary>
+        public Type? FindType
+            (
+                string name
+            )
+        {
+            Type? result = Type.GetType (name, false);
+            if (result is not null)
+            {
+                return result;
+            }
+
+            foreach (var ns in Namespaces.Keys)
+            {
+                var fullName = ns + "." + name;
+                result = Type.GetType (fullName, false);
+                if (result is not null)
+                {
+                    return result;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Поиск функции в текущем и в родительском контекстах.
+        /// </summary>
+        public FunctionDescriptor GetFunction
+            (
+                string name
+            )
+        {
+            Sure.NotNullNorEmpty (name);
+
+            if (Functions.TryGetValue (name, out var result))
+            {
+                return result;
+            }
+
+            for (var context = Parent; context is not null; context = context.Parent)
+            {
+                if (context.Functions.TryGetValue (name, out result))
+                {
+                    return result;
+                }
+            }
+
+            if (Builtins.Registry.TryGetValue (name, out result))
+            {
+                return result;
+            }
+
+            throw new Exception ($"Function {name} not found");
         }
 
         /// <summary>

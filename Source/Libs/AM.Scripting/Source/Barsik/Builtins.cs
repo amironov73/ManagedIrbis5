@@ -15,8 +15,8 @@
 #region Using directives
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -41,11 +41,13 @@ namespace AM.Scripting.Barsik
             { "bold", new FunctionDescriptor ("bold", Bold) },
             { "cat", new FunctionDescriptor ("cat", Cat) },
             { "debug", new FunctionDescriptor ("debug", Debug) },
+            { "delete", new FunctionDescriptor ("delete", Delete) },
             { "dict", new FunctionDescriptor ("dict", Dict) },
             { "dispose", new FunctionDescriptor ("dispose", Dispose) },
             { "error", new FunctionDescriptor ("error", Error) },
+            { "format", new FunctionDescriptor ("format", Format) },
+            { "have_var", new FunctionDescriptor ("have_var", HaveVariable) },
             { "italic", new FunctionDescriptor ("italic", Italic) },
-            { "len", new FunctionDescriptor ("len", Len) },
             { "now", new FunctionDescriptor ("now", Now) },
             { "open", new FunctionDescriptor ("open", Open) },
             { "read", new FunctionDescriptor ("read", Read) },
@@ -79,6 +81,17 @@ namespace AM.Scripting.Barsik
         }
 
         /// <summary>
+        /// Удаление из текущего контекста указанной переменной.
+        /// </summary>
+        public static dynamic? Delete (Context context, dynamic?[] args)
+        {
+            var name = (string) args[0]!;
+            context.Variables.Remove (name);
+
+            return null;
+        }
+
+        /// <summary>
         /// Создание словаря.
         /// </summary>
         public static dynamic Dict (Context context, dynamic?[] args) =>
@@ -104,27 +117,32 @@ namespace AM.Scripting.Barsik
             Console.Error.WriteLine (args.FirstOrDefault());
 
         /// <summary>
+        /// Форматирование.
+        /// </summary>
+        public static dynamic Format (Context context, dynamic?[] args)
+        {
+            var format = (string) args[0]!;
+            var other = args.Select (o => (object?) o).Skip (1).ToArray();
+            var result = string.Format (CultureInfo.InvariantCulture, format, other);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Проверка существования переменной с указанным именем
+        /// (в любом контексте).
+        /// </summary>
+        public static dynamic HaveVariable (Context context, dynamic?[] args)
+        {
+            var name = (string) args[0]!;
+            return context.TryGetVariable (name, out _);
+        }
+
+        /// <summary>
         /// Выделение текста курсивом.
         /// </summary>
         public static dynamic Italic (Context context, dynamic?[] args) =>
             "<i>" + args.FirstOrDefault() + "</i>";
-
-        /// <summary>
-        /// Вычисление длины.
-        /// </summary>
-        public static dynamic Len (Context context, dynamic?[] args)
-        {
-            var obj = args.FirstOrDefault();
-
-            return obj switch
-            {
-                string s => s.Length,
-                Array array => array.Length,
-                IList list => list.Count,
-                ICollection collection => collection.Count,
-                _ => 0
-            };
-        }
 
         /// <summary>
         /// Текущие дата и время.

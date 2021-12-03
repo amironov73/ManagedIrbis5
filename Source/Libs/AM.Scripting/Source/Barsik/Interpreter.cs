@@ -46,13 +46,15 @@ namespace AM.Scripting.Barsik
         public Interpreter
             (
                 Dictionary<string, dynamic?>? variables = null,
-                TextWriter? output = null
+                TextWriter? output = null,
+                TextWriter? error = null
             )
         {
             variables ??= new ();
             output ??= Console.Out;
+            error ??= Console.Error;
 
-            Context = new (variables, output);
+            Context = new (variables, output, error);
         }
 
         #endregion

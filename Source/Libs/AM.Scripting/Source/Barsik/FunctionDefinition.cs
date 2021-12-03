@@ -64,25 +64,44 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public Func<Context, dynamic?[], dynamic?> CreateCallPoint()
         {
-            // TODO implement
-
-            return (context, _) =>
-            {
-                context.Output.WriteLine ("This is a stub");
-
-                return "(null)";
-            };
+            return Execute;
         }
 
         /// <summary>
         /// Выполнение функции.
         /// </summary>
-        public void Execute (Context context)
+        public dynamic? Execute
+            (
+                Context context,
+                dynamic?[] argumentValues
+            )
         {
-            foreach (var statement in _body)
+            try
             {
-                statement.Execute (context);
+                var innerContext = context.CreateChild();
+                var index = 0;
+                foreach (var argumentName in _arguments)
+                {
+                    if (index >= argumentValues.Length)
+                    {
+                        break;
+                    }
+
+                    innerContext.Variables[argumentName] = argumentValues[index];
+                    ++index;
+                }
+
+                foreach (var statement in _body)
+                {
+                    statement.Execute (innerContext);
+                }
             }
+            catch (ReturnException exception)
+            {
+                return exception.Value;
+            }
+
+            return "(null)";
         }
 
         #endregion

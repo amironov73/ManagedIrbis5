@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using AM.Text;
@@ -272,6 +273,31 @@ namespace AM.Scripting.Barsik
         private readonly string _objectName;
         private readonly string _propertyName;
 
+        private dynamic? ComputeStatic (Context context)
+        {
+            var type = context.FindType (_objectName);
+            if (type is null)
+            {
+                context.Error.WriteLine ($"Variable or type {_objectName} not found");
+
+                return null;
+            }
+
+            var property = type.GetProperty (_propertyName);
+            if (property is not null)
+            {
+                return property.GetValue (null);
+            }
+
+            var field = type.GetField (_propertyName);
+            if (field is not null)
+            {
+                return field.GetValue (null);
+            }
+
+            return null;
+        }
+
         #endregion
 
         #region AtomNode members
@@ -280,7 +306,7 @@ namespace AM.Scripting.Barsik
         {
             if (!context.TryGetVariable (_objectName, out var obj))
             {
-                return null;
+                return ComputeStatic (context);
             }
 
             if (obj is null)
@@ -333,6 +359,38 @@ namespace AM.Scripting.Barsik
         private readonly string _methodName;
         private readonly List<AtomNode> _arguments;
 
+        private dynamic? ComputeStatic (Context context)
+        {
+            var type = context.FindType (_thisName);
+            if (type is null)
+            {
+                context.Error.WriteLine ($"Variable or type {_thisName} not found");
+
+                return null;
+            }
+
+            var method = type
+                    .GetMethods (BindingFlags.Public | BindingFlags.Static)
+                    .FirstOrDefault (info => info.Name == _methodName
+                        && info.GetParameters().Length == _arguments.Count);
+
+            if (method is null)
+            {
+                return null;
+            }
+
+            var parameters = new List<object?>();
+            foreach (var argument in _arguments)
+            {
+                var parameter = (object?) argument.Compute (context);
+                parameters.Add (parameter);
+            }
+
+            var result = method.Invoke (null, parameters.ToArray());
+
+            return result;
+        }
+
         #endregion
 
         #region AtomNode members
@@ -341,7 +399,7 @@ namespace AM.Scripting.Barsik
         {
             if (!context.TryGetVariable (_thisName, out var thisValue))
             {
-                return null;
+                return ComputeStatic (context);
             }
 
             if (thisValue is null)
@@ -375,6 +433,54 @@ namespace AM.Scripting.Barsik
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Оператор new.
+    /// </summary>
+    sealed class NewNode : AtomNode
+    {
+        public NewNode(string typeName, IEnumerable<AtomNode>? arguments)
+        {
+            _typeName = typeName;
+            _arguments = new ();
+            if (arguments is not null)
+            {
+                _arguments.AddRange (arguments);
+            }
+        }
+
+        private readonly string _typeName;
+        private readonly List<AtomNode> _arguments;
+
+        public override dynamic? Compute (Context context)
+        {
+            var type = context.FindType (_typeName);
+            if (type is null)
+            {
+                context.Error.WriteLine ($"Type {_typeName} not found");
+                return null;
+            }
+
+            object? result;
+            if (_arguments.Count == 0)
+            {
+                result = Activator.CreateInstance (type);
+            }
+            else
+            {
+                var parameters = new List<object?>();
+                foreach (var argument in _arguments)
+                {
+                    var parameter = (object?) argument.Compute (context);
+                    parameters.Add (parameter);
+                }
+
+                result = Activator.CreateInstance (type, parameters.ToArray());
+            }
+
+            return result;
+        }
     }
 
     /// <summary>
@@ -511,16 +617,7 @@ namespace AM.Scripting.Barsik
 
         public override dynamic? Compute (Context context)
         {
-            if (_function is null)
-            {
-                if (!context.Functions.TryGetValue (_name, out _function))
-                {
-                    if (!Builtins.Registry.TryGetValue (_name, out _function))
-                    {
-                        throw new Exception ($"function '{_name}' not found");
-                    }
-                }
-            }
+            _function ??= context.GetFunction (_name);
 
             var args = new List<dynamic?>();
             foreach (var node in _arguments)
@@ -604,6 +701,26 @@ namespace AM.Scripting.Barsik
     }
 
     /// <summary>
+    /// Возврат значения из функции.
+    /// </summary>
+    sealed class ReturnNode : StatementNode
+    {
+        public ReturnNode (AtomNode? value)
+        {
+            _value = value;
+        }
+
+        private readonly AtomNode? _value;
+
+        public override void Execute (Context context)
+        {
+            var value = _value?.Compute (context) ?? "(null)";
+
+            throw new ReturnException (value);
+        }
+    }
+
+    /// <summary>
     /// Псевдо-узел, предназначенный для функций.
     /// </summary>
     class PseudoNode : StatementNode
@@ -637,15 +754,15 @@ namespace AM.Scripting.Barsik
         public readonly List<string> theArguments;
         internal readonly List<StatementNode> theBody;
 
-        public override void Execute (Context context)
-        {
-            context.Output.WriteLine ($"Function {theName} ({string.Join (',', theArguments)})");
-            foreach (var statement in theBody)
-            {
-                context.Output.WriteLine (statement);
-            }
-
-        }
+        // public override void Execute (Context context)
+        // {
+        //     context.Output.WriteLine ($"Function {theName} ({string.Join (',', theArguments)})");
+        //     foreach (var statement in theBody)
+        //     {
+        //         context.Output.WriteLine (statement);
+        //     }
+        //
+        // }
     }
 
     /// <summary>
