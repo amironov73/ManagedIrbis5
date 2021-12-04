@@ -13,8 +13,10 @@
 #region Using directives
 
 using System;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.IO;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 using AM;
 using AM.IO;
@@ -29,20 +31,27 @@ namespace ManagedIrbis.Opt
     /// <summary>
     /// Строка OPT-файла.
     /// </summary>
-    [DebuggerDisplay ("{" + nameof (Key) + "} {" + nameof (Value) + "}")]
+    [XmlRoot ("line")]
     public sealed class OptLine
-        : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Properties
 
         /// <summary>
         /// Ключ.
         /// </summary>
+        [XmlAttribute ("key")]
+        [JsonPropertyName ("key")]
+        [Description ("Ключ")]
         public string? Key { get; set; }
 
         /// <summary>
         /// Значение.
         /// </summary>
+        [XmlAttribute ("value")]
+        [JsonPropertyName ("value")]
+        [Description ("Значение")]
         public string? Value { get; set; }
 
         #endregion
@@ -52,8 +61,10 @@ namespace ManagedIrbis.Opt
         /// <summary>
         /// Сравнение строки с ключом.
         /// </summary>
-        public bool Compare (string? text) =>
-            OptUtility.CompareString (Key.ThrowIfNull ("Key"), text);
+        public bool Compare (string? text)
+        {
+            return OptUtility.CompareString (Key.ThrowIfNull (), text);
+        }
 
         /// <summary>
         /// Разбор строки.
@@ -92,8 +103,7 @@ namespace ManagedIrbis.Opt
             };
 
             return result;
-
-        } // method Parse
+        }
 
         #endregion
 
@@ -109,8 +119,7 @@ namespace ManagedIrbis.Opt
 
             Key = reader.ReadNullableString();
             Value = reader.ReadNullableString();
-
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
         public void SaveToStream
@@ -122,18 +131,37 @@ namespace ManagedIrbis.Opt
 
             writer.WriteNullable (Key);
             writer.WriteNullable (Value);
+        }
 
-        } // method SaveToStream
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<OptLine> (this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (Key)
+                .NotNullNorEmpty (Value);
+
+            return verifier.Result;
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => $"{Key} {Value}";
+        public override string ToString()
+        {
+            return $"{Key.ToVisibleString()} {Value.ToVisibleString()}";
+        }
 
         #endregion
-
-    } // class OptLine
-
-} // namespace ManagedIrbis.Opt
+    }
+}

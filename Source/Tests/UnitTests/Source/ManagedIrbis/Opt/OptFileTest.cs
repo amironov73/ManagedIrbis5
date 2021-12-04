@@ -1,4 +1,5 @@
 ﻿// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
@@ -20,7 +21,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTests.ManagedIrbis
 {
     [TestClass]
-    public class OptFileTest
+    public sealed class OptFileTest
         : Common.CommonUnitTest
     {
         private void _TestSerialization
@@ -31,14 +32,14 @@ namespace UnitTests.ManagedIrbis
             var bytes = first.SaveToMemory();
             var second = bytes.RestoreObjectFromMemory<OptFile>().ThrowIfNull();
 
-            Assert.AreEqual(first.WorksheetLength, second.WorksheetLength);
-            Assert.AreEqual(first.WorksheetTag, second.WorksheetTag);
-            Assert.AreEqual(first.Lines.Count, second.Lines.Count);
+            Assert.AreEqual (first.WorksheetLength, second.WorksheetLength);
+            Assert.AreEqual (first.WorksheetTag, second.WorksheetTag);
+            Assert.AreEqual (first.Lines.Count, second.Lines.Count);
 
             for (var i = 0; i < first.Lines.Count; i++)
             {
-                Assert.AreEqual(first.Lines[i].Key, second.Lines[i].Key);
-                Assert.AreEqual(first.Lines[i].Value, second.Lines[i].Value);
+                Assert.AreEqual (first.Lines[i].Key, second.Lines[i].Key);
+                Assert.AreEqual (first.Lines[i].Value, second.Lines[i].Value);
             }
         }
 
@@ -52,41 +53,40 @@ namespace UnitTests.ManagedIrbis
                     "ws31.opt"
                 );
 
-            var opt = OptFile.LoadFile(filePath);
-            Assert.IsNotNull(opt);
-            Assert.AreEqual(920, opt.WorksheetTag);
-            Assert.AreEqual(5, opt.WorksheetLength);
-            Assert.AreEqual(14, opt.Lines.Count);
+            var opt = OptFile.LoadFile (filePath);
+            Assert.IsNotNull (opt);
+            Assert.AreEqual (920, opt.WorksheetTag);
+            Assert.AreEqual (5, opt.WorksheetLength);
+            Assert.AreEqual (14, opt.Lines.Count);
 
-            var optimized = opt.SelectWorksheet("UNKN");
-            Assert.AreEqual("PAZK42", optimized);
+            var optimized = opt.SelectWorksheet ("UNKN");
+            Assert.AreEqual ("PAZK42", optimized);
 
-            opt.Validate(true);
+            opt.Validate (true);
 
-            _TestSerialization(opt);
+            _TestSerialization (opt);
 
             var writer = new StringWriter();
-            opt.WriteOptFile(writer);
-            var actual = writer.ToString().Replace("\r\n", "\n");
-            var expected = File.ReadAllText(filePath, Encoding.Default)
-                .Replace("\r\n", "\n");
-            Assert.AreEqual(actual, expected);
+            opt.WriteOptFile (writer);
+            var actual = writer.ToString().DosToUnix();
+            var expected = File.ReadAllText (filePath, Encoding.Default).DosToUnix();
+            Assert.AreEqual (actual, expected);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        [ExpectedException (typeof (ArgumentOutOfRangeException))]
         public void IrbisOpt_SetWorksheetLength_1()
         {
             var opt = new OptFile();
-            opt.SetWorksheetLength(-1);
+            opt.SetWorksheetLength (-1);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(IrbisException))]
+        [ExpectedException (typeof (IrbisException))]
         public void IrbisOpt_SelectWorksheet_1()
         {
             var opt = new OptFile();
-            opt.SelectWorksheet("NOWS");
+            opt.SelectWorksheet ("NOWS");
         }
 
         private Record _GetRecord()
@@ -94,39 +94,39 @@ namespace UnitTests.ManagedIrbis
             var result = new Record();
 
             var field = new Field { Tag = 700 };
-            field.Add('a', "Иванов");
-            field.Add('b', "И. И.");
-            result.Fields.Add(field);
+            field.Add ('a', "Иванов");
+            field.Add ('b', "И. И.");
+            result.Fields.Add (field);
 
             field = new Field { Tag = 701 };
-            field.Add('a', "Петров");
-            field.Add('b', "П. П.");
-            result.Fields.Add(field);
+            field.Add ('a', "Петров");
+            field.Add ('b', "П. П.");
+            result.Fields.Add (field);
 
             field = new Field { Tag = 200 };
-            field.Add('a', "Заглавие");
-            field.Add('e', "подзаголовочное");
-            field.Add('f', "И. И. Иванов, П. П. Петров");
-            result.Fields.Add(field);
+            field.Add ('a', "Заглавие");
+            field.Add ('e', "подзаголовочное");
+            field.Add ('f', "И. И. Иванов, П. П. Петров");
+            result.Fields.Add (field);
 
-            field = new Field {Tag = 210 };
-            field.Add('a', "Иркутск");
-            field.Add('d', "2016");
-            result.Fields.Add(field);
+            field = new Field { Tag = 210 };
+            field.Add ('a', "Иркутск");
+            field.Add ('d', "2016");
+            result.Fields.Add (field);
 
             field = new Field { Tag = 215 };
-            field.Add('a', "123");
-            result.Fields.Add(field);
+            field.Add ('a', "123");
+            result.Fields.Add (field);
 
             field = new Field (300, "Первое примечание");
-            result.Fields.Add(field);
+            result.Fields.Add (field);
             field = new Field (300, "Второе примечание");
-            result.Fields.Add(field);
+            result.Fields.Add (field);
             field = new Field (300, "Третье примечание");
-            result.Fields.Add(field);
+            result.Fields.Add (field);
 
             field = new Field (920, "PAZK");
-            result.Fields.Add(field);
+            result.Fields.Add (field);
 
             return result;
         }
@@ -135,11 +135,11 @@ namespace UnitTests.ManagedIrbis
         public void OptFile_GetWorksheet_1()
         {
             var opt = new OptFile();
-            opt.SetWorksheetTag(920);
+            opt.SetWorksheetTag (920);
             var record = _GetRecord();
             const string expected = "PAZK";
-            var actual = opt.GetWorksheet(record);
-            Assert.AreEqual(expected, actual);
+            var actual = opt.GetWorksheet (record);
+            Assert.AreEqual (expected, actual);
         }
 
         /*
@@ -192,22 +192,21 @@ namespace UnitTests.ManagedIrbis
         {
             var fileName = Path.GetTempFileName();
             var opt = new OptFile();
-            opt.SetWorksheetLength(5);
-            opt.SetWorksheetTag(920);
-            opt.Lines.Add(new OptLine { Key = "OGO", Value = "AGA" });
-            opt.Lines.Add(new OptLine { Key = "UGU", Value = "EGE" });
-            opt.WriteFile(fileName);
-            var actual = File.ReadAllText(fileName).DosToUnix();
-            Assert.AreEqual("920\n5\nOGO   AGA\nUGU   EGE\n*****\n", actual);
+            opt.SetWorksheetLength (5);
+            opt.SetWorksheetTag (920);
+            opt.Lines.Add (new OptLine { Key = "OGO", Value = "AGA" });
+            opt.Lines.Add (new OptLine { Key = "UGU", Value = "EGE" });
+            opt.WriteFile (fileName);
+            var actual = File.ReadAllText (fileName).DosToUnix();
+            Assert.AreEqual ("920\n5\nOGO   AGA\nUGU   EGE\n*****\n", actual);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(IrbisException))]
+        [ExpectedException (typeof (IrbisException))]
         public void OptFile_Validate_1()
         {
             var opt = new OptFile();
-            opt.Validate(true);
+            opt.Validate (true);
         }
-
     }
 }
