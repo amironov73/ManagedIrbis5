@@ -18,6 +18,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -3357,6 +3358,41 @@ namespace AM
             value.IsEmpty ? null : value.ToString();
 
         /// <summary>
+        /// Добавление объекта-перечисления.
+        /// </summary>
+        public static StringBuilder AppendEnumerable
+            (
+                this StringBuilder builder,
+                IEnumerable? obj,
+                string? delimiter = ", ",
+                string? open = "[",
+                string? close = "]"
+            )
+        {
+            if (obj is null)
+            {
+                builder.Append ("(null)");
+                return builder;
+            }
+
+            var first = true;
+            builder.Append (open);
+            foreach (var item in obj)
+            {
+                if (!first)
+                {
+                    builder.Append (delimiter);
+                }
+
+                builder.Append (item.ToVisibleString());
+            }
+
+            builder.Append (close);
+
+            return builder;
+        }
+
+        /// <summary>
         /// Добавление объекта, предваренного разделителем.
         /// </summary>
         public static StringBuilder AppendWithDelimiter
@@ -3384,7 +3420,6 @@ namespace AM
             }
 
             return builder;
-
         }
 
         /// <summary>
@@ -3415,7 +3450,6 @@ namespace AM
             }
 
             return builder;
-
         }
 
         /// <summary>
