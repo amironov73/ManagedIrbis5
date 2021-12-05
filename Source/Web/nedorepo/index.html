@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<!--suppress CheckImageSize, HtmlFormInputWithoutLabel, HttpUrlsUsage -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width,initial-scale=1'>
+
+    <title>Репозиторий статей сотрудников ИрНИТУ</title>
+
+    <link rel='icon' type='image/png' href='img/favicon.ico'>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        td {
+            border: #0dcaf0 solid thin;
+            padding: 3pt;
+        }
+
+        .article-number {
+            min-width: 30px;
+        }
+
+    </style>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="http://library.istu.edu">
+            <img src="img/logo.png" height="40" alt="НТБ ИрНИТУ">
+        </a>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item text-primary">
+                <a href="http://library.istu.edu">
+                    <h2 style="padding-top: 10px; text-decoration: none; ">НТБ ИрНИТУ</h2>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+
+        <form class="col-lg-6 offset-lg-3 mt-3" autocomplete="off" onsubmit="return handleSubmit()">
+
+            <h2 class="text-center mb-4">Репозиторий статей<br/>
+                <small>преподавателей ИРНИТУ</small></h2>
+
+            <div class="input-group">
+                <select id="select1" class="btn btn-outline-primary">
+                    <option value="A=" selected>Автор</option>
+                    <option value="T=">Заглавие</option>
+                    <option value="MR=">Кафедра</option>
+                    <option value="K=">Ключевое слово</option>
+                    <option value="G=">Год издания</option>
+                    <option value="TJ=">Источник</option>
+                    <option value="BBK=">ББК</option>
+                </select>
+                <input id="input1" type="text" class="form-control">
+                <div class="input-group-text">
+                    <input id="check1" type="checkbox" class="form-check-input" checked
+                           data-bs-toggle="tooltip" data-bs-placement="top" title="усечение">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <select id="select2" class="btn btn-outline-primary">
+                    <option value="A=">Автор</option>
+                    <option value="T=" selected>Заглавие</option>
+                    <option value="MR=">Кафедра</option>
+                    <option value="K=">Ключевое слово</option>
+                    <option value="G=">Год издания</option>
+                    <option value="TJ=">Источник</option>
+                    <option value="BBK=">ББК</option>
+                </select>
+                <input id="input2" type="text" class="form-control">
+                <div class="input-group-text">
+                    <input id="check2" type="checkbox" class="form-check-input" checked
+                           data-bs-toggle="tooltip" data-bs-placement="top" title="усечение">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <select id="select3" class="btn btn-outline-primary">
+                    <option value="A=">Автор</option>
+                    <option value="T=">Заглавие</option>
+                    <option value="MR=" selected>Кафедра</option>
+                    <option value="K=">Ключевое слово</option>
+                    <option value="G=">Год издания</option>
+                    <option value="TJ=">Источник</option>
+                    <option value="BBK=">ББК</option>
+                </select>
+                <input id="input3" type="text" class="form-control">
+                <div class="input-group-text">
+                    <input id="check3" type="checkbox" class="form-check-input" checked
+                           data-bs-toggle="tooltip" data-bs-placement="top" title="усечение">
+                </div>
+            </div>
+
+            <div class="input-group mt-3 mb-5">
+                <button type="submit" class="btn btn-primary form-control">Поиск</button>
+                &nbsp;
+                <button type="reset" class="btn btn-outline-primary form-control">Сброс</button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <div id="busyIndicator" class="text-center text-danger mb-5" style="display: none;">
+        <h2>Выполняется поиск</h2>
+    </div>
+
+    <div id="suggestion" class="text-center text-info mb-5">
+        <p>Попробуйте поиск по фамилиям: Байбородин, Бегунов, Большаков, Гридин, Зайдес, Лобацкая, <br/>
+            Меерович, Пономарев, Тен, Щадов, Ястребов.</p>
+        <p>Или по местам работы: Кафедра машиностроительных технологий и материалов,<br/>
+            Кафедра оборудования и автоматизации машиностроения,<br/>
+            Кафедра математики, Кафедра самолетостроения,<br/>
+            Кафедра электроснабжения и электротехники, Кафедра геммологии
+        </p>
+    </div>
+
+    <div id="errorIndicator" class="text-center text-danger mb-5" style="display: none;">
+        <h2 id="errorMessage">Произошла ошибка</h2>
+    </div>
+
+    <div id="debugIndicator" class="text-center text-danger mb-5" style="display: none;">
+        <h2 id="debugMessage">Отладочное сообщение</h2>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-8 offset-lg-2 mt-3">
+
+            <table id="articleList">
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const select1 = document.getElementById ('select1')
+    const input1  = document.getElementById ('input1')
+    const check1  = document.getElementById ('check1')
+    const select2 = document.getElementById ('select2')
+    const input2  = document.getElementById ('input2')
+    const check2  = document.getElementById ('check2')
+    const select3 = document.getElementById ('select3')
+    const input3  = document.getElementById ('input3')
+    const check3  = document.getElementById ('check3')
+
+    const busyIndicator  = document.getElementById ('busyIndicator')
+    const suggestion     = document.getElementById ('suggestion')
+    const errorIndicator = document.getElementById ('errorIndicator')
+    const errorMessage   = document.getElementById ('errorMessage')
+    const debugIndicator = document.getElementById ('debugIndicator')
+    const debugMessage   = document.getElementById ('debugMessage')
+
+    const articleList = document.getElementById ('articleList')
+
+    function show (element, state) {
+        element.style.display = state ? "initial" : "none"
+    }
+
+    function showError (message) {
+        errorMessage.innerText = message
+        show (errorIndicator, true)
+    }
+
+    function hideError() {
+        show (errorIndicator, false)
+    }
+
+    function showDebug (message) {
+        debugMessage.innerText = message
+        show (debugIndicator, true)
+    }
+
+    function hideSuggestion() {
+        show (suggestion, false)
+    }
+
+    function hideDebug() {
+        show (debugIndicator, false)
+    }
+
+    function clearArticleList() {
+        articleList.innerHTML = ''
+    }
+
+    function splitToUrl (sourceText) {
+        const symptom = '. - http'
+        const index = sourceText.indexOf (symptom)
+        if (index < 0) {
+            return [sourceText, '']
+        }
+
+        const firstPart = sourceText.substr(0, index).trim()
+        const secondPart = sourceText.substr(index + 4).trim()
+        return [firstPart, secondPart]
+    }
+
+    function buildTerm (select, input, check) {
+        if (input.value) {
+            return '"' + select.value + input.value + (check.checked ? '$' : '') + '"'
+        }
+
+        return ''
+    }
+    
+    function buildExpression() {
+        let result = ''
+        let term = buildTerm (select1, input1, check1)
+        if (term) {
+            result = term
+        }
+
+        term = buildTerm (select2, input2, check2)
+        if (term) {
+            result = result ? (result + ' * ' + term) : term
+        }
+
+        term = buildTerm (select3, input3, check3)
+        if (term) {
+            result = result ? (result + ' * ' + term) : term
+        }
+
+        return result
+    }
+    
+    function searchForArticles (expression) {
+        const url = 'https://localhost:5001/search_format/VRL=ASP+*+TEK=HTTP:%2F%2F$+*+' + expression + '/@brief_with_url/PERIO/100'
+        // const url = 'https://localhost:5001/search_format/VRL=ASP+*+' + expression + '/@brief_with_url/PERIO/100'
+        console.log (url)
+
+        $.getJSON (url, function (books) {
+            const articles = books.sort()
+            console.log ('Найдено: ' + articles.length)
+            if (articles.length === 0) {
+                showError ('Ничего не найдено')
+                return
+            }
+
+            let index = 0
+            for (const article of articles) {
+                const tr = document.createElement ('tr')
+
+                const td1 = document.createElement ('td')
+                td1.classList.add ('article-number')
+                td1.innerText = (++index).toString()
+
+                const td2 = document.createElement ('td')
+                td2.innerText = article
+
+                const td3 = document.createElement ('td')
+                td3.innerHTML = '<a href="http://google.com"><img src="img/pdf.gif" alt="PDF"></a>'
+
+                tr.appendChild (td1)
+                tr.appendChild (td2)
+                tr.appendChild (td3)
+                articleList.appendChild (tr)
+            }
+        })
+    }
+    
+    function handleSubmit() {
+        clearArticleList()
+        hideSuggestion()
+        hideDebug()
+        hideError()
+        const expression = buildExpression()
+        if (!expression) {
+            return
+        }
+        // showDebug (expression)
+        searchForArticles (expression)
+        return false
+    }
+
+    const tooltipTriggerList = [].slice.call (document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    const tooltipList = tooltipTriggerList.map (function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip (tooltipTriggerEl)
+    })
+</script>
+
+</body>
+</html>

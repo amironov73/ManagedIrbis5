@@ -836,6 +836,8 @@ namespace Restaurant.Controllers
 
             var result = FoundItem.ToMfn (found);
 
+            _logger.LogInformation ($"{nameof (Search)}: found {result.Length}");
+
             return Ok (result);
         }
 
@@ -884,6 +886,8 @@ namespace Restaurant.Controllers
             {
                 return Problem (IrbisException.GetErrorDescription (connection.LastError));
             }
+
+            _logger.LogInformation ($"{nameof (SearchCount)}: found {result}");
 
             return Ok (result);
         }
@@ -952,6 +956,8 @@ namespace Restaurant.Controllers
             }
 
             var result = found.Select (item => item.Text).ToArray();
+
+            _logger.LogInformation ($"{nameof (SearchFormat)}: found {result.Length}");
 
             return Ok (result);
         }
