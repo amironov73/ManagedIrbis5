@@ -1,0 +1,12 @@
+td {
+    border: #0dcaf0 solid thin;
+    padding: 3pt;
+}
+
+.article-number {
+    min-width: 30px;
+}
+
+.article-icon {
+    min-width: 30px;
+}

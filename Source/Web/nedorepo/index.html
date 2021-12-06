@@ -8,24 +8,12 @@
 
     <link rel='icon' type='image/png' href='img/favicon.ico'>
     <link rel="stylesheet" href="css/bootstrap.min.css">
-
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-
-    <style>
-        td {
-            border: #0dcaf0 solid thin;
-            padding: 3pt;
-        }
-
-        .article-number {
-            min-width: 30px;
-        }
-
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 
 </head>
+
 <body>
+
 <nav class="navbar navbar-expand-sm navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="http://library.istu.edu">
@@ -130,8 +118,7 @@
 
     </div>
 
-    <div id="busyIndicator" class="text-center text-danger mb-5" style="display: none;">
-        <h2>Выполняется поиск</h2>
+    <div id="busyIndicator" class="text-center mb-5" style="display: none;">
         <h2><img src="img/arctic-fox.gif" height="100" alt="полярная лисичка"></h2>
     </div>
 
@@ -164,189 +151,9 @@
     </div>
 </div>
 
-<script>
-    // элементы пользовательского ввода
-    const select1  = document.getElementById ('select1')
-    const input1   = document.getElementById ('input1')
-    const check1   = document.getElementById ('check1')
-    const select2  = document.getElementById ('select2')
-    const input2   = document.getElementById ('input2')
-    const check2   = document.getElementById ('check2')
-    const select3  = document.getElementById ('select3')
-    const input3   = document.getElementById ('input3')
-    const check3   = document.getElementById ('check3')
-    const howMany  = document.getElementById ('howMany')
-    const fullText = document.getElementById ('fullText')
-
-    // отображение служебной информации
-    const busyIndicator  = document.getElementById ('busyIndicator')
-    const suggestion     = document.getElementById ('suggestion')
-    const errorIndicator = document.getElementById ('errorIndicator')
-    const errorMessage   = document.getElementById ('errorMessage')
-    const debugIndicator = document.getElementById ('debugIndicator')
-    const debugMessage   = document.getElementById ('debugMessage')
-
-    // список найденных статей
-    const articleList = document.getElementById ('articleList')
-
-    function show (element, state) {
-        element.style.display = state ? "initial" : "none"
-    }
-
-    function showBusy() {
-        show(busyIndicator, true)
-    }
-
-    function hideBusy() {
-        show(busyIndicator, false)
-    }
-
-    function showError (message) {
-        errorMessage.innerText = message
-        show (errorIndicator, true)
-    }
-
-    function hideError() {
-        show (errorIndicator, false)
-    }
-
-    function showDebug (message) {
-        debugMessage.innerText = message
-        show (debugIndicator, true)
-    }
-
-    function hideSuggestion() {
-        show (suggestion, false)
-    }
-
-    function hideDebug() {
-        show (debugIndicator, false)
-    }
-
-    function clearArticleList() {
-        articleList.innerHTML = ''
-    }
-
-    function splitToUrl (sourceText) {
-        const http = '. - http'
-        const index = sourceText.indexOf (http)
-        if (index < 0) {
-            return [sourceText, '']
-        }
-
-        const firstPart = sourceText.substr (0, index).trim()
-        const secondPart = sourceText.substr (index + 4).trim()
-        return [firstPart, secondPart]
-    }
-
-    function buildTerm (select, input, check) {
-        if (input.value) {
-            return '"' + select.value + input.value + (check.checked ? '$' : '') + '"'
-        }
-
-        return ''
-    }
-
-    function buildExpression() {
-        let result = ''
-        let term = buildTerm (select1, input1, check1)
-        if (term) {
-            result = term
-        }
-
-        term = buildTerm (select2, input2, check2)
-        if (term) {
-            result = result ? (result + ' * ' + term) : term
-        }
-
-        term = buildTerm (select3, input3, check3)
-        if (term) {
-            result = result ? (result + ' * ' + term) : term
-        }
-
-        return result
-    }
-
-    function buildUrl (expression) {
-        const resource = 'https://localhost:5001/search_format/'
-        const database = 'PERIO'
-        const format = '@brief_with_url'
-        const maxCount = howMany.value
-        const needFullText = fullText.checked ? 'VRL=ASP+*+TEK=HTTP:%2F%2F$+*+' : 'VRL=ASP+*+'
-        const result = resource + needFullText + expression + '/' + format + '/' + database + '/' + maxCount
-        // console.log (result)
-
-        return result
-    }
-
-    function searchForArticles (expression) {
-        const url = buildUrl (expression)
-
-        $.getJSON (url)
-            .done(function (books) {
-                const articles = books.sort()
-                // console.log ('Найдено: ' + articles.length)
-                if (articles.length === 0) {
-                    showError ('Не найдено ни одной статьи, удовлетворяющей заданным условиям')
-                    return
-                }
-
-                let index = 0
-                for (const article of articles) {
-                    const parts = splitToUrl (article)
-
-                    const tr = document.createElement ('tr')
-
-                    const td1 = document.createElement ('td')
-                    td1.classList.add ('article-number')
-                    td1.innerText = (++index).toString()
-
-                    const td2 = document.createElement ('td')
-                    td2.innerText = parts[0]
-
-                    const td3 = document.createElement('td')
-                    const link = parts[1]
-                    td3.innerHTML = link
-                        ? '<a href="' + link + '" target="_blank" title="полный текст статьи">' +
-                        '<img src="img/pdf.gif" alt="полный текст статьи"></a>'
-                        : '&nbsp;'
-
-                    tr.appendChild (td1)
-                    tr.appendChild (td2)
-                    tr.appendChild (td3)
-                    articleList.appendChild (tr)
-                }
-            })
-            .fail(function () {
-                showError ('Сервер не ответил либо прислал невалидный ответ')
-            })
-    }
-
-    function handleSubmit() {
-        showBusy()
-        clearArticleList()
-        hideSuggestion()
-        hideDebug()
-        hideError()
-
-        const expression = buildExpression()
-        if (!expression) {
-            return
-        }
-
-        // showDebug (expression)
-
-        searchForArticles (expression)
-        hideBusy()
-
-        return false
-    }
-
-    const tooltipTriggerList = [].slice.call (document.querySelectorAll ('[data-bs-toggle="tooltip"]'))
-    const tooltipList = tooltipTriggerList.map (function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip (tooltipTriggerEl)
-    })
-</script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/script.js"></script>
 
 </body>
 </html>
