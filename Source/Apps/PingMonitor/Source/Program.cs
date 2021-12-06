@@ -3,12 +3,13 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable CoVariantArrayConversion
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
-/* Program.cs -- точка входа в программу
+/* MainForm.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,7 +26,7 @@ using AM.Windows.Forms;
 
 #nullable enable
 
-namespace PartyStatus
+namespace PingMonitor
 {
     static class Program
     {
@@ -35,7 +36,7 @@ namespace PartyStatus
                 ThreadExceptionEventArgs eventArgs
             )
         {
-            ExceptionBox.Show(eventArgs.Exception);
+            ExceptionBox.Show (eventArgs.Exception);
             Environment.FailFast
                 (
                     "Shutting down",
@@ -57,13 +58,13 @@ namespace PartyStatus
                 Application.ThreadException += _ThreadException;
 
                 Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
+                Application.SetCompatibleTextRenderingDefault (false);
 
-                Application.Run(new MainForm());
+                Application.Run (new MainForm());
             }
             catch (Exception exception)
             {
-                ExceptionBox.Show(exception);
+                ExceptionBox.Show (exception);
             }
         }
     }

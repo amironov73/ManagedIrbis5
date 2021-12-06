@@ -9,7 +9,7 @@
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
-/* MainForm.cs -- точка входа в программу
+/* MainForm.cs -- главная форма приложения
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -30,8 +30,13 @@ using ManagedIrbis.Providers;
 
 #endregion
 
+#nullable enable
+
 namespace PartyStatus
 {
+    /// <summary>
+    /// Главная форма приложения.
+    /// </summary>
     public partial class MainForm
         : Form
     {
