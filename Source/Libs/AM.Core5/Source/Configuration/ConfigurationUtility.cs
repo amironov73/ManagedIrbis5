@@ -104,10 +104,16 @@ namespace AM.Configuration
                 params string[] candidates
             )
         {
-            foreach (string candidate in candidates.NonEmptyLines())
+            foreach (var candidate in candidates.NonEmptyLines())
             {
                 var setting = CM.AppSettings[candidate];
-                if (!string.IsNullOrEmpty(setting))
+                if (!string.IsNullOrEmpty (setting))
+                {
+                    return setting;
+                }
+
+                setting = Magna.Configuration[candidate];
+                if (!string.IsNullOrEmpty (setting))
                 {
                     return setting;
                 }

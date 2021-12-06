@@ -176,7 +176,7 @@ namespace ManagedIrbis
         public static ISyncProvider GetConnectionFromConfig()
         {
             var connectionString = GetStandardConnectionString();
-            if (string.IsNullOrEmpty(connectionString))
+            if (string.IsNullOrEmpty (connectionString))
             {
                 throw new IrbisException
                     (
@@ -184,12 +184,11 @@ namespace ManagedIrbis
                     );
             }
 
-            ISyncProvider result = ConnectionFactory.Shared.CreateSyncConnection();
-            result.ParseConnectionString(connectionString);
+            var result = ConnectionFactory.Shared.CreateSyncConnection();
+            result.ParseConnectionString (connectionString);
 
             return result;
-
-        } // method GetConnectionFromConfig
+        }
 
         /// <summary>
         /// Получаем строку подключения из (возможно, несуществующего)
