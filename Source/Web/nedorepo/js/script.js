@@ -103,7 +103,7 @@ function buildExpression() {
 
 function buildUrl (expression) {
     // const resource = 'http://localhost:5000/search_format/'
-    const resource = 'http://localhost/Jsoner.php?op=search_format'
+    const resource = 'http://elib.istu.edu/Jsoner.php?op=search_format'
     const database = 'PERIO'
     const format = '@brief_with_url'
     const limit = howMany.value
@@ -156,6 +156,8 @@ function handleSuccess (data) {
 function searchForArticles (expression) {
     const url = buildUrl (expression)
 
+    showBusy()
+
     // $.getJSON (url)
     //     .done (function (response) {
     //         handleSuccess (response)
@@ -168,9 +170,11 @@ function searchForArticles (expression) {
     axios.get (url)
         .then (function (response) {
             handleSuccess (response.data)
+            hideBusy ()
         })
         .catch (function (error) {
-            console.log (error)
+            console.log(error)
+            hideBusy ()
             showError ('Сервер не ответил либо прислал невалидный ответ')
         })
 }
@@ -190,7 +194,6 @@ function handleSubmit() {
     // showDebug (expression)
 
     searchForArticles (expression)
-    hideBusy()
 
     return false
 }

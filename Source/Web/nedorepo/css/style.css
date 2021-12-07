@@ -10,3 +10,9 @@ td {
 .article-icon {
     min-width: 30px;
 }
+
+#arctic-fox {
+    width: 100%;
+    min-width: 100px;
+    max-width: 500px;
+}
