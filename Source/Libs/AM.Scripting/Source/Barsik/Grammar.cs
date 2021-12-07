@@ -291,8 +291,25 @@ namespace AM.Scripting.Barsik
             from atom in Addition.XOr (Atom)
             select atom;
 
+        private static readonly Parser<string> _Member =
+            from dot in Parse.Char ('.')
+            from memberName in Identifier.Text()
+            select memberName;
+
+        private static readonly Parser<AtomNode> _Index =
+            from open in Parse.Char ('[').Token()
+            from index in Atom
+            from close in Parse.Char (']').Token()
+            select index;
+
+        private static readonly Parser<TargetNode> Target =
+            from variable in Identifier.Text()
+            from member in _Member.Optional()
+            from index in _Index.Optional()
+            select new TargetNode (variable, member.GetOrDefault(), index.GetOrDefault());
+
         private static readonly Parser<StatementNode> Assignment =
-            from variable in Identifier.Token().Text()
+            from variable in Target
             from eq in Parse.Char ('=').Token()
             from expression in ArithmeticExpression
             select new AssignmentNode (variable, expression);

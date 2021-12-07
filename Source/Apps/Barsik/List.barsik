@@ -6,3 +6,8 @@ l.AddRange ([11, 12]);
 println l.Count;
 println l[0], ", ", l[1];
 println l;
+println "Присваивание по индексу";
+l[0] = 111;
+l[1] = l[0] * 2;
+l[2] = l[0] * 4;
+println l;

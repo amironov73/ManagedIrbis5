@@ -7,3 +7,7 @@ println text.Substring(8, 6);
 
 println "Current user is ", Environment.UserName;
 println "Today is ", format ("{0:d}", DateTime.Today);
+
+weak = new WeakReference ("hello");
+weak.Target = "world";
+println weak.Target;

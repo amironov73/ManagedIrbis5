@@ -23,7 +23,6 @@ using AM.Text;
 
 #nullable enable
 
-
 namespace AM.Scripting.Barsik
 {
     /// <summary>
@@ -31,20 +30,97 @@ namespace AM.Scripting.Barsik
     /// </summary>
     sealed class AssignmentNode : StatementNode
     {
-        public string VariableName { get; }
-        public AtomNode Expression { get; }
-
-        public AssignmentNode (string variableName, AtomNode expression)
+        public AssignmentNode
+            (
+                TargetNode target,
+                AtomNode expression
+            )
         {
-            VariableName = variableName;
-            Expression = expression;
+            _target = target;
+            _expression = expression;
         }
 
-        public override void Execute (Context context)
+        private readonly TargetNode _target;
+        private readonly AtomNode _expression;
+
+        public override void Execute
+            (
+                Context context
+            )
         {
-            context.Variables[VariableName] = Expression.Compute (context);
+            var variableName = _target.VariableName;
+            var memberName = _target.MemberName;
+            var computedValue = _expression.Compute (context);
+            var index = _target.Index;
+
+            if (index is null && memberName is null)
+            {
+                context.Variables[variableName] = computedValue;
+                return;
+            }
+
+            if (!context.TryGetVariable (variableName, out var variableValue))
+            {
+                var type = context.FindType (variableName);
+                if (type is null)
+                {
+                    context.Error.WriteLine ($"Variable or type {variableName} not found");
+
+                    return;
+                }
+
+                if (memberName is not null)
+                {
+                    var property = type.GetProperty (memberName);
+                    if (property is not null)
+                    {
+                        property.SetValue (null, computedValue);
+                        return;
+                    }
+
+                    var field = type.GetField (memberName);
+                    if (field is not null)
+                    {
+                        field.SetValue (null, computedValue);
+                        return;
+                    }
+                }
+
+                return;
+            }
+
+            if (variableValue is null)
+            {
+                return;
+            }
+
+            if (memberName is not null)
+            {
+
+                var type = ((object)variableValue).GetType();
+                var property = type.GetProperty (memberName);
+                if (property is not null)
+                {
+                    property.SetValue (variableValue, computedValue);
+                }
+                else
+                {
+                    var field = type.GetField (memberName);
+                    if (field is not null)
+                    {
+                        field.SetValue (variableValue, computedValue);
+                    }
+                }
+            }
+
+            if (index is not null)
+            {
+                var indexValue = index.Compute (context);
+
+                variableValue[indexValue] = computedValue;
+            }
         }
 
-        public override string ToString() => $"Assignment: {VariableName} = {Expression};";
+        public override string ToString() => $"Assignment: {_target.VariableName} = {_expression};";
     }
 }
