@@ -15,6 +15,8 @@
 #region Using directives
 
 using System;
+using System.Text.Json;
+
 using AM;
 using AM.Json;
 
@@ -80,15 +82,13 @@ namespace RestfulIrbis.Viaf
         /// </summary>
         public static ViafData Parse
             (
-                // TODO: implement
-                object obj
-                // JObject obj
+                JsonDocument obj
             )
         {
             /*
             var result = new ViafData
             {
-                ViafId = obj["viafID"].NullableToString(),
+                ViafId = obj.RootElement["viafID"].NullableToString(),
                 NameType = obj["nameType"].NullableToString(),
                 Sources = ViafSource.Parse(obj.SelectArray("$.sources.source")),
                 MainHeadings = ViafMainHeading.Parse(obj.SelectArray("$.mainHeadings.data")),
@@ -98,7 +98,6 @@ namespace RestfulIrbis.Viaf
             };
 
             return result;
-
             */
 
             throw new NotImplementedException();

@@ -14,7 +14,8 @@
 
 #region Using directives
 
-using System;
+using System.Text.Json;
+
 using AM;
 
 using RestSharp;
@@ -43,7 +44,6 @@ namespace RestfulIrbis.Viaf
     /// <summary>
     /// VIAF requester.
     /// </summary>
-
     public class ViafClient
     {
         #region Constants
@@ -60,14 +60,14 @@ namespace RestfulIrbis.Viaf
         /// <summary>
         /// Connection
         /// </summary>
-        public RestClient Connection { get; private set; }
+        public RestClient Connection { get; }
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public ViafClient()
             : this (BaseUrl)
@@ -75,16 +75,16 @@ namespace RestfulIrbis.Viaf
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public ViafClient
             (
                 string baseUrl
             )
         {
-            Magna.Trace($"ViafClient: constructor: {baseUrl}");
+            Magna.Trace ($"{nameof (ViafClient)}: constructor: {baseUrl}");
 
-            Connection = new RestClient(baseUrl);
+            Connection = new RestClient (baseUrl);
         }
 
         #endregion
@@ -99,21 +99,17 @@ namespace RestfulIrbis.Viaf
                 string name
             )
         {
-            /*
+            Sure.NotNullNorEmpty (name);
 
-            Magna.Trace("ViafClient: get suggestions");
+            Magna.Trace (nameof (ViafClient) + "::" + nameof (GetSuggestions));
 
-            var request = new RestRequest("/viaf/AutoSuggest?query={name}");
-            request.AddUrlSegment("name", name);
-            var response = Connection.Execute(request);
-            var viaf
-                = JsonConvert.DeserializeObject<ViafSuggestResponse>(response.Content);
+            var request = new RestRequest ("/viaf/AutoSuggest?query={name}");
+            request.AddUrlSegment ("name", name);
+            var response = Connection.Execute (request);
+            var viaf = JsonSerializer.Deserialize<ViafSuggestResponse> (response.Content)
+                .ThrowIfNull();
 
-            return viaf.SuggestResults;
-
-            */
-
-            throw new NotImplementedException();
+            return viaf.SuggestResults.ThrowIfNull();
         }
 
         /// <summary>
@@ -124,22 +120,16 @@ namespace RestfulIrbis.Viaf
                 string recordId
             )
         {
-            /*
+            Magna.Trace (nameof (ViafClient) + "::" + nameof (GetAuthorityClusterData));
 
-            Magna.Trace("ViafClient: get authority cluster data");
-
-            var request = new RestRequest("/viaf/{id}/");
-            request.AddUrlSegment("id", recordId);
-            request.AddHeader("Accept", "application/json");
-            var response = Connection.Execute(request);
-            var obj = JObject.Parse(response.Content);
-            var result = ViafData.Parse(obj);
+            var request = new RestRequest ("/viaf/{id}/");
+            request.AddUrlSegment ("id", recordId);
+            request.AddHeader ("Accept", "application/json");
+            var response = Connection.Execute (request);
+            var obj =  JsonDocument.Parse (response.Content);
+            var result = ViafData.Parse (obj);
 
             return result;
-
-            */
-
-            throw new NotImplementedException();
         }
 
         #endregion

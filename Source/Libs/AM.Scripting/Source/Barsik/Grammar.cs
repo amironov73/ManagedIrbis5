@@ -161,6 +161,12 @@ namespace AM.Scripting.Barsik
             NullLiteral.Or (CharLiteral).Or (BoolLiteral)
                 .Or (DoubleLiteral).Or (StringLiteral).Or (Int32Literal);
 
+        private static readonly Parser<KeyValueNode> KeyAndValue =
+            from key in Constant
+            from colon in Parse.Char (':').Token()
+            from value in Constant
+            select new KeyValueNode (key, value);
+
         private static readonly Parser<string> Identifier =
             Parse.Identifier (Parse.Letter.Or (Parse.Char ('_')),
                 Parse.LetterOrDigit.Or (Parse.Char ('_')));
@@ -208,6 +214,12 @@ namespace AM.Scripting.Barsik
             from close in Parse.Char (']').Token()
             select new ListNode (items.GetOrDefault());
 
+        private static readonly Parser<DictionaryNode> Dictionary =
+            from open in Parse.Char ('{').Token()
+            from items in KeyAndValue.DelimitedBy (Parse.Char (',').Token()).Optional()
+            from close in Parse.Char ('}').Token()
+            select new DictionaryNode (items.GetOrDefault());
+
         private static readonly Parser<AtomNode> Index =
             from objectName in Identifier
             from open in Parse.Char ('[').Token()
@@ -243,7 +255,8 @@ namespace AM.Scripting.Barsik
             select condition;
 
         private static readonly Parser<AtomNode> Atom =
-            MethodCall.Or (New). Or (Parenthesis).Or (List).Or (Index).Or (Property).Or (Constant)
+            MethodCall.Or (New). Or (Parenthesis).Or (Dictionary).Or (List)
+                .Or (Index).Or (Property).Or (Constant)
                 .Or (FunctionCall).Or (Variable).Or (Negation);
 
         private static readonly Parser<string> Compare =
