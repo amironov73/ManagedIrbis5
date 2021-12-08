@@ -1,11 +1,10 @@
 import '@popperjs/core/dist/umd/popper'
-import bootstrap from 'bootstrap/dist/js/bootstrap.bundle'
+import '@fortawesome/fontawesome-free/js/fontawesome'
+import '@fortawesome/fontawesome-free/js/solid'
+import Tooltip  from "bootstrap/js/dist/tooltip";
 import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.css'
 import './../css/styles.css'
-import './../img/arctic-fox.gif'
-import './../img/favicon.ico'
-import './../img/logo.png'
 
 // путь к бэк-энду
 const baseURL = 'http://elib.istu.edu/Jsoner.php'
@@ -19,7 +18,7 @@ const databaseSelector = document.getElementById ('database-selector')
 const inputContainer   = document.getElementById ('input-container')
 const howMany          = document.getElementById ('how-many')
 const formatSelector   = document.getElementById ('format-selector')
-const fullText         = document.getElementById ('full-text')
+//const fullText         = document.getElementById ('full-text')
 const busyIndicator    = document.getElementById ('busy-indicator')
 const errorIndicator   = document.getElementById ('error-indicator')
 const resultContainer  = document.getElementById ('result-container')
@@ -69,6 +68,7 @@ function buildExpression() {
     const database = databaseSelector.value
     const format = formatSelector.value
     const limit = howMany.value
+    // noinspection UnnecessaryLocalVariableJS
     const result = baseURL + '?op=search_format&db=' +  database + '&expr=' + encodeURIComponent (expression) + '&format=' + format + "&limit=" + limit
     // console.log (result)
 
@@ -87,7 +87,7 @@ function handleSuccess (data) {
     // let index = 0
     for (const description of documents) {
         const item = document.createElement ('div')
-        item.classList.add ('card')
+        item.classList.add ('found-card')
         item.innerHTML = description
         resultContainer.appendChild (item)
     }
@@ -155,7 +155,7 @@ function createRow() {
     check.title = 'усечение'
     check.setAttribute ('data-bs-toggle', 'tooltip')
     check.setAttribute ('data-bs-placement', 'top')
-    new bootstrap.Tooltip (check)
+    new Tooltip (check)
     div.appendChild (check)
 
     inputContainer.appendChild (inputGroup)
@@ -207,7 +207,9 @@ setTimeout(function () {
 
     const addRowButton = document.getElementById ('add-row')
     addRowButton.onclick = addRow
-    new bootstrap.Tooltip (addRowButton)
+    new Tooltip (addRowButton)
+
+    new Tooltip (document.getElementById ('full-text'))
 
     const mainForm = document.getElementById ('main-form')
     mainForm.onsubmit = handleSubmit

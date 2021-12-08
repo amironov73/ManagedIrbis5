@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Электронный каталог</title>
-    <link rel='icon' type='image/png' href='favicon.ico'>
+    <link rel='icon' type='image/png' href='./img/favicon.ico'>
 </head>
 <body>
 
@@ -46,10 +46,10 @@
                 </div>
                 <select id="database-selector" class="btn btn-outline-primary">
                 </select>
-                <button id="add-row" class="btn btn-outline-secondary"
+                <button id="add-row" class="btn btn-sm btn-outline-secondary"
                         style="width: 5em;"
                         data-bs-toggle="tooltip" data-bs-placement="top"
-                        title="добавление строки">+</button>
+                        title="добавление строки"><i class="fas fa-plus"></i></button>
             </div>
 
             <form id="main-form" autocomplete="off">
@@ -67,11 +67,15 @@
                     <label for="format-selector" class="form-check-label">формат выдачи&nbsp;</label>
                     <select id="format-selector" class="form-control" style="width: 10em;">
                         <option value="@" selected>полный</option>
+                        <option value="@infow_h">информационный</option>
                         <option value="@brief">краткий</option>
                     </select>
                     &nbsp;
-                    <input id="full-text" type="checkbox" class="form-check-input" checked>
-                    <label for="full-text" class="form-check-label">&nbsp;полный текст</label>
+                    <input id="full-text" type="checkbox" class="form-check-input"
+                           data-bs-toggle="tooltip" data-bs-placement="top"
+                           title="только документы с полным текстом">
+                    &nbsp;
+                    <label for="full-text">полный текст</label>
                 </div>
 
                 <div class="input-group mt-3 mb-3">
@@ -82,22 +86,28 @@
             </form>
 
             <div id="busy-indicator" class="text-center mb-5" style="display: none;">
-                <h2><img id="arctic-fox" src="arctic-fox.gif" alt="полярная лиса"></h2>
+                <h2><img id="arctic-fox" src="img/arctic-fox.gif" alt="полярная лиса"></h2>
             </div>
 
             <div id="error-indicator" class="text-center text-danger mb-5" style="display: none;">
                 <h2 id="errorMessage">Произошла ошибка</h2>
             </div>
 
-            <div id="result-container">
-            </div>
-
         </div>
 
     </div>
 
+    <div class="row">
+        <div class="col">
+            <div id="result-container">
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
+<!--suppress HtmlUnknownTarget -->
 <script defer src="bundle.js"></script>
 
 </body>
