@@ -1,0 +1,37 @@
+{
+  "name": "catalog",
+  "version": "1.0.0",
+  "description": "OPAC front-end for IRBIS64",
+  "main": "src/js/app.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amironov73/ManagedIrbis5"
+  },
+  "homepage": "https://arsmagna.ru",
+  "scripts": {
+    "build": "webpack --mode=development --progress",
+    "dev": "webpack serve --mode=development",
+    "production": "webpack --mode=production --progress"
+  },
+  "keywords": [
+    "IRBIS64",
+    "OPAC"
+  ],
+  "author": "Alexey Mironov <amironov73@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "css-loader": "^6.5.1",
+    "file-loader": "^6.2.0",
+    "html-webpack-plugin": "^5.5.0",
+    "path": "^0.12.7",
+    "style-loader": "^3.3.1",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.6.0"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.0",
+    "axios": "^0.24.0",
+    "bootstrap": "^5.1.3"
+  }
+}

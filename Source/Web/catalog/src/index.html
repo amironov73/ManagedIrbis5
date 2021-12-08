@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Электронный каталог</title>
+    <link rel='icon' type='image/png' href='favicon.ico'>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+    <div class="container-fluid">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                <a class="nav-link active" href="http://library.istu.edu">
+                    НТБ ИРНИТУ
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    О проекте
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    Руководство
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="https://github.com/amironov73/ManagedIrbis5">
+                    GitHub
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2 mt-3">
+            <h2 class="text-center">Электронный каталог НТБ ИРНИТУ</h2>
+
+            <div class="input-group">
+                <div class="form-control">
+                    <label for="database-selector" class="form-control">База данных: </label>
+                </div>
+                <select id="database-selector" class="btn btn-outline-primary">
+                </select>
+                <button id="add-row" class="btn btn-outline-secondary"
+                        style="width: 5em;"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="добавление строки">+</button>
+            </div>
+
+            <form id="main-form" autocomplete="off">
+                <div id="input-container"></div>
+
+                <div class="input-group-text">
+                    <label for="how-many">ограничить&nbsp;</label>
+                    <select id="how-many" class="form-select" style="width: 5em;">
+                        <option value="10">10</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                        <option value="500">500</option>
+                    </select>
+                    &nbsp;
+                    <label for="format-selector" class="form-check-label">формат выдачи&nbsp;</label>
+                    <select id="format-selector" class="form-control" style="width: 10em;">
+                        <option value="@" selected>полный</option>
+                        <option value="@brief">краткий</option>
+                    </select>
+                    &nbsp;
+                    <input id="full-text" type="checkbox" class="form-check-input" checked>
+                    <label for="full-text" class="form-check-label">&nbsp;полный текст</label>
+                </div>
+
+                <div class="input-group mt-3 mb-3">
+                    <button type="submit" class="btn btn-primary form-control">Поиск</button>
+                    <button type="reset" class="btn btn-outline-primary form-control">Сброс</button>
+                </div>
+
+            </form>
+
+            <div id="busy-indicator" class="text-center mb-5" style="display: none;">
+                <h2><img id="arctic-fox" src="arctic-fox.gif" alt="полярная лиса"></h2>
+            </div>
+
+            <div id="error-indicator" class="text-center text-danger mb-5" style="display: none;">
+                <h2 id="errorMessage">Произошла ошибка</h2>
+            </div>
+
+            <div id="result-container">
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script defer src="bundle.js"></script>
+
+</body>
+</html>
