@@ -29,7 +29,7 @@ namespace AM.Scripting.Barsik
     /// <summary>
     /// Узел, в котором происходят какие-то вычисления.
     /// </summary>
-    abstract class AtomNode : AstNode
+    public abstract class AtomNode : AstNode
     {
         #region Public methods
 

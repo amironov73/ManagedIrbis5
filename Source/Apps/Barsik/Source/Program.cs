@@ -15,6 +15,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using AM.Scripting.Barsik;
@@ -50,7 +51,8 @@ namespace Barsik
             try
             {
                 var dump = false;
-
+                var index = 0;
+                string sourceCode;
                 foreach (var fileName in args)
                 {
                     if (fileName == "-d")
@@ -59,8 +61,24 @@ namespace Barsik
                         continue;
                     }
 
-                    var sourceCode = File.ReadAllText (fileName);
+                    if (fileName == "-r")
+                    {
+                        interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
+                        new Repl (interpreter).Loop();
+                        continue;
+                    }
+
+                    if (fileName == "-e")
+                    {
+                        sourceCode = string.Join (' ', args.Skip (index + 1));
+                        interpreter.Execute (sourceCode);
+                        break;
+                    }
+
+                    sourceCode = File.ReadAllText (fileName);
                     interpreter.Execute (sourceCode);
+
+                    index++;
                 }
 
                 if (dump)

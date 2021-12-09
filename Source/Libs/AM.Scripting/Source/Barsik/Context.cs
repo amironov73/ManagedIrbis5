@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 
 using AM.Collections;
+using AM.IO;
 
 #endregion
 
@@ -49,9 +50,14 @@ namespace AM.Scripting.Barsik
         public Dictionary<string, dynamic?> Variables { get; }
 
         /// <summary>
+        /// Стандартный входной поток.
+        /// </summary>
+        public TextReader Input { get; }
+
+        /// <summary>
         /// Стандартный выходной поток.
         /// </summary>
-        public TextWriter Output { get; }
+        public TextWriter Output { get; private set; }
 
         /// <summary>
         /// Выходной поток ошибок.
@@ -73,6 +79,7 @@ namespace AM.Scripting.Barsik
         public Context
             (
                 Dictionary<string, dynamic?> variables,
+                TextReader input,
                 TextWriter output,
                 TextWriter error,
                 Context? parent = null
@@ -81,9 +88,25 @@ namespace AM.Scripting.Barsik
             Parent = parent;
             Functions = new ();
             Variables = variables;
+            Input = input;
             Output = output;
             Error = error;
             Namespaces = new ();
+        }
+
+        #endregion
+
+        #region Private members
+
+        /// <summary>
+        /// Делаем контекст внимательным к выводу текста.
+        /// </summary>
+        internal void MakeAttentive()
+        {
+            if (Output is not AttentiveWriter)
+            {
+                Output = new AttentiveWriter (Output);
+            }
         }
 
         #endregion
@@ -98,6 +121,7 @@ namespace AM.Scripting.Barsik
             return new Context
                 (
                     new (),
+                    Input,
                     Output,
                     Error,
                     this

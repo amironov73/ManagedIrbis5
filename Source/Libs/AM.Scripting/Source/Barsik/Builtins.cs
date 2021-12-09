@@ -6,6 +6,7 @@
 // ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable HeapView.BoxingAllocation
 // ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
 /* Builtins.cs -- встроенные функции
@@ -49,13 +50,11 @@ namespace AM.Scripting.Barsik
             { "have_var", new FunctionDescriptor ("have_var", HaveVariable) },
             { "italic", new FunctionDescriptor ("italic", Italic) },
             { "now", new FunctionDescriptor ("now", Now) },
-            { "open", new FunctionDescriptor ("open", Open) },
-            { "read", new FunctionDescriptor ("read", Read) },
+            { "readln", new FunctionDescriptor ("readln", Readln) },
             { "system", new FunctionDescriptor ("system", System) },
             { "trace", new FunctionDescriptor ("trace", Trace) },
             { "trim", new FunctionDescriptor ("trim", Trim) },
             { "warn", new FunctionDescriptor ("warn", Warn) },
-            { "write", new FunctionDescriptor ("write", Write) },
         };
 
         /// <summary>
@@ -150,23 +149,12 @@ namespace AM.Scripting.Barsik
         public static dynamic Now (Context context, dynamic?[] args) => DateTime.Now;
 
         /// <summary>
-        /// Открытие файла.
-        /// </summary>
-        public static dynamic Open (Context context, dynamic?[] args)
-        {
-            var fileName = (string) args.FirstOrDefault()!;
-
-            // TODO разные режимы
-
-            var result = File.OpenRead (fileName);
-
-            return result;
-        }
-
-        /// <summary>
         /// Чтение данных из файла.
         /// </summary>
-        public static dynamic Read (Context context, dynamic?[] args) => throw new NotImplementedException();
+        public static dynamic? Readln (Context context, dynamic?[] args)
+        {
+            return context.Input.ReadLine();
+        }
 
         /// <summary>
         /// Выполнение внешней программы и получение ее выходного потока.

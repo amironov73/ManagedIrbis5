@@ -37,8 +37,9 @@ namespace UnitTests.Scripting.Barsik
         public void Interpreter_Execute_2()
         {
             var variables = new Dictionary<string, dynamic?>();
+            var input = TextReader.Null;
             var output = new StringWriter();
-            var interpreter = new Interpreter (variables, output);
+            var interpreter = new Interpreter (variables, input, output);
             variables.Add ("x", 1);
             variables.Add ("y", 2);
             interpreter.Execute (@"if (x < y) { print ""x is less""; } else { print ""y is less""; }");
@@ -51,8 +52,9 @@ namespace UnitTests.Scripting.Barsik
         public void Interpreter_Execute_3()
         {
             var variables = new Dictionary<string, dynamic?>();
+            var input = TextReader.Null;
             var output = new StringWriter();
-            var interpreter = new Interpreter (variables, output);
+            var interpreter = new Interpreter (variables, input, output);
             variables.Add ("x", 1);
             variables.Add ("y", 2);
             interpreter.Execute (@"if (x != y) { print ""x is not equal y""; } else { print ""x is equal to y""; }");

@@ -48,6 +48,21 @@ namespace AM.Scripting.Barsik
         }
 
         /// <summary>
+        /// Разбор текста программы.
+        /// </summary>
+        public static AtomNode? ParseExpression
+            (
+                string sourceCode
+            )
+        {
+            Sure.NotNull (sourceCode);
+
+            sourceCode = RemoveComments (sourceCode);
+
+            return ArithmeticExpression.End().Parse (sourceCode);
+        }
+
+        /// <summary>
         /// Замена в исходном тексте комментариев в стиле C/C++ на пробелы.
         /// </summary>
         private static string RemoveComments
@@ -168,8 +183,8 @@ namespace AM.Scripting.Barsik
             select new KeyValueNode (key, value);
 
         private static readonly Parser<string> Identifier =
-            Parse.Identifier (Parse.Letter.Or (Parse.Char ('_')),
-                Parse.LetterOrDigit.Or (Parse.Char ('_')));
+            Parse.Identifier (Parse.Letter.Or (Parse.Char ('_')).Or (Parse.Char ('$')),
+                Parse.LetterOrDigit.Or (Parse.Char ('_').Or (Parse.Char ('$'))));
 
         private static readonly Parser<AtomNode> Variable =
             from identifier in Identifier.Text()

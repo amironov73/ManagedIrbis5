@@ -29,7 +29,7 @@ namespace AM.Scripting.Barsik
     /// <summary>
     /// Абстрактный узел AST.
     /// </summary>
-    abstract class AstNode
+    public abstract class AstNode
     {
     }
 }

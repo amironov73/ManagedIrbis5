@@ -46,20 +46,37 @@ namespace AM.Scripting.Barsik
         public Interpreter
             (
                 Dictionary<string, dynamic?>? variables = null,
+                TextReader? input = null,
                 TextWriter? output = null,
                 TextWriter? error = null
             )
         {
             variables ??= new ();
+            input ??= Console.In;
             output ??= Console.Out;
             error ??= Console.Error;
 
-            Context = new (variables, output, error);
+            Context = new (variables, input, output, error);
         }
 
         #endregion
 
         #region Public methods
+
+        /// <summary>
+        /// Вычисление значения переменной.
+        /// </summary>
+        public AtomNode? Evaluate
+            (
+                string sourceCode
+            )
+        {
+            Sure.NotNull (sourceCode);
+
+            var node = Grammar.ParseExpression (sourceCode);
+
+            return node ?? null;
+        }
 
         /// <summary>
         /// Запуск скрипта на исполнение.
