@@ -382,6 +382,32 @@ namespace AM.Scripting.Barsik
             from close2 in Parse.Char ('}').Token()
             select new ForNode (init, condition, step, statements);
 
+        private static readonly Parser<CatchNode> Catch =
+            from _ in Parse.String ("catch")
+            from open1 in Parse.Char ('(').Token()
+            from variable in Identifier
+            from close1 in Parse.Char (')').Token()
+            from open2 in Parse.Char ('{').Token()
+            from block in Block
+            from close2 in Parse.Char ('}').Token()
+            select new CatchNode (variable, block);
+
+        private static readonly Parser<IEnumerable<StatementNode>> Finally =
+            from _ in Parse.String ("finally")
+            from open in Parse.Char ('{').Token()
+            from block in Block
+            from close in Parse.Char ('}').Token()
+            select block;
+
+        private static readonly Parser<StatementNode> TryCatchFinally =
+            from _ in Parse.String ("try")
+            from open in Parse.Char ('{').Token()
+            from tryBlock in Block
+            from close in Parse.Char ('}').Token()
+            from catchNode in Catch.Optional()
+            from finallyBlock in Finally.Optional()
+            select new TryNode (tryBlock, catchNode.GetOrDefault(), finallyBlock.GetOrDefault());
+
         // определение функции
         private static readonly Parser<DefinitionNode> Definition =
             from _ in Parse.String ("func").Token()
@@ -400,7 +426,7 @@ namespace AM.Scripting.Barsik
             select new StatementNode();
 
         private static readonly Parser<StatementNode> NoSemicolon =
-            from statement in Nop.Or (Definition).Or (ForEach).Or (For).Or (While).Or (If)
+            from statement in Nop.Or (Definition).Or (ForEach).Or (For).Or (While).Or (If).Or (TryCatchFinally)
             select statement;
 
         private static readonly Parser<StatementNode> RequireSemicolon =
