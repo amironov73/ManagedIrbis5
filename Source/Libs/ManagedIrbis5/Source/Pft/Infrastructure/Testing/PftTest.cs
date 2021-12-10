@@ -83,21 +83,23 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Folder name.
         /// </summary>
-        public string Folder { get; private set; }
+        public string Folder { get; }
 
         #endregion
 
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public PftTest
             (
                 string folder
             )
         {
-            Folder = Path.GetFullPath(folder);
+            Sure.NotNullNorEmpty (folder);
+
+            Folder = Path.GetFullPath (folder);
         }
 
         #endregion
@@ -109,11 +111,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 string shortName
             )
         {
-            return Path.Combine
-                (
-                    Folder,
-                    shortName
-                );
+            return Path.Combine (Folder, shortName);
         }
 
         #endregion
@@ -121,17 +119,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         #region Public methods
 
         /// <summary>
-        /// Whether the directory contains test?
+        /// Содержит ли папка тест?
         /// </summary>
         public static bool IsDirectoryContainsTest
             (
                 string directory
             )
         {
+            Sure.NotNullNorEmpty (directory);
+
             var result =
-                File.Exists(Path.Combine(directory, DescriptionFileName))
-                && File.Exists(Path.Combine(directory, RecordFileName))
-                && File.Exists(Path.Combine(directory, InputFileName));
+                File.Exists (Path.Combine (directory, DescriptionFileName))
+                && File.Exists (Path.Combine (directory, RecordFileName))
+                && File.Exists (Path.Combine (directory, InputFileName));
 
             return result;
         }
@@ -152,13 +152,13 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
 
             try
             {
-                if (ReferenceEquals(Provider, null))
+                if (ReferenceEquals (Provider, null))
                 {
-                    throw new PftException("environment not set");
+                    throw new PftException ("environment not set");
                 }
 
-                var descriptionFile = GetFullName(DescriptionFileName);
-                if (File.Exists(descriptionFile))
+                var descriptionFile = GetFullName (DescriptionFileName);
+                if (File.Exists (descriptionFile))
                 {
                     var description = File.ReadAllText
                         (
@@ -166,19 +166,19 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                             IrbisEncoding.Utf8
                         );
                     result.Description = description;
-                    ConsoleInput.Write(description);
+                    ConsoleInput.Write (description);
                 }
 
-                var ignoreFile = GetFullName(IgnoreFileName);
-                if (File.Exists(ignoreFile))
+                var ignoreFile = GetFullName (IgnoreFileName);
+                if (File.Exists (ignoreFile))
                 {
-                    ConsoleInput.Write(" IGNORED");
+                    ConsoleInput.Write (" IGNORED");
                     goto DONE;
                 }
 
-                var recordFile = GetFullName(RecordFileName);
+                var recordFile = GetFullName (RecordFileName);
 
-                if (ReferenceEquals(recordFile, null))
+                if (ReferenceEquals (recordFile, null))
                 {
                     throw new IrbisException
                         (
@@ -187,75 +187,76 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                 }
 
                 var record = PlainText.ReadOneRecord
-                    (
-                        recordFile,
-                        IrbisEncoding.Utf8
-                    )
-                    .ThrowIfNull("ReadOneRecord returns null");
+                        (
+                            recordFile,
+                            IrbisEncoding.Utf8
+                        )
+                    .ThrowIfNull ("ReadOneRecord returns null");
                 record.Mfn = 1; // TODO some other value?
 
-                var pftFile = GetFullName(InputFileName);
+                var pftFile = GetFullName (InputFileName);
                 var input = File.ReadAllText
-                    (
-                        pftFile,
-                        IrbisEncoding.Utf8
-                    )
+                        (
+                            pftFile,
+                            IrbisEncoding.Utf8
+                        )
                     .DosToUnix()
-                    .ThrowIfNull("input");
+                    .ThrowIfNull ("input");
                 result.Input = input;
 
                 //ConsoleInput.WriteLine(input);
                 //ConsoleInput.WriteLine();
 
                 var lexer = new PftLexer();
-                var tokenList = lexer.Tokenize(input);
+                var tokenList = lexer.Tokenize (input);
                 var writer = new StringWriter();
-                tokenList.Dump(writer);
+                tokenList.Dump (writer);
                 result.Tokens = writer.ToString()
                     .DosToUnix()
-                    .ThrowIfNull("tokens");
+                    .ThrowIfNull ("tokens");
 
                 //ConsoleInput.WriteLine(result.Tokens);
                 //ConsoleInput.WriteLine();
 
-                var parser = new PftParser(tokenList);
+                var parser = new PftParser (tokenList);
                 var program = parser.Parse();
 
                 //result.Ast = program.DumpToText().DosToUnix();
                 //ConsoleInput.WriteLine(result.Ast);
                 //ConsoleInput.WriteLine();
 
-                var expectedFile = GetFullName(ExpectedFileName);
+                var expectedFile = GetFullName (ExpectedFileName);
                 string? expected = null;
-                if (File.Exists(expectedFile))
+                if (File.Exists (expectedFile))
                 {
                     expected = File.ReadAllText
-                        (
-                            expectedFile,
-                            IrbisEncoding.Utf8
-                        )
+                            (
+                                expectedFile,
+                                IrbisEncoding.Utf8
+                            )
                         .DosToUnix()
-                        .ThrowIfNull("expected");
+                        .ThrowIfNull ("expected");
                     result.Expected = expected;
                 }
 
-                var provider = Provider.ThrowIfNull("Provider");
+                var provider = Provider.ThrowIfNull ("Provider");
 
                 string output;
                 using (var formatter = new PftFormatter { Program = program })
                 {
-                    formatter.SetProvider(provider);
+                    formatter.SetProvider (provider);
 
-                    var breakFile = GetFullName(DebugBreakFileName);
-                    if (File.Exists(breakFile))
+                    var breakFile = GetFullName (DebugBreakFileName);
+                    if (File.Exists (breakFile))
                     {
                         Debugger.Break();
                     }
 
-                    output = formatter.FormatRecord(record)
+                    output = formatter.FormatRecord (record)
                         .DosToUnix()
-                        .ThrowIfNull("output");
+                        .ThrowIfNull ("output");
                 }
+
                 result.Output = output;
 
                 //ConsoleInput.WriteLine(output);
@@ -267,24 +268,20 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                         result.Failed = true;
 
                         ConsoleInput.WriteLine();
-                        ConsoleInput.WriteLine("!!! FAILED !!!");
+                        ConsoleInput.WriteLine ("!!! FAILED !!!");
                         ConsoleInput.WriteLine();
-                        ConsoleInput.WriteLine("EXPECTED");
-                        ConsoleInput.WriteLine(expected);
+                        ConsoleInput.WriteLine ("EXPECTED");
+                        ConsoleInput.WriteLine (expected);
                         ConsoleInput.WriteLine();
-                        ConsoleInput.WriteLine("ACTUAL");
-                        ConsoleInput.WriteLine(output);
+                        ConsoleInput.WriteLine ("ACTUAL");
+                        ConsoleInput.WriteLine (output);
                         ConsoleInput.WriteLine();
                     }
                 }
             }
             catch (Exception exception)
             {
-                Magna.TraceException
-                    (
-                        "PftTest::Run",
-                        exception
-                    );
+                Magna.TraceException (nameof (PftTest) + "::" + nameof (Run), exception);
 
                 result.Failed = true;
                 result.Exception = exception.ToString();

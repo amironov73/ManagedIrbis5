@@ -1,0 +1,4 @@
+Have builder? False
+Have builder? True
+Result is 0123456789
+Have builder? False

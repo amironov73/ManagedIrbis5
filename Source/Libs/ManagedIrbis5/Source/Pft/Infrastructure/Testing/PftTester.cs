@@ -44,17 +44,17 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         /// <summary>
         /// Folder name.
         /// </summary>
-        public string Folder { get; private set; }
+        public string Folder { get; }
 
         /// <summary>
         /// Tests.
         /// </summary>
-        public NonNullCollection<PftTest> Tests { get; private set; }
+        public NonNullCollection<PftTest> Tests { get; }
 
         /// <summary>
         /// Results.
         /// </summary>
-        public NonNullCollection<PftTestResult> Results { get; private set; }
+        public NonNullCollection<PftTestResult> Results { get; }
 
         #endregion
 
@@ -92,10 +92,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
 
             foreach (var subDir in directories)
             {
-                if (PftTest.IsDirectoryContainsTest(subDir))
+                if (PftTest.IsDirectoryContainsTest (subDir))
                 {
-                    var test = new PftTest(subDir);
-                    Tests.Add(test);
+                    var test = new PftTest (subDir);
+                    Tests.Add (test);
                 }
             }
         }
@@ -110,30 +110,30 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         {
             PftTestResult? result = null;
 
-            var name = Path.GetFileName(test.Folder);
+            var name = Path.GetFileName (test.Folder);
 
             var foreColor = ConsoleInput.ForegroundColor;
             ConsoleInput.ForegroundColor = ConsoleColor.Cyan;
 
-            ConsoleInput.Write(name + ": ");
+            ConsoleInput.Write (name + ": ");
 
             ConsoleInput.ForegroundColor = foreColor;
 
             try
             {
-                result = test.Run(name);
+                result = test.Run (name);
 
                 ConsoleInput.ForegroundColor = result.Failed
                     ? ConsoleColor.Red
                     : ConsoleColor.Green;
 
                 //ConsoleInput.WriteLine();
-                ConsoleInput.Write(" ");
+                ConsoleInput.Write (" ");
                 ConsoleInput.WriteLine
                     (
                         result.Failed
-                        ? "FAIL"
-                        : "OK"
+                            ? "FAIL"
+                            : "OK"
                     );
 
                 ConsoleInput.ForegroundColor = foreColor;
@@ -149,9 +149,9 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
                         exception
                     );
 
-                Debug.WriteLine(exception);
+                Debug.WriteLine (exception);
 
-                ConsoleInput.WriteLine(exception.ToString());
+                ConsoleInput.WriteLine (exception.ToString());
             }
 
             //ConsoleInput.WriteLine();
@@ -167,10 +167,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
             foreach (var test in Tests)
             {
                 test.Provider = Provider;
-                var result = RunTest(test);
+                var result = RunTest (test);
                 if (result is not null)
                 {
-                    Results.Add(result);
+                    Results.Add (result);
                 }
             }
         }

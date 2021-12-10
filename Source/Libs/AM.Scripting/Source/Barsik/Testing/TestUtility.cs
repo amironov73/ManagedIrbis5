@@ -1,0 +1,179 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
+// ReSharper disable UnusedMember.Global
+
+/* TestUtility.cs -- полезные методы для тестирования Барсика
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Scripting.Barsik
+{
+    /// <summary>
+    /// Полезные методы для тестирования Барсика.
+    /// </summary>
+    public static class TestUtility
+    {
+        #region Constants
+
+        /// <summary>
+        /// Если в папке с данными для теста находится
+        /// файл с таким именем, тест вызовет отладчик
+        /// перед началом выполнения.
+        /// </summary>
+        public const string DebugBreakFileName = "debug.break";
+
+        /// <summary>
+        /// Имя файла с описанием теста.
+        /// </summary>
+        public const string DescriptionFileName = "description.txt";
+
+        /// <summary>
+        /// Имя файла с ожидаемым результатом вывода.
+        /// Если файла с таким именем нет,
+        /// от теста требуется просто не упасть.
+        /// </summary>
+        public const string OutputFileName = "output.txt";
+
+        /// <summary>
+        /// Если в папке с данными для теста находится
+        /// файл с таким именем, тест пропускается.
+        /// </summary>
+        public const string IgnoreFileName = "test.ignore";
+
+        /// <summary>
+        /// Имя файла с входными данными.
+        /// Если такого файла нет, входных данных не требуется.
+        /// </summary>
+        public const string InputFileName = "input.txt";
+
+        /// <summary>
+        /// Имя файла с исходным кодом.
+        /// </summary>
+        public const string SourceFileName = "source.barsik";
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Содержит ли папка тест?
+        /// </summary>
+        public static bool IsDirectoryContainsTest
+            (
+                string directory
+            )
+        {
+            Sure.NotNullNorEmpty (directory);
+
+            return File.Exists (Path.Combine (directory, DescriptionFileName))
+                   && File.Exists (Path.Combine (directory, SourceFileName));
+        }
+
+        /// <summary>
+        /// Запуск всех тестов и сохранение результатов.
+        /// </summary>
+        public static void RunTests
+            (
+                string inputFolder,
+                string outputFolder
+            )
+        {
+            Sure.NotNullNorEmpty (inputFolder);
+            Sure.NotNullNorEmpty (outputFolder);
+
+            if (!Directory.Exists (inputFolder))
+            {
+                throw new DirectoryNotFoundException (inputFolder);
+            }
+
+            if (!Directory.Exists (outputFolder))
+            {
+                throw new DirectoryNotFoundException (outputFolder);
+            }
+
+            var context = new TestContext (Console.Out);
+            var tester = new Tester (context);
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            var testResults = tester.DiscoverAndRunTests (inputFolder);
+
+            stopwatch.Stop();
+            var elapsed = stopwatch.Elapsed;
+
+            var totalTestCount = testResults.Length;
+            var failedTestCount = testResults.Count (t => t.Failed);
+            var ignoredTestCount = testResults.Count (t => t.Ignored);
+            Console.WriteLine();
+            Console.WriteLine (
+                $"Total tests: {totalTestCount}, failed: {failedTestCount}, ignored: {ignoredTestCount}, elapsed: {elapsed.ToAutoString()}");
+            Console.WriteLine();
+
+            var fileName = DateTime.Now.ToString ("yyyy-MM-dd HH-mm-ss") + ".json";
+            fileName = Path.Combine (outputFolder, fileName);
+
+            var options = new JsonSerializerOptions
+            {
+                IgnoreNullValues = true,
+                WriteIndented = true
+
+            };
+            var content = JsonSerializer.Serialize (testResults, options);
+            File.WriteAllText (fileName, content);
+        }
+
+        /// <summary>
+        /// Показ разницы между двумя строками.
+        /// </summary>
+        public static void ShowDifference
+            (
+                TestContext context,
+                string expected,
+                string actual
+            )
+        {
+            var index = 0;
+            while (index < expected.Length && index < actual.Length)
+            {
+                if (expected[index] != actual[index])
+                {
+                    break;
+                }
+
+                ++index;
+            }
+
+            if (index == expected.Length && index == actual.Length)
+            {
+                return;
+            }
+
+            context.Output.WriteLine ($"Difference at index {index}");
+            context.Output.WriteLine ($"Expected: {expected.Substring (index)}");
+            context.Output.WriteLine ($"Actual  : {actual.Substring (index)}");
+
+        }
+
+        #endregion
+    }
+}

@@ -3,13 +3,12 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable PropertyCanBeMadeInitOnly.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* PftTestResult.cs -- результат прогона одного теста
+/* TestResult.cs -- результат прогона одного теста
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,12 +21,12 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace ManagedIrbis.Pft.Infrastructure.Testing
+namespace AM.Scripting.Barsik
 {
     /// <summary>
-    /// Результат прогона одного теста
+    /// Результат прогона одного теста.
     /// </summary>
-    public sealed class PftTestResult
+    public sealed class TestResult
     {
         #region Properties
 
@@ -38,67 +37,67 @@ namespace ManagedIrbis.Pft.Infrastructure.Testing
         public TimeSpan Duration { get; set; }
 
         /// <summary>
-        /// Test failed?
+        /// Тест провален?
         /// </summary>
         [JsonPropertyName ("failed")]
         public bool Failed { get; set; }
 
         /// <summary>
-        /// Finish time.
+        /// Тест проигнорирован?
+        /// </summary>
+        [JsonPropertyName ("ignored")]
+        public bool Ignored { get; set; }
+
+        /// <summary>
+        /// Момент окончания прогона.
         /// </summary>
         [JsonPropertyName ("finish")]
         public DateTime FinishTime { get; set; }
 
         /// <summary>
-        /// Name of the test.
+        /// Имя теста.
         /// </summary>
         [JsonPropertyName ("name")]
         public string? Name { get; set; }
 
         /// <summary>
-        /// Description.
+        /// Описание (берется из файла с описанием).
         /// </summary>
         [JsonPropertyName ("description")]
         public string? Description { get; set; }
 
         /// <summary>
-        /// Start time.
+        /// Момент начала прогона.
         /// </summary>
         [JsonPropertyName ("start")]
         public DateTime StartTime { get; set; }
 
         /// <summary>
-        /// Input.
+        /// Исходный код тестируемого скрипта.
+        /// </summary>
+        [JsonPropertyName ("source")]
+        public string? Source { get; set; }
+
+        /// <summary>
+        /// Входные данные (если есть).
         /// </summary>
         [JsonPropertyName ("input")]
         public string? Input { get; set; }
 
         /// <summary>
-        /// Tokens.
-        /// </summary>
-        [JsonPropertyName ("tokens")]
-        public string? Tokens { get; set; }
-
-        /// <summary>
-        /// Program AST dump.
-        /// </summary>
-        [JsonPropertyName ("ast")]
-        public string? Ast { get; set; }
-
-        /// <summary>
-        /// Output text.
+        /// Ожидаемые выходные данные.
         /// </summary>
         [JsonPropertyName ("expected")]
         public string? Expected { get; set; }
 
         /// <summary>
-        /// Output text.
+        /// Фактические выходные данные.
         /// </summary>
         [JsonPropertyName ("output")]
         public string? Output { get; set; }
 
         /// <summary>
-        /// Exception text (if any).
+        /// Исключение (если было).
         /// </summary>
         [JsonPropertyName ("exception")]
         public string? Exception { get; set; }
