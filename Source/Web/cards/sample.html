@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Пример дизайна</title>
+
+    <style>
+        .card {
+            margin: 7mm 5%;
+            padding: 5pt;
+            min-width: 600px;
+            border: gray solid thin;
+            border-radius: 2mm;
+            background: rgb(237, 237, 237);
+            background: linear-gradient(200deg, rgba(237, 237, 237, 1) 0%, rgba(240, 240, 240, 1) 100%);
+            overflow: auto;
+        }
+
+        .cover {
+            float: left;
+            height: 100px;
+        }
+
+        .cover a {
+            text-decoration: none;
+            align-self: center;
+        }
+
+        .brief {
+        }
+
+        .exemplars {
+            border-top: gray solid thin;
+            padding-top: 2mm;
+        }
+
+        .free-exemplar {
+            color: green;
+            font-weight: bold;
+        }
+
+        .control-exemplar {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .nonfree-exemplar {
+            color: red;
+            font-weight: bold;
+        }
+
+        .expand {
+            align-self: center;
+        }
+
+        .checkmark {
+            align-self: center;
+        }
+
+        .h-wrapper {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .v-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+        }
+
+        .cover-row {
+            margin-right: 2mm;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+        }
+
+        .expand-button {
+            border: none;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="card">
+    <div class="h-wrapper">
+        <div class="v-wrapper cover-row">
+            <div class="cover">
+                <a href="http://84.237.19.2:8081/Opac/PicHandler.ashx?command=show&catalog=cover&file=50\669150.png"
+                   target="_blank">
+                    <img src="http://84.237.19.2:8081/Opac/PicHandler.ashx?command=show&catalog=cover&file=50\669150.png"
+                         alt="обложка" class="cover"></a>
+            </div>
+            <div class="h-wrapper">
+                <div class="checkmark">
+                    <label>
+                        <input type="checkbox">
+                    </label>
+                </div>
+                <div class="expand">
+                    <button class="expand-button">▲</button>
+                </div>
+            </div>
+        </div>
+        <div class="brief">
+            <p>Дмитриченко, Михаил Иванович. Товароведение и экспертиза пищевых жиров, молока и молочных продуктов : для
+                вузов по специальности 35.11.00 "Товароведение и экспертиза товаров" / М. И. Дмитриченко, Т. В.
+                Пилипенко. - Санкт-Петербург [и др.] : Питер, 2004. - 350 с. : ил. - (Учебное пособие). - ISBN
+                5-94723-680-X : 105.00 р.</p>
+            <p><b>В надзаг.:</b> Министерство образования и науки РФ</p>
+            <p><b>УДК</b> 664.014(076.5)</p>
+
+            <p><b>Рубрики:</b> Пищевая химия</p>
+
+            <p><b>Кл.слова (ненормированные)</b>: пищевая биотехнология -- пектины -- каратин -- пищевые продукты --
+                растительное сырье -- ферменты -- микроорганизмы</p>
+            <p><b>Доп. точки доступа</b>:
+                Иркутский государственный технический университет (Иркутск). Кафедра органической химии и пищевой
+                технологии</p>
+        </div>
+    </div>
+    <div class="exemplars">
+        Экземпляры: <span class="control-exemplar">663268</span>, <span class="nonfree-exemplar">663269</span>, <span
+            class="free-exemplar">663270</span>
+    </div>
+</div>
+
+<div class="card">
+    <div class="h-wrapper">
+        <div class="v-wrapper cover-row">
+            <div class="checkmark">
+                <label>
+                    <input type="checkbox">
+                </label>
+            </div>
+            <div class="expand">
+                <button class="expand-button">▼</button>
+            </div>
+        </div>
+        <div class="brief">
+            Пилипенко, Татьяна Владимировна. Товароведение и экспертиза пищевых жиров : учебник для вузов по
+            специальности "Товароведение и экспертиза товаров" / Т. В. Пилипенко. - Санкт-Петербург : ГИОРД, 2006. - 376
+            с. : ил. - (Современная учебная, техническая и научная литература). - ISBN 5-98879-031-3 : 234.30 р.
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="h-wrapper">
+        <div class="v-wrapper cover-row">
+            <div class="checkmark">
+                <label>
+                    <input type="checkbox">
+                </label>
+            </div>
+            <div class="expand">
+                <button class="expand-button">▼</button>
+            </div>
+        </div>
+        <div class="brief">
+            Физико-химические методы исследования сырья : [ Электронный ресурс] : методические указания по практическим
+            занятиям магистрантов Направление подготовки: 260100 "Продукты питания из растительного сырья" Магистерская
+            программа: "Биотехнология продуктов питания" Квалификация (степень): магистр Форма обучения: очная / Иркут.
+            гос. техн. ун-т ; сост. В. И. Луцкий. - Иркутск : ИрГТУ, 2013. - 13 с.
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="h-wrapper">
+        <div class="v-wrapper cover-row">
+            <a href="http://84.237.19.2:8081/Opac/PicHandler.ashx?command=show&catalog=cover&file=11\672511.png"
+               target="_blank">
+                <img src="http://84.237.19.2:8081/Opac/PicHandler.ashx?command=show&catalog=cover&file=11\672511.png"
+                     alt="обложка" class="cover"></a>
+            <div class="h-wrapper">
+                <div class="checkmark">
+                    <label>
+                        <input type="checkbox">
+                    </label>
+                </div>
+                <div class="expand">
+                    <button class="expand-button">▼</button>
+                </div>
+            </div>
+        </div>
+        <div class="brief">
+            Товарный менеджмент и экспертиза жировых товаров : учебное пособие / О. Б. Рудаков [и др.]. -
+            Санкт-Петербург [и др.] : Лань, 2016. - 304 с. : ил. - (Учебники для вузов. Специальная литература). -
+            Библиогр.: с. 296-300. - ISBN 978-5-8114-1954-8 : 875.16 р.
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="h-wrapper">
+        <div class="v-wrapper">
+            <a href="http://84.237.19.2:8081/Opac/PicHandler.ashx?command=show&catalog=cover&file=61\669061.png"
+               target="_blank">
+                <img src="http://84.237.19.2:8081/Opac/PicHandler.ashx?command=show&catalog=cover&file=61\669061.png"
+                     alt="обложка" class="cover"></a>
+            <div class="h-wrapper">
+                <div class="checkmark">
+                    <label>
+                        <input type="checkbox">
+                    </label>
+                </div>
+                <div class="expand">
+                    <button class="expand-button">▼</button>
+                </div>
+            </div>
+        </div>
+        <div class="brief">
+            Гусакова, Галина Семеновна. Перспективы промышленной переработки семечковых культур Южного Прибайкалья :
+            монография / Г. С. Гусакова, М. А. Раченко, С. Н. Евстафьев ; Иркут. нац. исслед. техн. ун-т. - Иркутск :
+            ИРНИТУ, 2016. - 156 с. : ил. - ISBN 978-5-8038-1158-9 : 275.00 р.
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
