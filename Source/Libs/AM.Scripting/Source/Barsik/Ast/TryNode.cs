@@ -61,6 +61,8 @@ namespace AM.Scripting.Barsik
                 Context context
             )
         {
+            PreExecute (context);
+
             try
             {
                 foreach (var statement in _tryBlock)

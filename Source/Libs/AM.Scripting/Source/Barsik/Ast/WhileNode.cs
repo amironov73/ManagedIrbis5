@@ -53,6 +53,8 @@ namespace AM.Scripting.Barsik
         /// <inheritdoc cref="StatementNode.Execute"/>
         public override void Execute (Context context)
         {
+            PreExecute (context);
+
             while (_condition.Compute (context))
             {
                 foreach (var statement in _statements)

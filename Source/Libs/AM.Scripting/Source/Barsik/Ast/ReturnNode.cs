@@ -31,18 +31,44 @@ namespace AM.Scripting.Barsik
     /// </summary>
     sealed class ReturnNode : StatementNode
     {
-        public ReturnNode (AtomNode? value)
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="value"></param>
+        public ReturnNode
+            (
+                AtomNode? value
+            )
         {
             _value = value;
         }
 
+        #endregion
+
+        #region Private members
+
         private readonly AtomNode? _value;
 
-        public override void Execute (Context context)
+        #endregion
+
+        #region StatementNode members
+
+
+        /// <inheritdoc cref="StatementNode.Execute"/>
+        public override void Execute
+            (
+                Context context
+            )
         {
+            PreExecute (context);
+
             var value = _value?.Compute (context) ?? "(null)";
 
             throw new ReturnException (value);
         }
+
+        #endregion
     }
 }

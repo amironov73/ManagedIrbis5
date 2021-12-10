@@ -46,6 +46,8 @@ namespace AM.Scripting.Barsik
 
         public override void Execute (Context context)
         {
+            PreExecute (context);
+
             var enumerable = _enumerable.Compute (context);
             if (enumerable is null || enumerable is not IEnumerable)
             {

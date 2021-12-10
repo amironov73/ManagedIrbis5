@@ -50,6 +50,8 @@ namespace AM.Scripting.Barsik
 
         public override void Execute (Context context)
         {
+            PreExecute (context);
+
             _expression.Compute (context);
         }
 

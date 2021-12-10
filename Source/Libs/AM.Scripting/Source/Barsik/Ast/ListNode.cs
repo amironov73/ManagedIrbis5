@@ -14,11 +14,7 @@
 
 #region Using directives
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
-
-using AM.Text;
 
 #endregion
 
@@ -44,7 +40,7 @@ namespace AM.Scripting.Barsik
 
         public override dynamic? Compute (Context context)
         {
-            var result = new List<dynamic?>();
+            var result = new BarsikList();
             foreach (var item in _items)
             {
                 var value = item.Compute (context);

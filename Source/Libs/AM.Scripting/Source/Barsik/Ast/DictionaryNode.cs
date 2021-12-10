@@ -46,7 +46,7 @@ namespace AM.Scripting.Barsik
 
         #region Private members
 
-        private List<KeyValueNode> _items;
+        private readonly List<KeyValueNode> _items;
 
         #endregion
 
@@ -57,7 +57,7 @@ namespace AM.Scripting.Barsik
                 Context context
             )
         {
-            var result = new Dictionary<dynamic, dynamic?>();
+            var result = new BarsikDictionary();
             foreach (var item in _items)
             {
                 var key = item.Key.Compute (context);

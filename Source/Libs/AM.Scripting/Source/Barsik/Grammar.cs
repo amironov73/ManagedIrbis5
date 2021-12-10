@@ -196,10 +196,9 @@ namespace AM.Scripting.Barsik
             select new NegationNode (inner);
 
         private static readonly Parser<AtomNode> Parenthesis =
-            from open in Parse.Char ('(').Token()
-            from inner in Parse.Ref (() => ArithmeticExpression)
-            from close in Parse.Char (')').Token()
-            select new ParenthesisNode (inner);
+            Parse.Ref (() => ArithmeticExpression)
+                .Contained (Parse.Char ('(').Token(), Parse.Char (')').Token())
+                .Select (s => new ParenthesisNode (s));
 
         private static readonly Parser<AtomNode> FunctionCall =
             from name in Identifier
@@ -263,7 +262,7 @@ namespace AM.Scripting.Barsik
             from condition in Parse.ChainOperator
                 (
                     AndOr.Token(),
-                    Comparison,
+                    Comparison.Or (Variable),
                     (op, left, right) =>
                         new ConditionNode (left, right, op)
                 )

@@ -95,6 +95,8 @@ namespace AM.Scripting.Barsik
 
         public override void Execute (Context context)
         {
+            PreExecute (context);
+
             foreach (var node in _nodes)
             {
                 Print (node, context);

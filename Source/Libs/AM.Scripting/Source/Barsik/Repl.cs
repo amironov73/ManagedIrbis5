@@ -198,6 +198,10 @@ namespace AM.Scripting.Barsik
                         Interpreter.Context.DumpVariables();
                         break;
 
+                    case "#u":
+                        Interpreter.Context.DumpNamespaces();
+                        break;
+
                     default:
                         ExecuteCore (sourceCode);
                         break;

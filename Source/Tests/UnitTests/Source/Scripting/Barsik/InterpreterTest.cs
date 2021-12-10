@@ -107,8 +107,22 @@ x = 1;
         {
             var interpreter = new Interpreter();
             interpreter.Execute ("l = [];");
-            var actual = (List<dynamic?>)interpreter.Context.Variables["l"]!;
+            var actual = (List<dynamic?>) interpreter.Context.Variables["l"]!;
             Assert.AreEqual (0, actual.Count);
+        }
+
+        [TestMethod]
+        [Description ("Скобки")]
+        public void Interpreter_Execute_8()
+        {
+            var interpreter = new Interpreter();
+            var variables = interpreter.Context.Variables;
+            variables.Add ("x", 1);
+            variables.Add ("y", 2);
+            variables.Add ("z", 3);
+            interpreter.Execute ("r = (x + y) * z;");
+            var actual = (int) (object) interpreter.Context.Variables["r"]!;
+            Assert.AreEqual (9, actual);
         }
     }
 }

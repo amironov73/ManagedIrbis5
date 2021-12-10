@@ -50,6 +50,16 @@ namespace AM.Scripting.Barsik
         public Dictionary<string, dynamic?> Variables { get; }
 
         /// <summary>
+        /// Точки останова.
+        /// </summary>
+        public Dictionary<StatementNode, Breakpoint> Breakpoints { get; }
+
+        /// <summary>
+        /// Отладчик.
+        /// </summary>
+        public IBarsikDebugger? Debugger { get; set; }
+
+        /// <summary>
         /// Стандартный входной поток.
         /// </summary>
         public TextReader Input { get; }
@@ -92,6 +102,7 @@ namespace AM.Scripting.Barsik
             Output = output;
             Error = error;
             Namespaces = new ();
+            Breakpoints = new ();
         }
 
         #endregion
@@ -126,6 +137,25 @@ namespace AM.Scripting.Barsik
                     Error,
                     this
                 );
+        }
+
+        /// <summary>
+        /// Дамп пространств имен.
+        /// </summary>
+        public void DumpNamespaces()
+        {
+            var keys = Namespaces.Keys.ToArray();
+            if (keys.IsNullOrEmpty())
+            {
+                Output.WriteLine ("(no namespaces)");
+                return;
+            }
+
+            Array.Sort (keys);
+            foreach (var key in keys)
+            {
+                Output.WriteLine (key);
+            }
         }
 
         /// <summary>

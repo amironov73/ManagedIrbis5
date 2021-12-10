@@ -14,7 +14,6 @@
 
 #region Using directives
 
-using System.Collections;
 using System.Collections.Generic;
 
 using AM.Text;
@@ -29,7 +28,8 @@ namespace AM.Scripting.Barsik
     /// <summary>
     /// Условный оператор if-then-else.
     /// </summary>
-    sealed class IfNode : StatementNode
+    sealed class IfNode
+        : StatementNode
     {
         #region Construction
 
@@ -61,8 +61,13 @@ namespace AM.Scripting.Barsik
         #region AstNode members
 
         /// <inheritdoc cref="StatementNode.Execute"/>
-        public override void Execute (Context context)
+        public override void Execute
+            (
+                Context context
+            )
         {
+            PreExecute (context);
+
             if (_condition.Compute (context))
             {
                 foreach (var statement in _thenBlock)

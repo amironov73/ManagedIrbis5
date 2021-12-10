@@ -48,6 +48,8 @@ namespace AM.Scripting.Barsik
                 Context context
             )
         {
+            PreExecute (context);
+
             var variableName = _target.VariableName;
             var memberName = _target.MemberName;
             var computedValue = _expression.Compute (context);
