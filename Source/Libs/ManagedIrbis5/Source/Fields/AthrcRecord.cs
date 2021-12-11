@@ -178,7 +178,5 @@ namespace ManagedIrbis.Fields
         public string? Worksheet { get; set; }
 
         #endregion
-
-    } // class AthrcRecord
-
-} // namespace ManagedIrbis.Fields
+    }
+}

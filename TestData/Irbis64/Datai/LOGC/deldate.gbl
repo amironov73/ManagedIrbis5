@@ -1,0 +1,28 @@
+1
+DelDate.wss
+Удаление данных протокола за указанный диапазон дат
+// 991^A - нижний предел дат
+// 991^B - верхний предел дат
+DEL
+991
+*
+XXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXX
+ADD
+991
+XXXXXXXXXXXXXXXXXXX
+'%1'
+XXXXXXXXXXXXXXXXXXX
+IF
+if (val(v991^a)+val(v991^b)>0) and (val(v1.8)>=val(v991^a)) and ((val(v991^b)=0) or (val(v1.8)<=val(v991^b))) then '1' fi
+DELR
+XXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXX
+FI
+DEL
+991
+*
+XXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXX

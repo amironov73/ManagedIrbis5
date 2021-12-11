@@ -220,7 +220,5 @@ namespace ManagedIrbis.Fields
         public override string ToString() => MainTitle.ToVisibleString();
 
         #endregion
-
-    } // class AthraRecord
-
-} // namespace ManagedIrbis.Fields
+    }
+}

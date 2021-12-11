@@ -16,6 +16,7 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -81,10 +82,11 @@ namespace ManagedIrbis.EventDb
         public Field? Field { get; set; }
 
         /// <summary>
-        /// Arbitrary user data.
+        /// Произвольные пользовательские данные.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -113,11 +115,8 @@ namespace ManagedIrbis.EventDb
             };
 
             return result;
-
-        } // method Parse
+        }
 
         #endregion
-
-    } // class EventDates
-
-} // namespace ManagedIrbis.EventDb
+    }
+}

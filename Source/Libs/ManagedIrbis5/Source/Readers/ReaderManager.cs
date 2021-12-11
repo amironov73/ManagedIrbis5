@@ -269,7 +269,5 @@ namespace ManagedIrbis.Readers
         }
 
         #endregion
-
-    } // class ReaderManager
-
-} // namespace ManagedIrbis.Readers
+    }
+}

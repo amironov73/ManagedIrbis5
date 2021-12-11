@@ -46,7 +46,7 @@ namespace UnitTests.ManagedIrbis.Connectivity.InMemory
             var dataiPath = _GetDataiPath();
             provider.RestoreFrom (dataiPath);
             var files = provider.ListResources (".");
-            Assert.AreEqual (4, files.Length);
+            Assert.AreEqual (5, files.Length);
         }
 
         [TestMethod]
