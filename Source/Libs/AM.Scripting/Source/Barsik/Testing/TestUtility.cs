@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
+// ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 
 /* TestUtility.cs -- полезные методы для тестирования Барсика
@@ -19,6 +20,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 
 #endregion
@@ -69,6 +71,39 @@ namespace AM.Scripting.Barsik
         /// Имя файла с исходным кодом.
         /// </summary>
         public const string SourceFileName = "source.barsik";
+
+        #endregion
+
+        #region Private members
+
+        private  static void DumpAt
+            (
+                TestContext context,
+                string name,
+                byte[] bytes,
+                int start
+            )
+        {
+            context.Output.Write ($"{name}:");
+
+            if (start != 0)
+            {
+                --start;
+            }
+
+            for (var i = 0; i < 6; i++)
+            {
+                var j = start + i;
+                if (j >= bytes.Length)
+                {
+                    break;
+                }
+
+                context.Output.Write ($" {bytes[j]:X2}");
+            }
+
+            context.Output.WriteLine();
+        }
 
         #endregion
 
@@ -129,7 +164,7 @@ namespace AM.Scripting.Barsik
                 $"Total tests: {totalTestCount}, failed: {failedTestCount}, ignored: {ignoredTestCount}, elapsed: {elapsed.ToAutoString()}");
             Console.WriteLine();
 
-            var fileName = DateTime.Now.ToString ("yyyy-MM-dd HH-mm-ss") + ".json";
+            var fileName = "barsik-tests-" + DateTime.Now.ToString ("yyyy-MM-dd HH-mm-ss") + ".json";
             fileName = Path.Combine (outputFolder, fileName);
 
             var options = new JsonSerializerOptions
@@ -152,10 +187,13 @@ namespace AM.Scripting.Barsik
                 string actual
             )
         {
+            var expectedBytes = Encoding.UTF8.GetBytes (expected);
+            var actualBytes = Encoding.UTF8.GetBytes (actual);
+
             var index = 0;
-            while (index < expected.Length && index < actual.Length)
+            while (index < expectedBytes.Length && index < actualBytes.Length)
             {
-                if (expected[index] != actual[index])
+                if (expectedBytes[index] != actualBytes[index])
                 {
                     break;
                 }
@@ -163,15 +201,14 @@ namespace AM.Scripting.Barsik
                 ++index;
             }
 
-            if (index == expected.Length && index == actual.Length)
+            if (index == expectedBytes.Length && index == actualBytes.Length)
             {
                 return;
             }
 
             context.Output.WriteLine ($"Difference at index {index}");
-            context.Output.WriteLine ($"Expected: {expected.Substring (index)}");
-            context.Output.WriteLine ($"Actual  : {actual.Substring (index)}");
-
+            DumpAt (context, "expected ", expectedBytes, index);
+            DumpAt (context, "actual   ", actualBytes,   index);
         }
 
         #endregion

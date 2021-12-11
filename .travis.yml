@@ -17,4 +17,5 @@ script:
   - dotnet build --no-restore            --configuration Release -p:Version=${VERSION}        Source/ManagedIrbis5.sln
   - dotnet test  --no-restore --no-build --configuration Release                              Source/ManagedIrbis5.sln
   - dotnet run   --no-restore --no-build --configuration Release --project                    Source/Tests/PftTests/PftTests.csproj
+  - dotnet run   --no-restore --no-build --configuration Release --project                    Source/Tests/BarsikTestRunner/BarsikTestRunner.csproj
   - dotnet pack  --no-restore --no-build --configuration Release -p:PackageVersion=${VERSION} Source/ManagedIrbis5.sln

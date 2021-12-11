@@ -42,14 +42,14 @@ namespace PftTests
 
             while (true)
             {
-                var guess = Path.Combine(candidate, "Tests");
-                if (Directory.Exists(guess))
+                var guess = Path.Combine (candidate, "Tests");
+                if (Directory.Exists (guess))
                 {
                     return candidate;
                 }
 
-                var parent = Path.GetDirectoryName(candidate);
-                if (string.IsNullOrEmpty(parent))
+                var parent = Path.GetDirectoryName (candidate);
+                if (string.IsNullOrEmpty (parent))
                 {
                     return null;
                 }
@@ -60,26 +60,27 @@ namespace PftTests
 
         private static void DiscoverAndRunTests()
         {
-            var provider = new DirectProvider(_testsRoot!);
+            var provider = new DirectProvider (_testsRoot!);
 
-            var tester = new PftTester(_testsRoot!);
-            tester.SetEnvironment(provider);
+            var tester = new PftTester (_testsRoot!);
+            tester.SetEnvironment (provider);
 
             tester.DiscoverTests();
 
             tester.RunTests();
 
             var fileName = DateTime.Now.ToString
-                           (
-                               "yyyy-MM-dd-hh-mm-ss"
-                           )
+                               (
+                                   "yyyy-MM-dd-hh-mm-ss"
+                               )
                            + ".json";
-            tester.WriteResults(fileName);
+            tester.WriteResults (fileName);
 
             var total = tester.Results.Count;
-            int failed = tester.Results.Count(t => t.Failed);
+            int failed = tester.Results.Count (t => t.Failed);
 
             ConsoleColor foreColor;
+
             //foreach (PftTestResult result in tester.Results)
             //{
             //    foreColor = Console.ForegroundColor;
@@ -123,8 +124,8 @@ namespace PftTests
                             (
                                 ", ",
                                 tester.Results
-                                    .Where(t => t.Failed)
-                                    .Select(t => t.Name)
+                                    .Where (t => t.Failed)
+                                    .Select (t => t.Name)
                             )
                     );
                 Console.WriteLine();
@@ -144,10 +145,10 @@ namespace PftTests
                 startAt = args[0];
             }
 
-            _testsRoot = FindTestsFolder(startAt);
+            _testsRoot = FindTestsFolder (startAt);
             if (_testsRoot is null)
             {
-                Console.WriteLine("Can't locate tests");
+                Console.WriteLine ("Can't locate tests");
                 return 1;
             }
 
@@ -157,7 +158,7 @@ namespace PftTests
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+                Console.WriteLine (exception);
                 return 1;
             }
 
