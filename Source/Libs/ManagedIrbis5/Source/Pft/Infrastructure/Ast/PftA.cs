@@ -39,7 +39,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Properties
 
         /// <summary>
-        /// Field.
+        /// Связанное с узлом поле.
         /// </summary>
         public PftField? Field { get; set; }
 
@@ -48,47 +48,47 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор по умолчанию.
         /// </summary>
         public PftA()
         {
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор с токеном.
         /// </summary>
         public PftA
             (
                 PftToken token
             )
-            : base(token)
+            : base (token)
         {
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор с непосредственным текстом.
         /// </summary>
         public PftA
             (
                 string text
             )
         {
-            Field = new PftV(text);
+            Field = new PftV (text);
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор с меткой поля.
         /// </summary>
         public PftA
             (
                 int tag
             )
         {
-            Field = new PftV(tag);
+            Field = new PftV (tag);
         }
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор с меткой поля и кодом подполя.
         /// </summary>
         public PftA
             (
@@ -96,7 +96,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 char code
             )
         {
-            Field = new PftV(tag, code);
+            Field = new PftV (tag, code);
         }
 
         #endregion
@@ -106,11 +106,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
         /// <inheritdoc cref="PftNode.Clone" />
         public override object Clone()
         {
-            var result = (PftA) base.Clone();
+            var result = (PftA)base.Clone();
 
-            if (!ReferenceEquals(Field, null))
+            if (!ReferenceEquals (Field, null))
             {
-                result.Field = (PftField) Field.Clone();
+                result.Field = (PftField)Field.Clone();
             }
 
             return result;
@@ -126,7 +126,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftNode otherNode
             )
         {
-            base.CompareNode(otherNode);
+            base.CompareNode (otherNode);
 
             PftSerializationUtility.CompareNodes
                 (
@@ -141,23 +141,24 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftCompiler compiler
             )
         {
-            if (ReferenceEquals(Field, null))
+            Sure.NotNull (compiler);
+
+            if (Field is null)
             {
                 throw new PftCompilerException();
             }
 
-            var info = compiler.CompileField(Field);
-
-            compiler.StartMethod(this);
+            var info = compiler.CompileField (Field);
+            compiler.StartMethod (this);
 
             if (Field.Command == 'g')
             {
-                var number = FastNumber.ParseInt32(Field.Tag.ThrowIfNull());
+                var number = FastNumber.ParseInt32 (Field.Tag.ThrowIfNull());
                 compiler
                     .WriteIndent()
                     .WriteLine
                         (
-                            "bool flag = !PftP.HaveGlobal(Context, {0}, "
+                            "var flag = !PftP.HaveGlobal(Context, {0}, "
                             + "{1}, Context.Index);",
                             info.Reference,
                             number.ToInvariantString()
@@ -167,53 +168,53 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     .WriteIndent()
                     .WriteLine
                         (
-                            "RecordField[] fields = Context.Globals.Get({0});",
+                            "var fields = Context.Globals.Get({0});",
                             number.ToInvariantString()
                         )
                     .WriteIndent()
-                    .WriteLine("if (Context.Index <= fields.Length)")
+                    .WriteLine ("if (Context.Index <= fields.Length)")
                     .WriteIndent()
-                    .WriteLine("{")
+                    .WriteLine ("{")
                     .IncreaseIndent()
                     .WriteIndent()
-                    .WriteLine("HaveOutput()")
+                    .WriteLine ("HaveOutput()")
                     .DecreaseIndent()
                     .WriteIndent()
-                    .WriteLine("}")
+                    .WriteLine ("}")
                     .WriteIndent()
-                    .WriteLine("return flag;"); //-V3010
+                    .WriteLine ("return flag;"); //-V3010
             }
             else
             {
                 compiler
                     .WriteIndent()
-                    .WriteLine("MarcRecord record = Context.Record;")
+                    .WriteLine ("var record = Context.Record;")
                     .WriteIndent()
-                    .WriteLine("string tag = {0}.Tag;", info.Reference)
+                    .WriteLine ("string tag = {0}.Tag;", info.Reference)
                     .WriteIndent()
                     .WriteLine
                         (
-                            "bool flag = PftP.HaveRepeat(record, "
+                            "var flag = PftP.HaveRepeat(record, "
                             + "tag, {0}.SubField, Context.Index);",
                             info.Reference
                         )
                     .WriteIndent()
-                    .WriteLine("if (PftP.HaveRepeat(record, "
-                               + "tag, SubField.NoCode, Context.Index))")
+                    .WriteLine ("if (PftP.HaveRepeat(record, "
+                                + "tag, SubField.NoCode, Context.Index))")
                     .WriteIndent()
-                    .WriteLine("{")
+                    .WriteLine ("{")
                     .IncreaseIndent()
                     .WriteIndent()
-                    .WriteLine("HaveOutput();")
+                    .WriteLine ("HaveOutput();")
                     .DecreaseIndent()
                     .WriteIndent()
-                    .WriteLine("}")
+                    .WriteLine ("}")
                     .WriteIndent()
-                    .WriteLine("return !flag;"); //-V3010
+                    .WriteLine ("return !flag;"); //-V3010
             }
 
-            compiler.EndMethod(this);
-            compiler.MarkReady(this);
+            compiler.EndMethod (this);
+            compiler.MarkReady (this);
         }
 
         /// <inheritdoc cref="PftNode.Deserialize" />
@@ -222,9 +223,11 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryReader reader
             )
         {
-            base.Deserialize(reader);
+            Sure.NotNull (reader);
 
-            Field = (PftField?) PftSerializer.DeserializeNullable(reader);
+            base.Deserialize (reader);
+
+            Field = (PftField?)PftSerializer.DeserializeNullable (reader);
         }
 
         /// <inheritdoc cref="PftNode.Execute" />
@@ -233,27 +236,29 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftContext context
             )
         {
-            OnBeforeExecution(context);
+            Sure.NotNull (context);
 
-            if (ReferenceEquals(Field, null))
+            OnBeforeExecution (context);
+
+            if (ReferenceEquals (Field, null))
             {
                 Magna.Error
                     (
-                        "PftA::Execute: "
-                        + "Field not specified"
+                        nameof (PftA) + "::" + nameof (Execute)
+                        + ": Field not specified"
                     );
 
-                throw new PftSyntaxException(this);
+                throw new PftSyntaxException (this);
             }
 
-            var tag = Field.Tag.ThrowIfNull("Field.Tag");
+            var tag = Field.Tag.ThrowIfNull ();
             var record = context.Record;
             var index = context.Index;
 
             if (Field.Command == 'g')
             {
-                var number = FastNumber.ParseInt32(tag);
-                var fields = context.Globals.Get(number);
+                var number = FastNumber.ParseInt32 (tag);
+                var fields = context.Globals.Get (number);
                 Value = !PftP.HaveGlobal
                     (
                         context,
@@ -269,7 +274,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             }
             else if (Field.Command == 'v')
             {
-                if (!ReferenceEquals(record, null))
+                if (!ReferenceEquals (record, null))
                 {
                     // ИРБИС64 вне группы всегда проверяет
                     // на наличие лишь первое повторение поля!
@@ -286,12 +291,12 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     // при наличии повторения поля
 
                     if (PftP.HaveRepeat
-                        (
-                            record,
-                            tag.SafeToInt32(),
-                            SubField.NoCode,
-                            index
-                        ))
+                            (
+                                record,
+                                tag.SafeToInt32(),
+                                SubField.NoCode,
+                                index
+                            ))
                     {
                         context.OutputFlag = true;
                     }
@@ -301,8 +306,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             {
                 Magna.Error
                     (
-                        "PftA::Execute: "
-                        + "unexpected command: "
+                        nameof (PftA) + "::" + nameof (Execute)
+                        + ": unexpected command: "
                         + Field.Command
                     );
 
@@ -313,7 +318,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                     );
             }
 
-            OnAfterExecution(context);
+            OnAfterExecution (context);
         }
 
         /// <inheritdoc cref="PftNode.GetNodeInfo" />
@@ -322,18 +327,18 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
             var result = new PftNodeInfo
             {
                 Node = this,
-                Name = SimplifyTypeName(GetType().Name)
+                Name = SimplifyTypeName (GetType().Name)
             };
 
-            if (!ReferenceEquals(Field, null))
+            if (!ReferenceEquals (Field, null))
             {
                 var fieldInfo = new PftNodeInfo
                 {
                     Node = Field,
                     Name = "Field"
                 };
-                fieldInfo.Children.Add(Field.GetNodeInfo());
-                result.Children.Add(fieldInfo);
+                fieldInfo.Children.Add (Field.GetNodeInfo());
+                result.Children.Add (fieldInfo);
             }
 
             return result;
@@ -345,12 +350,14 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 PftPrettyPrinter printer
             )
         {
+            Sure.NotNull (printer);
+
             // Обрамляем пробелами
             printer
                 .SingleSpace()
-                .Write("a(");
-            Field?.PrettyPrint(printer);
-            printer.Write(')');
+                .Write ("a(");
+            Field?.PrettyPrint (printer);
+            printer.Write (')');
         }
 
         /// <inheritdoc cref="PftNode.Serialize" />
@@ -359,23 +366,29 @@ namespace ManagedIrbis.Pft.Infrastructure.Ast
                 BinaryWriter writer
             )
         {
-            base.Serialize(writer);
+            Sure.NotNull (writer);
 
-            PftSerializer.SerializeNullable(writer, Field);
+            base.Serialize (writer);
+
+            PftSerializer.SerializeNullable (writer, Field);
         }
 
         /// <inheritdoc cref="PftNode.ShouldSerializeText" />
-        protected internal override bool ShouldSerializeText() => false;
+        protected internal override bool ShouldSerializeText()
+        {
+            return false;
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="PftNode.ToString" />
-        public override string ToString() => "a(" + Field + ")";
+        public override string ToString()
+        {
+            return "a(" + Field + ")";
+        }
 
         #endregion
-
-    } // class PftA
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    }
+}

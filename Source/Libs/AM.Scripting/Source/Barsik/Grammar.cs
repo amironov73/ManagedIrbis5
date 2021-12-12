@@ -439,8 +439,15 @@ namespace AM.Scripting.Barsik
             from _ in Parse.Chars (" \t").Until (Parse.LineEnd)
             select new StatementNode();
 
+        private static readonly Parser<ExternalNode> External =
+            from open in Parse.Char ('{').Token()
+            from code in Parse.CharExcept ('}').Many().Text()
+            from close in Parse.Char ('}').Token()
+            select new ExternalNode (code);
+
         private static readonly Parser<StatementNode> NoSemicolon =
-            from statement in Nop.Or (Definition).Or (ForEach).Or (For).Or (While).Or (If).Or (TryCatchFinally)
+            from statement in Nop.Or (Definition).Or (ForEach).Or (For)
+                .Or (While).Or (If).Or (TryCatchFinally).Or (External)
             select statement;
 
         private static readonly Parser<StatementNode> RequireSemicolon =

@@ -79,6 +79,11 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public Dictionary<string, object?> Namespaces { get; }
 
+        /// <summary>
+        /// Обработчик внешнего кода.
+        /// </summary>
+        public ExternalCodeHandler? ExternalCodeHandler { get; set; }
+
         #endregion
 
         #region Constructor
