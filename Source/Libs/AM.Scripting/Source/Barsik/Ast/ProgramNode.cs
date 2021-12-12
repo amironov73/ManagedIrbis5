@@ -29,7 +29,7 @@ namespace AM.Scripting.Barsik
     /// <summary>
     /// Корневой узел AST.
     /// </summary>
-    sealed class ProgramNode
+    public sealed class ProgramNode
         : AstNode
     {
         #region Properties

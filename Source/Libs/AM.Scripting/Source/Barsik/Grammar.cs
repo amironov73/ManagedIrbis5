@@ -455,9 +455,10 @@ namespace AM.Scripting.Barsik
             from semicolon in Parse.Char (';').Token()
             select statement;
 
-        private static readonly Parser<StatementNode> Statement =
+        private static readonly Parser<StatementNode> Statement = (
             from statement in NoSemicolon.Or (RequireSemicolon)
-            select statement;
+            select statement
+            ).Positioned();
 
         private static readonly Parser<IEnumerable<StatementNode>> Block =
             from statements in Statement.Many()

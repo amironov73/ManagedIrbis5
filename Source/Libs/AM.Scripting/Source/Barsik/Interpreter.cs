@@ -113,6 +113,17 @@ namespace AM.Scripting.Barsik
             program.Execute (Context);
         }
 
+        /// <summary>
+        /// Разбор текста программы.
+        /// </summary>
+        public static ProgramNode Parse
+            (
+                string sourceCode
+            )
+        {
+            return Grammar.ParseProgram (sourceCode);
+        }
+
         #endregion
     }
 }

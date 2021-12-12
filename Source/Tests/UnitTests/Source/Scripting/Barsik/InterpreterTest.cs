@@ -150,5 +150,18 @@ x = 1;
             var actual = output.ToString();
             Assert.AreEqual ("<Hello from inner code>", actual);
         }
+
+        [TestMethod]
+        [Description ("Позиционирование стейтментов")]
+        public void Interpreter_Positioned_1()
+        {
+            const string sourceCode = @"x = 1;
+y = 2;
+z = 3;";
+            var program = Interpreter.Parse (sourceCode);
+            Assert.AreEqual (1, program.Statements[0].StartPosition!.Line);
+            Assert.AreEqual (2, program.Statements[1].StartPosition!.Line);
+            Assert.AreEqual (3, program.Statements[2].StartPosition!.Line);
+        }
     }
 }
