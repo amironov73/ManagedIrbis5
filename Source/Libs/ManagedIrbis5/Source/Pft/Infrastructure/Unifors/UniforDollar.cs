@@ -25,7 +25,6 @@ using ManagedIrbis.Infrastructure;
 
 namespace ManagedIrbis.Pft.Infrastructure.Unifors
 {
-
     //
     // Создан новый форматный выход, который возвращает
     // хеш-сумму (MD5) заданной строки:
@@ -49,24 +48,21 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
         {
             expression ??= string.Empty;
 
-            var bytes = IrbisEncoding.Utf8.GetBytes(expression);
-            var md5 = MD5.HashData(bytes);
+            var bytes = IrbisEncoding.Utf8.GetBytes (expression);
+            var md5 = MD5.HashData (bytes);
             var builder = StringBuilderPool.Shared.Get();
 
             foreach (var one in md5)
             {
-                builder.AppendFormat("{0:X2}", one);
+                builder.AppendFormat ("{0:X2}", one);
             }
 
             var output = builder.ToString();
-            StringBuilderPool.Shared.Return(builder);
+            StringBuilderPool.Shared.Return (builder);
 
-            context.WriteAndSetFlag(node, output);
-
-        } // method Md5Hash
+            context.WriteAndSetFlag (node, output);
+        }
 
         #endregion
-
-    } // class UniforDollar
-
-} // namespace ManagedIrbis.PftInfrastructure.Unifors
+    }
+}
