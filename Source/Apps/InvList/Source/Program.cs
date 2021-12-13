@@ -43,7 +43,7 @@ namespace InvList
 
             var description = _connection.FormatRecord("@brief", mfn);
             var worklist = record.FM(920);
-            var exemplars = ExemplarInfo.Parse(record);
+            var exemplars = ExemplarInfo.ParseRecord(record);
             var count = record.FM(999).SafeToInt32();
 
             foreach (var exemplar in exemplars)

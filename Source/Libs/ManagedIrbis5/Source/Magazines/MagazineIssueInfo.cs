@@ -216,7 +216,7 @@ namespace ManagedIrbis.Magazines
 
                 Exemplars = record
                     .EnumerateField (910)
-                    .Select (field => ExemplarInfo.Parse (field))
+                    .Select (field => ExemplarInfo.ParseField (field))
                     .ToArray(),
 
                 LoanCount = record.FM (999).SafeToInt32(),

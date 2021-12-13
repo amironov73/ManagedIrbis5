@@ -37,9 +37,10 @@ namespace ManagedIrbis.Fields
     /// <summary>
     /// Информация об экземпляре (поле 910).
     /// </summary>
-    [XmlRoot("exemplar")]
+    [XmlRoot ("exemplar")]
     public sealed class ExemplarInfo
-        : IHandmadeSerializable
+        : IHandmadeSerializable,
+        IVerifiable
     {
         #region Constants
 
@@ -58,233 +59,262 @@ namespace ManagedIrbis.Fields
         #region Properties
 
         /// <summary>
-        /// Identifier for LiteDB.
+        /// Идентификатор для LiteDB.
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public int Id { get; set; }
 
         /// <summary>
-        /// Статус. Подполе a.
+        /// Статус экземпляра. Подполе a.
         /// </summary>
-        [SubField('a')]
-        [XmlAttribute("status")]
-        [JsonPropertyName("status")]
+        [SubField ('a')]
+        [XmlAttribute ("status")]
+        [JsonPropertyName ("status")]
+        [Description ("Статус экземпляра")]
         public string? Status { get; set; }
 
         /// <summary>
         /// Инвентарный номер. Подполе b.
         /// </summary>
-        [SubField('b')]
-        [XmlAttribute("number")]
-        [JsonPropertyName("number")]
+        [SubField ('b')]
+        [XmlAttribute ("number")]
+        [JsonPropertyName ("number")]
+        [Description ("Инвентарный номер")]
         public string? Number { get; set; }
 
         /// <summary>
         /// Дата поступления. Подполе c.
         /// </summary>
-        [SubField('c')]
-        [XmlAttribute("date")]
-        [JsonPropertyName("date")]
+        [SubField ('c')]
+        [XmlAttribute ("date")]
+        [JsonPropertyName ("date")]
+        [Description ("Дата поступления")]
         public string? Date { get; set; }
 
         /// <summary>
         /// Место хранения. Подполе d.
         /// </summary>
-        [SubField('d')]
-        [XmlAttribute("place")]
-        [JsonPropertyName("place")]
+        [SubField ('d')]
+        [XmlAttribute ("place")]
+        [JsonPropertyName ("place")]
+        [Description ("Место хранения")]
         public string? Place { get; set; }
 
         /// <summary>
         /// Наименование коллекции. Подполе q.
         /// </summary>
-        [SubField('q')]
-        [XmlAttribute("collection")]
-        [JsonPropertyName("collection")]
+        [SubField ('q')]
+        [XmlAttribute ("collection")]
+        [JsonPropertyName ("collection")]
+        [Description ("Наименование коллекции")]
         public string? Collection { get; set; }
 
         /// <summary>
         /// Расстановочный шифр. Подполе r.
         /// </summary>
-        [SubField('r')]
-        [XmlAttribute("shelf-index")]
-        [JsonPropertyName("shelf-index")]
+        [SubField ('r')]
+        [XmlAttribute ("shelf-index")]
+        [JsonPropertyName ("shelf-index")]
+        [Description ("Расстановочный шифр")]
         public string? ShelfIndex { get; set; }
 
         /// <summary>
         /// Цена экземпляра. Подполе e.
         /// </summary>
-        [SubField('e')]
-        [XmlAttribute("price")]
-        [JsonPropertyName("price")]
+        [SubField ('e')]
+        [XmlAttribute ("price")]
+        [JsonPropertyName ("price")]
+        [Description ("Цена экземпляра")]
         public string? Price { get; set; }
 
         /// <summary>
         /// Штрих-код/радиометка. Подполе h.
         /// </summary>
-        [SubField('h')]
-        [XmlAttribute("barcode")]
-        [JsonPropertyName("barcode")]
+        [SubField ('h')]
+        [XmlAttribute ("barcode")]
+        [JsonPropertyName ("barcode")]
+        [Description ("Штрих-код/радиометка")]
         public string? Barcode { get; set; }
 
         /// <summary>
         /// Число экземпляров. Подполе 1.
         /// </summary>
-        [SubField('1')]
-        [XmlAttribute("amount")]
-        [JsonPropertyName("amount")]
+        [SubField ('1')]
+        [XmlAttribute ("amount")]
+        [JsonPropertyName ("amount")]
+        [Description ("Число экземпляров")]
         public string? Amount { get; set; }
 
         /// <summary>
         /// Специальное назначение фонда. Подполе t.
         /// </summary>
-        [SubField('t')]
-        [XmlAttribute("purpose")]
-        [JsonPropertyName("purpose")]
+        [SubField ('t')]
+        [XmlAttribute ("purpose")]
+        [JsonPropertyName ("purpose")]
+        [Description ("Специальное назначение фонда")]
         public string? Purpose { get; set; }
 
         /// <summary>
         /// Коэффициент многоразового использования. Подполе =.
         /// </summary>
-        [SubField('=')]
-        [XmlAttribute("coefficient")]
-        [JsonPropertyName("coefficient")]
+        [SubField ('=')]
+        [XmlAttribute ("coefficient")]
+        [JsonPropertyName ("coefficient")]
+        [Description ("Коэффициент многоразового использования")]
         public string? Coefficient { get; set; }
 
         /// <summary>
         /// Экземпляры не на баланс. Подполе 4.
         /// </summary>
-        [SubField('4')]
-        [XmlAttribute("off-balance")]
-        [JsonPropertyName("off-balance")]
+        [SubField ('4')]
+        [XmlAttribute ("off-balance")]
+        [JsonPropertyName ("off-balance")]
+        [Description ("Экземпляры не на баланс")]
         public string? OffBalance { get; set; }
 
         /// <summary>
         /// Номер записи КСУ. Подполе u.
         /// </summary>
-        [SubField('u')]
-        [XmlAttribute("ksu-number1")]
-        [JsonPropertyName("ksu-number1")]
+        [SubField ('u')]
+        [XmlAttribute ("ksu-number1")]
+        [JsonPropertyName ("ksu-number1")]
+        [Description ("Номер записи КСУ")]
         public string? KsuNumber1 { get; set; }
 
         /// <summary>
         /// Номер акта. Подполе y.
         /// </summary>
-        [SubField('y')]
-        [XmlAttribute("act-number1")]
-        [JsonPropertyName("act-number1")]
+        [SubField ('y')]
+        [XmlAttribute ("act-number1")]
+        [JsonPropertyName ("act-number1")]
+        [Description ("Номер акта")]
         public string? ActNumber1 { get; set; }
 
         /// <summary>
         /// Канал поступления. Подполе f.
         /// </summary>
-        [SubField('f')]
-        [XmlAttribute("channel")]
-        [JsonPropertyName("channel")]
+        [SubField ('f')]
+        [XmlAttribute ("channel")]
+        [JsonPropertyName ("channel")]
+        [Description ("Канал поступления")]
         public string? Channel { get; set; }
 
         /// <summary>
         /// Число выданных экземпляров. Подполе 2.
         /// </summary>
-        [SubField('2')]
-        [XmlAttribute("on-hand")]
-        [JsonPropertyName("on-hand")]
+        [SubField ('2')]
+        [XmlAttribute ("on-hand")]
+        [JsonPropertyName ("on-hand")]
+        [Description ("Число выданных экземпляров")]
         public string? OnHand { get; set; }
 
         /// <summary>
         /// Номер акта списания. Подполе v.
         /// </summary>
-        [SubField('v')]
-        [XmlAttribute("act-number2")]
-        [JsonPropertyName("act-number2")]
+        [SubField ('v')]
+        [XmlAttribute ("act-number2")]
+        [JsonPropertyName ("act-number2")]
+        [Description ("Номер акта списания")]
         public string? ActNumber2 { get; set; }
 
         /// <summary>
         /// Количество списываемых экземпляров. Подполе x.
         /// </summary>
-        [SubField('x')]
-        [XmlAttribute("write-off")]
-        [JsonPropertyName("write-off")]
+        [SubField ('x')]
+        [XmlAttribute ("write-off")]
+        [JsonPropertyName ("write-off")]
+        [Description ("Количество списываемых экземпляров")]
         public string? WriteOff { get; set; }
 
         /// <summary>
         /// Количество экземпляров для докомплектования. Подполе k.
         /// </summary>
-        [SubField('k')]
-        [XmlAttribute("completion")]
-        [JsonPropertyName("completion")]
+        [SubField ('k')]
+        [XmlAttribute ("completion")]
+        [JsonPropertyName ("completion")]
+        [Description ("Количество экземпляров для докомплектования")]
         public string? Completion { get; set; }
 
         /// <summary>
         /// Номер акта передачи в другое подразделение. Подполе w.
         /// </summary>
-        [SubField('w')]
-        [XmlAttribute("act-number3")]
-        [JsonPropertyName("act-number3")]
+        [SubField ('w')]
+        [XmlAttribute ("act-number3")]
+        [JsonPropertyName ("act-number3")]
+        [Description ("Номер акта передачи")]
         public string? ActNumber3 { get; set; }
 
         /// <summary>
         /// Количество передаваемых экземпляров. Подполе z.
         /// </summary>
-        [SubField('z')]
-        [XmlAttribute("moving")]
-        [JsonPropertyName("moving")]
+        [SubField ('z')]
+        [XmlAttribute ("moving")]
+        [JsonPropertyName ("moving")]
+        [Description ("Количество передаваемых экземпляров")]
         public string? Moving { get; set; }
 
         /// <summary>
         /// Новое место хранения. Подполе m.
         /// </summary>
-        [SubField('m')]
-        [XmlAttribute("new-place")]
-        [JsonPropertyName("new-place")]
+        [SubField ('m')]
+        [XmlAttribute ("new-place")]
+        [JsonPropertyName ("new-place")]
+        [Description ("Новое место хранения")]
         public string? NewPlace { get; set; }
 
         /// <summary>
         /// Дата проверки фонда. Подполе s.
         /// </summary>
-        [SubField('s')]
-        [XmlAttribute("checked-date")]
-        [JsonPropertyName("checked-date")]
+        [SubField ('s')]
+        [XmlAttribute ("checked-date")]
+        [JsonPropertyName ("checked-date")]
+        [Description ("Дата проверки фонда")]
         public string? CheckedDate { get; set; }
 
         /// <summary>
         /// Число проверенных экземпляров. Подполе 0.
         /// </summary>
-        [SubField('0')]
-        [XmlAttribute("checked-amount")]
-        [JsonPropertyName("checked-amount")]
+        [SubField ('0')]
+        [XmlAttribute ("checked-amount")]
+        [JsonPropertyName ("checked-amount")]
+        [Description ("Число проверенных экземпляров")]
         public string? CheckedAmount { get; set; }
 
         /// <summary>
         /// Реальное место нахождения книги. Подполе !.
         /// </summary>
-        [SubField('!')]
-        [XmlAttribute("real-place")]
-        [JsonPropertyName("real-place")]
+        [SubField ('!')]
+        [XmlAttribute ("real-place")]
+        [JsonPropertyName ("real-place")]
+        [Description ("Реальное место нахождения книги")]
         public string? RealPlace { get; set; }
 
         /// <summary>
         /// Шифр подшивки. Подполе p.
         /// </summary>
-        [SubField('p')]
-        [XmlAttribute("binding-index")]
-        [JsonPropertyName("binding-index")]
+        [SubField ('p')]
+        [XmlAttribute ("binding-index")]
+        [JsonPropertyName ("binding-index")]
+        [Description ("Шифр подшивки")]
         public string? BindingIndex { get; set; }
 
         /// <summary>
         /// Инвентарный номер подшивки. Подполе i.
         /// </summary>
-        [SubField('i')]
-        [XmlAttribute("binding-number")]
-        [JsonPropertyName("binding-number")]
+        [SubField ('i')]
+        [XmlAttribute ("binding-number")]
+        [JsonPropertyName ("binding-number")]
+        [Description ("Инвентарный номер подшивки")]
         public string? BindingNumber { get; set; }
 
         /// <summary>
         /// Год издания. Берётся не из подполя.
         /// </summary>
-        [XmlAttribute("year")]
-        [JsonPropertyName("year")]
+        [XmlAttribute ("year")]
+        [JsonPropertyName ("year")]
+        [Browsable (false)]
         public string? Year { get; set; }
 
         /// <summary>
@@ -292,34 +322,39 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public SubField[]? OtherSubFields { get; set; }
 
         /// <summary>
         /// MFN записи, из которой заимствован экземпляр.
         /// </summary>
-        [XmlAttribute("mfn")]
-        [JsonPropertyName("mfn")]
+        [XmlAttribute ("mfn")]
+        [JsonPropertyName ("mfn")]
+        [Browsable (false)]
         public int Mfn { get; set; }
 
         /// <summary>
         /// Краткое библиографическое описание экземпляра.
         /// </summary>
-        [XmlAttribute("description")]
-        [JsonPropertyName("description")]
+        [XmlAttribute ("description")]
+        [JsonPropertyName ("description")]
+        [Browsable (false)]
         public string? Description { get; set; }
 
         /// <summary>
         /// ББК.
         /// </summary>
-        [XmlAttribute("bbk")]
-        [JsonPropertyName("bbk")]
+        [XmlAttribute ("bbk")]
+        [JsonPropertyName ("bbk")]
+        [Browsable (false)]
         public string? Bbk { get; set; }
 
         /// <summary>
         /// Номер выпуска (для журналов).
         /// </summary>
-        [XmlAttribute("issue")]
-        [JsonPropertyName("issue")]
+        [XmlAttribute ("issue")]
+        [JsonPropertyName ("issue")]
+        [Browsable (false)]
         public string? Issue { get; set; }
 
         /// <summary>
@@ -327,6 +362,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public int SequentialNumber { get; set; }
 
         /// <summary>
@@ -334,13 +370,15 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public string? OrderingData { get; set; }
 
         /// <summary>
-        /// Флаг.
+        /// Флаг - пометка.
         /// </summary>
-        [XmlAttribute("marked")]
-        [JsonPropertyName("marked")]
+        [XmlAttribute ("marked")]
+        [JsonPropertyName ("marked")]
+        [Browsable (false)]
         public bool Marked { get; set; }
 
         /// <summary>
@@ -348,6 +386,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public Record? Record { get; set; }
 
         /// <summary>
@@ -355,6 +394,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public Field? Field { get; set; }
 
         /// <summary>
@@ -362,6 +402,7 @@ namespace ManagedIrbis.Fields
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -371,34 +412,42 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Apply to the <see cref="Field"/>.
         /// </summary>
-        public Field ApplyToField (Field field) => field
-            .SetSubFieldValue ('a', Status)
-            .SetSubFieldValue ('b', Number)
-            .SetSubFieldValue ('c', Date)
-            .SetSubFieldValue ('d', Place)
-            .SetSubFieldValue ('q', Collection)
-            .SetSubFieldValue ('r', ShelfIndex)
-            .SetSubFieldValue ('e', Price)
-            .SetSubFieldValue ('h', Barcode)
-            .SetSubFieldValue ('1', Amount)
-            .SetSubFieldValue ('t', Purpose)
-            .SetSubFieldValue ('=', Coefficient)
-            .SetSubFieldValue ('4', OffBalance)
-            .SetSubFieldValue ('u', KsuNumber1)
-            .SetSubFieldValue ('y', ActNumber1)
-            .SetSubFieldValue ('f', Channel)
-            .SetSubFieldValue ('2', OnHand)
-            .SetSubFieldValue ('v', ActNumber2)
-            .SetSubFieldValue ('x', WriteOff)
-            .SetSubFieldValue ('k', Completion)
-            .SetSubFieldValue ('w', ActNumber3)
-            .SetSubFieldValue ('z', Moving)
-            .SetSubFieldValue ('m', NewPlace)
-            .SetSubFieldValue ('s', CheckedDate)
-            .SetSubFieldValue ('0', CheckedAmount)
-            .SetSubFieldValue ('!', RealPlace)
-            .SetSubFieldValue ('p', BindingIndex)
-            .SetSubFieldValue ('i', BindingNumber);
+        public Field ApplyToField
+            (
+                Field field
+            )
+        {
+            Sure.NotNull (field);
+
+            return field
+                .SetSubFieldValue ('a', Status)
+                .SetSubFieldValue ('b', Number)
+                .SetSubFieldValue ('c', Date)
+                .SetSubFieldValue ('d', Place)
+                .SetSubFieldValue ('q', Collection)
+                .SetSubFieldValue ('r', ShelfIndex)
+                .SetSubFieldValue ('e', Price)
+                .SetSubFieldValue ('h', Barcode)
+                .SetSubFieldValue ('1', Amount)
+                .SetSubFieldValue ('t', Purpose)
+                .SetSubFieldValue ('=', Coefficient)
+                .SetSubFieldValue ('4', OffBalance)
+                .SetSubFieldValue ('u', KsuNumber1)
+                .SetSubFieldValue ('y', ActNumber1)
+                .SetSubFieldValue ('f', Channel)
+                .SetSubFieldValue ('2', OnHand)
+                .SetSubFieldValue ('v', ActNumber2)
+                .SetSubFieldValue ('x', WriteOff)
+                .SetSubFieldValue ('k', Completion)
+                .SetSubFieldValue ('w', ActNumber3)
+                .SetSubFieldValue ('z', Moving)
+                .SetSubFieldValue ('m', NewPlace)
+                .SetSubFieldValue ('s', CheckedDate)
+                .SetSubFieldValue ('0', CheckedAmount)
+                .SetSubFieldValue ('!', RealPlace)
+                .SetSubFieldValue ('p', BindingIndex)
+                .SetSubFieldValue ('i', BindingNumber);
+        }
 
         /// <summary>
         /// Вычисляет количество свободных экземпляров,
@@ -420,8 +469,10 @@ namespace ManagedIrbis.Fields
                 // 9 - забронирован
 
                 // экземпляры группового учета
-                case 'U': case 'u': // вуз
-                case 'C': case 'c': // библиотечная сеть
+                case 'U':
+                case 'u': // вуз
+                case 'C':
+                case 'c': // библиотечная сеть
                     var total = Amount
                         .SafeToInt32(); // всего экземпляров по месту хранения
                     var nonFree = OnHand
@@ -440,7 +491,7 @@ namespace ManagedIrbis.Fields
             }
 
             return 0;
-        } // method GetFreeCount
+        }
 
         /// <summary>
         /// Вычисляет общее количество экземпляров,
@@ -459,8 +510,10 @@ namespace ManagedIrbis.Fields
                     return 1;
 
                 // экземпляры группового учета:
-                case 'U': case 'u': // вуз
-                case 'C': case 'c': // библиотечная сеть
+                case 'U':
+                case 'u': // вуз
+                case 'C':
+                case 'c': // библиотечная сеть
                     var count = Amount.SafeToInt32();
                     return count;
 
@@ -475,72 +528,69 @@ namespace ManagedIrbis.Fields
             }
 
             return 0;
-        } // method GetTotalCount
+        }
 
         /// <summary>
         /// Parses the specified field.
         /// </summary>
-        public static ExemplarInfo Parse
+        public static ExemplarInfo ParseField
             (
                 Field field
             )
         {
-            // TODO: реализовать эффективно
+            Sure.NotNull (field);
 
             var result = new ExemplarInfo
-                {
-                    Status         = field.GetFirstSubFieldValue('a'),
-                    Number         = field.GetFirstSubFieldValue('b'),
-                    Date           = field.GetFirstSubFieldValue('c'),
-                    Place          = field.GetFirstSubFieldValue('d'),
-                    Collection     = field.GetFirstSubFieldValue('q'),
-                    ShelfIndex     = field.GetFirstSubFieldValue('r'),
-                    Price          = field.GetFirstSubFieldValue('e'),
-                    Barcode        = field.GetFirstSubFieldValue('h'),
-                    Amount         = field.GetFirstSubFieldValue('1'),
-                    Purpose        = field.GetFirstSubFieldValue('t'),
-                    Coefficient    = field.GetFirstSubFieldValue('='),
-                    OffBalance     = field.GetFirstSubFieldValue('4'),
-                    KsuNumber1     = field.GetFirstSubFieldValue('u'),
-                    ActNumber1     = field.GetFirstSubFieldValue('y'),
-                    Channel        = field.GetFirstSubFieldValue('f'),
-                    OnHand         = field.GetFirstSubFieldValue('2'),
-                    ActNumber2     = field.GetFirstSubFieldValue('v'),
-                    WriteOff       = field.GetFirstSubFieldValue('x'),
-                    Completion     = field.GetFirstSubFieldValue('k'),
-                    ActNumber3     = field.GetFirstSubFieldValue('w'),
-                    Moving         = field.GetFirstSubFieldValue('z'),
-                    NewPlace       = field.GetFirstSubFieldValue('m'),
-                    CheckedDate    = field.GetFirstSubFieldValue('s'),
-                    CheckedAmount  = field.GetFirstSubFieldValue('0'),
-                    RealPlace      = field.GetFirstSubFieldValue('!'),
-                    BindingIndex   = field.GetFirstSubFieldValue('p'),
-                    BindingNumber  = field.GetFirstSubFieldValue('i'),
-                    OtherSubFields = field.Subfields
-                        .Where(sub => KnownCodes
-                            .IndexOf(char.ToLower(sub.Code)) < 0)
-                        .ToArray(),
-                    Field = field
-                };
+            {
+                Status = field.GetFirstSubFieldValue ('a'),
+                Number = field.GetFirstSubFieldValue ('b'),
+                Date = field.GetFirstSubFieldValue ('c'),
+                Place = field.GetFirstSubFieldValue ('d'),
+                Collection = field.GetFirstSubFieldValue ('q'),
+                ShelfIndex = field.GetFirstSubFieldValue ('r'),
+                Price = field.GetFirstSubFieldValue ('e'),
+                Barcode = field.GetFirstSubFieldValue ('h'),
+                Amount = field.GetFirstSubFieldValue ('1'),
+                Purpose = field.GetFirstSubFieldValue ('t'),
+                Coefficient = field.GetFirstSubFieldValue ('='),
+                OffBalance = field.GetFirstSubFieldValue ('4'),
+                KsuNumber1 = field.GetFirstSubFieldValue ('u'),
+                ActNumber1 = field.GetFirstSubFieldValue ('y'),
+                Channel = field.GetFirstSubFieldValue ('f'),
+                OnHand = field.GetFirstSubFieldValue ('2'),
+                ActNumber2 = field.GetFirstSubFieldValue ('v'),
+                WriteOff = field.GetFirstSubFieldValue ('x'),
+                Completion = field.GetFirstSubFieldValue ('k'),
+                ActNumber3 = field.GetFirstSubFieldValue ('w'),
+                Moving = field.GetFirstSubFieldValue ('z'),
+                NewPlace = field.GetFirstSubFieldValue ('m'),
+                CheckedDate = field.GetFirstSubFieldValue ('s'),
+                CheckedAmount = field.GetFirstSubFieldValue ('0'),
+                RealPlace = field.GetFirstSubFieldValue ('!'),
+                BindingIndex = field.GetFirstSubFieldValue ('p'),
+                BindingNumber = field.GetFirstSubFieldValue ('i'),
+                OtherSubFields = field.Subfields.GetUnknownSubFields (KnownCodes),
+                Field = field
+            };
 
             return result;
-        } // method Parse
+        }
 
         /// <summary>
         /// Разбор записи на экземпляры.
         /// </summary>
-        public static ExemplarInfo[] Parse
+        public static ExemplarInfo[] ParseRecord
             (
                 Record record,
                 int tagNumber = ExemplarTag
             )
         {
             var result = record.Fields
-                .GetField(tagNumber)
-                .Select(field => Parse(field))
+                .GetField (tagNumber)
+                .Select (field => ParseField (field))
                 .ToArray();
 
-            foreach (ExemplarInfo exemplar in result)
+            foreach (var exemplar in result)
             {
                 exemplar.Mfn = record.Mfn;
                 exemplar.Description = record.Description;
@@ -548,24 +598,24 @@ namespace ManagedIrbis.Fields
             }
 
             return result;
-        } // method Parse
+        }
 
         /// <summary>
         /// Should serialize <see cref="OtherSubFields"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        [EditorBrowsable(EditorBrowsableState.Never)]
+        [EditorBrowsable (EditorBrowsableState.Never)]
         public bool ShouldSerializeOtherSubFields()
         {
             return !OtherSubFields.IsNullOrEmpty();
-        } // method ShouldSerializeOtherSubFields
+        }
 
         /// <summary>
         /// Преобразование экземпляра обратно в поле записи.
         /// </summary>
         public Field ToField()
         {
-            var result = new Field { Tag = ExemplarTag }
+            var result = new Field (ExemplarTag)
                 .AddNonEmpty ('a', Status)
                 .AddNonEmpty ('b', Number)
                 .AddNonEmpty ('c', Date)
@@ -594,19 +644,13 @@ namespace ManagedIrbis.Fields
                 .AddNonEmpty ('p', BindingIndex)
                 .AddNonEmpty ('i', BindingNumber);
 
-            if (OtherSubFields != null)
-            {
-                foreach (var subField in OtherSubFields)
-                {
-                    result.Add(subField.Code, subField.Value);
-                }
-            }
+            result.AddRange (OtherSubFields);
 
             return result;
-        } // method ToField
+        }
 
         /// <summary>
-        /// Compares two specified numbers.
+        /// Сравнение инвентарных номеров экземпляров.
         /// </summary>
         public static int CompareNumbers
             (
@@ -614,12 +658,15 @@ namespace ManagedIrbis.Fields
                 ExemplarInfo second
             )
         {
-            var one = new NumberText(first.Number);
-            var two = new NumberText(second.Number);
-            var result = one.CompareTo(two);
+            Sure.NotNull (first);
+            Sure.NotNull (second);
+
+            var one = new NumberText (first.Number);
+            var two = new NumberText (second.Number);
+            var result = one.CompareTo (two);
 
             return result;
-        } // method CompareNumbers
+        }
 
         #endregion
 
@@ -631,6 +678,8 @@ namespace ManagedIrbis.Fields
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Id = reader.ReadPackedInt32();
             Status = reader.ReadNullableString();
             Number = reader.ReadNullableString();
@@ -665,7 +714,7 @@ namespace ManagedIrbis.Fields
             Issue = reader.ReadNullableString();
             OrderingData = reader.ReadNullableString();
             Mfn = reader.ReadInt32();
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -673,42 +722,64 @@ namespace ManagedIrbis.Fields
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WritePackedInt32(Id)
-                .WriteNullable(Status)
-                .WriteNullable(Number)
-                .WriteNullable(Date)
-                .WriteNullable(Place)
-                .WriteNullable(Collection)
-                .WriteNullable(ShelfIndex)
-                .WriteNullable(Price)
-                .WriteNullable(Barcode)
-                .WriteNullable(Amount)
-                .WriteNullable(Purpose)
-                .WriteNullable(Coefficient)
-                .WriteNullable(OffBalance)
-                .WriteNullable(KsuNumber1)
-                .WriteNullable(ActNumber1)
-                .WriteNullable(Channel)
-                .WriteNullable(OnHand)
-                .WriteNullable(ActNumber2)
-                .WriteNullable(WriteOff)
-                .WriteNullable(Completion)
-                .WriteNullable(ActNumber3)
-                .WriteNullable(Moving)
-                .WriteNullable(NewPlace)
-                .WriteNullable(CheckedDate)
-                .WriteNullable(CheckedAmount)
-                .WriteNullable(RealPlace)
-                .WriteNullable(BindingIndex)
-                .WriteNullable(BindingNumber)
-                .WriteNullable(Year)
-                .WriteNullable(Description)
-                .WriteNullable(Bbk)
-                .WriteNullable(Issue)
-                .WriteNullable(OrderingData);
-            writer.Write(Mfn);
-        } // method SaveToStream
+                .WritePackedInt32 (Id)
+                .WriteNullable (Status)
+                .WriteNullable (Number)
+                .WriteNullable (Date)
+                .WriteNullable (Place)
+                .WriteNullable (Collection)
+                .WriteNullable (ShelfIndex)
+                .WriteNullable (Price)
+                .WriteNullable (Barcode)
+                .WriteNullable (Amount)
+                .WriteNullable (Purpose)
+                .WriteNullable (Coefficient)
+                .WriteNullable (OffBalance)
+                .WriteNullable (KsuNumber1)
+                .WriteNullable (ActNumber1)
+                .WriteNullable (Channel)
+                .WriteNullable (OnHand)
+                .WriteNullable (ActNumber2)
+                .WriteNullable (WriteOff)
+                .WriteNullable (Completion)
+                .WriteNullable (ActNumber3)
+                .WriteNullable (Moving)
+                .WriteNullable (NewPlace)
+                .WriteNullable (CheckedDate)
+                .WriteNullable (CheckedAmount)
+                .WriteNullable (RealPlace)
+                .WriteNullable (BindingIndex)
+                .WriteNullable (BindingNumber)
+                .WriteNullable (Year)
+                .WriteNullable (Description)
+                .WriteNullable (Bbk)
+                .WriteNullable (Issue)
+                .WriteNullable (OrderingData);
+            writer.Write (Mfn);
+        }
+
+        #endregion
+
+        #region IVerifiable members
+
+        /// <inheritdoc cref="IVerifiable.Verify"/>
+        public bool Verify
+            (
+                bool throwOnError
+            )
+        {
+            var verifier = new Verifier<ExemplarInfo> (this, throwOnError);
+
+            verifier
+                .NotNullNorEmpty (Status)
+                .Assert (Status.IsOneOf (ExemplarStatus.ListValues()))
+                .NotNullNorEmpty (Place);
+
+            return verifier.Result;
+        }
 
         #endregion
 
@@ -717,18 +788,16 @@ namespace ManagedIrbis.Fields
         /// <inheritdoc cref="object.ToString" />
         public override string ToString()
         {
-            string result = $"{Number} ({Place}) [{Status}]";
+            var result = $"{Number.ToVisibleString()} ({Place.ToVisibleString()}) [{Status.ToVisibleString()}]";
 
-            if (!string.IsNullOrEmpty(BindingNumber))
+            if (!string.IsNullOrEmpty (BindingNumber))
             {
                 result = result + " <binding " + BindingNumber + ">";
             }
 
             return result;
-        } // method ToString
+        }
 
         #endregion
-
-    } // class ExemplarInfo
-
-} // namespace ManagedIrbis.Fields
+    }
+}

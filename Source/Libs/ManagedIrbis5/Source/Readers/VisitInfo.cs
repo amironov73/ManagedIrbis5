@@ -367,7 +367,7 @@ namespace ManagedIrbis.Readers
 
             foreach (var field in fields)
             {
-                var exemplar = ExemplarInfo.Parse(field);
+                var exemplar = ExemplarInfo.ParseField(field);
 
                 if (!string.IsNullOrEmpty(Inventory))
                 {

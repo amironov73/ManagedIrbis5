@@ -317,7 +317,7 @@ namespace ManagedIrbis.Records
         /// <summary>
         /// Получение экземпляров документа.
         /// </summary>
-        public ExemplarInfo[] GetExemplars (Record record) => ExemplarInfo.Parse (record, ExemplarTag);
+        public ExemplarInfo[] GetExemplars (Record record) => ExemplarInfo.ParseRecord (record, ExemplarTag);
 
         /// <summary>
         /// Получение поля с держателем документа.

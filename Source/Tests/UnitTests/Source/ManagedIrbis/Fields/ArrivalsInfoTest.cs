@@ -23,43 +23,52 @@ namespace UnitTests.ManagedIrbis.Fields
     public class ArrivalsInfoTest
         : CommonFieldsTest
     {
-        private Field _GetField() => new Field (ArrivalsInfo.Tag)
+        private Field _GetField()
+        {
+            return new Field (ArrivalsInfo.Tag)
                 .Add ('1', "62")
                 .Add ('a', "62")
                 .Add ('3', "59");
+        }
 
-        private Record _GetRecord() => new Record()
-            .Add (88, "^A2017/112^Y112^B20171205^CТов. накл. №№ 3, 4, 5, 6, 7 от 17.11.2017 г.^DК8^E64^F82^G61115")
-            .Add (920, "KSU")
-            .Add (907, "^C^A20171205^Bklipovatv")
-            .Add (907, "^CПК^A20171205^Bklipovatv")
-            .Add (44, "^IФ404^H05^J62^K82^+61115.00^A79^O62^P82^S82^882^G3")
-            .Add (744, "^IФ404^H05^A62^B82^+61115.00^L59^M78^S82^682^O4^J3^43")
-            .Add (145, "^A62^B82^C61115.00^G62^H82^I61115.00^J59^K79^P59^Q79")
-            .Add (147, "^C3^F3")
-            .Add (148, "^B59^C78^D4^G10")
-            .Add (149, "^C62^D59^F82^G79^L61115.00^M62^N82^O61115.00^T82^V82^182")
-            .Add (151, "^882")
-            .Add (45, "^A79^382^462^582^661115.00^.62^(59^G3")
-            .Add (47, "^882")
-            .Add (18, "^162^259^359^762")
-            .Add (17, "^162^A62^359")
-            .Add (910, "^261115.00")
-            .Add (20, "^A288.00^B62.00^E82.00^F82.00^G62.00")
-            .Add (910, "^1И83156")
-            .Add (910, "^1Б62490")
-            .Add (910, "^1CD4093")
-            .Add (910, "И83210")
-            .Add (910, "Б62513")
-            .Add (910, "CD4095");
+        private Record _GetRecord()
+        {
+            return new Record()
+                .Add (88, "^A2017/112^Y112^B20171205^CТов. накл. №№ 3, 4, 5, 6, 7 от 17.11.2017 г.^DК8^E64^F82^G61115")
+                .Add (920, "KSU")
+                .Add (907, "^C^A20171205^Bklipovatv")
+                .Add (907, "^CПК^A20171205^Bklipovatv")
+                .Add (44, "^IФ404^H05^J62^K82^+61115.00^A79^O62^P82^S82^882^G3")
+                .Add (744, "^IФ404^H05^A62^B82^+61115.00^L59^M78^S82^682^O4^J3^43")
+                .Add (145, "^A62^B82^C61115.00^G62^H82^I61115.00^J59^K79^P59^Q79")
+                .Add (147, "^C3^F3")
+                .Add (148, "^B59^C78^D4^G10")
+                .Add (149, "^C62^D59^F82^G79^L61115.00^M62^N82^O61115.00^T82^V82^182")
+                .Add (151, "^882")
+                .Add (45, "^A79^382^462^582^661115.00^.62^(59^G3")
+                .Add (47, "^882")
+                .Add (18, "^162^259^359^762")
+                .Add (17, "^162^A62^359")
+                .Add (910, "^261115.00")
+                .Add (20, "^A288.00^B62.00^E82.00^F82.00^G62.00")
+                .Add (910, "^1И83156")
+                .Add (910, "^1Б62490")
+                .Add (910, "^1CD4093")
+                .Add (910, "И83210")
+                .Add (910, "Б62513")
+                .Add (910, "CD4095");
+        }
 
-        private ArrivalsInfo _GetArrivals() => new ()
+        private ArrivalsInfo _GetArrivals()
+        {
+            return new ()
             {
                 OnBalanceWithoutPeriodicals = "62",
                 TotalWithoutPeriodicals = "62",
                 Educational = "59",
                 UnknownSubFields = Array.Empty<SubField>()
             };
+        }
 
         [TestMethod]
         [Description ("Конструктор по умолчанию")]
@@ -198,11 +207,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void ArrivalsInfo_ToXml_1()
         {
             var arrivals = new ArrivalsInfo();
-            Assert.AreEqual ("<arrivals />", XmlUtility.SerializeShort (arrivals));
+            Assert.AreEqual
+                (
+                    "<arrivals />",
+                    XmlUtility.SerializeShort (arrivals)
+                );
 
             arrivals = _GetArrivals();
-            Assert.AreEqual ("<arrivals onBalanceWithoutPeriodicals=\"62\" totalWithoutPeriodicals=\"62\" educational=\"59\" />",
-                XmlUtility.SerializeShort (arrivals));
+            Assert.AreEqual
+                (
+                    "<arrivals onBalanceWithoutPeriodicals=\"62\" totalWithoutPeriodicals=\"62\" educational=\"59\" />",
+                    XmlUtility.SerializeShort (arrivals)
+                );
         }
 
         [TestMethod]
@@ -210,12 +226,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void ArrivalsInfo_ToJson_1()
         {
             var arrivals = new ArrivalsInfo();
-            Assert.AreEqual ("{}", JsonUtility.SerializeShort (arrivals));
+            Assert.AreEqual
+                (
+                    "{}",
+                    JsonUtility.SerializeShort (arrivals)
+                );
 
             arrivals = _GetArrivals();
-            var expected = "{\"onBalanceWithoutPeriodicals\":\"62\",\"totalWithoutPeriodicals\":\"62\",\"educational\":\"59\",\"unknown\":[]}";
-            var actual = JsonUtility.SerializeShort (arrivals);
-            Assert.AreEqual (expected, actual);
+            Assert.AreEqual
+                (
+                    "{\"onBalanceWithoutPeriodicals\":\"62\",\"totalWithoutPeriodicals\":\"62\",\"educational\":\"59\",\"unknown\":[]}",
+                    JsonUtility.SerializeShort (arrivals)
+                );
         }
 
         [TestMethod]
@@ -223,12 +245,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void ArrivalsInfo_ToString_1()
         {
             var arrivals = new ArrivalsInfo();
-            Assert.AreEqual ("OnBalanceWithoutPeriodicals: (null), OffBalanceWithoutPeriodicals: (null), TotalWithoutPeriodicals: (null), OffBalanceWithPeriodicals: (null), Educational: (null)",
-                arrivals.ToString());
+            Assert.AreEqual
+                (
+                    "OnBalanceWithoutPeriodicals: (null), OffBalanceWithoutPeriodicals: (null), TotalWithoutPeriodicals: (null), OffBalanceWithPeriodicals: (null), Educational: (null)",
+                    arrivals.ToString()
+                );
 
             arrivals = _GetArrivals();
-            Assert.AreEqual ("OnBalanceWithoutPeriodicals: 62, OffBalanceWithoutPeriodicals: (null), TotalWithoutPeriodicals: 62, OffBalanceWithPeriodicals: (null), Educational: 59",
-                arrivals.ToString());
+            Assert.AreEqual
+                (
+                    "OnBalanceWithoutPeriodicals: 62, OffBalanceWithoutPeriodicals: (null), TotalWithoutPeriodicals: 62, OffBalanceWithPeriodicals: (null), Educational: 59",
+                    arrivals.ToString()
+                );
         }
     }
 }

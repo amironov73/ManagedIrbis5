@@ -20,14 +20,20 @@ namespace UnitTests.ManagedIrbis.Fields
     public class Field203Test
         : Common.CommonUnitTest
     {
-        private Field203 _Get203() => new ()
+        private Field203 _Get203()
         {
-            ContentType = new [] { "Текст" },
-            Access = new [] { "непосредственный" },
-            ContentDescription = new [] { "визуальный" }
-        };
+            return new ()
+            {
+                ContentType = new[] { "Текст" },
+                Access = new[] { "непосредственный" },
+                ContentDescription = new[] { "визуальный" }
+            };
+        }
 
-        private Field _GetField() => new (Field203.Tag, "^aТекст^cнепосредственный^oвизуальный");
+        private Field _GetField()
+        {
+            return new (Field203.Tag, "^aТекст^cнепосредственный^oвизуальный");
+        }
 
         private void _Compare
             (
@@ -193,11 +199,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void Field203_ToXml_1()
         {
             var field203 = new Field203();
-            Assert.AreEqual ("<field-203 />", XmlUtility.SerializeShort (field203));
+            Assert.AreEqual
+                (
+                    "<field-203 />",
+                    XmlUtility.SerializeShort (field203)
+                );
 
             field203 = _Get203();
-            Assert.AreEqual ("<field-203 content-type=\"Текст\" access=\"непосредственный\" content-description=\"визуальный\" />",
-                XmlUtility.SerializeShort (field203));
+            Assert.AreEqual
+                (
+                    "<field-203 content-type=\"Текст\" access=\"непосредственный\" content-description=\"визуальный\" />",
+                    XmlUtility.SerializeShort (field203)
+                );
         }
 
         [TestMethod]
@@ -205,11 +218,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void Field203_ToJson_1()
         {
             var field203 = new Field203();
-            Assert.AreEqual ("{}", JsonUtility.SerializeShort (field203));
+            Assert.AreEqual
+                (
+                    "{}",
+                    JsonUtility.SerializeShort (field203)
+                );
 
             field203 = _Get203();
-            Assert.AreEqual ("{\"contentType\":[\"\\u0422\\u0435\\u043A\\u0441\\u0442\"],\"access\":[\"\\u043D\\u0435\\u043F\\u043E\\u0441\\u0440\\u0435\\u0434\\u0441\\u0442\\u0432\\u0435\\u043D\\u043D\\u044B\\u0439\"],\"content-description\":[\"\\u0432\\u0438\\u0437\\u0443\\u0430\\u043B\\u044C\\u043D\\u044B\\u0439\"]}",
-                JsonUtility.SerializeShort (field203));
+            Assert.AreEqual
+                (
+                    "{\"contentType\":[\"\\u0422\\u0435\\u043A\\u0441\\u0442\"],\"access\":[\"\\u043D\\u0435\\u043F\\u043E\\u0441\\u0440\\u0435\\u0434\\u0441\\u0442\\u0432\\u0435\\u043D\\u043D\\u044B\\u0439\"],\"content-description\":[\"\\u0432\\u0438\\u0437\\u0443\\u0430\\u043B\\u044C\\u043D\\u044B\\u0439\"]}",
+                    JsonUtility.SerializeShort (field203)
+                );
         }
 
         [TestMethod]
@@ -217,12 +237,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void Field203_ToString_1()
         {
             var field203 = new Field203();
-            Assert.AreEqual ("(none): (none)",
-                field203.ToString());
+            Assert.AreEqual
+                (
+                    "(none): (none)",
+                    field203.ToString()
+                );
 
             field203 = _Get203();
-            Assert.AreEqual ("Текст: непосредственный",
-                field203.ToString());
+            Assert.AreEqual
+                (
+                    "Текст: непосредственный",
+                    field203.ToString()
+                );
         }
     }
 }

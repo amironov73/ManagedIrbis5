@@ -40,7 +40,7 @@ namespace ManagedIrbis.Quality.Rules
                 Field field
             )
         {
-            var exemplar = ExemplarInfo.Parse(field);
+            var exemplar = ExemplarInfo.ParseField(field);
 
             if (!CheckForMenu(_statusMenu, exemplar.Status))
             {

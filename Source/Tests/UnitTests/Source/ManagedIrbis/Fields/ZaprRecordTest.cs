@@ -18,23 +18,29 @@ namespace UnitTests.ManagedIrbis.Fields
     [TestClass]
     public sealed class ZaprRecordTest
     {
-        private Record _GetRecord() => new Record()
-            .Add (1, "A0123")
-            .Add (2, "^A<.>U=5$<.>^C<.>U=5$<.>^D20170214");
-
-        private ZaprRecord _GetZaprRecord() => new ()
+        private Record _GetRecord()
         {
-            Ticket = "A0123",
-            Requests = new []
+            return new Record()
+                .Add (1, "A0123")
+                .Add (2, "^A<.>U=5$<.>^C<.>U=5$<.>^D20170214");
+        }
+
+        private ZaprRecord _GetZaprRecord()
+        {
+            return new ()
             {
-                new ZaprInfo()
+                Ticket = "A0123",
+                Requests = new[]
                 {
-                    NaturalLanguage = "<.>U=5$<.>",
-                    SearchQuery = "<.>U=5$<.>",
-                    Date = "20170214"
+                    new ZaprInfo()
+                    {
+                        NaturalLanguage = "<.>U=5$<.>",
+                        SearchQuery = "<.>U=5$<.>",
+                        Date = "20170214"
+                    }
                 }
-            }
-        };
+            };
+        }
 
         private void _Compare
             (
@@ -154,11 +160,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void ZaprRecord_ToXml_1()
         {
             var zapr = new ZaprRecord();
-            Assert.AreEqual ("<zapr />", XmlUtility.SerializeShort (zapr));
+            Assert.AreEqual
+                (
+                    "<zapr />",
+                    XmlUtility.SerializeShort (zapr)
+                );
 
             zapr = _GetZaprRecord();
-            Assert.AreEqual ("<zapr><ticket>A0123</ticket><request><natural>&lt;.&gt;U=5$&lt;.&gt;</natural><search>&lt;.&gt;U=5$&lt;.&gt;</search><date>20170214</date></request></zapr>",
-                XmlUtility.SerializeShort (zapr));
+            Assert.AreEqual
+                (
+                    "<zapr><ticket>A0123</ticket><request><natural>&lt;.&gt;U=5$&lt;.&gt;</natural><search>&lt;.&gt;U=5$&lt;.&gt;</search><date>20170214</date></request></zapr>",
+                    XmlUtility.SerializeShort (zapr)
+                );
         }
 
         [TestMethod]
@@ -166,13 +179,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void ZaprRecord_ToJson_1()
         {
             var zapr = new ZaprRecord();
-            Assert.AreEqual ("{}",
-                JsonUtility.SerializeShort (zapr));
+            Assert.AreEqual
+                (
+                    "{}",
+                    JsonUtility.SerializeShort (zapr)
+                );
 
             zapr = _GetZaprRecord();
-            var expected = "{\"ticket\":\"A0123\",\"zapr\":[{\"natual\":\"\\u003C.\\u003EU=5$\\u003C.\\u003E\",\"search\":\"\\u003C.\\u003EU=5$\\u003C.\\u003E\",\"date\":\"20170214\"}]}";
-            var actual = JsonUtility.SerializeShort (zapr);
-            Assert.AreEqual (expected, actual);
+            Assert.AreEqual
+                (
+                    "{\"ticket\":\"A0123\",\"zapr\":[{\"natual\":\"\\u003C.\\u003EU=5$\\u003C.\\u003E\",\"search\":\"\\u003C.\\u003EU=5$\\u003C.\\u003E\",\"date\":\"20170214\"}]}",
+                    JsonUtility.SerializeShort (zapr))
+                ;
         }
 
         [TestMethod]
@@ -180,11 +198,18 @@ namespace UnitTests.ManagedIrbis.Fields
         public void ZaprRecord_ToString_1()
         {
             var zapr = new ZaprRecord();
-            Assert.AreEqual ("(null)", zapr.ToString());
+            Assert.AreEqual
+                (
+                    "(null)",
+                    zapr.ToString()
+                );
 
             zapr = _GetZaprRecord();
-            Assert.AreEqual ("A0123",
-                zapr.ToString());
+            Assert.AreEqual
+                (
+                    "A0123",
+                    zapr.ToString()
+                );
         }
 
     }

@@ -368,7 +368,7 @@ namespace ManagedIrbis.Fields
                 Record record
             )
         {
-            var result = ExemplarInfo.Parse(record);
+            var result = ExemplarInfo.ParseRecord(record);
 
             foreach (var exemplar in result)
             {
@@ -494,7 +494,7 @@ namespace ManagedIrbis.Fields
             var fields = record.Fields.GetField(ExemplarInfo.ExemplarTag);
             foreach (var field in fields)
             {
-                var result = ExemplarInfo.Parse(field);
+                var result = ExemplarInfo.ParseField(field);
                 if (result.Barcode.SameString(number)
                     || result.Number.SameString(number))
                 {
@@ -525,7 +525,7 @@ namespace ManagedIrbis.Fields
             var fields = record.Fields.GetField(ExemplarInfo.ExemplarTag);
             foreach (var field in fields)
             {
-                var result = ExemplarInfo.Parse(field);
+                var result = ExemplarInfo.ParseField(field);
                 if (result.Barcode.SameString(number)
                     || result.Number.SameString(number))
                 {

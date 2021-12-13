@@ -51,7 +51,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 Record record
             )
         {
-            var exemplars = ExemplarInfo.Parse(record);
+            var exemplars = ExemplarInfo.ParseRecord(record);
             var counter = new DictionaryCounterInt32<string>();
 
             foreach (var exemplar in exemplars)

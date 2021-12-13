@@ -41,7 +41,7 @@ namespace ClearInventarization
                 Record record
             )
         {
-            var exemplars = ExemplarInfo.Parse(record);
+            var exemplars = ExemplarInfo.ParseRecord(record);
 
             var found = false;
             foreach (var exemplar in exemplars)

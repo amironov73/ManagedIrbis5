@@ -100,7 +100,7 @@ namespace ManagedIrbis.Inventory
             {
                 progress?.Report (++index);
 
-                var allExemplars = ExemplarInfo.Parse (record, RecordConfiguration.ExemplarTag);
+                var allExemplars = ExemplarInfo.ParseRecord (record, RecordConfiguration.ExemplarTag);
                 var goodExemplars = allExemplars
                     .Where (e =>
                         (

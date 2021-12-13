@@ -141,7 +141,7 @@ namespace ManagedIrbis.Fields
         /// <summary>
         /// Экземпляры.
         /// </summary>
-        public ExemplarInfo[] Exemplars => ExemplarInfo.Parse(Record);
+        public ExemplarInfo[] Exemplars => ExemplarInfo.ParseRecord(Record);
 
         /// <summary>
         /// Число экземпляров.
