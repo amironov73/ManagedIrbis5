@@ -196,15 +196,12 @@ namespace AM.Scripting.Barsik
             select new NegationNode (inner);
 
         private static readonly Parser<AtomNode> Parenthesis =
-            Parse.Ref (() => ArithmeticExpression)
-                .Contained (Parse.Char ('(').Token(), Parse.Char (')').Token())
+            Parse.Ref (() => ArithmeticExpression).RoundBraces()
                 .Select (s => new ParenthesisNode (s));
 
         private static readonly Parser<AtomNode> FunctionCall =
             from name in Identifier
-            from open in Parse.Char ('(').Token()
-            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
-            from close in Parse.Char (')')
+            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional().RoundBraces()
             select new FreeCallNode (name, args.GetOrDefault());
 
         private static readonly Parser<AtomNode> Property =
@@ -217,9 +214,7 @@ namespace AM.Scripting.Barsik
             from objectName in Identifier
             from dot in Parse.Char ('.')
             from memberName in Identifier
-            from open in Parse.Char ('(').Token()
-            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
-            from close in Parse.Char (')').Token()
+            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional().RoundBraces()
             select new MethodNode (objectName, memberName, args.GetOrDefault());
 
         private static readonly Parser<AtomNode> List =
@@ -229,9 +224,7 @@ namespace AM.Scripting.Barsik
             select new ListNode (items.GetOrDefault());
 
         private static readonly Parser<DictionaryNode> Dictionary =
-            from open in Parse.Char ('{').Token()
-            from items in KeyAndValue.DelimitedBy (Parse.Char (',').Token()).Optional()
-            from close in Parse.Char ('}').Token()
+            from items in KeyAndValue.DelimitedBy (Parse.Char (',').Token()).Optional().CurlyBraces()
             select new DictionaryNode (items.GetOrDefault());
 
         private static readonly Parser<AtomNode> Index =
@@ -244,9 +237,7 @@ namespace AM.Scripting.Barsik
         private static readonly Parser<AtomNode> New =
             from _ in Parse.String ("new").Token()
             from typeName in Identifier
-            from open in Parse.Char ('(').Token()
-            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
-            from close in Parse.Char (')').Token()
+            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional().RoundBraces()
             select new NewNode (typeName, args.GetOrDefault());
 
         private static readonly Parser<string> AndOr =
@@ -344,30 +335,28 @@ namespace AM.Scripting.Barsik
 
         private static readonly Parser<IEnumerable<StatementNode>> Else =
             from _ in Parse.String ("else")
-            from open in Parse.Char ('{').Token()
-            from statements in Parse.Ref (() => Block)
-            from close in Parse.Char ('}').Token()
+            from statements in Parse.Ref (() => Block).CurlyBraces()
             select statements;
+
+        private static readonly Parser<IfNode> ElseIf =
+            from _1 in Parse.String ("else").Token()
+            from _2 in Parse.String ("if")
+            from condition in Condition.RoundBraces()
+            from statements in Block.CurlyBraces()
+            select new IfNode (condition, statements, null, null);
 
         private static readonly Parser<StatementNode> If =
             from _ in Parse.String ("if")
-            from open1 in Parse.Char ('(').Token()
-            from condition in Condition
-            from close1 in Parse.Char (')').Token()
-            from open2 in Parse.Char ('{').Token()
-            from thenBlock in Parse.Ref (() => Block)
-            from close2 in Parse.Char ('}').Token()
+            from condition in Condition.RoundBraces()
+            from thenBlock in Parse.Ref (() => Block).CurlyBraces()
+            from elseIf in ElseIf.Many().Optional()
             from elseBlock in Else.Optional()
-            select new IfNode (condition, thenBlock, elseBlock.GetOrDefault());
+            select new IfNode (condition, thenBlock, elseIf.GetOrDefault(), elseBlock.GetOrDefault());
 
         private static readonly Parser<StatementNode> While =
             from _ in Parse.String ("while")
-            from open1 in Parse.Char ('(').Token()
-            from condition in Condition
-            from close1 in Parse.Char (')').Token()
-            from open2 in Parse.Char ('{').Token()
-            from statements in Block
-            from close2 in Parse.Char ('}').Token()
+            from condition in Condition.RoundBraces()
+            from statements in Block.CurlyBraces()
             select new WhileNode (condition, statements);
 
         private static readonly Parser<StatementNode> ForEach =
@@ -377,9 +366,7 @@ namespace AM.Scripting.Barsik
             from _2 in Parse.String ("in").Token()
             from enumerable in Atom
             from close1 in Parse.Char (')').Token()
-            from open2 in Parse.Char ('{').Token()
-            from statements in Block
-            from close2 in Parse.Char ('}').Token()
+            from statements in Block.CurlyBraces()
             select new ForEachNode (variableName, enumerable, statements);
 
         private static readonly Parser<StatementNode> For =
@@ -391,33 +378,24 @@ namespace AM.Scripting.Barsik
             from _3 in Parse.Char (';').Token()
             from step in Assignment
             from close1 in Parse.Char (')').Token()
-            from open2 in Parse.Char ('{').Token()
-            from statements in Block
-            from close2 in Parse.Char ('}').Token()
-            select new ForNode (init, condition, step, statements);
+            from statements in Block.CurlyBraces()
+            from elseBody in Else.Optional()
+            select new ForNode (init, condition, step, statements, elseBody.GetOrDefault());
 
         private static readonly Parser<CatchNode> Catch =
             from _ in Parse.String ("catch")
-            from open1 in Parse.Char ('(').Token()
-            from variable in Identifier
-            from close1 in Parse.Char (')').Token()
-            from open2 in Parse.Char ('{').Token()
-            from block in Block
-            from close2 in Parse.Char ('}').Token()
+            from variable in Identifier.RoundBraces()
+            from block in Block.CurlyBraces()
             select new CatchNode (variable, block);
 
         private static readonly Parser<IEnumerable<StatementNode>> Finally =
             from _ in Parse.String ("finally")
-            from open in Parse.Char ('{').Token()
-            from block in Block
-            from close in Parse.Char ('}').Token()
+            from block in Block.CurlyBraces()
             select block;
 
         private static readonly Parser<StatementNode> TryCatchFinally =
             from _ in Parse.String ("try")
-            from open in Parse.Char ('{').Token()
-            from tryBlock in Block
-            from close in Parse.Char ('}').Token()
+            from tryBlock in Block.CurlyBraces()
             from catchNode in Catch.Optional()
             from finallyBlock in Finally.Optional()
             select new TryNode (tryBlock, catchNode.GetOrDefault(), finallyBlock.GetOrDefault());
@@ -426,12 +404,8 @@ namespace AM.Scripting.Barsik
         private static readonly Parser<DefinitionNode> Definition =
             from _ in Parse.String ("func").Token()
             from name in Identifier
-            from open1 in Parse.Char ('(').Token()
-            from args in Identifier.DelimitedBy (Parse.Char (',').Token()).Optional()
-            from close1 in Parse.Char (')').Token()
-            from open2 in Parse.Char ('{')
-            from body in Parse.Ref (() => Block)
-            from close2 in Parse.Char ('}')
+            from args in Identifier.DelimitedBy (Parse.Char (',').Token()).Optional().RoundBraces()
+            from body in Parse.Ref (() => Block).CurlyBraces()
             select new DefinitionNode (name, args.GetOrDefault(), body);
 
         // костыль
@@ -440,9 +414,7 @@ namespace AM.Scripting.Barsik
             select new StatementNode();
 
         private static readonly Parser<ExternalNode> External =
-            from open in Parse.Char ('{').Token()
-            from code in Parse.CharExcept ('}').Many().Text()
-            from close in Parse.Char ('}').Token()
+            from code in Parse.CharExcept ('}').Many().Text().CurlyBraces()
             select new ExternalNode (code);
 
         private static readonly Parser<StatementNode> NoSemicolon =
@@ -455,10 +427,9 @@ namespace AM.Scripting.Barsik
             from semicolon in Parse.Char (';').Token()
             select statement;
 
-        private static readonly Parser<StatementNode> Statement = (
-            from statement in NoSemicolon.Or (RequireSemicolon)
-            select statement
-            ).Positioned();
+        private static readonly Parser<StatementNode> Statement =
+            (from statement in NoSemicolon.Or (RequireSemicolon)
+            select statement).Positioned();
 
         private static readonly Parser<IEnumerable<StatementNode>> Block =
             from statements in Statement.Many()

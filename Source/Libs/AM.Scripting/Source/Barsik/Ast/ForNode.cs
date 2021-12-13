@@ -14,15 +14,11 @@
 
 #region Using directives
 
-using System.Collections;
 using System.Collections.Generic;
-
-using AM.Text;
 
 #endregion
 
 #nullable enable
-
 
 namespace AM.Scripting.Barsik
 {
@@ -31,8 +27,14 @@ namespace AM.Scripting.Barsik
     /// </summary>
     sealed class ForNode : StatementNode
     {
-        public ForNode(StatementNode init, AtomNode condition,
-            StatementNode step, IEnumerable<StatementNode>? body)
+        public ForNode
+            (
+                StatementNode init,
+                AtomNode condition,
+                StatementNode step,
+                IEnumerable<StatementNode>? body,
+                IEnumerable<StatementNode>? elseBody
+            )
         {
             _init = init;
             _condition = condition;
@@ -42,26 +44,42 @@ namespace AM.Scripting.Barsik
             {
                 _body.AddRange (body);
             }
+
+            if (elseBody is not null)
+            {
+                _else = new List<StatementNode> (elseBody);
+            }
         }
 
         private readonly StatementNode _init;
         private readonly AtomNode _condition;
         private readonly StatementNode _step;
         private readonly List<StatementNode> _body;
+        private readonly List<StatementNode>? _else;
 
         public override void Execute (Context context)
         {
             PreExecute (context);
 
             _init.Execute (context);
+            var success = false;
             while (_condition.Compute (context))
             {
+                success = true;
                 foreach (var statement in _body)
                 {
                     statement.Execute (context);
                 }
 
                 _step.Execute (context);
+            }
+
+            if (!success && _else is not null)
+            {
+                foreach (var statement in _else)
+                {
+                    statement.Execute (context);
+                }
             }
         }
     }

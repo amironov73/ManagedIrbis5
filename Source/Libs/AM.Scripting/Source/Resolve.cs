@@ -147,6 +147,18 @@ namespace AM.Scripting
         /// </summary>
         public static Parser<IEnumerable<T>> Perhaps<T> (this Parser<T> parser) => parser.Repeat (0, 1);
 
+        /// <summary>
+        /// Выражение в круглых скобках.
+        /// </summary>
+        public static Parser<T>? RoundBraces<T> (this Parser<T>? parser) =>
+            parser.Contained (Parse.Char ('(').Token(), Parse.Char (')').Token());
+
+        /// <summary>
+        /// Выражение в фигурных скобках.
+        /// </summary>
+        public static Parser<T>? CurlyBraces<T> (this Parser<T>? parser) =>
+            parser.Contained (Parse.Char ('{').Token(), Parse.Char ('}').Token());
+
         #endregion
 
     }

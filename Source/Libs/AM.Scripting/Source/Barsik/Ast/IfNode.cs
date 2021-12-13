@@ -37,11 +37,17 @@ namespace AM.Scripting.Barsik
             (
                 AtomNode condition,
                 IEnumerable<StatementNode> thenBlock,
+                IEnumerable<IfNode>? elseIfBlocks,
                 IEnumerable<StatementNode>? elseBlock
             )
         {
             _condition = condition;
             _thenBlock = new (thenBlock);
+            if (elseIfBlocks is not null)
+            {
+                _elseIfBlocks = new (elseIfBlocks);
+            }
+
             if (elseBlock is not null)
             {
                 _elseBlock = new (elseBlock);
@@ -54,6 +60,7 @@ namespace AM.Scripting.Barsik
 
         private readonly AtomNode _condition;
         private readonly List<StatementNode> _thenBlock;
+        private readonly List<IfNode>? _elseIfBlocks;
         private readonly List<StatementNode>? _elseBlock;
 
         #endregion
@@ -75,11 +82,32 @@ namespace AM.Scripting.Barsik
                     statement.Execute (context);
                 }
             }
-            else if (_elseBlock is not null)
+            else
             {
-                foreach (var statement in _elseBlock)
+                var handled = false;
+
+                if (_elseIfBlocks is not null)
                 {
-                    statement.Execute (context);
+                    foreach (var block in _elseIfBlocks)
+                    {
+                        if (block._condition.Compute (context))
+                        {
+                            foreach (var statement in block._thenBlock)
+                            {
+                                statement.Execute (context);
+                            }
+
+                            handled = true;
+                        }
+                    }
+                }
+
+                if (!handled && _elseBlock is not null)
+                {
+                    foreach (var statement in _elseBlock)
+                    {
+                        statement.Execute (context);
+                    }
                 }
             }
         }
@@ -96,6 +124,18 @@ namespace AM.Scripting.Barsik
             foreach (var statement in _thenBlock)
             {
                 builder.AppendLine (statement.ToString());
+            }
+
+            if (_elseIfBlocks is not null)
+            {
+                foreach (var block in _elseIfBlocks)
+                {
+                    builder.AppendLine ($"Else if: {block._condition}");
+                    foreach (var statement in block._thenBlock)
+                    {
+                        builder.AppendLine (statement.ToString());
+                    }
+                }
             }
 
             if (_elseBlock is not null)

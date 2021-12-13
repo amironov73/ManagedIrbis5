@@ -1,0 +1,8 @@
+﻿for (i = 10; i < 10; i = i + 1)
+{
+    print "never";
+}
+else
+{
+    print "else";
+}

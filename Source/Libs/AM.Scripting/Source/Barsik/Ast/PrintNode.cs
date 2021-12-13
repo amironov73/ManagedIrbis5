@@ -14,15 +14,11 @@
 
 #region Using directives
 
-using System.Collections;
 using System.Collections.Generic;
-
-using AM.Text;
 
 #endregion
 
 #nullable enable
-
 
 namespace AM.Scripting.Barsik
 {
@@ -44,62 +40,13 @@ namespace AM.Scripting.Barsik
         private readonly List<AtomNode> _nodes;
         private readonly bool _newLine;
 
-        private void Print (IEnumerable sequence, Context context)
-        {
-            var first = true;
-            foreach (var item in sequence)
-            {
-                if (!first)
-                {
-                    context.Output.Write (", ");
-                }
-
-                context.Output.Write (item);
-                first = false;
-            }
-        }
-
-        private void Print (AtomNode node, Context context)
-        {
-            var value = node.Compute (context);
-            if (value is null)
-            {
-                context.Output.Write ("(null)");
-                return;
-            }
-
-            if (value is string)
-            {
-                context.Output.Write (value);
-                return;
-            }
-
-            var type = ((object) value).GetType();
-            if (type.IsPrimitive)
-            {
-                context.Output.Write (value);
-                return;
-            }
-
-            switch (value)
-            {
-                case IEnumerable sequence:
-                    Print (sequence, context);
-                    break;
-
-                default:
-                    context.Output.Write (value);
-                    break;
-            }
-        }
-
         public override void Execute (Context context)
         {
             PreExecute (context);
 
             foreach (var node in _nodes)
             {
-                Print (node, context);
+                context.Print (node);
             }
 
             if (_newLine)
