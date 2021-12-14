@@ -48,7 +48,7 @@ class Program
         }
     }
 
-    public static void Main (string[] args)
+    public static int Main (string[] args)
     {
         var startAt = AppContext.BaseDirectory;
         if (args.Length != 0)
@@ -59,6 +59,6 @@ class Program
         var inputFolder = FindTestRoot (startAt);
         var outputFolder = Directory.GetCurrentDirectory();
 
-        TestUtility.RunTests (inputFolder, outputFolder);
+        return TestUtility.RunTests (inputFolder, outputFolder) ? 0 : 1;
     }
 }

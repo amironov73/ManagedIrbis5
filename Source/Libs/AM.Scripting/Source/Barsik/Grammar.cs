@@ -267,6 +267,14 @@ namespace AM.Scripting.Barsik
             from identifier in Identifier
             select new IncrementNode (identifier, prefix, null));
 
+        private static readonly Parser<AtomNode> Ternary =
+            from condition in Condition
+            from question in Parse.Char ('?').Token()
+            from trueValue in Parse.Ref (() => Atom)
+            from colon in Parse.Char (':').Token()
+            from falseValue in Parse.Ref (() => Atom)
+            select new TernaryNode (condition, trueValue, falseValue);
+
         private static readonly Parser<AtomNode> Atom =
             MethodCall.Or (New). Or (Parenthesis).Or (Dictionary).Or (List)
                 .Or (Index).Or (Property).Or (Constant).Or (Increment)

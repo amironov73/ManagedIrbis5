@@ -68,6 +68,12 @@ namespace AM.Scripting.Barsik
         public const string InputFileName = "input.txt";
 
         /// <summary>
+        /// Имя файла, в котором содержится тип исключения,
+        /// с которым должен упасть тест.
+        /// </summary>
+        public const string ExceptionFileName = "exception.txt";
+
+        /// <summary>
         /// Имя файла с исходным кодом.
         /// </summary>
         public const string SourceFileName = "source.barsik";
@@ -126,7 +132,7 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Запуск всех тестов и сохранение результатов.
         /// </summary>
-        public static void RunTests
+        public static bool RunTests
             (
                 string inputFolder,
                 string outputFolder
@@ -177,6 +183,8 @@ namespace AM.Scripting.Barsik
             };
             var content = JsonSerializer.Serialize (testResults, options);
             File.WriteAllText (fileName, content);
+
+            return failedTestCount == 0;
         }
 
         /// <summary>

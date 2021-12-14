@@ -92,6 +92,13 @@ namespace AM.Scripting.Barsik
                 Name = Name,
             };
 
+            string? expectedExceptionType = null;
+            var exceptionFileName = GetFullName (TestUtility.ExceptionFileName);
+            if (File.Exists (exceptionFileName))
+            {
+                expectedExceptionType = File.ReadAllText (exceptionFileName).Trim();
+            }
+
             try
             {
                 var descriptionFile = GetFullName (TestUtility.DescriptionFileName);
@@ -151,6 +158,13 @@ namespace AM.Scripting.Barsik
                     }
                 }
 
+                if (expectedExceptionType is not null && !result.Failed)
+                {
+                    result.Failed = true;
+                    context.Output.WriteLine();
+                    context.Output.WriteLine ($"Expected exception={exceptionFileName}, no exception thrown");
+                }
+
             }
             catch (Exception exception)
             {
@@ -158,11 +172,35 @@ namespace AM.Scripting.Barsik
 
                 result.Failed = true;
                 result.Exception = exception.ToString();
+
+                if (expectedExceptionType is not null)
+                {
+                    var actualExceptionType = exception.GetType().FullName;
+                    if (actualExceptionType != expectedExceptionType)
+                    {
+                        context.Output.WriteLine();
+                        context.Output.WriteLine
+                            (
+                                $"Expected exception={expectedExceptionType}, got={actualExceptionType}"
+                            );
+
+                        context.Output.WriteLine();
+                        context.Output.WriteLine (exception.Message);
+                    }
+                    else
+                    {
+                        result.Failed = false;
+                    }
+                }
             }
 
             context.Output.WriteLine (result.Failed ? " FAILED" : " SUCCESS");
 
-            if (result.Expected is not null && result.Expected != result.Output)
+            if (
+                    result.Expected is not null
+                    && result.Expected != result.Output
+                    && expectedExceptionType is null
+               )
             {
                 context.Output.WriteLine ($"\tEXPECTED <{result.Expected}>");
                 context.Output.WriteLine ($"\tACTUAL <{result.Output}>");
