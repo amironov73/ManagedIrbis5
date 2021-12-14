@@ -3,24 +3,11 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* ConstantNode.cs -- константное значение
  * Ars Magna project, http://arsmagna.ru
  */
-
-#region Using directives
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-
-using AM.Text;
-
-#endregion
 
 #nullable enable
 
@@ -33,9 +20,17 @@ namespace AM.Scripting.Barsik
     {
         #region Construction
 
-        public ConstantNode (dynamic? value)
+        public ConstantNode
+            (
+                dynamic? value
+            )
         {
             _value = value;
+
+            if (value is string rawText)
+            {
+                _value = Resolve.UnescapeText (rawText);
+            }
         }
 
         #endregion
@@ -49,13 +44,22 @@ namespace AM.Scripting.Barsik
         #region AtomNode members
 
         /// <inheritdoc cref="AtomNode.Compute"/>
-        public override dynamic? Compute (Context context) => _value;
+        public override dynamic? Compute
+            (
+                Context context
+            )
+        {
+            return _value;
+        }
 
         #endregion
 
         #region Object members
 
-        public override string ToString() => $"constant '{_value}'";
+        public override string ToString()
+        {
+            return $"constant '{_value}'";
+        }
 
         #endregion
     }

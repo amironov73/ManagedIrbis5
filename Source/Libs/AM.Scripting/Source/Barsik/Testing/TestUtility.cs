@@ -160,8 +160,10 @@ namespace AM.Scripting.Barsik
             var failedTestCount = testResults.Count (t => t.Failed);
             var ignoredTestCount = testResults.Count (t => t.Ignored);
             Console.WriteLine();
-            Console.WriteLine (
-                $"Total tests: {totalTestCount}, failed: {failedTestCount}, ignored: {ignoredTestCount}, elapsed: {elapsed.ToAutoString()}");
+            Console.WriteLine
+                (
+                    $"Total tests: {totalTestCount}, failed: {failedTestCount}, ignored: {ignoredTestCount}, elapsed: {elapsed.ToAutoString()}"
+                );
             Console.WriteLine();
 
             var fileName = "barsik-tests-" + DateTime.Now.ToString ("yyyy-MM-dd HH-mm-ss") + ".json";

@@ -17,6 +17,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 
+using AM.Text;
+
 using Sprache;
 
 #endregion
@@ -30,7 +32,6 @@ namespace AM.Scripting
     /// </summary>
     public static class Resolve
     {
-
         #region Fields
 
         /// <summary>
@@ -143,6 +144,159 @@ namespace AM.Scripting
         #region Extension methods
 
         /// <summary>
+        /// Экранирование в строке специальных символов,
+        /// таких как <c>\n</c>.
+        /// </summary>
+        public static string? EscapeText
+            (
+                string? text
+            )
+        {
+            if (string.IsNullOrEmpty (text))
+            {
+                return text;
+            }
+
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (text.Length);
+
+            foreach (var c in text)
+            {
+                switch (c)
+                {
+                    case '\a':
+                        builder.Append ("\\a");
+                        break;
+
+                    case '\b':
+                        builder.Append ("\\b");
+                        break;
+
+                    case '\f':
+                        builder.Append ("\\f");
+                        break;
+
+                    case '\n':
+                        builder.Append ("\\n");
+                        break;
+
+                    case '\r':
+                        builder.Append ("\\r");
+                        break;
+
+                    case '\t':
+                        builder.Append ("\\t");
+                        break;
+
+                    case '\v':
+                        builder.Append ("\\v");
+                        break;
+
+                    case '\\':
+                        builder.Append ("\\\\");
+                        break;
+
+                    case '"':
+                        builder.Append ("\\\"");
+                        break;
+
+                    default:
+                        if (c < ' ')
+                        {
+                            builder.Append ($"\\u{((int) c):xxxx}");
+                        }
+                        else
+                        {
+                            builder.Append (c);
+                        }
+                        break;
+                }
+            }
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Преобразует строку, содержащую escape-последовательности,
+        /// к нормальному виду.
+        /// </summary>
+        public static string? UnescapeText
+            (
+                string? text
+            )
+        {
+            if (string.IsNullOrEmpty (text))
+            {
+                return text;
+            }
+
+            var navigator = new TextNavigator (text);
+            var builder = StringBuilderPool.Shared.Get();
+            builder.EnsureCapacity (text.Length);
+
+            while (!navigator.IsEOF)
+            {
+                var c = navigator.ReadChar();
+                if (c == '\\')
+                {
+                    var c2 = navigator.ReadChar();
+                    c2 = c2 switch
+                    {
+                        'a' => '\a',
+                        'b' => '\b',
+                        'f' => '\f',
+                        'n' => '\n',
+                        'r' => '\r',
+                        't' => '\t',
+                        'u' => ParseUnicode(),
+                        'v' => '\v',
+                        '\'' => '\'',
+                        '"' => '"',
+                        '\\' => '\\',
+                        '0' => '\0',
+                        _ => '?'
+                    };
+                    builder.Append (c2);
+                }
+                else
+                {
+                    builder.Append (c);
+                }
+            }
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+
+            char ParseUnicode()
+            {
+                return (char) int.Parse
+                    (
+                        navigator.ReadString (4).Span,
+                        NumberStyles.HexNumber
+                    );
+            }
+        }
+
+        /// <summary>
+        /// Парсинг строкового литерала с экранированными символами.
+        /// </summary>
+        public static Parser<string> EscapedLiteral
+            (
+                char limiter = '"',
+                char escapeSymbol = '\\'
+            )
+        {
+            var escapist = new Escapist (limiter, escapeSymbol);
+
+            return i => escapist.Parse (i);
+        }
+
+        /// <summary>
         /// Повторяется ноль или один раз.
         /// </summary>
         public static Parser<IEnumerable<T>> Perhaps<T> (this Parser<T> parser) => parser.Repeat (0, 1);
@@ -160,6 +314,5 @@ namespace AM.Scripting
             parser.Contained (Parse.Char ('{').Token(), Parse.Char ('}').Token());
 
         #endregion
-
     }
 }

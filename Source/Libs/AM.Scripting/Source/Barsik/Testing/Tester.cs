@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
 /* Tester.cs -- автоматический тестировщик для Барсика
  * Ars Magna project, http://arsmagna.ru
@@ -14,6 +11,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -79,6 +77,8 @@ namespace AM.Scripting.Barsik
                     "*",
                     SearchOption.AllDirectories
                 );
+
+            Array.Sort (directories);
 
             foreach (var subDir in directories)
             {

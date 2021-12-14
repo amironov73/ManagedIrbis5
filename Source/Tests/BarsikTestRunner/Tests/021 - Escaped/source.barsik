@@ -1,0 +1,2 @@
+﻿x = "hello\t,\nworld";
+print x;

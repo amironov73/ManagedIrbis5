@@ -372,6 +372,7 @@ namespace AM.Scripting.Barsik
             }
 
             var first = true;
+            Output.Write ("[");
             foreach (var item in sequence)
             {
                 if (!first)
@@ -382,6 +383,7 @@ namespace AM.Scripting.Barsik
                 Print (item);
                 first = false;
             }
+            Output.Write ("]");
         }
 
         /// <summary>

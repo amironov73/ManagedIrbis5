@@ -2,6 +2,7 @@
 // ReSharper disable ForCanBeConvertedToForeach
 // ReSharper disable InvokeAsExtensionMethod
 // ReSharper disable PropertyCanBeMadeInitOnly.Local
+// ReSharper disable StringLiteralTypo
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -128,5 +129,76 @@ namespace UnitTests.Scripting
             Assert.AreEqual ("_1", Resolve.Identifier.End ().Parse ("_1"));
         }
 
+        [TestMethod]
+        [Description ("Строка с экранированными символами: пустая строка")]
+        public void Resolve_EscapedLiteral_1()
+        {
+            var actual = Resolve.EscapedLiteral().Parse ("\"\"");
+            Assert.AreEqual (string.Empty, actual);
+        }
+
+        [TestMethod]
+        [Description ("Строка с экранированными символами: пустой входной поток")]
+        public void Resolve_EscapedLiteral_2()
+        {
+            var actual = Resolve.EscapedLiteral().TryParse (string.Empty);
+            Assert.IsFalse (actual.WasSuccessful);
+        }
+
+        [TestMethod]
+        [Description ("Строка с экранированными символами: неоткрытая строка")]
+        public void Resolve_EscapedLiteral_3()
+        {
+            var actual = Resolve.EscapedLiteral().TryParse ("hello");
+            Assert.IsFalse (actual.WasSuccessful);
+        }
+
+        [TestMethod]
+        [Description ("Строка с экранированными символами: незакрытая строка")]
+        public void Resolve_EscapedLiteral_4()
+        {
+            var actual = Resolve.EscapedLiteral().TryParse ("\"hello");
+            Assert.IsFalse (actual.WasSuccessful);
+        }
+
+        [TestMethod]
+        [Description ("Строка с экранированными символами: непустая строка")]
+        public void Resolve_EscapedLiteral_5()
+        {
+            var actual = Resolve.EscapedLiteral().Parse ("\"hello\"");
+            Assert.AreEqual ("hello", actual);
+        }
+
+        [TestMethod]
+        [Description ("Строка с экранированными символами: непустая строка с экранированным символом")]
+        public void Resolve_EscapedLiteral_6()
+        {
+            var actual = Resolve.EscapedLiteral().Parse ("\"hello\\nworld\"");
+            Assert.AreEqual ("hello\\nworld", actual);
+        }
+
+        [TestMethod]
+        [Description ("Строка с экранированными символами: непустая строка с экранированным символом-ограничителем")]
+        public void Resolve_EscapedLiteral_7()
+        {
+            var actual = Resolve.EscapedLiteral().Parse ("\"hello\\\"world\"");
+            Assert.AreEqual ("hello\\\"world", actual);
+        }
+
+        [TestMethod]
+        [Description ("Строка с экранированными символами: строка с неверно экранированным символом-ограничителем")]
+        public void Resolve_EscapedLiteral_8()
+        {
+            var actual = Resolve.EscapedLiteral().TryParse ("\"hello\\\"");
+            Assert.IsFalse (actual.WasSuccessful);
+        }
+
+        [TestMethod]
+        [Description ("Строка с экранированными символами: строка с неверно экранированным символом-не-ограничителем")]
+        public void Resolve_EscapedLiteral_9()
+        {
+            var actual = Resolve.EscapedLiteral().TryParse ("\"hello\\n");
+            Assert.IsFalse (actual.WasSuccessful);
+        }
     }
 }

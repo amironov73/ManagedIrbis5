@@ -151,16 +151,11 @@ namespace AM.Scripting.Barsik
             select new ConstantNode (text == "true");
 
         private static readonly Parser<ConstantNode> CharLiteral =
-            from open in Parse.Char ('\'')
-            from symbol in Parse.CharExcept ('\'')
-            from close in Parse.Char ('\'')
+            from symbol in Parse.CharExcept ('\'').Contained (Parse.Char ('\''), Parse.Char ('\''))
             select new ConstantNode (symbol);
 
         private static readonly Parser<ConstantNode> StringLiteral =
-            from open in Parse.Char ('"')
-            from text in Parse.CharExcept ('"').Many().Text()
-            from close in Parse.Char ('"')
-            select new ConstantNode (text);
+            Resolve.EscapedLiteral().Select (text => new ConstantNode (text));
 
         private static readonly Parser<ConstantNode> DoubleLiteral =
             from whole in Parse.Number
