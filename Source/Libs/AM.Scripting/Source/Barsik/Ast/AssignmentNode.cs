@@ -30,6 +30,8 @@ namespace AM.Scripting.Barsik
     /// </summary>
     sealed class AssignmentNode : StatementNode
     {
+        #region Construction
+
         public AssignmentNode
             (
                 TargetNode target,
@@ -40,8 +42,16 @@ namespace AM.Scripting.Barsik
             _expression = expression;
         }
 
+        #endregion
+
+        #region Private members
+
         private readonly TargetNode _target;
         private readonly AtomNode _expression;
+
+        #endregion
+
+        #region StatementNode members
 
         public override void Execute
             (
@@ -57,7 +67,7 @@ namespace AM.Scripting.Barsik
 
             if (index is null && memberName is null)
             {
-                context.Variables[variableName] = computedValue;
+                context.SetVariable (variableName, computedValue);
                 return;
             }
 
@@ -123,6 +133,15 @@ namespace AM.Scripting.Barsik
             }
         }
 
-        public override string ToString() => $"Assignment: {_target.VariableName} = {_expression};";
+        #endregion
+
+        #region Object members
+
+        public override string ToString()
+        {
+            return $"Assignment: {_target.VariableName} = {_expression};";
+        }
+
+        #endregion
     }
 }

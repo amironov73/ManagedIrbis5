@@ -399,6 +399,36 @@ namespace AM.Scripting.Barsik
         }
 
         /// <summary>
+        /// Установка значения переменной
+        /// (с сохранением ее места в контексте).
+        /// </summary>
+        public void SetVariable
+            (
+                string name,
+                dynamic? value
+            )
+        {
+            Sure.NotNullNorEmpty (name);
+
+            if (Variables.ContainsKey (name))
+            {
+                Variables[name] = value;
+                return;
+            }
+
+            for (var context = Parent; context is not null; context = context.Parent)
+            {
+                if (context.Variables.ContainsKey (name))
+                {
+                    context.Variables[name] = value;
+                    return;
+                }
+            }
+
+            Variables[name] = value;
+        }
+
+        /// <summary>
         /// Поиск переменной в текущем и в родительских контекстах.
         /// </summary>
         public bool TryGetVariable

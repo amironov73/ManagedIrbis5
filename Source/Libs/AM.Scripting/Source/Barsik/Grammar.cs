@@ -196,7 +196,8 @@ namespace AM.Scripting.Barsik
 
         private static readonly Parser<AtomNode> FunctionCall =
             from name in Identifier
-            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional().RoundBraces()
+            from args in Parse.Ref (() => Atom)
+                .DelimitedBy (Parse.Char (',').Token()).Optional().RoundBraces()
             select new FreeCallNode (name, args.GetOrDefault());
 
         private static readonly Parser<AtomNode> Property =
@@ -209,17 +210,20 @@ namespace AM.Scripting.Barsik
             from objectName in Identifier
             from dot in Parse.Char ('.')
             from memberName in Identifier
-            from args in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional().RoundBraces()
+            from args in Parse.Ref (() => Atom)
+                .DelimitedBy (Parse.Char (',').Token()).Optional().RoundBraces()
             select new MethodNode (objectName, memberName, args.GetOrDefault());
 
         private static readonly Parser<AtomNode> List =
             from open in Parse.Char ('[').Token()
-            from items in Parse.Ref (() => Atom).DelimitedBy (Parse.Char (',').Token()).Optional()
+            from items in Parse.Ref (() => Atom)
+                .DelimitedBy (Parse.Char (',').Token()).Optional()
             from close in Parse.Char (']').Token()
             select new ListNode (items.GetOrDefault());
 
         private static readonly Parser<DictionaryNode> Dictionary =
-            from items in KeyAndValue.DelimitedBy (Parse.Char (',').Token()).Optional().CurlyBraces()
+            from items in KeyAndValue
+                .DelimitedBy (Parse.Char (',').Token()).Optional().CurlyBraces()
             select new DictionaryNode (items.GetOrDefault());
 
         private static readonly Parser<AtomNode> Index =
@@ -254,9 +258,18 @@ namespace AM.Scripting.Barsik
                 )
             select condition;
 
+        private static readonly Parser<AtomNode> Increment =
+            (from identifier in Identifier
+            from suffix in (Parse.String ("++").Or (Parse.String ("--"))).Text().Token()
+            select new IncrementNode (identifier, null, suffix))
+            .Or
+            (from prefix in (Parse.String ("++").Or (Parse.String ("--"))).Text().Token()
+            from identifier in Identifier
+            select new IncrementNode (identifier, prefix, null));
+
         private static readonly Parser<AtomNode> Atom =
             MethodCall.Or (New). Or (Parenthesis).Or (Dictionary).Or (List)
-                .Or (Index).Or (Property).Or (Constant)
+                .Or (Index).Or (Property).Or (Constant).Or (Increment)
                 .Or (FunctionCall).Or (Variable).Or (Negation);
 
         private static readonly Parser<string> Compare =
@@ -315,7 +328,7 @@ namespace AM.Scripting.Barsik
             select new AssignmentNode (variable, expression);
 
         private static readonly Parser<StatementNode> NotAssignment =
-            from expression in MethodCall.Or (FunctionCall)
+            from expression in MethodCall.Or (FunctionCall).Or (Increment)
             select new NotAssignmentNode (expression);
 
         private static readonly Parser<StatementNode> Return =
@@ -371,7 +384,7 @@ namespace AM.Scripting.Barsik
             from _2 in Parse.Char (';').Token()
             from condition in Condition
             from _3 in Parse.Char (';').Token()
-            from step in Assignment
+            from step in Assignment.Or (NotAssignment)
             from close1 in Parse.Char (')').Token()
             from statements in Block.CurlyBraces()
             from elseBody in Else.Optional()
