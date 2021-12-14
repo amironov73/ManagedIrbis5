@@ -21,6 +21,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
+using AM.Text;
+
 #endregion
 
 #nullable enable
@@ -43,9 +45,10 @@ namespace AM.Scripting.Barsik
             { "cat", new FunctionDescriptor ("cat", Cat) },
             { "debug", new FunctionDescriptor ("debug", Debug) },
             { "delete", new FunctionDescriptor ("delete", Delete) },
-            { "dict", new FunctionDescriptor ("dict", Dict) },
             { "dispose", new FunctionDescriptor ("dispose", Dispose) },
             { "error", new FunctionDescriptor ("error", Error) },
+            { "eval", new FunctionDescriptor ("eval", Evaluate) },
+            { "exec", new FunctionDescriptor ("exec", Execute) },
             { "format", new FunctionDescriptor ("format", Format) },
             { "have_var", new FunctionDescriptor ("have_var", HaveVariable) },
             { "italic", new FunctionDescriptor ("italic", Italic) },
@@ -60,14 +63,18 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выделение текста жирным шрифтом.
         /// </summary>
-        public static dynamic Bold (Context context, dynamic?[] args) =>
-            "<b>" + args.FirstOrDefault() + "</b>";
+        public static dynamic Bold (Context context, dynamic?[] args)
+        {
+            return "<b>" + args.FirstOrDefault() + "</b>";
+        }
 
         /// <summary>
         /// Чтение содержимого файла.
         /// </summary>
-        public static dynamic Cat (Context context, dynamic?[] args) =>
-            File.ReadAllText ((string) args.FirstOrDefault()!);
+        public static dynamic Cat (Context context, dynamic?[] args)
+        {
+            return File.ReadAllText ((string)args.FirstOrDefault()!);
+        }
 
         /// <summary>
         /// Выдача отладочного сообщения.
@@ -91,12 +98,6 @@ namespace AM.Scripting.Barsik
         }
 
         /// <summary>
-        /// Создание словаря.
-        /// </summary>
-        public static dynamic Dict (Context context, dynamic?[] args) =>
-            new Dictionary<dynamic, dynamic?>();
-
-        /// <summary>
         /// Освобождение ресурса.
         /// </summary>
         public static dynamic? Dispose (Context context, dynamic?[] args)
@@ -112,8 +113,82 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выдача сообщения в поток ошибок.
         /// </summary>
-        public static dynamic Error (Context context, dynamic?[] args) =>
-            Console.Error.WriteLine (args.FirstOrDefault());
+        public static dynamic Error (Context context, dynamic?[] args)
+        {
+            return context.Error.WriteLine (args.FirstOrDefault());
+        }
+
+        /// <summary>
+        /// Вычисление значения выражения.
+        /// </summary>
+        public static dynamic? Evaluate (Context context, dynamic?[] args)
+        {
+            try
+            {
+                var sourceCode = _BuildSourceCode (context, args);
+                var expression = Grammar.ParseExpression (sourceCode);
+                var result = expression?.Compute (context);
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                context.Error.WriteLine (exception.Message);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Динамическое исполнение скрипта.
+        /// </summary>
+        public static dynamic? Execute (Context context, dynamic?[] args)
+        {
+            try
+            {
+                var sourceCode = _BuildSourceCode (context, args);
+                var program = Interpreter.Parse (sourceCode);
+                foreach (var statement in program.Statements)
+                {
+                    statement.Execute (context);
+                }
+            }
+            catch (Exception exception)
+            {
+                context.Error.WriteLine (exception.Message);
+            }
+
+            return null;
+        }
+
+        private static string _BuildSourceCode
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            var builder = StringBuilderPool.Shared.Get();
+            foreach (var one in args)
+            {
+                if (one is null)
+                {
+                    continue;
+                }
+
+                if (one is AtomNode atom)
+                {
+                    var value = atom.Compute (context);
+                    builder.Append ((object?)value);
+                    continue;
+                }
+
+                builder.Append ((object?)one);
+            }
+
+            var sourceCode = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+            return sourceCode;
+        }
 
         /// <summary>
         /// Форматирование.
@@ -140,8 +215,10 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выделение текста курсивом.
         /// </summary>
-        public static dynamic Italic (Context context, dynamic?[] args) =>
-            "<i>" + args.FirstOrDefault() + "</i>";
+        public static dynamic Italic (Context context, dynamic?[] args)
+        {
+            return "<i>" + args.FirstOrDefault() + "</i>";
+        }
 
         /// <summary>
         /// Текущие дата и время.
@@ -159,7 +236,10 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выполнение внешней программы и получение ее выходного потока.
         /// </summary>
-        public static dynamic System (Context context, dynamic?[] args) => throw new NotImplementedException();
+        public static dynamic System (Context context, dynamic?[] args)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Трассировочное сообщение.
@@ -186,14 +266,18 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Предупреждающее сообщение.
         /// </summary>
-        public static dynamic Warn (Context context, dynamic?[] args) =>
-            Magna.Warning (args.FirstOrDefault());
+        public static dynamic Warn (Context context, dynamic?[] args)
+        {
+            return Magna.Warning (args.FirstOrDefault());
+        }
 
         /// <summary>
         /// Запись данных в файл.
         /// </summary>
-        public static dynamic Write (Context context, dynamic?[] args) => throw new NotImplementedException();
-
+        public static dynamic Write (Context context, dynamic?[] args)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
     }
