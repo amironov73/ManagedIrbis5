@@ -435,6 +435,12 @@ namespace AM.Scripting.Barsik
             from body in Block.CurlyBraces()
             select new UsingNode (variable, initialization, body);
 
+        // оператор throw
+        private static readonly Parser<StatementNode> Throw =
+            from _ in Parse.String ("throw").Token()
+            from operand in Atom
+            select new ThrowNode (operand);
+
         // костыль
         private static readonly Parser<StatementNode> Nop =
             from _ in Parse.Chars (" \t").Until (Parse.LineEnd)
@@ -451,7 +457,7 @@ namespace AM.Scripting.Barsik
             select statement;
 
         private static readonly Parser<StatementNode> RequireSemicolon =
-            from statement in Print.Or (Return).Or (Assignment).Or (NotAssignment)
+            from statement in Print.Or (Return).Or (Throw).Or (Assignment).Or (NotAssignment)
             from semicolon in Parse.Char (';').Token()
             select statement;
 
