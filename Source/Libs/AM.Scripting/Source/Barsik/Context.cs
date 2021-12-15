@@ -264,6 +264,12 @@ namespace AM.Scripting.Barsik
                 return;
             }
 
+            if (value is bool b)
+            {
+                Output.Write (b ? "true" : "false");
+                return;
+            }
+
             if (value is string)
             {
                 Output.Write (value);

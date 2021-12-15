@@ -267,13 +267,13 @@ namespace AM.Scripting.Barsik
             from identifier in Identifier
             select new IncrementNode (identifier, prefix, null));
 
-        private static readonly Parser<AtomNode> Ternary =
-            from condition in Condition
-            from question in Parse.Char ('?').Token()
-            from trueValue in Parse.Ref (() => Atom)
-            from colon in Parse.Char (':').Token()
-            from falseValue in Parse.Ref (() => Atom)
-            select new TernaryNode (condition, trueValue, falseValue);
+        // private static readonly Parser<AtomNode> Ternary =
+        //     from condition in Condition
+        //     from question in Parse.Char ('?').Token()
+        //     from trueValue in Parse.Ref (() => Atom)
+        //     from colon in Parse.Char (':').Token()
+        //     from falseValue in Parse.Ref (() => Atom)
+        //     select new TernaryNode (condition, trueValue, falseValue);
 
         private static readonly Parser<AtomNode> Atom =
             MethodCall.Or (New). Or (Parenthesis).Or (Dictionary).Or (List)
@@ -424,6 +424,17 @@ namespace AM.Scripting.Barsik
             from body in Parse.Ref (() => Block).CurlyBraces()
             select new DefinitionNode (name, args.GetOrDefault(), body);
 
+        // блок using
+        private static readonly Parser<StatementNode> Using =
+            from _ in Parse.String ("using").Token()
+            from open in Parse.Char ('(').Token()
+            from variable in Identifier
+            from equal in Parse.Char ('=').Token()
+            from initialization in Atom
+            from close in Parse.Char (')').Token()
+            from body in Block.CurlyBraces()
+            select new UsingNode (variable, initialization, body);
+
         // костыль
         private static readonly Parser<StatementNode> Nop =
             from _ in Parse.Chars (" \t").Until (Parse.LineEnd)
@@ -436,6 +447,7 @@ namespace AM.Scripting.Barsik
         private static readonly Parser<StatementNode> NoSemicolon =
             from statement in Nop.Or (Definition).Or (ForEach).Or (For)
                 .Or (While).Or (If).Or (TryCatchFinally).Or (External)
+                .Or (Using)
             select statement;
 
         private static readonly Parser<StatementNode> RequireSemicolon =

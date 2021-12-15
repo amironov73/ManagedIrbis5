@@ -1,0 +1,14 @@
+﻿#u System.IO
+
+println "Before";
+
+using (m = new MemoryStream())
+{
+    m.WriteByte (31);
+    m.WriteByte (32);
+    m.WriteByte (33);
+
+    prinln m.Position;
+}
+
+println "After";

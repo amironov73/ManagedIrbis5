@@ -1,0 +1,14 @@
+﻿t = true;
+f = false;
+
+println t, " ", f;
+
+if (t)
+{
+    println "Can be";
+}
+
+if (f)
+{
+    println "Can't be";
+}
