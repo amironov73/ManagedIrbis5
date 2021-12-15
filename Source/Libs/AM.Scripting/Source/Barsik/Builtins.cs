@@ -34,6 +34,74 @@ namespace AM.Scripting.Barsik
     /// </summary>
     public static class Builtins
     {
+        #region Private members
+
+        /// <summary>
+        /// Вычисление аргумента по соответствующему индексу.
+        /// </summary>
+        private static object? Compute
+            (
+                Context context,
+                dynamic?[] args,
+                int index
+            )
+        {
+            if (index >= args.Length)
+            {
+                return null;
+            }
+
+            var arg = args[index];
+            if (arg is null)
+            {
+                return null;
+            }
+
+            if (arg is AtomNode atom)
+            {
+                var value = atom.Compute (context);
+                return value;
+            }
+
+            return arg;
+        }
+
+        /// <summary>
+        /// Вычисление всех значений в виде одной длинной строки.
+        /// </summary>
+        private static string? ComputeAll
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            if (args.Length == 0)
+            {
+                return null;
+            }
+
+            var builder = StringBuilderPool.Shared.Get();
+            for (var index = 0; index < args.Length; index++)
+            {
+                var value = Compute (context, args, index);
+                if (value is IFormattable formattable)
+                {
+                    builder.Append (formattable.ToString (null, CultureInfo.InvariantCulture));
+                }
+                else
+                {
+                    builder.Append (value);
+                }
+            }
+
+            var result = builder.ToString();
+            StringBuilderPool.Shared.Return (builder);
+
+            return result;
+        }
+
+        #endregion
+
         #region Public methods
 
         /// <summary>
@@ -43,6 +111,7 @@ namespace AM.Scripting.Barsik
         {
             { "bold", new FunctionDescriptor ("bold", Bold) },
             { "cat", new FunctionDescriptor ("cat", Cat) },
+            { "chr", new FunctionDescriptor ("chr", Chr) },
             { "debug", new FunctionDescriptor ("debug", Debug) },
             { "delete", new FunctionDescriptor ("delete", Delete) },
             { "dispose", new FunctionDescriptor ("dispose", Dispose) },
@@ -63,17 +132,60 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выделение текста жирным шрифтом.
         /// </summary>
-        public static dynamic Bold (Context context, dynamic?[] args)
+        public static dynamic? Bold
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
-            return "<b>" + args.FirstOrDefault() + "</b>";
+            var value = Compute (context, args, 0);
+
+            return value is null ? null : "<b>" + value + "</b>";
         }
 
         /// <summary>
         /// Чтение содержимого файла.
         /// </summary>
-        public static dynamic Cat (Context context, dynamic?[] args)
+        public static dynamic? Cat
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
-            return File.ReadAllText ((string)args.FirstOrDefault()!);
+            var fileName = (string?) Compute (context, args, 0);
+            if (string.IsNullOrEmpty (fileName))
+            {
+                context.Error.WriteLine ("File name is not specified");
+
+                return null;
+            }
+
+            if (!File.Exists (fileName))
+            {
+                context.Error.WriteLine ($"File '{fileName}' doesn't exist");
+
+                return null;
+            }
+
+            return File.ReadAllText (fileName);
+        }
+
+        /// <summary>
+        /// Символ с указанным кодом.
+        /// </summary>
+        public static dynamic? Chr
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            var value = Compute (context, args, 0);
+            if (value is null)
+            {
+                return null;
+            }
+
+            return Convert.ToChar (value);
         }
 
         /// <summary>
@@ -81,7 +193,8 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public static dynamic? Debug (Context context, dynamic?[] args)
         {
-            global::System.Diagnostics.Debug.WriteLine ((object?)args.FirstOrDefault());
+            var text = ComputeAll (context, args);
+            global::System.Diagnostics.Debug.WriteLine (text);
 
             return null;
         }
@@ -91,8 +204,15 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public static dynamic? Delete (Context context, dynamic?[] args)
         {
-            var name = (string) args[0]!;
-            context.Variables.Remove (name);
+            for (var index = 0; index < args.Length; index++)
+            {
+                var value = Compute (context, args, index);
+
+                if (value is string name && !string.IsNullOrEmpty (name))
+                {
+                    context.Variables.Remove (name);
+                }
+            }
 
             return null;
         }
@@ -113,9 +233,15 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выдача сообщения в поток ошибок.
         /// </summary>
-        public static dynamic Error (Context context, dynamic?[] args)
+        public static dynamic? Error (Context context, dynamic?[] args)
         {
-            return context.Error.WriteLine (args.FirstOrDefault());
+            var text = ComputeAll (context, args);
+            if (!string.IsNullOrEmpty (text))
+            {
+                context.Error.WriteLine (text);
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -125,7 +251,12 @@ namespace AM.Scripting.Barsik
         {
             try
             {
-                var sourceCode = _BuildSourceCode (context, args);
+                var sourceCode = ComputeAll (context, args);
+                if (string.IsNullOrWhiteSpace (sourceCode))
+                {
+                    return null;
+                }
+
                 var expression = Grammar.ParseExpression (sourceCode);
                 var result = expression?.Compute (context);
 
@@ -146,7 +277,12 @@ namespace AM.Scripting.Barsik
         {
             try
             {
-                var sourceCode = _BuildSourceCode (context, args);
+                var sourceCode = ComputeAll (context, args);
+                if (string.IsNullOrWhiteSpace (sourceCode))
+                {
+                    return null;
+                }
+
                 var program = Interpreter.Parse (sourceCode);
                 foreach (var statement in program.Statements)
                 {
@@ -161,41 +297,17 @@ namespace AM.Scripting.Barsik
             return null;
         }
 
-        private static string _BuildSourceCode
-            (
-                Context context,
-                dynamic?[] args
-            )
-        {
-            var builder = StringBuilderPool.Shared.Get();
-            foreach (var one in args)
-            {
-                if (one is null)
-                {
-                    continue;
-                }
-
-                if (one is AtomNode atom)
-                {
-                    var value = atom.Compute (context);
-                    builder.Append ((object?)value);
-                    continue;
-                }
-
-                builder.Append ((object?)one);
-            }
-
-            var sourceCode = builder.ToString();
-            StringBuilderPool.Shared.Return (builder);
-            return sourceCode;
-        }
-
         /// <summary>
         /// Форматирование.
         /// </summary>
         public static dynamic Format (Context context, dynamic?[] args)
         {
-            var format = (string) args[0]!;
+            var format = (string?) Compute (context, args, 0);
+            if (string.IsNullOrEmpty (format))
+            {
+                return string.Empty;
+            }
+
             var other = args.Select (o => (object?) o).Skip (1).ToArray();
             var result = string.Format (CultureInfo.InvariantCulture, format, other);
 
@@ -208,22 +320,32 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public static dynamic HaveVariable (Context context, dynamic?[] args)
         {
-            var name = (string) args[0]!;
+            var name = (string?) Compute (context, args, 0);
+            if (string.IsNullOrEmpty (name))
+            {
+                return false;
+            }
+
             return context.TryGetVariable (name, out _);
         }
 
         /// <summary>
         /// Выделение текста курсивом.
         /// </summary>
-        public static dynamic Italic (Context context, dynamic?[] args)
+        public static dynamic? Italic (Context context, dynamic?[] args)
         {
-            return "<i>" + args.FirstOrDefault() + "</i>";
+            var value = Compute (context, args, 0);
+
+            return value is null ? null : "<i>" + value + "</i>";
         }
 
         /// <summary>
         /// Текущие дата и время.
         /// </summary>
-        public static dynamic Now (Context context, dynamic?[] args) => DateTime.Now;
+        public static dynamic Now (Context context, dynamic?[] args)
+        {
+            return DateTime.Now;
+        }
 
         /// <summary>
         /// Чтение данных из файла.
@@ -246,7 +368,11 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public static dynamic? Trace (Context context, dynamic?[] args)
         {
-            Magna.Trace ((string) args.FirstOrDefault()!);
+            var text = ComputeAll (context, args);
+            if (!string.IsNullOrEmpty (text))
+            {
+                Magna.Trace (text);
+            }
 
             return null;
         }
@@ -256,7 +382,7 @@ namespace AM.Scripting.Barsik
         /// </summary>
         public static dynamic? Trim (Context context, dynamic?[] args)
         {
-            var text = (string?) args.FirstOrDefault();
+            var text = ComputeAll (context, args);
 
             return string.IsNullOrEmpty (text)
                 ? text
@@ -266,9 +392,15 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Предупреждающее сообщение.
         /// </summary>
-        public static dynamic Warn (Context context, dynamic?[] args)
+        public static dynamic? Warn (Context context, dynamic?[] args)
         {
-            return Magna.Warning (args.FirstOrDefault());
+            var text = ComputeAll (context, args);
+            if (!string.IsNullOrEmpty (text))
+            {
+                Magna.Warning (text);
+            }
+
+            return null;
         }
 
         /// <summary>
