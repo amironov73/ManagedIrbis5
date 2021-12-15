@@ -31,6 +31,17 @@ namespace Barsik
     /// </summary>
     class Program
     {
+        static void DoRepl
+            (
+                Interpreter interpreter
+            )
+        {
+            var version = typeof (Interpreter).Assembly.GetName().Version;
+            interpreter.Context.Output.WriteLine ($"Barsik interpreter {version}");
+            interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
+            new Repl (interpreter).Loop();
+        }
+
         /// <summary>
         /// Точка входа в программу.
         /// </summary>
@@ -41,11 +52,6 @@ namespace Barsik
         {
             Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
 
-            if (args.Length == 0)
-            {
-                return 1;
-            }
-
             var interpreter = new Interpreter();
 
             try
@@ -53,6 +59,12 @@ namespace Barsik
                 var dump = false;
                 var index = 0;
                 string sourceCode;
+
+                if (args.Length == 0)
+                {
+                    DoRepl (interpreter);
+                }
+
                 foreach (var fileName in args)
                 {
                     if (fileName == "-d")
@@ -63,8 +75,7 @@ namespace Barsik
 
                     if (fileName == "-r")
                     {
-                        interpreter.Context.Output.WriteLine ("Press ENTER twice to exit");
-                        new Repl (interpreter).Loop();
+                        DoRepl (interpreter);
                         continue;
                     }
 

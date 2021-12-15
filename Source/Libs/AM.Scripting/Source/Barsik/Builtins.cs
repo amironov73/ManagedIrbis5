@@ -16,10 +16,11 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 
 using AM.Text;
 
@@ -122,8 +123,11 @@ namespace AM.Scripting.Barsik
             { "have_var", new FunctionDescriptor ("have_var", HaveVariable) },
             { "italic", new FunctionDescriptor ("italic", Italic) },
             { "now", new FunctionDescriptor ("now", Now) },
+            { "open_read", new FunctionDescriptor ("open_read", OpenRead) },
             { "readln", new FunctionDescriptor ("readln", Readln) },
             { "system", new FunctionDescriptor ("system", System) },
+            { "to_bool", new FunctionDescriptor ("to_bool", ToBoolean) },
+            { "to_str", new FunctionDescriptor ("to_str", ToString) },
             { "trace", new FunctionDescriptor ("trace", Trace) },
             { "trim", new FunctionDescriptor ("trim", Trim) },
             { "warn", new FunctionDescriptor ("warn", Warn) },
@@ -191,7 +195,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выдача отладочного сообщения.
         /// </summary>
-        public static dynamic? Debug (Context context, dynamic?[] args)
+        public static dynamic? Debug
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             var text = ComputeAll (context, args);
             global::System.Diagnostics.Debug.WriteLine (text);
@@ -202,7 +210,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Удаление из текущего контекста указанной переменной.
         /// </summary>
-        public static dynamic? Delete (Context context, dynamic?[] args)
+        public static dynamic? Delete
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             for (var index = 0; index < args.Length; index++)
             {
@@ -218,13 +230,21 @@ namespace AM.Scripting.Barsik
         }
 
         /// <summary>
-        /// Освобождение ресурса.
+        /// Освобождение ресурса(ов).
         /// </summary>
-        public static dynamic? Dispose (Context context, dynamic?[] args)
+        public static dynamic? Dispose
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
-            if (args.FirstOrDefault() is IDisposable disposable)
+            for (var i = 0; i < args.Length; i++)
             {
-                disposable.Dispose();
+                var value = Compute (context, args, i);
+                if (value is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
             }
 
             return null;
@@ -233,7 +253,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выдача сообщения в поток ошибок.
         /// </summary>
-        public static dynamic? Error (Context context, dynamic?[] args)
+        public static dynamic? Error
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             var text = ComputeAll (context, args);
             if (!string.IsNullOrEmpty (text))
@@ -247,7 +271,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Вычисление значения выражения.
         /// </summary>
-        public static dynamic? Evaluate (Context context, dynamic?[] args)
+        public static dynamic? Evaluate
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             try
             {
@@ -273,7 +301,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Динамическое исполнение скрипта.
         /// </summary>
-        public static dynamic? Execute (Context context, dynamic?[] args)
+        public static dynamic? Execute
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             try
             {
@@ -300,7 +332,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Форматирование.
         /// </summary>
-        public static dynamic Format (Context context, dynamic?[] args)
+        public static dynamic Format
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             var format = (string?) Compute (context, args, 0);
             if (string.IsNullOrEmpty (format))
@@ -308,8 +344,14 @@ namespace AM.Scripting.Barsik
                 return string.Empty;
             }
 
-            var other = args.Select (o => (object?) o).Skip (1).ToArray();
-            var result = string.Format (CultureInfo.InvariantCulture, format, other);
+            var other = new List<object?> ();
+            for (var index = 1; index < args.Length; index++)
+            {
+                var value = Compute (context, args, index);
+                other.Add (value);
+            }
+
+            var result = string.Format (CultureInfo.InvariantCulture, format, other.ToArray());
 
             return result;
         }
@@ -318,7 +360,11 @@ namespace AM.Scripting.Barsik
         /// Проверка существования переменной с указанным именем
         /// (в любом контексте).
         /// </summary>
-        public static dynamic HaveVariable (Context context, dynamic?[] args)
+        public static dynamic HaveVariable
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             var name = (string?) Compute (context, args, 0);
             if (string.IsNullOrEmpty (name))
@@ -332,7 +378,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выделение текста курсивом.
         /// </summary>
-        public static dynamic? Italic (Context context, dynamic?[] args)
+        public static dynamic? Italic
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             var value = Compute (context, args, 0);
 
@@ -342,15 +392,48 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Текущие дата и время.
         /// </summary>
-        public static dynamic Now (Context context, dynamic?[] args)
+        public static dynamic Now
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             return DateTime.Now;
         }
 
         /// <summary>
+        /// Открытие файла только для чтения.
+        /// </summary>
+        public static dynamic? OpenRead
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            var fileName = (string?) Compute (context, args, 0);
+            if (string.IsNullOrWhiteSpace (fileName))
+            {
+                context.Error.WriteLine ("No file name specified");
+                return null;
+            }
+
+            if (!File.Exists (fileName))
+            {
+                context.Error.WriteLine ($"File {fileName} doesn't exist");
+                return null;
+            }
+
+            return new StreamReader (fileName);
+        }
+
+        /// <summary>
         /// Чтение данных из файла.
         /// </summary>
-        public static dynamic? Readln (Context context, dynamic?[] args)
+        public static dynamic? Readln
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             return context.Input.ReadLine();
         }
@@ -358,15 +441,104 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Выполнение внешней программы и получение ее выходного потока.
         /// </summary>
-        public static dynamic System (Context context, dynamic?[] args)
+        public static dynamic? System
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
-            throw new NotImplementedException();
+            var command = (string?) Compute (context, args, 0);
+            if (string.IsNullOrWhiteSpace (command))
+            {
+                return null;
+            }
+
+            command = command.Trim();
+            var startInfo = new ProcessStartInfo (command)
+            {
+                UseShellExecute = false,
+                RedirectStandardOutput = true
+            };
+            for (var i = 1; i < args.Length; i++)
+            {
+                var value = (string?) Compute (context, args, i);
+                if (!string.IsNullOrWhiteSpace (value))
+                {
+                    startInfo.ArgumentList.Add (value.Trim());
+                }
+            }
+
+            var process = Process.Start (startInfo);
+            if (process is not null)
+            {
+                var result = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
+                return result;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Преобразование любого значения в логическое.
+        /// </summary>
+        public static dynamic ToBoolean
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            var value = Compute (context, args, 0);
+
+            return value switch
+            {
+                null => false,
+                true => true,
+                false => false,
+                "true" or "True" => true,
+                "false" or "False" => false,
+                string text => !string.IsNullOrEmpty (text),
+                sbyte sb => sb != 0,
+                byte b => b != 0,
+                short i16 => i16 != 0,
+                int i32 => i32 != 0,
+                long i64 => i64 != 0,
+                float f32 => f32 != 0.0f,
+                double d64 => d64 != 0.0,
+                decimal d => d != 0.0m,
+                IList list => list.Count != 0,
+                IDictionary dictionary => dictionary.Count != 0,
+                _ => true
+            };
+        }
+
+        /// <summary>
+        /// Преобразование любого значения в строку.
+        /// </summary>
+        /// <remarks>
+        /// Всегда возвращается не <c>null</c>.
+        /// Взамен <c>null</c> возвращается <see cref="string.Empty"/>.
+        /// </remarks>
+        public static dynamic ToString
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            var result = ComputeAll (context, args);
+
+            return result ?? string.Empty;
         }
 
         /// <summary>
         /// Трассировочное сообщение.
         /// </summary>
-        public static dynamic? Trace (Context context, dynamic?[] args)
+        public static dynamic? Trace
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             var text = ComputeAll (context, args);
             if (!string.IsNullOrEmpty (text))
@@ -380,7 +552,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Обрезка начальных и конечных пробелов в строке.
         /// </summary>
-        public static dynamic? Trim (Context context, dynamic?[] args)
+        public static dynamic? Trim
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             var text = ComputeAll (context, args);
 
@@ -392,7 +568,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Предупреждающее сообщение.
         /// </summary>
-        public static dynamic? Warn (Context context, dynamic?[] args)
+        public static dynamic? Warn
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             var text = ComputeAll (context, args);
             if (!string.IsNullOrEmpty (text))
@@ -406,7 +586,11 @@ namespace AM.Scripting.Barsik
         /// <summary>
         /// Запись данных в файл.
         /// </summary>
-        public static dynamic Write (Context context, dynamic?[] args)
+        public static dynamic Write
+            (
+                Context context,
+                dynamic?[] args
+            )
         {
             throw new NotImplementedException();
         }

@@ -186,9 +186,14 @@ namespace AM.Scripting.Barsik
             select new VariableNode (identifier);
 
         private static readonly Parser<AtomNode> Negation =
-            from minus in Parse.Char ('-')
+            from minus in Parse.Char ('-').Token()
             from inner in Atom
             select new NegationNode (inner);
+
+        private static readonly Parser<AtomNode> Not =
+            from minus in Parse.Char ('!').Token()
+            from inner in Atom
+            select new NotNode (inner);
 
         private static readonly Parser<AtomNode> Parenthesis =
             Parse.Ref (() => ArithmeticExpression).RoundBraces()
@@ -278,7 +283,7 @@ namespace AM.Scripting.Barsik
         private static readonly Parser<AtomNode> Atom =
             MethodCall.Or (New). Or (Parenthesis).Or (Dictionary).Or (List)
                 .Or (Index).Or (Property).Or (Constant).Or (Increment)
-                .Or (FunctionCall).Or (Variable).Or (Negation);
+                .Or (FunctionCall).Or (Variable).Or (Negation).Or (Not);
 
         private static readonly Parser<string> Compare =
             Parse.String ("<=").Token()

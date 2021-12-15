@@ -1,0 +1,3 @@
+x = true;
+y = !x;
+println x, ", ", y;
