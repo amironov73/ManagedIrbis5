@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* PrintNode.cs -- распечатка значений переменных и выражений
  * Ars Magna project, http://arsmagna.ru
@@ -25,9 +22,19 @@ namespace AM.Scripting.Barsik
     /// <summary>
     /// Распечатка значений переменных и выражений.
     /// </summary>
-    sealed class PrintNode : StatementNode
+    sealed class PrintNode
+        : StatementNode
     {
-        public PrintNode (IEnumerable<AtomNode>? nodes, bool newLine)
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public PrintNode
+            (
+                IEnumerable<AtomNode>? nodes,
+                bool newLine
+            )
         {
             _nodes = new List<AtomNode> ();
             if (nodes is not null)
@@ -37,10 +44,22 @@ namespace AM.Scripting.Barsik
             _newLine = newLine;
         }
 
+        #endregion
+
+        #region Private members
+
         private readonly List<AtomNode> _nodes;
         private readonly bool _newLine;
 
-        public override void Execute (Context context)
+        #endregion
+
+        #region StatementNode members
+
+        /// <inheritdoc cref="StatementNode.Execute"/>
+        public override void Execute
+            (
+                Context context
+            )
         {
             PreExecute (context);
 
@@ -55,9 +74,16 @@ namespace AM.Scripting.Barsik
             }
         }
 
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
             return "Print: " + string.Join (',', _nodes);
         }
+
+        #endregion
     }
 }

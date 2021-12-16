@@ -14,9 +14,7 @@
 #region Using directives
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -250,147 +248,7 @@ namespace AM.Scripting.Barsik
             throw new Exception ($"Function {name} not found");
         }
 
-        /// <summary>
-        /// Вывод на печать произвольного объекта.
-        /// </summary>
-        public void Print
-            (
-                object? value
-            )
-        {
-            if (value is null)
-            {
-                Output.Write ("(null)");
-                return;
-            }
 
-            if (value is bool b)
-            {
-                Output.Write (b ? "true" : "false");
-                return;
-            }
-
-            if (value is string)
-            {
-                Output.Write (value);
-                return;
-            }
-
-            if (value is AtomNode atom)
-            {
-                Print (atom);
-                return;
-            }
-
-            var type = value.GetType();
-            if (type.IsPrimitive)
-            {
-                if (value is IFormattable formattable)
-                {
-                    Output.Write (formattable.ToString (null, CultureInfo.InvariantCulture));
-                }
-                else
-                {
-                    Output.Write (value);
-                }
-                return;
-            }
-
-            switch (value)
-            {
-                case IDictionary dictionary:
-                    Print (dictionary);
-                    break;
-
-                case IEnumerable sequence:
-                    Print (sequence);
-                    break;
-
-                case IFormattable formattable:
-                    Output.Write (formattable.ToString (null, CultureInfo.InvariantCulture));
-                    break;
-
-                default:
-                    Output.Write (value);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Вывод на печать словаря.
-        /// </summary>
-        /// <param name="dictionary"></param>
-        public void Print
-            (
-                IDictionary? dictionary
-            )
-        {
-            if (dictionary is null)
-            {
-                Output.Write ("(null)");
-                return;
-            }
-
-            Output.Write ("{");
-
-            var first = true;
-            foreach (DictionaryEntry entry in dictionary)
-            {
-                if (!first)
-                {
-                    Output.Write (", ");
-                }
-
-                Print (entry.Key);
-                Output.Write (": ");
-                Print (entry.Value);
-
-                first = false;
-            }
-
-            Output.Write ("}");
-        }
-
-        /// <summary>
-        /// Вывод на печать последовательности.
-        /// </summary>
-        public void Print
-            (
-                IEnumerable? sequence
-            )
-        {
-            if (sequence is null)
-            {
-                Output.Write ("(null)");
-                return;
-            }
-
-            if (sequence is IDictionary dictionary)
-            {
-                Print (dictionary);
-                return;
-            }
-
-            if (sequence is string)
-            {
-                Output.Write (sequence);
-                return;
-            }
-
-            var first = true;
-            Output.Write ("[");
-            foreach (var item in sequence)
-            {
-                if (!first)
-                {
-                    Output.Write (", ");
-                }
-
-                Print (item);
-                first = false;
-            }
-            Output.Write ("]");
-        }
 
         /// <summary>
         /// Вывод на печать значения AST-узла.
@@ -401,7 +259,7 @@ namespace AM.Scripting.Barsik
             )
         {
             var value = node.Compute (this);
-            Print ((object?) value);
+            BarsikUtility.PrintObject (Output, value);
         }
 
         /// <summary>

@@ -16,28 +16,24 @@ namespace AM.Scripting.Barsik
     /// <summary>
     /// Констатное значение.
     /// </summary>
-    sealed class ConstantNode : AtomNode
+    sealed class ConstantNode
+        : AtomNode
     {
         #region Construction
 
         public ConstantNode
             (
-                dynamic? value
+                object? value
             )
         {
             _value = value;
-
-            if (value is string rawText)
-            {
-                _value = Resolve.UnescapeText (rawText);
-            }
         }
 
         #endregion
 
         #region Private members
 
-        private readonly dynamic? _value;
+        private readonly object? _value;
 
         #endregion
 
@@ -56,6 +52,7 @@ namespace AM.Scripting.Barsik
 
         #region Object members
 
+        /// <inheritdoc cref="object.ToString"/>
         public override string ToString()
         {
             return $"constant '{_value}'";
