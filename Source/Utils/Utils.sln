@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniCall", "UniCall\UniCall.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bin2sharp", "Bin2sharp\Bin2sharp.csproj", "{915FA4B4-85FE-46F4-BD3A-147CA5704794}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deamble", "Deamble\Deamble.csproj", "{9AFFB5D7-C2A8-4802-873C-9B033645CE39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{915FA4B4-85FE-46F4-BD3A-147CA5704794}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{915FA4B4-85FE-46F4-BD3A-147CA5704794}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{915FA4B4-85FE-46F4-BD3A-147CA5704794}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AFFB5D7-C2A8-4802-873C-9B033645CE39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AFFB5D7-C2A8-4802-873C-9B033645CE39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AFFB5D7-C2A8-4802-873C-9B033645CE39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AFFB5D7-C2A8-4802-873C-9B033645CE39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
