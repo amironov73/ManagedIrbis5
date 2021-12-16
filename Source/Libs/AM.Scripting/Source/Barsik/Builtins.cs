@@ -121,6 +121,7 @@ namespace AM.Scripting.Barsik
             { "format", new FunctionDescriptor ("format", Format) },
             { "have_var", new FunctionDescriptor ("have_var", HaveVariable) },
             { "italic", new FunctionDescriptor ("italic", Italic) },
+            { "len", new FunctionDescriptor ("len", Length) },
             { "max", new FunctionDescriptor ("max", Max) },
             { "min", new FunctionDescriptor ("min", Min) },
             { "now", new FunctionDescriptor ("now", Now) },
@@ -388,6 +389,20 @@ namespace AM.Scripting.Barsik
             var value = Compute (context, args, 0);
 
             return value is null ? null : "<i>" + value + "</i>";
+        }
+
+        /// <summary>
+        /// Вычисление длины объекта.
+        /// </summary>
+        public static dynamic? Length
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            var value = Compute (context, args, 0);
+
+            return BarsikUtility.GetLength (value);
         }
 
         /// <summary>

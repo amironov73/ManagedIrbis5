@@ -262,33 +262,22 @@ namespace AM.Scripting.Barsik
             };
         }
 
-        public static Type? GetCommonType
+        /// <summary>
+        /// Вычисление длины объекта.
+        /// </summary>
+        public static int GetLength
             (
-                IEnumerable values
+                object? value
             )
         {
-            Type? result = null;
-
-            foreach (var value in values)
+            return value switch
             {
-                if (value is not null)
-                {
-                    var type = value.GetType();
-                    if (result is not null)
-                    {
-                        if (type != result)
-                        {
-                            return null;
-                        }
-                    }
-                    else
-                    {
-                        result = type;
-                    }
-                }
-            }
-
-            return result;
+                null => 0,
+                string text => text.Length,
+                IList list => list.Count,
+                IDictionary dictionary => dictionary.Count,
+                _ => 1
+            };
         }
 
         #endregion
