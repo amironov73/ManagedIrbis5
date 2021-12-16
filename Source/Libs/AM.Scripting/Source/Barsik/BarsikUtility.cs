@@ -232,6 +232,65 @@ namespace AM.Scripting.Barsik
             return result;
         }
 
+        /// <summary>
+        /// Преобразование любого значения в логическое.
+        /// </summary>
+        public static bool ToBoolean
+            (
+                object? value
+            )
+        {
+            return value switch
+            {
+                null => false,
+                true => true,
+                false => false,
+                "true" or "True" => true,
+                "false" or "False" => false,
+                string text => !string.IsNullOrEmpty (text),
+                sbyte sb => sb != 0,
+                byte b => b != 0,
+                short i16 => i16 != 0,
+                int i32 => i32 != 0,
+                long i64 => i64 != 0,
+                float f32 => f32 != 0.0f,
+                double d64 => d64 != 0.0,
+                decimal d => d != 0.0m,
+                IList list => list.Count != 0,
+                IDictionary dictionary => dictionary.Count != 0,
+                _ => true
+            };
+        }
+
+        public static Type? GetCommonType
+            (
+                IEnumerable values
+            )
+        {
+            Type? result = null;
+
+            foreach (var value in values)
+            {
+                if (value is not null)
+                {
+                    var type = value.GetType();
+                    if (result is not null)
+                    {
+                        if (type != result)
+                        {
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        result = type;
+                    }
+                }
+            }
+
+            return result;
+        }
+
         #endregion
     }
 }

@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -122,6 +121,8 @@ namespace AM.Scripting.Barsik
             { "format", new FunctionDescriptor ("format", Format) },
             { "have_var", new FunctionDescriptor ("have_var", HaveVariable) },
             { "italic", new FunctionDescriptor ("italic", Italic) },
+            { "max", new FunctionDescriptor ("max", Max) },
+            { "min", new FunctionDescriptor ("min", Min) },
             { "now", new FunctionDescriptor ("now", Now) },
             { "open_read", new FunctionDescriptor ("open_read", OpenRead) },
             { "readln", new FunctionDescriptor ("readln", Readln) },
@@ -390,6 +391,96 @@ namespace AM.Scripting.Barsik
         }
 
         /// <summary>
+        /// Поиск максимального значения среди перечисленных.
+        /// </summary>
+        public static dynamic? Max
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            IComparable? result = null;
+            var index = 0;
+
+            while (index < args.Length)
+            {
+                if (args[index] is IComparable comparable)
+                {
+                    result = comparable;
+                    break;
+                }
+
+                index++;
+            }
+
+            if (result is null)
+            {
+                return null;
+            }
+
+            index++;
+            while (index < args.Length)
+            {
+                if (args[index] is IComparable comparable)
+                {
+                    if (result.CompareTo (comparable) < 0)
+                    {
+                        result = comparable;
+                    }
+                }
+
+                index++;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Поиск минимального значения среди перечисленных.
+        /// </summary>
+        public static dynamic? Min
+            (
+                Context context,
+                dynamic?[] args
+            )
+        {
+            IComparable? result = null;
+            var index = 0;
+
+            while (index < args.Length)
+            {
+                if (args[index] is IComparable comparable)
+                {
+                    result = comparable;
+                    break;
+                }
+
+                index++;
+            }
+
+            if (result is null)
+            {
+                return null;
+            }
+
+            index++;
+            while (index < args.Length)
+            {
+                if (args[index] is IComparable comparable)
+                {
+                    if (result.CompareTo (comparable) > 0)
+                    {
+                        result = comparable;
+                    }
+                }
+
+                index++;
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Текущие дата и время.
         /// </summary>
         public static dynamic Now
@@ -491,26 +582,7 @@ namespace AM.Scripting.Barsik
         {
             var value = Compute (context, args, 0);
 
-            return value switch
-            {
-                null => false,
-                true => true,
-                false => false,
-                "true" or "True" => true,
-                "false" or "False" => false,
-                string text => !string.IsNullOrEmpty (text),
-                sbyte sb => sb != 0,
-                byte b => b != 0,
-                short i16 => i16 != 0,
-                int i32 => i32 != 0,
-                long i64 => i64 != 0,
-                float f32 => f32 != 0.0f,
-                double d64 => d64 != 0.0,
-                decimal d => d != 0.0m,
-                IList list => list.Count != 0,
-                IDictionary dictionary => dictionary.Count != 0,
-                _ => true
-            };
+            return BarsikUtility.ToBoolean (value);
         }
 
         /// <summary>
