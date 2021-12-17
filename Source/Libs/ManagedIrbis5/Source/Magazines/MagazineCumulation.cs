@@ -135,7 +135,7 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Разбор поля.
         /// </summary>
-        public static MagazineCumulation Parse
+        public static MagazineCumulation ParseField
             (
                 Field field
             )
@@ -161,7 +161,7 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Разбор записи.
         /// </summary>
-        public static MagazineCumulation[] Parse
+        public static MagazineCumulation[] ParseRecord
             (
                 Record record,
                 int tag = Tag
@@ -172,7 +172,7 @@ namespace ManagedIrbis.Magazines
 
             return record.Fields
                 .GetField (tag)
-                .Select (field => Parse (field))
+                .Select (field => ParseField (field))
                 .ToArray();
         }
 

@@ -21,6 +21,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 using AM;
+using AM.Collections;
 using AM.Linq;
 
 #endregion
@@ -47,20 +49,34 @@ namespace ManagedIrbis
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
+        [Pure]
+        // ReSharper disable PossibleMultipleEnumeration
         public static Field[] GetField
             (
                 this IEnumerable<Field> fields,
                 int tag
             )
         {
-            return fields
-                .Where (field => field.Tag == tag)
-                .ToArray();
+            Sure.NotNull (fields);
+
+            var list = new ValueList<Field>();
+
+            foreach (var field in fields)
+            {
+                if (field.Tag == tag)
+                {
+                    list.Append (field);
+                }
+            }
+
+            return list.ToArray();
         }
+        // ReSharper restore PossibleMultipleEnumeration
 
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
+        [Pure]
         public static Field? GetField
             (
                 this IEnumerable<Field> fields,
@@ -87,16 +103,30 @@ namespace ManagedIrbis
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
+        [Pure]
+        // ReSharper disable PossibleMultipleEnumeration
         public static Field[] GetField
             (
                 this IEnumerable<Field> fields,
-                int[] tags
+                IReadOnlyList<int> tags
             )
         {
-            return fields
-                .Where (field => field.Tag.IsOneOf (tags))
-                .ToArray();
+            Sure.NotNull (fields);
+            Sure.NotNull (tags);
+
+            var list = new ValueList<Field>();
+
+            foreach (var field in fields)
+            {
+                if (field.Tag.IsOneOf (tags))
+                {
+                    list.Append (field);
+                }
+            }
+
+            return list.ToArray();
         }
+        // ReSharper restore PossibleMultipleEnumeration
 
         ///// <summary>
         ///// Фильтрация полей.
@@ -133,17 +163,34 @@ namespace ManagedIrbis
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
+        [Pure]
+        // ReSharper disable PossibleMultipleEnumeration
         public static Field? GetField
             (
                 this IEnumerable<Field> fields,
-                int[] tags,
+                IReadOnlyList<int> tags,
                 int occurrence
             )
         {
-            return fields
-                .GetField (tags)
-                .GetOccurrence (occurrence);
+            Sure.NotNull (fields);
+            Sure.NotNull (tags);
+
+            foreach (var field in fields)
+            {
+                if (field.Tag.IsOneOf (tags))
+                {
+                    if (occurrence == 0)
+                    {
+                        return field;
+                    }
+
+                    occurrence--;
+                }
+            }
+
+            return null;
         }
+        // ReSharper restore PossibleMultipleEnumeration
 
         /// <summary>
         /// Фильтрация полей.
@@ -207,7 +254,7 @@ namespace ManagedIrbis
                         }
                     }
                 }
-            } // method GetField
+            }
 
             return result;
         }
@@ -1006,8 +1053,7 @@ namespace ManagedIrbis
             }
 
             return default;
-
-        } // method GetSubFieldValue
+        }
 
         // ==========================================================
 
@@ -1064,8 +1110,7 @@ namespace ManagedIrbis
             }
 
             return false;
-
-        } // method HaveSubField
+        }
 
         /// <summary>
         /// Есть хотя бы одно подполе с указанным кодом?
@@ -1091,8 +1136,7 @@ namespace ManagedIrbis
             }
 
             return false;
-
-        } // method HaveSubField
+        }
 
         /// <summary>
         /// Есть хотя бы одно поле с любым из указанных кодов?
@@ -1116,8 +1160,7 @@ namespace ManagedIrbis
             }
 
             return false;
-
-        } // method HaveSubField
+        }
 
         // ==========================================================
 
@@ -1168,24 +1211,27 @@ namespace ManagedIrbis
             }
 
             return true;
-
-        } // method HaveNotSubField
-
-        // ==========================================================
-
-        /// <summary>
-        /// Фильтрация полей.
-        /// </summary>
-        public static Field[] NotNullTag (this IEnumerable<Field> fields) =>
-            fields.Where (field => field.Tag != 0).ToArray();
+        }
 
         // ==========================================================
 
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
-        public static Field[] NotNullValue (this IEnumerable<Field> fields) =>
-            fields.Where (field => !field.Value.IsEmpty()).ToArray();
+        public static Field[] NotNullTag (this IEnumerable<Field> fields)
+        {
+            return fields.Where (field => field.Tag != 0).ToArray();
+        }
+
+        // ==========================================================
+
+        /// <summary>
+        /// Фильтрация полей.
+        /// </summary>
+        public static Field[] NotNullValue (this IEnumerable<Field> fields)
+        {
+            return fields.Where (field => !field.Value.IsEmpty()).ToArray();
+        }
 
         // ==========================================================
 
@@ -1243,8 +1289,7 @@ namespace ManagedIrbis
             }
 
             return field;
-
-        } // method ReplaceSubField
+        }
 
         // ==========================================================
 
@@ -1271,8 +1316,7 @@ namespace ManagedIrbis
             }
 
             return field;
-
-        } // method ReplaceSubField
+        }
 
         // ==========================================================
 
@@ -1299,8 +1343,7 @@ namespace ManagedIrbis
             return ReferenceEquals (result, null)
                 ? Array.Empty<SubField>()
                 : result.ToArray();
-
-        } // method GetUnknownSubFields
+        }
 
         // ==========================================================
 
@@ -1429,7 +1472,7 @@ namespace ManagedIrbis
                 }
             }
 
-            if (code != (char)0)
+            if (code != (char) 0)
             {
                 result.Add
                     (
@@ -1439,8 +1482,7 @@ namespace ManagedIrbis
             }
 
             return result;
-
-        } // method Parse
+        }
 
         /// <summary>
         /// Парсинг строкового представления поля.
@@ -1468,8 +1510,7 @@ namespace ManagedIrbis
                     tag.AsMemory(),
                     body.AsMemory()
                 );
-
-        } // method Parse
+        }
 
         // ==========================================================
 
@@ -1497,8 +1538,7 @@ namespace ManagedIrbis
             serializer.Serialize (xml, field);
 
             return writer.ToString();
-
-        } // method ToXml
+        }
 
         /// <summary>
         /// Restore the field from XML.
@@ -1513,8 +1553,7 @@ namespace ManagedIrbis
             var result = (Field?)serializer.Deserialize (reader);
 
             return result;
-
-        } // method FromXml
+        }
 
         // ==========================================================
 
@@ -1532,14 +1571,15 @@ namespace ManagedIrbis
                         field => field.Tag == 0
                     )
                 .ToArray();
-
-        } // method WithNullTag
+        }
 
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
-        public static Field[] WithNullValue (this IEnumerable<Field> fields) =>
-            fields.Where (field => field.Value.IsEmpty()).ToArray();
+        public static Field[] WithNullValue (this IEnumerable<Field> fields)
+        {
+            return fields.Where (field => field.Value.IsEmpty()).ToArray();
+        }
 
         // ==========================================================
 
@@ -1578,14 +1618,15 @@ namespace ManagedIrbis
             }
 
             return false;
-
-        } // method HaveSubFields
+        }
 
         /// <summary>
         /// Фильтрация полей.
         /// </summary>
-        public static Field[] WithSubFields (this IEnumerable<Field> fields) =>
-            fields.Where (field => field.HaveSubFields()).ToArray();
+        public static Field[] WithSubFields (this IEnumerable<Field> fields)
+        {
+            return fields.Where (field => field.HaveSubFields()).ToArray();
+        }
 
         // ==========================================================
 
@@ -1613,11 +1654,9 @@ namespace ManagedIrbis
             }
 
             throw new KeyNotFoundException ($"Tag={tag}");
-
-        } // method RequireField
+        }
 
         #endregion
 
-    } // class FieldUtility
-
-} // namespace ManagedIrbis
+    }
+}

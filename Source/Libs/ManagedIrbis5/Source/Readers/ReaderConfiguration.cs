@@ -103,7 +103,5 @@ namespace ManagedIrbis.Readers
         public string? GetTicket (Record record) => record.FM (Ticket);
 
         #endregion
-
-    } // class ReaderConfiguration
-
-} // namespace ManagedIrbis.Readers
+    }
+}

@@ -110,11 +110,12 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         public static MagazineArticleInfo[] ParseIssue
             (
-                Record record
+                Record record,
+                int tag = 922
             )
         {
             var result = new List<MagazineArticleInfo>();
-            foreach (var field in record.Fields.GetField (922))
+            foreach (var field in record.Fields.GetField (tag))
             {
                 var article = ParseField330 (field);
                 result.Add (article);

@@ -19,6 +19,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -165,6 +166,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public bool IsBinding => Worksheet.SameString ("NJK");
 
         /// <summary>
@@ -172,6 +174,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public Record? Record { get; set; }
 
         /// <summary>
@@ -179,6 +182,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
+        [Browsable (false)]
         public object? UserData { get; set; }
 
         #endregion
@@ -190,6 +194,7 @@ namespace ManagedIrbis.Magazines
         /// <see cref="MagazineCode"/>, <see cref="Year"/>, <see cref="Volume"/>
         /// и <see cref="Number"/>.
         /// </summary>
+        [Pure]
         public string BuildIssueIndex()
         {
             return string.IsNullOrEmpty (Volume)
@@ -242,6 +247,7 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Создание библиографической записи по данным о номере журнала.
         /// </summary>
+        [Pure]
         public Record ToRecord()
         {
             var result = new Record();
@@ -273,7 +279,7 @@ namespace ManagedIrbis.Magazines
             }
 
             return result;
-        } // method ToRecord
+        }
 
         /// <summary>
         /// Should serialize the <see cref="Articles"/> field?
@@ -309,8 +315,15 @@ namespace ManagedIrbis.Magazines
         /// Сравнение двух выпусков
         /// (с целью сортировки по возрастанию номеров).
         /// </summary>
-        public static int CompareNumbers (MagazineIssueInfo first, MagazineIssueInfo second)
+        public static int CompareNumbers
+            (
+                MagazineIssueInfo first,
+                MagazineIssueInfo second
+            )
         {
+            Sure.NotNull (first);
+            Sure.NotNull (second);
+
             return NumberText.Compare (first.Number, second.Number);
         }
 

@@ -145,7 +145,7 @@ namespace UnitTests.ManagedIrbis.Magazines
         public void MagazineCumulation_Parse_1()
         {
             var field = _GetField();
-            var cumulation = MagazineCumulation.Parse(field);
+            var cumulation = MagazineCumulation.ParseField(field);
             Assert.AreEqual(field.GetFirstSubFieldValue('q'), cumulation.Year);
             Assert.AreEqual(field.GetFirstSubFieldValue('f'), cumulation.Volume);
             Assert.AreEqual(field.GetFirstSubFieldValue('d'), cumulation.Place);
@@ -159,7 +159,7 @@ namespace UnitTests.ManagedIrbis.Magazines
         public void MagazineCumulation_Parse_2()
         {
             var record = _GetRecord();
-            var cumulations = MagazineCumulation.Parse(record);
+            var cumulations = MagazineCumulation.ParseRecord(record);
             Assert.AreEqual(42, cumulations.Length);
         }
 

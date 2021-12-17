@@ -247,13 +247,14 @@ namespace ManagedIrbis.Records
                 Record record
             )
         {
+            Sure.NotNull (record);
+
             var field = record.GetField (Tag203);
 
             return field is null
                 ? null
                 : Field203.ParseField (field);
-
-        } // method Get203
+        }
 
         /// <summary>
         /// Получение типа контента (поле 181).
@@ -263,19 +264,29 @@ namespace ManagedIrbis.Records
                 Record record
             )
         {
+            Sure.NotNull (record);
+
             var field = record.GetField (ContentTypeTag);
 
             return field is null
                 ? null
                 : ContentType.ParseField (field);
-
-        } // method GetContentType
+        }
 
         /// <summary>
         /// Получение кода страны.
         /// </summary>
         [Pure]
-        public string? GetCountryCode (Record record, string? defaultValue = null) => record.FM (CountryTag) ?? defaultValue;
+        public string? GetCountryCode
+            (
+                Record record,
+                string? defaultValue = null
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.FM (CountryTag) ?? defaultValue;
+        }
 
         /// <summary>
         /// Получение кодов стран.
@@ -287,6 +298,8 @@ namespace ManagedIrbis.Records
                 string? defaultValue = null
             )
         {
+            Sure.NotNull (record);
+
             var result = record.FMA (CountryTag);
             if (result.Length == 0 && !string.IsNullOrEmpty (defaultValue))
             {
@@ -294,92 +307,207 @@ namespace ManagedIrbis.Records
             }
 
             return result;
-
-        } // method GetCountryCodes
+        }
 
         /// <summary>
         /// Получение поля для настройки библиографической записи.
         /// </summary>
         [Pure]
-        public Field? GetCustomizationField (Record record) => record.GetFirstField (CustomizationTag);
+        public Field? GetCustomizationField
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.GetFirstField (CustomizationTag);
+        }
 
         /// <summary>
         /// Получение конфигурации по умолчанию.
         /// </summary>
         [Pure]
-        public static RecordConfiguration GetDefault() => new ();
+        public static RecordConfiguration GetDefault()
+        {
+            return new ();
+        }
 
         /// <summary>
         /// Получение полей с экземплярами.
         /// </summary>
-        public Field[] GetExemplarFields (Record record) => record.Fields.GetField (ExemplarTag);
+        public Field[] GetExemplarFields
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.Fields.GetField (ExemplarTag);
+        }
 
         /// <summary>
         /// Получение экземпляров документа.
         /// </summary>
-        public ExemplarInfo[] GetExemplars (Record record) => ExemplarInfo.ParseRecord (record, ExemplarTag);
+        public ExemplarInfo[] GetExemplars
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return ExemplarInfo.ParseRecord (record, ExemplarTag);
+        }
 
         /// <summary>
         /// Получение поля с держателем документа.
         /// </summary>
         [Pure]
-        public Field? GetHolderField (Record record) => record.GetFirstField (HolderTag);
+        public Field? GetHolderField
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.GetFirstField (HolderTag);
+        }
 
         /// <summary>
         /// Получение поля с держателем документа.
         /// </summary>
-        public Field[] GetHolderFields (Record record) => record.Fields.GetField (HolderTag);
+        public Field[] GetHolderFields
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.Fields.GetField (HolderTag);
+        }
 
         /// <summary>
         /// Получение поля с графическими данными.
         /// </summary>
         [Pure]
-        public Field? GetImageField (Record record) => record.GetFirstField (ImageTag);
+        public Field? GetImageField
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.GetFirstField (ImageTag);
+        }
 
         /// <summary>
         /// Получение поля с графическими данными.
         /// </summary>
-        public Field[] GetImageFields (Record record) => record.Fields.GetField (ImageTag);
+        public Field[] GetImageFields
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.Fields.GetField (ImageTag);
+        }
 
         /// <summary>
         /// Получение поля с шифром документа.
         /// </summary>
         [Pure]
-        public string? GetIndex (Record record) => record.FM (IndexTag);
+        public string? GetIndex
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.FM (IndexTag);
+        }
 
         /// <summary>
         /// Получение массива полей с ISBN.
         /// </summary>
         [Pure]
-        public Field[] GetIsbnFields (Record record) => record.Fields.GetField (IsbnTag);
+        public Field[] GetIsbnFields
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.Fields.GetField (IsbnTag);
+        }
 
         /// <summary>
         /// Получение массива ISBN.
         /// </summary>
-        public IsbnInfo[] GetIsbn (Record record) => IsbnInfo.ParseRecord (record, IsbnTag);
+        public IsbnInfo[] GetIsbn
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return IsbnInfo.ParseRecord (record, IsbnTag);
+        }
 
         /// <summary>
         /// Получение массива полей с ISSN.
         /// </summary>
         [Pure]
-        public Field[] GetIssnFields (Record record) => record.Fields.GetField (IssnTag);
+        public Field[] GetIssnFields
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.Fields.GetField (IssnTag);
+        }
 
         /// <summary>
         /// Получение ISSN.
         /// </summary>
-        public IssnInfo[] GetIssn (Record record) => IssnInfo.ParseRecord (record, IssnTag);
+        public IssnInfo[] GetIssn
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return IssnInfo.ParseRecord (record, IssnTag);
+        }
 
         /// <summary>
         /// Получение раздела знаний.
         /// </summary>
         [Pure]
-        public string? GetKnowledgeSection (Record record) => record.FM (KnowledgeTag);
+        public string? GetKnowledgeSection
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.FM (KnowledgeTag);
+        }
 
         /// <summary>
         /// Получение кода языка основного текста.
         /// </summary>
         [Pure]
-        public string? GetLanguageCode (Record record, string? defaultValue = null) => record.FM (LanguageTag) ?? defaultValue;
+        public string? GetLanguageCode
+            (
+                Record record,
+                string? defaultValue = null
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.FM (LanguageTag) ?? defaultValue;
+        }
 
         /// <summary>
         /// Получение кодов языка основного текста.
@@ -390,6 +518,8 @@ namespace ManagedIrbis.Records
                 string? defaultValue = null
             )
         {
+            Sure.NotNull (record);
+
             var result = record.FMA (LanguageTag);
             if (result.Length == 0 && !string.IsNullOrEmpty (defaultValue))
             {
@@ -397,55 +527,116 @@ namespace ManagedIrbis.Records
             }
 
             return result;
-
-        } // method GetLanguageCodes
+        }
 
         /// <summary>
         /// Получение полей с информацией о каталогизаторе и дате обработки.
         /// </summary>
-        public Field[] GetOperatorFields (Record record) => record.Fields.GetField (OperatorTag);
+        public Field[] GetOperatorFields
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.Fields.GetField (OperatorTag);
+        }
 
         /// <summary>
         /// Получение информации о редактировании записи.
         /// </summary>
-        public Technology[] GetTechnology (Record record) => Technology.ParseRecord (record, OperatorTag);
+        public Technology[] GetTechnology
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return Technology.ParseRecord (record, OperatorTag);
+        }
 
         /// <summary>
         /// Получение количества выдач документа.
         /// </summary>
         [Pure]
-        public int GetRentalCount (Record record) => record.FM (RentalTag).SafeToInt32();
+        public int GetRentalCount
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.FM (RentalTag).SafeToInt32();
+        }
 
         /// <summary>
         /// Получение поля с внутренним двоичном ресурсом.
         /// </summary>
         [Pure]
-        public Field? GetResourceField (Record record) => record.GetFirstField (ResourceTag);
+        public Field? GetResourceField
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.GetFirstField (ResourceTag);
+        }
 
         /// <summary>
         /// Получение поля с внутренним двоичном ресурсом.
         /// </summary>
-        public Field[] GetResourceFields (Record record) => record.Fields.GetField (ResourceTag);
+        public Field[] GetResourceFields
+            (
+                Record record
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.Fields.GetField (ResourceTag);
+        }
 
         /// <summary>
         /// Получение кода рабочего листа (вида документа).
         /// </summary>
         [Pure]
-        public string? GetWorksheet (Record record, string? defaultValue = null) => record.FM (WorksheetTag) ?? defaultValue;
+        public string? GetWorksheet
+            (
+                Record record,
+                string? defaultValue = null
+            )
+        {
+            Sure.NotNull (record);
+
+            return record.FM (WorksheetTag) ?? defaultValue;
+        }
 
         /// <summary>
         /// Чтение конфигурации из указанного файла.
         /// </summary>
-        public static RecordConfiguration LoadConfiguration (string fileName) =>
-            JsonUtility.ReadObjectFromFile<RecordConfiguration> (fileName);
+        public static RecordConfiguration LoadConfiguration
+            (
+                string fileName
+            )
+        {
+            Sure.FileExists (fileName);
+
+            return JsonUtility.ReadObjectFromFile<RecordConfiguration> (fileName);
+        }
 
         /// <summary>
         /// Запись конфигурации в указанный файл.
         /// </summary>
-        public void SaveConfiguration (string fileName) => JsonUtility.SaveObjectToFile (this, fileName);
+        public void SaveConfiguration
+            (
+                string fileName
+            )
+        {
+            Sure.NotNullNorEmpty (fileName);
+
+            JsonUtility.SaveObjectToFile (this, fileName);
+        }
 
         #endregion
-
-    } // class RecordConfiguration
-
-} // namespace ManagedIrbis.Records
+    }
+}

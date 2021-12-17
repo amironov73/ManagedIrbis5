@@ -255,7 +255,7 @@ namespace ManagedIrbis.Magazines
                 Index = record.FM (903),
                 Title = record.FM (200, 'a'),
                 SubTitle = record.FM (200, 'e'),
-                Cumulation = MagazineCumulation.Parse (record),
+                Cumulation = MagazineCumulation.ParseRecord (record),
                 QuarterlyOrders = QuarterlyOrderInfo.ParseRecord (record),
                 SeriesNumber = record.FM (923, 'h'),
                 SeriesTitle = record.FM (923, 'i'),
