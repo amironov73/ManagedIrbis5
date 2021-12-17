@@ -13,15 +13,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DevExpress.WindowsDesktop.Core" Version="20.2.5" />
-    <PackageReference Include="DevExpress.WindowsDesktop.Win" Version="20.2.5-ctp" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
     <ProjectReference Include="..\AM.Drawing5\AM.Drawing5.csproj" />
     <ProjectReference Include="..\AM.Win32\AM.Win32.csproj" />
     <ProjectReference Include="..\AM.Windows.Forms5\AM.Windows.Forms5.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.Document.Processor" Version="21.1.3" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="21.1.3" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="21.1.3" />
+    <PackageReference Include="DevExpress.Win" Version="21.1.3" />
+    <PackageReference Include="DevExpress.Win.BonusSkins" Version="21.1.3" />
+  </ItemGroup>
+
     
 </Project>

@@ -29,6 +29,20 @@ namespace AM.Scripting.Barsik
     /// </summary>
     static class BarsikUtility
     {
+        #region Properties
+
+        /// <summary>
+        /// Ключевые слова Барсика.
+        /// </summary>
+        public static string[] Keywords { get; } =
+        {
+            "and", "catch", "else", "false", "finally", "for", "foreach",
+            "func", "if", "in", "new", "null", "or", "print", "println",
+            "return", "throw", "true", "try", "using", "while"
+        };
+
+        #endregion
+
         #region Public methods
 
         /// <summary>
