@@ -40,8 +40,6 @@ using AM.IO;
 using AM.PlatformAbstraction;
 using AM.Text;
 
-using Microsoft.Extensions.Primitives;
-
 #endregion
 
 #nullable enable
@@ -4793,11 +4791,20 @@ namespace AM
                     // Nothing to do here
                 }
             }
+        }
 
-        } // method Forget
+        /// <summary>
+        /// Соединение последовательности в строку.
+        /// </summary>
+        public static string JoinText<T>
+            (
+                this IEnumerable<T> sequence,
+                string separator = ", "
+            )
+        {
+            return string.Join (separator, sequence.ToArray());
+        }
 
         #endregion
-
-    } // class Utility
-
-} // namespace AM
+    }
+}

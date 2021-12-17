@@ -19,7 +19,7 @@ using System.Drawing;
 
 using DevExpress.Spreadsheet;
 
-using Range=DevExpress.Spreadsheet.CellRange;
+using Range = DevExpress.Spreadsheet.CellRange;
 
 #endregion
 
@@ -148,7 +148,7 @@ namespace AM.Windows.DevExpress
                 this Cell cell
             )
         {
-            cell.Borders.SetAllBorders(Color.DarkBlue, BorderLineStyle.Thin);
+            cell.Borders.SetAllBorders (Color.Gray, BorderLineStyle.Thin);
 
             return cell;
         }
@@ -161,7 +161,7 @@ namespace AM.Windows.DevExpress
                 this Range range
             )
         {
-            range.Borders.SetAllBorders(Color.DarkBlue, BorderLineStyle.Thin);
+            range.Borders.SetAllBorders (Color.Gray, BorderLineStyle.Thin);
 
             return range;
         }
@@ -218,23 +218,22 @@ namespace AM.Windows.DevExpress
                 Color maxColor
             )
         {
-            minColor.NotUsed ();
-            maxColor.NotUsed ();
+            minColor.NotUsed();
+            maxColor.NotUsed();
 
             var conditionalFormattings = range.Worksheet.ConditionalFormattings;
-            var minPoint = conditionalFormattings.CreateValue(ConditionalFormattingValueType.MinMax);
-            var maxPoint = conditionalFormattings.CreateValue(ConditionalFormattingValueType.MinMax);
+            var minPoint = conditionalFormattings.CreateValue (ConditionalFormattingValueType.MinMax);
+            var maxPoint = conditionalFormattings.CreateValue (ConditionalFormattingValueType.MinMax);
             conditionalFormattings.AddColorScale2ConditionalFormatting
-               (
-                   range,
-                   minPoint,
-                   minColor,
-                   maxPoint,
-                   maxColor
-               );
+                (
+                    range,
+                    minPoint,
+                    minColor,
+                    maxPoint,
+                    maxColor
+                );
 
             return range;
         }
-
     }
 }

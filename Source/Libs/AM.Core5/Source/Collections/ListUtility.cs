@@ -140,6 +140,7 @@ namespace AM.Collections
         /// <summary>
         /// Is the list is <c>null</c> or empty?
         /// </summary>
+        [Pure]
         public static bool IsNullOrEmpty<T>
             (
                 [NotNullWhen((false))] this IList<T>? list
@@ -151,8 +152,7 @@ namespace AM.Collections
             }
 
             return true;
-
-        } // method IsNullOrEmpty
+        }
 
         /// <summary>
         /// Throw <see cref="ArgumentNullException"/>

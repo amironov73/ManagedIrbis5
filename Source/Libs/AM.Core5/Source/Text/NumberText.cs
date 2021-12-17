@@ -51,7 +51,7 @@ namespace AM.Text
         /// </summary>
         class Chunk
             : IHandmadeSerializable,
-              IVerifiable
+                IVerifiable
         {
             #region Properties
 
@@ -102,7 +102,7 @@ namespace AM.Text
                     result = true;
                     HaveValue = true;
                     Length = number.Length;
-                    Value = FastNumber.ParseInt64(number);
+                    Value = FastNumber.ParseInt64 (number);
                 }
 
                 return result;
@@ -122,8 +122,8 @@ namespace AM.Text
                 if (result == 0)
                 {
                     result = HaveValue && other.HaveValue
-                        ? Math.Sign(Value - other.Value)
-                        : HaveValue.CompareTo(other.HaveValue);
+                        ? Math.Sign (Value - other.Value)
+                        : HaveValue.CompareTo (other.HaveValue);
                 }
 
                 return result;
@@ -151,7 +151,7 @@ namespace AM.Text
                     BinaryReader reader
                 )
             {
-                Sure.NotNull(reader, nameof(reader));
+                Sure.NotNull (reader, nameof (reader));
 
                 Prefix = reader.ReadOnlyMemory();
                 Value = reader.ReadPackedInt64();
@@ -164,13 +164,13 @@ namespace AM.Text
                     BinaryWriter writer
                 )
             {
-                Sure.NotNull(writer, nameof(writer));
+                Sure.NotNull (writer, nameof (writer));
 
                 writer
-                    .Write(Prefix)
-                    .WritePackedInt64(Value)
-                    .WritePackedInt32(Length)
-                    .Write(HaveValue);
+                    .Write (Prefix)
+                    .WritePackedInt64 (Value)
+                    .WritePackedInt32 (Length)
+                    .Write (HaveValue);
             }
 
             #endregion
@@ -183,9 +183,9 @@ namespace AM.Text
                     bool throwOnError
                 )
             {
-                var verifier = new Verifier<Chunk>(this, throwOnError);
+                var verifier = new Verifier<Chunk> (this, throwOnError);
 
-                verifier.Assert(HavePrefix || HaveValue, "Must have prefix or value");
+                verifier.Assert (HavePrefix || HaveValue, "Must have prefix or value");
 
                 return verifier.Result;
             }
@@ -197,23 +197,23 @@ namespace AM.Text
             public override string ToString()
             {
                 var builder = StringBuilderPool.Shared.Get();
-                builder.Append(Prefix);
+                builder.Append (Prefix);
 
                 if (HaveValue)
                 {
                     if (Length > 0)
                     {
-                        var format = new string('0', Length);
-                        builder.Append(Value.ToString(format, CultureInfo.InvariantCulture));
+                        var format = new string ('0', Length);
+                        builder.Append (Value.ToString (format, CultureInfo.InvariantCulture));
                     }
                     else
                     {
-                        builder.Append(Value.ToInvariantString());
+                        builder.Append (Value.ToInvariantString());
                     }
                 }
 
                 var result = builder.ToString();
-                StringBuilderPool.Shared.Return(builder);
+                StringBuilderPool.Shared.Return (builder);
 
                 return result;
             } // method ToString
@@ -249,15 +249,15 @@ namespace AM.Text
         /// Contains only text (prefix)?
         /// </summary>
         public bool TextOnly => Length == 1
-                                && HavePrefix(0)
-                                && !HaveValue(0);
+                                && HavePrefix (0)
+                                && !HaveValue (0);
 
         /// <summary>
         /// Contains only numeric value?
         /// </summary>
         public bool ValueOnly => Length == 1
-                                 && !HavePrefix(0)
-                                 && HaveValue(0);
+                                 && !HavePrefix (0)
+                                 && HaveValue (0);
 
         #endregion
 
@@ -280,7 +280,7 @@ namespace AM.Text
             )
             : this()
         {
-            Parse(text);
+            Parse (text);
         }
 
         /// <summary>
@@ -292,7 +292,7 @@ namespace AM.Text
             )
             : this()
         {
-            Parse(text.AsMemory());
+            Parse (text.AsMemory());
         }
 
         #endregion
@@ -301,7 +301,7 @@ namespace AM.Text
 
         private readonly LinkedList<Chunk> _chunks;
 
-        private Chunk? this[int index]
+        private Chunk? this [int index]
         {
             get
             {
@@ -317,6 +317,7 @@ namespace AM.Text
                     {
                         return null;
                     }
+
                     result = result.Next;
                     index--;
                 }
@@ -346,7 +347,7 @@ namespace AM.Text
                 Value = value,
                 Length = length
             };
-            _chunks.AddLast(chunk);
+            _chunks.AddLast (chunk);
 
             return this;
         }
@@ -354,8 +355,8 @@ namespace AM.Text
         /// <summary>
         /// Добавляем фрагмент в конец числа.
         /// </summary>
-        public NumberText AppendChunk ( string? prefix, long value, int length = 0 ) =>
-            AppendChunk(prefix.AsMemory(), value, length);
+        public NumberText AppendChunk (string? prefix, long value, int length = 0) =>
+            AppendChunk (prefix.AsMemory(), value, length);
 
 
         /// <summary>
@@ -370,7 +371,7 @@ namespace AM.Text
             {
                 Prefix = prefix
             };
-            _chunks.AddLast(chunk);
+            _chunks.AddLast (chunk);
 
             return this;
         }
@@ -378,7 +379,7 @@ namespace AM.Text
         /// <summary>
         /// Добавляем фрагмент в конец числа.
         /// </summary>
-        public NumberText AppendChunk ( string? text ) => AppendChunk(text.AsMemory());
+        public NumberText AppendChunk (string? text) => AppendChunk (text.AsMemory());
 
         /// <summary>
         /// Append chunk to the number tail.
@@ -393,7 +394,7 @@ namespace AM.Text
                 HaveValue = true,
                 Value = value
             };
-            _chunks.AddLast(chunk);
+            _chunks.AddLast (chunk);
 
             return this;
         }
@@ -406,7 +407,7 @@ namespace AM.Text
             var result = new NumberText();
             foreach (var chunk in _chunks)
             {
-                result._chunks.AddLast(chunk.Copy());
+                result._chunks.AddLast (chunk.Copy());
             }
 
             return result;
@@ -420,7 +421,7 @@ namespace AM.Text
                 NumberText other
             )
         {
-            return GetValue(0) - other.GetValue(0);
+            return GetValue (0) - other.GetValue (0);
         }
 
         /// <summary>
@@ -463,26 +464,26 @@ namespace AM.Text
             return chunk == null
                 ? 0
                 : chunk.HaveValue
-                  ? chunk.Value
-                  : 0;
+                    ? chunk.Value
+                    : 0;
         }
 
         /// <summary>
         /// Do we have the chunk with the given index?
         /// </summary>
-        public bool HaveChunk ( int index ) => this[index] is not null;
+        public bool HaveChunk (int index) => this[index] is not null;
 
         /// <summary>
         /// Do we have the prefix in the chunk
         /// with the given index?
         /// </summary>
-        public bool HavePrefix ( int index ) => this[index]?.HavePrefix ?? false;
+        public bool HavePrefix (int index) => this[index]?.HavePrefix ?? false;
 
         /// <summary>
         /// Do we have numeric value in the chunk
         /// with the given index?
         /// </summary>
-        public bool HaveValue ( int index ) => this[index]?.HaveValue ?? false;
+        public bool HaveValue (int index) => this[index]?.HaveValue ?? false;
 
         /// <summary>
         /// Увеличение последнего сегмента на указанное число
@@ -552,9 +553,9 @@ namespace AM.Text
                 return;
             }
 
-            var reader = new ValueTextNavigator(text.Span);
+            var reader = new ValueTextNavigator (text.Span);
             var chunk = new Chunk();
-            _chunks.AddLast(chunk);
+            _chunks.AddLast (chunk);
             var textPart = true;
             ReadOnlyMemory<char> str = default;
             ReadOnlyMemory<char> number = default;
@@ -565,28 +566,28 @@ namespace AM.Text
             {
                 if (textPart)
                 {
-                    if (char.IsDigit(code))
+                    if (char.IsDigit (code))
                     {
                         start = offset;
-                        number = text.Slice(start, 1);
+                        number = text.Slice (start, 1);
                         textPart = false;
                     }
                     else
                     {
-                        str = text.Slice(start, offset - start + 1);
+                        str = text.Slice (start, offset - start + 1);
                     }
                 }
                 else
                 {
-                    if (char.IsDigit(code))
+                    if (char.IsDigit (code))
                     {
-                        number = text.Slice(start, offset - start + 1);
+                        number = text.Slice (start, offset - start + 1);
                     }
                     else
                     {
-                        chunk.SetUp(str, number);
+                        chunk.SetUp (str, number);
                         chunk = new Chunk();
-                        _chunks.AddLast(chunk);
+                        _chunks.AddLast (chunk);
                         start = offset;
                         number = default;
                         str = default;
@@ -597,7 +598,7 @@ namespace AM.Text
                 ++offset;
             }
 
-            if (!chunk.SetUp(str, number))
+            if (!chunk.SetUp (str, number))
             {
                 _chunks.RemoveLast();
             }
@@ -611,18 +612,18 @@ namespace AM.Text
                 string text
             )
         {
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty (text))
             {
                 yield break;
             }
 
-            var reader = new StringReader(text);
+            var reader = new StringReader (text);
 
             var firstBuffer = new StringBuilder();
             var secondBuffer = new StringBuilder();
             NumberText firstNumber;
 
-        BEGIN:
+            BEGIN:
 
             int c1;
             while ((c1 = reader.Read()) != -1)
@@ -634,7 +635,7 @@ namespace AM.Text
                     {
                         Magna.Error
                             (
-                                nameof(NumberText) + "::" + nameof(ParseRanges)
+                                nameof (NumberText) + "::" + nameof (ParseRanges)
                                 + ": syntax error"
                             );
 
@@ -647,7 +648,7 @@ namespace AM.Text
                 if (
                         c2 != '/'
                         &&
-                        (char.IsSeparator(c2) || char.IsPunctuation(c2))
+                        (char.IsSeparator (c2) || char.IsPunctuation (c2))
                     )
                 {
                     if (firstBuffer.Length == 0)
@@ -655,18 +656,18 @@ namespace AM.Text
                         continue;
                     }
 
-                    firstNumber = new NumberText(firstBuffer.ToString());
+                    firstNumber = new NumberText (firstBuffer.ToString());
                     yield return firstNumber;
                     firstBuffer.Length = 0;
                     goto BEGIN;
                 }
 
-                firstBuffer.Append(c2);
+                firstBuffer.Append (c2);
             }
 
             if (reader.Peek() == -1)
             {
-                firstNumber = new NumberText(firstBuffer.ToString());
+                firstNumber = new NumberText (firstBuffer.ToString());
                 yield return firstNumber;
                 firstBuffer.Length = 0;
             }
@@ -677,7 +678,7 @@ namespace AM.Text
                 {
                     var c4 = (char)c3;
 
-                    if (char.IsWhiteSpace(c4))
+                    if (char.IsWhiteSpace (c4))
                     {
                         if (secondBuffer.Length == 0)
                         {
@@ -688,46 +689,46 @@ namespace AM.Text
                     if (
                             c4 != '/'
                             &&
-                            (char.IsSeparator(c4) || char.IsPunctuation(c4))
+                            (char.IsSeparator (c4) || char.IsPunctuation (c4))
                         )
                     {
                         break;
                     }
 
-                    secondBuffer.Append(c4);
+                    secondBuffer.Append (c4);
                 }
 
                 if (secondBuffer.Length == 0)
                 {
                     Magna.Error
                         (
-                            nameof(NumberText) + "::" + nameof(ParseRanges)
+                            nameof (NumberText) + "::" + nameof (ParseRanges)
                             + ": syntax error"
                         );
 
                     throw new Exception();
                 }
 
-                firstNumber = new NumberText(firstBuffer.ToString());
-                var secondNumber = new NumberText(secondBuffer.ToString());
+                firstNumber = new NumberText (firstBuffer.ToString());
+                var secondNumber = new NumberText (secondBuffer.ToString());
 
-                if (Utility.CompareSpans(firstNumber.GetPrefix(0).Span,
-                    secondNumber.GetPrefix(0).Span) != 0)
+                if (Utility.CompareSpans (firstNumber.GetPrefix (0).Span,
+                        secondNumber.GetPrefix (0).Span) != 0)
                 {
                     Magna.Error
                         (
-                            nameof(NumberText) + "::" + nameof(ParseRanges)
+                            nameof (NumberText) + "::" + nameof (ParseRanges)
                             + ": prefix mismatch: '"
-                            + firstNumber.GetPrefix(0)
+                            + firstNumber.GetPrefix (0)
                             + "' and '"
-                            + secondNumber.GetPrefix(0)
+                            + secondNumber.GetPrefix (0)
                             + "'"
                         );
 
                     throw new Exception();
                 }
 
-                while (firstNumber.CompareTo(secondNumber) <= 0)
+                while (firstNumber.CompareTo (secondNumber) <= 0)
                 {
                     yield return firstNumber.Clone();
                     firstNumber = firstNumber.Increment();
@@ -752,9 +753,9 @@ namespace AM.Text
             )
         {
             var chunk = this[index];
-            if (!ReferenceEquals(chunk, null))
+            if (!ReferenceEquals (chunk, null))
             {
-                _chunks.Remove(chunk);
+                _chunks.Remove (chunk);
             }
 
             return this;
@@ -800,8 +801,8 @@ namespace AM.Text
         /// <summary>
         /// Устанавливаем префикс для указанного фрагмента.
         /// </summary>
-        public NumberText SetPrefix ( int index, string? prefix ) =>
-            SetPrefix(index, prefix.AsMemory());
+        public NumberText SetPrefix (int index, string? prefix) =>
+            SetPrefix (index, prefix.AsMemory());
 
         /// <summary>
         /// Set the numeric value for the specified chunk.
@@ -831,12 +832,12 @@ namespace AM.Text
             )
         {
             var result = lines
-                .Select(item => new NumberText(item))
+                .Select (item => new NumberText (item))
                 .ToList();
 
             result.Sort();
 
-            return result.Select(item => item.ToString());
+            return result.Select (item => item.ToString());
         }
 
         /// <summary>
@@ -847,7 +848,7 @@ namespace AM.Text
                 IEnumerable<NumberText> numbers
             )
         {
-            var result = new List<NumberText>(numbers);
+            var result = new List<NumberText> (numbers);
             result.Sort();
 
             return result;
@@ -861,7 +862,7 @@ namespace AM.Text
                 string? text
             )
         {
-            return new NumberText(text);
+            return new NumberText (text);
         }
 
         #endregion
@@ -874,18 +875,18 @@ namespace AM.Text
                 NumberText? other
             )
         {
-            if (ReferenceEquals(other, null))
+            if (ReferenceEquals (other, null))
             {
                 return 1;
             }
 
-            for (var i = 0; ; i++)
+            for (var i = 0;; i++)
             {
                 var c1 = this[i];
                 var c2 = other[i];
                 if (c1 is not null && c2 is not null)
                 {
-                    var result = c1.CompareTo(c2);
+                    var result = c1.CompareTo (c2);
                     if (result != 0)
                     {
                         return result;
@@ -922,7 +923,7 @@ namespace AM.Text
                 return 1;
             }
 
-            return Math.Sign(chunk.Value - value);
+            return Math.Sign (chunk.Value - value);
         }
 
         /// <summary>
@@ -933,7 +934,7 @@ namespace AM.Text
                 string text
             )
         {
-            return CompareTo(new NumberText(text));
+            return CompareTo (new NumberText (text));
         }
 
         /// <summary>
@@ -945,10 +946,10 @@ namespace AM.Text
                 string? right
             )
         {
-            var one = new NumberText(left);
-            var two = new NumberText(right);
+            var one = new NumberText (left);
+            var two = new NumberText (right);
 
-            return one.CompareTo(two);
+            return one.CompareTo (two);
         }
 
         /// <summary>
@@ -988,17 +989,17 @@ namespace AM.Text
                 NumberText? right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
-                return ReferenceEquals(right, null);
+                return ReferenceEquals (right, null);
             }
 
-            if (ReferenceEquals(right, null))
+            if (ReferenceEquals (right, null))
             {
                 return false;
             }
 
-            return left.CompareTo(right) == 0;
+            return left.CompareTo (right) == 0;
         }
 
         /// <summary>
@@ -1010,17 +1011,17 @@ namespace AM.Text
                 string? right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
-                return ReferenceEquals(right, null);
+                return ReferenceEquals (right, null);
             }
 
-            if (ReferenceEquals(right, null))
+            if (ReferenceEquals (right, null))
             {
                 return false;
             }
 
-            return left.CompareTo(right) == 0;
+            return left.CompareTo (right) == 0;
         }
 
         /// <summary>
@@ -1032,7 +1033,7 @@ namespace AM.Text
                 int right
             )
         {
-            return left?.CompareTo(right) == 0;
+            return left?.CompareTo (right) == 0;
         }
 
         /// <summary>
@@ -1044,18 +1045,18 @@ namespace AM.Text
                 NumberText? right
             )
         {
-            if (ReferenceEquals(left, null)
-                ||ReferenceEquals(right, null))
+            if (ReferenceEquals (left, null)
+                || ReferenceEquals (right, null))
             {
                 return true;
             }
 
-            if (ReferenceEquals(left, right))
+            if (ReferenceEquals (left, right))
             {
                 return false;
             }
 
-            return left.CompareTo(right) != 0;
+            return left.CompareTo (right) != 0;
         }
 
         /// <summary>
@@ -1067,13 +1068,13 @@ namespace AM.Text
                 string? right
             )
         {
-            if (ReferenceEquals(left, null)
-                ||ReferenceEquals(right, null))
+            if (ReferenceEquals (left, null)
+                || ReferenceEquals (right, null))
             {
                 return true;
             }
 
-            return left.CompareTo(right) != 0;
+            return left.CompareTo (right) != 0;
         }
 
         /// <summary>
@@ -1085,7 +1086,7 @@ namespace AM.Text
                 int right
             )
         {
-            return left?.CompareTo(right) != 0;
+            return left?.CompareTo (right) != 0;
         }
 
         /// <summary>
@@ -1097,17 +1098,17 @@ namespace AM.Text
                 NumberText? right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
-                return !ReferenceEquals(right, null);
+                return !ReferenceEquals (right, null);
             }
 
-            if (ReferenceEquals(right, null))
+            if (ReferenceEquals (right, null))
             {
                 return false;
             }
 
-            return left.CompareTo(right) < 0;
+            return left.CompareTo (right) < 0;
         }
 
         /// <summary>
@@ -1119,17 +1120,17 @@ namespace AM.Text
                 string? right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
-                return !ReferenceEquals(right, null);
+                return !ReferenceEquals (right, null);
             }
 
-            if (ReferenceEquals(right, null))
+            if (ReferenceEquals (right, null))
             {
                 return false;
             }
 
-            return left.CompareTo(right) < 0;
+            return left.CompareTo (right) < 0;
         }
 
         /// <summary>
@@ -1141,17 +1142,17 @@ namespace AM.Text
                 NumberText? right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
-                return !ReferenceEquals(right, null);
+                return !ReferenceEquals (right, null);
             }
 
-            if (ReferenceEquals(right, null))
+            if (ReferenceEquals (right, null))
             {
                 return false;
             }
 
-            return left.CompareTo(right) <= 0;
+            return left.CompareTo (right) <= 0;
         }
 
         /// <summary>
@@ -1163,12 +1164,12 @@ namespace AM.Text
                 int right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
                 return true;
             }
 
-            return left.CompareTo(right) < 0;
+            return left.CompareTo (right) < 0;
         }
 
         /// <summary>
@@ -1180,17 +1181,17 @@ namespace AM.Text
                 NumberText? right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
-                return ReferenceEquals(right, null);
+                return ReferenceEquals (right, null);
             }
 
-            if (ReferenceEquals(right, null))
+            if (ReferenceEquals (right, null))
             {
                 return true;
             }
 
-            return left.CompareTo(right) > 0;
+            return left.CompareTo (right) > 0;
         }
 
         /// <summary>
@@ -1202,17 +1203,17 @@ namespace AM.Text
                 string? right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
-                return ReferenceEquals(right, null);
+                return ReferenceEquals (right, null);
             }
 
-            if (ReferenceEquals(right, null))
+            if (ReferenceEquals (right, null))
             {
                 return true;
             }
 
-            return left.CompareTo(right) > 0;
+            return left.CompareTo (right) > 0;
         }
 
         /// <summary>
@@ -1224,7 +1225,7 @@ namespace AM.Text
                 int right
             )
         {
-            return left?.CompareTo(right) > 0;
+            return left?.CompareTo (right) > 0;
         }
 
         /// <summary>
@@ -1236,17 +1237,17 @@ namespace AM.Text
                 NumberText? right
             )
         {
-            if (ReferenceEquals(left, null))
+            if (ReferenceEquals (left, null))
             {
-                return ReferenceEquals(right, null);
+                return ReferenceEquals (right, null);
             }
 
-            if (ReferenceEquals(right, null))
+            if (ReferenceEquals (right, null))
             {
                 return true;
             }
 
-            return left.CompareTo(right) >= 0;
+            return left.CompareTo (right) >= 0;
         }
 
         /// <inheritdoc cref="IEquatable{T}.Equals(T)" />
@@ -1255,11 +1256,12 @@ namespace AM.Text
                 NumberText? other
             )
         {
-            if (ReferenceEquals(other, null))
+            if (ReferenceEquals (other, null))
             {
                 return false;
             }
-            return CompareTo(other) == 0;
+
+            return CompareTo (other) == 0;
         }
 
         /// <inheritdoc cref="object.Equals(object)" />
@@ -1268,10 +1270,10 @@ namespace AM.Text
                 object? obj
             )
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals (null, obj)) return false;
+            if (ReferenceEquals (this, obj)) return true;
 
-            return obj is NumberText text && Equals(text);
+            return obj is NumberText text && Equals (text);
         }
 
         /// <inheritdoc cref="object.GetHashCode" />
@@ -1294,7 +1296,7 @@ namespace AM.Text
                 int right
             )
         {
-            return left.Clone().Increment(right);
+            return left.Clone().Increment (right);
         }
 
         /// <summary>
@@ -1306,12 +1308,12 @@ namespace AM.Text
                 NumberText right
             )
         {
-            return left.GetDifference(right);
+            return left.GetDifference (right);
         }
 
         #endregion
 
-        #region  IEnumerable<T> members
+        #region IEnumerable<T> members
 
         [ExcludeFromCodeCoverage]
         IEnumerator IEnumerable.GetEnumerator()
@@ -1344,8 +1346,8 @@ namespace AM.Text
             for (var i = 0; i < count; i++)
             {
                 var chunk = new Chunk();
-                chunk.RestoreFromStream(reader);
-                _chunks.AddLast(chunk);
+                chunk.RestoreFromStream (reader);
+                _chunks.AddLast (chunk);
             }
         }
 
@@ -1356,10 +1358,10 @@ namespace AM.Text
             )
         {
             var count = _chunks.Count;
-            writer.WritePackedInt32(count);
+            writer.WritePackedInt32 (count);
             foreach (var chunk in _chunks)
             {
-                chunk.SaveToStream(writer);
+                chunk.SaveToStream (writer);
             }
         }
 
@@ -1373,16 +1375,15 @@ namespace AM.Text
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<NumberText>(this, throwOnError);
+            var verifier = new Verifier<NumberText> (this, throwOnError);
 
-            verifier.Positive(_chunks.Count, "_chunks.Count");
+            verifier.Positive (_chunks.Count, "_chunks.Count");
             foreach (var chunk in _chunks)
             {
-                verifier.VerifySubObject(chunk, "chunk");
+                verifier.VerifySubObject (chunk, "chunk");
             }
 
             return verifier.Result;
-
         } // method Verify
 
         #endregion
@@ -1395,18 +1396,15 @@ namespace AM.Text
             var builder = StringBuilderPool.Shared.Get();
             foreach (var chunk in _chunks)
             {
-                builder.Append(chunk);
+                builder.Append (chunk);
             }
 
             var result = builder.ToString();
-            StringBuilderPool.Shared.Return(builder);
+            StringBuilderPool.Shared.Return (builder);
 
             return result;
-
         } // method ToString
 
         #endregion
-
-    } // class NumberText
-
-} // namespace AM.Text
+    }
+}

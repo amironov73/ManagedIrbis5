@@ -73,6 +73,14 @@ namespace AM.Windows.DevExpress
         #region Public methods
 
         /// <summary>
+        /// Замораживаем все строки с начала до текущей (включая).
+        /// </summary>
+        public void FreezeRows()
+        {
+            Worksheet.FreezeRows (_currentRow);
+        }
+
+        /// <summary>
         /// Получение ячейки.
         /// </summary>
         public Cell GetCell
@@ -85,6 +93,23 @@ namespace AM.Windows.DevExpress
             Sure.NonNegative (column);
 
             return Worksheet.Cells[row, column];
+        }
+
+        /// <summary>
+        /// Получение диапазона ячеек, считая от текущей.
+        /// </summary>
+        public CellRange GetRange
+            (
+                int columns
+            )
+        {
+            return Worksheet.Range.FromLTRB
+                (
+                    _currentColumn,
+                    _currentRow,
+                    _currentColumn + columns,
+                    _currentRow
+                );
         }
 
         /// <summary>
@@ -128,11 +153,28 @@ namespace AM.Windows.DevExpress
         }
 
         /// <summary>
+        /// Объединение ячеек.
+        /// </summary>
+        public CellRange MergeCells
+            (
+                int columns
+            )
+        {
+            var range = GetRange (columns);
+            range.Merge();
+
+            return range;
+        }
+
+        /// <summary>
         /// Переход на новую строку.
         /// </summary>
-        public void NewLine()
+        public void NewLine
+            (
+                int delta = 1
+            )
         {
-            _currentRow++;
+            _currentRow += delta;
             _currentColumn = 0;
         }
 

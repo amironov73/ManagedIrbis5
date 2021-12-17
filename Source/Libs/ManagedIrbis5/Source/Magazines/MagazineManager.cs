@@ -84,21 +84,25 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Получение перечня всех журналов из базы.
         /// </summary>
-        public MagazineInfo[] GetAllMagazines()
+        public MagazineInfo[] GetAllMagazines
+            (
+                bool alternative = false
+            )
         {
             var result = new List<MagazineInfo>();
 
+            var searchExpression = alternative ? "VRL=J" : "TJ=$";
             var batch = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database.ThrowIfNull ("Connection.Database"),
-                    "VRL=J",
+                    searchExpression,
+                    Connection.Database.ThrowIfNull(),
                     1000
                 );
             foreach (var record in batch)
             {
                 var magazine = MagazineInfo.Parse (record);
-                if (!ReferenceEquals (magazine, null))
+                if (magazine is not null)
                 {
                     result.Add (magazine);
                 }

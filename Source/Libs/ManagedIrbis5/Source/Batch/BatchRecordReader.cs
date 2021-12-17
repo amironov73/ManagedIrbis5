@@ -28,6 +28,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using AM;
+using AM.Collections;
 using AM.Linq;
 
 using ManagedIrbis.Providers;
@@ -274,7 +275,7 @@ namespace ManagedIrbis.Batch
                 Expression = searchExpression
             };
             var found = connection.Search (parameters);
-            if (found?.Length == 0)
+            if (found.IsNullOrEmpty())
             {
                 return Array.Empty<Record>();
             }

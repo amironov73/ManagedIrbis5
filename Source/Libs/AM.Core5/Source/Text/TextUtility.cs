@@ -55,11 +55,8 @@ namespace AM.Text
             }
 
             return TextKind.PlainText;
-
-        } // method DetermineTextKind
+        }
 
         #endregion
-
-    } // class TextUtility
-
-} // namespace AM.Text
+    }
+}
