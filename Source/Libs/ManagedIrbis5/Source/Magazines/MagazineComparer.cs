@@ -31,10 +31,10 @@ namespace ManagedIrbis.Magazines
         public class ByTitle : IComparer<MagazineInfo>
         {
             /// <inheritdoc cref="IComparer{T}.Compare"/>
-            public int Compare(MagazineInfo? x, MagazineInfo? y)
-                => string.Compare(x?.Title, y?.Title, StringComparison.CurrentCulture);
+            public int Compare (MagazineInfo? x, MagazineInfo? y)
+            {
+                return string.Compare (x?.Title, y?.Title, StringComparison.CurrentCulture);
+            }
         }
-
-    } // class MagazineComparer
-
-} // namespace ManagedIrbis.Magazines
+    }
+}

@@ -39,7 +39,7 @@ namespace ManagedIrbis.Magazines
     [XmlRoot ("cumulation")]
     public sealed class MagazineCumulation
         : IHandmadeSerializable,
-            IVerifiable
+        IVerifiable
     {
         #region Constants
 
@@ -87,7 +87,7 @@ namespace ManagedIrbis.Magazines
 
         /// <summary>
         /// Номер комплекта. Подполе K.
-            /// </summary>
+        /// </summary>
         [XmlAttribute ("set")]
         [JsonPropertyName ("set")]
         public string? ComplectNumber { get; set; }
@@ -122,12 +122,15 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Применение кумуляции к полю записи <see cref="Field"/>.
         /// </summary>
-        public Field ApplyTo (Field field) => field
-            .SetSubFieldValue ('q', Year)
-            .SetSubFieldValue ('f', Volume)
-            .SetSubFieldValue ('d', Place)
-            .SetSubFieldValue ('h', Numbers)
-            .SetSubFieldValue ('k', ComplectNumber);
+        public Field ApplyTo (Field field)
+        {
+            return field
+                .SetSubFieldValue ('q', Year)
+                .SetSubFieldValue ('f', Volume)
+                .SetSubFieldValue ('d', Place)
+                .SetSubFieldValue ('h', Numbers)
+                .SetSubFieldValue ('k', ComplectNumber);
+        }
 
         /// <summary>
         /// Разбор поля.
@@ -137,6 +140,8 @@ namespace ManagedIrbis.Magazines
                 Field field
             )
         {
+            Sure.NotNull (field);
+
             // TODO: реализовать эффективно
 
             var result = new MagazineCumulation
@@ -151,8 +156,7 @@ namespace ManagedIrbis.Magazines
             };
 
             return result;
-
-        } // method Parse
+        }
 
         /// <summary>
         /// Разбор записи.
@@ -163,38 +167,38 @@ namespace ManagedIrbis.Magazines
                 int tag = Tag
             )
         {
+            Sure.NotNull (record);
+            Sure.Positive (tag);
+
             return record.Fields
                 .GetField (tag)
                 .Select (field => Parse (field))
                 .ToArray();
-
-        } // method Parse
-
+        }
 
         /// <summary>
         /// Should serialize the <see cref="UnknownSubFields"/> array?
         /// </summary>
         [ExcludeFromCodeCoverage]
-        public bool ShouldSerializeUnknownSubFields() =>
-            !ReferenceEquals (UnknownSubFields, null)
-            && UnknownSubFields.Length != 0;
+        public bool ShouldSerializeUnknownSubFields()
+        {
+            return !ReferenceEquals (UnknownSubFields, null)
+                   && UnknownSubFields.Length != 0;
+        }
 
         /// <summary>
         /// Convert back to <see cref="Field"/>.
         /// </summary>
         public Field ToField()
         {
-            Field result = new Field (Tag)
+            return new Field (Tag)
                 .AddNonEmpty ('q', Year)
                 .AddNonEmpty ('f', Volume)
                 .AddNonEmpty ('d', Place)
                 .AddNonEmpty ('h', Numbers)
                 .AddNonEmpty ('k', ComplectNumber)
                 .AddRange (UnknownSubFields);
-
-            return result;
-
-        } // method ToField
+        }
 
         #endregion
 
@@ -206,14 +210,15 @@ namespace ManagedIrbis.Magazines
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Year = reader.ReadNullableString();
             Volume = reader.ReadNullableString();
             Place = reader.ReadNullableString();
             Numbers = reader.ReadNullableString();
             ComplectNumber = reader.ReadNullableString();
             UnknownSubFields = reader.ReadNullableArray<SubField>();
-
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
         public void SaveToStream
@@ -221,6 +226,8 @@ namespace ManagedIrbis.Magazines
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
                 .WriteNullable (Year)
                 .WriteNullable (Volume)
@@ -228,8 +235,7 @@ namespace ManagedIrbis.Magazines
                 .WriteNullable (Numbers)
                 .WriteNullable (ComplectNumber)
                 .WriteNullableArray (UnknownSubFields);
-
-        } // method SaveToStream
+        }
 
         #endregion
 
@@ -244,22 +250,22 @@ namespace ManagedIrbis.Magazines
             var verifier = new Verifier<MagazineCumulation> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty (Year, "Year")
-                .NotNullNorEmpty (Numbers, "Number");
+                .NotNullNorEmpty (Year)
+                .NotNullNorEmpty (Numbers);
 
             return verifier.Result;
-
-        } // method Verify
+        }
 
         #endregion
 
         #region Object members
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Year.ToVisibleString() + ": " + Numbers.ToVisibleString();
+        public override string ToString()
+        {
+            return Year.ToVisibleString() + ": " + Numbers.ToVisibleString();
+        }
 
         #endregion
-
-    } // class MagazineCumulation
-
-} // namespace ManagedIrbis.Magazines
+    }
+}

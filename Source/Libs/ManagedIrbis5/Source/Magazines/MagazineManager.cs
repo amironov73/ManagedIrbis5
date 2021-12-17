@@ -9,6 +9,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable UnusedMember.Global
 
 /* MagazineManager.cs -- работа с периодикой
  * Ars Magna project, http://arsmagna.ru
@@ -57,6 +58,7 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Клиент для связи с сервером.
         /// </summary>
+
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local
         public ISyncProvider Connection { get; private set; }
 
@@ -89,19 +91,16 @@ namespace ManagedIrbis.Magazines
             var batch = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database.ThrowIfNull("Connection.Database"),
+                    Connection.Database.ThrowIfNull ("Connection.Database"),
                     "VRL=J",
                     1000
                 );
             foreach (var record in batch)
             {
-                if (!ReferenceEquals(record, null))
+                var magazine = MagazineInfo.Parse (record);
+                if (!ReferenceEquals (magazine, null))
                 {
-                    var magazine = MagazineInfo.Parse(record);
-                    if (!ReferenceEquals(magazine, null))
-                    {
-                        result.Add(magazine);
-                    }
+                    result.Add (magazine);
                 }
             }
 
@@ -119,8 +118,7 @@ namespace ManagedIrbis.Magazines
             var record = Connection.ReadRecord (mfn);
 
             return record is null ? null : MagazineInfo.Parse (record);
-
-        } // method GetMagazine
+        }
 
         /// <summary>
         /// Получение журнала по его выпуску.
@@ -130,27 +128,26 @@ namespace ManagedIrbis.Magazines
                 MagazineIssueInfo issue
             )
         {
-            Magna.Error
-                (
-                    "MagazineManager::GetMagazine: "
-                    + "not implemented"
-                );
+            Sure.VerifyNotNull (issue);
 
-            throw new NotImplementedException();
+            var index = issue.BuildIssueIndex();
+            var record = Connection.ByIndex (index);
+
+            return record is null ? null : MagazineInfo.Parse (record);
         }
 
         /// <summary>
         /// Получение выпуска журнала по статье из этого выпуска.
         /// </summary>
-        public MagazineIssueInfo? GetIssue
+        public MagazineIssueInfo GetIssue
             (
                 MagazineArticleInfo article
             )
         {
             Magna.Error
                 (
-                    "MagazineManager::GetIssue: "
-                    + "not implemented"
+                    nameof (MagazineManager) + "::" + nameof (GetIssue)
+                    + ": not implemented"
                 );
 
             throw new NotImplementedException();
@@ -166,20 +163,44 @@ namespace ManagedIrbis.Magazines
                 string number
             )
         {
-            /*
+            Sure.VerifyNotNull (magazine);
+            Sure.NotNullNorEmpty (year);
+            Sure.NotNullNorEmpty (number);
 
-            string index = magazine.Index + "/" + year + "/" + number;
-            var record = Connection.SearchReadOneRecord("\"I={0}\"", index);
-            if (ReferenceEquals(record, null))
+            var index = magazine.BuildIssueIndex (year, number);
+            var record = Connection.ByIndex (index);
+            if (record is null)
             {
                 return null;
             }
 
             return MagazineIssueInfo.Parse(record);
+        }
 
-            */
+        /// <summary>
+        /// Получение выпуска журнала с указанным номером.
+        /// </summary>
+        public MagazineIssueInfo? GetIssue
+            (
+                MagazineInfo magazine,
+                string year,
+                string volume,
+                string number
+            )
+        {
+            Sure.VerifyNotNull (magazine);
+            Sure.NotNullNorEmpty (year);
+            Sure.NotNullNorEmpty (volume);
+            Sure.NotNullNorEmpty (number);
 
-            throw new NotImplementedException();
+            var index = magazine.BuildIssueIndex (year, volume, number);
+            var record = Connection.ByIndex (index);
+            if (record is null)
+            {
+                return null;
+            }
+
+            return MagazineIssueInfo.Parse(record);
         }
 
         /// <summary>
@@ -190,21 +211,17 @@ namespace ManagedIrbis.Magazines
                 MagazineInfo magazine
             )
         {
-            var searchExpression = string.Format
-                (
-                        "\"I933={0}/$\"",
-                        magazine.Index
-                );
+            var searchExpression = $"\"I933={magazine.Index}/$\"";
             var records = BatchRecordReader.Search
                 (
                     Connection,
                     searchExpression,
-                    Connection.Database.ThrowIfNull("Connection.Database"),
+                    Connection.Database.ThrowIfNull(),
                     1000
                 );
 
             var result = records
-                .Select(record => MagazineIssueInfo.Parse(record))
+                .Select (record => MagazineIssueInfo.Parse (record))
                 .NonNullItems()
                 .ToArray();
 
@@ -220,22 +237,17 @@ namespace ManagedIrbis.Magazines
                 string year
             )
         {
-            var searchExpression = string.Format
-                (
-                        "\"I={0}/{1}/$\"",
-                        magazine.Index,
-                        year
-                );
+            var searchExpression = $"\"I={magazine.Index}/{year}/$\"";
             var records = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database.ThrowIfNull("Connection.Database"),
+                    Connection.Database.ThrowIfNull(),
                     searchExpression,
                     1000
                 );
 
             var result = records
-                .Select(record => MagazineIssueInfo.Parse(record))
+                .Select (record => MagazineIssueInfo.Parse (record))
                 .NonNullItems()
                 .ToArray();
 
@@ -250,21 +262,17 @@ namespace ManagedIrbis.Magazines
                 MagazineIssueInfo issue
             )
         {
-            var searchExpression = string.Format
-                (
-                    "\"II={0}\"",
-                    issue.Index
-                );
+            var searchExpression = $"\"II={issue.Index}\"";
             var records = BatchRecordReader.Search
                 (
                     Connection,
-                    Connection.Database.ThrowIfNull("Connection.Database"),
+                    Connection.Database.ThrowIfNull(),
                     searchExpression,
                     1000
                 );
 
             var result = records
-                .Select(record => MagazineArticleInfo.ParseAsp(record))
+                .Select (record => MagazineArticleInfo.ParseAsp (record))
                 .NonNullItems()
                 .ToArray();
 
@@ -321,7 +329,5 @@ namespace ManagedIrbis.Magazines
         }
 
         #endregion
-
-    } // class Magazine Manager
-
-} // namespace ManagedIrbis.Magazines
+    }
+}

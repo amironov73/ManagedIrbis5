@@ -145,7 +145,5 @@ namespace ManagedIrbis.Magazines
         }
 
         #endregion
-
-    } // class BindingSpecification
-
-} // namespace ManagedIrbis.Magazines
+    }
+}

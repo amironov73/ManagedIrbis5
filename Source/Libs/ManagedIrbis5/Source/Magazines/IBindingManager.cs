@@ -17,16 +17,6 @@
 #region Using directives
 
 using System;
-using System.Linq;
-
-using AM;
-using AM.Collections;
-using AM.Text.Ranges;
-
-using ManagedIrbis.Fields;
-using ManagedIrbis.Infrastructure;
-using ManagedIrbis.Providers;
-using ManagedIrbis.Records;
 
 #endregion
 
@@ -66,5 +56,5 @@ namespace ManagedIrbis.Magazines
                 string bindingIndex
             );
 
-    } // interface IBindingManager
+    }
 }

@@ -36,7 +36,7 @@ namespace ManagedIrbis.Magazines
     /// <summary>
     /// Информация о журнале в целом.
     /// </summary>
-    [XmlRoot("magazine")]
+    [XmlRoot ("magazine")]
     public sealed class MagazineInfo
         : IHandmadeSerializable,
         IVerifiable
@@ -60,46 +60,46 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Код документа в базе. Поле 903.
         /// </summary>
-        [XmlAttribute("index")]
-        [JsonPropertyName("index")]
+        [XmlAttribute ("index")]
+        [JsonPropertyName ("index")]
         public string? Index { get; set; }
 
         /// <summary>
         /// Библиографическое описание.
         /// </summary>
-        [XmlAttribute("description")]
-        [JsonPropertyName("description")]
+        [XmlAttribute ("description")]
+        [JsonPropertyName ("description")]
         public string? Description { get; set; }
 
         /// <summary>
         /// Заглавие. Поле 200^a.
         /// </summary>
-        [XmlAttribute("title")]
-        [JsonPropertyName("title")]
+        [XmlAttribute ("title")]
+        [JsonPropertyName ("title")]
         public string? Title { get; set; }
 
         /// <summary>
         /// Подзаголовочные сведения.
         /// Поле 200^e.
         /// </summary>
-        [XmlAttribute("sub-title")]
-        [JsonPropertyName("sub-title")]
+        [XmlAttribute ("sub-title")]
+        [JsonPropertyName ("sub-title")]
         public string? SubTitle { get; set; }
 
         /// <summary>
         /// Обозначение и выпуск серии.
         /// Поле 923^1.
         /// </summary>
-        [XmlAttribute("series-number")]
-        [JsonPropertyName("series-number")]
+        [XmlAttribute ("series-number")]
+        [JsonPropertyName ("series-number")]
         public string? SeriesNumber { get; set; }
 
         /// <summary>
         /// Заголовок серии.
         /// Поле 923^i.
         /// </summary>
-        [XmlAttribute("series-title")]
-        [JsonPropertyName("series-title")]
+        [XmlAttribute ("series-title")]
+        [JsonPropertyName ("series-title")]
         public string? SeriesTitle { get; set; }
 
         /// <summary>
@@ -113,18 +113,20 @@ namespace ManagedIrbis.Magazines
             get
             {
                 var result = new StringBuilder();
-                result.Append(Title);
-                if (!string.IsNullOrEmpty(SeriesNumber))
+                result.Append (Title);
+                if (!string.IsNullOrEmpty (SeriesNumber))
                 {
-                    result.AppendFormat(". {0}", SeriesNumber);
+                    result.AppendFormat (". {0}", SeriesNumber);
                 }
-                if (!string.IsNullOrEmpty(SeriesTitle))
+
+                if (!string.IsNullOrEmpty (SeriesTitle))
                 {
-                    result.AppendFormat(". {0}", SeriesTitle);
+                    result.AppendFormat (". {0}", SeriesTitle);
                 }
-                if (!string.IsNullOrEmpty(SubTitle))
+
+                if (!string.IsNullOrEmpty (SubTitle))
                 {
-                    result.AppendFormat(": {0}", SubTitle);
+                    result.AppendFormat (": {0}", SubTitle);
                 }
 
                 return result.ToString();
@@ -134,8 +136,8 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Тип издания. Поле 110^t
         /// </summary>
-        [XmlAttribute("magazine-type")]
-        [JsonPropertyName("magazine-type")]
+        [XmlAttribute ("magazine-type")]
+        [JsonPropertyName ("magazine-type")]
         public string? MagazineType { get; set; }
 
         /// <summary>
@@ -145,36 +147,36 @@ namespace ManagedIrbis.Magazines
         /// Журнал = 'a'
         /// Газета = 'c'
         /// </remarks>
-        [XmlAttribute("magazine-kind")]
-        [JsonPropertyName("magazine-kind")]
+        [XmlAttribute ("magazine-kind")]
+        [JsonPropertyName ("magazine-kind")]
         public string? MagazineKind { get; set; }
 
         /// <summary>
         /// Периодичность (число). Поле 110^x
         /// </summary>
-        [XmlAttribute("periodicity")]
-        [JsonPropertyName("periodicity")]
+        [XmlAttribute ("periodicity")]
+        [JsonPropertyName ("periodicity")]
         public string? Periodicity { get; set; }
 
         /// <summary>
         /// Кумуляция. Поле 909
         /// </summary>
-        [XmlElement("cumulation")]
-        [JsonPropertyName("cumulation")]
+        [XmlElement ("cumulation")]
+        [JsonPropertyName ("cumulation")]
         public MagazineCumulation[]? Cumulation { get; set; }
 
         /// <summary>
         /// Сведения о заказах (поквартальные). Поле 938.
         /// </summary>
-        [XmlElement("order")]
-        [JsonPropertyName("orders")]
+        [XmlElement ("order")]
+        [JsonPropertyName ("orders")]
         public QuarterlyOrderInfo[]? QuarterlyOrders { get; set; }
 
         /// <summary>
         /// MFN записи журнала.
         /// </summary>
-        [XmlElement("mfn")]
-        [JsonPropertyName("mfn")]
+        [XmlElement ("mfn")]
+        [JsonPropertyName ("mfn")]
         public int Mfn { get; set; }
 
         /// <summary>
@@ -182,7 +184,7 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         [XmlIgnore]
         [JsonIgnore]
-        public bool IsNewspaper => MagazineKind.SameString(NewspaperKindCode);
+        public bool IsNewspaper => MagazineKind.SameString (NewspaperKindCode);
 
         /// <summary>
         /// Record.
@@ -200,47 +202,76 @@ namespace ManagedIrbis.Magazines
 
         #endregion
 
-        #region Construction
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
         #region Public methods
 
         /// <summary>
-        /// Разбор записи.
+        /// Формирование шифра документа по свойству
+        /// <see cref="Index"/>, году и номеру.
+        /// </summary>
+        public string BuildIssueIndex
+            (
+                string year,
+                string number
+            )
+        {
+            Sure.NotNullNorEmpty (year);
+            Sure.NotNullNorEmpty (number);
+
+            return Index.ThrowIfNullOrEmpty() + "/" + year + "/" + number;
+        }
+
+        /// <summary>
+        /// Формирование шифра документа по свойству
+        /// <see cref="Index"/>, году, тому и номеру.
+        /// </summary>
+        public string BuildIssueIndex
+            (
+                string year,
+                string volume,
+                string number
+            )
+        {
+            Sure.NotNullNorEmpty (year);
+            Sure.NotNullNorEmpty (volume);
+            Sure.NotNullNorEmpty (number);
+
+            return Index.ThrowIfNullOrEmpty() + "/" + year + "/" + volume + "/" + number;
+        }
+
+        /// <summary>
+        /// Разбор указанной библиографической записи.
         /// </summary>
         public static MagazineInfo? Parse
             (
                 Record record
             )
         {
+            Sure.NotNull (record);
+
             // TODO: реализовать оптимально
 
             var result = new MagazineInfo
             {
-                Index = record.FM(903),
-                Title = record.FM(200, 'a'),
-                SubTitle = record.FM(200, 'e'),
-                Cumulation = MagazineCumulation.Parse(record),
+                Index = record.FM (903),
+                Title = record.FM (200, 'a'),
+                SubTitle = record.FM (200, 'e'),
+                Cumulation = MagazineCumulation.Parse (record),
                 QuarterlyOrders = QuarterlyOrderInfo.ParseRecord (record),
-                SeriesNumber = record.FM(923,'h'),
-                SeriesTitle = record.FM(923, 'i'),
-                MagazineType = record.FM(110, 't'),
-                MagazineKind = record.FM(110, 'b'),
-                Periodicity = record.FM(110, 'x'),
+                SeriesNumber = record.FM (923, 'h'),
+                SeriesTitle = record.FM (923, 'i'),
+                MagazineType = record.FM (110, 't'),
+                MagazineKind = record.FM (110, 'b'),
+                Periodicity = record.FM (110, 'x'),
                 Record = record,
                 Mfn = record.Mfn
             };
 
-            if (string.IsNullOrEmpty(result.Title)
-                || string.IsNullOrEmpty(result.Index)
+            if (string.IsNullOrEmpty (result.Title)
+                || string.IsNullOrEmpty (result.Index)
+
                 //|| string.IsNullOrEmpty(result.MagazineKind)
                 //|| string.IsNullOrEmpty(result.MagazineType)
-            )
+               )
             {
                 return null;
             }
@@ -267,6 +298,8 @@ namespace ManagedIrbis.Magazines
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Index = reader.ReadNullableString();
             Description = reader.ReadNullableString();
             Title = reader.ReadNullableString();
@@ -288,18 +321,20 @@ namespace ManagedIrbis.Magazines
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullable(Index)
-                .WriteNullable(Description)
-                .WriteNullable(Title)
-                .WriteNullable(SubTitle)
-                .WriteNullable(SeriesNumber)
-                .WriteNullable(SeriesTitle)
-                .WriteNullable(MagazineType)
-                .WriteNullable(MagazineKind)
-                .WriteNullable(Periodicity)
-                .WritePackedInt32(Mfn)
-                .WriteNullableArray(QuarterlyOrders);
+                .WriteNullable (Index)
+                .WriteNullable (Description)
+                .WriteNullable (Title)
+                .WriteNullable (SubTitle)
+                .WriteNullable (SeriesNumber)
+                .WriteNullable (SeriesTitle)
+                .WriteNullable (MagazineType)
+                .WriteNullable (MagazineKind)
+                .WriteNullable (Periodicity)
+                .WritePackedInt32 (Mfn)
+                .WriteNullableArray (QuarterlyOrders);
 
             // TODO Handle Cumulation array
         }
@@ -314,11 +349,10 @@ namespace ManagedIrbis.Magazines
                 bool throwOnError
             )
         {
-            var verifier
-                = new Verifier<MagazineInfo>(this, throwOnError);
+            var verifier = new Verifier<MagazineInfo> (this, throwOnError);
 
             verifier
-                .NotNullNorEmpty(Title, "Title");
+                .NotNullNorEmpty (Title);
 
             return verifier.Result;
         }
@@ -334,7 +368,5 @@ namespace ManagedIrbis.Magazines
         }
 
         #endregion
-
-    } // class MagazineInfo
-
-} // namespace ManagedIrbis.Magazines
+    }
+}

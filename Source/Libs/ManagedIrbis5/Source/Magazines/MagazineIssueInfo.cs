@@ -45,7 +45,7 @@ namespace ManagedIrbis.Magazines
     [DebuggerDisplay ("{Year} {Number} {Supplement}")]
     public sealed class MagazineIssueInfo
         : IHandmadeSerializable,
-            IVerifiable
+        IVerifiable
     {
         #region Properties
 
@@ -186,6 +186,18 @@ namespace ManagedIrbis.Magazines
         #region Public methods
 
         /// <summary>
+        /// Формирование шифра документа по свойствам
+        /// <see cref="MagazineCode"/>, <see cref="Year"/>, <see cref="Volume"/>
+        /// и <see cref="Number"/>.
+        /// </summary>
+        public string BuildIssueIndex()
+        {
+            return string.IsNullOrEmpty (Volume)
+                ? MagazineCode + "/" + Year + "/" + Number
+                : MagazineCode + "/" + Year + "/" + Volume + "/" + Number;
+        }
+
+        /// <summary>
         /// Разбор библиографической записи.
         /// </summary>
         public static MagazineIssueInfo Parse
@@ -225,7 +237,6 @@ namespace ManagedIrbis.Magazines
             };
 
             return result;
-
         }
 
         /// <summary>
@@ -262,7 +273,6 @@ namespace ManagedIrbis.Magazines
             }
 
             return result;
-
         } // method ToRecord
 
         /// <summary>
@@ -270,28 +280,39 @@ namespace ManagedIrbis.Magazines
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable (EditorBrowsableState.Never)]
-        public bool ShouldSerializeArticles() => !Articles.IsNullOrEmpty();
+        public bool ShouldSerializeArticles()
+        {
+            return !Articles.IsNullOrEmpty();
+        }
 
         /// <summary>
         /// Should serialize the <see cref="LoanCount"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable (EditorBrowsableState.Never)]
-        public bool ShouldSerializeLoanCount() => LoanCount != 0;
+        public bool ShouldSerializeLoanCount()
+        {
+            return LoanCount != 0;
+        }
 
         /// <summary>
         /// Should serialize the <see cref="Mfn"/> field?
         /// </summary>
         [ExcludeFromCodeCoverage]
         [EditorBrowsable (EditorBrowsableState.Never)]
-        public bool ShouldSerializeMfn() => Mfn != 0;
+        public bool ShouldSerializeMfn()
+        {
+            return Mfn != 0;
+        }
 
         /// <summary>
         /// Сравнение двух выпусков
         /// (с целью сортировки по возрастанию номеров).
         /// </summary>
         public static int CompareNumbers (MagazineIssueInfo first, MagazineIssueInfo second)
-            => NumberText.Compare (first.Number, second.Number);
+        {
+            return NumberText.Compare (first.Number, second.Number);
+        }
 
         #endregion
 
@@ -303,6 +324,8 @@ namespace ManagedIrbis.Magazines
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Mfn = reader.ReadPackedInt32();
             Index = reader.ReadNullableString();
             Description = reader.ReadNullableString();
@@ -315,8 +338,7 @@ namespace ManagedIrbis.Magazines
             Worksheet = reader.ReadNullableString();
             Articles = reader.ReadNullableArray<MagazineArticleInfo>();
             Exemplars = reader.ReadNullableArray<ExemplarInfo>();
-
-        } // method RestoreFromStream
+        }
 
         /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
         public void SaveToStream
@@ -324,6 +346,8 @@ namespace ManagedIrbis.Magazines
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
                 .WritePackedInt32 (Mfn)
                 .WriteNullable (Index)
@@ -337,7 +361,6 @@ namespace ManagedIrbis.Magazines
                 .WriteNullable (Worksheet);
             writer.WriteNullableArray (Articles);
             writer.WriteNullableArray (Exemplars);
-
         } // method SaveToStream
 
         #endregion
@@ -359,20 +382,20 @@ namespace ManagedIrbis.Magazines
                 .NotNullNorEmpty (Year);
 
             return verifier.Result;
-
-        } // method Verify
+        }
 
         #endregion
 
         #region Object info
 
         /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => string.IsNullOrEmpty (Supplement)
-            ? Number.ToVisibleString().Trim()
-            : $"{Number.ToVisibleString()} ({Supplement})".Trim();
+        public override string ToString()
+        {
+            return string.IsNullOrEmpty (Supplement)
+                ? Number.ToVisibleString().Trim()
+                : $"{Number.ToVisibleString()} ({Supplement})".Trim();
+        }
 
         #endregion
-
-    } // class MagazineIssueInfo
-
-} // namespace ManagedIrbis.Magazines
+    }
+}

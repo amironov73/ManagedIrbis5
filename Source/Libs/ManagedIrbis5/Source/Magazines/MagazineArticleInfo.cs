@@ -38,7 +38,7 @@ namespace ManagedIrbis.Magazines
     /// Информация о статье из журнала/сборника.
     /// Рабочий лист ASP.
     /// </summary>
-    [XmlRoot("article")]
+    [XmlRoot ("article")]
     public sealed class MagazineArticleInfo
         : IHandmadeSerializable,
         IVerifiable
@@ -48,35 +48,35 @@ namespace ManagedIrbis.Magazines
         /// <summary>
         /// Авторы, поля 70x и 710x.
         /// </summary>
-        [XmlElement("author")]
-        [Description("Авторы")]
-        [DisplayName("Авторы")]
-        [JsonPropertyName("authors")]
+        [XmlElement ("author")]
+        [Description ("Авторы")]
+        [DisplayName ("Авторы")]
+        [JsonPropertyName ("authors")]
         public AuthorInfo[]? Authors { get; set; }
 
         /// <summary>
         /// Заглавие, поле 200.
         /// </summary>
-        [XmlElement("title")]
-        [Description("Заглавие")]
-        [DisplayName("Заглавие")]
-        [JsonPropertyName("title")]
+        [XmlElement ("title")]
+        [Description ("Заглавие")]
+        [DisplayName ("Заглавие")]
+        [JsonPropertyName ("title")]
         public TitleInfo? Title { get; set; }
 
         /// <summary>
         /// Издание, в котором опубликована статья, поле 463.
         /// </summary>
-        [XmlElement("source")]
-        [Description("Издание, в котором опубликована статья")]
-        [DisplayName("Издание, в котором опубликована статья")]
-        [JsonPropertyName("sources")]
+        [XmlElement ("source")]
+        [Description ("Издание, в котором опубликована статья")]
+        [DisplayName ("Издание, в котором опубликована статья")]
+        [JsonPropertyName ("sources")]
         public SourceInfo[]? Sources { get; set; }
 
         #endregion
 
         #region Private members
 
-        private static int[] _authorTags = {700, 701, 702};
+        private static int[] _authorTags = { 700, 701, 702 };
 
         #endregion
 
@@ -90,14 +90,17 @@ namespace ManagedIrbis.Magazines
                 Record record
             )
         {
-            var result = new MagazineArticleInfo();
-            result.Authors = AuthorInfo.ParseRecord(record, _authorTags);
-            var field200 = record.Fields.GetFirstField(200);
-            if (!ReferenceEquals(field200, null))
+            var result = new MagazineArticleInfo
             {
-                result.Title = TitleInfo.ParseField200(field200);
+                Authors = AuthorInfo.ParseRecord (record, _authorTags)
+            };
+            var field200 = record.Fields.GetFirstField (200);
+            if (field200 is not null)
+            {
+                result.Title = TitleInfo.ParseField200 (field200);
             }
-            result.Sources = SourceInfo.ParseRecord(record);
+
+            result.Sources = SourceInfo.ParseRecord (record);
 
             return result;
         }
@@ -111,10 +114,10 @@ namespace ManagedIrbis.Magazines
             )
         {
             var result = new List<MagazineArticleInfo>();
-            foreach (var field in record.Fields.GetField(922))
+            foreach (var field in record.Fields.GetField (922))
             {
-                MagazineArticleInfo article = ParseField330(field);
-                result.Add(article);
+                var article = ParseField330 (field);
+                result.Add (article);
             }
 
             return result.ToArray();
@@ -129,10 +132,10 @@ namespace ManagedIrbis.Magazines
             )
         {
             var result = new List<MagazineArticleInfo>();
-            foreach (var field in record.Fields.GetField(330))
+            foreach (var field in record.Fields.GetField (330))
             {
-                MagazineArticleInfo article = ParseField330(field);
-                result.Add(article);
+                MagazineArticleInfo article = ParseField330 (field);
+                result.Add (article);
             }
 
             return result.ToArray();
@@ -148,8 +151,8 @@ namespace ManagedIrbis.Magazines
         {
             var result = new MagazineArticleInfo
             {
-                Authors = AuthorInfo.ParseField330(field),
-                Title = TitleInfo.ParseField330(field)
+                Authors = AuthorInfo.ParseField330 (field),
+                Title = TitleInfo.ParseField330 (field)
             };
 
             return result;
@@ -175,6 +178,8 @@ namespace ManagedIrbis.Magazines
                 BinaryReader reader
             )
         {
+            Sure.NotNull (reader);
+
             Authors = reader.ReadNullableArray<AuthorInfo>();
             Title = reader.RestoreNullable<TitleInfo>();
             Sources = reader.ReadNullableArray<SourceInfo>();
@@ -186,10 +191,12 @@ namespace ManagedIrbis.Magazines
                 BinaryWriter writer
             )
         {
+            Sure.NotNull (writer);
+
             writer
-                .WriteNullableArray(Authors)
-                .WriteNullable(Title)
-                .WriteNullableArray(Sources);
+                .WriteNullableArray (Authors)
+                .WriteNullable (Title)
+                .WriteNullableArray (Sources);
         }
 
         #endregion
@@ -202,10 +209,10 @@ namespace ManagedIrbis.Magazines
                 bool throwOnError
             )
         {
-            var verifier = new Verifier<MagazineArticleInfo>(this, throwOnError);
+            var verifier = new Verifier<MagazineArticleInfo> (this, throwOnError);
 
             verifier
-                .NotNull(Title, "Title");
+                .NotNull (Title);
 
             return verifier.Result;
         }
@@ -215,10 +222,11 @@ namespace ManagedIrbis.Magazines
         #region Object members
 
         /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => Title?.ToString() ?? string.Empty;
+        public override string ToString()
+        {
+            return Title?.ToString() ?? string.Empty;
+        }
 
         #endregion
-
-    } // class MagazineArticleInfo
-
-} // namespace ManagedIrbis.Magazines
+    }
+}
