@@ -204,7 +204,7 @@ namespace AM.AppServices
             Magna.Host = host;
 
             Logger = host.Services
-                .GetService<ILoggerFactory>()
+                .GetRequiredService<ILoggerFactory>()
                 .CreateLogger<MagnaApplication>();
 
             _prerun = true;

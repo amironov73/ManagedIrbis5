@@ -179,7 +179,7 @@ namespace ManagedIrbis
         {
             if (Busy.State != busy)
             {
-                _logger.LogTrace($"SetBusy: {busy}");
+                _logger?.LogTrace($"SetBusy: {busy}");
                 Busy.SetState(busy);
 
                 // TODO: нужно ли это здесь?

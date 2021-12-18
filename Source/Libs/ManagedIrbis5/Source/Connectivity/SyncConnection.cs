@@ -455,7 +455,7 @@ namespace ManagedIrbis
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogError
+                    _logger?.LogError
                         (
                             exception,
                             nameof(SyncConnection) + "::" + nameof(Disconnect)

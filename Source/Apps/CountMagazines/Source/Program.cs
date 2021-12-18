@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
+// ReSharper disable TemplateIsNotCompileTimeConstantProblem
 
 /* Program.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
@@ -33,16 +34,19 @@ using Microsoft.Extensions.Logging;
 
 namespace CountMagazines
 {
+    /// <summary>
+    /// Вся логика программы в одном классе.
+    /// </summary>
     class Program
         : IrbisApplication
     {
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public Program(string[] args)
-            : base(args)
+        public Program (string[] args)
+            : base (args)
         {
-        } // constructor
+        }
 
         /// <inheritdoc cref="MagnaApplication.ActualRun"/>
         protected override int ActualRun()
@@ -73,15 +77,14 @@ namespace CountMagazines
                     .ToArray();
                 var loanCount = issues.Sum (issue => issue.LoanCount);
                 Console.WriteLine ($"{title}\t{issues.Length}\t{loanCount}");
-
-            } // foreach
+            }
 
             return 0;
+        }
 
-        } // method ActualRun
-
-        static void Main (string[] args) => new Program (args).Run();
-
-    } // class Program
-
-} // namespace CountMagazines
+        static void Main (string[] args)
+        {
+            new Program (args).Run();
+        }
+    }
+}

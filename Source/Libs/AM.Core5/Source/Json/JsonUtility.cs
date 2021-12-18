@@ -17,6 +17,7 @@
 
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 #endregion
 
@@ -303,7 +304,7 @@ namespace AM.Json
         {
             var options = new JsonSerializerOptions
             {
-                IgnoreNullValues = true,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 WriteIndented = false,
 
             };
