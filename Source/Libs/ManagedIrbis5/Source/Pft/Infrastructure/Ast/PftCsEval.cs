@@ -12,6 +12,9 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+// IL3000: Avoid accessing Assembly file path when publishing as a single file
+#pragma warning disable IL3000
+
 #region Using directives
 
 using System;
@@ -106,18 +109,28 @@ namespace ManagedIrbis.UserSpace
             /// <summary>
             /// Добавление ссылки на указанную сборку.
             /// </summary>
-            private void AddReference (string assemblyRef) => AddReference (Assembly.Load (assemblyRef));
+            private void AddReference (string assemblyRef)
+            {
+                AddReference (Assembly.Load (assemblyRef));
+            }
 
             /// <summary>
             /// Добавление ссылки на указанную сборку.
             /// </summary>
-            private void AddReference (Assembly assembly) =>
+            private void AddReference (Assembly assembly)
+            {
+                // TODO: в single-exe-application .Location возвращает string.Empty
+                // consider using the AppContext.BaseDirectory
                 References.Add (MetadataReference.CreateFromFile (assembly.Location));
+            }
 
             /// <summary>
             /// Добавление ссылки на сборку, содержащую указанный тип.
             /// </summary>
-            private void AddReference (Type type) => AddReference (type.Assembly);
+            private void AddReference (Type type)
+            {
+                AddReference (type.Assembly);
+            }
 
             /// <summary>
             /// Компиляция сниппета.
@@ -127,8 +140,8 @@ namespace ManagedIrbis.UserSpace
                     string sourceCode
                 )
             {
-                var className = "Class" + Guid.NewGuid().ToString("N");
-                sourceCode = Prologue.Replace("<<<CLASSNAME>>>", className)
+                var className = "Class" + Guid.NewGuid().ToString ("N");
+                sourceCode = Prologue.Replace ("<<<CLASSNAME>>>", className)
                              + sourceCode
                              + Epilogue;
 
@@ -137,7 +150,7 @@ namespace ManagedIrbis.UserSpace
                 var compilation = CSharpCompilation.Create
                     (
                         className + ".dll",
-                        new [] { syntaxTree },
+                        new[] { syntaxTree },
                         References,
                         compilationOptions
                     );
@@ -161,8 +174,7 @@ namespace ManagedIrbis.UserSpace
                     {
                         return null;
                     }
-
-                } // if
+                }
 
                 var bytes = stream.ToArray();
                 var assembly = Assembly.Load (bytes);
@@ -171,10 +183,8 @@ namespace ManagedIrbis.UserSpace
                 var method = type.GetMethod ("UserCode");
 
                 return method;
-
-            } // method CompileSnippet
-
-        } // class SnippetCompiler
+            }
+        }
 
         #endregion
 
@@ -192,7 +202,7 @@ namespace ManagedIrbis.UserSpace
         /// </summary>
         public PftCsEval()
         {
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -204,8 +214,7 @@ namespace ManagedIrbis.UserSpace
             : base (token)
         {
             token.MustBe (PftTokenKind.CsEval);
-
-        } // constructor
+        }
 
         /// <summary>
         /// Конструктор.
@@ -216,7 +225,7 @@ namespace ManagedIrbis.UserSpace
             )
             : base (children)
         {
-        } // constructor
+        }
 
         #endregion
 
@@ -255,8 +264,7 @@ namespace ManagedIrbis.UserSpace
             }
 
             OnAfterExecution (context);
-
-        } // method Execute
+        }
 
         /// <inheritdoc cref="PftNode.PrettyPrint" />
         public override void PrettyPrint
@@ -298,11 +306,8 @@ namespace ManagedIrbis.UserSpace
             StringBuilderPool.Shared.Return (builder);
 
             return result;
-
-        } // method ToString
+        }
 
         #endregion
-
-    } // class PftCsEval
-
-} // namespace ManagedIrbis.Pft.Infrastructure.Ast
+    }
+}

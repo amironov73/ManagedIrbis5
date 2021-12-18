@@ -12,6 +12,9 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+// IL3000: Avoid accessing Assembly file path when publishing as a single file
+#pragma warning disable IL3000
+
 #region Using directives
 
 using System;
@@ -72,8 +75,7 @@ namespace ManagedIrbis.Scripting
             Provider = provider;
             _cache = cache;
             ErrorWriter = errorWriter ?? Console.Error;
-
-        } // constructor
+        }
 
         #endregion
 
@@ -86,7 +88,7 @@ namespace ManagedIrbis.Scripting
             /// <summary>
             /// Ссылки на сборки.
             /// </summary>
-            public List<MetadataReference> References { get; } = new();
+            public List<MetadataReference> References { get; } = new ();
 
             /// <summary>
             /// Добавление ссылок на сборки по умолчанию.
@@ -94,41 +96,50 @@ namespace ManagedIrbis.Scripting
             public void AddDefaultReferences()
             {
                 AddReference ("System.Runtime");
-                AddReference (typeof(object));
-                AddReference (typeof(Console));
-                AddReference (typeof(System.Collections.IEnumerable));
-                AddReference (typeof(List<>));
-                AddReference (typeof(Encoding));
-                AddReference (typeof(File));
-                AddReference (typeof(Enumerable));
+                AddReference (typeof (object));
+                AddReference (typeof (Console));
+                AddReference (typeof (System.Collections.IEnumerable));
+                AddReference (typeof (List<>));
+                AddReference (typeof (Encoding));
+                AddReference (typeof (File));
+                AddReference (typeof (Enumerable));
                 AddReference ("System.ComponentModel");
                 AddReference ("System.Data.Common");
                 AddReference ("System.Linq.Expressions");
 
-                AddReference (typeof(Utility));
-                AddReference (typeof(ISyncProvider));
+                AddReference (typeof (Utility));
+                AddReference (typeof (ISyncProvider));
 
-                AddReference (typeof(Microsoft.Extensions.Logging.Abstractions.NullLogger));
-                AddReference (typeof(Microsoft.Extensions.Logging.Logger<>));
+                AddReference (typeof (Microsoft.Extensions.Logging.Abstractions.NullLogger));
+                AddReference (typeof (Microsoft.Extensions.Logging.Logger<>));
             }
 
             /// <summary>
             /// Добавление ссылки на указанную сборку.
             /// </summary>
-            public void AddReference (string assemblyRef) => AddReference (Assembly.Load (assemblyRef));
+            public void AddReference (string assemblyRef)
+            {
+                AddReference (Assembly.Load (assemblyRef));
+            }
 
             /// <summary>
             /// Добавление ссылки на указанную сборку.
             /// </summary>
-            private void AddReference (Assembly assembly) =>
-                References.Add(MetadataReference.CreateFromFile (assembly.Location));
+            private void AddReference (Assembly assembly)
+            {
+                // TODO: в single-exe-application .Location возвращает string.Empty
+                // consider using the AppContext.BaseDirectory
+                References.Add (MetadataReference.CreateFromFile (assembly.Location));
+            }
 
             /// <summary>
             /// Добавление ссылки на сборку, содержащую указанный тип.
             /// </summary>
-            private void AddReference (Type type) => AddReference (type.Assembly);
-
-        } // class ScriptOptions
+            private void AddReference (Type type)
+            {
+                AddReference (type.Assembly);
+            }
+        }
 
         /// <summary>
         /// Компилируем сборку в память.
@@ -153,7 +164,7 @@ namespace ManagedIrbis.Scripting
             var compilation = CSharpCompilation.Create
                 (
                     "FormattingScript",
-                    new [] { syntaxTree },
+                    new[] { syntaxTree },
                     localOptions.References,
                     compilationOptions
                 );
@@ -162,10 +173,10 @@ namespace ManagedIrbis.Scripting
             if (!emit.Success)
             {
                 var failures = emit.Diagnostics.Where
-                (
-                    diagnostic => diagnostic.IsWarningAsError
-                                  || diagnostic.Severity == DiagnosticSeverity.Error
-                );
+                    (
+                        diagnostic => diagnostic.IsWarningAsError
+                                      || diagnostic.Severity == DiagnosticSeverity.Error
+                    );
 
                 foreach (var failure in failures)
                 {
@@ -173,12 +184,10 @@ namespace ManagedIrbis.Scripting
                 }
 
                 return null;
-
-            } // if
+            }
 
             return memory.ToArray();
-
-        } // method CompileCode
+        }
 
         /// <summary>
         /// Получение сборки для указанного исходного кода.
@@ -204,8 +213,7 @@ namespace ManagedIrbis.Scripting
             }
 
             return null;
-
-        } // method GetAssemblyForCode
+        }
 
         #endregion
 
@@ -235,8 +243,7 @@ namespace ManagedIrbis.Scripting
             instance.AfterAll();
 
             return output.ToString();
-
-        } // method FormatRecord
+        }
 
         /// <summary>
         /// Расформатирование нескольких записей.
@@ -266,8 +273,7 @@ namespace ManagedIrbis.Scripting
             instance.AfterAll();
 
             return output.ToString();
-
-        } // method FormatRecord
+        }
 
         /// <summary>
         /// Получение экземпляра контекста для расформатирования.
@@ -285,9 +291,9 @@ namespace ManagedIrbis.Scripting
             }
 
             var scriptType = assembly.GetTypes()
-                .FirstOrDefault (type => type.IsAssignableTo (typeof(ScriptContext)))
+                .FirstOrDefault (type => type.IsAssignableTo (typeof (ScriptContext)))
                 .ThrowIfNull ("Can't find script context type");
-            var result = (ScriptContext?) Activator.CreateInstance
+            var result = (ScriptContext?)Activator.CreateInstance
                 (
                     scriptType,
                     Provider,
@@ -295,18 +301,18 @@ namespace ManagedIrbis.Scripting
                 );
 
             return result;
-
-        } // method GetContextInstance
+        }
 
         #endregion
 
         #region IDisposable members
 
         /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => _cache?.Dispose();
+        public void Dispose()
+        {
+            _cache?.Dispose();
+        }
 
         #endregion
-
-    } // class ScriptFormatter
-
-} // namespace ManagedIrbis.Scripting
+    }
+}

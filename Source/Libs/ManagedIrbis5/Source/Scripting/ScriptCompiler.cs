@@ -12,6 +12,9 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+// IL3000: Avoid accessing Assembly file path when publishing as a single file
+#pragma warning disable IL3000
+
 #region Using directives
 
 using System;
@@ -64,8 +67,7 @@ namespace ManagedIrbis.Scripting
         {
             References = new List<MetadataReference>();
             ErrorWriter = Console.Error;
-
-        } // constructor
+        }
 
         #endregion
 
@@ -111,8 +113,7 @@ internal class Program : IrbisApplication
             builder.AppendLine();
 
             return builder.ToString();
-
-        } // method _AddLines
+        }
 
         private static string _MergeCode
             (
@@ -162,8 +163,7 @@ internal class Program : IrbisApplication
                 .NormalizeWhitespace();
 
             return resultRoot.ToFullString();
-
-        } // method _MergeCode
+        }
 
         #endregion
 
@@ -196,18 +196,28 @@ internal class Program : IrbisApplication
         /// <summary>
         /// Добавление ссылки на указанную сборку.
         /// </summary>
-        public void AddReference (string assemblyRef) => AddReference (Assembly.Load (assemblyRef));
+        public void AddReference (string assemblyRef)
+        {
+            AddReference (Assembly.Load (assemblyRef));
+        }
 
         /// <summary>
         /// Добавление ссылки на указанную сборку.
         /// </summary>
-        public void AddReference (Assembly assembly) =>
+        public void AddReference (Assembly assembly)
+        {
+            // TODO: в single-exe-application .Location возвращает string.Empty
+            // consider using the AppContext.BaseDirectory
             References.Add (MetadataReference.CreateFromFile (assembly.Location));
+        }
 
         /// <summary>
         /// Добавление ссылки на сборку, содержащую указанный тип.
         /// </summary>
-        public void AddReference (Type type) => AddReference (type.Assembly);
+        public void AddReference (Type type)
+        {
+            AddReference (type.Assembly);
+        }
 
         /// <summary>
         /// Компиляция текста скрипта в соответствии с опциями.
@@ -249,7 +259,7 @@ internal class Program : IrbisApplication
             }
 
             var compilationOptions = options.CompilationOptions
-                                     ?? new CSharpCompilationOptions (OutputKind.ConsoleApplication);
+                ?? new CSharpCompilationOptions (OutputKind.ConsoleApplication);
 
             var result = CSharpCompilation.Create
                 (
@@ -260,8 +270,7 @@ internal class Program : IrbisApplication
                 );
 
             return result;
-
-        } // method Compile
+        }
 
         /// <summary>
         /// Простая компиляция текста скрипта.
@@ -281,8 +290,7 @@ internal class Program : IrbisApplication
                 );
 
             return result;
-
-        } // method CompileScriptText
+        }
 
         /// <summary>
         /// Получение сборки в указанный поток.
@@ -320,8 +328,7 @@ internal class Program : IrbisApplication
             }
 
             return emitResult.Success;
-
-        } // method EmitAssemblyToStream
+        }
 
         /// <summary>
         /// Получение сборки на диске.
@@ -337,8 +344,7 @@ internal class Program : IrbisApplication
             using var exeStream = File.Create (exeName);
 
             return EmitAssemblyToStream (compilation, exeStream);
-
-        } // method EmitAssemblyToFile
+        }
 
         /// <summary>
         /// Получение сборки в памяти по результатам компиляции.
@@ -359,8 +365,7 @@ internal class Program : IrbisApplication
             var result = Assembly.Load (memory);
 
             return result;
-
-        } // method EmitAssembly
+        }
 
         /// <summary>
         /// Разбор аргументов, предназначенных для компилятора.
@@ -466,8 +471,7 @@ internal class Program : IrbisApplication
             result.ShowApplicationCode = parseResult.ValueForOption (showOption);
 
             return result;
-
-        } // method ParseArguments
+        }
 
         /// <summary>
         /// Запуск скомпилированной сборки.
@@ -486,8 +490,7 @@ internal class Program : IrbisApplication
                     entryPoint.Invoke (null, new object?[] { args });
                 }
             }
-
-        } // method RunAssembly
+        }
 
         /// <summary>
         /// Разделение аргументов на компиляторные и скриптовые.
@@ -522,11 +525,8 @@ internal class Program : IrbisApplication
             }
 
             return new[] { compilerArgs.ToArray(), scriptArgs.ToArray() };
-
-        } // method SeparateArguments
+        }
 
         #endregion
-
-    } // class ScriptCompiler
-
-} // namespace ManagedIrbis.Scripting
+    }
+}

@@ -12,6 +12,9 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+// IL3000: Avoid accessing Assembly file path when publishing as a single file
+#pragma warning disable IL3000
+
 #region Using directives
 
 using System;
@@ -47,7 +50,7 @@ namespace AM.Windows.Forms
         {
             const int delta = 1;
 
-            screen ??= Screen.FromControl(form);
+            screen ??= Screen.FromControl (form);
 
             var area = screen.WorkingArea;
 
@@ -73,8 +76,7 @@ namespace AM.Windows.Forms
                 );
 
             return form;
-
-        } // method AdjustPlacement
+        }
 
         /// <summary>
         /// Calculates placement for the window according to
@@ -96,14 +98,14 @@ namespace AM.Windows.Forms
                     result = new Point
                         (
                             workingArea.Left
-                                + (workingArea.Width - windowSize.Width) / 2,
+                            + (workingArea.Width - windowSize.Width) / 2,
                             workingArea.Top
-                                + (workingArea.Height - windowSize.Height) / 2
+                            + (workingArea.Height - windowSize.Height) / 2
                         );
                     break;
 
                 case WindowPlacement.TopLeftCorner:
-                    result = new Point(indent);
+                    result = new Point (indent);
                     break;
 
                 case WindowPlacement.TopRightCorner:
@@ -118,7 +120,7 @@ namespace AM.Windows.Forms
                     result = new Point
                         (
                             workingArea.Left
-                                + (workingArea.Width - windowSize.Width) / 2,
+                            + (workingArea.Width - windowSize.Width) / 2,
                             indent.Height
                         );
                     break;
@@ -128,7 +130,7 @@ namespace AM.Windows.Forms
                         (
                             indent.Width,
                             workingArea.Top
-                                + (workingArea.Height - windowSize.Height) / 2
+                            + (workingArea.Height - windowSize.Height) / 2
                         );
                     break;
 
@@ -137,7 +139,7 @@ namespace AM.Windows.Forms
                         (
                             workingArea.Right - windowSize.Width - indent.Width,
                             workingArea.Top
-                                + (workingArea.Height - windowSize.Height) / 2
+                            + (workingArea.Height - windowSize.Height) / 2
                         );
                     break;
 
@@ -145,7 +147,7 @@ namespace AM.Windows.Forms
                     result = new Point
                         (
                             workingArea.Left
-                                + (workingArea.Width - windowSize.Width) / 2,
+                            + (workingArea.Width - windowSize.Width) / 2,
                             workingArea.Height - windowSize.Height - indent.Height
                         );
                     break;
@@ -167,13 +169,11 @@ namespace AM.Windows.Forms
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(placement));
-
-            } // switch
+                    throw new ArgumentOutOfRangeException (nameof (placement));
+            }
 
             return result;
-
-        } // method CalculatePlacement
+        }
 
         /// <summary>
         /// Show version information in form title.
@@ -187,12 +187,16 @@ namespace AM.Windows.Forms
             var vi = assembly?.GetName().Version;
             if (assembly?.Location is null)
             {
+                // TODO: в single-exe-application .Location возвращает string.Empty
+                // consider using the AppContext.BaseDirectory
                 return;
             }
 
+            // TODO: в single-exe-application .Location возвращает string.Empty
+            // consider using the AppContext.BaseDirectory
             var fvi = FileVersionInfo
-                .GetVersionInfo(assembly.Location);
-            var fi = new FileInfo(assembly.Location);
+                .GetVersionInfo (assembly.Location);
+            var fi = new FileInfo (assembly.Location);
 
             // ReSharper disable UseStringInterpolation
             form.Text += string.Format
@@ -202,6 +206,7 @@ namespace AM.Windows.Forms
                     fvi.FileVersion,
                     fi.LastWriteTime.ToShortDateString()
                 );
+
             // ReSharper restore UseStringInterpolation
         }
 
@@ -229,10 +234,14 @@ namespace AM.Windows.Forms
                 var vi = assembly?.GetName().Version;
                 if (assembly?.Location is null)
                 {
+                    // TODO: в single-exe-application .Location возвращает string.Empty
+                    // consider using the AppContext.BaseDirectory
                     return;
                 }
 
-                var fi = new FileInfo(assembly.Location);
+                // TODO: в single-exe-application .Location возвращает string.Empty
+                // consider using the AppContext.BaseDirectory
+                var fi = new FileInfo (assembly.Location);
                 output.WriteLine
                     (
                         "Application version: {0} ({1})",
@@ -242,14 +251,11 @@ namespace AM.Windows.Forms
                 output.WriteLine
                     (
                         "Memory: {0} Mb",
-                        GC.GetTotalMemory(false)/1024
+                        GC.GetTotalMemory (false) / 1024
                     );
             }
-
-        } // method PrintSystemInformation
+        }
 
         #endregion
-
-    } // class FormUtility
-
-} // namespace AM.Windows.Forms
+    }
+}
