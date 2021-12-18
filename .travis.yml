@@ -9,7 +9,9 @@ solution: ManagedIrbis5.sln
 
 mono: none
 
-dotnet: 5.0
+dotnet:
+  - 5.0
+  - 6.0
 
 script:
   - echo ${VERSION}
