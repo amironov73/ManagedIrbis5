@@ -100,6 +100,7 @@ static class Program
                 var cumulated = NumberRangeCollection.Cumulate (years).ToString();
                 excel.WriteText (cumulated).SetBorders();
 
+                // можно взять места хранения из зарегистрированных экземпляров
                 // var places = issues.SelectMany
                 //         (
                 //             i => i.Exemplars ?? Array.Empty<ExemplarInfo>()
@@ -109,15 +110,18 @@ static class Program
                 //     .Distinct()
                 //     .OrderBy (s => s)
                 //     .JoinText ();
+
+                // а можно - из специального поля, как в ИРНИТУ
                 var places = magazine.Record?.FMA (2005).JoinText() ?? string.Empty;
                 excel.WriteText (places).SetBorders();
 
+                // срок хранения - в специальном поле
                 var shelfLife = magazine.Record?.FM (2024) ?? string.Empty;
                 if (shelfLife == "0")
                 {
                     shelfLife = "постоянно";
                 }
-                excel.WriteText (shelfLife).SetBorders();
+                excel.WriteText (shelfLife).Center().SetBorders();
 
                 // пустая ячейка, чтобы не вылазило за пределы предыдущей ячейки
                 excel.WriteText (string.Empty);

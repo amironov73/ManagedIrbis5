@@ -63,7 +63,7 @@ namespace AM.Scripting.Barsik
 
             _init.Execute (context);
             var success = false;
-            while (_condition.Compute (context))
+            while (BarsikUtility.ToBoolean (_condition.Compute (context)))
             {
                 success = true;
                 foreach (var statement in _body)

@@ -75,7 +75,7 @@ namespace AM.Scripting.Barsik
         {
             PreExecute (context);
 
-            if (_condition.Compute (context))
+            if (BarsikUtility.ToBoolean (_condition.Compute (context)))
             {
                 foreach (var statement in _thenBlock)
                 {
@@ -90,7 +90,7 @@ namespace AM.Scripting.Barsik
                 {
                     foreach (var block in _elseIfBlocks)
                     {
-                        if (block._condition.Compute (context))
+                        if (BarsikUtility.ToBoolean (block._condition.Compute (context)))
                         {
                             foreach (var statement in block._thenBlock)
                             {

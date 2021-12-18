@@ -14,7 +14,6 @@
 
 #region Using directives
 
-using System.Collections;
 using System.Collections.Generic;
 
 using AM.Text;
@@ -55,7 +54,7 @@ namespace AM.Scripting.Barsik
         {
             PreExecute (context);
 
-            while (_condition.Compute (context))
+            while (BarsikUtility.ToBoolean (_condition.Compute (context)))
             {
                 foreach (var statement in _statements)
                 {
