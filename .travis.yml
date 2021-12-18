@@ -1,7 +1,11 @@
 language: csharp
 
 env:
-  - VERSION=5.0.0.${TRAVIS_BUILD_NUMBER}
+  global:
+    - VERSION: 5.0.0.${TRAVIS_BUILD_NUMBER}
+    - DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+    - DOTNET_CLI_TELEMETRY_OPTOUT: true
+    - TRAVIS: true
 
 dist: bionic
 
@@ -9,9 +13,7 @@ solution: ManagedIrbis5.sln
 
 mono: none
 
-dotnet:
-  - 5.0
-  - 6.0
+dotnet: 5.0
 
 script:
   - echo ${VERSION}
