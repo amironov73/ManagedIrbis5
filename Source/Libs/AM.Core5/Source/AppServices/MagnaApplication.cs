@@ -35,227 +35,223 @@ using NLog.Extensions.Logging;
 
 #nullable enable
 
-namespace AM.AppServices
+namespace AM.AppServices;
+
+/// <summary>
+/// Класс-приложение.
+/// </summary>
+public class MagnaApplication
 {
+    #region Properties
+
     /// <summary>
-    /// Класс-приложение.
+    /// Аргументы командной строки.
     /// </summary>
-    public class MagnaApplication
+    public string[] Args { get; }
+
+    /// <summary>
+    /// Результат разбора командной строки.
+    /// </summary>
+    public ParseResult? ParseResult { get; protected set; }
+
+    /// <summary>
+    /// Конфигурация.
+    /// </summary>
+    [AllowNull]
+    public IConfiguration Configuration { get; protected set; }
+
+    /// <summary>
+    /// Логгер.
+    /// </summary>
+    [AllowNull]
+    public ILogger Logger { get; protected set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="args">Аргументы командной строки.</param>
+    public MagnaApplication
+        (
+            string[] args
+        )
     {
-        #region Properties
+        Args = args;
+    } // constructor
 
-        /// <summary>
-        /// Аргументы командной строки.
-        /// </summary>
-        public string[] Args { get; }
+    #endregion
 
-        /// <summary>
-        /// Результат разбора командной строки.
-        /// </summary>
-        public ParseResult? ParseResult { get; protected set; }
+    #region Private members
 
-        /// <summary>
-        /// Конфигурация.
-        /// </summary>
-        [AllowNull]
-        public IConfiguration Configuration { get; protected set; }
+    private bool _prerun;
 
-        /// <summary>
-        /// Логгер.
-        /// </summary>
-        [AllowNull]
-        public ILogger Logger { get; protected set; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Построение конфигурации.
+    /// </summary>
+    protected virtual IConfigurationBuilder BuildConfiguration()
+    {
+        var result = new ConfigurationBuilder()
+            .SetBasePath (AppContext.BaseDirectory)
+            .AddJsonFile ("appsettings.json", true, true)
+            .AddEnvironmentVariables()
+            .AddCommandLine (Args);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="args">Аргументы командной строки.</param>
-        public MagnaApplication
-            (
-                string[] args
-            )
+        return result;
+    } // method BuildConfiguration
+
+    /// <summary>
+    /// Построение хоста.
+    /// </summary>
+    protected virtual IHostBuilder BuildHost() => Host.CreateDefaultBuilder (Args);
+
+    /// <summary>
+    /// Корневая команда для разбора командной строки.
+    /// </summary>
+    protected virtual RootCommand? BuildRootCommand() => null;
+
+    /// <summary>
+    /// Конфигурирование сервисов.
+    /// </summary>
+    /// <param name="context">Контекст.</param>
+    /// <param name="services">Коллекция сервисов.</param>
+    protected virtual void ConfigureServices
+        (
+            HostBuilderContext context,
+            IServiceCollection services
+        )
+    {
+        services.AddOptions();
+    } // method ConfigureServices
+
+    /// <summary>
+    /// Конфигурирование логирования.
+    /// </summary>
+    /// <param name="logging">Билдер.</param>
+    protected virtual void ConfigureLogging
+        (
+            ILoggingBuilder logging
+        )
+    {
+        logging.ClearProviders();
+        logging.AddNLog (Configuration);
+    } // method ConfigureLogging
+
+    /// <summary>
+    /// Разбор командной строки.
+    /// </summary>
+    protected virtual ParseResult? ParseCommandLine()
+    {
+        var rootCommand = BuildRootCommand();
+        if (rootCommand is null)
         {
-            Args = args;
-        } // constructor
+            return null;
+        }
 
-        #endregion
+        var result = new CommandLineBuilder (rootCommand)
+            .UseDefaults()
+            .Build()
+            .Parse (Args);
 
-        #region Private members
+        return result;
+    } // method ParseCommandLine
 
-        private bool _prerun;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Построение конфигурации.
-        /// </summary>
-        protected virtual IConfigurationBuilder BuildConfiguration()
+    /// <summary>
+    /// Конфигурирование перед запуском.
+    /// </summary>
+    protected virtual MagnaApplication PreRun()
+    {
+        if (_prerun)
         {
-            var result = new ConfigurationBuilder()
-                .SetBasePath (AppContext.BaseDirectory)
-                .AddJsonFile ("appsettings.json", true, true)
-                .AddEnvironmentVariables()
-                .AddCommandLine (Args);
-
-            return result;
-
-        } // method BuildConfiguration
-
-        /// <summary>
-        /// Построение хоста.
-        /// </summary>
-        protected virtual IHostBuilder BuildHost() => Host.CreateDefaultBuilder (Args);
-
-        /// <summary>
-        /// Корневая команда для разбора командной строки.
-        /// </summary>
-        protected virtual RootCommand? BuildRootCommand() => null;
-
-        /// <summary>
-        /// Конфигурирование сервисов.
-        /// </summary>
-        /// <param name="context">Контекст.</param>
-        /// <param name="services">Коллекция сервисов.</param>
-        protected virtual void ConfigureServices
-            (
-                HostBuilderContext context,
-                IServiceCollection services
-            )
-        {
-            services.AddOptions();
-
-        } // method ConfigureServices
-
-        /// <summary>
-        /// Конфигурирование логирования.
-        /// </summary>
-        /// <param name="logging">Билдер.</param>
-        protected virtual void ConfigureLogging
-            (
-                ILoggingBuilder logging
-            )
-        {
-            logging.ClearProviders();
-            logging.AddNLog (Configuration);
-
-        } // method ConfigureLogging
-
-        /// <summary>
-        /// Разбор командной строки.
-        /// </summary>
-        protected virtual ParseResult? ParseCommandLine()
-        {
-            var rootCommand = BuildRootCommand();
-            if (rootCommand is null)
-            {
-                return null;
-            }
-
-            var result = new CommandLineBuilder (rootCommand)
-                .UseDefaults()
-                .Build()
-                .Parse (Args);
-
-            return result;
-
-        } // method ParseCommandLine
-
-        /// <summary>
-        /// Конфигурирование перед запуском.
-        /// </summary>
-        protected virtual MagnaApplication PreRun()
-        {
-            if (_prerun)
-            {
-                return this;
-            }
-
-            // Это временный хост, чтобы сделать возможным логирование
-            // до того, как всё проинициализируется окончательно
-            var preliminaryServices = new ServiceCollection()
-                .AddLogging (builder =>
-                {
-                    builder.ClearProviders();
-                    builder.AddConsole();
-                })
-                .BuildServiceProvider();
-
-            Logger = preliminaryServices.GetRequiredService<ILogger<MagnaApplication>>();
-            Logger.LogInformation ("Preliminary logging enabled");
-
-            Magna.Application = this;
-            Configuration = BuildConfiguration().Build();
-            ParseResult = ParseCommandLine();
-
-            var hostBuilder = BuildHost();
-            hostBuilder.ConfigureServices (ConfigureServices);
-            hostBuilder.ConfigureServices
-                (
-                    serviceCollection => serviceCollection.AddLogging (ConfigureLogging)
-                );
-
-            var host = hostBuilder.Build();
-            Magna.Host = host;
-
-            Logger = host.Services
-                .GetRequiredService<ILoggerFactory>()
-                .CreateLogger<MagnaApplication>();
-
-            _prerun = true;
-
-            Logger.LogInformation ("Pre-run configuration done");
-
             return this;
+        }
 
-        } // method PreRun
+        // Это временный хост, чтобы сделать возможным логирование
+        // до того, как всё проинициализируется окончательно
+        var preliminaryServices = new ServiceCollection()
+            .AddLogging (builder =>
+            {
+                builder.ClearProviders();
+                builder.AddConsole();
+            })
+            .BuildServiceProvider();
 
-        /// <summary>
-        /// Собственно работа приложения.
-        /// Метод должен быть переопределен в классе-потомке.
-        /// </summary>
-        /// <returns>Код, возвращаемый операционной системе.</returns>
-        protected virtual int ActualRun() => 0;
+        Logger = preliminaryServices.GetRequiredService<ILogger<MagnaApplication>>();
+        Logger.LogInformation ("Preliminary logging enabled");
 
-        /// <summary>
-        /// Собственно работа приложения.
-        /// </summary>
-        /// <returns>Код, возвращаемый операционной системе.
-        /// </returns>
-        public virtual int Run()
+        Magna.Application = this;
+        Configuration = BuildConfiguration().Build();
+        ParseResult = ParseCommandLine();
+
+        var hostBuilder = BuildHost();
+        hostBuilder.ConfigureServices (ConfigureServices);
+        hostBuilder.ConfigureServices
+            (
+                serviceCollection => serviceCollection.AddLogging (ConfigureLogging)
+            );
+
+        var host = hostBuilder.Build();
+        Magna.Host = host;
+
+        Logger.LogInformation ("Switching to main logging");
+        preliminaryServices.Dispose();
+        Logger = host.Services
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger<MagnaApplication>();
+
+        _prerun = true;
+
+        Logger.LogInformation ("Pre-run configuration done");
+
+        return this;
+    }
+
+    /// <summary>
+    /// Собственно работа приложения.
+    /// Метод должен быть переопределен в классе-потомке.
+    /// </summary>
+    /// <returns>Код, возвращаемый операционной системе.</returns>
+    protected virtual int ActualRun()
+    {
+        return 0;
+    }
+
+    /// <summary>
+    /// Собственно работа приложения.
+    /// </summary>
+    /// <returns>Код, возвращаемый операционной системе.
+    /// </returns>
+    public virtual int Run()
+    {
+        try
         {
-            try
-            {
-                Logger = new NullLogger<MagnaApplication>();
+            Logger = new NullLogger<MagnaApplication>();
 
-                PreRun();
+            PreRun();
 
-                using var host = Magna.Host;
+            using var host = Magna.Host;
 
-                Magna.Host.Start();
+            Magna.Host.Start();
 
-                return ActualRun();
-            }
-            catch (Exception exception)
-            {
-                Logger.LogError
-                    (
-                        exception,
-                        nameof (MagnaApplication) + "::" + nameof (Run)
-                    );
-            }
+            return ActualRun();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError
+                (
+                    exception,
+                    nameof (MagnaApplication) + "::" + nameof (Run)
+                );
+        }
 
-            return 1;
+        return 1;
+    }
 
-        } // method Run
-
-        #endregion
-
-    } // class MagnaApplication
-
-} // namespace AM.AppServices
+    #endregion
+}

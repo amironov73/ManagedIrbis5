@@ -32,59 +32,75 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace CountMagazines
+namespace CountMagazines;
+
+/// <summary>
+/// Вся логика программы в одном классе.
+/// </summary>
+sealed class Program
+    : IrbisApplication
 {
     /// <summary>
-    /// Вся логика программы в одном классе.
+    /// Конструктор.
     /// </summary>
-    class Program
-        : IrbisApplication
+    public Program (string[] args)
+        : base (args)
     {
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Program (string[] args)
-            : base (args)
-        {
-        }
+    }
 
-        /// <inheritdoc cref="MagnaApplication.ActualRun"/>
-        protected override int ActualRun()
-        {
-            var connection = Connection!;
-            var manager = new MagazineManager (connection);
-            var magazineList = File.ReadLines ("magazine-list.txt");
+    private static bool _stop;
 
-            foreach (var title in magazineList)
+    /// <inheritdoc cref="MagnaApplication.ActualRun"/>
+    protected override int ActualRun()
+    {
+        var connection = Connection!;
+        var manager = new MagazineManager (connection);
+        var magazineList = File.ReadLines ("magazine-list.txt");
+
+        foreach (var title in magazineList)
+        {
+            if (_stop)
             {
-                var expression = Search.Magazine (title).ToString();
-                var record = connection.SearchReadOneRecord (expression);
-                if (record is null)
-                {
-                    Logger.LogError ($"Can't find magazine {title}");
-                    continue;
-                }
-
-                var magazine = MagazineInfo.Parse (record);
-                if (magazine is null)
-                {
-                    Logger.LogError ($"Can't parse record for magazzine {title}");
-                    continue;
-                }
-
-                var issues = manager.GetIssues (magazine)
-                    .Where (issue => issue.Year.SafeToInt32() >= 2017)
-                    .ToArray();
-                var loanCount = issues.Sum (issue => issue.LoanCount);
-                Console.WriteLine ($"{title}\t{issues.Length}\t{loanCount}");
+                Logger.LogError ("Cancel key pressed");
+                break;
             }
 
-            return 0;
+            var expression = Search.Magazine (title).ToString();
+            var record = connection.SearchReadOneRecord (expression);
+            if (record is null)
+            {
+                Logger.LogError ("Can't find magazine {Title}", title);
+                continue;
+            }
+
+            var magazine = MagazineInfo.Parse (record);
+            if (magazine is null)
+            {
+                Logger.LogError ("Can't parse record for magazzine {Title}", title);
+                continue;
+            }
+
+            var issues = manager.GetIssues (magazine)
+                .Where (issue => issue.Year.SafeToInt32() >= 2017)
+                .ToArray();
+            var loanCount = issues.Sum (issue => issue.LoanCount);
+            Console.WriteLine ($"{title}\t{issues.Length}\t{loanCount}");
         }
 
-        static void Main (string[] args)
+        return 0;
+    }
+
+    static void Main
+        (
+            string[] args
+        )
+    {
+        Console.TreatControlCAsInput = false;
+        Console.CancelKeyPress += (_, eventArgs) =>
         {
-            new Program (args).Run();
-        }
+            _stop = true;
+            eventArgs.Cancel = true;
+        };
+        new Program (args).Run();
     }
 }

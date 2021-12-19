@@ -46,7 +46,7 @@ namespace UnitTests.ManagedIrbis.Gbl
             var second = bytes.RestoreObjectFromMemory<GblFile>();
 
             Assert.IsNotNull (second);
-            Assert.AreEqual (first.Statements.Count, second!.Statements.Count);
+            Assert.AreEqual (first.Statements.Count, second.Statements.Count);
             for (var i = 0; i < first.Statements.Count; i++)
             {
                 Assert.AreEqual (first.Statements[i].Command, second.Statements[i].Command);

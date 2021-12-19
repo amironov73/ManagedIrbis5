@@ -1,13 +1,13 @@
 # ManagedIrbis5
 
-Client framework for IRBIS64 system ported to .NET 5
+Client framework for IRBIS64 system ported to .NET 6
 
 Currently supports:
 
-* Windows 7/10 x64
+* Windows 7/10/11 x64
 * MacOS 10.14
-* .NET runtime 5.0.0 and higher
-* .NET SDK 5.0.100 and higher
+* .NET runtime 6.0.0 and higher
+* .NET SDK 6.0.100 and higher
 
 ```c#
 using System;
@@ -25,8 +25,7 @@ internal class Program
     {
         try
         {
-            using var connection = ConnectionFactory.Default
-                .CreateAsyncConnection();
+            using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
 
             connection.Host = "127.0.0.1";
             connection.Username = "librarian";
@@ -35,46 +34,46 @@ internal class Program
             var success = await connection.ConnectAsync();
             if (!success)
             {
-                Error.WriteLine("Can't connect");
+                Error.WriteLine ("Can't connect");
                 return 1;
             }
 
-            WriteLine("Successfully connected");
+            WriteLine ("Successfully connected");
 
             var version = await connection.GetServerVersionAsync();
-            WriteLine(version);
+            WriteLine (version);
 
             var processes = await connection.ListProcessesAsync();
-            WriteLine("Processes: " + string.Join<ProcessInfo>(" | ", processes));
+            WriteLine ("Processes: " + string.Join<ProcessInfo> (" | ", processes));
 
             var maxMfn = await connection.GetMaxMfnAsync();
-            WriteLine($"Max MFN={maxMfn}");
+            WriteLine ($"Max MFN={maxMfn}");
 
-            var found = await connection.SearchAsync(Search.Keyword("бетон$"));
-            WriteLine("Found: " + string.Join<int>(", ", found));
+            var found = await connection.SearchAsync (Search.Keyword("бетон$"));
+            WriteLine ("Found: " + string.Join<int>(", ", found));
 
             await connection.NopAsync();
-            WriteLine("NOP");
+            WriteLine ("NOP");
 
             var record = await connection.ReadRecordAsync(1);
-            WriteLine($"ReadRecord={record?.FM(200, 'a')}");
+            WriteLine ($"ReadRecord={record?.FM (200, 'a')}");
 
-            var formatted = await connection.FormatRecordAsync("@brief", 1);
-            WriteLine($"Formatted={formatted}");
+            var formatted = await connection.FormatRecordAsync ("@brief", 1);
+            WriteLine ($"Formatted={formatted}");
 
-            var files = await connection.ListFilesAsync("2.IBIS.*.mnu");
-            WriteLine("Files: " + string.Join(",", files));
+            var files = await connection.ListFilesAsync ("2.IBIS.*.mnu");
+            WriteLine ("Files: " + string.Join(",", files));
 
-            var fileText = await connection.ReadTextFileAsync("2.IBIS.brief.pft");
-            WriteLine($"BRIEF: {fileText}");
+            var fileText = await connection.ReadTextFileAsync ("2.IBIS.brief.pft");
+            WriteLine ($"BRIEF: {fileText}");
             WriteLine();
 
             await connection.DisposeAsync();
-            WriteLine("Successfully disconnected");
+            WriteLine ("Successfully disconnected");
         }
         catch (Exception exception)
         {
-            WriteLine(exception);
+            WriteLine (exception);
             return 1;
         }
 

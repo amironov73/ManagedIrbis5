@@ -19,12 +19,15 @@ using System.Drawing;
 using System.Linq;
 
 using AM;
+using AM.AppServices;
 using AM.Linq;
 using AM.Text.Ranges;
 using AM.Windows.DevExpress;
 
-using ManagedIrbis;
+using ManagedIrbis.AppServices;
 using ManagedIrbis.Magazines;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -33,28 +36,32 @@ using ManagedIrbis.Magazines;
 /// <summary>
 /// Вся логика программы в одном классе.
 /// </summary>
-static class Program
+sealed class Program
+    : IrbisApplication
 {
-    public static int Main ()
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    private Program (string[] args)
+        : base (args)
+    {
+    }
+
+    private static volatile bool _stop;
+
+    /// <inheritdoc cref="MagnaApplication.ActualRun"/>
+    protected override int ActualRun()
     {
         try
         {
-            using var connection = ConnectionFactory.Shared.CreateSyncConnection();
-            connection.ParseConnectionString ("host=127.0.0.1;user=librarian;password=secret;db=PERIO;");
-            connection.Connect();
-            if (!connection.Connected)
-            {
-                Console.WriteLine ("Not connected");
-                Console.WriteLine (IrbisException.GetErrorDescription (connection.LastError));
-                return 1;
-            }
+            using var connection = Connection!;
 
             var manager = new MagazineManager (connection);
             var magazines = manager.GetAllMagazines()
                 .OrderBy (m => m.Title)
                 .ToArray();
-            //magazines = magazines.Take (50).ToArray();
-            Console.WriteLine (magazines.Length);
+            // magazines = magazines.Take (50).ToArray();
+            Logger.LogInformation ("Magazines found: {Length}", magazines.Length);
 
             using var excel = new EasyExcel();
             excel.NewLine ();
@@ -87,8 +94,14 @@ static class Program
 
             foreach (var magazine in magazines)
             {
+                if (_stop)
+                {
+                    Logger.LogError ("Cancel key pressed");
+                    break;
+                }
+
                 var title = magazine.ExtendedTitle;
-                Console.WriteLine (title);
+                Logger.LogInformation ("Magazine: {Title}", title);
                 excel.WriteText (title).SetBorders();
 
                 var issues = manager.GetIssues (magazine);
@@ -129,14 +142,32 @@ static class Program
                 excel.NewLine ();
             }
 
-            excel.SaveAs ("magazines.xlsx");
+            if (!_stop)
+            {
+                excel.SaveAs ("magazines.xlsx");
+                Logger.LogInformation ("Excel file successfully created");
+            }
         }
         catch (Exception exception)
         {
-            Console.WriteLine (exception);
+            Logger.LogError (exception, "Error while building magazine list");
             return 1;
         }
 
         return 0;
+    }
+
+    static void Main 
+        (
+            string[] args
+        )
+    {
+        Console.TreatControlCAsInput = false;
+        Console.CancelKeyPress += (_, eventArgs) =>
+        {
+            _stop = true;
+            eventArgs.Cancel = true;
+        };
+        new Program (args).Run();
     }
 }

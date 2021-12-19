@@ -1,8 +1,17 @@
-﻿// ReSharper disable CheckNamespace
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
+
+/* Program.cs -- точка входа в программу
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directive
 
 using System;
 using System.Threading.Tasks;
@@ -11,11 +20,13 @@ using ManagedIrbis;
 
 using static System.Console;
 
+#endregion
+
 #nullable enable
 
 class Program
 {
-    static async Task<int> Main(string[] args)
+    static async Task<int> Main (string[] args)
     {
         try
         {
@@ -31,11 +42,13 @@ class Program
             var success = await connection.ConnectAsync();
             if (!success)
             {
-                await Error.WriteLineAsync("Can't connect");
+                // не получилось подключиться, жалуемся и завершаемся
+                await Error.WriteLineAsync ("Can't connect");
+                await Error.WriteLineAsync (IrbisException.GetErrorDescription (connection.LastError));
                 return 1;
             }
 
-            WriteLine("Successfully connected");
+            await Out.WriteLineAsync ("Successfully connected");
 
             // Ищем все книги, автором которых является А. С. Пушкин
             // Обратите внимание на двойные кавычки в тексте запроса
@@ -44,20 +57,20 @@ class Program
                     "\"A=ПУШКИН$\""
                 );
 
-            WriteLine($"Найдено записей: {found.Length}");
+            await Out.WriteLineAsync ($"Найдено записей: {found.Length}");
 
             // Чтобы не распечатывать все найденные записи,
             // отберем только 10 первых
             foreach (var mfn in found[..10])
             {
                 // Получаем запись из базы данных
-                var record = await connection.ReadRecordAsync(mfn);
+                var record = await connection.ReadRecordAsync (mfn);
 
                 if (record is not null)
                 {
                     // Извлекаем из записи интересующее нас поле и подполе
-                    var title = record.FM(200, 'a');
-                    WriteLine($"Title: {title}");
+                    var title = record.FM (200, 'a');
+                    await Out.WriteLineAsync ($"Title: {title}");
                 }
 
                 // Форматируем запись средствами сервера
@@ -66,18 +79,18 @@ class Program
                         "@brief",
                         mfn
                     );
-                WriteLine($"Биб. описание: {description}");
+                await Out.WriteLineAsync ($"Биб. описание: {description}");
 
-                WriteLine(); // Добавляем пустую строку
+                await Out.WriteLineAsync(); // Добавляем пустую строку
             }
 
             // Отключаемся от сервера
             await connection.DisposeAsync();
-            WriteLine("Successfully disconnected");
+            await Out.WriteLineAsync ("Successfully disconnected");
         }
         catch (Exception exception)
         {
-            WriteLine(exception);
+            await Error.WriteLineAsync (exception.ToString());
             return 1;
         }
 
