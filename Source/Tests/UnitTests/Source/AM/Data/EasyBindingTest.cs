@@ -31,7 +31,7 @@ namespace UnitTests.AM.Data
                 set
                 {
                     _name = value;
-                    NameChanged?.Invoke(this, EventArgs.Empty);
+                    NameChanged?.Invoke (this, EventArgs.Empty);
                 }
             }
 
@@ -41,7 +41,7 @@ namespace UnitTests.AM.Data
                 set
                 {
                     _age = value;
-                    AgeChanged?.Invoke(this, EventArgs.Empty);
+                    AgeChanged?.Invoke (this, EventArgs.Empty);
                 }
             }
         }
@@ -59,7 +59,7 @@ namespace UnitTests.AM.Data
                 set
                 {
                     _title = value;
-                    TitleChanged?.Invoke(this, EventArgs.Empty);
+                    TitleChanged?.Invoke (this, EventArgs.Empty);
                 }
             }
 
@@ -69,7 +69,7 @@ namespace UnitTests.AM.Data
                 set
                 {
                     _price = value;
-                    PriceChanged?.Invoke(this, EventArgs.Empty);
+                    PriceChanged?.Invoke (this, EventArgs.Empty);
                 }
             }
         }
@@ -87,26 +87,25 @@ namespace UnitTests.AM.Data
             var binding = EasyBinding.Create
                 (
                     () => second.Title == first.Name
-                    && second.Price == first.Age
+                          && second.Price == first.Age
                 );
 
-            Assert.AreEqual(first.Name, second.Title);
-            Assert.AreEqual(first.Age, second.Price);
+            Assert.AreEqual (first.Name, second.Title);
+            Assert.AreEqual (first.Age, second.Price);
 
             first.Name = "Genghis Khan";
             second.Price = 123;
 
-            Assert.AreEqual(first.Name, second.Title);
-            Assert.AreEqual(second.Price, first.Age);
+            Assert.AreEqual (first.Name, second.Title);
+            Assert.AreEqual (second.Price, first.Age);
 
             second.Title = "Timur";
             first.Age = 321;
 
-            Assert.AreEqual(second.Title, first.Name);
-            Assert.AreEqual(first.Age, second.Price);
+            Assert.AreEqual (second.Title, first.Name);
+            Assert.AreEqual (first.Age, second.Price);
 
             binding.Unbind();
-
         }
     }
 }

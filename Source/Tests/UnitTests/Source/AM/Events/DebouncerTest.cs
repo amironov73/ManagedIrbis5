@@ -25,12 +25,12 @@ namespace UnitTests.AM.Events
         {
             public static bool DebounceDuring100MsStatic()
             {
-                return Debouncer.DebounceHereStatic<DebouncingSample>(100);
+                return Debouncer.DebounceHereStatic<DebouncingSample> (100);
             }
 
             public bool DebounceDuring100Ms()
             {
-                return this.DebounceHere(100);
+                return this.DebounceHere (100);
             }
         }
 
@@ -40,13 +40,13 @@ namespace UnitTests.AM.Events
             WeakReference? sampleRef = null;
             WeakReference? sampleRef2 = null;
 
-            new Action(() =>
+            new Action (() =>
             {
                 var sample = new DebouncingSample();
                 var sample2 = new DebouncingSample();
 
-                sampleRef = new WeakReference(sample);
-                sampleRef2 = new WeakReference(sample2);
+                sampleRef = new WeakReference (sample);
+                sampleRef2 = new WeakReference (sample2);
 
                 sample.DebounceHere();
                 sample2.DebounceHere();
@@ -54,8 +54,8 @@ namespace UnitTests.AM.Events
 
             GC.Collect();
 
-            Assert.IsFalse(sampleRef!.IsAlive);
-            Assert.IsFalse(sampleRef2!.IsAlive);
+            Assert.IsFalse (sampleRef!.IsAlive);
+            Assert.IsFalse (sampleRef2!.IsAlive);
         }
 
         [TestMethod]
@@ -63,10 +63,10 @@ namespace UnitTests.AM.Events
         {
             var sample = new DebouncingSample();
 
-            Assert.IsFalse(LocalDebounce(sample));
-            Assert.IsTrue(LocalDebounce(sample));
+            Assert.IsFalse (LocalDebounce (sample));
+            Assert.IsTrue (LocalDebounce (sample));
 
-            static bool LocalDebounce(DebouncingSample sample) => sample.DebounceHere();
+            static bool LocalDebounce (DebouncingSample sample) => sample.DebounceHere();
         }
 
         [TestMethod]
@@ -74,14 +74,14 @@ namespace UnitTests.AM.Events
         {
             var sample = new DebouncingSample();
 
-            Assert.IsFalse(DebounceLocation1(sample));
-            Assert.IsFalse(DebounceLocation2(sample));
+            Assert.IsFalse (DebounceLocation1 (sample));
+            Assert.IsFalse (DebounceLocation2 (sample));
 
-            Assert.IsTrue(DebounceLocation1(sample));
-            Assert.IsTrue(DebounceLocation2(sample));
+            Assert.IsTrue (DebounceLocation1 (sample));
+            Assert.IsTrue (DebounceLocation2 (sample));
 
-            static bool DebounceLocation1(DebouncingSample sample) => sample.DebounceHere();
-            static bool DebounceLocation2(DebouncingSample sample) => sample.DebounceHere();
+            static bool DebounceLocation1 (DebouncingSample sample) => sample.DebounceHere();
+            static bool DebounceLocation2 (DebouncingSample sample) => sample.DebounceHere();
         }
 
         [TestMethod]
@@ -90,12 +90,12 @@ namespace UnitTests.AM.Events
             var sample = new DebouncingSample();
             var sample2 = new DebouncingSample();
 
-            Assert.IsFalse(SameLocationDebounce(sample));
-            Assert.IsFalse(SameLocationDebounce(sample2));
-            Assert.IsTrue(SameLocationDebounce(sample));
-            Assert.IsTrue(SameLocationDebounce(sample2));
+            Assert.IsFalse (SameLocationDebounce (sample));
+            Assert.IsFalse (SameLocationDebounce (sample2));
+            Assert.IsTrue (SameLocationDebounce (sample));
+            Assert.IsTrue (SameLocationDebounce (sample2));
 
-            static bool SameLocationDebounce(DebouncingSample sample) => sample.DebounceHere();
+            static bool SameLocationDebounce (DebouncingSample sample) => sample.DebounceHere();
         }
 
         [TestMethod]
@@ -103,8 +103,8 @@ namespace UnitTests.AM.Events
         {
             var testOk = true;
 
-            var thread1 = new Thread(Test);
-            var thread2 = new Thread(Test);
+            var thread1 = new Thread (Test);
+            var thread2 = new Thread (Test);
 
             thread1.Start();
             thread2.Start();
@@ -112,7 +112,7 @@ namespace UnitTests.AM.Events
             thread1.Join();
             thread2.Join();
 
-            Assert.IsTrue(testOk);
+            Assert.IsTrue (testOk);
 
             void Test()
             {
@@ -124,15 +124,15 @@ namespace UnitTests.AM.Events
                     testOk &= !sample.DebounceHere();
                     testOk &= !sample2.DebounceHere();
 
-                    testOk &= !SameLocationDebounce(sample);
-                    testOk &= !SameLocationDebounce(sample2);
+                    testOk &= !SameLocationDebounce (sample);
+                    testOk &= !SameLocationDebounce (sample2);
 
-                    testOk &= SameLocationDebounce(sample);
-                    testOk &= SameLocationDebounce(sample2);
+                    testOk &= SameLocationDebounce (sample);
+                    testOk &= SameLocationDebounce (sample2);
                 }
             }
 
-            static bool SameLocationDebounce(DebouncingSample sample) => sample.DebounceHere();
+            static bool SameLocationDebounce (DebouncingSample sample) => sample.DebounceHere();
         }
     }
 }

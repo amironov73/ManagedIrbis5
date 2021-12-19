@@ -3,10 +3,10 @@
 <Project>
 
   <PropertyGroup>
-    <Version>5.0.0.303</Version>
-    <AssemblyVersion>5.0.0.303</AssemblyVersion>
-    <PackageVersion>5.0.0.303</PackageVersion>
-    <InformationalVersion>5.0.0.303</InformationalVersion>
+    <Version>5.0.0.556</Version>
+    <AssemblyVersion>5.0.0.556</AssemblyVersion>
+    <PackageVersion>5.0.0.556</PackageVersion>
+    <InformationalVersion>5.0.0.556</InformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup>

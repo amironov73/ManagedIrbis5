@@ -15,19 +15,19 @@ namespace UnitTests.AM.Collections
         public void CloneableDictionary_Clone()
         {
             var source = new CloneableDictionary<int, string>
-                {
-                    { 1, "one" },
-                    { 2, "two" },
-                    { 3, "three" }
-                };
+            {
+                { 1, "one" },
+                { 2, "two" },
+                { 3, "three" }
+            };
 
-            var clone = (CloneableDictionary<int, string>) source.Clone();
+            var clone = (CloneableDictionary<int, string>)source.Clone();
 
-            Assert.AreEqual(source.Count, clone.Count);
+            Assert.AreEqual (source.Count, clone.Count);
             var keys = source.Keys;
             foreach (var key in keys)
             {
-                Assert.AreEqual(source[key], clone[key]);
+                Assert.AreEqual (source[key], clone[key]);
             }
         }
     }

@@ -3623,11 +3623,13 @@ namespace AM
             var converterFrom = TypeDescriptor.GetConverter (value);
             if (converterFrom.CanConvertTo (typeof (bool)))
             {
-                return (bool)converterFrom.ConvertTo
+                var converted = converterFrom.ConvertTo
                     (
                         value,
                         typeof (bool)
                     );
+
+                return converted is not null && (bool) converted;
             }
 
             Magna.Error

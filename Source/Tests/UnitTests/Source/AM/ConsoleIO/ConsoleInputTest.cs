@@ -16,9 +16,9 @@ namespace UnitTests.AM.ConsoleIO
         private static IConsoleDriver? _saveDriver;
 
         [ClassInitialize]
-        public static void Setup(TestContext context)
+        public static void Setup (TestContext context)
         {
-            _saveDriver = ConsoleInput.SetDriver(new NullConsole());
+            _saveDriver = ConsoleInput.SetDriver (new NullConsole());
         }
 
         [ClassCleanup]
@@ -26,7 +26,7 @@ namespace UnitTests.AM.ConsoleIO
         {
             if (_saveDriver is not null)
             {
-                ConsoleInput.SetDriver(_saveDriver);
+                ConsoleInput.SetDriver (_saveDriver);
             }
         }
 
@@ -34,74 +34,74 @@ namespace UnitTests.AM.ConsoleIO
         public void ConsoleInput_BackgroundColor_1()
         {
             ConsoleInput.BackgroundColor = ConsoleColor.Black;
-            Assert.AreEqual(ConsoleColor.Black, ConsoleInput.BackgroundColor);
+            Assert.AreEqual (ConsoleColor.Black, ConsoleInput.BackgroundColor);
         }
 
         [TestMethod]
         public void ConsoleInput_ForegroundColor_1()
         {
             ConsoleInput.ForegroundColor = ConsoleColor.Black;
-            Assert.AreEqual(ConsoleColor.Black, ConsoleInput.ForegroundColor);
+            Assert.AreEqual (ConsoleColor.Black, ConsoleInput.ForegroundColor);
         }
 
         [TestMethod]
         public void ConsoleInput_KeyAvailable_1()
         {
-            Assert.IsFalse(ConsoleInput.KeyAvailable);
+            Assert.IsFalse (ConsoleInput.KeyAvailable);
         }
 
         [TestMethod]
         public void ConsoleInput_Title_1()
         {
             ConsoleInput.Title = "Title";
-            Assert.AreEqual("Title", ConsoleInput.Title);
+            Assert.AreEqual ("Title", ConsoleInput.Title);
         }
 
         [TestMethod]
         public void ConsoleInput_Clear_1()
         {
             ConsoleInput.Clear();
-            Assert.IsTrue(true);
+            Assert.IsTrue (true);
         }
 
         [TestMethod]
         public void ConsoleInput_Read_1()
         {
-            Assert.AreEqual(-1, ConsoleInput.Read());
+            Assert.AreEqual (-1, ConsoleInput.Read());
         }
 
         [TestMethod]
         public void ConsoleInput_ReadKey_1()
         {
-            ConsoleKeyInfo info = ConsoleInput.ReadKey(false);
-            Assert.AreEqual((ConsoleKey)0, info.Key);
+            ConsoleKeyInfo info = ConsoleInput.ReadKey (false);
+            Assert.AreEqual ((ConsoleKey)0, info.Key);
         }
 
         [TestMethod]
         public void ConsoleInput_ReadLine_1()
         {
-            Assert.AreEqual(null, ConsoleInput.ReadLine());
+            Assert.AreEqual (null, ConsoleInput.ReadLine());
         }
 
         [TestMethod]
         public void ConsoleInput_Write_1()
         {
-            ConsoleInput.Write("Text");
-            Assert.IsTrue(true);
+            ConsoleInput.Write ("Text");
+            Assert.IsTrue (true);
         }
 
         [TestMethod]
         public void ConsoleInput_WriteLine_1()
         {
             ConsoleInput.WriteLine();
-            Assert.IsTrue(true);
+            Assert.IsTrue (true);
         }
 
         [TestMethod]
         public void ConsoleInput_WriteLine_2()
         {
-            ConsoleInput.WriteLine("Text");
-            Assert.IsTrue(true);
+            ConsoleInput.WriteLine ("Text");
+            Assert.IsTrue (true);
         }
     }
 }

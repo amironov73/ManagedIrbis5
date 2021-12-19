@@ -20,18 +20,19 @@ namespace UnitTests.AM.CommandLine
         {
             public string? Verb { get; set; }
             public string? Noun { get; set; }
+
             public override string ToString() =>
-                $"{nameof(Verb)}: {Verb}, {nameof(Noun)}: {Noun}";
+                $"{nameof (Verb)}: {Verb}, {nameof (Noun)}: {Noun}";
         }
 
         private Command GetCommand()
         {
-            return new RootCommand("HelloCmd")
+            return new RootCommand ("HelloCmd")
             {
-                new Argument<string>("input") { Arity = ArgumentArity.ZeroOrOne },
-                new Argument<string>("output") { Arity = ArgumentArity.ZeroOrOne },
-                new Option<string>("--verb", () => "Hello", "the verb"),
-                new Option<string>("--noun", () => "World", "the noun")
+                new Argument<string> ("input") { Arity = ArgumentArity.ZeroOrOne },
+                new Argument<string> ("output") { Arity = ArgumentArity.ZeroOrOne },
+                new Option<string> ("--verb", () => "Hello", "the verb"),
+                new Option<string> ("--noun", () => "World", "the noun")
             };
         }
 
@@ -45,9 +46,9 @@ namespace UnitTests.AM.CommandLine
         {
             var command = GetCommand();
             var arguments = GetArguments();
-            var hello = command.MapCommandResult<HelloClass>(arguments);
-            Assert.AreEqual("Hola", hello.Verb);
-            Assert.AreEqual("Irkutsk", hello.Noun);
+            var hello = command.MapCommandResult<HelloClass> (arguments);
+            Assert.AreEqual ("Hola", hello.Verb);
+            Assert.AreEqual ("Irkutsk", hello.Noun);
         }
 
         [TestMethod]
@@ -55,10 +56,9 @@ namespace UnitTests.AM.CommandLine
         {
             var command = GetCommand();
             var arguments = Array.Empty<string>();
-            var hello = command.MapCommandResult<HelloClass>(arguments);
-            Assert.AreEqual("Hello", hello.Verb);
-            Assert.AreEqual("World", hello.Noun);
+            var hello = command.MapCommandResult<HelloClass> (arguments);
+            Assert.AreEqual ("Hello", hello.Verb);
+            Assert.AreEqual ("World", hello.Noun);
         }
-
     }
 }

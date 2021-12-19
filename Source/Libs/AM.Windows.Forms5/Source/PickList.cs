@@ -173,7 +173,7 @@ namespace AM.Windows.Forms
                 DragEventArgs e
             )
         {
-            var obj = e.Data.GetData(typeof(ListBox));
+            var obj = e.Data!.GetData(typeof(ListBox));
             if (obj == _selected)
             {
                 e.Effect = DragDropEffects.Move;
@@ -195,7 +195,7 @@ namespace AM.Windows.Forms
                 DragEventArgs e
             )
         {
-            var obj = e.Data.GetData(typeof(ListBox));
+            var obj = e.Data!.GetData(typeof(ListBox));
             if (obj == _available)
             {
                 e.Effect = DragDropEffects.Move;

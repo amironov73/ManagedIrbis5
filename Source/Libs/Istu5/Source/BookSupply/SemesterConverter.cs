@@ -37,49 +37,55 @@ namespace Istu.BookSupply
         /// <inheritdoc cref="TypeConverter.CanConvertFrom(ITypeDescriptorContext,Type)"/>
         public override bool CanConvertFrom
             (
-                ITypeDescriptorContext context,
+                ITypeDescriptorContext? context,
                 Type sourceType
             )
-            => sourceType == typeof (string) || base.CanConvertFrom (context, sourceType);
+        {
+            return sourceType == typeof (string) || base.CanConvertFrom (context, sourceType);
+        }
 
 
         /// <inheritdoc cref="TypeConverter.CanConvertTo(ITypeDescriptorContext,Type)"/>
         public override bool CanConvertTo
             (
-                ITypeDescriptorContext context,
-                Type destinationType
+                ITypeDescriptorContext? context,
+                Type? destinationType
             )
-            => destinationType == typeof (string) || base.CanConvertTo (context, destinationType);
+        {
+            return destinationType == typeof (string) || base.CanConvertTo (context, destinationType);
+        }
 
         /// <inheritdoc cref="TypeConverter.ConvertFrom(ITypeDescriptorContext,CultureInfo,object)"/>
         public override object ConvertFrom
             (
-                ITypeDescriptorContext context,
-                CultureInfo culture,
+                ITypeDescriptorContext? context,
+                CultureInfo? culture,
                 object? value
             )
-            => value switch
+        {
+            return value switch
             {
                 string text => SemesterUtility.Parse (text),
 
-                _ => base.ConvertFrom (context, culture, value).ThrowIfNull()
+                _ => base.ConvertFrom (context, culture, value!).ThrowIfNull()
             };
+        }
 
         /// <inheritdoc cref="TypeConverter.ConvertTo(ITypeDescriptorContext,CultureInfo,object,Type)"/>
         public override object ConvertTo
             (
-                ITypeDescriptorContext context,
-                CultureInfo culture,
+                ITypeDescriptorContext? context,
+                CultureInfo? culture,
                 object? value,
                 Type destinationType
             )
-            => value is Semester semester
+        {
+            return value is Semester semester
                 ? SemesterUtility.ToString (semester)
                 : base.ConvertTo (context, culture, value, destinationType)
                     .ThrowIfNull();
+        }
 
         #endregion
-
-    } // class SemesterConverter
-
-} // namespace Istu.BookSupply
+    }
+}

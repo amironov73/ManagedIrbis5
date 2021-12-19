@@ -8,14 +8,18 @@
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
-/* UniforPlus3.cs --
+/* UniforPlus3.cs -- работа со строками
  * Ars Magna project, http://arsmagna.ru
  */
+
+// CS0618: Use of obsolete symbol
+#pragma warning disable CS0618
 
 #region Using directives
 
 using System;
 using System.IO;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -527,8 +531,8 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             var content = string.Empty;
             try
             {
-                var client = new System.Net.WebClient();
-                content = client.DownloadString(expression);
+                using var client = new HttpClient();
+                content = client.GetStringAsync (expression).Result;
             }
             catch (Exception exception)
             {

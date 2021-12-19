@@ -51,12 +51,12 @@ namespace AM.Security
             }
 
             var rawData = stream.ReadToEnd();
-            var result = new X509Certificate();
-            result.Import (rawData);
+            var result = new X509Certificate (rawData, "nH38RavkcNLr");
+            // new X509Certificate();
+            // result.Import (rawData);
 
             return result;
-
-        } // method GetSslSertificate
+        }
 
         /// <summary>
         /// Получение сертификата для указанного субъекта
@@ -81,8 +81,7 @@ namespace AM.Security
             }
 
             throw new ArsMagnaException();
-
-        } // method GetRootSertificate
+        }
 
         /// <summary>
         /// Простое шифрование текста до неузнаваемости.
@@ -98,7 +97,7 @@ namespace AM.Security
             )
         {
             var plainBytes = Encoding.UTF8.GetBytes (secretText);
-            var symmetricAlgorithm = Rijndael.Create();
+            var symmetricAlgorithm = Aes.Create();
             var passwordBytes = new Rfc2898DeriveBytes (password, new byte[16])
                 .GetBytes (16);
 
@@ -134,7 +133,7 @@ namespace AM.Security
             )
         {
             var encryptedBytes = Convert.FromBase64String (encryptedText);
-            var symmetricAlgorithm = Rijndael.Create();
+            var symmetricAlgorithm = Aes.Create();
             var passwordBytes = new Rfc2898DeriveBytes (password, new byte[16])
                 .GetBytes (16);
 

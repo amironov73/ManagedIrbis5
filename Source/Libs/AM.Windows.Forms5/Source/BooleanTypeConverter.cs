@@ -35,28 +35,27 @@ namespace AM.Windows.Forms
         /// <inheritdoc cref="TypeConverter.ConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,object,System.Type)"/>
         public override object ConvertTo
             (
-                ITypeDescriptorContext context,
-                CultureInfo culture,
-                object value,
+                ITypeDescriptorContext? context,
+                CultureInfo? culture,
+                object? value,
                 Type destType
             )
         {
-            return (bool) value ? "Да" : "Нет";
-        } // method ConvertTo
+            return (bool) (value ?? false) ? "Да" : "Нет";
+        }
 
         /// <inheritdoc cref="TypeConverter.ConvertFrom(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,object)"/>
         public override object ConvertFrom
             (
-                ITypeDescriptorContext context,
-                CultureInfo culture,
+                ITypeDescriptorContext? context,
+                CultureInfo? culture,
                 object value
             )
         {
             return string.Compare((string) value, "Да", StringComparison.OrdinalIgnoreCase) == 0;
-        } // method ConvertFrom
+        }
 
         #endregion
 
-    } // class BooleanTypeConverter
-
-} // namespace AM.Windows.Forms
+    }
+}

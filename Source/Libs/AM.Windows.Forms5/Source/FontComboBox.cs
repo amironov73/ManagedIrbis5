@@ -100,7 +100,7 @@ namespace AM.Windows.Forms
 
         private void _DrawItem
             (
-                object sender,
+                object? sender,
                 DrawItemEventArgs e
             )
         {

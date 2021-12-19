@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* ListBoxEx.cs -- ListBox with drag-drop support
+/* ListBoxEx.cs -- ListBox с поддержкой drag-drop
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,16 +26,16 @@ using System.Windows.Forms;
 namespace AM.Windows.Forms
 {
     /// <summary>
-    /// <see cref="ListBox"/> with drag-drop support
+    /// <see cref="ListBox"/> с поддержкой drag-drop.
     /// </summary>
-    [System.ComponentModel.DesignerCategory("Code")]
+    [System.ComponentModel.DesignerCategory ("Code")]
     public sealed class ListBoxEx
         : ListBox
     {
         #region Construction
 
         /// <summary>
-        /// Constructor.
+        /// Конструктор.
         /// </summary>
         public ListBoxEx()
         {
@@ -46,69 +46,60 @@ namespace AM.Windows.Forms
 
         #region Control members
 
-        /// <summary>
-        /// Raises the
-        /// <see cref="E:System.Windows.Forms.Control.DragDrop"/>
-        /// event.
-        /// </summary>
+        /// <inheritdoc cref="Control.OnDragDrop"/>
         protected override void OnDragDrop
             (
                 DragEventArgs dragEvent
             )
         {
-            base.OnDragDrop(dragEvent);
+            base.OnDragDrop (dragEvent);
             if (Items.Count == 0)
             {
                 return;
             }
-            ArrayList sel = new ArrayList(SelectedItems);
-            Point pt = PointToClient(new Point(dragEvent.X, dragEvent.Y));
-            int index = IndexFromPoint(pt);
+
+            ArrayList sel = new ArrayList (SelectedItems);
+            Point pt = PointToClient (new Point (dragEvent.X, dragEvent.Y));
+            int index = IndexFromPoint (pt);
             if (index < 0)
             {
                 index = Items.Count - 1;
             }
+
             foreach (object obj in sel)
             {
-                Items.Remove(obj);
+                Items.Remove (obj);
             }
+
             foreach (object obj in sel)
             {
                 //Items.Add ( obj );
-                Items.Insert(index, obj);
+                Items.Insert (index, obj);
             }
         }
 
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Control.DragEnter"/>
-        /// event.
-        /// </summary>
+        /// <inheritdoc cref="Control.OnDragEnter"/>
         protected override void OnDragEnter
             (
                 DragEventArgs dragEvent
             )
         {
-            base.OnDragEnter(dragEvent);
-            object obj = dragEvent.Data.GetData(typeof(ListBoxEx));
+            base.OnDragEnter (dragEvent);
+            var obj = dragEvent.Data!.GetData (typeof (ListBoxEx));
             if (obj == this)
             {
                 dragEvent.Effect = DragDropEffects.Move;
             }
         }
 
-        /// <summary>
-        /// Raises the <see cref="E:System.Windows.Forms.Control.MouseDown"/>
-        /// event.
-        /// </summary>
-        /// <param name="e">A <see cref="MouseEventArgs"/>
-        /// that contains the event data.</param>
+        ///<inheritdoc cref="Control.OnMouseDown"/>
         protected override void OnMouseDown
             (
                 MouseEventArgs e
             )
         {
-            base.OnMouseDown(e);
-            DoDragDrop(this, DragDropEffects.Move);
+            base.OnMouseDown (e);
+            DoDragDrop (this, DragDropEffects.Move);
         }
 
         #endregion

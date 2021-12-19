@@ -15,12 +15,12 @@ namespace UnitTests.AM.Collections
     [TestClass]
     public unsafe class ValueListTest
     {
-        private static T[] Get<T>(ReadOnlySpan<char> span)
+        private static T[] Get<T> (ReadOnlySpan<char> span)
         {
             T[] result = new T[span.Length];
             for (var i = 0; i < span.Length; i++)
             {
-                result[i] = (T) Convert.ChangeType(span[i], typeof(T));
+                result[i] = (T)Convert.ChangeType (span[i], typeof (T));
             }
 
             return result;
@@ -31,7 +31,7 @@ namespace UnitTests.AM.Collections
                 Span<T> one,
                 Span<T> two
             )
-            where T: IEquatable<T>
+            where T : IEquatable<T>
         {
             if (one.Length != two.Length)
             {
@@ -40,11 +40,10 @@ namespace UnitTests.AM.Collections
 
             for (var i = 0; i < one.Length; i++)
             {
-                if (!one[i].Equals(two[i]))
+                if (!one[i].Equals (two[i]))
                 {
                     return false;
                 }
-
             }
 
             return true;
@@ -55,11 +54,11 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            Assert.AreEqual(0, list.Length);
-            Assert.AreEqual(bufferLength, list.Capacity);
-            Assert.AreEqual(0, list.ToArray().Length);
+            Assert.AreEqual (0, list.Length);
+            Assert.AreEqual (bufferLength, list.Capacity);
+            Assert.AreEqual (0, list.ToArray().Length);
         }
 
         [TestMethod]
@@ -67,19 +66,19 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            list.Append('H');
-            Assert.AreEqual(1, list.Length);
-            list.Append('e');
-            Assert.AreEqual(2, list.Length);
-            list.Append('l');
-            Assert.AreEqual(3, list.Length);
-            list.Append('l');
-            Assert.AreEqual(4, list.Length);
-            list.Append('o');
-            Assert.AreEqual(5, list.Length);
-            Assert.IsTrue(Same<int>
+            list.Append ('H');
+            Assert.AreEqual (1, list.Length);
+            list.Append ('e');
+            Assert.AreEqual (2, list.Length);
+            list.Append ('l');
+            Assert.AreEqual (3, list.Length);
+            list.Append ('l');
+            Assert.AreEqual (4, list.Length);
+            list.Append ('o');
+            Assert.AreEqual (5, list.Length);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> ("Hello"),
                     list.ToArray()
@@ -91,13 +90,13 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            list.Append(Get<int>("Hello, "));
-            Assert.AreEqual(7, list.Length);
-            list.Append(Get<int>("world!"));
-            Assert.AreEqual(13, list.Length);
-            Assert.IsTrue(Same<int>
+            list.Append (Get<int> ("Hello, "));
+            Assert.AreEqual (7, list.Length);
+            list.Append (Get<int> ("world!"));
+            Assert.AreEqual (13, list.Length);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> ("Hello, world!"),
                     list.ToArray()
@@ -109,11 +108,11 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            list.Append(Get<int>("Hello, "), Get<int>("world!"));
-            Assert.AreEqual(13, list.Length);
-            Assert.IsTrue(Same<int>
+            list.Append (Get<int> ("Hello, "), Get<int> ("world!"));
+            Assert.AreEqual (13, list.Length);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> ("Hello, world!"),
                     list.ToArray()
@@ -125,12 +124,12 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
-            var longString = new string('x', 80);
+            var list = new ValueList<int> (buffer);
+            var longString = new string ('x', 80);
 
-            list.Append(Get<int>(longString));
-            Assert.AreEqual(longString.Length, list.Length);
-            Assert.IsTrue(Same<int>
+            list.Append (Get<int> (longString));
+            Assert.AreEqual (longString.Length, list.Length);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> (longString),
                     list.ToArray()
@@ -142,12 +141,12 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
-            var longString = new string('x', 80);
+            var list = new ValueList<int> (buffer);
+            var longString = new string ('x', 80);
 
-            list.Append(Get<int>(longString), Get<int>(longString));
-            Assert.AreEqual(longString.Length * 2, list.Length);
-            Assert.IsTrue(Same<int>
+            list.Append (Get<int> (longString), Get<int> (longString));
+            Assert.AreEqual (longString.Length * 2, list.Length);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> (longString + longString),
                     list.ToArray()
@@ -159,13 +158,13 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
-            var longString = new string('x', 80);
+            var list = new ValueList<int> (buffer);
+            var longString = new string ('x', 80);
 
-            list.Append(Get<int>(longString));
-            list.Append(Get<int>(longString));
-            Assert.AreEqual(longString.Length * 2, list.Length);
-            Assert.IsTrue(Same<int>
+            list.Append (Get<int> (longString));
+            list.Append (Get<int> (longString));
+            Assert.AreEqual (longString.Length * 2, list.Length);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> (longString + longString),
                     list.ToArray()
@@ -177,13 +176,13 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
-            var longString = new string('x', 80);
+            var list = new ValueList<int> (buffer);
+            var longString = new string ('x', 80);
 
-            list.Append(Get<int>(longString), Get<int>(longString),
-                Get<int>(longString));
-            Assert.AreEqual(longString.Length * 3, list.Length);
-            Assert.IsTrue(Same<int>
+            list.Append (Get<int> (longString), Get<int> (longString),
+                Get<int> (longString));
+            Assert.AreEqual (longString.Length * 3, list.Length);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> (longString + longString + longString),
                     list.ToArray()
@@ -195,17 +194,17 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
             for (var i = 0; i < 100; i++)
             {
-                list.Append('x');
+                list.Append ('x');
             }
 
-            Assert.AreEqual(100, list.Length);
-            Assert.IsTrue(Same<int>
+            Assert.AreEqual (100, list.Length);
+            Assert.IsTrue (Same<int>
                 (
-                    Get<int> (new string('x', 100)),
+                    Get<int> (new string ('x', 100)),
                     list.ToArray()
                 ));
         }
@@ -215,14 +214,14 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            buffer.Fill('x');
+            buffer.Fill ('x');
             list.Length = 5;
-            Assert.AreEqual(5, list.Length);
-            Assert.IsTrue(Same<int>
+            Assert.AreEqual (5, list.Length);
+            Assert.IsTrue (Same<int>
                 (
-                    Get<int> (new string('x', 5)),
+                    Get<int> (new string ('x', 5)),
                     list.ToArray()
                 ));
         }
@@ -232,10 +231,10 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            buffer.Fill('x');
-            Assert.AreEqual('x', list.RawBuffer[0]);
+            buffer.Fill ('x');
+            Assert.AreEqual ('x', list.RawBuffer[0]);
         }
 
         [TestMethod]
@@ -243,14 +242,14 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            buffer.Fill('x');
-            Assert.AreEqual('x', list[1]);
+            buffer.Fill ('x');
+            Assert.AreEqual ('x', list[1]);
             list[1] = 'X';
-            Assert.AreEqual('X', list[1]);
+            Assert.AreEqual ('X', list[1]);
             list.Length = 2;
-            Assert.IsTrue(Same<int>
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> ("xX"),
                     list.ToArray()
@@ -262,10 +261,10 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            list.EnsureCapacity(100);
-            Assert.IsTrue(100 <= list.Capacity);
+            list.EnsureCapacity (100);
+            Assert.IsTrue (100 <= list.Capacity);
             list.Dispose();
         }
 
@@ -274,11 +273,11 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            list.Append(Get<int>("Hello, world"));
-            var span = list.AsSpan(7);
-            Assert.IsTrue(Same<int>
+            list.Append (Get<int> ("Hello, world"));
+            var span = list.AsSpan (7);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> ("world"),
                     span.ToArray()
@@ -291,11 +290,11 @@ namespace UnitTests.AM.Collections
         {
             const int bufferLength = 16;
             Span<int> buffer = stackalloc int[bufferLength];
-            var list = new ValueList<int>(buffer);
+            var list = new ValueList<int> (buffer);
 
-            list.Append(Get<int>("Hello, world"));
-            var span = list.AsSpan(0, 5);
-            Assert.IsTrue(Same<int>
+            list.Append (Get<int> ("Hello, world"));
+            var span = list.AsSpan (0, 5);
+            Assert.IsTrue (Same<int>
                 (
                     Get<int> ("Hello"),
                     span.ToArray()

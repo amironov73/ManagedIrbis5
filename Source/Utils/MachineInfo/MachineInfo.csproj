@@ -2,15 +2,9 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net5.0-windows</TargetFramework>
+        <TargetFramework>net6.0-windows</TargetFramework>
         <UseWindowsForms>true</UseWindowsForms>
         <ApplicationIcon>MachineInfo.ico</ApplicationIcon>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Compile Update="MainForm.cs">
-        <SubType>Form</SubType>
-      </Compile>
-    </ItemGroup>
     
 </Project>

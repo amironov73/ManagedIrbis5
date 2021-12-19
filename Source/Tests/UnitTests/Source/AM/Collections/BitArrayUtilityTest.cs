@@ -16,16 +16,16 @@ namespace UnitTests.AM.Collections
         [TestMethod]
         public void BitArrayUtility_AreEqual_1()
         {
-            var left = new BitArray(10) { [1] = true };
-            var right = new BitArray(10) { [1] = true };
+            var left = new BitArray (10) { [1] = true };
+            var right = new BitArray (10) { [1] = true };
 
-            Assert.IsTrue(BitArrayUtility.AreEqual(left, right));
+            Assert.IsTrue (BitArrayUtility.AreEqual (left, right));
 
             right[2] = true;
-            Assert.IsFalse(BitArrayUtility.AreEqual(left, right));
+            Assert.IsFalse (BitArrayUtility.AreEqual (left, right));
 
-            right = new BitArray(11) { [1] = true };
-            Assert.IsFalse(BitArrayUtility.AreEqual(left, right));
+            right = new BitArray (11) { [1] = true };
+            Assert.IsFalse (BitArrayUtility.AreEqual (left, right));
         }
     }
 }

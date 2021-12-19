@@ -23,10 +23,10 @@ namespace UnitTests.AM.Globalization
 
             using (CultureSaver.ForTesting())
             {
-                Assert.AreEqual(CultureCode.AmericanEnglish, CultureInfo.CurrentCulture.Name);
+                Assert.AreEqual (CultureCode.AmericanEnglish, CultureInfo.CurrentCulture.Name);
             }
 
-            Assert.AreEqual(saved, CultureInfo.CurrentCulture.Name);
+            Assert.AreEqual (saved, CultureInfo.CurrentCulture.Name);
         }
     }
 }

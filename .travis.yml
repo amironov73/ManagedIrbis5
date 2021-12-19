@@ -13,7 +13,7 @@ solution: ManagedIrbis5.sln
 
 mono: none
 
-dotnet: 5.0
+dotnet: 6.0
 
 script:
   - echo ${VERSION}

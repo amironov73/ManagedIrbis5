@@ -38,7 +38,7 @@ namespace UnitTests.AM.Collections
 
             collection.Dispose();
 
-            Assert.AreEqual(3, _count);
+            Assert.AreEqual (3, _count);
         }
     }
 }

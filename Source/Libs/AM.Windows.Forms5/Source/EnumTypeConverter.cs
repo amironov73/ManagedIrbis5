@@ -41,7 +41,7 @@ namespace AM.Windows.Forms
         /// </returns>
         public override bool CanConvertFrom
             (
-                ITypeDescriptorContext context,
+                ITypeDescriptorContext? context,
                 Type sourceType
             )
         {
@@ -70,8 +70,8 @@ namespace AM.Windows.Forms
         /// </returns>
         public override bool CanConvertTo
             (
-                ITypeDescriptorContext context,
-                Type destinationType
+                ITypeDescriptorContext? context,
+                Type? destinationType
             )
         {
             if ((destinationType == typeof(string))
@@ -95,8 +95,8 @@ namespace AM.Windows.Forms
         /// <exception cref="T:System.NotSupportedException">The conversion cannot be performed. </exception>
         public override object? ConvertFrom
             (
-                ITypeDescriptorContext context,
-                CultureInfo culture,
+                ITypeDescriptorContext? context,
+                CultureInfo? culture,
                 object value
             )
         {
@@ -133,9 +133,9 @@ namespace AM.Windows.Forms
         /// <exception cref="T:System.ArgumentNullException">The destinationType parameter is null. </exception>
         public override object? ConvertTo
             (
-                ITypeDescriptorContext context,
-                CultureInfo culture,
-                object value,
+                ITypeDescriptorContext? context,
+                CultureInfo? culture,
+                object? value,
                 Type destinationType
             )
         {

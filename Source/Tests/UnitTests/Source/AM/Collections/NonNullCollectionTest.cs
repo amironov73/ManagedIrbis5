@@ -22,29 +22,29 @@ namespace UnitTests.AM.Collections
         public void NonNullCollection_Construction_1()
         {
             var collection = new NonNullCollection<object>();
-            Assert.IsNotNull(collection);
-            Assert.AreEqual(0, collection.Count);
+            Assert.IsNotNull (collection);
+            Assert.AreEqual (0, collection.Count);
         }
 
         [TestMethod]
         public void NonNullCollection_Add_1()
         {
             var collection = new NonNullCollection<object>
-                {
-                    new object()
-                };
-            Assert.AreEqual(1, collection.Count);
+            {
+                new object()
+            };
+            Assert.AreEqual (1, collection.Count);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException (typeof (ArgumentNullException))]
         public void NonNullCollection_Add_2()
         {
             var collection = new NonNullCollection<object>
             {
                 null!
             };
-            Assert.AreEqual(0, collection.Count);
+            Assert.AreEqual (0, collection.Count);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace UnitTests.AM.Collections
                         new object()
                     }
                 );
-            Assert.AreEqual(3, collection.Count);
+            Assert.AreEqual (3, collection.Count);
         }
 
         [TestMethod]
@@ -71,14 +71,14 @@ namespace UnitTests.AM.Collections
                 = new NonNullCollection<object>();
             collection.AddRange
                 (
-                    (IEnumerable<object>) new[]
+                    (IEnumerable<object>)new[]
                     {
                         new object(),
                         new object(),
                         new object()
                     }
                 );
-            Assert.AreEqual(3, collection.Count);
+            Assert.AreEqual (3, collection.Count);
         }
 
         [TestMethod]
@@ -88,18 +88,18 @@ namespace UnitTests.AM.Collections
                 = new NonNullCollection<object>();
             collection.AddRange
                 (
-                    (IList<object>) new[]
+                    (IList<object>)new[]
                     {
                         new object(),
                         new object(),
                         new object()
                     }
                 );
-            Assert.AreEqual(3, collection.Count);
+            Assert.AreEqual (3, collection.Count);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException (typeof (ArgumentNullException))]
         public void NonNullCollection_AddRange_4()
         {
             var collection
@@ -125,29 +125,29 @@ namespace UnitTests.AM.Collections
                 };
 
             collection.Clear();
-            Assert.AreEqual(0, collection.Count);
+            Assert.AreEqual (0, collection.Count);
         }
 
         [TestMethod]
         public void NonNullCollection_Indexer_1()
         {
             var collection = new NonNullCollection<object>
-                {
-                    new object()
-                };
+            {
+                new object()
+            };
             collection[0] = 1;
-            Assert.AreEqual(1, collection[0]);
+            Assert.AreEqual (1, collection[0]);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException (typeof (ArgumentNullException))]
         public void NonNullCollection_Indexer_2()
         {
             var collection = new NonNullCollection<object>
-                {
-                    new object()
-                };
-            Assert.IsNotNull(collection);
+            {
+                new object()
+            };
+            Assert.IsNotNull (collection);
             collection[0] = null!;
         }
 
@@ -158,8 +158,8 @@ namespace UnitTests.AM.Collections
             {
                 new object()
             };
-            collection.EnsureCapacity(100);
-            Assert.IsTrue(collection.Capacity >= 100);
+            collection.EnsureCapacity (100);
+            Assert.IsTrue (collection.Capacity >= 100);
         }
 
         [TestMethod]
@@ -167,29 +167,29 @@ namespace UnitTests.AM.Collections
         {
             var collection = new NonNullCollection<string>();
             var array = collection.ToArray();
-            Assert.AreEqual(0, array.Length);
+            Assert.AreEqual (0, array.Length);
         }
 
         [TestMethod]
         public void NonNullCollection_ToArray_2()
         {
             var collection = new NonNullCollection<string>();
-            collection.Add("hello");
+            collection.Add ("hello");
             var array = collection.ToArray();
-            Assert.AreEqual(1, array.Length);
-            Assert.AreEqual("hello", array[0]);
+            Assert.AreEqual (1, array.Length);
+            Assert.AreEqual ("hello", array[0]);
         }
 
         [TestMethod]
         public void NonNullCollection_ToArray_3()
         {
             var collection = new NonNullCollection<string>();
-            collection.Add("hello");
-            collection.Add("world");
+            collection.Add ("hello");
+            collection.Add ("world");
             var array = collection.ToArray();
-            Assert.AreEqual(2, array.Length);
-            Assert.AreEqual("hello", array[0]);
-            Assert.AreEqual("world", array[1]);
+            Assert.AreEqual (2, array.Length);
+            Assert.AreEqual ("hello", array[0]);
+            Assert.AreEqual ("world", array[1]);
         }
     }
 }

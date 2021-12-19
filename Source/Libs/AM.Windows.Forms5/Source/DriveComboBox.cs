@@ -263,7 +263,7 @@ namespace AM.Windows.Forms
 
             using (Brush brush = new SolidBrush(e.ForeColor))
             {
-                graphics.DrawString(text, e.Font, brush, rect);
+                graphics.DrawString(text, e.Font!, brush, rect);
             }
 
             e.DrawFocusRectangle();

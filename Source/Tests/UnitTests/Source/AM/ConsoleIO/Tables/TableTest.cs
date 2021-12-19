@@ -24,17 +24,18 @@ namespace UnitTests.AM.ConsoleIO.Tables
         public void Table_ToString_1()
         {
             var table = new Table();
-            table.AddColumn("Name")
-                .AddColumn("Age");
+            table.AddColumn ("Name")
+                .AddColumn ("Age");
 
-            table.AddRow("Sharik", 1)
-                .AddRow("Matroskin", 2)
-                .AddRow("Fyodor", 12);
+            table.AddRow ("Sharik", 1)
+                .AddRow ("Matroskin", 2)
+                .AddRow ("Fyodor", 12);
 
-            const string expected = "| Name      | Age |\n|-----------|-----|\n| Sharik    | 1   |\n| Matroskin | 2   |\n| Fyodor    | 12  |\n";
+            const string expected =
+                "| Name      | Age |\n|-----------|-----|\n| Sharik    | 1   |\n| Matroskin | 2   |\n| Fyodor    | 12  |\n";
             var actual = table.ToString().DosToUnix();
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual (expected, actual);
         }
 
         [TestMethod]
@@ -42,17 +43,18 @@ namespace UnitTests.AM.ConsoleIO.Tables
         {
             var persons = new Person[]
             {
-                new() { Name = "Sharik", Age = 1 },
-                new() { Name = "Matroskin", Age = 2 },
-                new() { Name = "Fyodor", Age = 12 },
+                new () { Name = "Sharik", Age = 1 },
+                new () { Name = "Matroskin", Age = 2 },
+                new () { Name = "Fyodor", Age = 12 },
             };
 
-            var table = Table.From(persons);
+            var table = Table.From (persons);
 
-            const string expected = "| Name      | Age |\n|-----------|-----|\n| Sharik    | 1   |\n| Matroskin | 2   |\n| Fyodor    | 12  |\n";
+            const string expected =
+                "| Name      | Age |\n|-----------|-----|\n| Sharik    | 1   |\n| Matroskin | 2   |\n| Fyodor    | 12  |\n";
             var actual = table.ToString().DosToUnix();
 
-            Assert.AreEqual(expected, actual);
+            Assert.AreEqual (expected, actual);
         }
     }
 }

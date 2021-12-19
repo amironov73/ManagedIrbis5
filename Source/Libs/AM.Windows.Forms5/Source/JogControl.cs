@@ -113,8 +113,8 @@ namespace AM.Windows.Forms
         {
             DoubleBuffered = true;
             ResizeRedraw = true;
-            ColorConverter cc = new ColorConverter();
-            _coolColor = (Color)cc.ConvertFromString(CoolColorName);
+            var cc = new ColorConverter();
+            _coolColor = (Color) cc.ConvertFromString (CoolColorName)!;
         }
 
         #endregion
@@ -129,16 +129,16 @@ namespace AM.Windows.Forms
                 PaintEventArgs e
             )
         {
-            Graphics g = e.Graphics;
+            var g = e.Graphics;
             g.SmoothingMode = SmoothingMode.HighQuality;
-            Rectangle r = ClientRectangle;
+            var r = ClientRectangle;
             r.Width--;
             r.Height--;
             //Color coolColor = Color.FromArgb ( 60, 20, 20 );
-            using (GraphicsPath path = new GraphicsPath())
+            using (var path = new GraphicsPath())
             {
                 path.AddEllipse(r);
-                using (PathGradientBrush brush =
+                using (var brush =
                     new PathGradientBrush(path))
                 {
                     brush.CenterColor = Color.LightGray;
@@ -155,9 +155,9 @@ namespace AM.Windows.Forms
             r.Width /= 2;
             r.Height /= 2;
             g.TranslateTransform(r.Width, r.Height);
-            GraphicsState state = g.Save();
+            var state = g.Save();
             g.RotateTransform(Angle);
-            for (float a = 0f; a < 360f; a += 10f)
+            for (var a = 0f; a < 360f; a += 10f)
             {
                 g.RotateTransform(10f);
                 g.DrawLine(Pens.Gray,
@@ -167,25 +167,25 @@ namespace AM.Windows.Forms
                              r.Height * 9 / 10);
             }
             g.Restore(state);
-            int x = (int)(r.Width
-                            * Math.Sin(Math.PI * _angle / 180f) * 0.8);
-            int y = (int)(-(double)r.Height
-                            * Math.Cos(Math.PI * _angle / 180f) * 0.8);
-            int x2 = (int)(r.Width
-                             * Math.Sin(Math.PI * _angle / 180f) * 0.5);
-            int y2 = (int)(-(double)r.Height
-                             * Math.Cos(Math.PI * _angle / 180f) * 0.5);
-            int dx = r.Width / 3;
-            int dy = r.Height / 3;
-            Rectangle r2 = new Rectangle(x - dx / 2, y - dy / 2, dx, dy);
-            Rectangle r3 = new Rectangle(-r.Width, -r.Height, Width, Height);
-            using (LinearGradientBrush brush = new LinearGradientBrush(
+            var x = (int)(r.Width
+                          * Math.Sin(Math.PI * _angle / 180f) * 0.8);
+            var y = (int)(-(double)r.Height
+                          * Math.Cos(Math.PI * _angle / 180f) * 0.8);
+            var x2 = (int)(r.Width
+                           * Math.Sin(Math.PI * _angle / 180f) * 0.5);
+            var y2 = (int)(-(double)r.Height
+                           * Math.Cos(Math.PI * _angle / 180f) * 0.5);
+            var dx = r.Width / 3;
+            var dy = r.Height / 3;
+            var r2 = new Rectangle(x - dx / 2, y - dy / 2, dx, dy);
+            var r3 = new Rectangle(-r.Width, -r.Height, Width, Height);
+            using (var brush = new LinearGradientBrush(
                 r2, _coolColor, Color.LightGray, 45f))
             {
-                using (LinearGradientBrush brush2 = new LinearGradientBrush(
+                using (var brush2 = new LinearGradientBrush(
                     r3, _coolColor, Color.LightGray, 45f))
                 {
-                    using (Pen pen = new Pen(brush2, dx / 3))
+                    using (var pen = new Pen(brush2, dx / 3))
                     {
                         pen.StartCap = LineCap.Round;
                         pen.EndCap = LineCap.Round;
@@ -223,8 +223,8 @@ namespace AM.Windows.Forms
         {
             if (Capture)
             {
-                float x = e.X - (float)Width / 2;
-                float y = e.Y - (float)Height / 2;
+                var x = e.X - (float)Width / 2;
+                var y = e.Y - (float)Height / 2;
 
                 // ReSharper disable CompareOfFloatsByEqualityOperator
                 if (x == 0) //-V3024
@@ -244,7 +244,7 @@ namespace AM.Windows.Forms
         /// </summary>
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            float delta = e.Delta / 30f;
+            var delta = e.Delta / 30f;
             Angle -= delta;
             base.OnMouseWheel(e);
         }
@@ -262,7 +262,7 @@ namespace AM.Windows.Forms
                 BoundsSpecified specified
             )
         {
-            int max = Math.Max(width, height);
+            var max = Math.Max(width, height);
             base.SetBoundsCore(x, y, max, max, specified);
         }
 

@@ -18,6 +18,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 
 using AM;
@@ -45,10 +46,10 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
                 string address
             )
         {
-            using var client = new System.Net.WebClient();
+            using var client = new HttpClient();
             try
             {
-                client.DownloadString (address);
+                client.GetAsync (address).GetAwaiter().GetResult();
 
                 return true;
             }
@@ -56,7 +57,7 @@ namespace ManagedIrbis.Pft.Infrastructure.Unifors
             {
                 Magna.TraceException
                     (
-                        "UniforPlus9::_CheckUrlExist",
+                        nameof (UniforPlus9) + "::" + nameof (_CheckUrlExist),
                         exception
                     );
             }

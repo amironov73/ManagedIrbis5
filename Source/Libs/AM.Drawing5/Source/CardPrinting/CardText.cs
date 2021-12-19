@@ -104,7 +104,7 @@ namespace AM.Drawing.CardPrinting
                 using var font = (Font) fontConverter.ConvertFromString(Font)
                     .ThrowIfNull("fontConverter.ConvertFromString");
                 var colorConverter = new ColorConverter();
-                var color = (Color) colorConverter.ConvertFromString(Color);
+                var color = (Color) colorConverter.ConvertFromString (Color)!;
                 var text = context.ExpandText(Text);
                 using var brush = new SolidBrush(color);
                 var rectangle = new Rectangle(Left, Top, Width, Height);

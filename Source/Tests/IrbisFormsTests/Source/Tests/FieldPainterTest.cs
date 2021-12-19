@@ -45,7 +45,7 @@ namespace IrbisFormsTests
 
         void form_Paint
             (
-                object sender,
+                object? sender,
                 PaintEventArgs e
             )
         {

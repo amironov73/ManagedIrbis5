@@ -199,45 +199,44 @@ namespace AM.Linq
 
         } // method Assert
 
-        /// <summary>
-        /// Нарезает последовательность на куски (массивы)
-        /// не больше указанного размера.
-        /// </summary>
-        public static IEnumerable<T[]> Chunk<T>
-        (
-            this IEnumerable<T> sequence,
-            int pieceSize
-        )
-        {
-            if (pieceSize <= 0)
-            {
-                Magna.Error
-                (
-                    nameof(Sequence) + "::" + nameof(Chunk)
-                    + "pieceSize="
-                    + pieceSize
-                );
-
-                throw new ArgumentOutOfRangeException(nameof(pieceSize));
-            }
-
-            var piece = new List<T>(pieceSize);
-            foreach (T item in sequence)
-            {
-                piece.Add(item);
-                if (piece.Count >= pieceSize)
-                {
-                    yield return piece.ToArray();
-                    piece = new List<T>(pieceSize);
-                }
-            }
-
-            if (piece.Count != 0)
-            {
-                yield return piece.ToArray();
-            }
-
-        } // method Chunk
+        // /// <summary>
+        // /// Нарезает последовательность на куски (массивы)
+        // /// не больше указанного размера.
+        // /// </summary>
+        // public static IEnumerable<T[]> Chunk<T>
+        // (
+        //     this IEnumerable<T> sequence,
+        //     int pieceSize
+        // )
+        // {
+        //     if (pieceSize <= 0)
+        //     {
+        //         Magna.Error
+        //         (
+        //             nameof(Sequence) + "::" + nameof(Chunk)
+        //             + "pieceSize="
+        //             + pieceSize
+        //         );
+        //
+        //         throw new ArgumentOutOfRangeException(nameof(pieceSize));
+        //     }
+        //
+        //     var piece = new List<T>(pieceSize);
+        //     foreach (T item in sequence)
+        //     {
+        //         piece.Add(item);
+        //         if (piece.Count >= pieceSize)
+        //         {
+        //             yield return piece.ToArray();
+        //             piece = new List<T>(pieceSize);
+        //         }
+        //     }
+        //
+        //     if (piece.Count != 0)
+        //     {
+        //         yield return piece.ToArray();
+        //     }
+        // }
 
         /// <summary>
         /// Просто перебирает все элементы последовательности,
@@ -255,8 +254,7 @@ namespace AM.Linq
             {
                 // Do nothing
             }
-
-        } // method Consume
+        }
 
         /// <summary>
         /// Вычисление последовательности функций.
@@ -270,8 +268,7 @@ namespace AM.Linq
             {
                 yield return function();
             }
-
-        } // method Evaluate
+        }
 
         /// <summary>
         /// Первый элемент из последовательности либо значение по умолчанию.
@@ -288,8 +285,7 @@ namespace AM.Linq
             }
 
             return defaultValue;
-
-        } // method FirstOr
+        }
 
         /// <summary>
         /// Первый элемент из последовательности либо значение по умолчанию.
@@ -306,8 +302,7 @@ namespace AM.Linq
             }
 
             return defaultValue();
-
-        } // method FirstOr
+        }
 
         /// <summary>
         /// Порождает последовательность из одного элемента.

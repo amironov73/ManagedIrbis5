@@ -16,8 +16,6 @@
 using System;
 using System.Windows.Forms;
 
-using AM;
-
 using ManagedIrbis.Pft.Infrastructure;
 using ManagedIrbis.Pft.Infrastructure.Diagnostics;
 
@@ -89,10 +87,10 @@ namespace ManagedIrbis.WinForms.Pft
 
             foreach (var child in info.Children)
             {
-                if (!ReferenceEquals(child, null))
+                if (!ReferenceEquals (child, null))
                 {
                     var node = _ConvertNode(child);
-                    if (!ReferenceEquals(node, null))
+                    if (!ReferenceEquals (node, null))
                     {
                         result.Nodes.Add(node);
                     }
@@ -102,11 +100,23 @@ namespace ManagedIrbis.WinForms.Pft
             return result;
         }
 
-        private void _tree_AfterCheck ( object sender, TreeViewEventArgs e ) =>
-            NodeChecked?.Invoke(sender, e);
+        private void _tree_AfterCheck
+            (
+                object? sender,
+                TreeViewEventArgs e
+            )
+        {
+            NodeChecked?.Invoke (sender, e);
+        }
 
-        void _tree_AfterSelect ( object sender, TreeViewEventArgs e ) =>
-            CurrentNodeChanged?.Invoke(sender, e);
+        void _tree_AfterSelect
+            (
+                object? sender,
+                TreeViewEventArgs e
+            )
+        {
+            CurrentNodeChanged?.Invoke (sender, e);
+        }
 
         #endregion
 
