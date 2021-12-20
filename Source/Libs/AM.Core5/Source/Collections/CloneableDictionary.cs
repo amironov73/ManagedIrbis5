@@ -23,85 +23,85 @@ using System.Diagnostics;
 
 #nullable enable
 
-namespace AM.Collections
-{
-    /// <summary>
-    /// Словарь, состоящий из клонируемых элементов.
-    /// </summary>
-    [DebuggerDisplay("Count={" + nameof(Count) + "}")]
-    public class CloneableDictionary<TKey, TValue>
-        : Dictionary<TKey, TValue>,
+namespace AM.Collections;
+
+/// <summary>
+/// Словарь, состоящий из клонируемых элементов.
+/// </summary>
+[DebuggerDisplay ("Count={" + nameof (Count) + "}")]
+public class CloneableDictionary<TKey, TValue>
+    : Dictionary<TKey, TValue>,
         ICloneable
-        where TKey: notnull
+    where TKey : notnull
+{
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public object Clone()
     {
-        #region ICloneable members
+        var result = new CloneableDictionary<TKey, TValue>();
 
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public object Clone()
+        var keyType = typeof (TKey);
+        var valueType = typeof (TValue);
+        var cloneKeys = false;
+        var cloneValues = false;
+
+        if (!keyType.IsValueType)
         {
-            var result = new CloneableDictionary<TKey, TValue>();
-
-            var keyType = typeof(TKey);
-            var valueType = typeof(TValue);
-            var cloneKeys = false;
-            var cloneValues = false;
-
-            if (!keyType.IsValueType)
+            if (keyType.IsAssignableFrom (typeof (ICloneable)))
             {
-                if (keyType.IsAssignableFrom(typeof(ICloneable)))
-                {
-                    Magna.Error
-                        (
-                            "CloneableDictionary::Clone: "
-                            + "type "
-                            + keyType.FullName
-                            + " is not cloneable"
-                        );
+                Magna.Error
+                    (
+                        "CloneableDictionary::Clone: "
+                        + "type "
+                        + keyType.FullName
+                        + " is not cloneable"
+                    );
 
-                    throw new ArgumentException(keyType.Name);
-                }
-                cloneKeys = true;
+                throw new ArgumentException (keyType.Name);
             }
 
-            if (!valueType.IsValueType)
-            {
-                if (valueType.IsAssignableFrom(typeof(ICloneable)))
-                {
-                    Magna.Error
-                        (
-                            "CloneableDictionary::Clone: "
-                            + "type "
-                            + valueType.FullName
-                            + " is not cloneable"
-                        );
-
-                    throw new ArgumentException(valueType.Name);
-                }
-                cloneValues = true;
-            }
-
-            foreach (var pair in this)
-            {
-                var keyCopy = pair.Key;
-                var valueCopy = pair.Value;
-                if (cloneKeys)
-                {
-                    keyCopy = (TKey)((ICloneable)keyCopy).Clone();
-                }
-
-                if (cloneValues
-                    && !ReferenceEquals(valueCopy, null))
-                {
-                    valueCopy = (TValue)((ICloneable)valueCopy).Clone();
-                }
-
-                result.Add(keyCopy, valueCopy);
-            }
-
-            return result;
+            cloneKeys = true;
         }
 
-        #endregion
-    }
-}
+        if (!valueType.IsValueType)
+        {
+            if (valueType.IsAssignableFrom (typeof (ICloneable)))
+            {
+                Magna.Error
+                    (
+                        "CloneableDictionary::Clone: "
+                        + "type "
+                        + valueType.FullName
+                        + " is not cloneable"
+                    );
 
+                throw new ArgumentException (valueType.Name);
+            }
+
+            cloneValues = true;
+        }
+
+        foreach (var pair in this)
+        {
+            var keyCopy = pair.Key;
+            var valueCopy = pair.Value;
+            if (cloneKeys)
+            {
+                keyCopy = (TKey)((ICloneable)keyCopy).Clone();
+            }
+
+            if (cloneValues
+                && !ReferenceEquals (valueCopy, null))
+            {
+                valueCopy = (TValue)((ICloneable)valueCopy).Clone();
+            }
+
+            result.Add (keyCopy, valueCopy);
+        }
+
+        return result;
+    }
+
+    #endregion
+}

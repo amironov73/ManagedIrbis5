@@ -16,46 +16,42 @@ using System.Collections;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Вспомогательные методы для класса <see cref="BitArray"/>.
+/// </summary>
+public static class BitArrayUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Вспомогательные методы для класса <see cref="BitArray"/>.
+    /// Сравнение двух <see cref="BitArray"/>.
     /// </summary>
-    public static class BitArrayUtility
+    public static bool AreEqual
+        (
+            BitArray left,
+            BitArray right
+        )
     {
-        #region Public methods
+        Sure.NotNull (left);
+        Sure.NotNull (right);
 
-        /// <summary>
-        /// Сравнение двух <see cref="BitArray"/>s.
-        /// </summary>
-        public static bool AreEqual
-            (
-                BitArray left,
-                BitArray right
-            )
+        if (left.Length != right.Length)
         {
-            Sure.NotNull (left);
-            Sure.NotNull (right);
+            return false;
+        }
 
-            if (left.Length != right.Length)
+        for (var i = 0; i < left.Length; i++)
+        {
+            if (left[i] != right[i])
             {
                 return false;
             }
+        }
 
-            for (int i = 0; i < left.Length; i++)
-            {
-                if (left[i] != right[i])
-                {
-                    return false;
-                }
-            }
+        return true;
+    }
 
-            return true;
-
-        } // method AreEqual
-
-        #endregion
-
-    } // class BitArrayUtility
-
-} // namespace AM.Collections
+    #endregion
+}

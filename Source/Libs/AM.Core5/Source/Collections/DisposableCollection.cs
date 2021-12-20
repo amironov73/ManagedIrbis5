@@ -18,52 +18,34 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Коллекция, состоящая из <see cref="IDisposable"/> элементов.
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[DebuggerDisplay ("Count = {" + nameof (Count) + "}")]
+public class DisposableCollection<T>
+    : Collection<T>,
+    IDisposable
+    where T : IDisposable
 {
-    /// <summary>
-    /// Коллекция, состоящая из <see cref="IDisposable"/> элементов.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
-    public class DisposableCollection<T>
-        : Collection<T>,
-        IDisposable
-        where T : IDisposable
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
     {
-        #region Construction/destruction
-
-        /// <summary>
-        /// Finalize.
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        ~DisposableCollection()
+        for (var i = 0; i < Count; i++)
         {
-            // TODO ???
-            Dispose();
+            IDisposable item = this[i];
+            item.Dispose();
         }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            for (int i = 0; i < Count; i++)
-            {
-                IDisposable item = this[i];
-                item?.Dispose();
-                //GC.SuppressFinalize(item); ???
-            }
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
     }
+
+    #endregion
 }

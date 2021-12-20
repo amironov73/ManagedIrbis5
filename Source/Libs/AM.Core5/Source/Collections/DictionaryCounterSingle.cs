@@ -22,148 +22,145 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Простой словарь-счетчик с дробными числами.
+/// </summary>
+public sealed class DictionaryCounterSingle<TKey>
+    : Dictionary<TKey, float>
+    where TKey : notnull
 {
+    #region Properties
+
     /// <summary>
-    /// Простой словарь-счетчик с дробными числами.
+    /// Gets the total.
     /// </summary>
-    public sealed class DictionaryCounterSingle<TKey>
-        : Dictionary<TKey, float>
-        where TKey: notnull
+    public float Total
     {
-        #region Properties
-
-        /// <summary>
-        /// Gets the total.
-        /// </summary>
-        public float Total
+        get
         {
-            get
+            lock (SyncRoot)
             {
-                lock (SyncRoot)
+                var result = 0.0f;
+                foreach (var value in Values)
                 {
-                    var result = 0.0f;
-                    foreach (var value in Values)
-                    {
-                        result += value;
-                    }
-
-                    return result;
+                    result += value;
                 }
-            } // method get
-        } // property Total
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="DictionaryCounterSingle{TKey}"/> class.
-        /// </summary>
-        public DictionaryCounterSingle()
-        {
-        } // constructor
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="comparer">The comparer.</param>
-        public DictionaryCounterSingle
-            (
-                IEqualityComparer<TKey> comparer
-            )
-            : base(comparer)
-        {
-        } // constructor
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="DictionaryCounterSingle{TKey}"/> class.
-        /// </summary>
-        /// <param name="capacity">The capacity.</param>
-        public DictionaryCounterSingle
-            (
-                int capacity
-            )
-            : base(capacity)
-        {
-        } // constructor
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="DictionaryCounterSingle{TKey}"/> class.
-        /// </summary>
-        /// <param name="dictionary">The dictionary.</param>
-        public DictionaryCounterSingle
-            (
-                DictionaryCounterSingle<TKey> dictionary
-            )
-            : base(dictionary)
-        {
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private object SyncRoot => ((ICollection)this).SyncRoot;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Augments the specified key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="increment">The value.</param>
-        /// <returns>New value for given key.</returns>
-        public float Augment
-            (
-                TKey key,
-                float increment
-            )
-        {
-            lock (SyncRoot)
-            {
-                TryGetValue(key, out var result);
-                result += increment;
-                this[key] = result;
 
                 return result;
             }
-        } // method Augment
+        } // method get
+    } // property Total
 
-        /// <summary>
-        /// Get accumulated value for the specified key.
-        /// </summary>
-        public float GetValue
-            (
-                TKey key
-            )
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initializes a new instance of the
+    /// <see cref="DictionaryCounterSingle{TKey}"/> class.
+    /// </summary>
+    public DictionaryCounterSingle()
+    {
+    } // constructor
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="comparer">The comparer.</param>
+    public DictionaryCounterSingle
+        (
+            IEqualityComparer<TKey> comparer
+        )
+        : base (comparer)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the
+    /// <see cref="DictionaryCounterSingle{TKey}"/> class.
+    /// </summary>
+    /// <param name="capacity">The capacity.</param>
+    public DictionaryCounterSingle
+        (
+            int capacity
+        )
+        : base (capacity)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the
+    /// <see cref="DictionaryCounterSingle{TKey}"/> class.
+    /// </summary>
+    /// <param name="dictionary">The dictionary.</param>
+    public DictionaryCounterSingle
+        (
+            DictionaryCounterSingle<TKey> dictionary
+        )
+        : base (dictionary)
+    {
+    }
+
+    #endregion
+
+    #region Private members
+
+    private object SyncRoot => ((ICollection) this).SyncRoot;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Augments the specified key.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <param name="increment">The value.</param>
+    /// <returns>New value for given key.</returns>
+    public float Augment
+        (
+            TKey key,
+            float increment
+        )
+    {
+        lock (SyncRoot)
         {
-            lock (SyncRoot)
-            {
-                TryGetValue(key, out var result);
+            TryGetValue (key, out var result);
+            result += increment;
+            this[key] = result;
 
-                return result;
-            }
-        } // method GetValue
+            return result;
+        }
+    }
 
-        /// <summary>
-        /// Increment the specified key.
-        /// </summary>
-        public double Increment
-            (
-                TKey key
-            )
+    /// <summary>
+    /// Get accumulated value for the specified key.
+    /// </summary>
+    public float GetValue
+        (
+            TKey key
+        )
+    {
+        lock (SyncRoot)
         {
-            return Augment(key, 1.0f);
-        } // method Increment
+            TryGetValue (key, out var result);
 
-        #endregion
+            return result;
+        }
+    }
 
-    } // class DictionaryCounterSingle
+    /// <summary>
+    /// Increment the specified key.
+    /// </summary>
+    public double Increment
+        (
+            TKey key
+        )
+    {
+        return Augment (key, 1.0f);
+    }
 
-} // namespace AM.Collections
+    #endregion
+}

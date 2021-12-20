@@ -19,148 +19,238 @@ using System;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Итератор по массиву.
+/// </summary>
+public struct ArrayIterator<T>
+    : IIterator<T>,
+    IEquatable<ArrayIterator<T>>
+    where T : unmanaged
 {
+    #region Construction
+
     /// <summary>
-    /// Итератор по массиву.
+    /// Конструктор.
     /// </summary>
-    public struct ArrayIterator<T>
-        : IIterator<T>,
-        IEquatable<ArrayIterator<T>>
-        where T: unmanaged
+    public ArrayIterator
+        (
+            T[] array,
+            int index = 0
+        )
     {
-        #region Construction
+        Sure.NotNull (array);
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ArrayIterator
-            (
-                T[] array,
-                int index = 0
-            )
-        {
-            _array = array;
-            _index = index;
-        }
+        _array = array;
+        _index = index;
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Private members
 
-        private readonly T[] _array;
-        private int _index;
+    private readonly T[] _array;
+    private int _index;
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region Public methods
 
-        /// <summary>
-        /// Оператор инкремента.
-        /// </summary>
-        public static ArrayIterator<T> operator ++(ArrayIterator<T> iterator) =>
-            new (iterator._array, iterator._index + 1);
+    /// <summary>
+    /// Оператор инкремента.
+    /// </summary>
+    public static ArrayIterator<T> operator ++
+        (
+            ArrayIterator<T> iterator
+        )
+    {
+        return new (iterator._array, iterator._index + 1);
+    }
 
-        /// <summary>
-        /// Оператор декремента.
-        /// </summary>
-        public static ArrayIterator<T> operator --(ArrayIterator<T> iterator) =>
-            new (iterator._array, iterator._index - 1);
+    /// <summary>
+    /// Оператор декремента.
+    /// </summary>
+    public static ArrayIterator<T> operator --
+        (
+            ArrayIterator<T> iterator
+        )
+    {
+        return new (iterator._array, iterator._index - 1);
+    }
 
-        /// <summary>
-        /// Оператор сложения с целым числом.
-        /// </summary>
-        public static ArrayIterator<T> operator + (ArrayIterator<T> left, int right) =>
-            new (left._array, left._index + right);
+    /// <summary>
+    /// Оператор сложения с целым числом.
+    /// </summary>
+    public static ArrayIterator<T> operator +
+        (
+            ArrayIterator<T> left,
+            int right
+        )
+    {
+        return new (left._array, left._index + right);
+    }
 
-        /// <summary>
-        /// Оператор вычитания целого числа.
-        /// </summary>
-        public static ArrayIterator<T> operator - (ArrayIterator<T> left, int right) =>
-            new (left._array, left._index - right);
+    /// <summary>
+    /// Оператор вычитания целого числа.
+    /// </summary>
+    public static ArrayIterator<T> operator -
+        (
+            ArrayIterator<T> left,
+            int right
+        )
+    {
+        return new (left._array, left._index - right);
+    }
 
-        /// <summary>
-        /// Вычисление разности между двумя итераторами.
-        /// </summary>
-        public static int operator - (ArrayIterator<T> left, ArrayIterator<T> right) =>
-            left._index - right._index;
+    /// <summary>
+    /// Вычисление разности между двумя итераторами.
+    /// </summary>
+    public static int operator -
+        (
+            ArrayIterator<T> left,
+            ArrayIterator<T> right
+        )
+    {
+        return left._index - right._index;
+    }
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator < (ArrayIterator<T> left, ArrayIterator<T> right) =>
-            left._index < right._index;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator <
+        (
+            ArrayIterator<T> left,
+            ArrayIterator<T> right
+        )
+    {
+        return left._index < right._index;
+    }
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator <= (ArrayIterator<T> left, ArrayIterator<T> right) =>
-            left._index <= right._index;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator <=
+        (
+            ArrayIterator<T> left,
+            ArrayIterator<T> right
+        )
+    {
+        return left._index <= right._index;
+    }
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator > (ArrayIterator<T> left, ArrayIterator<T> right) =>
-            left._index > right._index;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator >
+        (
+            ArrayIterator<T> left,
+            ArrayIterator<T> right
+        )
+    {
+        return left._index > right._index;
+    }
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator >= (ArrayIterator<T> left, ArrayIterator<T> right) =>
-            left._index >= right._index;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator >=
+        (
+            ArrayIterator<T> left,
+            ArrayIterator<T> right
+        )
+    {
+        return left._index >= right._index;
+    }
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator == (ArrayIterator<T> left, ArrayIterator<T> right) =>
-            left._index == right._index;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator ==
+        (
+            ArrayIterator<T> left,
+            ArrayIterator<T> right
+        )
+    {
+        return left._index == right._index;
+    }
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator != (ArrayIterator<T> left, ArrayIterator<T> right) =>
-            left._index != right._index;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator !=
+        (
+            ArrayIterator<T> left,
+            ArrayIterator<T> right
+        )
+    {
+        return left._index != right._index;
+    }
 
-        #endregion
+    #endregion
 
-        #region IIterator members
+    #region IIterator members
 
-        /// <inheritdoc cref="IComparable{T}.CompareTo"/>
-        public int CompareTo(IIterator<T>? other) =>
-            other is ArrayIterator<T> array
-                ? _index - array._index
-                : throw new ArgumentException();
+    /// <inheritdoc cref="IComparable{T}.CompareTo"/>
+    public int CompareTo
+        (
+            IIterator<T>? other
+        )
+    {
+        return other is ArrayIterator<T> array
+            ? _index - array._index
+            : throw new ArgumentException();
+    }
 
-        /// <inheritdoc cref="IIterator{T}.Value"/>
-        public ref T Value => ref _array[_index];
+    /// <inheritdoc cref="IIterator{T}.Value"/>
+    public ref T Value => ref _array[_index];
 
-        /// <inheritdoc cref="IIterator{T}.Advance"/>
-        public void Advance(int delta = 1) => _index += delta;
+    /// <inheritdoc cref="IIterator{T}.Advance"/>
+    public void Advance
+        (
+            int delta = 1
+        )
+    {
+        _index += delta;
+    }
 
-        #endregion
+    #endregion
 
-        #region IEquatable members
+    #region IEquatable members
 
-        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-        public bool Equals(ArrayIterator<T> other) =>
-            _array.Equals(other._array) && _index == other._index;
+    /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
+    public bool Equals
+        (
+            ArrayIterator<T> other
+        )
+    {
+        return _array.Equals (other._array) && _index == other._index;
+    }
 
-        #endregion
+    #endregion
 
-        #region Object members
+    #region Object members
 
-        /// <inheritdoc cref="object.Equals(object)"/>
-        public override bool Equals(object? obj) =>
-            obj is ArrayIterator<T> other && Equals(other);
+    /// <inheritdoc cref="object.Equals(object)"/>
+    public override bool Equals
+        (
+            object? obj
+        )
+    {
+        return obj is ArrayIterator<T> other && Equals (other);
+    }
 
-        /// <inheritdoc cref="object.GetHashCode"/>
-        public override int GetHashCode() => HashCode.Combine(_array, _index);
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode()
+    {
+        return HashCode.Combine (_array, _index);
+    }
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => _index.ToInvariantString();
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return _index.ToInvariantString();
+    }
 
-        #endregion
-
-    } // struct ArrayIterator
-
-} // namespace AM.Collections
+    #endregion
+}

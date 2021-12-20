@@ -22,60 +22,57 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Словарь, нечувствительный к регистру символов.
+/// </summary>
+public class CaseInsensitiveDictionary<T>
+    : Dictionary<string, T>
 {
+    #region Construction
+
     /// <summary>
-    /// Словарь, нечувствительный к регистру символов.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public class CaseInsensitiveDictionary<T>
-        : Dictionary<string, T>
+    public CaseInsensitiveDictionary()
+        : base (_GetComparer())
     {
-        #region Construction
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public CaseInsensitiveDictionary()
-            : base(_GetComparer())
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public CaseInsensitiveDictionary
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public CaseInsensitiveDictionary
         (
             int capacity
         )
-            : base(capacity, _GetComparer())
-        {
-        }
+        : base (capacity, _GetComparer())
+    {
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public CaseInsensitiveDictionary
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public CaseInsensitiveDictionary
         (
             IDictionary<string, T> dictionary
         )
-            : base(dictionary, _GetComparer())
-        {
-        }
+        : base (dictionary, _GetComparer())
+    {
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Private members
 
-        /// <summary>
-        /// Get comparer for the dictionary.
-        /// </summary>
-        private static IEqualityComparer<string> _GetComparer()
-        {
-            return StringComparer.OrdinalIgnoreCase;
-        }
+    /// <summary>
+    /// Получение компарера для словаря.
+    /// </summary>
+    private static IEqualityComparer<string> _GetComparer()
+    {
+        return StringComparer.OrdinalIgnoreCase;
+    }
 
-        #endregion
-
-    } // CaseInsensitiveDictionary
-
-} // namespace AM.Collections
+    #endregion
+}

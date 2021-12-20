@@ -13,23 +13,20 @@
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Indexable object interface.
+/// </summary>
+public interface IIndexable<T>
 {
     /// <summary>
-    /// Indexable object interface.
+    /// Gets item at the specified index.
     /// </summary>
-    public interface IIndexable<T>
-    {
-        /// <summary>
-        /// Gets item at the specified index.
-        /// </summary>
-        T? this[int index] { get; }
+    T? this [int index] { get; }
 
-        /// <summary>
-        /// Gets the count of items.
-        /// </summary>
-        int Count { get; }
-
-    } // interface IIndexable
-
-} // namespace AM.Collections
+    /// <summary>
+    /// Gets the count of items.
+    /// </summary>
+    int Count { get; }
+}

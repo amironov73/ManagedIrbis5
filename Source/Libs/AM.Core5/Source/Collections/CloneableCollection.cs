@@ -23,31 +23,30 @@ using System.Diagnostics;
 
 #nullable enable
 
-namespace AM.Collections
-{
-    /// <summary>
-    /// Клонируемая коллекция.
-    /// </summary>
-    [DebuggerDisplay("Count={" + nameof(Count) + "}")]
-    public class CloneableCollection<T>
-        : Collection<T>,
+namespace AM.Collections;
+
+/// <summary>
+/// Клонируемая коллекция.
+/// </summary>
+[DebuggerDisplay ("Count={" + nameof (Count) + "}")]
+public class CloneableCollection<T>
+    : Collection<T>,
         ICloneable
+{
+    #region ICloneable members
+
+    /// <inheritdoc cref="ICloneable.Clone" />
+    public object Clone()
     {
-        #region ICloneable members
+        var result = new CloneableCollection<T>();
 
-        /// <inheritdoc cref="ICloneable.Clone" />
-        public object Clone()
+        foreach (var item in this)
         {
-            var result = new CloneableCollection<T>();
-
-            foreach (var item in this)
-            {
-                result.Add(item);
-            }
-
-            return result;
+            result.Add (item);
         }
 
-        #endregion
+        return result;
     }
+
+    #endregion
 }

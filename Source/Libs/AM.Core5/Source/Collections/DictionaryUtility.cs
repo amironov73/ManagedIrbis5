@@ -22,144 +22,141 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// <see cref="Dictionary{Key,Value}" /> manipulation
+/// helper methods.
+/// </summary>
+public static class DictionaryUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// <see cref="Dictionary{Key,Value}" /> manipulation
-    /// helper methods.
+    /// Merges the specified dictionaries.
     /// </summary>
-    public static class DictionaryUtility
+    /// <param name="dictionaries">Dictionaries to merge.</param>
+    /// <returns>Merged dictionary.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// One or more dictionaries is <c>null</c>.
+    /// </exception>
+    public static Dictionary<TKey, TValue> MergeWithConflicts<TKey, TValue>
+        (
+            params Dictionary<TKey, TValue>[] dictionaries
+        )
+        where TKey : notnull
     {
-        #region Public methods
-
-        /// <summary>
-        /// Merges the specified dictionaries.
-        /// </summary>
-        /// <param name="dictionaries">Dictionaries to merge.</param>
-        /// <returns>Merged dictionary.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// One or more dictionaries is <c>null</c>.
-        /// </exception>
-        public static Dictionary<TKey, TValue> MergeWithConflicts<TKey, TValue>
-            (
-                params Dictionary<TKey, TValue>[] dictionaries
-            )
-            where TKey: notnull
+        foreach (var dictionary in dictionaries)
         {
-            foreach (Dictionary<TKey, TValue> dictionary in dictionaries)
+            if (ReferenceEquals (dictionary, null))
             {
-                if (ReferenceEquals(dictionary, null))
-                {
-                    Magna.Error
-                        (
-                            nameof(DictionaryUtility) + "::" + nameof(MergeWithConflicts)
-                            + ": "
-                            + "dictionary is null"
-                        );
+                Magna.Error
+                    (
+                        nameof (DictionaryUtility) + "::" + nameof (MergeWithConflicts)
+                        + ": "
+                        + "dictionary is null"
+                    );
 
-                    throw new ArgumentNullException(nameof(dictionaries));
-                }
+                throw new ArgumentNullException (nameof (dictionaries));
             }
-
-            Dictionary<TKey, TValue> result = new ();
-            for (var i = 0; i < dictionaries.Length; i++)
-            {
-                Dictionary<TKey, TValue> dic = dictionaries[i];
-                foreach (var pair in dic)
-                {
-                    result.Add(pair.Key, pair.Value);
-                }
-            }
-
-            return result;
         }
 
-        /// <summary>
-        /// Merges the specified dictionaries.
-        /// </summary>
-        /// <param name="dictionaries">Dictionaries to merge.</param>
-        /// <returns>Merged dictionary.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// One or more dictionaries is <c>null</c>.
-        /// </exception>
-        public static Dictionary<TKey, TValue> MergeFirstValues<TKey, TValue>
-            (
-                params Dictionary<TKey, TValue>[] dictionaries
-            )
-            where TKey: notnull
+        var result = new Dictionary<TKey, TValue>();
+        foreach (var dic in dictionaries)
         {
-            foreach (Dictionary<TKey, TValue> dictionary in dictionaries)
+            foreach (var pair in dic)
             {
-                if (ReferenceEquals(dictionary, null))
-                {
-                    Magna.Error
-                        (
-                            nameof(DictionaryUtility) + "::" + nameof(MergeFirstValues)
-                            + ": "
-                            + "dictionary is null"
-                        );
-
-                    throw new ArgumentNullException(nameof(dictionaries));
-                }
+                result.Add (pair.Key, pair.Value);
             }
-
-            Dictionary<TKey, TValue> result = new ();
-            for (var i = 0; i < dictionaries.Length; i++)
-            {
-                Dictionary<TKey, TValue> dic = dictionaries[i];
-                foreach (var pair in dic)
-                {
-                    if (!result.ContainsKey(pair.Key))
-                    {
-                        result.Add(pair.Key, pair.Value);
-                    }
-                }
-            }
-
-            return result;
         }
 
-        /// <summary>
-        /// Merges the specified dictionaries.
-        /// </summary>
-        /// <param name="dictionaries">Dictionaries to merge.</param>
-        /// <returns>Merged dictionary.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// One or more dictionaries is <c>null</c>.
-        /// </exception>
-        public static Dictionary<TKey, TValue> MergeLastValues<TKey, TValue>
-            (
-                params Dictionary<TKey, TValue>[] dictionaries
-            )
-            where TKey: notnull
-        {
-            foreach (Dictionary<TKey, TValue> dictionary in dictionaries)
-            {
-                if (ReferenceEquals(dictionary, null))
-                {
-                    Magna.Error
-                        (
-                            nameof(DictionaryUtility) + "::" + nameof(MergeLastValues)
-                            + ": "
-                            + "dictionary is null"
-                        );
-
-                    throw new ArgumentNullException(nameof(dictionaries));
-                }
-            }
-
-            Dictionary<TKey, TValue> result = new ();
-            for (var i = 0; i < dictionaries.Length; i++)
-            {
-                Dictionary<TKey, TValue> dic = dictionaries[i];
-                foreach (var pair in dic)
-                {
-                    result[pair.Key] = pair.Value;
-                }
-            }
-            return result;
-        }
-
-        #endregion
+        return result;
     }
+
+    /// <summary>
+    /// Merges the specified dictionaries.
+    /// </summary>
+    /// <param name="dictionaries">Dictionaries to merge.</param>
+    /// <returns>Merged dictionary.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// One or more dictionaries is <c>null</c>.
+    /// </exception>
+    public static Dictionary<TKey, TValue> MergeFirstValues<TKey, TValue>
+        (
+            params Dictionary<TKey, TValue>[] dictionaries
+        )
+        where TKey : notnull
+    {
+        foreach (var dictionary in dictionaries)
+        {
+            if (ReferenceEquals (dictionary, null))
+            {
+                Magna.Error
+                    (
+                        nameof (DictionaryUtility) + "::" + nameof (MergeFirstValues)
+                        + ": "
+                        + "dictionary is null"
+                    );
+
+                throw new ArgumentNullException (nameof (dictionaries));
+            }
+        }
+
+        var result = new Dictionary<TKey, TValue>();
+        foreach (var dic in dictionaries)
+        {
+            foreach (var pair in dic)
+            {
+                if (!result.ContainsKey (pair.Key))
+                {
+                    result.Add (pair.Key, pair.Value);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Merges the specified dictionaries.
+    /// </summary>
+    /// <param name="dictionaries">Dictionaries to merge.</param>
+    /// <returns>Merged dictionary.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// One or more dictionaries is <c>null</c>.
+    /// </exception>
+    public static Dictionary<TKey, TValue> MergeLastValues<TKey, TValue>
+        (
+            params Dictionary<TKey, TValue>[] dictionaries
+        )
+        where TKey : notnull
+    {
+        foreach (var dictionary in dictionaries)
+        {
+            if (ReferenceEquals (dictionary, null))
+            {
+                Magna.Error
+                    (
+                        nameof (DictionaryUtility) + "::" + nameof (MergeLastValues)
+                        + ": "
+                        + "dictionary is null"
+                    );
+
+                throw new ArgumentNullException (nameof (dictionaries));
+            }
+        }
+
+        var result = new Dictionary<TKey, TValue> ();
+        foreach (var dic in dictionaries)
+        {
+            foreach (var pair in dic)
+            {
+                result[pair.Key] = pair.Value;
+            }
+        }
+
+        return result;
+    }
+
+    #endregion
 }

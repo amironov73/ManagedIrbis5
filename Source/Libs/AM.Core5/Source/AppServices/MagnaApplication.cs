@@ -104,7 +104,7 @@ public class MagnaApplication
             .AddCommandLine (Args);
 
         return result;
-    } // method BuildConfiguration
+    }
 
     /// <summary>
     /// Построение хоста.
@@ -128,7 +128,7 @@ public class MagnaApplication
         )
     {
         services.AddOptions();
-    } // method ConfigureServices
+    }
 
     /// <summary>
     /// Конфигурирование логирования.
@@ -141,7 +141,7 @@ public class MagnaApplication
     {
         logging.ClearProviders();
         logging.AddNLog (Configuration);
-    } // method ConfigureLogging
+    }
 
     /// <summary>
     /// Разбор командной строки.
@@ -160,7 +160,7 @@ public class MagnaApplication
             .Parse (Args);
 
         return result;
-    } // method ParseCommandLine
+    }
 
     /// <summary>
     /// Конфигурирование перед запуском.
