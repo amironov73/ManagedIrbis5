@@ -10,7 +10,7 @@ static class Program
     {
         // SpracheExperiment.NoSemicolons();
         // PidginExperimentZero.SimpleExpression();
-        // PidginExperimentOne.SimpleExpression();
+        //PidginExperimentOne.SimpleExpression();
         PidginExperimentTwo.Statements();
     }
 }
