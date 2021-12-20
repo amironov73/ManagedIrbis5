@@ -126,7 +126,8 @@ static class PidginExperimentTwo
     private static Parser<char, T> Tok<T> (Parser<char, T> token) =>
         Try (token).Between (SkipWhitespaces);
 
-    private static Parser<char, string> Tok (string token) => Tok (String (token));
+    private static Parser<char, string> Tok (string token) =>
+        Tok (String (token));
 
     private static Parser<char, string> Id =>
         from first in Letter
