@@ -4,10 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* IIndexable.cs -- indexable object interface
+/* IIndexable.cs -- интерфейс индексируемого объекта
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,12 +19,12 @@ namespace AM.Collections;
 public interface IIndexable<T>
 {
     /// <summary>
-    /// Gets item at the specified index.
+    /// Получение объекта по указанному индексу.
     /// </summary>
     T? this [int index] { get; }
 
     /// <summary>
-    /// Gets the count of items.
+    /// Общее количество проиндексированных элементов.
     /// </summary>
     int Count { get; }
 }
