@@ -127,6 +127,7 @@ public class EasyReport
 
     #region IDisposable members
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         Report.Dispose();
