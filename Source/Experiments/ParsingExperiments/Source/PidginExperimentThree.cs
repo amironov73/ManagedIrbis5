@@ -181,7 +181,7 @@ static class PidginExperimentThree
     }
 
     private static Parser<char, T> Tok<T> (Parser<char, T> token) =>
-        token.Between (SkipWhitespaces);
+        Try (token).Between (SkipWhitespaces);
 
     private static Parser<char, string> Tok (string token) =>
         Tok (String (token));
@@ -240,8 +240,7 @@ static class PidginExperimentThree
         select (StatementNode) new AssignmentNode (name, expr);
 
     private static readonly Parser<char, IEnumerable<StatementNode>> Program =
-        Assignment.SeparatedAndOptionallyTerminated (SkipWhitespaces)
-            .Then (End, (_1, _) => _1);
+        Assignment.SeparatedAndOptionallyTerminated (SkipWhitespaces).Before (End);
 
     private static void ParseAndExecute (string sourceCode)
     {

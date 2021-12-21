@@ -23,10 +23,10 @@ public abstract partial class Parser<TToken, TResult>
 {
     public abstract bool TryParse
         (
-        	ref ParseState<TToken> state,
+            ref ParseState<TToken> state,
             ref PooledList<Expected<TToken>> expecteds,
             [MaybeNullWhen(false)] out TResult result
-    	);
+        );
 }
 ```
 
@@ -189,8 +189,8 @@ Console.WriteLine (result.Value);
 ```c#
 Parser<char, char> expr = null!;
 Parser<char, char> parenthesised = Char ('(')
-	.Then (Rec(() => expr))
-	.Before (Char(')'));
+    .Then (Rec(() => expr))
+    .Before (Char(')'));
 expr = Digit.Or (parenthesised);
 var result = expr.Parse ("((1))");
 Console.WriteLine (result.Success); // True
@@ -204,14 +204,13 @@ Console.WriteLine (result.Value); // 1
 ```c#
 Parser<char, int> arithmetic = null!;
 Parser<char, int> addExpr = Map
-(
-    (x, _, y) => x + y,
-    Rec (() => arithmetic),
-    Char ('+'),
-    Rec (() => arithmetic)
-);
+    (
+        (x, _, y) => x + y,
+        Rec (() => arithmetic),
+        Char ('+'),
+        Rec (() => arithmetic)
+    );
 arithmetic = addExpr.Or (Digit.Select (d => (int) char.GetNumericValue (d)));
-
 arithmetic.Parse("2+2");  // stack overflow!
 ```
 
@@ -223,3 +222,20 @@ arithmetic.Parse("2+2");  // stack overflow!
 СУММА' -> '+' цифра
 СУММА' -> '+' цифра СУММА'
 ```
+
+Получается право-рекурсивная грамматика, с которой Pidgin справляется без проблем. В терминах Pidgin это будет
+
+```c#
+var digit = Digit.Select (d => (int) char.GetNumericValue (d));
+var summa = Map
+    (
+        (first, second) => first + second.Sum(),
+        digit,
+        Char ('+').Then (digit).Many()
+    );
+var result = summa.Parse ("1+2+3+4");
+Console.WriteLine (result.Success); // True
+Console.WriteLine (result.Value); // 10
+```
+
+Впрочем, для разбора арифметических выражений в Pidgin есть специальные очень удобные инструменты, о которых мы поговорим в свое время.

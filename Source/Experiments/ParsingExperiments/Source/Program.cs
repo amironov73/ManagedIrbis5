@@ -10,8 +10,9 @@ static class Program
     {
         // SpracheExperiment.NoSemicolons();
         // PidginExperimentZero.SimpleExpression();
-        //PidginExperimentOne.SimpleExpression();
-        //PidginExperimentTwo.Statements();
-        PidginExperimentThree.Assignments();
+        // PidginExperimentOne.SimpleExpression();
+        // PidginExperimentTwo.Statements();
+        // PidginExperimentThree.Assignments();
+        PidginExperimentFour.LeftRecursion();
     }
 }

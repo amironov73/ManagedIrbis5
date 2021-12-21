@@ -179,8 +179,7 @@ static class PidginExperimentTwo
 
     private static readonly Parser<char, IEnumerable<StatementNode>> _pgm =
         //_stmt.SeparatedAndOptionallyTerminated (Token (';').AtLeastOnce().Between (SkipWhitespaces))
-        _stmt.SeparatedAndOptionallyTerminated (SkipWhitespaces)
-            .Then (End, (_1, _) => _1);
+        _stmt.SeparatedAndOptionallyTerminated (SkipWhitespaces).Before (End);
 
     private static void ParseAndExecute (string sourceCode)
     {
