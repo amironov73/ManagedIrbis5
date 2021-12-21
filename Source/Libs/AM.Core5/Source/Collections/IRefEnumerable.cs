@@ -3,6 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* IRefEnumerable.cs -- коллекция элементов, перечисляемых по ссылке
  * Ars Magna project, http://arsmagna.ru
@@ -10,18 +12,15 @@
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Коллекция элементов, перечисляемых по ссылке.
+/// </summary>
+public interface IRefEnumerable<T>
 {
     /// <summary>
-    /// Коллекция элементов, перечисляемых по ссылке.
+    /// Запрос перечислителя.
     /// </summary>
-    public interface IRefEnumerable<T>
-    {
-        /// <summary>
-        /// Запрос перечислителя.
-        /// </summary>
-        IRefEnumerable<T> GetEnumerator();
-
-    } // interface IRefEnumerable<T>
-
-} // namespace AM.Collections
+    IRefEnumerable<T> GetEnumerator();
+}

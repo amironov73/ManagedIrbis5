@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedType.Global
 
 /* IteratorUtility.cs -- вспомогательные методы для работы с итераторами
  * Ars Magna project, http://arsmagna.ru
@@ -18,32 +19,28 @@ using System;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Вспомогательные методы для работы с итераторами.
+/// </summary>
+public static class IteratorUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Вспомогательные методы для работы с итераторами.
+    /// Итератор, установленный на начало массива.
     /// </summary>
-    public static class IteratorUtility
-    {
-        #region Public methods
+    public static ArrayIterator<T> Begin<T> (T[] array)
+        where T : unmanaged
+        => new (array);
 
-        /// <summary>
-        /// Итератор, установленный на начало массива.
-        /// </summary>
-        public static ArrayIterator<T> Begin<T>(T[] array)
-            where T: unmanaged
-            => new (array);
+    /// <summary>
+    /// Итератор, установленный сразу за концом массива
+    /// </summary>
+    public static ArrayIterator<T> End<T> (T[] array)
+        where T : unmanaged
+        => new (array, array.Length);
 
-        /// <summary>
-        /// Итератор, установленный сразу за концом массива
-        /// </summary>
-        public static ArrayIterator<T> End<T>(T[] array)
-            where T: unmanaged
-            => new (array, array.Length);
-
-
-        #endregion
-
-    } // class IteratorUtility
-
-} // namespace AM.Collections
+    #endregion
+}

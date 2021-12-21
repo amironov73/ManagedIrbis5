@@ -20,171 +20,168 @@ using System;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Итератор по опасной памяти.
+/// </summary>
+public unsafe struct UnsafeIterator<T>
+    : IIterator<T>,
+    IEquatable<UnsafeIterator<T>>
+    where T : unmanaged
 {
+    #region Construction
+
     /// <summary>
-    /// Итератор по опасной памяти.
+    /// Конструктор.
     /// </summary>
-    public unsafe struct UnsafeIterator<T>
-        : IIterator<T>,
-        IEquatable<UnsafeIterator<T>>
-        where T: unmanaged
+    public UnsafeIterator (T* pointer) => _pointer = pointer;
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public UnsafeIterator (IntPtr pointer) => _pointer = (T*) pointer.ToPointer();
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public UnsafeIterator (UIntPtr pointer) => _pointer = (T*) pointer.ToPointer();
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public UnsafeIterator (ReadOnlySpan<T> span)
     {
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public UnsafeIterator (T* pointer) => _pointer = pointer;
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public UnsafeIterator (IntPtr pointer) => _pointer = (T*)pointer.ToPointer();
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public UnsafeIterator (UIntPtr pointer) => _pointer = (T*)pointer.ToPointer();
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public UnsafeIterator(ReadOnlySpan<T> span)
+        fixed (T* temporary = span)
         {
-            fixed (T* temporary = span)
-            {
-                _pointer = temporary;
-            }
-        } // constructor
+            _pointer = temporary;
+        }
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public UnsafeIterator(T[] array)
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public UnsafeIterator (T[] array)
+    {
+        fixed (T* temporary = array)
         {
-            fixed (T* temporary = array)
-            {
-                _pointer = temporary;
-            }
-        } // constructor
+            _pointer = temporary;
+        }
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Private members
 
-        private T* _pointer;
+    private T* _pointer;
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region Public methods
 
-        /// <summary>
-        /// Оператор инкремента.
-        /// </summary>
-        public static UnsafeIterator<T> operator ++(UnsafeIterator<T> iterator) =>
-            new (iterator._pointer + 1);
+    /// <summary>
+    /// Оператор инкремента.
+    /// </summary>
+    public static UnsafeIterator<T> operator ++ (UnsafeIterator<T> iterator) =>
+        new (iterator._pointer + 1);
 
-        /// <summary>
-        /// Оператор декремента.
-        /// </summary>
-        public static UnsafeIterator<T> operator --(UnsafeIterator<T> iterator) =>
-            new (iterator._pointer - 1);
+    /// <summary>
+    /// Оператор декремента.
+    /// </summary>
+    public static UnsafeIterator<T> operator -- (UnsafeIterator<T> iterator) =>
+        new (iterator._pointer - 1);
 
-        /// <summary>
-        /// Оператор сложения с целым числом.
-        /// </summary>
-        public static UnsafeIterator<T> operator + (UnsafeIterator<T> left, int right) =>
-            new (left._pointer + right);
+    /// <summary>
+    /// Оператор сложения с целым числом.
+    /// </summary>
+    public static UnsafeIterator<T> operator + (UnsafeIterator<T> left, int right) =>
+        new (left._pointer + right);
 
-        /// <summary>
-        /// Оператор вычитания целого числа.
-        /// </summary>
-        public static UnsafeIterator<T> operator - (UnsafeIterator<T> left, int right) =>
-            new (left._pointer - right);
+    /// <summary>
+    /// Оператор вычитания целого числа.
+    /// </summary>
+    public static UnsafeIterator<T> operator - (UnsafeIterator<T> left, int right) =>
+        new (left._pointer - right);
 
-        /// <summary>
-        /// Вычисление разности между двумя итераторами.
-        /// </summary>
-        public static int operator - (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
-            unchecked((int)(left._pointer - right._pointer));
+    /// <summary>
+    /// Вычисление разности между двумя итераторами.
+    /// </summary>
+    public static int operator - (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+        unchecked ((int)(left._pointer - right._pointer));
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator < (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
-            left._pointer < right._pointer;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator < (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+        left._pointer < right._pointer;
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator <= (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
-            left._pointer <= right._pointer;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator <= (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+        left._pointer <= right._pointer;
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator > (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
-            left._pointer > right._pointer;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator > (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+        left._pointer > right._pointer;
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator >= (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
-            left._pointer >= right._pointer;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator >= (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+        left._pointer >= right._pointer;
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator == (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
-            left._pointer == right._pointer;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator == (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+        left._pointer == right._pointer;
 
-        /// <summary>
-        /// Сравнение двух итераторов.
-        /// </summary>
-        public static bool operator != (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
-            left._pointer != right._pointer;
+    /// <summary>
+    /// Сравнение двух итераторов.
+    /// </summary>
+    public static bool operator != (UnsafeIterator<T> left, UnsafeIterator<T> right) =>
+        left._pointer != right._pointer;
 
-        #endregion
+    #endregion
 
-        #region IIterator members
+    #region IIterator members
 
-        /// <inheritdoc cref="IComparable{T}.CompareTo"/>
-        public int CompareTo(IIterator<T>? other) =>
-            other is UnsafeIterator<T> unsafeIterator
-                ? unchecked((int)(_pointer - unsafeIterator._pointer))
-                : throw new ArgumentException();
+    /// <inheritdoc cref="IComparable{T}.CompareTo"/>
+    public int CompareTo (IIterator<T>? other) =>
+        other is UnsafeIterator<T> unsafeIterator
+            ? unchecked ((int)(_pointer - unsafeIterator._pointer))
+            : throw new ArgumentException();
 
-        /// <inheritdoc cref="IIterator{T}.Value"/>
-        public ref T Value => ref *_pointer;
+    /// <inheritdoc cref="IIterator{T}.Value"/>
+    public ref T Value => ref *_pointer;
 
-        /// <inheritdoc cref="IIterator{T}.Advance"/>
-        public void Advance(int delta = 1) => _pointer += delta;
+    /// <inheritdoc cref="IIterator{T}.Advance"/>
+    public void Advance (int delta = 1) => _pointer += delta;
 
-        #endregion
+    #endregion
 
-        #region IEquatable members
+    #region IEquatable members
 
-        /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
-        public bool Equals(UnsafeIterator<T> other) =>
-            _pointer == other._pointer;
+    /// <inheritdoc cref="IEquatable{T}.Equals(T)"/>
+    public bool Equals (UnsafeIterator<T> other) =>
+        _pointer == other._pointer;
 
-        #endregion
+    #endregion
 
-        #region Object members
+    #region Object members
 
-        /// <inheritdoc cref="object.Equals(object)"/>
-        public override bool Equals(object? obj) =>
-            obj is UnsafeIterator<T> other && Equals(other);
+    /// <inheritdoc cref="object.Equals(object)"/>
+    public override bool Equals (object? obj) =>
+        obj is UnsafeIterator<T> other && Equals (other);
 
-        /// <inheritdoc cref="object.GetHashCode"/>
-        public override int GetHashCode() => (int)_pointer;
+    /// <inheritdoc cref="object.GetHashCode"/>
+    public override int GetHashCode() => (int)_pointer;
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => ((int)_pointer).ToString("x8");
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => ((int) _pointer).ToString ("x8");
 
-        #endregion
-
-    } // struct UnsafeIterator
-
-} // namespace AM.Collections
+    #endregion
+}

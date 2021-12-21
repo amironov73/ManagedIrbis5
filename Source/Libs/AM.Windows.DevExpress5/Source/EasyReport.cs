@@ -41,9 +41,18 @@ public class EasyReport
     public XtraReport Report { get; }
 
     /// <summary>
+    /// Высота рабочей области отчета.
+    /// </summary>
+    public int Height => Report.PageHeight
+                         - Report.Margins.Top
+                         - Report.Margins.Bottom;
+
+    /// <summary>
     /// Ширина рабочей области отчета.
     /// </summary>
-    public int Width => Report.PageWidth - Report.Margins.Left - Report.Margins.Right;
+    public int Width => Report.PageWidth
+                        - Report.Margins.Left
+                        - Report.Margins.Right;
 
     #endregion
 
@@ -109,6 +118,8 @@ public class EasyReport
             string fileName
         )
     {
+        Sure.NotNullNorEmpty (fileName);
+
         Report.ExportToPdf (fileName);
     }
 
@@ -120,6 +131,8 @@ public class EasyReport
             string fileName
         )
     {
+        Sure.NotNullNorEmpty (fileName);
+
         Report.ExportToXlsx (fileName);
     }
 

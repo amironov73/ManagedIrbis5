@@ -21,82 +21,81 @@ using System;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Обертка для перечисляемого спана.
+/// </summary>
+public readonly ref struct RefEnumerable<T>
 {
+    #region Nested class
+
     /// <summary>
-    /// Обертка для перечисляемого спана.
+    /// Перечислитель.
     /// </summary>
-    public readonly ref struct RefEnumerable<T>
+    public ref struct RefEnumerator<TT>
     {
-        #region Nested class
-
-        /// <summary>
-        /// Перечислитель.
-        /// </summary>
-        public ref struct RefEnumerator<TT>
-        {
-            #region Construction
-
-            /// <summary>
-            /// Конструктор.
-            /// </summary>
-            public RefEnumerator
-                (
-                    Span<TT> data
-                ) : this()
-            {
-                _data = data;
-                _position = -1;
-            }
-
-            #endregion
-
-            #region Private members
-
-            private readonly Span<TT> _data;
-            private int _position;
-
-            #endregion
-
-            #region IEnumerable imitation
-
-            /// <summary>
-            /// Ссылка на текущий элемент.
-            /// </summary>
-            public ref TT Current => ref _data[_position];
-
-            /// <summary>
-            /// Переход к следующему элементу.
-            /// </summary>
-            public bool MoveNext() => ++_position < _data.Length;
-
-            #endregion
-        }
-
-        #endregion
-
         #region Construction
 
         /// <summary>
         /// Конструктор.
         /// </summary>
-        public RefEnumerable(Span<T> data) => _data = data;
+        public RefEnumerator
+            (
+                Span<TT> data
+            ) : this()
+        {
+            _data = data;
+            _position = -1;
+        }
 
         #endregion
 
         #region Private members
 
-        private readonly Span<T> _data;
+        private readonly Span<TT> _data;
+        private int _position;
 
         #endregion
 
-        #region IRefEnumerable<T> imitation
+        #region IEnumerable imitation
 
         /// <summary>
-        /// Запрос перечислителя.
+        /// Ссылка на текущий элемент.
         /// </summary>
-        public RefEnumerator<T> GetEnumerator() => new RefEnumerator<T>(this._data);
+        public ref TT Current => ref _data[_position];
+
+        /// <summary>
+        /// Переход к следующему элементу.
+        /// </summary>
+        public bool MoveNext() => ++_position < _data.Length;
 
         #endregion
     }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public RefEnumerable (Span<T> data) => _data = data;
+
+    #endregion
+
+    #region Private members
+
+    private readonly Span<T> _data;
+
+    #endregion
+
+    #region IRefEnumerable<T> imitation
+
+    /// <summary>
+    /// Запрос перечислителя.
+    /// </summary>
+    public RefEnumerator<T> GetEnumerator() => new RefEnumerator<T> (this._data);
+
+    #endregion
 }

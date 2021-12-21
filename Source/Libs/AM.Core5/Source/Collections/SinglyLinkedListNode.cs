@@ -11,44 +11,41 @@
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Звено односвязного списка.
+/// </summary>
+public sealed class SinglyLinkedListNode<T>
 {
+    #region Properties
+
     /// <summary>
-    /// Звено односвязного списка.
+    /// Хранимое значение.
     /// </summary>
-    public sealed class SinglyLinkedListNode<T>
+    public T? Value { get; }
+
+    /// <summary>
+    /// Ссылка на следующее звено.
+    /// </summary>
+    public SinglyLinkedListNode<T>? Next { get; internal set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="value">Значение, которое должно храниться в звене.
+    /// </param>
+    public SinglyLinkedListNode
+        (
+            T? value
+        )
     {
-        #region Properties
+        Value = value;
+    }
 
-        /// <summary>
-        /// Хранимое значение.
-        /// </summary>
-        public T? Value { get; }
-
-        /// <summary>
-        /// Ссылка на следующее звено.
-        /// </summary>
-        public SinglyLinkedListNode<T>? Next { get; internal set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="value">Значение, которое должно храниться в звене.
-        /// </param>
-        public SinglyLinkedListNode
-            (
-                T? value
-            )
-        {
-            Value = value;
-        }
-
-        #endregion
-
-    } // class SinglyLinkedListNode
-
-} // namespace AM.Collections
+    #endregion
+}

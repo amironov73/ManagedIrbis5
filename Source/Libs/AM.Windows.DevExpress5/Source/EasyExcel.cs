@@ -250,7 +250,11 @@ public sealed class EasyExcel
     /// <summary>
     /// Вывод текста в указанную колонку.
     /// </summary>
-    public Cell WriteText (int column, string text)
+    public Cell WriteText
+        (
+            int column,
+            string text
+        )
     {
         var result = GetCell (_currentRow, column);
         result.Value = text;
@@ -262,7 +266,10 @@ public sealed class EasyExcel
     /// Вывод текста в текущую колонку.
     /// Переход к следующей колонке.
     /// </summary>
-    public Cell WriteText (string text)
+    public Cell WriteText
+        (
+            string text
+        )
     {
         var result = GetCell (_currentRow, _currentColumn);
         _currentColumn++;

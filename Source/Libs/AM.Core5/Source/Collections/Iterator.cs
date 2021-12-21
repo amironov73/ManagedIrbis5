@@ -21,72 +21,71 @@ using System.Diagnostics.CodeAnalysis;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Абстрактный перечислитель, заимствованный из <c>System.IO</c>.
+/// </summary>
+public abstract class Iterator<T>
+    : IEnumerable<T>,
+    IEnumerator<T>
 {
+    #region Construction
+
     /// <summary>
-    /// Абстрактный перечислитель, заимствованный из <c>System.IO</c>.
+    /// Конструктор.
     /// </summary>
-    public abstract class Iterator<T>
-        : IEnumerable<T>,
-          IEnumerator<T>
+    protected Iterator()
     {
-        #region Construction
+        State = -1;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        protected Iterator()
-        {
-            State = -1;
-        }
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Private members
+    /// <summary>
+    /// Состояние перечислителя.
+    /// В начале равно -1.
+    /// </summary>
+    protected int State;
 
-        /// <summary>
-        /// Состояние перечислителя.
-        /// В начале равно -1.
-        /// </summary>
-        protected int State;
+    /// <summary>
+    /// Текущий перечисляемый элемент.
+    /// </summary>
+    protected T? _current;
 
-        /// <summary>
-        /// Текущий перечисляемый элемент.
-        /// </summary>
-        protected T? _current;
+    #endregion
 
-        #endregion
+    #region IEnumerable<T> members
 
-        #region IEnumerable<T> members
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+    public IEnumerator<T> GetEnumerator() => this;
 
-        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
-        public IEnumerator<T> GetEnumerator() => this;
+    /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    #endregion
 
-        #endregion
+    #region IEnumerator<T> members
 
-        #region IEnumerator<T> members
+    /// <inheritdoc cref="IEnumerator{T}.Current"/>
+    public T Current => _current!;
 
-        /// <inheritdoc cref="IEnumerator{T}.Current"/>
-        public T Current => _current!;
+    /// <inheritdoc cref="IEnumerator.Current"/>
+    object? IEnumerator.Current => Current;
 
-        /// <inheritdoc cref="IEnumerator.Current"/>
-        object? IEnumerator.Current => Current;
+    /// <inheritdoc cref="IEnumerator.MoveNext"/>
+    public abstract bool MoveNext();
 
-        /// <inheritdoc cref="IEnumerator.MoveNext"/>
-        public abstract bool MoveNext();
+    /// <inheritdoc cref="IEnumerator.Reset"/>
+    [ExcludeFromCodeCoverage]
+    public void Reset() => throw new NotImplementedException();
 
-        /// <inheritdoc cref="IEnumerator.Reset"/>
-        [ExcludeFromCodeCoverage]
-        public void Reset() => throw new NotImplementedException();
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public virtual void Dispose()
+    {
+    }
 
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public virtual void Dispose() {}
-
-        #endregion
-
-    } // class Iterator<T>
-
-} // namespace AM.Collections
+    #endregion
+}

@@ -3,6 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedType.Global
 
 /* IRefEnumerator.cs -- перечисление объектов по ссылке
  * Ars Magna project, http://arsmagna.ru
@@ -10,25 +12,22 @@
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Перечисление объектов по ссылке.
+/// </summary>
+public interface IRefEnumerator<T>
 {
     /// <summary>
-    /// Перечисление объектов по ссылке.
+    /// Ссылка на текущий элемент.
     /// </summary>
-    public interface IRefEnumerator<T>
-    {
-        /// <summary>
-        /// Ссылка на текущий элемент.
-        /// </summary>
-        ref T Current { get; }
+    ref T Current { get; }
 
-        /// <summary>
-        /// Переход к следующему элементу.
-        /// </summary>
-        /// <returns><c>false</c>, если перечисляемые объекты закончились.
-        /// </returns>
-        bool MoveNext();
-
-    } // interface IRefEnumerator<T>
-
-} // namespace AM.Collections
+    /// <summary>
+    /// Переход к следующему элементу.
+    /// </summary>
+    /// <returns><c>false</c>, если перечисляемые объекты закончились.
+    /// </returns>
+    bool MoveNext();
+}

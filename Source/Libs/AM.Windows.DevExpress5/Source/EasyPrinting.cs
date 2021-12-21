@@ -45,6 +45,20 @@ public class EasyPrinting
     /// </summary>
     public BrickGraphics Graphics { get; }
 
+    /// <summary>
+    /// Полезная высота страницы.
+    /// </summary>
+    public int Height => Printing.PageBounds.Height
+                         - Printing.PageMargins.Top
+                         - Printing.PageMargins.Bottom;
+
+    /// <summary>
+    /// Полезная ширина страницы.
+    /// </summary>
+    public int Width => Printing.PageBounds.Width
+                        - Printing.PageMargins.Left
+                        - Printing.PageMargins.Right;
+
     #endregion
 
     #region Construction
@@ -114,8 +128,21 @@ public class EasyPrinting
             string fileName
         )
     {
+        Sure.NotNullNorEmpty (fileName);
+
         Printing.End();
         Printing.ExportToImage (fileName);
+    }
+
+    public void ExportToPdf
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        Printing.End();
+        Printing.ExportToPdf (fileName);
     }
 
     /// <summary>

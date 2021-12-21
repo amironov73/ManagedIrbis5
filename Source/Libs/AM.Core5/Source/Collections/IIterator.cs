@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 /* IIterator.cs -- аналог итератора из C++
  * Ars Magna project, http://arsmagna.ru
@@ -18,33 +19,30 @@ using System;
 
 #nullable enable
 
-namespace AM.Collections
+namespace AM.Collections;
+
+/// <summary>
+/// Аналог итератора из C++.
+/// </summary>
+public interface IIterator<T>
+    : IComparable<IIterator<T>>
+    where T : unmanaged
 {
+    #region Properties
+
     /// <summary>
-    /// Аналог итератора из C++.
+    /// Ссылка на значение.
     /// </summary>
-    public interface IIterator<T>
-        : IComparable<IIterator<T>>
-        where T: unmanaged
-    {
-        #region Properties
+    public ref T Value { get; }
 
-        /// <summary>
-        /// Ссылка на значение.
-        /// </summary>
-        public ref T Value { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
+    /// <summary>
+    /// Движение итератора.
+    /// </summary>
+    void Advance (int delta = 1);
 
-        /// <summary>
-        /// Движение итератора.
-        /// </summary>
-        void Advance(int delta = 1);
-
-        #endregion
-
-    } // interface IIterator
-
-} // namespace AM.Collections
+    #endregion
+}
