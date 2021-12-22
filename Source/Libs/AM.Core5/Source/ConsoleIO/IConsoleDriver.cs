@@ -21,79 +21,76 @@ using System;
 
 #nullable enable
 
-namespace AM.ConsoleIO
+namespace AM.ConsoleIO;
+
+/// <summary>
+/// Интерфейс абстрактной консоли.
+/// </summary>
+public interface IConsoleDriver
 {
+    #region Properties
+
     /// <summary>
-    /// Интерфейс абстрактной консоли.
+    /// Gets or sets the background color of the console.
     /// </summary>
-    public interface IConsoleDriver
-    {
-        #region Properties
+    ConsoleColor BackgroundColor { get; set; }
 
-        /// <summary>
-        /// Gets or sets the background color of the console.
-        /// </summary>
-        ConsoleColor BackgroundColor { get; set; }
+    /// <summary>
+    /// Gets or sets the foreground color of the console.
+    /// </summary>
+    ConsoleColor ForegroundColor { get; set; }
 
-        /// <summary>
-        /// Gets or sets the foreground color of the console.
-        /// </summary>
-        ConsoleColor ForegroundColor { get; set; }
+    /// <summary>
+    /// Gets a value indicating whether a key press
+    /// is available in the input stream.
+    /// </summary>
+    bool KeyAvailable { get; }
 
-        /// <summary>
-        /// Gets a value indicating whether a key press
-        /// is available in the input stream.
-        /// </summary>
-        bool KeyAvailable { get; }
+    /// <summary>
+    /// Gets or sets the title to display
+    /// in the console title bar.
+    /// </summary>
+    string Title { get; set; }
 
-        /// <summary>
-        /// Gets or sets the title to display
-        /// in the console title bar.
-        /// </summary>
-        string Title { get; set; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
+    /// <summary>
+    /// Clear the console.
+    /// </summary>
+    void Clear();
 
-        /// <summary>
-        /// Clear the console.
-        /// </summary>
-        void Clear();
+    /// <summary>
+    /// Read one key.
+    /// </summary>
+    ConsoleKeyInfo ReadKey
+        (
+            bool intercept
+        );
 
-        /// <summary>
-        /// Read one key.
-        /// </summary>
-        ConsoleKeyInfo ReadKey
-            (
-                bool intercept
-            );
+    /// <summary>
+    /// Reads the next character from the standard input stream.
+    /// </summary>
+    int Read();
 
-        /// <summary>
-        /// Reads the next character from the standard input stream.
-        /// </summary>
-        int Read();
+    /// <summary>
+    /// Read one line.
+    /// </summary>
+    string? ReadLine();
 
-        /// <summary>
-        /// Read one line.
-        /// </summary>
-        string? ReadLine();
+    /// <summary>
+    /// Write text.
+    /// </summary>
+    void Write
+        (
+            string? text
+        );
 
-        /// <summary>
-        /// Write text.
-        /// </summary>
-        void Write
-            (
-                string? text
-            );
+    /// <summary>
+    /// Goto next line.
+    /// </summary>
+    void WriteLine();
 
-        /// <summary>
-        /// Goto next line.
-        /// </summary>
-        void WriteLine();
-
-        #endregion
-
-    } // interface IConsoleDriver
-
-} // namespace AM.ConsoleIO
+    #endregion
+}

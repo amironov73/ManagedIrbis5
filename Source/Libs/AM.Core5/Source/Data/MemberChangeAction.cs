@@ -19,42 +19,39 @@ using System.Reflection;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Действие, привязанное к определенному члену объекта.
+/// Когда вызывается Notify, действие выполняется.
+/// </summary>
+internal sealed class MemberChangeAction
 {
-    /// <summary>
-    /// Действие, привязанное к определенному члену объекта.
-    /// Когда вызывается Notify, действие выполняется.
-    /// </summary>
-    internal sealed class MemberChangeAction
+    readonly Action<int> action;
+
+    public object? Target { get; }
+
+    public MemberInfo Member { get; }
+
+    public MemberChangeAction
+        (
+            object target,
+            MemberInfo member,
+            Action<int>? action
+        )
     {
-        readonly Action<int> action;
-
-        public object? Target { get; }
-
-        public MemberInfo Member { get; }
-
-        public MemberChangeAction
-            (
-                object target,
-                MemberInfo member,
-                Action<int>? action
-            )
+        Target = target;
+        if (member == null)
         {
-            Target = target;
-            if (member == null)
-            {
-                throw new ArgumentNullException (nameof(member));
-            }
-
-            Member = member;
-            this.action = action ?? throw new ArgumentNullException (nameof(action));
+            throw new ArgumentNullException (nameof (member));
         }
 
-        public void Notify (int changeId)
-        {
-            action (changeId);
-        }
+        Member = member;
+        this.action = action ?? throw new ArgumentNullException (nameof (action));
+    }
 
-    } // class MemberChangeAction
-
-} // namespace AM.Data
+    public void Notify (int changeId)
+    {
+        action (changeId);
+    }
+}

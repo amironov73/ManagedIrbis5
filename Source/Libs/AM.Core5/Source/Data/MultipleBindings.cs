@@ -19,43 +19,41 @@ using System.Linq;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+//
+// Заимствовано из проекта Praeclarum.Bind
+//
+// https://raw.githubusercontent.com/praeclarum/Bind/master/src/Bind.cs
+//
+// Copyright 2013-2014 Frank A. Krueger
+//
+
+/// <summary>
+/// Несколько байндингов сгруппированных как один,
+/// для упрощения добавления и удаления.
+/// </summary>
+internal sealed class MultipleBindings
+    : EasyBinding
 {
-    //
-    // Заимствовано из проекта Praeclarum.Bind
-    //
-    // https://raw.githubusercontent.com/praeclarum/Bind/master/src/Bind.cs
-    //
-    // Copyright 2013-2014 Frank A. Krueger
-    //
+    readonly List<EasyBinding> bindings;
 
-    /// <summary>
-    /// Несколько байндингов сгруппированных как один,
-    /// для упрощения добавления и удаления.
-    /// </summary>
-    internal sealed class MultipleBindings
-        : EasyBinding
+    public MultipleBindings
+        (
+            IEnumerable<EasyBinding> bindings
+        )
     {
-        readonly List<EasyBinding> bindings;
+        this.bindings = bindings.ToList();
+    }
 
-        public MultipleBindings
-            (
-                IEnumerable<EasyBinding> bindings
-            )
+    public override void Unbind()
+    {
+        base.Unbind();
+        foreach (var b in bindings)
         {
-            this.bindings = bindings.ToList ();
+            b.Unbind();
         }
 
-        public override void Unbind ()
-        {
-            base.Unbind ();
-            foreach (var b in bindings)
-            {
-                b.Unbind ();
-            }
-            bindings.Clear ();
-        }
-
-    } // class MultipleBindings
-
-} // namespace AM.Data
+        bindings.Clear();
+    }
+}

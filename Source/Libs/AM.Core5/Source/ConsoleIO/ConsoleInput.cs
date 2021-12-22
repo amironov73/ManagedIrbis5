@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* ConsoleInput.cs --
+/* ConsoleInput.cs -- консольный ввод-вывод
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,148 +21,145 @@ using System;
 
 #nullable enable
 
-namespace AM.ConsoleIO
+namespace AM.ConsoleIO;
+
+/// <summary>
+/// Консольный ввод-вывод.
+/// </summary>
+public static class ConsoleInput
 {
+    #region Properties
+
     /// <summary>
-    /// Console input.
+    /// Цвет фона.
     /// </summary>
-    public static class ConsoleInput
+    public static ConsoleColor BackgroundColor
     {
-        #region Properties
+        get => Driver.BackgroundColor;
+        set => Driver.BackgroundColor = value;
+    }
 
-        /// <summary>
-        /// Background color.
-        /// </summary>
-        public static ConsoleColor BackgroundColor
+    /// <summary>
+    /// Драйвер консоли.
+    /// </summary>
+    public static IConsoleDriver Driver => _driver;
+
+    /// <summary>
+    /// Цвет текста.
+    /// </summary>
+    public static ConsoleColor ForegroundColor
+    {
+        get => Driver.ForegroundColor;
+        set => Driver.ForegroundColor = value;
+    }
+
+    /// <summary>
+    /// Пользователь нажимал клавиши?
+    /// </summary>
+    public static bool KeyAvailable => Driver.KeyAvailable;
+
+    /// <summary>
+    /// Заголовок консоли.
+    /// </summary>
+    public static string Title
+    {
+        get => Driver.Title;
+        set => Driver.Title = value;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static IConsoleDriver _driver = new SystemConsole();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Очистка консоли.
+    /// </summary>
+    public static void Clear()
+    {
+        Driver.Clear();
+    }
+
+    /// <summary>
+    /// Считывание одного символа.
+    /// </summary>
+    public static int Read()
+    {
+        return Driver.Read();
+    }
+
+    /// <summary>
+    /// Считывание одного нажатия клавиши.
+    /// </summary>
+    public static ConsoleKeyInfo ReadKey
+        (
+            bool intercept
+        )
+    {
+        return Driver.ReadKey (intercept);
+    }
+
+    /// <summary>
+    /// Считывание строки.
+    /// </summary>
+    public static string? ReadLine()
+    {
+        return Driver.ReadLine();
+    }
+
+    /// <summary>
+    /// Переключение на другой драйвер клавиатуры.
+    /// </summary>
+    public static IConsoleDriver SetDriver
+        (
+            IConsoleDriver driver
+        )
+    {
+        var previousDriver = _driver;
+
+        _driver = driver;
+
+        return previousDriver;
+    }
+
+    /// <summary>
+    /// Вывод текста.
+    /// </summary>
+    public static void Write
+        (
+            string text
+        )
+    {
+        if (!string.IsNullOrEmpty (text))
         {
-            get => Driver.BackgroundColor;
-            set => Driver.BackgroundColor = value;
+            Driver.Write (text);
         }
+    }
 
-        /// <summary>
-        /// Driver for the console.
-        /// </summary>
-        public static IConsoleDriver Driver => _driver;
+    /// <summary>
+    /// Переход на новую строку.
+    /// </summary>
+    public static void WriteLine()
+    {
+        Driver.WriteLine();
+    }
 
-        /// <summary>
-        /// Foreground color.
-        /// </summary>
-        public static ConsoleColor ForegroundColor
-        {
-            get => Driver.ForegroundColor;
-            set => Driver.ForegroundColor = value;
-        }
+    /// <summary>
+    /// Write text and goto next line.
+    /// </summary>
+    public static void WriteLine
+        (
+            string text
+        )
+    {
+        Write (text);
+        WriteLine();
+    }
 
-        /// <summary>
-        /// Key available?
-        /// </summary>
-        public static bool KeyAvailable => Driver.KeyAvailable;
-
-        /// <summary>
-        /// Console title.
-        /// </summary>
-        public static string Title
-        {
-            get => Driver.Title;
-            set => Driver.Title = value;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private static IConsoleDriver _driver = new SystemConsole();
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Clear the console.
-        /// </summary>
-        public static void Clear()
-        {
-            Driver.Clear();
-        }
-
-        /// <summary>
-        /// Read one character.
-        /// </summary>
-        public static int Read()
-        {
-            return Driver.Read();
-        }
-
-        /// <summary>
-        /// Read one key.
-        /// </summary>
-        public static ConsoleKeyInfo ReadKey
-            (
-                bool intercept
-            )
-        {
-            return Driver.ReadKey(intercept);
-        }
-
-        /// <summary>
-        /// Read line.
-        /// </summary>
-        public static string? ReadLine()
-        {
-            return Driver.ReadLine();
-        }
-
-        /// <summary>
-        /// Set driver.
-        /// </summary>
-        public static IConsoleDriver SetDriver
-            (
-                IConsoleDriver driver
-            )
-        {
-            IConsoleDriver previousDriver = _driver;
-
-            _driver = driver;
-
-            return previousDriver;
-        }
-
-        /// <summary>
-        /// Write text.
-        /// </summary>
-        public static void Write
-            (
-                string text
-            )
-        {
-            if (!string.IsNullOrEmpty(text))
-            {
-                Driver.Write(text);
-            }
-        }
-
-        /// <summary>
-        /// Goto next line.
-        /// </summary>
-        public static void WriteLine()
-        {
-            Driver.WriteLine();
-        }
-
-        /// <summary>
-        /// Write text and goto next line.
-        /// </summary>
-        public static void WriteLine
-            (
-                string text
-            )
-        {
-            Write(text);
-            WriteLine();
-        }
-
-        #endregion
-
-    } // class ConsoleInput
-
-} // namespace AM.ConsoleIO
+    #endregion
+}

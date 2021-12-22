@@ -20,40 +20,37 @@ using System;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Задает заголовок колонки в гриде.
+/// </summary>
+[Serializable]
+[AttributeUsage (AttributeTargets.Property)]
+public sealed class ColumnHeaderAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    /// Задает заголовок колонки в гриде.
+    /// Заголовок колонки.
     /// </summary>
-    [Serializable]
-    [AttributeUsage (AttributeTargets.Property)]
-    public sealed class ColumnHeaderAttribute
-        : Attribute
+    public string Header { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ColumnHeaderAttribute
+        (
+            string header
+        )
     {
-        #region Properties
+        Header = header;
+    }
 
-        /// <summary>
-        /// Заголовок колонки.
-        /// </summary>
-        public string Header { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ColumnHeaderAttribute
-            (
-                string header
-            )
-        {
-            Header = header;
-        } // constructor
-
-        #endregion
-
-    } // class ColumnHeaderAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

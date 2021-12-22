@@ -19,31 +19,31 @@ using System.Linq.Expressions;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Методы для вычисления значения Linq-выражения.
+/// </summary>
+internal static class Evaluator
 {
     /// <summary>
-    /// Методы для вычисления значения Linq-выражения.
+    /// Gets the value of a Linq expression.
     /// </summary>
-    internal static class Evaluator
+    /// <param name="expr">The expresssion.</param>
+    public static object? EvalExpression (Expression expr)
     {
-        /// <summary>
-        /// Gets the value of a Linq expression.
-        /// </summary>
-        /// <param name="expr">The expresssion.</param>
-        public static object? EvalExpression (Expression expr)
+        //
+        // Easy case
+        //
+        if (expr.NodeType == ExpressionType.Constant)
         {
-            //
-            // Easy case
-            //
-            if (expr.NodeType == ExpressionType.Constant) {
-                return ((ConstantExpression)expr).Value;
-            }
-
-            //
-            // General case
-            //
-            var lambda = Expression.Lambda (expr, Enumerable.Empty<ParameterExpression> ());
-            return lambda.Compile ().DynamicInvoke ();
+            return ((ConstantExpression)expr).Value;
         }
+
+        //
+        // General case
+        //
+        var lambda = Expression.Lambda (expr, Enumerable.Empty<ParameterExpression>());
+        return lambda.Compile().DynamicInvoke();
     }
 }

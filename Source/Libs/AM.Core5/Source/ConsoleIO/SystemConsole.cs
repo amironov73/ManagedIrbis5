@@ -23,134 +23,131 @@ using System.Runtime.InteropServices;
 
 #nullable enable
 
-namespace AM.ConsoleIO
+namespace AM.ConsoleIO;
+
+/// <summary>
+/// Драйвер для системной консоли.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public sealed class SystemConsole
+    : IConsoleDriver
 {
-    /// <summary>
-    /// Драйвер для системной консоли.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public sealed class SystemConsole
-        : IConsoleDriver
+    #region IConsoleDriver members
+
+    /// <inheritdoc cref="IConsoleDriver.BackgroundColor" />
+    public ConsoleColor BackgroundColor
     {
-        #region IConsoleDriver members
+        get => Console.BackgroundColor;
+        set => Console.BackgroundColor = value;
+    }
 
-        /// <inheritdoc cref="IConsoleDriver.BackgroundColor" />
-        public ConsoleColor BackgroundColor
+    /// <inheritdoc cref="IConsoleDriver.ForegroundColor" />
+    public ConsoleColor ForegroundColor
+    {
+        get => Console.ForegroundColor;
+        set => Console.ForegroundColor = value;
+    }
+
+    /// <inheritdoc cref="IConsoleDriver.KeyAvailable" />
+    public bool KeyAvailable => Console.KeyAvailable;
+
+    /// <inheritdoc cref="IConsoleDriver.Title" />
+    public string Title
+    {
+        get => RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ? Console.Title : string.Empty;
+        set
         {
-            get => Console.BackgroundColor;
-            set => Console.BackgroundColor = value;
-        }
-
-        /// <inheritdoc cref="IConsoleDriver.ForegroundColor" />
-        public ConsoleColor ForegroundColor
-        {
-            get => Console.ForegroundColor;
-            set => Console.ForegroundColor = value;
-        }
-
-        /// <inheritdoc cref="IConsoleDriver.KeyAvailable" />
-        public bool KeyAvailable => Console.KeyAvailable;
-
-        /// <inheritdoc cref="IConsoleDriver.Title" />
-        public string Title
-        {
-            get => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? Console.Title : string.Empty;
-            set
+            if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    Console.Title = value;
-                }
+                Console.Title = value;
             }
         }
+    }
 
-        /// <inheritdoc cref="IConsoleDriver.Clear" />
-        public void Clear()
+    /// <inheritdoc cref="IConsoleDriver.Clear" />
+    public void Clear()
+    {
+        Console.Clear();
+    }
+
+    /// <inheritdoc cref="IConsoleDriver.Read" />
+    public int Read()
+    {
+        return Console.Read();
+    }
+
+    /// <inheritdoc cref="IConsoleDriver.ReadKey" />
+    public ConsoleKeyInfo ReadKey
+        (
+            bool intercept
+        )
+    {
+        return Console.ReadKey (intercept);
+    }
+
+    /// <inheritdoc cref="IConsoleDriver.ReadLine" />
+    public string? ReadLine()
+    {
+        return Console.ReadLine();
+    }
+
+    /// <inheritdoc cref="IConsoleDriver.Write" />
+    public void Write
+        (
+            string? text
+        )
+    {
+        Console.Write (text);
+    }
+
+    /// <inheritdoc cref="IConsoleDriver.WriteLine" />
+    public void WriteLine()
+    {
+        Console.WriteLine();
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Убирает из буфера все (возможно) накопившиеся там нажатия клавиш.
+    /// </summary>
+    /// <param name="intercept">С возможностью прерывания?</param>
+    public static void FlushInputBuffer
+        (
+            bool intercept = true
+        )
+    {
+        while (Console.KeyAvailable)
         {
-            Console.Clear();
+            Console.ReadKey (intercept);
+        }
+    }
+
+    /// <summary>
+    /// Задерживает выполнение программы,
+    /// пока не будет нажата указанная клавиша.
+    /// </summary>
+    /// <param name="key">Клавиша.</param>
+    public static void PressToContinue
+        (
+            ConsoleKey key = ConsoleKey.Enter
+        )
+    {
+        if (!Enum.IsDefined (typeof (ConsoleKey), key))
+        {
+            throw new ApplicationException();
         }
 
-        /// <inheritdoc cref="IConsoleDriver.Read" />
-        public int Read()
+        while (Console.ReadKey (true).Key != key)
         {
-            return Console.Read();
+            // ReSharper disable RedundantJumpStatement
+            continue;
+
+            // ReSharper restore RedundantJumpStatement
         }
+    }
 
-        /// <inheritdoc cref="IConsoleDriver.ReadKey" />
-        public ConsoleKeyInfo ReadKey
-            (
-                bool intercept
-            )
-        {
-            return Console.ReadKey(intercept);
-        }
-
-        /// <inheritdoc cref="IConsoleDriver.ReadLine" />
-        public string? ReadLine()
-        {
-            return Console.ReadLine();
-        }
-
-        /// <inheritdoc cref="IConsoleDriver.Write" />
-        public void Write
-            (
-                string? text
-            )
-        {
-            Console.Write(text);
-        }
-
-        /// <inheritdoc cref="IConsoleDriver.WriteLine" />
-        public void WriteLine()
-        {
-            Console.WriteLine();
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Убирает из буфера все (возможно) накопившиеся там нажатия клавиш.
-        /// </summary>
-        /// <param name="intercept">С возможностью прерывания?</param>
-        public static void FlushInputBuffer
-            (
-                bool intercept = true
-            )
-        {
-            while (Console.KeyAvailable)
-            {
-                Console.ReadKey(intercept);
-
-            }
-        } // method FlushInputBuffer
-
-        /// <summary>
-        /// Задерживает выполнение программы,
-        /// пока не будет нажата указанная клавиша.
-        /// </summary>
-        /// <param name="key">Клавиша.</param>
-        public static void PressToContinue
-            (
-                ConsoleKey key = ConsoleKey.Enter
-            )
-        {
-            if (!Enum.IsDefined(typeof(ConsoleKey), key))
-            {
-                throw new ApplicationException();
-            }
-
-            while (Console.ReadKey(true).Key != key)
-            {
-                // ReSharper disable RedundantJumpStatement
-                continue;
-                // ReSharper restore RedundantJumpStatement
-            }
-        } // method PressToContinue
-
-        #endregion
-
-    } // class SystemConsole
-
-} // namespace AM.ConsoleIO
+    #endregion
+}

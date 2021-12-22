@@ -13,48 +13,54 @@
 
 #nullable enable
 
-namespace AM.ConsoleIO.Tables
+namespace AM.ConsoleIO.Tables;
+
+/// <summary>
+/// Заголовок колонки.
+/// </summary>
+public class ColumnHeader
 {
+    #region Properties
+
     /// <summary>
-    /// Заголовок колонки.
+    /// Текст заголовка.
     /// </summary>
-    public class ColumnHeader
+    public string Title { get; init; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="title">Текст заголовка колонки</param>
+    public ColumnHeader (string title)
     {
-        #region Properties
+        Title = title;
+    }
 
-        /// <summary>
-        /// Текст заголовка.
-        /// </summary>
-        public string Title { get; init; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
+    /// <summary>
+    /// Оператор неявного преобразования строки в заголовок колонки.
+    /// </summary>
+    public static implicit operator ColumnHeader (string value)
+    {
+        return new (value);
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="title">Текст заголовка колонки</param>
-        public ColumnHeader (string title) => Title = title;
+    #endregion
 
-        #endregion
+    #region Object members
 
-        #region Public methods
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return Title;
+    }
 
-        /// <summary>
-        /// Оператор неявного преобразования строки в заголовок колонки.
-        /// </summary>
-        public static implicit operator ColumnHeader (string value) => new (value);
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => Title;
-
-        #endregion
-
-    } // struct ColumnHeader
-
-} // namespace AM.ConsoleIO.Tables
+    #endregion
+}

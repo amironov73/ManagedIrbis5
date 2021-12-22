@@ -21,139 +21,144 @@ using System.Reflection;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Байндинг между двумя значениями.
+/// Когда одно изменяется, другое устанавливается.
+/// </summary>
+class EqualityBinding
+    : EasyBinding
 {
-    /// <summary>
-    /// Байндинг между двумя значениями.
-    /// Когда одно изменяется, другое устанавливается.
-    /// </summary>
-    class EqualityBinding : EasyBinding
+    object? Value;
+
+    class Trigger
     {
-        object? Value;
+        public Expression? Expression;
+        public MemberInfo? Member;
+        public MemberChangeAction? ChangeAction;
+    }
 
-        class Trigger
+    readonly List<Trigger> leftTriggers = new ();
+    readonly List<Trigger> rightTriggers = new ();
+
+    public EqualityBinding (Expression left, Expression right)
+    {
+        // Try evaling the right and assigning left
+        Value = Evaluator.EvalExpression (right);
+        var leftSet = SetValue (left, Value, nextChangeId);
+
+        // If that didn't work, then try the other direction
+        if (!leftSet)
         {
-            public Expression? Expression;
-            public MemberInfo? Member;
-            public MemberChangeAction? ChangeAction;
+            Value = Evaluator.EvalExpression (left);
+            SetValue (right, Value, nextChangeId);
         }
 
-        readonly List<Trigger> leftTriggers = new ();
-        readonly List<Trigger> rightTriggers = new ();
+        nextChangeId++;
 
-        public EqualityBinding (Expression left, Expression right)
+        CollectTriggers (left, leftTriggers);
+        CollectTriggers (right, rightTriggers);
+
+        Resubscribe (leftTriggers, left, right);
+        Resubscribe (rightTriggers, right, left);
+    }
+
+    public override void Unbind()
+    {
+        Unsubscribe (leftTriggers);
+        Unsubscribe (rightTriggers);
+        base.Unbind();
+    }
+
+    void Resubscribe (List<Trigger> triggers, Expression expr, Expression dependentExpr)
+    {
+        Unsubscribe (triggers);
+        Subscribe (triggers, changeId => OnSideChanged (expr, dependentExpr, changeId));
+    }
+
+    int nextChangeId = 1;
+    readonly HashSet<int> activeChangeIds = new HashSet<int>();
+
+    void OnSideChanged (Expression expr, Expression dependentExpr, int causeChangeId)
+    {
+        if (activeChangeIds.Contains (causeChangeId))
         {
-            // Try evaling the right and assigning left
-            Value = Evaluator.EvalExpression (right);
-            var leftSet = SetValue (left, Value, nextChangeId);
-
-            // If that didn't work, then try the other direction
-            if (!leftSet) {
-                Value = Evaluator.EvalExpression (left);
-                SetValue (right, Value, nextChangeId);
-            }
-
-            nextChangeId++;
-
-            CollectTriggers (left, leftTriggers);
-            CollectTriggers (right, rightTriggers);
-
-            Resubscribe (leftTriggers, left, right);
-            Resubscribe (rightTriggers, right, left);
+            return;
         }
 
-        public override void Unbind ()
+        var v = Evaluator.EvalExpression (expr);
+
+        if (v == null && Value == null)
         {
-            Unsubscribe (leftTriggers);
-            Unsubscribe (rightTriggers);
-            base.Unbind ();
+            return;
         }
 
-        void Resubscribe (List<Trigger> triggers, Expression expr, Expression dependentExpr)
+        if (v == null && Value != null ||
+            v != null && Value == null ||
+            v is IComparable comparable && comparable.CompareTo (Value) != 0)
         {
-            Unsubscribe (triggers);
-            Subscribe (triggers, changeId => OnSideChanged (expr, dependentExpr, changeId));
+            Value = v;
+
+            var changeId = nextChangeId++;
+            activeChangeIds.Add (changeId);
+            SetValue (dependentExpr, v, changeId);
+            activeChangeIds.Remove (changeId);
         }
 
-        int nextChangeId = 1;
-        readonly HashSet<int> activeChangeIds = new HashSet<int> ();
-
-        void OnSideChanged (Expression expr, Expression dependentExpr, int causeChangeId)
-        {
-            if (activeChangeIds.Contains(causeChangeId))
-            {
-                return;
-            }
-
-            var v = Evaluator.EvalExpression (expr);
-
-            if (v == null && Value == null)
-            {
-                return;
-            }
-
-            if (v == null && Value != null ||
-                v != null && Value == null ||
-                v is IComparable comparable && comparable.CompareTo (Value) != 0)
-            {
-
-                Value = v;
-
-                var changeId = nextChangeId++;
-                activeChangeIds.Add (changeId);
-                SetValue (dependentExpr, v, changeId);
-                activeChangeIds.Remove (changeId);
-            }
 //			else {
 //				Debug.WriteLine ("Prevented needless update");
 //			}
-        }
+    }
 
-        static void Unsubscribe (List<Trigger> triggers)
+    static void Unsubscribe (List<Trigger> triggers)
+    {
+        foreach (var t in triggers)
         {
-            foreach (var t in triggers)
+            if (t.ChangeAction != null)
             {
-                if (t.ChangeAction != null)
-                {
-                    RemoveMemberChangeAction (t.ChangeAction);
-                }
+                RemoveMemberChangeAction (t.ChangeAction);
             }
         }
+    }
 
-        static void Subscribe (List<Trigger> triggers, Action<int> action)
+    static void Subscribe
+        (
+            List<Trigger> triggers,
+            Action<int> action
+        )
+    {
+        foreach (var t in triggers)
         {
-            foreach (var t in triggers)
-            {
-                t.ChangeAction = AddMemberChangeAction
-                    (
-                        Evaluator.EvalExpression (t.Expression!)!,
-                        t.Member!,
-                        action!
-                    );
-            }
+            t.ChangeAction = AddMemberChangeAction
+                (
+                    Evaluator.EvalExpression (t.Expression!)!,
+                    t.Member!,
+                    action!
+                );
         }
+    }
 
-        void CollectTriggers (Expression s, List<Trigger> triggers)
+    void CollectTriggers
+        (
+            Expression s,
+            List<Trigger> triggers
+        )
+    {
+        if (s.NodeType == ExpressionType.MemberAccess)
         {
-            if (s.NodeType == ExpressionType.MemberAccess)
+            var m = (MemberExpression)s;
+            CollectTriggers (m.Expression!, triggers);
+            var t = new Trigger { Expression = m.Expression, Member = m.Member };
+            triggers.Add (t);
+        }
+        else
+        {
+            if (s is BinaryExpression b)
             {
-
-                var m = (MemberExpression)s;
-                CollectTriggers (m.Expression!, triggers);
-                var t = new Trigger { Expression = m.Expression, Member = m.Member };
-                triggers.Add (t);
-
-            }
-            else
-            {
-                if (s is BinaryExpression b)
-                {
-                    CollectTriggers (b.Left, triggers);
-                    CollectTriggers (b.Right, triggers);
-                }
+                CollectTriggers (b.Left, triggers);
+                CollectTriggers (b.Right, triggers);
             }
         }
-
-    } // class EqualityBinding
-
-} // namespace AM.Data
+    }
+}

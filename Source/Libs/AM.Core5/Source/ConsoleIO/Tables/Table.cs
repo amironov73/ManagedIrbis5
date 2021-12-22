@@ -20,221 +20,211 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.ConsoleIO.Tables
+namespace AM.ConsoleIO.Tables;
+
+/// <summary>
+/// Собственно таблица.
+/// </summary>
+public sealed class Table
 {
+    #region Properties
+
     /// <summary>
-    /// Собственно таблица.
+    /// Колонки в таблице.
     /// </summary>
-    public sealed class Table
+    public IReadOnlyList<ColumnHeader> Columns => _columns;
+
+    /// <summary>
+    /// Строки в таблице.
+    /// </summary>
+    public IReadOnlyList<object[]> Rows => _rows;
+
+    /// <summary>
+    /// Разделитель колонок.
+    /// </summary>
+    public string Delimiter { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public Table()
     {
-        #region Properties
+        _columns = new List<ColumnHeader>();
+        _rows = new List<object[]>();
+        Delimiter = "|";
+    }
 
-        /// <summary>
-        /// Колонки в таблице.
-        /// </summary>
-        public IReadOnlyList<ColumnHeader> Columns => _columns;
+    #endregion
 
-        /// <summary>
-        /// Строки в таблице.
-        /// </summary>
-        public IReadOnlyList<object[]> Rows => _rows;
+    #region Private members
 
-        /// <summary>
-        /// Разделитель колонок.
-        /// </summary>
-        public string Delimiter { get; set; }
+    private readonly List<ColumnHeader> _columns;
+    private readonly List<object[]> _rows;
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public Table()
+    /// <summary>
+    /// Подсчет ширины колонок.
+    /// </summary>
+    /// <returns>Массив с шириной колонок.</returns>
+    internal int[] CountWidth()
+    {
+        var result = new int[_columns.Count];
+        for (var i = 0; i < _columns.Count; i++)
         {
-            _columns = new List<ColumnHeader>();
-            _rows = new List<object[]>();
-            Delimiter = "|";
-
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private readonly List<ColumnHeader> _columns;
-        private readonly List<object[]> _rows;
-
-        /// <summary>
-        /// Подсчет ширины колонок.
-        /// </summary>
-        /// <returns>Массив с шириной колонок.</returns>
-        internal int[] CountWidth()
-        {
-            var result = new int[_columns.Count];
-            for (var i = 0; i < _columns.Count; i++)
-            {
-                var max = _columns[i].ToString().Length;
-                foreach (var row in _rows)
-                {
-                    var current = row[i].ToString()?.Length ?? 0;
-                    if (current > max)
-                    {
-                        max = current;
-                    }
-                }
-
-                result[i] = max;
-            }
-
-            return result;
-
-        } // method CountWidth
-
-        /// <summary>
-        /// Вывод подчеркивания для строки заголовка.
-        /// </summary>
-        /// <param name="output">Куда помещать результат.</param>
-        /// <param name="widths">Массив с шириной колонок.</param>
-        internal void DividerLine
-            (
-                StringBuilder output,
-                int[] widths
-            )
-        {
-            foreach (var width in widths)
-            {
-                output.Append(Delimiter);
-                output.Append('-', width + 2);
-            }
-
-            output.Append(Delimiter);
-
-        } // method Divider
-
-        /// <summary>
-        /// Форматирование одной строки с данными.
-        /// </summary>
-        /// <param name="output">Куда помещать результат.</param>
-        /// <param name="widths">Массив с шириной колонок.</param>
-        /// <param name="values">Данные для форматирования.</param>
-        internal void FormatRow
-            (
-                StringBuilder output,
-                int[] widths,
-                IEnumerable<object> values
-            )
-        {
-            var index = 0;
-            foreach (var value in values)
-            {
-                output.Append(Delimiter);
-                output.Append(' ');
-                var text = value.ToString() ?? string.Empty;
-                output.Append(text.PadRight(widths[index]));
-                output.Append(' ');
-                index++;
-            }
-
-            output.Append(Delimiter);
-
-        } // method FormatRow
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление колонки в таблицу.
-        /// </summary>
-        /// <param name="title">Заголовок колонки.</param>
-        /// <returns><c>this</c></returns>
-        public Table AddColumn
-            (
-                object title
-            )
-        {
-            var titleText = title.ToString().ThrowIfNull();
-            _columns.Add (new ColumnHeader(titleText));
-
-            return this;
-
-        } // method AddColumn
-
-        /// <summary>
-        /// Добавление строки в таблицу.
-        /// </summary>
-        /// <param name="values">Массив добавляемых значений.</param>
-        /// <returns><c>this</c></returns>
-        public Table AddRow
-            (
-                params object[] values
-            )
-        {
-            _rows.Add (values);
-
-            return this;
-
-        } // method AddRow
-
-        /// <summary>
-        /// Формирует таблицу из значений с помощью отражения.
-        /// </summary>
-        /// <param name="values">Значения для строк таблицы.</param>
-        /// <typeparam name="T">Тип значений.</typeparam>
-        /// <returns>Построенную таблицу.</returns>
-        public static Table From<T>
-            (
-                IEnumerable<T> values
-            )
-        {
-            var result = new Table();
-            var properties = typeof(T).GetProperties();
-            foreach (var property in properties)
-            {
-                result.AddColumn(property.Name);
-            }
-
-            foreach (var value in values)
-            {
-                var row = new object[properties.Length];
-                for (var i = 0; i < properties.Length; i++)
-                {
-                    row[i] = properties[i].GetValue(value) ?? string.Empty;
-                }
-
-                result.AddRow(row);
-            }
-
-            return result;
-
-        } // method From
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString()
-        {
-            var result = new StringBuilder();
-            var widths = CountWidth();
-            FormatRow(result, widths, _columns);
-            result.AppendLine();
-            DividerLine(result, widths);
-            result.AppendLine();
+            var max = _columns[i].ToString().Length;
             foreach (var row in _rows)
             {
-                FormatRow(result, widths, row);
-                result.AppendLine();
+                var current = row[i].ToString()?.Length ?? 0;
+                if (current > max)
+                {
+                    max = current;
+                }
             }
 
-            return result.ToString();
+            result[i] = max;
         }
 
-        #endregion
+        return result;
+    }
 
-    } // class Table
+    /// <summary>
+    /// Вывод подчеркивания для строки заголовка.
+    /// </summary>
+    /// <param name="output">Куда помещать результат.</param>
+    /// <param name="widths">Массив с шириной колонок.</param>
+    internal void DividerLine
+        (
+            StringBuilder output,
+            int[] widths
+        )
+    {
+        foreach (var width in widths)
+        {
+            output.Append (Delimiter);
+            output.Append ('-', width + 2);
+        }
 
-} // namespace AM.ConsoleIO.Tables
+        output.Append (Delimiter);
+    }
+
+    /// <summary>
+    /// Форматирование одной строки с данными.
+    /// </summary>
+    /// <param name="output">Куда помещать результат.</param>
+    /// <param name="widths">Массив с шириной колонок.</param>
+    /// <param name="values">Данные для форматирования.</param>
+    internal void FormatRow
+        (
+            StringBuilder output,
+            int[] widths,
+            IEnumerable<object> values
+        )
+    {
+        var index = 0;
+        foreach (var value in values)
+        {
+            output.Append (Delimiter);
+            output.Append (' ');
+            var text = value.ToString() ?? string.Empty;
+            output.Append (text.PadRight (widths[index]));
+            output.Append (' ');
+            index++;
+        }
+
+        output.Append (Delimiter);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление колонки в таблицу.
+    /// </summary>
+    /// <param name="title">Заголовок колонки.</param>
+    /// <returns><c>this</c></returns>
+    public Table AddColumn
+        (
+            object title
+        )
+    {
+        var titleText = title.ToString().ThrowIfNull();
+        _columns.Add (new ColumnHeader (titleText));
+
+        return this;
+    }
+
+    /// <summary>
+    /// Добавление строки в таблицу.
+    /// </summary>
+    /// <param name="values">Массив добавляемых значений.</param>
+    /// <returns><c>this</c></returns>
+    public Table AddRow
+        (
+            params object[] values
+        )
+    {
+        _rows.Add (values);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Формирует таблицу из значений с помощью отражения.
+    /// </summary>
+    /// <param name="values">Значения для строк таблицы.</param>
+    /// <typeparam name="T">Тип значений.</typeparam>
+    /// <returns>Построенную таблицу.</returns>
+    public static Table From<T>
+        (
+            IEnumerable<T> values
+        )
+    {
+        var result = new Table();
+        var properties = typeof (T).GetProperties();
+        foreach (var property in properties)
+        {
+            result.AddColumn (property.Name);
+        }
+
+        foreach (var value in values)
+        {
+            var row = new object[properties.Length];
+            for (var i = 0; i < properties.Length; i++)
+            {
+                row[i] = properties[i].GetValue (value) ?? string.Empty;
+            }
+
+            result.AddRow (row);
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+        var widths = CountWidth();
+        FormatRow (result, widths, _columns);
+        result.AppendLine();
+        DividerLine (result, widths);
+        result.AppendLine();
+        foreach (var row in _rows)
+        {
+            FormatRow (result, widths, row);
+            result.AppendLine();
+        }
+
+        return result.ToString();
+    }
+
+    #endregion
+}

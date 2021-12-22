@@ -20,47 +20,44 @@ using System;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Скрывает колонку в гриде.
+/// </summary>
+[AttributeUsage (AttributeTargets.Property)]
+public sealed class HiddenColumnAttribute
+    : Attribute
 {
+    #region Properties
+
+    ///<summary>
+    /// Признак скрытой колонки.
+    ///</summary>
+    public bool Hidden { get; }
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Скрывает колонку в гриде.
+    /// Конструктор по умолчанию.
     /// </summary>
-    [AttributeUsage (AttributeTargets.Property)]
-    public sealed class HiddenColumnAttribute
-        : Attribute
+    public HiddenColumnAttribute()
+        : this (true)
     {
-        #region Properties
+    }
 
-        ///<summary>
-        /// Признак скрытой колонки.
-        ///</summary>
-        public bool Hidden { get; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public HiddenColumnAttribute
+        (
+            bool hidden
+        )
+    {
+        Hidden = hidden;
+    }
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public HiddenColumnAttribute ()
-            : this ( true )
-        {
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public HiddenColumnAttribute
-            (
-                bool hidden
-            )
-        {
-            Hidden = hidden;
-        } // constructor
-
-        #endregion
-
-    } // class HiddenColumnAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

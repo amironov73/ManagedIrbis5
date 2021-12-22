@@ -9,7 +9,7 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* NullConsole.cs --
+/* NullConsole.cs -- нулевая консоль
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,67 +21,66 @@ using System;
 
 #nullable enable
 
-namespace AM.ConsoleIO
+namespace AM.ConsoleIO;
+
+/// <summary>
+/// Нулевая консоль. Не выполняет никаких реальных действий.
+/// </summary>
+public sealed class NullConsole
+    : IConsoleDriver
 {
-    /// <summary>
-    ///
-    /// </summary>
-    public sealed class NullConsole
-        : IConsoleDriver
+    #region IConsoleDriver members
+
+    /// <inheritdoc />
+    public ConsoleColor BackgroundColor { get; set; }
+
+    /// <inheritdoc />
+    public ConsoleColor ForegroundColor { get; set; }
+
+    /// <inheritdoc />
+    public bool KeyAvailable => false;
+
+    /// <inheritdoc />
+    public string Title { get; set; } = string.Empty;
+
+    /// <inheritdoc />
+    public void Clear()
     {
-        #region IConsoleDriver members
-
-        /// <inheritdoc />
-        public ConsoleColor BackgroundColor { get; set; }
-
-        /// <inheritdoc />
-        public ConsoleColor ForegroundColor { get; set; }
-
-        /// <inheritdoc />
-        public bool KeyAvailable => false;
-
-        /// <inheritdoc />
-        public string Title { get; set; } = string.Empty;
-
-        /// <inheritdoc />
-        public void Clear()
-        {
-        }
-
-        /// <inheritdoc />
-        public ConsoleKeyInfo ReadKey
-            (
-                bool intercept
-            )
-        {
-            return new ConsoleKeyInfo();
-        }
-
-        /// <inheritdoc />
-        public int Read()
-        {
-            return -1;
-        }
-
-        /// <inheritdoc />
-        public string? ReadLine()
-        {
-            return null;
-        }
-
-        /// <inheritdoc />
-        public void Write
-            (
-                string? text
-            )
-        {
-        }
-
-        /// <inheritdoc />
-        public void WriteLine()
-        {
-        }
-
-        #endregion
     }
+
+    /// <inheritdoc />
+    public ConsoleKeyInfo ReadKey
+        (
+            bool intercept
+        )
+    {
+        return new ConsoleKeyInfo();
+    }
+
+    /// <inheritdoc />
+    public int Read()
+    {
+        return -1;
+    }
+
+    /// <inheritdoc />
+    public string? ReadLine()
+    {
+        return null;
+    }
+
+    /// <inheritdoc />
+    public void Write
+        (
+            string? text
+        )
+    {
+    }
+
+    /// <inheritdoc />
+    public void WriteLine()
+    {
+    }
+
+    #endregion
 }

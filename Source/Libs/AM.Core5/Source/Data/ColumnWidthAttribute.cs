@@ -20,40 +20,37 @@ using System;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Задает ширину колонки в гриде.
+/// </summary>
+[Serializable]
+[AttributeUsage (AttributeTargets.Property)]
+public sealed class ColumnWidthAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    /// Задает ширину колонки в гриде.
+    /// Ширина колонки.
     /// </summary>
-    [Serializable]
-    [AttributeUsage (AttributeTargets.Property)]
-    public sealed class ColumnWidthAttribute
-        : Attribute
+    public int Width { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ColumnWidthAttribute
+        (
+            int width
+        )
     {
-        #region Properties
+        Width = width;
+    }
 
-        /// <summary>
-        /// Ширина колонки.
-        /// </summary>
-        public int Width { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ColumnWidthAttribute
-            (
-                int width
-            )
-        {
-            Width = width;
-        } // constructor
-
-        #endregion
-
-    } // class ColumnWidthAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

@@ -9,33 +9,32 @@
 // ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable UnusedMember.Global
 
-/* InputHistory.cs --
+/* InputHistory.cs -- история пользовательского ввода
  * Ars Magna project, http://arsmagna.ru
  */
 
 #nullable enable
 
-namespace AM.ConsoleIO
+namespace AM.ConsoleIO;
+
+/// <summary>
+/// История пользовательского ввода.
+/// </summary>
+public static class InputHistory
 {
-    /// <summary>
-    /// Input history.
-    /// </summary>
-    public static class InputHistory
-    {
-        #region Properties
+    #region Properties
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Construction
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Private members
 
-        #endregion
+    #endregion
 
-        #region Public methods
+    #region Public methods
 
-        #endregion
-    }
+    #endregion
 }

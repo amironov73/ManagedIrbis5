@@ -19,14 +19,13 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.ConsoleIO.Tables
+namespace AM.ConsoleIO.Tables;
+
+/// <summary>
+/// Полезные методы для работы с консольными таблицами.
+/// </summary>
+public static class TableUtility
 {
-    /// <summary>
-    /// Полезные методы для работы с консольными таблицами.
-    /// </summary>
-    public static class TableUtility
-    {
 
-    } // class TableUtility
+}
 
-} // namespace AM.ConsoleIO.Tables

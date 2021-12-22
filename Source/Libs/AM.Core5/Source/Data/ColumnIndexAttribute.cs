@@ -20,40 +20,37 @@ using System;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Задает порядок колонок в гриде.
+/// </summary>
+[Serializable]
+[AttributeUsage (AttributeTargets.Property)]
+public sealed class ColumnIndexAttribute
+    : Attribute
 {
+    #region Properties
+
+    ///<summary>
+    /// Индекс колонки.
+    ///</summary>
+    public int Index { get; }
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Задает порядок колонок в гриде.
+    /// Конструктор.
     /// </summary>
-    [Serializable]
-    [AttributeUsage (AttributeTargets.Property)]
-    public sealed class ColumnIndexAttribute
-        : Attribute
+    public ColumnIndexAttribute
+        (
+            int index
+        )
     {
-        #region Properties
+        Index = index;
+    }
 
-        ///<summary>
-        /// Индекс колонки.
-        ///</summary>
-        public int Index { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ColumnIndexAttribute
-            (
-                int index
-            )
-        {
-            Index = index;
-        } // constructor
-
-        #endregion
-
-    } // class ColumnIndexAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}

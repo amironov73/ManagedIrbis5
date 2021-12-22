@@ -6,6 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedType.Global
 
 /* ReadOnlyColumnAttribute.cs -- помечает колонку как не подлежащую редактированию
@@ -20,47 +21,44 @@ using System;
 
 #nullable enable
 
-namespace AM.Data
+namespace AM.Data;
+
+/// <summary>
+/// Помечает колонку как не подлежащую редактированию.
+/// </summary>
+[AttributeUsage (AttributeTargets.Property)]
+public sealed class ReadOnlyColumnAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    /// Помечает колонку как не подлежащую редактированию.
+    /// Признак колонки только для чтения.
     /// </summary>
-    [AttributeUsage (AttributeTargets.Property)]
-    public sealed class ReadOnlyColumnAttribute
-        : Attribute
+    public bool ReadOnly { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public ReadOnlyColumnAttribute()
+        : this (true)
     {
-        #region Properties
+    }
 
-        /// <summary>
-        /// Признак колонки только для чтения.
-        /// </summary>
-        public bool ReadOnly { get; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ReadOnlyColumnAttribute
+        (
+            bool readOnly
+        )
+    {
+        ReadOnly = readOnly;
+    }
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public ReadOnlyColumnAttribute()
-            : this (true)
-        {
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ReadOnlyColumnAttribute
-            (
-                bool readOnly
-            )
-        {
-            ReadOnly = readOnly;
-        } // constructor
-
-        #endregion
-
-    } // class ReadOnlyColumnAttribute
-
-} // namespace AM.Windows.Forms
+    #endregion
+}
