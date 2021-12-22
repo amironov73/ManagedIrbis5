@@ -19,6 +19,7 @@
 
 #region Using directives
 
+using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -26,68 +27,72 @@ using System.Xml.Serialization;
 
 #nullable enable
 
-namespace AM.Commands
+namespace AM.Commands;
+
+/// <summary>
+/// Описатель команды (для сохранения/восстановления из файла).
+/// </summary>
+[XmlRoot ("command")]
+public sealed class CommandDescriptor
 {
+    #region Properties
+
     /// <summary>
-    /// Описатель команды (для сохранения/восстановления из файла).
+    /// Вызывается при выполнении команды.
     /// </summary>
-    [XmlRoot("command")]
-    public sealed class CommandDescriptor
-    {
-        #region Properties
+    [XmlElement ("execute")]
+    [JsonPropertyName ("execute")]
+    [Description ("Вызывается при выполнении команды")]
+    public DelegateDescriptor? Execute;
 
-        /// <summary>
-        /// Вызывается при выполнении команды.
-        /// </summary>
-        [JsonPropertyName("execute")]
-        [XmlElement("execute")]
-        public DelegateDescriptor? Execute;
+    /// <summary>
+    /// Вызывается, когда команда должна обновить свое состояние.
+    /// </summary>
+    [XmlElement ("update")]
+    [JsonPropertyName ("update")]
+    [Description ("Вызывается, когда команда должна обновить свое состояние")]
+    public DelegateDescriptor? Update;
 
-        /// <summary>
-        /// Вызывается, когда команда должна обновить свое состояние.
-        /// </summary>
-        [JsonPropertyName("update")]
-        [XmlElement("update")]
-        public DelegateDescriptor? Update;
+    /// <summary>
+    /// Вызывается, когда в команде что-то поменялось
+    /// (например, состояние <see cref="Enabled"/>).
+    /// </summary>
+    [XmlElement ("changed")]
+    [JsonPropertyName ("changed")]
+    [Description ("Вызывается при изменениях в команде")]
+    public DelegateDescriptor? Changed;
 
-        /// <summary>
-        /// Вызывается, когда в команде что-то поменялось
-        /// (например, состояние <see cref="Enabled"/>).
-        /// </summary>
-        [JsonPropertyName("changed")]
-        [XmlElement("changed")]
-        public DelegateDescriptor? Changed;
+    /// <summary>
+    /// Вызывается при очистке команды.
+    /// </summary>
+    [XmlElement ("disposed")]
+    [JsonPropertyName ("disposed")]
+    [Description ("Вызывается при очистке команды")]
+    public DelegateDescriptor? Disposed;
 
-        /// <summary>
-        /// Вызывается при очистке команды.
-        /// </summary>
-        [JsonPropertyName("disposed")]
-        [XmlElement("disposed")]
-        public DelegateDescriptor? Disposed;
+    /// <summary>
+    /// Команда разрешена к выполнению?
+    /// </summary>
+    [XmlAttribute ("enabled")]
+    [JsonPropertyName ("enabled")]
+    [Description ("Разрешена")]
+    public bool Enabled { get; set; }
 
-        /// <summary>
-        /// Команда разрешена к выполнению?
-        /// </summary>
-        [JsonPropertyName("enabled")]
-        [XmlAttribute("enabled")]
-        public bool Enabled { get; set; }
+    /// <summary>
+    /// Заглавие команды (произвольное).
+    /// </summary>
+    [XmlAttribute ("title")]
+    [JsonPropertyName ("title")]
+    [Description ("Заглавие команды")]
+    public string? Title { get; set; }
 
-        /// <summary>
-        /// Заглавие команды (произвольное).
-        /// </summary>
-        [JsonPropertyName("title")]
-        [XmlAttribute("title")]
-        public string? Title { get; set; }
+    /// <summary>
+    /// Описание команды в произвольной форме.
+    /// </summary>
+    [JsonPropertyName ("description")]
+    [XmlAttribute ("description")]
+    [Description ("Описание команды")]
+    public string? Description { get; set; }
 
-        /// <summary>
-        /// Описание команды в произвольной форме.
-        /// </summary>
-        [JsonPropertyName("description")]
-        [XmlAttribute("description")]
-        public string? Description { get; set; }
-
-        #endregion
-
-    } // class CommandDescriptor
-
-} // namespace AM.Commands
+    #endregion
+}

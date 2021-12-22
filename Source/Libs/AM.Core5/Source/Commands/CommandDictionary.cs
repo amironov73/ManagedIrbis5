@@ -26,28 +26,25 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Commands
-{
-    /// <summary>
-    /// Контейнер для команд.
-    /// </summary>
-    public sealed class CommandDictionary
-        : Dictionary<string, ICommand>,
+namespace AM.Commands;
+
+/// <summary>
+/// Контейнер для команд.
+/// </summary>
+public sealed class CommandDictionary
+    : Dictionary<string, ICommand>,
         IDisposable
+{
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
     {
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
+        foreach (var command in Values)
         {
-            foreach (var command in Values)
-            {
-                command.Dispose();
-            }
-        } // method Dispose
+            command.Dispose();
+        }
+    }
 
-        #endregion
-
-    } // class CommandDictionary
-
-} // namespace AM.Commands
+    #endregion
+}

@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* ObjectRegistry.cs -- реестр объектов для сопоставления с командами
@@ -21,15 +22,13 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Commands
+namespace AM.Commands;
+
+/// <summary>
+/// Реестр объектов для сопоставления с командами.
+/// </summary>
+public sealed class ObjectRegistry
+    : Dictionary<string, object>
 {
-    /// <summary>
-    /// Реестр объектов для сопоставления с командами.
-    /// </summary>
-    public sealed class ObjectRegistry
-        : Dictionary<string, object>
-    {
 
-    } // class ObjectRegistry
-
-} // namespace AM.Commands
+}

@@ -18,112 +18,106 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.ComponentModel
+namespace AM.ComponentModel;
+
+/// <summary>
+/// Позволяет объединить несколько поставщиков сервисов.
+/// </summary>
+public sealed class ServiceAggregator
+    : IServiceProvider
 {
+    #region Nested classes
+
     /// <summary>
-    /// Позволяет объединить несколько поставщиков сервисов.
+    /// Простейший дескриптор сервиса.
     /// </summary>
-    public sealed class ServiceAggregator
-        : IServiceProvider
+    record ServiceDescriptor(Type ServiceType, object Instance);
+
+    #endregion
+
+    #region Private members
+
+    private readonly List<IServiceProvider> _providers = new ();
+
+    private readonly List<ServiceDescriptor> _descriptors = new ();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Добавление провайдера сервисов в конец списка.
+    /// </summary>
+    public ServiceAggregator AddServiceProvider
+        (
+            IServiceProvider provider,
+            bool atBeginning = true
+        )
     {
-        #region Nested classes
-
-        /// <summary>
-        /// Простейший дескриптор сервиса.
-        /// </summary>
-        record ServiceDescriptor(Type ServiceType, object Instance);
-
-        #endregion
-
-        #region Private members
-
-        private readonly List<IServiceProvider> _providers = new();
-
-        private readonly List<ServiceDescriptor> _descriptors = new();
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление провайдера сервисов в конец списка.
-        /// </summary>
-        public ServiceAggregator AddServiceProvider
-            (
-                IServiceProvider provider,
-                bool atBeginning = true
-            )
+        if (atBeginning)
         {
-            if (atBeginning)
-            {
-                _providers.Insert(0, provider);
-            }
-            else
-            {
-                _providers.Add(provider);
-            }
-
-            return this;
-
-        } // method AddServiceProvider
-
-        /// <summary>
-        /// Добавление сервиса.
-        /// </summary>
-        public ServiceAggregator AddService
-            (
-                Type serviceType,
-                object serviceInstance,
-                bool atBeginning = true
-            )
+            _providers.Insert (0, provider);
+        }
+        else
         {
-            var descriptor = new ServiceDescriptor(serviceType, serviceInstance);
-            if (atBeginning)
-            {
-                _descriptors.Insert(0, descriptor);
-            }
-            else
-            {
-                _descriptors.Add(descriptor);
-            }
+            _providers.Add (provider);
+        }
 
-            return this;
+        return this;
+    }
 
-        } // method AddService
-
-        #endregion
-
-        #region IServiceProvider members
-
-        /// <inheritdoc cref="IServiceProvider.GetService"/>
-        public object? GetService
-            (
-                Type serviceType
-            )
+    /// <summary>
+    /// Добавление сервиса.
+    /// </summary>
+    public ServiceAggregator AddService
+        (
+            Type serviceType,
+            object serviceInstance,
+            bool atBeginning = true
+        )
+    {
+        var descriptor = new ServiceDescriptor (serviceType, serviceInstance);
+        if (atBeginning)
         {
-            foreach (var descriptor in _descriptors)
+            _descriptors.Insert (0, descriptor);
+        }
+        else
+        {
+            _descriptors.Add (descriptor);
+        }
+
+        return this;
+    }
+
+    #endregion
+
+    #region IServiceProvider members
+
+    /// <inheritdoc cref="IServiceProvider.GetService"/>
+    public object? GetService
+        (
+            Type serviceType
+        )
+    {
+        foreach (var descriptor in _descriptors)
+        {
+            if (descriptor.ServiceType == serviceType)
             {
-                if (descriptor.ServiceType == serviceType)
-                {
-                    return descriptor.Instance;
-                }
+                return descriptor.Instance;
             }
+        }
 
-            foreach (var provider in _providers)
+        foreach (var provider in _providers)
+        {
+            var result = provider.GetService (serviceType);
+            if (result is not null)
             {
-                var result = provider.GetService(serviceType);
-                if (result is not null)
-                {
-                    return result;
-                }
+                return result;
             }
+        }
 
-            return null;
+        return null;
+    }
 
-        } // method GetService
-
-        #endregion
-
-    } // class ServiceAggregator
-
-} // namespace AM.ComponentModel
+    #endregion
+}

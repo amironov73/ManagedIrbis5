@@ -27,32 +27,29 @@ using System.Xml.Serialization;
 
 #nullable enable
 
-namespace AM.Commands
+namespace AM.Commands;
+
+/// <summary>
+/// Описатель делегата.
+/// </summary>
+[XmlRoot ("delegate")]
+public sealed class DelegateDescriptor
 {
+    #region Properties
+
     /// <summary>
-    /// Описатель делегата.
+    /// Объект, к которому привязан делегат.
     /// </summary>
-    [XmlRoot("delegate")]
-    public sealed class DelegateDescriptor
-    {
-        #region Properties
+    [XmlAttribute ("object")]
+    [JsonPropertyName ("object")]
+    public string? Object { get; set; }
 
-        /// <summary>
-        /// Объект, к которому привязан делегат.
-        /// </summary>
-        [JsonPropertyName("object")]
-        [XmlAttribute("object")]
-        public string? Object { get; set; }
+    /// <summary>
+    /// Метод, выполняющий действие
+    /// </summary>
+    [XmlAttribute ("method")]
+    [JsonPropertyName ("method")]
+    public string? Method { get; set; }
 
-        /// <summary>
-        /// Метод, выполняющий действие
-        /// </summary>
-        [JsonPropertyName("method")]
-        [XmlAttribute("method")]
-        public string? Method { get; set; }
-
-        #endregion
-
-    } // class DelegateDesriptor
-
-} // namespace AM.Commands
+    #endregion
+}

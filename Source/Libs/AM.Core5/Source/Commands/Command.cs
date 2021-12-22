@@ -22,265 +22,280 @@
 #region Using directives
 
 using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Commands
+namespace AM.Commands;
+
+/// <summary>
+/// Некая команда (действие) приложения.
+/// </summary>
+public class Command
+    : ICommand
 {
-    /// <summary>
-    /// Некая команда (действие) приложения.
-    /// </summary>
-    public class Command
-        : ICommand
+    #region Events
+
+    /// <inheritdoc cref="ICommand.Execute"/>
+    public event EventHandler? Execute;
+
+    /// <inheritdoc cref="ICommand.Update"/>
+    public event EventHandler? Update;
+
+    /// <inheritdoc cref="ICommand.Changed"/>
+    public event EventHandler? Changed;
+
+    /// <inheritdoc cref="ICommand.Disposed"/>
+    public event EventHandler? Disposed;
+
+    #endregion
+
+    #region Properties
+
+    /// <inheritdoc cref="ICommand.Enabled"/>
+    [XmlAttribute ("enabled")]
+    [JsonPropertyName ("enabled")]
+    [Description ("Разрешена")]
+    public bool Enabled
     {
-        #region Events
-
-        /// <inheritdoc cref="ICommand.Execute"/>
-        public event EventHandler? Execute;
-
-        /// <inheritdoc cref="ICommand.Update"/>
-        public event EventHandler? Update;
-
-        /// <inheritdoc cref="ICommand.Changed"/>
-        public event EventHandler? Changed;
-
-        /// <inheritdoc cref="ICommand.Disposed"/>
-        public event EventHandler? Disposed;
-
-        #endregion
-
-        #region Properties
-
-        /// <inheritdoc cref="ICommand.Enabled"/>
-        public bool Enabled
+        get => _enabled;
+        set
         {
-            get => _enabled;
-            set
+            if (_enabled != value)
             {
-                if (_enabled != value)
-                {
-                    _enabled = value;
-                    PerformChange();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Заглавие команды (произвольное).
-        /// </summary>
-        public string? Title
-        {
-            get => _title;
-            set
-            {
-                if (_title != value)
-                {
-                    _title = value;
-                    PerformChange();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Описание команды в произвольной форме.
-        /// </summary>
-        public string? Description
-        {
-            get => _description;
-            set
-            {
-                if (_description != value)
-                {
-                    _description = value;
-                    PerformChange();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Произвольные пользовательские данные.
-        /// </summary>
-        public object? UserData
-        {
-            get => _userData;
-            set
-            {
-                _userData = value;
+                _enabled = value;
                 PerformChange();
             }
         }
+    }
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public Command()
+    /// <summary>
+    /// Заглавие команды (произвольное).
+    /// </summary>
+    [XmlAttribute ("title")]
+    [JsonPropertyName ("title")]
+    [Description ("Заглавие")]
+    public string? Title
+    {
+        get => _title;
+        set
         {
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="title">Название команды (произвольное).
-        /// </param>
-        /// <param name="description">Описание команды в произвольной
-        /// форме.</param>
-        /// <param name="enabled">Команда разрешена к выполнению?</param>
-        public Command
-            (
-                string? title,
-                string? description = default,
-                bool enabled = true
-            )
-        {
-            _enabled = enabled;
-            _title = title;
-            _description = description;
-        } // constructor
-
-        #endregion
-
-        #region Private members
-
-        private bool _enabled;
-        private string? _title, _description;
-        private object? _userData;
-
-        #endregion
-
-        #region Public methods
-
-        /// <inheritdoc cref="ICommand.PerformExecute()"/>
-        public virtual void PerformExecute()
-        {
-            if (Enabled)
+            if (_title != value)
             {
-                Execute?.Invoke(this, EventArgs.Empty);
+                _title = value;
+                PerformChange();
             }
-        } // method PerformExecute
+        }
+    }
 
-        /// <inheritdoc cref="ICommand.PerformExecute(System.EventArgs)"/>
-        public virtual void PerformExecute
-            (
-                EventArgs eventArgs
-            )
+    /// <summary>
+    /// Описание команды в произвольной форме.
+    /// </summary>
+    [XmlAttribute ("description")]
+    [JsonPropertyName ("description")]
+    [Description ("Описание команды")]
+    public string? Description
+    {
+        get => _description;
+        set
         {
-            if (Enabled)
+            if (_description != value)
             {
-                Execute?.Invoke(this, eventArgs);
+                _description = value;
+                PerformChange();
             }
-        } // method PerformExecute
+        }
+    }
 
-        /// <inheritdoc cref="ICommand.PerformExecuteAsync()"/>
-        public virtual Task PerformExecuteAsync()
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    [XmlIgnore]
+    [JsonIgnore]
+    [Browsable (false)]
+    public object? UserData
+    {
+        get => _userData;
+        set
         {
-            if (Enabled)
-            {
-                return Execute.RaiseAsync(this);
-            }
+            _userData = value;
+            PerformChange();
+        }
+    }
 
-            return Task.CompletedTask;
-        } // method PerformExecuteAsync
+    #endregion
 
-        /// <inheritdoc cref="ICommand.PerformExecuteAsync(System.EventArgs)"/>
-        public virtual Task PerformExecuteAsync
-            (
-                EventArgs eventArgs
-            )
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public Command()
+    {
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="title">Название команды (произвольное).
+    /// </param>
+    /// <param name="description">Описание команды в произвольной
+    /// форме.</param>
+    /// <param name="enabled">Команда разрешена к выполнению?</param>
+    public Command
+        (
+            string? title,
+            string? description = default,
+            bool enabled = true
+        )
+    {
+        _enabled = enabled;
+        _title = title;
+        _description = description;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private bool _enabled;
+    private string? _title, _description;
+    private object? _userData;
+
+    #endregion
+
+    #region Public methods
+
+    /// <inheritdoc cref="ICommand.PerformExecute()"/>
+    public virtual void PerformExecute()
+    {
+        if (Enabled)
         {
-            if (Enabled)
-            {
-                return Execute.RaiseAsync(this, eventArgs);
-            }
+            Execute?.Invoke (this, EventArgs.Empty);
+        }
+    }
 
-            return Task.CompletedTask;
-        } // method PerformExecuteAsync
-
-        /// <inheritdoc cref="ICommand.PerformUpdate()"/>
-        public virtual void PerformUpdate()
+    /// <inheritdoc cref="ICommand.PerformExecute(System.EventArgs)"/>
+    public virtual void PerformExecute
+        (
+            EventArgs eventArgs
+        )
+    {
+        if (Enabled)
         {
-            Update?.Invoke(this, EventArgs.Empty);
-        } // method PerformUpdate
+            Execute?.Invoke (this, eventArgs);
+        }
+    }
 
-        /// <inheritdoc cref="ICommand.PerformUpdate(System.EventArgs)"/>
-        public virtual void PerformUpdate
-            (
-                EventArgs eventArgs
-            )
+    /// <inheritdoc cref="ICommand.PerformExecuteAsync()"/>
+    public virtual Task PerformExecuteAsync()
+    {
+        if (Enabled)
         {
-            Update?.Invoke(this, eventArgs);
-        } // method PerformUpdate
-
-        /// <inheritdoc cref="ICommand.PerformUpdateAsync()"/>
-        public virtual Task PerformUpdateAsync()
-        {
-            return Update.RaiseAsync(this);
-        } // method PerformUpdateAsync
-
-        /// <inheritdoc cref="ICommand.PerformUpdateAsync(System.EventArgs)"/>
-        public virtual Task PerformUpdateAsync
-            (
-                EventArgs eventArgs
-            )
-        {
-            return Update.RaiseAsync(this, eventArgs);
-        } // method PerformUpdateAsync
-
-        /// <inheritdoc cref="ICommand.PerformChange()"/>
-        public virtual void PerformChange()
-        {
-            Changed?.Invoke(this, EventArgs.Empty);
-        } // method PerformChange
-
-        /// <inheritdoc cref="ICommand.PerformChange(System.EventArgs)"/>
-        public virtual void PerformChange
-            (
-                EventArgs eventArgs
-            )
-        {
-            Changed?.Invoke(this, eventArgs);
-        } // method PerformChange
-
-        /// <inheritdoc cref="ICommand.PerformChangeAsync()"/>
-        public virtual Task PerformChangeAsync()
-        {
-            return Changed.RaiseAsync(this);
-        } // method PerformChangeAsync
-
-        /// <inheritdoc cref="ICommand.PerformChangeAsync(System.EventArgs)"/>
-        public virtual Task PerformChangeAsync
-            (
-                EventArgs eventArgs
-            )
-        {
-            return Changed.RaiseAsync(this, eventArgs);
-        } // method PerformChangeAsync
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public virtual void Dispose()
-        {
-            Disposed?.Invoke(this, EventArgs.Empty);
+            return Execute.RaiseAsync (this);
         }
 
-        #endregion
+        return Task.CompletedTask;
+    }
 
-        #region Object members
+    /// <inheritdoc cref="ICommand.PerformExecuteAsync(System.EventArgs)"/>
+    public virtual Task PerformExecuteAsync
+        (
+            EventArgs eventArgs
+        )
+    {
+        if (Enabled)
+        {
+            return Execute.RaiseAsync (this, eventArgs);
+        }
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"{Title}: {Description} [{Enabled}]";
+        return Task.CompletedTask;
+    }
 
-        #endregion
+    /// <inheritdoc cref="ICommand.PerformUpdate()"/>
+    public virtual void PerformUpdate()
+    {
+        Update?.Invoke (this, EventArgs.Empty);
+    }
 
-    } // class Command
+    /// <inheritdoc cref="ICommand.PerformUpdate(System.EventArgs)"/>
+    public virtual void PerformUpdate
+        (
+            EventArgs eventArgs
+        )
+    {
+        Update?.Invoke (this, eventArgs);
+    }
 
-} // namespace AM.Commands
+    /// <inheritdoc cref="ICommand.PerformUpdateAsync()"/>
+    public virtual Task PerformUpdateAsync()
+    {
+        return Update.RaiseAsync (this);
+    }
+
+    /// <inheritdoc cref="ICommand.PerformUpdateAsync(System.EventArgs)"/>
+    public virtual Task PerformUpdateAsync
+        (
+            EventArgs eventArgs
+        )
+    {
+        return Update.RaiseAsync (this, eventArgs);
+    }
+
+    /// <inheritdoc cref="ICommand.PerformChange()"/>
+    public virtual void PerformChange()
+    {
+        Changed?.Invoke (this, EventArgs.Empty);
+    }
+
+    /// <inheritdoc cref="ICommand.PerformChange(System.EventArgs)"/>
+    public virtual void PerformChange
+        (
+            EventArgs eventArgs
+        )
+    {
+        Changed?.Invoke (this, eventArgs);
+    }
+
+    /// <inheritdoc cref="ICommand.PerformChangeAsync()"/>
+    public virtual Task PerformChangeAsync()
+    {
+        return Changed.RaiseAsync (this);
+    }
+
+    /// <inheritdoc cref="ICommand.PerformChangeAsync(System.EventArgs)"/>
+    public virtual Task PerformChangeAsync
+        (
+            EventArgs eventArgs
+        )
+    {
+        return Changed.RaiseAsync (this, eventArgs);
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public virtual void Dispose()
+    {
+        Disposed?.Invoke (this, EventArgs.Empty);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return $"{Title}: {Description} [{Enabled}]";
+    }
+
+    #endregion
+}

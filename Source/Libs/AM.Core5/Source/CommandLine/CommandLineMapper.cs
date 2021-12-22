@@ -16,7 +16,6 @@
 
 #region Using directives
 
-using System;
 using System.CommandLine;
 using System.CommandLine.Builder;
 using System.CommandLine.Parsing;
@@ -26,130 +25,123 @@ using System.Reflection;
 
 #nullable enable
 
-namespace AM.CommandLine
+namespace AM.CommandLine;
+
+/// <summary>
+/// Утилита для простейшего отображения результата разбора
+/// коммандной строки на объекты.
+/// </summary>
+public static class CommandLineMapper
 {
+    #region Private members
+
     /// <summary>
-    /// Утилита для простейшего отображения результата разбора
-    /// коммандной строки на объекты.
+    /// Маппинг одного свойства или поля объекта.
     /// </summary>
-    public static class CommandLineMapper
+    private static void MapValue
+        (
+            IReflect type,
+            object target,
+            string name,
+            object? value
+        )
     {
-        #region Private members
-
-        /// <summary>
-        /// Маппинг одного свойства или поля объекта.
-        /// </summary>
-        private static void MapValue
-            (
-                Type type,
-                object target,
-                string name,
-                object? value
-            )
+        var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase;
+        var propertyInfo = type.GetProperty (name, flags);
+        if (propertyInfo is not null)
         {
-            var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase;
-            var propertyInfo = type.GetProperty(name, flags);
-            if (propertyInfo is not null)
-            {
-                propertyInfo.SetValue(target, value);
-            }
-            else
-            {
-                var fieldInfo = type.GetField(name, flags);
-                if (fieldInfo is not null)
-                {
-                    fieldInfo.SetValue(target, value);
-                }
-            }
-
-        } // method MapValue
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Отображение результата разбора командной строки.
-        /// </summary>
-        /// <param name="parseResult">Результат разбора.</param>
-        /// <param name="target">Объект назначения.</param>
-        public static void MapParseResult
-            (
-                ParseResult parseResult,
-                object target
-            )
+            propertyInfo.SetValue (target, value);
+        }
+        else
         {
-            var type = target.GetType();
-            var children = parseResult.CommandResult.Children;
-            foreach (var child in children)
+            var fieldInfo = type.GetField (name, flags);
+            if (fieldInfo is not null)
             {
-                string name;
-                object? value;
+                fieldInfo.SetValue (target, value);
+            }
+        }
+    }
 
-                switch (child)
-                {
-                    case ArgumentResult argument:
-                        name = argument.Argument.Name;
-                        value = argument.GetValueOrDefault();
-                        break;
+    #endregion
 
-                    case OptionResult option:
-                        name = option.Option.Name;
-                        value = option.GetValueOrDefault();
-                        break;
+    #region Public methods
 
-                    default: // мы не знаем, что это такое, пропускаем
-                        continue;
-                }
+    /// <summary>
+    /// Отображение результата разбора командной строки.
+    /// </summary>
+    /// <param name="parseResult">Результат разбора.</param>
+    /// <param name="target">Объект назначения.</param>
+    public static void MapParseResult
+        (
+            ParseResult parseResult,
+            object target
+        )
+    {
+        var type = target.GetType();
+        var children = parseResult.CommandResult.Children;
+        foreach (var child in children)
+        {
+            string name;
+            object? value;
 
-                MapValue(type, target, name, value);
+            switch (child)
+            {
+                case ArgumentResult argument:
+                    name = argument.Argument.Name;
+                    value = argument.GetValueOrDefault();
+                    break;
+
+                case OptionResult option:
+                    name = option.Option.Name;
+                    value = option.GetValueOrDefault();
+                    break;
+
+                default: // мы не знаем, что это такое, пропускаем
+                    continue;
             }
 
-        } // method MapParseResult
+            MapValue (type, target, name, value);
+        }
+    }
 
-        /// <summary>
-        /// Разбор командной строки и отображение результатов на существующий объект.
-        /// </summary>
-        /// <param name="command">Команда (в т. ч. корневая).</param>
-        /// <param name="arguments">Аргументы командной строки.</param>
-        /// <param name="target">Объект назначения.</param>
-        public static void MapCommandResult
-            (
-                Command command,
-                string[] arguments,
-                object target
-            )
-        {
-            var parserResult = new CommandLineBuilder(command)
-                .Build()
-                .Parse(arguments);
-            MapParseResult(parserResult, target);
+    /// <summary>
+    /// Разбор командной строки и отображение результатов на существующий объект.
+    /// </summary>
+    /// <param name="command">Команда (в т. ч. корневая).</param>
+    /// <param name="arguments">Аргументы командной строки.</param>
+    /// <param name="target">Объект назначения.</param>
+    public static void MapCommandResult
+        (
+            Command command,
+            string[] arguments,
+            object target
+        )
+    {
+        var parserResult = new CommandLineBuilder (command)
+            .Build()
+            .Parse (arguments);
+        MapParseResult (parserResult, target);
+    }
 
-        } // method MapCommandResult
+    /// <summary>
+    /// Разбор командной строки и отображение результатов на вновь созданный объект.
+    /// </summary>
+    /// <param name="command">Команда (в т. ч. корневая).</param>
+    /// <param name="arguments">Аргументы командной строки.</param>
+    /// <typeparam name="T">Тип результата</typeparam>
+    /// <returns>Результат отображения на вновь созданный объект.</returns>
+    public static T MapCommandResult<T>
+        (
+            this Command command,
+            string[] arguments
+        )
+        where T : class, new()
+    {
+        var result = new T();
+        MapCommandResult (command, arguments, result);
 
-        /// <summary>
-        /// Разбор командной строки и отображение результатов на вновь созданный объект.
-        /// </summary>
-        /// <param name="command">Команда (в т. ч. корневая).</param>
-        /// <param name="arguments">Аргументы командной строки.</param>
-        /// <typeparam name="T">Тип результата</typeparam>
-        /// <returns>Результат отображения на вновь созданный объект.</returns>
-        public static T MapCommandResult<T>
-            (
-                this Command command,
-                string[] arguments
-            )
-            where T : class, new()
-        {
-            var result = new T();
-            MapCommandResult(command, arguments, result);
+        return result;
+    }
 
-            return result;
-
-        } // method MapCommandResult
-
-        #endregion
-
-    } // class CommandLineMapper
-
-} // namespace AM.CommandLine
+    #endregion
+}

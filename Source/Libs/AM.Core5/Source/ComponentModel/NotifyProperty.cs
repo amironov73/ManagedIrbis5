@@ -17,25 +17,27 @@ using System.ComponentModel;
 
 #nullable enable
 
-namespace AM.ComponentModel
+namespace AM.ComponentModel;
+
+/// <summary>
+/// Наивная реализация <see cref="INotifyPropertyChanged"/>.
+/// </summary>
+public class NotifyProperty
+    : INotifyPropertyChanged
 {
     /// <summary>
-    /// Наивная реализация <see cref="INotifyPropertyChanged"/>.
+    /// Событие возбуждается при изменении значения свойства.
     /// </summary>
-    public class NotifyProperty
-        : INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>
+    /// Извещает подписчиков свойства об изменении значения свойства.
+    /// </summary>
+    public virtual void NotifyPropertyChanged
+        (
+            string str
+        )
     {
-        /// <summary>
-        /// Событие возбуждается при изменении значения свойства.
-        /// </summary>
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        /// <summary>
-        /// Извещает подписчиков свойства об изменении значения свойства.
-        /// </summary>
-        public virtual void NotifyPropertyChanged (string str)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(str));
-
-    } // class NotifyProperty
-
-} // namespace AM.ComponentModel
+        PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (str));
+    }
+}
