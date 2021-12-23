@@ -24,153 +24,154 @@ using System.Diagnostics.CodeAnalysis;
 
 #nullable enable
 
-namespace AM.Diagnostics
+namespace AM.Diagnostics;
+
+/// <summary>
+/// Запускает консольный процесс и перехватывает его выдачу
+/// для показа, например, в текстовом боксе.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public sealed class ConsoleProcessRunner
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Запускает консольный процесс и перехватывает его выдачу
-    /// для показа, например, в текстовом боксе.
+    /// Gets the receiver.
     /// </summary>
-    [ExcludeFromCodeCoverage]
-    public sealed class ConsoleProcessRunner
-        : IDisposable
+    public IConsoleOutputReceiver? Receiver { get; private set; }
+
+    /// <summary>
+    /// Gets the running process.
+    /// </summary>
+    public Process? RunningProcess { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ConsoleProcessRunner
+        (
+            IConsoleOutputReceiver? receiver
+        )
     {
-        #region Properties
+        Receiver = receiver;
+    }
 
-        /// <summary>
-        /// Gets the receiver.
-        /// </summary>
-        public IConsoleOutputReceiver? Receiver { get; private set; }
+    #endregion
 
-        /// <summary>
-        /// Gets the running process.
-        /// </summary>
-        public Process? RunningProcess { get; private set; }
+    #region Private members
 
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ConsoleProcessRunner
-            (
-                IConsoleOutputReceiver? receiver
-            )
+    private void _OutputDataReceived
+        (
+            object? sender,
+            DataReceivedEventArgs e
+        )
+    {
+        if (Receiver != null && e.Data != null)
         {
-            Receiver = receiver;
+            Receiver.ReceiveConsoleOutput (e.Data);
+        }
+    }
+
+    private void _ProcessExited
+        (
+            object? sender,
+            EventArgs e
+        )
+    {
+        var process = RunningProcess;
+        if (!ReferenceEquals (process, null))
+        {
+            process.OutputDataReceived -= _OutputDataReceived;
+            process.Exited -= _ProcessExited;
+            RunningProcess = null;
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Starts new process with the specified file name.
+    /// </summary>
+    /// <param name="fileName">Name of the file.</param>
+    /// <param name="arguments">The arguments.</param>
+    public void Start
+        (
+            string fileName,
+            string arguments
+        )
+    {
+        if (RunningProcess is { HasExited: false })
+        {
+            Magna.Error
+                (
+                    nameof (ConsoleProcessRunner) + "::" + nameof (Start)
+                    + ": process already running"
+                );
+
+            throw new ArsMagnaException();
         }
 
-        #endregion
-
-        #region Private members
-
-        private void _OutputDataReceived
-            (
-                object? sender,
-                DataReceivedEventArgs e
-            )
+        var startInfo = new ProcessStartInfo
         {
-            if (Receiver != null && e.Data != null)
-            {
-                Receiver.ReceiveConsoleOutput(e.Data);
-            }
-        }
+            FileName = fileName,
+            Arguments = arguments,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            StandardErrorEncoding = null,
 
-        private void _ProcessExited
-            (
-                object? sender,
-                EventArgs e
-            )
+            // If the value of the StandardOutputEncoding property
+            // is null, the process uses the default standard
+            // output encoding for the standard output.
+            StandardOutputEncoding = null,
+
+            UseShellExecute = false
+        };
+        RunningProcess = new Process
         {
-            var process = RunningProcess;
-            if (!ReferenceEquals(process, null))
-            {
-                process.OutputDataReceived -= _OutputDataReceived;
-                process.Exited -= _ProcessExited;
-                RunningProcess = null;
-            }
-        }
+            StartInfo = startInfo
 
-        #endregion
+            //, SynchronizingObject = Receiver // Use this to event handler calls
+            // that are issued as a result of an Exited event on the process
+        };
+        RunningProcess.OutputDataReceived += _OutputDataReceived;
+        RunningProcess.ErrorDataReceived += _OutputDataReceived;
+        RunningProcess.Exited += _ProcessExited;
+        RunningProcess.Start();
+        RunningProcess.BeginOutputReadLine();
+        RunningProcess.BeginErrorReadLine();
+    }
 
-        #region Public methods
+    /// <summary>
+    /// Останавливает запущенный процесс, если это возможно.
+    /// </summary>
+    public void Stop()
+    {
+        // TODO: try to kill running process?
 
-        /// <summary>
-        /// Starts new process with the specified file name.
-        /// </summary>
-        /// <param name="fileName">Name of the file.</param>
-        /// <param name="arguments">The arguments.</param>
-        public void Start
-            (
-                string fileName,
-                string arguments
-            )
+        if (RunningProcess is { HasExited: false })
         {
-            if (RunningProcess is { HasExited: false })
-            {
-                Magna.Error
-                    (
-                        nameof(ConsoleProcessRunner) + "::" + nameof(Start)
-                        + ": process already running"
-                    );
-
-                throw new ArsMagnaException();
-            }
-
-            var startInfo = new ProcessStartInfo
-                {
-                    FileName = fileName,
-                    Arguments = arguments,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    StandardErrorEncoding = null,
-
-                    // If the value of the StandardOutputEncoding property
-                    // is null, the process uses the default standard
-                    // output encoding for the standard output.
-                    StandardOutputEncoding = null,
-
-                    UseShellExecute = false
-                };
-            RunningProcess = new Process
-                {
-                    StartInfo = startInfo
-                    //, SynchronizingObject = Receiver // Use this to event handler calls
-                    // that are issued as a result of an Exited event on the process
-                };
-            RunningProcess.OutputDataReceived += _OutputDataReceived;
-            RunningProcess.ErrorDataReceived += _OutputDataReceived;
-            RunningProcess.Exited += _ProcessExited;
-            RunningProcess.Start();
-            RunningProcess.BeginOutputReadLine();
-            RunningProcess.BeginErrorReadLine();
+            RunningProcess.OutputDataReceived -= _OutputDataReceived;
+            RunningProcess.Exited -= _ProcessExited;
         }
+    }
 
-        /// <summary>
-        /// Останавливает запущенный процесс, если это возможно.
-        /// </summary>
-        public void Stop()
-        {
-            // TODO: try to kill running process?
+    #endregion
 
-            if (RunningProcess is { HasExited: false })
-            {
-                RunningProcess.OutputDataReceived -= _OutputDataReceived;
-                RunningProcess.Exited -= _ProcessExited;
-            }
-        }
+    #region IDisposable
 
-        #endregion
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        RunningProcess?.Dispose();
+    }
 
-        #region IDisposable
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => RunningProcess?.Dispose();
-
-        #endregion
-
-    } // class ConsoleProcessRunner
-
-} // namespace AM.Diagnostics
+    #endregion
+}

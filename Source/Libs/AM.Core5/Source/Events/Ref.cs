@@ -15,30 +15,32 @@
 
 #nullable enable
 
-namespace AM.Events
+namespace AM.Events;
+
+//
+// Заимствовано из проекта DebounceMonitoring
+//
+// https://github.com/SIDOVSKY/DebounceMonitoring
+//
+// copyright Vadim Sedov
+//
+
+/// <summary>
+/// Ссылка на структуру.
+/// </summary>
+/// <typeparam name="T">Структура.</typeparam>
+internal sealed class Ref<T> where T
+    : struct
 {
-    //
-    // Заимствовано из проекта DebounceMonitoring
-    //
-    // https://github.com/SIDOVSKY/DebounceMonitoring
-    //
-    // copyright Vadim Sedov
-    //
+    public T Value;
 
-    /// <summary>
-    /// Ссылка на структуру.
-    /// </summary>
-    /// <typeparam name="T">Структура.</typeparam>
-    internal sealed class Ref<T> where T
-        : struct
+    public Ref (T value = default)
     {
-        public T Value;
+        Value = value;
+    }
 
-        public Ref(T value = default)
-        {
-            Value = value;
-        }
-
-        public override string ToString() => Value.ToString() ?? "(null)";
+    public override string ToString()
+    {
+        return Value.ToString() ?? "(null)";
     }
 }

@@ -25,132 +25,129 @@ using AM.Text;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Работа с директориями.
+/// </summary>
+public static class DirectoryUtility
 {
-    /// <summary>
-    /// Работа с директориями.
-    /// </summary>
-    public static class DirectoryUtility
+    #region Private members
+
+    private static void _GetFiles
+        (
+            ICollection<string> found,
+            string path,
+            string[] masks,
+            bool recursive
+        )
     {
-        #region Private members
-
-        private static void _GetFiles
-            (
-                List<string> found,
-                string path,
-                string[] masks,
-                bool recursive
-            )
+        foreach (var mask in masks)
         {
-            foreach (var mask in masks)
+            var files = Directory.GetFiles (path, mask);
+            foreach (var file in files)
             {
-                var files = Directory.GetFiles(path, mask);
-                foreach (var file in files)
+                if (!found.Contains (file))
                 {
-                    if (!found.Contains(file))
-                    {
-                        found.Add(file);
-                    }
-                }
-            }
-            if (recursive)
-            {
-                var directories = Directory.GetDirectories(path);
-                foreach (var dir in directories)
-                {
-                    _GetFiles(found, dir, masks, true);
+                    found.Add (file);
                 }
             }
         }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Clears the specified directory. Deletes all files
-        /// and subdirectories
-        /// from the directory.
-        /// </summary>
-        public static void ClearDirectory
-            (
-                string path
-            )
+        if (recursive)
         {
-            Sure.NotNullNorEmpty(path, nameof(path));
-
-            foreach (var subdirectory in Directory.GetDirectories(path))
+            var directories = Directory.GetDirectories (path);
+            foreach (var dir in directories)
             {
-                Directory.Delete
-                    (
-                        Path.Combine(path, subdirectory),
-                        true
-                    );
-            }
-
-            foreach (var fileName in Directory.GetFiles(path))
-            {
-                File.Delete(Path.Combine(path, fileName));
+                _GetFiles (found, dir, masks, true);
             }
         }
+    }
 
-        /// <summary>
-        /// Gets list of files in specified path.
-        /// </summary>
-        public static string[] GetFiles
-            (
-                string path,
-                string mask,
-                bool recursive
-            )
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Clears the specified directory. Deletes all files
+    /// and subdirectories
+    /// from the directory.
+    /// </summary>
+    public static void ClearDirectory
+        (
+            string path
+        )
+    {
+        Sure.NotNullNorEmpty (path);
+
+        foreach (var subdirectory in Directory.GetDirectories (path))
         {
-            Sure.NotNullNorEmpty(path, nameof(path));
-            Sure.NotNullNorEmpty(mask, nameof(mask));
-
-            var found = new List<string>();
-
-            var masks = mask.Split
+            Directory.Delete
                 (
-                    CommonSeparators.Semicolon,
-                    StringSplitOptions.RemoveEmptyEntries
+                    Path.Combine (path, subdirectory),
+                    true
                 );
-            _GetFiles(found, path, masks, recursive);
-
-            return found.ToArray();
         }
 
-        /// <summary>
-        /// Расширяет регулярное выражение DOS/Windows до списка файлов.
-        /// </summary>
-        /// <param name="wildcard">Регулярное выражение, включающее
-        /// в себя символы * и ?, например *.exe или c:\*.bat.</param>
-        /// <returns>Массив имен файлов, соответствующих регулярному
-        /// выражению. Если параметр <paramref name="wildcard"/>
-        /// включал имя директории, то каждое имя в массив также
-        /// будет содержать имя директории.</returns>
-        /// <remarks>В поиске участвуют только файлы, но не директории.
-        /// </remarks>
-        public static string[] Glob
-            (
-                string wildcard
-            )
+        foreach (var fileName in Directory.GetFiles (path))
         {
-            Sure.NotNullNorEmpty (wildcard);
+            File.Delete (Path.Combine (path, fileName));
+        }
+    }
 
-            var dir = Path.GetDirectoryName (wildcard);
-            if (string.IsNullOrEmpty (dir))
-            {
-                return Directory.GetFiles (Directory.GetCurrentDirectory(), wildcard);
-            }
+    /// <summary>
+    /// Gets list of files in specified path.
+    /// </summary>
+    public static string[] GetFiles
+        (
+            string path,
+            string mask,
+            bool recursive
+        )
+    {
+        Sure.NotNullNorEmpty (path);
+        Sure.NotNullNorEmpty (mask);
 
-            var name = Path.GetFileName (wildcard);
+        var found = new List<string>();
 
-            return Directory.GetFiles (dir, name);
+        var masks = mask.Split
+            (
+                CommonSeparators.Semicolon,
+                StringSplitOptions.RemoveEmptyEntries
+            );
+        _GetFiles (found, path, masks, recursive);
 
-        } // method Glob
+        return found.ToArray();
+    }
 
-        #endregion
+    /// <summary>
+    /// Расширяет регулярное выражение DOS/Windows до списка файлов.
+    /// </summary>
+    /// <param name="wildcard">Регулярное выражение, включающее
+    /// в себя символы * и ?, например *.exe или c:\*.bat.</param>
+    /// <returns>Массив имен файлов, соответствующих регулярному
+    /// выражению. Если параметр <paramref name="wildcard"/>
+    /// включал имя директории, то каждое имя в массив также
+    /// будет содержать имя директории.</returns>
+    /// <remarks>В поиске участвуют только файлы, но не директории.
+    /// </remarks>
+    public static string[] Glob
+        (
+            string wildcard
+        )
+    {
+        Sure.NotNullNorEmpty (wildcard);
 
-    } // class DirectoryInfo
+        var dir = Path.GetDirectoryName (wildcard);
+        if (string.IsNullOrEmpty (dir))
+        {
+            return Directory.GetFiles (Directory.GetCurrentDirectory(), wildcard);
+        }
 
-} // namespace AM.IO
+        var name = Path.GetFileName (wildcard);
+
+        return Directory.GetFiles (dir, name);
+    }
+
+    #endregion
+}

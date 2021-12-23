@@ -16,25 +16,24 @@ using System.Globalization;
 
 #nullable enable
 
-namespace AM.Globalization
+namespace AM.Globalization;
+
+/// <summary>
+/// Поддерживаемые встроенные культуры.
+/// </summary>
+public static class BuiltinCultures
 {
+    #region Properties
+
     /// <summary>
-    /// Поддерживаемые встроенные культуры.
+    /// American English.
     /// </summary>
-    public static class BuiltinCultures
-    {
-        #region Properties
+    public static CultureInfo AmericanEnglish => new (CultureCode.AmericanEnglish);
 
-        /// <summary>
-        /// American English.
-        /// </summary>
-        public static CultureInfo AmericanEnglish => new (CultureCode.AmericanEnglish);
+    /// <summary>
+    /// Русская культура (Русская-в-России!).
+    /// </summary>
+    public static CultureInfo Russian => new (CultureCode.Russian);
 
-        /// <summary>
-        /// Русская культура (Русская-в-России!).
-        /// </summary>
-        public static CultureInfo Russian => new (CultureCode.Russian);
-
-        #endregion
-    }
+    #endregion
 }

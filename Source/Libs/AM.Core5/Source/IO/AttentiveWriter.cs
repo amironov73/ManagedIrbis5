@@ -22,75 +22,77 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Внимательный поток, замечающий, когда в него выводят текст.
+/// </summary>
+public sealed class AttentiveWriter
+    : TextWriter
 {
+    #region Properties
+
     /// <summary>
-    /// Внимательный поток, замечающий, когда в него выводят текст.
+    /// Количество выведенных символов.
     /// </summary>
-    public sealed class AttentiveWriter
-        : TextWriter
+    public uint Counter => _counter;
+
+    /// <summary>
+    /// Отслеживаемый поток символов.
+    /// </summary>
+    public TextWriter Inner { get; }
+
+    /// <inheritdoc cref="TextWriter.Encoding"/>
+    public override Encoding Encoding => Inner.Encoding;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public AttentiveWriter
+        (
+            TextWriter inner
+        )
     {
-        #region Properties
+        Sure.NotNull (inner);
 
-        /// <summary>
-        /// Количество выведенных символов.
-        /// </summary>
-        public uint Counter => _counter;
-
-        /// <summary>
-        /// Отслеживаемый поток символов.
-        /// </summary>
-        public TextWriter Inner { get; }
-
-        /// <inheritdoc cref="TextWriter.Encoding"/>
-        public override Encoding Encoding => Inner.Encoding;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public AttentiveWriter
-            (
-                TextWriter inner
-            )
-        {
-            Sure.NotNull (inner);
-
-            Inner = inner;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private uint _counter;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Сброс счетчика.
-        /// </summary>
-        public void ResetCounter()
-        {
-            _counter = 0;
-        }
-
-        #endregion
-
-        #region TextWriter members
-
-        /// <inheritdoc cref="TextWriter.Write(char)"/>
-        public override void Write (char value)
-        {
-            ++_counter;
-            Inner.Write (value);
-        }
-
-        #endregion
+        Inner = inner;
     }
+
+    #endregion
+
+    #region Private members
+
+    private uint _counter;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Сброс счетчика.
+    /// </summary>
+    public void ResetCounter()
+    {
+        _counter = 0;
+    }
+
+    #endregion
+
+    #region TextWriter members
+
+    /// <inheritdoc cref="TextWriter.Write(char)"/>
+    public override void Write
+        (
+            char value
+        )
+    {
+        ++_counter;
+        Inner.Write (value);
+    }
+
+    #endregion
 }

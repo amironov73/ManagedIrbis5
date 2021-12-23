@@ -23,135 +23,132 @@ using System.Globalization;
 
 #nullable enable
 
-namespace AM.Globalization
+namespace AM.Globalization;
+
+/// <summary>
+/// Сравнивает строки согласно русской локали.
+/// </summary>
+public class RussianStringComparer
+    : StringComparer
 {
+    #region Properties
+
+    ///<summary>
+    /// Считать Ё отдельной буквой (иначе - считать ее равной Е)?
+    ///</summary>
+    public bool ConsiderYo { get; }
+
+    ///<summary>
+    /// Игнорировать регистр символов?
+    ///</summary>
+    public bool IgnoreCase { get; }
+
+    #endregion
+
+    #region Construction
+
     /// <summary>
-    /// Сравнивает строки согласно русской локали.
+    /// Конструктор.
     /// </summary>
-    public class RussianStringComparer
-        : StringComparer
+    /// <param name="considerYo">Считать Ё отдельной буквой?</param>
+    /// <param name="ignoreCase">Игнорировать регистр символов?</param>
+    public RussianStringComparer
+        (
+            bool considerYo = false,
+            bool ignoreCase = false
+        )
     {
-        #region Properties
+        ConsiderYo = considerYo;
+        IgnoreCase = ignoreCase;
 
-        ///<summary>
-        /// Считать Ё отдельной буквой (иначе - считать ее равной Е)?
-        ///</summary>
-        public bool ConsiderYo { get; }
+        var russianCulture = BuiltinCultures.Russian;
 
-        ///<summary>
-        /// Игнорировать регистр символов?
-        ///</summary>
-        public bool IgnoreCase { get; }
+        var options = ignoreCase
+            ? CompareOptions.IgnoreCase
+            : CompareOptions.None;
 
-        #endregion
+        _innerComparer = (left, right)
+            => russianCulture.CompareInfo.Compare
+                (
+                    left,
+                    right,
+                    options
+                );
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="considerYo">Считать Ё отдельной буквой?</param>
-        /// <param name="ignoreCase">Игнорировать регистр символов?</param>
-        public RussianStringComparer
-            (
-                bool considerYo = false,
-                bool ignoreCase = false
-            )
+    #region Private members
+
+    private readonly Func<string?, string?, int> _innerComparer;
+
+    private string? _Replace
+        (
+            string? str
+        )
+    {
+        if (ReferenceEquals(str, null))
         {
-            ConsiderYo = considerYo;
-            IgnoreCase = ignoreCase;
-
-            var russianCulture = BuiltinCultures.Russian;
-
-            var options = ignoreCase
-                ? CompareOptions.IgnoreCase
-                : CompareOptions.None;
-
-            _innerComparer = (left, right)
-                => russianCulture.CompareInfo.Compare
-                    (
-                        left,
-                        right,
-                        options
-                    );
+            return null;
         }
 
-        #endregion
-
-        #region Private members
-
-        private readonly Func<string?, string?, int> _innerComparer;
-
-        private string? _Replace
-            (
-                string? str
-            )
+        if (ConsiderYo)
         {
-            if (ReferenceEquals(str, null))
-            {
-                return null;
-            }
-
-            if (ConsiderYo)
-            {
-                str = str.Replace('ё', 'е')
-                    .Replace('Ё', 'Е');
-            }
-
-            return str;
+            str = str.Replace('ё', 'е')
+                .Replace('Ё', 'Е');
         }
 
-        #endregion
+        return str;
+    }
 
-        #region StringComparer members
+    #endregion
 
-        ///<inheritdoc/>
-        public override int Compare
-            (
-                string? x,
-                string? y
-            )
+    #region StringComparer members
+
+    /// <inheritdoc cref="StringComparer.Compare(string?,string?)" />
+    public override int Compare
+        (
+            string? x,
+            string? y
+        )
+    {
+        var xCopy = _Replace(x);
+        var yCopy = _Replace(y);
+
+        return _innerComparer ( xCopy, yCopy );
+    }
+
+    /// <inheritdoc cref="StringComparer.Equals(string?,string?)" />
+    public override bool Equals
+        (
+            string? x,
+            string? y
+        )
+    {
+        var xCopy = _Replace(x);
+        var yCopy = _Replace(y);
+
+        return _innerComparer ( xCopy, yCopy ) == 0;
+    }
+
+    /// <inheritdoc cref="StringComparer.GetHashCode(string)"/>
+    public override int GetHashCode
+        (
+            string obj
+        )
+    {
+        var objCopy = _Replace(obj);
+
+        if (IgnoreCase
+            && !ReferenceEquals(objCopy, null))
         {
-            var xCopy = _Replace(x);
-            var yCopy = _Replace(y);
-
-            return _innerComparer ( xCopy, yCopy );
+            objCopy = objCopy.ToUpper();
         }
 
-        ///<inheritdoc/>
-        public override bool Equals
-            (
-                string? x,
-                string? y
-            )
-        {
-            var xCopy = _Replace(x);
-            var yCopy = _Replace(y);
+        return ReferenceEquals(objCopy, null)
+            ? 0
+            : objCopy.GetHashCode();
+    }
 
-            return _innerComparer ( xCopy, yCopy ) == 0;
-        }
-
-        ///<inheritdoc/>
-        public override int GetHashCode
-            (
-                string obj
-            )
-        {
-            var objCopy = _Replace(obj);
-
-            if (IgnoreCase
-                && !ReferenceEquals(objCopy, null))
-            {
-                objCopy = objCopy.ToUpper();
-            }
-
-            return ReferenceEquals(objCopy, null)
-                ? 0
-                : objCopy.GetHashCode();
-        }
-
-        #endregion
-
-    } // class RussianStringComparer
-
-} // namespace AM.Globalization
+    #endregion
+}

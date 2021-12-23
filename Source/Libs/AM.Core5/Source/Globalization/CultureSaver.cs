@@ -26,104 +26,107 @@ using System.Threading;
 
 #nullable enable
 
-namespace AM.Globalization
+namespace AM.Globalization;
+
+/// <summary>
+/// Сохраняет и затем восстанавливает текущую культуру
+/// в определенном контексте.
+/// </summary>
+///
+/// <example>
+/// <para>This example changes current thread culture to
+/// for a while.
+/// </para>
+/// <code>
+/// using System.Globalization;
+/// using AM.Globalization;
+///
+/// using ( new CultureSaver ( "ru-RU" ) )
+/// {
+///     // do something
+/// }
+/// // here old culture is restored.
+/// </code>
+/// </example>
+[DebuggerDisplay("{" + nameof(PreviousCulture) + "}")]
+public sealed class CultureSaver
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Сохраняет и затем восстанавливает текущую культуру
-    /// в определенном контексте.
+    /// Сохраненная культура.
     /// </summary>
-    ///
-    /// <example>
-    /// <para>This example changes current thread culture to
-    /// for a while.
-    /// </para>
-    /// <code>
-    /// using System.Globalization;
-    /// using AM.Globalization;
-    ///
-    /// using ( new CultureSaver ( "ru-RU" ) )
-    /// {
-    ///     // do something
-    /// }
-    /// // here old culture is restored.
-    /// </code>
-    /// </example>
-    [DebuggerDisplay("{" + nameof(PreviousCulture) + "}")]
-    public sealed class CultureSaver
-        : IDisposable
+    public CultureInfo PreviousCulture { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Констурктор.
+    /// </summary>
+    public CultureSaver()
     {
-        #region Properties
+        PreviousCulture = Thread.CurrentThread.CurrentCulture;
+    }
 
-        /// <summary>
-        /// Сохраненная культура.
-        /// </summary>
-        public CultureInfo PreviousCulture { get; }
+    /// <summary>
+    /// Конструктор. Устанавливает указанную культуру.
+    /// </summary>
+    public CultureSaver
+        (
+            CultureInfo newCulture
+        )
+        : this()
+    {
+        Thread.CurrentThread.CurrentCulture = newCulture;
+    }
 
-        #endregion
+    /// <summary>
+    /// Конструктор. Устанавливает указанную культуру.
+    /// </summary>
+    public CultureSaver
+        (
+            string cultureName
+        )
+        : this(new CultureInfo(cultureName))
+    {
+    }
 
-        #region Construction
+    /// <summary>
+    /// Конструктор. Устанавливает указанную культуру.
+    /// </summary>
+    public CultureSaver
+        (
+            int cultureIdentifier
+        )
+        : this(new CultureInfo(cultureIdentifier))
+    {
+    }
 
-        /// <summary>
-        /// Констурктор.
-        /// </summary>
-        public CultureSaver()
-        {
-            PreviousCulture = Thread.CurrentThread.CurrentCulture;
-        }
+    #endregion
 
-        /// <summary>
-        /// Конструктор. Устанавливает указанную культуру.
-        /// </summary>
-        public CultureSaver
-            (
-                CultureInfo newCulture
-            )
-            : this()
-        {
-            Thread.CurrentThread.CurrentCulture = newCulture;
-        }
+    #region Public methods
 
-        /// <summary>
-        /// Конструктор. Устанавливает указанную культуру.
-        /// </summary>
-        public CultureSaver
-            (
-                string cultureName
-            )
-            : this(new CultureInfo(cultureName))
-        {
-        }
+    /// <summary>
+    /// Временно (для целей тестирования) устанавливает
+    /// культуру American-English.
+    /// </summary>
+    public static CultureSaver ForTesting()
+    {
+        return new (BuiltinCultures.AmericanEnglish);
+    }
 
-        /// <summary>
-        /// Конструктор. Устанавливает указанную культуру.
-        /// </summary>
-        public CultureSaver
-            (
-                int cultureIdentifier
-            )
-            : this(new CultureInfo(cultureIdentifier))
-        {
-        }
+    #endregion
 
-        #endregion
+    #region IDisposable members
 
-        #region Public methods
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        Thread.CurrentThread.CurrentCulture = PreviousCulture;
+    }
 
-        /// <summary>
-        /// Временно (для целей тестирования) устанавливает
-        /// культуру American-English.
-        /// </summary>
-        public static CultureSaver ForTesting() => new (BuiltinCultures.AmericanEnglish);
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => Thread.CurrentThread.CurrentCulture = PreviousCulture;
-
-        #endregion
-
-    } // class CultureSaver
-
-} // namespace AM.Globalization
+    #endregion
+}

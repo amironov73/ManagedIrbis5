@@ -10,21 +10,18 @@
 
 #nullable enable
 
-namespace AM.Diagnostics
+namespace AM.Diagnostics;
+
+/// <summary>
+/// Принимает вывод консольного процесса.
+/// </summary>
+public interface IConsoleOutputReceiver
 {
     /// <summary>
-    /// Принимает вывод консольного процесса.
+    /// Прием очередной порции данных.
     /// </summary>
-    public interface IConsoleOutputReceiver
-    {
-        /// <summary>
-        /// Прием очередной порции данных.
-        /// </summary>
-        void ReceiveConsoleOutput
-            (
-                string text
-            );
-
-    } // interface IConsoleOutputReceiver
-
-} // namespace AM.Diagnostics
+    void ReceiveConsoleOutput
+        (
+            string text
+        );
+}

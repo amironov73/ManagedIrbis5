@@ -8,27 +8,24 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Globalization
+namespace AM.Globalization;
+
+/// <summary>
+/// Коды поддерживаемых культур.
+/// </summary>
+public static class CultureCode
 {
+    #region Constants
+
     /// <summary>
-    /// Коды поддерживаемых культур.
+    /// American English.
     /// </summary>
-    public static class CultureCode
-    {
-        #region Constants
+    public const string AmericanEnglish = "en-US";
 
-        /// <summary>
-        /// American English.
-        /// </summary>
-        public const string AmericanEnglish = "en-US";
+    /// <summary>
+    /// Русская-в-России.
+    /// </summary>
+    public const string Russian = "ru-RU";
 
-        /// <summary>
-        /// Русская-в-России.
-        /// </summary>
-        public const string Russian = "ru-RU";
-
-        #endregion
-
-    } // class CultrureCode
-
-} // namespace AM.Globalization
+    #endregion
+}

@@ -16,461 +16,456 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-
-using AM.Collections;
-using AM.Runtime;
 
 #endregion
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Навигатор по байтовому массиву.
+/// </summary>
+public sealed class ByteNavigator
 {
+    #region Constants
+
     /// <summary>
-    /// Навигатор по байтовому массиву.
+    /// Признак конца данных.
     /// </summary>
-    public sealed class ByteNavigator
+    // ReSharper disable once InconsistentNaming
+    public const int EOF = -1;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Используемая кодировка.
+    /// </summary>
+    public Encoding Encoding { get; private set; }
+
+    /// <summary>
+    /// Достигнут конец данных?
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
+    public bool IsEOF => Position >= Length;
+
+    /// <summary>
+    /// Длина массива.
+    /// </summary>
+    public int Length { get; private set; }
+
+    /// <summary>
+    /// Текущая позиция.
+    /// </summary>
+    public int Position { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ByteNavigator
+        (
+            byte[] data
+        )
     {
-        #region Constants
+        _data = data;
+        Length = data.Length;
+        Encoding = Encoding.Default;
+    }
 
-        /// <summary>
-        /// Признак конца данных.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        public const int EOF = -1;
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ByteNavigator
+        (
+            byte[] data,
+            int length
+        )
+    {
+        Sure.NonNegative(length, nameof(length));
 
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Используемая кодировка.
-        /// </summary>
-        public Encoding Encoding { get; private set; }
-
-        /// <summary>
-        /// Достигнут конец данных?
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        public bool IsEOF => Position >= Length;
-
-        /// <summary>
-        /// Длина массива.
-        /// </summary>
-        public int Length { get; private set; }
-
-        /// <summary>
-        /// Текущая позиция.
-        /// </summary>
-        public int Position { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ByteNavigator
-            (
-                byte[] data
-            )
+        if (length > data.Length)
         {
-            _data = data;
-            Length = data.Length;
-            Encoding = Encoding.Default;
+            length = data.Length;
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ByteNavigator
-            (
-                byte[] data,
-                int length
-            )
+        _data = data;
+        Length = length;
+        Encoding = Encoding.Default;
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ByteNavigator
+        (
+            byte[] data,
+            int length,
+            Encoding encoding
+        )
+    {
+        Sure.NonNegative(length, nameof(length));
+
+        if (length > data.Length)
         {
-            Sure.NonNegative(length, nameof(length));
-
-            if (length > data.Length)
-            {
-                length = data.Length;
-            }
-
-            _data = data;
-            Length = length;
-            Encoding = Encoding.Default;
+            length = data.Length;
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ByteNavigator
-            (
-                byte[] data,
-                int length,
-                Encoding encoding
-            )
+        _data = data;
+        Length = length;
+        Encoding = encoding;
+    }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public ByteNavigator
+        (
+            byte[] data,
+            int offset,
+            int length,
+            Encoding encoding
+        )
+    {
+        Sure.NonNegative(offset, nameof(offset));
+        Sure.NonNegative(length, nameof(length));
+
+        if (length > data.Length)
         {
-            Sure.NonNegative(length, nameof(length));
-
-            if (length > data.Length)
-            {
-                length = data.Length;
-            }
-
-            _data = data;
-            Length = length;
-            Encoding = encoding;
+            length = data.Length;
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public ByteNavigator
+        _data = data;
+        Position = offset;
+        Length = length;
+        Encoding = encoding;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly byte[] _data;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Clone the navigator.
+    /// </summary>
+    public ByteNavigator Clone()
+    {
+        var result = new ByteNavigator
             (
-                byte[] data,
-                int offset,
-                int length,
-                Encoding encoding
+                _data,
+                Length
             )
-        {
-            Sure.NonNegative(offset, nameof(offset));
-            Sure.NonNegative(length, nameof(length));
-
-            if (length > data.Length)
-            {
-                length = data.Length;
-            }
-
-            _data = data;
-            Position = offset;
-            Length = length;
-            Encoding = encoding;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly byte[] _data;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Clone the navigator.
-        /// </summary>
-        public ByteNavigator Clone()
-        {
-            var result = new ByteNavigator
-                (
-                    _data,
-                    Length
-                )
             {
                 Encoding = Encoding,
                 Position = Position
             };
 
-            return result;
+        return result;
+    }
+
+    /// <summary>
+    /// Навигатор по двоичному файлу.
+    /// </summary>
+    public static ByteNavigator FromFile
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty(fileName, nameof(fileName));
+
+        var data = File.ReadAllBytes(fileName);
+        var result = new ByteNavigator(data);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Выдать остаток данных.
+    /// </summary>
+    public byte[]? GetRemainingData()
+    {
+        if (IsEOF)
+        {
+            return null;
         }
 
-        /// <summary>
-        /// Навигатор по двоичному файлу.
-        /// </summary>
-        public static ByteNavigator FromFile
-            (
-                string fileName
-            )
+        var result = new Span<byte>(_data)
+            .Slice(Position).ToArray();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Управляющий символ?
+    /// </summary>
+    public bool IsControl() => char.IsControl(PeekChar());
+
+    /// <summary>
+    /// Цифра?
+    /// </summary>
+    public bool IsDigit() => char.IsDigit(PeekChar());
+
+    /// <summary>
+    /// Буква?
+    /// </summary>
+    public bool IsLetter() => char.IsLetter(PeekChar());
+
+    /// <summary>
+    /// Буква или цифра?
+    /// </summary>
+    public bool IsLetterOrDigit() => char.IsLetterOrDigit(PeekChar());
+
+    /// <summary>
+    /// Часть числа?
+    /// </summary>
+    public bool IsNumber() => char.IsNumber(PeekChar());
+
+    /// <summary>
+    /// Знак пунктуации?
+    /// </summary>
+    public bool IsPunctuation() => char.IsPunctuation(PeekChar());
+
+    /// <summary>
+    /// Разделитель?
+    /// </summary>
+    public bool IsSeparator() => char.IsSeparator(PeekChar());
+
+    /// <summary>
+    /// Суррогат?
+    /// </summary>
+    public bool IsSurrogate() => char.IsSurrogate(PeekChar());
+
+    /// <summary>
+    /// Символ?
+    /// </summary>
+    public bool IsSymbol() => char.IsSymbol(PeekChar());
+
+    /// <summary>
+    /// Пробельный символ?
+    /// </summary>
+    public bool IsWhiteSpace() => char.IsWhiteSpace(PeekChar());
+
+    /// <summary>
+    /// Абсолютное перемещение.
+    /// </summary>
+    public void MoveAbsolute
+        (
+            int position
+        )
+    {
+        if (position > Length)
         {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+            position = Length;
+        }
+        if (position < 0)
+        {
+            position = 0;
+        }
+        Position = position;
+    }
 
-            var data = File.ReadAllBytes(fileName);
-            var result = new ByteNavigator(data);
+    /// <summary>
+    /// Относительное перемещение.
+    /// </summary>
+    public void MoveRelative
+        (
+            int delta
+        )
+    {
+        Position += delta;
+        if (Position > Length)
+        {
+            Position = Length;
+        }
+        if (Position < 0)
+        {
+            Position = 0;
+        }
+    }
 
-            return result;
+    /// <summary>
+    /// Подсмотреть один байт.
+    /// </summary>
+    public int PeekByte() => Position >= Length
+        ? EOF
+        : _data[Position];
+
+    /// <summary>
+    /// Peek one char.
+    /// </summary>
+    public char PeekChar()
+    {
+        if (Position >= Length)
+        {
+            return '\0';
         }
 
-        /// <summary>
-        /// Выдать остаток данных.
-        /// </summary>
-        public byte[]? GetRemainingData()
+        var result = (char)_data[Position];
+        return result;
+
+        // TODO implement properly
+    }
+
+    /// <summary>
+    /// Прочитать один байт
+    /// (текущая позиция продвигается).
+    /// </summary>
+    public int ReadByte()
+    {
+        if (Position >= Length)
         {
-            if (IsEOF)
-            {
-                return null;
-            }
-
-            var result = new Span<byte>(_data)
-                .Slice(Position).ToArray();
-
-            return result;
+            return -1;
         }
 
-        /// <summary>
-        /// Управляющий символ?
-        /// </summary>
-        public bool IsControl() => char.IsControl(PeekChar());
+        var result = _data[Position];
+        Position++;
+        return result;
+    }
 
-        /// <summary>
-        /// Цифра?
-        /// </summary>
-        public bool IsDigit() => char.IsDigit(PeekChar());
-
-        /// <summary>
-        /// Буква?
-        /// </summary>
-        public bool IsLetter() => char.IsLetter(PeekChar());
-
-        /// <summary>
-        /// Буква или цифра?
-        /// </summary>
-        public bool IsLetterOrDigit() => char.IsLetterOrDigit(PeekChar());
-
-        /// <summary>
-        /// Часть числа?
-        /// </summary>
-        public bool IsNumber() => char.IsNumber(PeekChar());
-
-        /// <summary>
-        /// Знак пунктуации?
-        /// </summary>
-        public bool IsPunctuation() => char.IsPunctuation(PeekChar());
-
-        /// <summary>
-        /// Разделитель?
-        /// </summary>
-        public bool IsSeparator() => char.IsSeparator(PeekChar());
-
-        /// <summary>
-        /// Суррогат?
-        /// </summary>
-        public bool IsSurrogate() => char.IsSurrogate(PeekChar());
-
-        /// <summary>
-        /// Символ?
-        /// </summary>
-        public bool IsSymbol() => char.IsSymbol(PeekChar());
-
-        /// <summary>
-        /// Пробельный символ?
-        /// </summary>
-        public bool IsWhiteSpace() => char.IsWhiteSpace(PeekChar());
-
-        /// <summary>
-        /// Абсолютное перемещение.
-        /// </summary>
-        public void MoveAbsolute
-            (
-                int position
-            )
+    /// <summary>
+    /// Read one char.
+    /// </summary>
+    public char ReadChar()
+    {
+        if (Position >= Length)
         {
-            if (position > Length)
-            {
-                position = Length;
-            }
-            if (position < 0)
-            {
-                position = 0;
-            }
-            Position = position;
+            return '\0';
         }
 
-        /// <summary>
-        /// Относительное перемещение.
-        /// </summary>
-        public void MoveRelative
-            (
-                int delta
-            )
+        var result = (char)_data[Position];
+        Position++;
+
+        return result;
+
+        // TODO implement properly
+
+        //byte[] bytes = new byte[Encoding.GetMaxByteCount(1)];
+        //bytes[0] = _data[Position];
+        //Position++;
+        //int count = 1;
+
+        //Decoder decoder = Encoding.GetDecoder();
+        //decoder.Reset();
+
+        //char[] chars = new char[1];
+        //int bytesUsed, charsUsed;
+        //bool completed;
+        //decoder.Convert(bytes, 0, count, chars, 0, 1,
+        //    false, out bytesUsed, out charsUsed,
+        //    out completed);
+        //while (charsUsed != 1)
+        //{
+        //    if (count == bytes.Length)
+        //    {
+        //        return '\0';
+        //    }
+
+        //    if (Position >= Length)
+        //    {
+        //        return '\0';
+        //    }
+
+        //    bytes[count] = _data[Position];
+        //    count++;
+        //    Position++;
+
+        //    decoder.Convert(bytes, 0, count, chars, 0, 1,
+        //        false, out bytesUsed, out charsUsed,
+        //        out completed);
+        //}
+
+        //return chars[0];
+    }
+
+    /// <summary>
+    /// Чтение до конца строки.
+    /// </summary>
+    public string? ReadLine()
+    {
+        if (IsEOF)
         {
-            Position += delta;
-            if (Position > Length)
-            {
-                Position = Length;
-            }
-            if (Position < 0)
-            {
-                Position = 0;
-            }
+            return null;
         }
 
-        /// <summary>
-        /// Подсмотреть один байт.
-        /// </summary>
-        public int PeekByte() => Position >= Length
-                ? EOF
-                : _data[Position];
+        var result = new StringBuilder();
 
-        /// <summary>
-        /// Peek one char.
-        /// </summary>
-        public char PeekChar()
+        while (!IsEOF)
         {
-            if (Position >= Length)
+            var c = PeekChar();
+            if (c == '\r' || c == '\n')
             {
-                return '\0';
+                break;
             }
-
-            var result = (char)_data[Position];
-            return result;
-
-            // TODO implement properly
+            c = ReadChar();
+            result.Append(c);
         }
 
-        /// <summary>
-        /// Прочитать один байт
-        /// (текущая позиция продвигается).
-        /// </summary>
-        public int ReadByte()
+        if (!IsEOF)
         {
-            if (Position >= Length)
+            var c = PeekChar();
+
+            if (c == '\r')
             {
-                return -1;
+                ReadChar();
+                c = PeekChar();
             }
-
-            var result = _data[Position];
-            Position++;
-            return result;
-        }
-
-        /// <summary>
-        /// Read one char.
-        /// </summary>
-        public char ReadChar()
-        {
-            if (Position >= Length)
+            if (c == '\n')
             {
-                return '\0';
-            }
-
-            var result = (char)_data[Position];
-            Position++;
-
-            return result;
-
-            // TODO implement properly
-
-            //byte[] bytes = new byte[Encoding.GetMaxByteCount(1)];
-            //bytes[0] = _data[Position];
-            //Position++;
-            //int count = 1;
-
-            //Decoder decoder = Encoding.GetDecoder();
-            //decoder.Reset();
-
-            //char[] chars = new char[1];
-            //int bytesUsed, charsUsed;
-            //bool completed;
-            //decoder.Convert(bytes, 0, count, chars, 0, 1,
-            //    false, out bytesUsed, out charsUsed,
-            //    out completed);
-            //while (charsUsed != 1)
-            //{
-            //    if (count == bytes.Length)
-            //    {
-            //        return '\0';
-            //    }
-
-            //    if (Position >= Length)
-            //    {
-            //        return '\0';
-            //    }
-
-            //    bytes[count] = _data[Position];
-            //    count++;
-            //    Position++;
-
-            //    decoder.Convert(bytes, 0, count, chars, 0, 1,
-            //        false, out bytesUsed, out charsUsed,
-            //        out completed);
-            //}
-
-            //return chars[0];
-        }
-
-        /// <summary>
-        /// Чтение до конца строки.
-        /// </summary>
-        public string? ReadLine()
-        {
-            if (IsEOF)
-            {
-                return null;
-            }
-
-            var result = new StringBuilder();
-
-            while (!IsEOF)
-            {
-                var c = PeekChar();
-                if (c == '\r' || c == '\n')
-                {
-                    break;
-                }
-                c = ReadChar();
-                result.Append(c);
-            }
-
-            if (!IsEOF)
-            {
-                var c = PeekChar();
-
-                if (c == '\r')
-                {
-                    ReadChar();
-                    c = PeekChar();
-                }
-                if (c == '\n')
-                {
-                    ReadChar();
-                }
-            }
-
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Пропускаем строку
-        /// </summary>
-        public void SkipLine()
-        {
-            if (IsEOF)
-            {
-                return;
-            }
-
-            while (!IsEOF)
-            {
-                var c = PeekChar();
-                if (c == '\r' || c == '\n')
-                {
-                    break;
-                }
                 ReadChar();
             }
-
-            if (!IsEOF)
-            {
-                var c = PeekChar();
-
-                if (c == '\r')
-                {
-                    ReadChar();
-                    c = PeekChar();
-                }
-                if (c == '\n')
-                {
-                    ReadChar();
-                }
-            }
         }
 
-        #endregion
+        return result.ToString();
     }
+
+    /// <summary>
+    /// Пропускаем строку
+    /// </summary>
+    public void SkipLine()
+    {
+        if (IsEOF)
+        {
+            return;
+        }
+
+        while (!IsEOF)
+        {
+            var c = PeekChar();
+            if (c == '\r' || c == '\n')
+            {
+                break;
+            }
+            ReadChar();
+        }
+
+        if (!IsEOF)
+        {
+            var c = PeekChar();
+
+            if (c == '\r')
+            {
+                ReadChar();
+                c = PeekChar();
+            }
+            if (c == '\n')
+            {
+                ReadChar();
+            }
+        }
+    }
+
+    #endregion
 }

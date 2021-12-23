@@ -20,66 +20,62 @@ using System.IO.Compression;
 
 #endregion
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Работа со сжатыми данными.
+/// </summary>
+public static class CompressionUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Работа со сжатыми данными.
+    /// Сжатие указанных данных.
     /// </summary>
-    public static class CompressionUtility
+    public static byte[] Compress
+        (
+            byte[] data
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Сжатие указанных данных.
-        /// </summary>
-        public static byte[] Compress
-            (
-                byte[] data
-            )
+        var memory = new MemoryStream();
+        using (var compressor = new DeflateStream
+                   (
+                       memory,
+                       CompressionMode.Compress
+                   ))
         {
-            var memory = new MemoryStream();
-            using (var compressor = new DeflateStream
-                (
-                    memory,
-                    CompressionMode.Compress
-                ))
-            {
-                compressor.Write (data, 0, data.Length);
-            }
+            compressor.Write (data, 0, data.Length);
+        }
 
-            return memory.ToArray();
+        return memory.ToArray();
+    }
 
-        } // method Compress
-
-        /// <summary>
-        /// Распаковка указанных данных.
-        /// </summary>
-        public static byte[] Decompress
-            (
-                byte[] data
-            )
+    /// <summary>
+    /// Распаковка указанных данных.
+    /// </summary>
+    public static byte[] Decompress
+        (
+            byte[] data
+        )
+    {
+        var memory = new MemoryStream (data);
+        var result = new MemoryStream();
+        using (var decompresser = new DeflateStream
+                   (
+                       memory,
+                       CompressionMode.Decompress
+                   ))
         {
-            var memory = new MemoryStream (data);
-            var result = new MemoryStream();
-            using (var decompresser = new DeflateStream
+            StreamUtility.AppendTo
                 (
-                    memory,
-                    CompressionMode.Decompress
-                ))
-            {
-                StreamUtility.AppendTo
-                    (
-                        decompresser,
-                        result
-                    );
-            }
+                    decompresser,
+                    result
+                );
+        }
 
-            return result.ToArray();
+        return result.ToArray();
 
-        } // method Decompress
+    }
 
-        #endregion
-
-    } // class CompressionUtility
-
-} // namespace AM.IO
+    #endregion
+}
