@@ -13,6 +13,7 @@ static class Program
         // PidginExperimentOne.SimpleExpression();
         // PidginExperimentTwo.Statements();
         // PidginExperimentThree.Assignments();
-        PidginExperimentFour.LeftRecursion();
+        // PidginExperimentFour.LeftRecursion();
+        PidginExperimentFive.Comments();
     }
 }
