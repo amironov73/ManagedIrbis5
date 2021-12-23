@@ -22,111 +22,111 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Вспомогательные методы для чтения текстовых данных.
+/// </summary>
+public static class TextReaderUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Вспомогательные методы для чтения текстовых данных.
+    /// Open file for reading.
     /// </summary>
-    public static class TextReaderUtility
+    public static StreamReader OpenRead
+        (
+            string fileName,
+            Encoding encoding
+        )
     {
-        #region Public methods
+        Sure.NotNullNorEmpty (fileName);
+        Sure.NotNull (encoding);
 
-        /// <summary>
-        /// Open file for reading.
-        /// </summary>
-        public static StreamReader OpenRead
+        var result = new StreamReader
             (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+                File.OpenRead (fileName),
+                encoding
+            );
 
-            var result = new StreamReader
+        return result;
+    }
+
+    /// <summary>
+    /// Чтение строки непосредственно в <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="builder">Куда помещать результат.</param>
+    /// <param name="reader">Поток, из которого считывается строка.</param>
+    /// <param name="appendNewLine">Добавлять перевод строки в конец?</param>
+    /// <returns><c>false</c>, если достигнут конец потока.</returns>
+    public static bool ReadLine
+        (
+            this StringBuilder builder,
+            TextReader reader,
+            bool appendNewLine = false
+        )
+    {
+        Sure.NotNull (builder);
+        Sure.NotNull (reader);
+
+        var first = true;
+        while (true)
+        {
+            var chr = reader.Read();
+            if (chr < 0)
+            {
+                return !first;
+            }
+
+            if (chr == '\n')
+            {
+                if (appendNewLine)
+                {
+                    builder.Append ((char)chr);
+                }
+
+                return true;
+            }
+
+            if (chr != '\r')
+            {
+                builder.Append ((char)chr);
+            }
+
+            first = false;
+        }
+    }
+
+    /// <summary>
+    /// Обязательное чтение строки.
+    /// </summary>
+    public static string RequireLine
+        (
+            this TextReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        var result = reader.ReadLine();
+        if (ReferenceEquals (result, null))
+        {
+            Magna.Error
                 (
-                    File.OpenRead(fileName),
-                    encoding
+                    nameof (TextReaderUtility)
+                    + "::"
+                    + nameof (RequireLine)
+                    + ": "
+                    + "unexpected end of stream"
                 );
 
-            return result;
+            throw new ArsMagnaException
+                (
+                    "Unexpected end of stream"
+                );
+        }
 
-        } // method OpenRead
+        return result;
+    }
 
-        /// <summary>
-        /// Чтение строки непосредственно в <see cref="StringBuilder"/>.
-        /// </summary>
-        /// <param name="builder">Куда помещать результат.</param>
-        /// <param name="reader">Поток, из которого считывается строка.</param>
-        /// <param name="appendNewLine">Добавлять перевод строки в конец?</param>
-        /// <returns><c>false</c>, если достигнут конец потока.</returns>
-        public static bool ReadLine
-            (
-                this StringBuilder builder,
-                TextReader reader,
-                bool appendNewLine = false
-            )
-        {
-            var first = true;
-            while (true)
-            {
-                var chr = reader.Read();
-                if (chr < 0)
-                {
-                    return !first;
-                }
-
-                if (chr == '\n')
-                {
-                    if (appendNewLine)
-                    {
-                        builder.Append ((char) chr);
-                    }
-
-                    return true;
-                }
-
-                if (chr != '\r')
-                {
-                    builder.Append ((char) chr);
-                }
-
-                first = false;
-            }
-
-        } // method ReadLine
-
-        /// <summary>
-        /// Обязательное чтение строки.
-        /// </summary>
-        public static string RequireLine
-            (
-                this TextReader reader
-            )
-        {
-            var result = reader.ReadLine();
-            if (ReferenceEquals(result, null))
-            {
-                Magna.Error
-                    (
-                        nameof(TextReaderUtility)
-                        + "::"
-                        + nameof(RequireLine)
-                        + ": "
-                        + "unexpected end of stream"
-                    );
-
-                throw new ArsMagnaException
-                    (
-                        "Unexpected end of stream"
-                    );
-            }
-
-            return result;
-
-        } // method RequireLine
-
-        #endregion
-
-    } // method TextReaderUtility
-
-} // namespace AM.IO
+    #endregion
+}

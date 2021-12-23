@@ -8,6 +8,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* NonCloseableMemoryStream.cs -- незакрываемый MemoryStream
@@ -22,67 +23,83 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Незакрываемая версия <see cref="MemoryStream"/>.
+/// </summary>
+public sealed class NonCloseableMemoryStream
+    : MemoryStream
 {
+    #region Construction
+
     /// <summary>
-    /// Незакрываемая версия <see cref="MemoryStream"/>.
+    /// Конструктор.
     /// </summary>
-    public sealed class NonCloseableMemoryStream
-        : MemoryStream
+    public NonCloseableMemoryStream()
     {
-        #region Construction
-
-        /// <inheritdoc />
-        public NonCloseableMemoryStream()
-        {
-        }
-
-        /// <inheritdoc />
-        public NonCloseableMemoryStream(byte[] buffer) : base(buffer)
-        {
-        }
-
-        /// <inheritdoc />
-        public NonCloseableMemoryStream(byte[] buffer, bool writable) : base(buffer, writable)
-        {
-        }
-
-        /// <inheritdoc />
-        public NonCloseableMemoryStream(byte[] buffer, int index, int count) : base(buffer, index, count)
-        {
-        }
-
-        /// <inheritdoc />
-        public NonCloseableMemoryStream(byte[] buffer, int index, int count, bool writable) : base(buffer, index, count, writable)
-        {
-        }
-
-        /// <inheritdoc />
-        public NonCloseableMemoryStream(byte[] buffer, int index, int count, bool writable, bool publiclyVisible) : base(buffer, index, count, writable, publiclyVisible)
-        {
-        }
-
-        /// <inheritdoc />
-        public NonCloseableMemoryStream(int capacity) : base(capacity)
-        {
-        }
-
-        #endregion
-
-        #region Stream members
-
-        /// <inheritdoc cref="MemoryStream.Dispose(bool)" />
-        protected override void Dispose(bool disposing)
-        {
-            // Nothing to do here
-        }
-
-        /// <inheritdoc cref="Stream.Close" />
-        public override void Close()
-        {
-            // Nothing to do here
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public NonCloseableMemoryStream
+        (
+            byte[] buffer
+        )
+        : base (buffer)
+    {
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public NonCloseableMemoryStream
+        (
+            byte[] buffer,
+            bool writable
+        )
+        : base (buffer, writable)
+    {
+    }
+
+    /// <inheritdoc />
+    public NonCloseableMemoryStream (byte[] buffer, int index, int count) : base (buffer, index, count)
+    {
+    }
+
+    /// <inheritdoc />
+    public NonCloseableMemoryStream (byte[] buffer, int index, int count, bool writable) : base (buffer, index, count,
+        writable)
+    {
+    }
+
+    /// <inheritdoc />
+    public NonCloseableMemoryStream (byte[] buffer, int index, int count, bool writable, bool publiclyVisible) : base (
+        buffer, index, count, writable, publiclyVisible)
+    {
+    }
+
+    /// <inheritdoc />
+    public NonCloseableMemoryStream (int capacity) : base (capacity)
+    {
+    }
+
+    #endregion
+
+    #region Stream members
+
+    /// <inheritdoc cref="MemoryStream.Dispose(bool)" />
+    protected override void Dispose (bool disposing)
+    {
+        // Nothing to do here
+    }
+
+    /// <inheritdoc cref="Stream.Close" />
+    public override void Close()
+    {
+        // Nothing to do here
+    }
+
+    #endregion
 }

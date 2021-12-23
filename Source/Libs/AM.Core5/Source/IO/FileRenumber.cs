@@ -28,269 +28,254 @@ using AM.Text.Output;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Переименовыватель файлов для исправления косяков в нумерации.
+/// </summary>
+public sealed class FileRenumber
 {
+    #region Nested classes
+
     /// <summary>
-    /// Переименовыватель файлов для исправления косяков в нумерации.
+    /// Пара имен: старое и новое.
     /// </summary>
-    public sealed class FileRenumber
+    public record Bunch(string OldName, string NewName)
     {
-        #region Nested classes
-
-        /// <summary>
-        /// Пара имен: старое и новое.
-        /// </summary>
-        public record Bunch (string OldName, string NewName)
+        private string FullNewName
         {
-            private string FullNewName
+            get
             {
-                get
+                var result = NewName;
+                var directory = Path.GetDirectoryName (OldName);
+                if (directory is not null)
                 {
-                    var result = NewName;
-                    var directory = Path.GetDirectoryName (OldName);
-                    if (directory is not null)
-                    {
-                        result = Path.Combine (directory, result);
-                    }
-
-                    var extension = Path.GetExtension (OldName);
-                    if (!string.IsNullOrEmpty (extension))
-                    {
-                        result += extension;
-                    }
-
-                    return result;
+                    result = Path.Combine (directory, result);
                 }
 
-            } // method GetFullNewName
-
-            /// <summary>
-            /// Проверка возможности переименования.
-            /// </summary>
-            public bool Check
-                (
-                    AbstractOutput? output = null
-                )
-            {
-                var newName = FullNewName;
-
-                if (!File.Exists (OldName))
+                var extension = Path.GetExtension (OldName);
+                if (!string.IsNullOrEmpty (extension))
                 {
-                    output?.WriteLine ($"File {OldName} doesn't exist");
-
-                    return false;
+                    result += extension;
                 }
 
-                if (File.Exists (newName) || Directory.Exists (newName))
-                {
-                    output?.WriteLine ($"File {newName} already exists");
-
-                    return false;
-                }
-
-                return true;
-
-            } // method Check
-
-            /// <summary>
-            /// Переименование файла.
-            /// </summary>
-            public void Rename
-                (
-                    AbstractOutput? output = null,
-                    bool dryRun = false
-                )
-            {
-                var fullName = FullNewName;
-
-                output?.WriteLine ($"{OldName} -> {fullName}");
-                if (!dryRun)
-                {
-                    File.Move (OldName, fullName);
-                }
-
-            } // method Rename
-
-        } // record Bunch
-
-        #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Номер цифровой группы, подлежащей перенумерации.
-        /// Нумерация с нуля.
-        /// </summary>
-        [JsonPropertyName ("group")]
-        public int GroupNumber { get; set; }
-
-        /// <summary>
-        /// Ширина (для дополнения нулями слева).
-        /// Ноль означает автоматическое определение ширины.
-        /// </summary>
-        [JsonPropertyName ("width")]
-        public int GroupWidth { get; set; }
-
-        /// <summary>
-        /// Холостой прогон <see cref="Rename"/> (репетиция).
-        /// </summary>
-        [JsonPropertyName ("dry")]
-        public bool DryRun { get; set; }
-
-        /// <summary>
-        /// Добавление к каждому числу.
-        /// </summary>
-        [JsonPropertyName ("delta")]
-        public int Delta { get; set; }
-
-        /// <summary>
-        /// Префикс (отменяет использование оригинальных имен файлов).
-        /// </summary>
-        [JsonPropertyName ("prefix")]
-        public string? Prefix { get; set; }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Генерация списка для переименования.
-        /// </summary>
-        public List<Bunch> GenerateNames
-            (
-                IList<string> existingFiles
-            )
-        {
-            var regex = new Regex (@"\d+");
-            var result = new List<Bunch>();
-            var maxValue = 0;
-            var sourceFiles = new List<string>();
-
-            foreach (var fullName in existingFiles)
-            {
-                var fileName = Path.GetFileNameWithoutExtension (fullName);
-                if (string.IsNullOrEmpty (fileName))
-                {
-                    // это очень странный файл, не будем с ним связываться
-                    continue;
-                }
-
-                var group = regex.Matches (fileName)!.SafeAt (GroupNumber)?.Value;
-                if (string.IsNullOrEmpty (group))
-                {
-                    // в имени файла нет цифр, пропускаем
-                    continue;
-                }
-
-                var value = group.SafeToInt32 (-1);
-                if (value < 0)
-                {
-                    // странно, но это не удалось сконвертировать в число
-                    continue;
-                }
-
-                value += Delta;
-
-                if (maxValue < value)
-                {
-                    maxValue = value;
-                }
-
-                sourceFiles.Add (fullName);
-
-            } // foreach
-
-            var pattern = "0";
-            while (maxValue >= 10)
-            {
-                pattern += "0";
-                maxValue /= 10;
-            }
-
-            if (GroupWidth > 1)
-            {
-                pattern = new string ('0', GroupWidth);
-            }
-
-            if (pattern.Length == 1 && string.IsNullOrEmpty (Prefix))
-            {
-                // нет смысла переименовывать файлы, им не нужны ведущие нули
                 return result;
             }
-
-            foreach (var sourceFile in sourceFiles)
-            {
-                var oldName = Path.GetFileNameWithoutExtension (sourceFile);
-                var match = regex.Matches (oldName)!.SafeAt (GroupNumber)!;
-                var value = int.Parse  (match.Value, CultureInfo.InvariantCulture);
-
-                var newName = string.IsNullOrEmpty (Prefix)
-
-
-                    ? oldName.Substring (0, match.Index)
-                        + value.ToString (pattern, CultureInfo.InvariantCulture)
-                        + oldName.Substring (match.Index + match.Length)
-
-                    : Prefix + value.ToString (pattern, CultureInfo.InvariantCulture);
-
-                if (string.CompareOrdinal (oldName, newName) != 0)
-                {
-                    var bunch = new Bunch (sourceFile, newName);
-                    result.Add (bunch);
-                }
-
-            } // foreach
-
-            return result;
-
-        } // method GenerateNames
+        }
 
         /// <summary>
-        /// Проверка имен.
+        /// Проверка возможности переименования.
         /// </summary>
-        public bool CheckNames
+        public bool Check
             (
-                IEnumerable<Bunch> fileList,
                 AbstractOutput? output = null
             )
         {
-            foreach (var bunch in fileList)
+            var newName = FullNewName;
+
+            if (!File.Exists (OldName))
             {
-                if (!bunch.Check (output))
-                {
-                    return false;
-                }
+                output?.WriteLine ($"File {OldName} doesn't exist");
+
+                return false;
+            }
+
+            if (File.Exists (newName) || Directory.Exists (newName))
+            {
+                output?.WriteLine ($"File {newName} already exists");
+
+                return false;
             }
 
             return true;
-
-        } // method CheckNames
+        }
 
         /// <summary>
-        /// Переименование файлов.
+        /// Переименование файла.
         /// </summary>
         public void Rename
             (
-                IEnumerable<Bunch> fileList,
-                AbstractOutput? output = null
+                AbstractOutput? output = null,
+                bool dryRun = false
             )
         {
-            foreach (var bunch in fileList)
+            var fullName = FullNewName;
+
+            output?.WriteLine ($"{OldName} -> {fullName}");
+            if (!dryRun)
             {
-                bunch.Rename (output, DryRun);
+                File.Move (OldName, fullName);
+            }
+        }
+    }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Номер цифровой группы, подлежащей перенумерации.
+    /// Нумерация с нуля.
+    /// </summary>
+    [JsonPropertyName ("group")]
+    public int GroupNumber { get; set; }
+
+    /// <summary>
+    /// Ширина (для дополнения нулями слева).
+    /// Ноль означает автоматическое определение ширины.
+    /// </summary>
+    [JsonPropertyName ("width")]
+    public int GroupWidth { get; set; }
+
+    /// <summary>
+    /// Холостой прогон <see cref="Rename"/> (репетиция).
+    /// </summary>
+    [JsonPropertyName ("dry")]
+    public bool DryRun { get; set; }
+
+    /// <summary>
+    /// Добавление к каждому числу.
+    /// </summary>
+    [JsonPropertyName ("delta")]
+    public int Delta { get; set; }
+
+    /// <summary>
+    /// Префикс (отменяет использование оригинальных имен файлов).
+    /// </summary>
+    [JsonPropertyName ("prefix")]
+    public string? Prefix { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Генерация списка для переименования.
+    /// </summary>
+    public List<Bunch> GenerateNames
+        (
+            IList<string> existingFiles
+        )
+    {
+        var regex = new Regex (@"\d+");
+        var result = new List<Bunch>();
+        var maxValue = 0;
+        var sourceFiles = new List<string>();
+
+        foreach (var fullName in existingFiles)
+        {
+            var fileName = Path.GetFileNameWithoutExtension (fullName);
+            if (string.IsNullOrEmpty (fileName))
+            {
+                // это очень странный файл, не будем с ним связываться
+                continue;
             }
 
-        } // method Rename
+            var group = regex.Matches (fileName)!.SafeAt (GroupNumber)?.Value;
+            if (string.IsNullOrEmpty (group))
+            {
+                // в имени файла нет цифр, пропускаем
+                continue;
+            }
 
-        #endregion
+            var value = group.SafeToInt32 (-1);
+            if (value < 0)
+            {
+                // странно, но это не удалось сконвертировать в число
+                continue;
+            }
 
-        #region Object members
+            value += Delta;
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString() => $"Number: {GroupNumber}, Width: {GroupWidth}";
+            if (maxValue < value)
+            {
+                maxValue = value;
+            }
 
-        #endregion
+            sourceFiles.Add (fullName);
+        } // foreach
 
-    } // class FileRenames
+        var pattern = "0";
+        while (maxValue >= 10)
+        {
+            pattern += "0";
+            maxValue /= 10;
+        }
 
-} // namespace AM.IO
+        if (GroupWidth > 1)
+        {
+            pattern = new string ('0', GroupWidth);
+        }
+
+        if (pattern.Length == 1 && string.IsNullOrEmpty (Prefix))
+        {
+            // нет смысла переименовывать файлы, им не нужны ведущие нули
+            return result;
+        }
+
+        foreach (var sourceFile in sourceFiles)
+        {
+            var oldName = Path.GetFileNameWithoutExtension (sourceFile);
+            var match = regex.Matches (oldName)!.SafeAt (GroupNumber)!;
+            var value = int.Parse (match.Value, CultureInfo.InvariantCulture);
+
+            var newName = string.IsNullOrEmpty (Prefix)
+                ? oldName.Substring (0, match.Index)
+                  + value.ToString (pattern, CultureInfo.InvariantCulture)
+                  + oldName.Substring (match.Index + match.Length)
+                : Prefix + value.ToString (pattern, CultureInfo.InvariantCulture);
+
+            if (string.CompareOrdinal (oldName, newName) != 0)
+            {
+                var bunch = new Bunch (sourceFile, newName);
+                result.Add (bunch);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Проверка имен.
+    /// </summary>
+    public bool CheckNames
+        (
+            IEnumerable<Bunch> fileList,
+            AbstractOutput? output = null
+        )
+    {
+        foreach (var bunch in fileList)
+        {
+            if (!bunch.Check (output))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Переименование файлов.
+    /// </summary>
+    public void Rename
+        (
+            IEnumerable<Bunch> fileList,
+            AbstractOutput? output = null
+        )
+    {
+        foreach (var bunch in fileList)
+        {
+            bunch.Rename (output, DryRun);
+        }
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"Number: {GroupNumber}, Width: {GroupWidth}";
+
+    #endregion
+}

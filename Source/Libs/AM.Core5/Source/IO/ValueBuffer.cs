@@ -18,177 +18,172 @@
 
 using System;
 using System.IO;
-using System.Threading.Tasks;
+
 using AM.Memory;
 
 #endregion
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Буфер для чтения из потока, располагающийся на стеке.
+/// </summary>
+public ref struct ValueBuffer
 {
+    #region Properties
+
     /// <summary>
-    /// Буфер для чтения из потока, располагающийся на стеке.
+    /// Прочитанные данные.
     /// </summary>
-    public ref struct ValueBuffer
+    public ReadOnlyMemory<byte> Data { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public unsafe ValueBuffer
+        (
+            byte* bytes,
+            int size
+        )
     {
-        #region Properties
+        Data = default;
+        var manager = new UnmanagedMemoryManager<byte> (bytes, size);
+        _memory = manager.Memory;
+    }
 
-        /// <summary>
-        /// Прочитанные данные.
-        /// </summary>
-        public ReadOnlyMemory<byte> Data { get; private set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ValueBuffer
+        (
+            Memory<byte> memory = default
+        )
+        : this()
+    {
+        Data = default;
+        _memory = memory;
+    }
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region Private members
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public unsafe ValueBuffer
-            (
-                byte *bytes,
-                int size
-            )
+    /// <summary>
+    /// Указатель на блок памяти.
+    /// </summary>
+    private Memory<byte> _memory;
+
+    /// <summary>
+    /// Округление числа вверх до ближайшей степени двойки.
+    /// </summary>
+    static int RoundUp
+        (
+            int size
+        )
+    {
+        var result = 8;
+
+        if (size < 8)
         {
-            Data = default;
-            var manager = new UnmanagedMemoryManager<byte> (bytes, size);
-            _memory = manager.Memory;
+            size = 8;
+        }
 
-        } // constructor
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ValueBuffer
-            (
-                Memory<byte> memory = default
-            )
-            : this()
+        while (result < size)
         {
-            Data = default;
-            _memory = memory;
+            result *= 2;
+        }
 
-        } // constructor
+        return result;
+    }
 
-        #endregion
+    #endregion
 
-        #region Private members
+    #region Public methods
 
-        /// <summary>
-        /// Указатель на блок памяти.
-        /// </summary>
-        private Memory<byte> _memory;
+    /// <summary>
+    /// Чтение из потока.
+    /// </summary>
+    public int Read
+        (
+            Stream stream,
+            int amount
+        )
+    {
+        Sure.NotNull (stream);
+        Sure.Positive (amount);
 
-        /// <summary>
-        /// Округление числа вверх до ближайшей степени двойки.
-        /// </summary>
-        static int RoundUp
-            (
-                int size
-            )
+        if (amount > _memory.Length)
         {
-            var result = 8;
+            var newSize = RoundUp (amount);
+            _memory = new byte [newSize];
+        }
 
-            if (size < 8)
+        var result = stream.Read (_memory.Span.Slice (0, amount));
+        Data = _memory.Slice (0, result);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Считывание вплоть до разделителя строк или конца потока.
+    /// </summary>
+    public int ReadLine
+        (
+            Stream stream
+        )
+    {
+        Sure.NotNull (stream);
+
+        var counter = 0; // количество записанных в буфер байт
+        while (true)
+        {
+            var chr = stream.ReadByte();
+            if (chr < 0)
             {
-                size = 8;
-            }
-
-            while (result < size)
-            {
-                result *= 2;
-            }
-
-            return result;
-
-        } // method RoundUp
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Чтение из потока.
-        /// </summary>
-        public int Read
-            (
-                Stream stream,
-                int amount
-            )
-        {
-            if (amount > _memory.Length)
-            {
-                var newSize = RoundUp (amount);
-                _memory = new byte [newSize];
-            }
-
-            var result = stream.Read (_memory.Span.Slice (0, amount));
-            Data = _memory.Slice (0, result);
-
-            return result;
-
-        } // method Read
-
-        /// <summary>
-        /// Считывание вплоть до разделителя строк или конца потока.
-        /// </summary>
-        public int ReadLine
-            (
-                Stream stream
-            )
-        {
-            var counter = 0; // количество записанных в буфер байт
-            while (true)
-            {
-                var chr = stream.ReadByte();
-                if (chr < 0)
+                if (counter == 0)
                 {
-                    if (counter == 0)
-                    {
-                        // достигнут конец потока,
-                        // ни одного байта прочитать не удалось
+                    // достигнут конец потока,
+                    // ни одного байта прочитать не удалось
 
-                        Data = default;
-                        return chr;
-                    }
-
-                    // если удалось прочитать хотя бы один байт
-
-                    break;
+                    Data = default;
+                    return chr;
                 }
 
-                if (chr == '\n')
+                // если удалось прочитать хотя бы один байт
+
+                break;
+            }
+
+            if (chr == '\n')
+            {
+                break;
+            }
+
+            if (chr != '\r')
+            {
+                if (counter == _memory.Length)
                 {
-                    break;
+                    var newSize = RoundUp (_memory.Length + 1);
+                    var newMemory = new byte [newSize];
+                    _memory.CopyTo (newMemory);
+                    _memory = newMemory;
                 }
 
-                if (chr != '\r')
-                {
-                    if (counter == _memory.Length)
-                    {
-                        var newSize = RoundUp (_memory.Length + 1);
-                        var newMemory = new byte [newSize];
-                        _memory.CopyTo (newMemory);
-                        _memory = newMemory;
-                    }
+                _memory.Span[counter] = (byte)chr;
+                ++counter;
+            }
+        }
 
-                    _memory.Span [counter] = (byte)chr;
-                    ++counter;
+        Data = _memory.Slice (0, counter);
 
-                } // if
+        return counter;
+    }
 
-            } // while true
-
-            Data = _memory.Slice (0, counter);
-
-            return counter;
-
-        } // method ReadLine
-
-        #endregion
-
-    } // struct ValueBuffer
-
-} // namespace AM.IO
+    #endregion
+}

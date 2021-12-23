@@ -22,125 +22,125 @@ using System.Threading;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Файл блокировки - создается программой, чтобы "застолбить место"
+/// (также, возможно, для хранения сессионных данных).
+/// </summary>
+/// <remarks>
+/// Заимствован из проекта: https://github.com/Tyrrrz/LockFile
+/// </remarks>
+/// <example>
+/// <para>Однократная попытка захвата</para>
+/// <code>
+/// using (var lockFile = LockFile.TryAcquire("some.lock"))
+/// {
+///   if (lockFile != null)
+///   {
+///     // лок-файл захвачен
+///   }
+///   else
+///   {
+///     // что-то нам мешает
+///   }
+/// }
+/// </code>
+/// <para>Попытка захвата в течение двух секунд.</para>
+/// <code>
+/// using (var cts = new CancellationTokenSource (TimeSpan.FromSeconds (2)))
+/// using (var lockFile = LockFile.WaitAcquire ("some.lock", cts.Token))
+/// {
+///    // Если файл блокировки не получен в течение 2 секунд, генерируется исключение.
+/// }
+/// </code>
+/// </example>
+public sealed class LockFile
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Файл блокировки - создается программой, чтобы "застолбить место"
-    /// (также, возможно, для хранения сессионных данных).
+    /// Поток.
     /// </summary>
-    /// <remarks>
-    /// Заимствован из проекта: https://github.com/Tyrrrz/LockFile
-    /// </remarks>
-    /// <example>
-    /// <para>Однократная попытка захвата</para>
-    /// <code>
-    /// using (var lockFile = LockFile.TryAcquire("some.lock"))
-    /// {
-    ///   if (lockFile != null)
-    ///   {
-    ///     // лок-файл захвачен
-    ///   }
-    ///   else
-    ///   {
-    ///     // что-то нам мешает
-    ///   }
-    /// }
-    /// </code>
-    /// <para>Попытка захвата в течение двух секунд.</para>
-    /// <code>
-    /// using (var cts = new CancellationTokenSource (TimeSpan.FromSeconds (2)))
-    /// using (var lockFile = LockFile.WaitAcquire ("some.lock", cts.Token))
-    /// {
-    ///    // Если файл блокировки не получен в течение 2 секунд, генерируется исключение.
-    /// }
-    /// </code>
-    /// </example>
-    public sealed class LockFile
-        : IDisposable
+    public Stream Stream { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public LockFile (FileStream stream)
     {
-        #region Properties
+        Stream = stream;
+    }
 
-        /// <summary>
-        /// Поток.
-        /// </summary>
-        public Stream Stream { get; }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public LockFile (FileStream stream) => Stream = stream;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Пытается получить файл блокировки с заданным путем.
-        /// Возвращает null, если файл уже используется.
-        /// </summary>
-        public static LockFile? TryAcquire
-            (
-                string filePath
-            )
+    /// <summary>
+    /// Пытается получить файл блокировки с заданным путем.
+    /// Возвращает null, если файл уже используется.
+    /// </summary>
+    public static LockFile? TryAcquire
+        (
+            string filePath
+        )
+    {
+        try
         {
-            try
-            {
-                var fileStream = File.Open
-                    (
-                        filePath,
-                        FileMode.OpenOrCreate,
-                        FileAccess.ReadWrite,
-                        FileShare.None
-                    );
+            var fileStream = File.Open
+                (
+                    filePath,
+                    FileMode.OpenOrCreate,
+                    FileAccess.ReadWrite,
+                    FileShare.None
+                );
 
-                return new LockFile (fileStream);
-            }
+            return new LockFile (fileStream);
+        }
 
-            // Когда доступ к файлу запрещен, генерируем исключение
-            catch (IOException ex) when (ex.GetType() == typeof (IOException))
-            {
-                return null;
-            }
-
-        } // method TryAcquire
-
-        /// <summary>
-        /// Пытается получить файл блокировки,
-        /// пока операция не завершится успешно или не будет отменена.
-        /// </summary>
-        public static LockFile WaitAcquire
-            (
-                string filePath,
-                CancellationToken cancellationToken = default
-            )
+        // Когда доступ к файлу запрещен, генерируем исключение
+        catch (IOException ex) when (ex.GetType() == typeof (IOException))
         {
-            while (true)
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Пытается получить файл блокировки,
+    /// пока операция не завершится успешно или не будет отменена.
+    /// </summary>
+    public static LockFile WaitAcquire
+        (
+            string filePath,
+            CancellationToken cancellationToken = default
+        )
+    {
+        while (true)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var lockFile = TryAcquire (filePath);
+            if (lockFile != null)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                return lockFile;
+            }
+        }
+    }
 
-                var lockFile = TryAcquire (filePath);
-                if (lockFile != null)
-                {
-                    return lockFile;
-                }
+    #endregion
 
-            } // while
+    #region IDisposable members
 
-        } // method WaitAcquire
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        Stream.Dispose();
+    }
 
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose() => Stream.Dispose();
-
-        #endregion
-
-    } // class LockFile
-
-} // namespace AM.IO
+    #endregion
+}

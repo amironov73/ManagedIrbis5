@@ -22,59 +22,54 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Вспомогательные методы для записи текстовых данных.
+/// </summary>
+public static class TextWriterUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Вспомогательные методы для записи текстовых данных.
+    /// Open file for append.
     /// </summary>
-    public static class TextWriterUtility
+    public static StreamWriter Append
+        (
+            string fileName,
+            Encoding encoding
+        )
     {
-        #region Public methods
+        Sure.NotNullNorEmpty (fileName);
 
-        /// <summary>
-        /// Open file for append.
-        /// </summary>
-        public static StreamWriter Append
+        var result = new StreamWriter
             (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+                new FileStream (fileName, FileMode.Append),
+                encoding
+            );
 
-            var result = new StreamWriter
-                (
-                    new FileStream(fileName, FileMode.Append),
-                    encoding
-                );
+        return result;
+    }
 
-            return result;
+    /// <summary>
+    /// Open file for writing.
+    /// </summary>
+    public static StreamWriter Create
+        (
+            string fileName,
+            Encoding encoding
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
 
-        } // method Append
-
-        /// <summary>
-        /// Open file for writing.
-        /// </summary>
-        public static StreamWriter Create
+        var result = new StreamWriter
             (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            Sure.NotNullNorEmpty(fileName, nameof(fileName));
+                new FileStream (fileName, FileMode.Create),
+                encoding
+            );
 
-            var result = new StreamWriter
-                (
-                    new FileStream(fileName, FileMode.Create),
-                    encoding
-                );
+        return result;
+    }
 
-            return result;
-
-        } // method Create
-
-        #endregion
-
-    } // method TextWriterUtility
-
-} // namespace AM.IO
+    #endregion
+}

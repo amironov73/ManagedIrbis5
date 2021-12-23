@@ -23,364 +23,394 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+/// <summary>
+/// Навигатор по массиву байт, небезопасный вариант.
+/// </summary>
+public unsafe ref struct UnsafeByteNavigator
 {
+    #region Constants
+
     /// <summary>
-    /// Навигатор по массиву байт, небезопасный вариант.
+    /// Признак конца данных.
     /// </summary>
-    public unsafe ref struct UnsafeByteNavigator
+
+    // ReSharper disable once InconsistentNaming
+    public const int EOF = -1;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Используемая кодировка.
+    /// </summary>
+    public Encoding Encoding { get; set; }
+
+    /// <summary>
+    /// Достигнут конец данных?
+    /// </summary>
+
+    // ReSharper disable once InconsistentNaming
+    [Pure]
+    public bool IsEOF => _position >= _length;
+
+    /// <summary>
+    /// Длина массива.
+    /// </summary>
+    [Pure]
+    public int Length => _length;
+
+    /// <summary>
+    /// Текущая позиция.
+    /// </summary>
+    [Pure]
+    public int Position => _position;
+
+    /// <summary>
+    /// Данные в виде спана.
+    /// </summary>
+    [Pure]
+    public ReadOnlySpan<byte> AsSpan => new ReadOnlySpan<byte> (_data, _length);
+
+    /// <summary>
+    /// Данные, хранящиеся в навигаторе.
+    /// </summary>
+    [Pure]
+    public byte[] Data => AsSpan.ToArray();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public UnsafeByteNavigator
+        (
+            byte* data,
+            int length
+        )
     {
-        #region Constants
+        _data = data;
+        _length = length;
+        _position = 0;
+        Encoding = Encoding.Default;
+    }
 
-        /// <summary>
-        /// Признак конца данных.
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        public const int EOF = -1;
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Properties
+    private readonly byte* _data;
+    private readonly int _length;
+    private int _position;
 
-        /// <summary>
-        /// Используемая кодировка.
-        /// </summary>
-        public Encoding Encoding { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Достигнут конец данных?
-        /// </summary>
-        // ReSharper disable once InconsistentNaming
-        [Pure]
-        public bool IsEOF => _position >= _length;
+    #region Public methods
 
-        /// <summary>
-        /// Длина массива.
-        /// </summary>
-        [Pure]
-        public int Length => _length;
-
-        /// <summary>
-        /// Текущая позиция.
-        /// </summary>
-        [Pure]
-        public int Position => _position;
-
-        /// <summary>
-        /// Данные в виде спана.
-        /// </summary>
-        [Pure]
-        public ReadOnlySpan<byte> AsSpan => new ReadOnlySpan<byte>(_data, _length);
-
-        /// <summary>
-        /// Данные, хранящиеся в навигаторе.
-        /// </summary>
-        [Pure]
-        public byte[] Data => AsSpan.ToArray();
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public UnsafeByteNavigator
-            (
-                byte *data,
-                int length
-            )
+    /// <summary>
+    /// Клонирование навигатора.
+    /// </summary>
+    public UnsafeByteNavigator Clone()
+    {
+        var result = new UnsafeByteNavigator (_data, _length)
         {
-            _data = data;
-            _length = length;
-            _position = 0;
-            Encoding = Encoding.Default;
+            Encoding = Encoding,
+            _position = _position
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Выдать остаток данных.
+    /// </summary>
+    [Pure]
+    public ReadOnlySpan<byte> GetRemainingData()
+    {
+        if (IsEOF)
+        {
+            return ReadOnlySpan<byte>.Empty;
         }
 
-        #endregion
+        var result = AsSpan.Slice (_position);
 
-        #region Private members
+        return result;
+    }
 
-        private readonly byte *_data;
-        private readonly int _length;
-        private int _position;
+    /// <summary>
+    /// Текущий байт - управляющий?
+    /// </summary>
+    [Pure]
+    public bool IsControl()
+    {
+        return char.IsControl (PeekChar());
+    }
 
-        #endregion
+    /// <summary>
+    /// Текущий байт - цифра?
+    /// </summary>
+    [Pure]
+    public bool IsDigit()
+    {
+        return char.IsDigit (PeekChar());
+    }
 
-        #region Public methods
+    /// <summary>
+    /// Текущий байт - буква?
+    /// </summary>
+    [Pure]
+    public bool IsLetter()
+    {
+        return char.IsLetter (PeekChar());
+    }
 
-        /// <summary>
-        /// Клонирование навигатора.
-        /// </summary>
-        public UnsafeByteNavigator Clone()
+    /// <summary>
+    /// Текущий байт - буква или цифра?
+    /// </summary>
+    [Pure]
+    public bool IsLetterOrDigit()
+    {
+        return char.IsLetterOrDigit (PeekChar());
+    }
+
+    /// <summary>
+    /// Текущий байт - часть числа?
+    /// </summary>
+    [Pure]
+    public bool IsNumber()
+    {
+        return char.IsNumber (PeekChar());
+    }
+
+    /// <summary>
+    /// Текущий байт - знак пунктуации?
+    /// </summary>
+    [Pure]
+    public bool IsPunctuation()
+    {
+        return char.IsPunctuation (PeekChar());
+    }
+
+    /// <summary>
+    /// Текущий байт - разделитель?
+    /// </summary>
+    [Pure]
+    public bool IsSeparator()
+    {
+        return char.IsSeparator (PeekChar());
+    }
+
+    /// <summary>
+    /// Текущий байт - суррогат?
+    /// </summary>
+    [Pure]
+    public bool IsSurrogate()
+    {
+        return char.IsSurrogate (PeekChar());
+    }
+
+    /// <summary>
+    /// Текущий байт - символ?
+    /// </summary>
+    [Pure]
+    public bool IsSymbol()
+    {
+        return char.IsSymbol (PeekChar());
+    }
+
+    /// <summary>
+    /// Текущий байт - пробельный символ?
+    /// </summary>
+    [Pure]
+    public bool IsWhiteSpace()
+    {
+        return char.IsWhiteSpace (PeekChar());
+    }
+
+    /// <summary>
+    /// Абсолютное перемещение.
+    /// </summary>
+    public void MoveAbsolute
+        (
+            int position
+        )
+    {
+        if (position > Length)
         {
-            var result = new UnsafeByteNavigator (_data, _length)
-            {
-                Encoding = Encoding,
-                _position = _position
-            };
+            position = Length;
+        }
 
-            return result;
-        } // method Clone
-
-        /// <summary>
-        /// Выдать остаток данных.
-        /// </summary>
-        [Pure]
-        public ReadOnlySpan<byte> GetRemainingData()
+        if (position < 0)
         {
-            if (IsEOF)
-            {
-                return ReadOnlySpan<byte>.Empty;
-            }
+            position = 0;
+        }
 
-            var result = AsSpan.Slice(_position);
+        _position = position;
+    }
 
-            return result;
-        } // method GetRemainingData
-
-        /// <summary>
-        /// Текущий байт - управляющий?
-        /// </summary>
-        [Pure]
-        public bool IsControl() => char.IsControl(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - цифра?
-        /// </summary>
-        [Pure]
-        public bool IsDigit() => char.IsDigit(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - буква?
-        /// </summary>
-        [Pure]
-        public bool IsLetter() => char.IsLetter(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - буква или цифра?
-        /// </summary>
-        [Pure]
-        public bool IsLetterOrDigit() => char.IsLetterOrDigit(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - часть числа?
-        /// </summary>
-        [Pure]
-        public bool IsNumber() => char.IsNumber(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - знак пунктуации?
-        /// </summary>
-        [Pure]
-        public bool IsPunctuation() => char.IsPunctuation(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - разделитель?
-        /// </summary>
-        [Pure]
-        public bool IsSeparator() => char.IsSeparator(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - суррогат?
-        /// </summary>
-        [Pure]
-        public bool IsSurrogate() => char.IsSurrogate(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - символ?
-        /// </summary>
-        [Pure]
-        public bool IsSymbol() => char.IsSymbol(PeekChar());
-
-        /// <summary>
-        /// Текущий байт - пробельный символ?
-        /// </summary>
-        [Pure]
-        public bool IsWhiteSpace() => char.IsWhiteSpace(PeekChar());
-
-        /// <summary>
-        /// Абсолютное перемещение.
-        /// </summary>
-        public void MoveAbsolute
-            (
-                int position
-            )
+    /// <summary>
+    /// Относительное перемещение.
+    /// </summary>
+    public void MoveRelative
+        (
+            int delta
+        )
+    {
+        var position = _position + delta;
+        if (position > Length)
         {
-            if (position > Length)
-            {
-                position = Length;
-            }
+            position = Length;
+        }
 
-            if (position < 0)
-            {
-                position = 0;
-            }
-
-            _position = position;
-        } // method MoveAbsolute
-
-        /// <summary>
-        /// Относительное перемещение.
-        /// </summary>
-        public void MoveRelative
-            (
-                int delta
-            )
+        if (position < 0)
         {
-            var position = _position + delta;
-            if (position > Length)
-            {
-                position = Length;
-            }
+            position = 0;
+        }
 
-            if (position < 0)
-            {
-                position = 0;
-            }
+        _position = position;
+    }
 
-            _position = position;
-        } // method MoveRelative
+    /// <summary>
+    /// Подсмотреть один байт.
+    /// </summary>
+    [Pure]
+    public int PeekByte()
+    {
+        return _position >= _length ? EOF : _data[_position];
+    }
 
-        /// <summary>
-        /// Подсмотреть один байт.
-        /// </summary>
-        [Pure]
-        public int PeekByte() => _position >= _length
-                ? EOF
-                : _data[_position];
-
-        /// <summary>
-        /// Peek one char.
-        /// </summary>
-        [Pure]
-        public char PeekChar()
+    /// <summary>
+    /// Peek one char.
+    /// </summary>
+    [Pure]
+    public char PeekChar()
+    {
+        if (_position >= _length)
         {
-            if (_position >= _length)
-            {
-                return '\0';
-            }
+            return '\0';
+        }
 
-            // TODO implement properly
+        // TODO implement properly
 
-            var result = (char)_data[_position];
+        var result = (char)_data[_position];
 
-            return result;
-        } // method PeekChar
+        return result;
+    }
 
-        /// <summary>
-        /// Чтение одного байта
-        /// (текущая позиция продвигается).
-        /// </summary>
-        public int ReadByte()
+    /// <summary>
+    /// Чтение одного байта
+    /// (текущая позиция продвигается).
+    /// </summary>
+    public int ReadByte()
+    {
+        if (_position >= _length)
         {
-            if (_position >= _length)
-            {
-                return -1;
-            }
+            return -1;
+        }
 
-            var result = _data[_position++];
+        var result = _data[_position++];
 
-            return result;
-        } // method ReadByte
+        return result;
+    }
 
-        /// <summary>
-        /// Чтение одного символа
-        /// (текущая позиция продвигается).
-        /// </summary>
-        public char ReadChar()
+    /// <summary>
+    /// Чтение одного символа
+    /// (текущая позиция продвигается).
+    /// </summary>
+    public char ReadChar()
+    {
+        if (_position >= _length)
         {
-            if (_position >= _length)
-            {
-                return '\0';
-            }
+            return '\0';
+        }
 
-            var result = (char)_data[_position++];
+        var result = (char)_data[_position++];
 
-            return result;
-        } // method ReadChar
+        return result;
+    }
 
-        /// <summary>
-        /// Чтение до конца строки.
-        /// </summary>
-        public ReadOnlySpan<byte> ReadLine()
+    /// <summary>
+    /// Чтение до конца строки.
+    /// </summary>
+    public ReadOnlySpan<byte> ReadLine()
+    {
+        if (IsEOF)
         {
-            if (IsEOF)
+            return ReadOnlySpan<byte>.Empty;
+        }
+
+        var start = _position;
+        while (!IsEOF)
+        {
+            var c = PeekByte();
+            if (c == '\r' || c == '\n')
             {
-                return ReadOnlySpan<byte>.Empty;
+                break;
             }
 
-            var start = _position;
-            while (!IsEOF)
-            {
-                var c = PeekByte();
-                if (c == '\r' || c == '\n')
-                {
-                    break;
-                }
+            ReadByte();
+        }
 
+        var stop = _position;
+        if (!IsEOF)
+        {
+            var c = PeekByte();
+            if (c == '\r')
+            {
+                ReadChar();
+                c = PeekChar();
+            }
+
+            if (c == '\n')
+            {
                 ReadByte();
             }
+        }
 
-            var stop = _position;
-            if (!IsEOF)
-            {
-                var c = PeekByte();
-                if (c == '\r')
-                {
-                    ReadChar();
-                    c = PeekChar();
-                }
+        return AsSpan.Slice (start, stop - start);
+    }
 
-                if (c == '\n')
-                {
-                    ReadByte();
-                }
-            }
-
-            return AsSpan.Slice(start, stop - start);
-        } // method ReadLine
-
-        /// <summary>
-        /// Пропускаем строку
-        /// </summary>
-        public void SkipLine()
+    /// <summary>
+    /// Пропускаем строку
+    /// </summary>
+    public void SkipLine()
+    {
+        if (IsEOF)
         {
-            if (IsEOF)
+            return;
+        }
+
+        while (!IsEOF)
+        {
+            var c = PeekByte();
+            if (c == '\r' || c == '\n')
             {
-                return;
+                break;
             }
 
-            while (!IsEOF)
-            {
-                var c = PeekByte();
-                if (c == '\r' || c == '\n')
-                {
-                    break;
-                }
+            ReadByte();
+        }
 
+        if (!IsEOF)
+        {
+            var c = PeekByte();
+
+            if (c == '\r')
+            {
+                ReadByte();
+                c = PeekByte();
+            }
+
+            if (c == '\n')
+            {
                 ReadByte();
             }
+        }
+    }
 
-            if (!IsEOF)
-            {
-                var c = PeekByte();
-
-                if (c == '\r')
-                {
-                    ReadByte();
-                    c = PeekByte();
-                }
-
-                if (c == '\n')
-                {
-                    ReadByte();
-                }
-            }
-        } // method SkipLine
-
-        #endregion
-
-    } // struct UnsafeByteNavigator
-
-} // namespace AM.IO
+    #endregion
+}

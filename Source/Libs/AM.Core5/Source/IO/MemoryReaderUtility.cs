@@ -21,150 +21,148 @@ using AM.Collections;
 
 #nullable enable
 
-namespace AM.IO
+namespace AM.IO;
+
+// Алиас для краткости
+using Chunk = ReadOnlyMemory<byte>;
+
+/// <summary>
+/// Методы расширения для MemoryReader.
+/// </summary>
+public static class MemoryReaderUtility
 {
-    // Алиас для краткости
-    using Chunk = ReadOnlyMemory<byte>;
+    #region Public methods
 
     /// <summary>
-    /// Методы расширения для MemoryReader.
+    /// Чтение указанного объема памяти, возможно, кусками.
     /// </summary>
-    public static class MemoryReaderUtility
+    /// <param name="reader">Читатель.</param>
+    /// <param name="limit">Максимальное количество считываемых байт.</param>
+    /// <returns>Последовательность чанков (возможно, пустая).</returns>
+    public static IEnumerable<Chunk> Enumerate
+        (
+            this MemoryReader reader,
+            int limit = int.MaxValue
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Чтение указанного объема памяти, возможно, кусками.
-        /// </summary>
-        /// <param name="reader">Читатель.</param>
-        /// <param name="limit">Максимальное количество считываемых байт.</param>
-        /// <returns>Последовательность чанков (возможно, пустая).</returns>
-        public static IEnumerable<Chunk> Enumerate
-            (
-                this MemoryReader reader,
-                int limit = int.MaxValue
-            )
+        while (limit > 0 && !reader.IsEof)
         {
-            while (limit > 0 && !reader.IsEof)
+            var chunk = reader.ReadBlock(limit);
+            limit -= chunk.Length;
+            yield return chunk;
+        }
+    }
+
+    /// <summary>
+    /// Чтение непрерывного блока памяти.
+    /// При необходимости куски склеиваются автоматически.
+    /// </summary>
+    /// <param name="reader">Читатель.</param>
+    /// <param name="limit">Максимальное количество считываемых байт.
+    /// </param>
+    /// <returns>Блок.</returns>
+    public static Chunk ReadContinuous
+        (
+            this MemoryReader reader,
+            int limit = int.MaxValue
+        )
+    {
+        var firstChunk = reader.ReadBlock(limit);
+        if (firstChunk.IsEmpty || reader.IsEof)
+        {
+            return firstChunk;
+        }
+
+        var subsequentChunks = new SinglyLinkedList<Chunk>();
+        limit -= firstChunk.Length;
+        while (!reader.IsEof && limit > 0)
+        {
+            var nextChunk = reader.ReadBlock(limit);
+
+            subsequentChunks.Add(nextChunk);
+            limit -= nextChunk.Length;
+        }
+
+        if (subsequentChunks.Count == 0)
+        {
+            return firstChunk;
+        }
+
+        var offset = firstChunk.Length;
+        var total = offset;
+        foreach (var chunk in subsequentChunks)
+        {
+            total += chunk.Length;
+        }
+
+        var result = new byte [total].AsMemory();
+        firstChunk.CopyTo(result);
+
+        foreach (var chunk in subsequentChunks)
+        {
+            chunk.CopyTo(result.Slice(offset));
+            offset += chunk.Length;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Чтение непрерывного блока памяти вплоть до указанного
+    /// байта-разделителя.
+    /// При необходимости куски склеиваются автоматически.
+    /// </summary>
+    /// <param name="reader">Читатель.</param>
+    /// <param name="limiter">Символ-ограничитель.</param>
+    /// <returns>Блок.</returns>
+    public static Chunk ReadContinuousTo
+        (
+            this MemoryReader reader,
+            byte limiter
+        )
+    {
+        var firstUnit = reader.ReadTo(limiter);
+        if (firstUnit.Chunk.IsEmpty || firstUnit.Found || reader.IsEof)
+        {
+            return firstUnit.Chunk;
+        }
+
+        var subsequentUnits = new SinglyLinkedList<Chunk>();
+        while (!reader.IsEof)
+        {
+            var nextUnit = reader.ReadTo(limiter);
+
+            subsequentUnits.Add(nextUnit.Chunk);
+            if (nextUnit.Found)
             {
-                var chunk = reader.ReadBlock(limit);
-                limit -= chunk.Length;
-                yield return chunk;
+                break;
             }
         }
 
-        /// <summary>
-        /// Чтение непрерывного блока памяти.
-        /// При необходимости куски склеиваются автоматически.
-        /// </summary>
-        /// <param name="reader">Читатель.</param>
-        /// <param name="limit">Максимальное количество считываемых байт.
-        /// </param>
-        /// <returns>Блок.</returns>
-        public static Chunk ReadContinuous
-            (
-                this MemoryReader reader,
-                int limit = int.MaxValue
-            )
+        if (subsequentUnits.Count == 0)
         {
-            var firstChunk = reader.ReadBlock(limit);
-            if (firstChunk.IsEmpty || reader.IsEof)
-            {
-                return firstChunk;
-            }
+            return firstUnit.Chunk;
+        }
 
-            var subsequentChunks = new SinglyLinkedList<Chunk>();
-            limit -= firstChunk.Length;
-            while (!reader.IsEof && limit > 0)
-            {
-                var nextChunk = reader.ReadBlock(limit);
-
-                subsequentChunks.Add(nextChunk);
-                limit -= nextChunk.Length;
-            }
-
-            if (subsequentChunks.Count == 0)
-            {
-                return firstChunk;
-            }
-
-            var offset = firstChunk.Length;
-            var total = offset;
-            foreach (var chunk in subsequentChunks)
-            {
-                total += chunk.Length;
-            }
-
-            var result = new byte [total].AsMemory();
-            firstChunk.CopyTo(result);
-
-            foreach (var chunk in subsequentChunks)
-            {
-                chunk.CopyTo(result.Slice(offset));
-                offset += chunk.Length;
-            }
-
-            return result;
-        } // method ReadContinuous
-
-        /// <summary>
-        /// Чтение непрерывного блока памяти вплоть до указанного
-        /// байта-разделителя.
-        /// При необходимости куски склеиваются автоматически.
-        /// </summary>
-        /// <param name="reader">Читатель.</param>
-        /// <param name="limiter">Символ-ограничитель.</param>
-        /// <returns>Блок.</returns>
-        public static Chunk ReadContinuousTo
-            (
-                this MemoryReader reader,
-                byte limiter
-            )
+        var offset = firstUnit.Chunk.Length;
+        var total = offset;
+        foreach (var chunk in subsequentUnits)
         {
-            var firstUnit = reader.ReadTo(limiter);
-            if (firstUnit.Chunk.IsEmpty || firstUnit.Found || reader.IsEof)
-            {
-                return firstUnit.Chunk;
-            }
+            total += chunk.Length;
+        }
 
-            var subsequentUnits = new SinglyLinkedList<Chunk>();
-            while (!reader.IsEof)
-            {
-                var nextUnit = reader.ReadTo(limiter);
+        var result = new byte [total].AsMemory();
+        firstUnit.Chunk.CopyTo(result);
 
-                subsequentUnits.Add(nextUnit.Chunk);
-                if (nextUnit.Found)
-                {
-                    break;
-                }
-            }
+        foreach (var chunk in subsequentUnits)
+        {
+            chunk.CopyTo(result.Slice(offset));
+            offset += chunk.Length;
+        }
 
-            if (subsequentUnits.Count == 0)
-            {
-                return firstUnit.Chunk;
-            }
+        return result;
+    }
 
-            var offset = firstUnit.Chunk.Length;
-            var total = offset;
-            foreach (var chunk in subsequentUnits)
-            {
-                total += chunk.Length;
-            }
+    #endregion
 
-            var result = new byte [total].AsMemory();
-            firstUnit.Chunk.CopyTo(result);
-
-            foreach (var chunk in subsequentUnits)
-            {
-                chunk.CopyTo(result.Slice(offset));
-                offset += chunk.Length;
-            }
-
-            return result;
-        } // method ReadContinuousTo
-
-        #endregion
-
-    } // class MemoryReaderUtility
-
-} // namespace AM.IO
+}
