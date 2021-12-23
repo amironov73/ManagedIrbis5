@@ -14,6 +14,7 @@ static class Program
         // PidginExperimentTwo.Statements();
         // PidginExperimentThree.Assignments();
         // PidginExperimentFour.LeftRecursion();
-        PidginExperimentFive.Comments();
+        // PidginExperimentFive.Comments();
+        PidginExperimentSix.Positions();
     }
 }
