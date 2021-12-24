@@ -14,133 +14,131 @@
 
 #nullable enable
 
-namespace AM.Results
+namespace AM.Results;
+
+//
+// ПРЕДОПРЕДЕЛЕННЫЕ РЕЗУЛЬТАТЫ
+//
+
+/// <summary>
+/// Результат: да.
+/// </summary>
+public readonly struct Yes { }
+
+/// <summary>
+/// Результат: нет.
+/// </summary>
+public readonly struct No { }
+
+/// <summary>
+/// Результат: может быть.
+/// </summary>
+public readonly struct Maybe { }
+
+/// <summary>
+/// Результат: неизвестно.
+/// </summary>
+public readonly struct Unknown { }
+
+/// <summary>
+/// Результат: истина.
+/// </summary>
+public readonly struct True { }
+
+/// <summary>
+/// Результат: ложь.
+/// </summary>
+public readonly struct False { }
+
+/// <summary>
+/// Результат: все.
+/// </summary>
+public readonly struct All { }
+
+/// <summary>
+/// Результат: некоторые.
+/// </summary>
+public readonly struct Some { }
+
+/// <summary>
+/// Результат: ни одного.
+/// </summary>
+public readonly struct None
 {
-    //
-    // ПРЕДОПРЕДЕЛЕННЫЕ РЕЗУЛЬТАТЫ
-    //
-
     /// <summary>
-    /// Результат: да.
+    /// Конструирование значения.
     /// </summary>
-    public readonly struct Yes { }
+    public static OneOf<T, None> Of<T>(T t) => new None();
+}
 
-    /// <summary>
-    /// Результат: нет.
-    /// </summary>
-    public readonly struct No { }
+/// <summary>
+/// Результат: не найдено.
+/// </summary>
+public readonly struct NotFound { }
 
-    /// <summary>
-    /// Результат: может быть.
-    /// </summary>
-    public readonly struct Maybe { }
+/// <summary>
+/// Результат: успех.
+/// </summary>
+public readonly struct Success { }
 
+/// <summary>
+/// Результат: успех со значением.
+/// </summary>
+public readonly struct Success<T>
+{
     /// <summary>
-    /// Результат: неизвестно.
+    /// Конструктор.
     /// </summary>
-    public readonly struct Unknown { }
-
-    /// <summary>
-    /// Результат: истина.
-    /// </summary>
-    public readonly struct True { }
-
-    /// <summary>
-    /// Результат: ложь.
-    /// </summary>
-    public readonly struct False { }
-
-    /// <summary>
-    /// Результат: все.
-    /// </summary>
-    public readonly struct All { }
-
-    /// <summary>
-    /// Результат: некоторые.
-    /// </summary>
-    public readonly struct Some { }
-
-    /// <summary>
-    /// Результат: ни одного.
-    /// </summary>
-    public readonly struct None
+    public Success(T value)
     {
-        /// <summary>
-        /// Конструирование значения.
-        /// </summary>
-        public static OneOf<T, None> Of<T>(T t) => new None();
-    } // struct None
+        Value = value;
+    }
 
     /// <summary>
-    /// Результат: не найдено.
+    /// Хранимое значение.
     /// </summary>
-    public readonly struct NotFound { }
+    public T Value { get; }
+}
 
+/// <summary>
+/// Результат.
+/// </summary>
+public readonly struct Result<T>
+{
     /// <summary>
-    /// Результат: успех.
+    /// Конструктор.
     /// </summary>
-    public readonly struct Success { }
-
-    /// <summary>
-    /// Результат: успех со значением.
-    /// </summary>
-    public readonly struct Success<T>
+    public Result(T value)
     {
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Success(T value)
-        {
-            Value = value;
-        }
-
-        /// <summary>
-        /// Хранимое значение.
-        /// </summary>
-        public T Value { get; }
-    } // struct Success
+        Value = value;
+    }
 
     /// <summary>
-    /// Результат.
+    /// Хранимое значение.
     /// </summary>
-    public readonly struct Result<T>
+    public T Value { get; }
+}
+
+/// <summary>
+/// Результат: ошибка.
+/// </summary>
+public readonly struct Error { }
+
+/// <summary>
+/// Результат: ошибка со значением.
+/// </summary>
+public readonly struct Error<T>
+{
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Error(T value)
     {
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Result(T value)
-        {
-            Value = value;
-        }
-
-        /// <summary>
-        /// Хранимое значение.
-        /// </summary>
-        public T Value { get; }
-    } // struct Result
+        Value = value;
+    }
 
     /// <summary>
-    /// Результат: ошибка.
+    /// Хранимое значение.
     /// </summary>
-    public readonly struct Error { }
-
-    /// <summary>
-    /// Результат: ошибка со значением.
-    /// </summary>
-    public readonly struct Error<T>
-    {
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Error(T value)
-        {
-            Value = value;
-        }
-
-        /// <summary>
-        /// Хранимое значение.
-        /// </summary>
-        public T Value { get; }
-    } // struct Error
-
-} // namespace AM.Results
+    public T Value { get; }
+}

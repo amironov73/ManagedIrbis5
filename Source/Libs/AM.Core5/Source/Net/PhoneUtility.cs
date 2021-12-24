@@ -62,66 +62,74 @@ using AM.Text;
  *
  */
 
-namespace AM.Net
+namespace AM.Net;
+
+/// <summary>
+/// Утилиты для работы с номером телефона.
+/// </summary>
+public static class PhoneUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Утилиты для работы с номером телефона.
+    /// Очистка номера от лишних символов.
+    /// Перевод кириллических символов в латиницу.
     /// </summary>
-    public static class PhoneUtility
+    public static string CleanupNumber
+        (
+            string number
+        )
     {
-        #region Public methods
+        Sure.NotNull (number);
 
-        /// <summary>
-        /// Очистка номера от лишних символов.
-        /// Перевод кириллических символов в латиницу.
-        /// </summary>
-        public static string CleanupNumber
-            (
-                string number
-            )
+        var builder = StringBuilderPool.Shared.Get();
+        if (number.FirstChar() == '+')
         {
-            var builder = StringBuilderPool.Shared.Get();
-            if (number.FirstChar() == '+')
+            builder.Append ('+');
+        }
+
+        if (number.FirstChar() == '8')
+        {
+            builder.Append ('+');
+            builder.Append ('7');
+            number = number.Substring (1);
+        }
+
+        foreach (var c in number)
+        {
+            if (c.IsArabicDigit())
             {
-                builder.Append('+');
+                builder.Append (c);
             }
+        }
 
-            if (number.FirstChar() == '8')
-            {
-                builder.Append ('+');
-                builder.Append ('7');
-                number = number.Substring (1);
-            }
+        if (builder.Length > 10 && builder[0] == '7')
+        {
+            builder.Insert (0, '+');
+        }
 
-            foreach (var c in number)
-            {
-                if (c.IsArabicDigit())
-                {
-                    builder.Append (c);
-                }
-            }
+        var result = builder.ToString();
+        StringBuilderPool.Shared.Return (builder);
 
-            if (builder.Length > 10 && builder[0] == '7')
-            {
-                builder.Insert (0, '+');
-            }
+        return result;
+    }
 
-            var result = builder.ToString();
-            StringBuilderPool.Shared.Return(builder);
+    /// <summary>
+    /// Верификация (весьма приблизительная) номера телефона.
+    /// </summary>
+    public static bool VerifyNumber
+        (
+            string number
+        )
+    {
+        if (string.IsNullOrEmpty (number))
+        {
+            return false;
+        }
 
-            return result;
+        return (number.StartsWith ("8") || number.StartsWith ("+7"))
+               && number.Length is >= 10 and <= 15;
+    }
 
-        } // method CleanupNumber
-
-        /// <summary>
-        /// Верификация (весьма приблизительная) номера телефона.
-        /// </summary>
-        public static bool VerifyNumber (string number) =>
-            (number.StartsWith ("8") || number.StartsWith ("+7"))
-            &&  number.Length is >= 10 and <= 15;
-
-        #endregion
-
-    } // class PhoneUtility
-
-} // namespace AM
+    #endregion
+}

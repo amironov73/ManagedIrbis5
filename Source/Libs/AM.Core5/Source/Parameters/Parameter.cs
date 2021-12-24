@@ -29,129 +29,132 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace AM.Parameters
-{
-    /// <summary>
-    /// Параметр вида ИМЯ=ЗНАЧЕНИЕ.
-    /// </summary>
-    [XmlRoot("parameter")]
-    [DebuggerDisplay("{Name}={Value}")]
-    public sealed class Parameter
-        : IHandmadeSerializable,
+namespace AM.Parameters;
+
+/// <summary>
+/// Параметр вида ИМЯ=ЗНАЧЕНИЕ.
+/// </summary>
+[XmlRoot ("parameter")]
+[DebuggerDisplay ("{Name}={Value}")]
+public sealed class Parameter
+    : IHandmadeSerializable,
         IVerifiable
+{
+    #region Properties
+
+    /// <summary>
+    /// Name.
+    /// </summary>
+    [XmlAttribute ("name")]
+    [JsonPropertyName ("name")]
+    public string? Name { get; set; }
+
+    /// <summary>
+    /// Value.
+    /// </summary>
+    /// <remarks>Can be <c>string.Empty</c>.</remarks>
+    [XmlAttribute ("value")]
+    [JsonPropertyName ("value")]
+    public string? Value { get; set; }
+
+    /// <summary>
+    /// Values.
+    /// </summary>
+    public NonNullCollection<string> Values { get; private set; }
+
+    #endregion
+
+    #region Construciton
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public Parameter()
     {
-        #region Properties
-
-        /// <summary>
-        /// Name.
-        /// </summary>
-        [XmlAttribute("name")]
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
-
-        /// <summary>
-        /// Value.
-        /// </summary>
-        /// <remarks>Can be <c>string.Empty</c>.</remarks>
-        [XmlAttribute("value")]
-        [JsonPropertyName("value")]
-        public string? Value { get; set; }
-
-        /// <summary>
-        /// Values.
-        /// </summary>
-        public NonNullCollection<string> Values { get; private set; }
-
-        #endregion
-
-        #region Construciton
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public Parameter()
-        {
-            Values = new NonNullCollection<string>();
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public Parameter
-            (
-                string name,
-                string? value
-            )
-        {
-            Sure.NotNullNorEmpty(name, nameof(name));
-
-            Name = name;
-            Value = value ?? string.Empty;
-            Values = new NonNullCollection<string>
-            {
-                Value
-            };
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Name = reader.ReadNullableString();
-            Value = reader.ReadNullableString();
-        }
-
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WriteNullable(Name)
-                .WriteNullable(Value);
-        }
-
-        #endregion
-
-        #region IVerifiable members
-
-        /// <inheritdoc cref="IVerifiable.Verify" />
-        public bool Verify
-            (
-                bool throwOnError
-            )
-        {
-            var verifier = new Verifier<Parameter>
-                (
-                    this,
-                    throwOnError
-                );
-
-            verifier
-                .NotNullNorEmpty(Name, "Name")
-                .NotNull(Value, "Value");
-
-            return verifier.Result;
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString" />
-        [Pure]
-        public override string ToString()
-        {
-            return $"{Name}={Value}";
-        }
-
-        #endregion
+        Values = new NonNullCollection<string>();
     }
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public Parameter
+        (
+            string name,
+            string? value
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        Name = name;
+        Value = value ?? string.Empty;
+        Values = new NonNullCollection<string>
+        {
+            Value
+        };
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Name = reader.ReadNullableString();
+        Value = reader.ReadNullableString();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer
+            .WriteNullable (Name)
+            .WriteNullable (Value);
+    }
+
+    #endregion
+
+    #region IVerifiable members
+
+    /// <inheritdoc cref="IVerifiable.Verify" />
+    public bool Verify
+        (
+            bool throwOnError
+        )
+    {
+        var verifier = new Verifier<Parameter>
+            (
+                this,
+                throwOnError
+            );
+
+        verifier
+            .NotNullNorEmpty (Name)
+            .NotNull (Value);
+
+        return verifier.Result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    [Pure]
+    public override string ToString()
+    {
+        return $"{Name}={Value}";
+    }
+
+    #endregion
 }

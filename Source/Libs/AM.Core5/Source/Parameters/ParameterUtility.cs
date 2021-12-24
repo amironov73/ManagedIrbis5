@@ -15,199 +15,206 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using AM.Collections;
 using AM.Text;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Parameters
+namespace AM.Parameters;
+
+/// <summary>
+/// Утилиты для работы с параметрами ИМЯ=ЗНАЧЕНИЕ.
+/// </summary>
+public static class ParameterUtility
 {
+    #region Properties
+
     /// <summary>
-    /// Утилиты для работы с параметрами ИМЯ=ЗНАЧЕНИЕ.
+    /// Escape character.
     /// </summary>
-    public static class ParameterUtility
+    public static char EscapeCharacter = '\\';
+
+    /// <summary>
+    /// Name separator.
+    /// </summary>
+    public static char NameSeparator = '=';
+
+    /// <summary>
+    /// Value separator.
+    /// </summary>
+    public static char ValueSeparator = ';';
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Encode parameters to sting representation.
+    /// </summary>
+    public static string Encode
+        (
+            Parameter[] parameters
+        )
     {
-        #region Properties
+        Sure.NotNull (parameters);
 
-        /// <summary>
-        /// Escape character.
-        /// </summary>
-        public static char EscapeCharacter = '\\';
+        var result = new StringBuilder();
 
-        /// <summary>
-        /// Name separator.
-        /// </summary>
-        public static char NameSeparator = '=';
+        char[] badNameCharacters = { NameSeparator };
+        char[] badValueCharacters = { ValueSeparator };
 
-        /// <summary>
-        /// Value separator.
-        /// </summary>
-        public static char ValueSeparator = ';';
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Encode parameters to sting representation.
-        /// </summary>
-        public static string Encode
-            (
-                Parameter[] parameters
-            )
+        foreach (var parameter in parameters)
         {
-            var result = new StringBuilder();
+            result.Append
+                (
+                    Utility.Mangle
+                        (
+                            parameter.Name,
+                            EscapeCharacter,
+                            badNameCharacters
+                        )
+                );
+            result.Append (NameSeparator);
+            result.Append
+                (
+                    Utility.Mangle
+                        (
+                            parameter.Value,
+                            EscapeCharacter,
+                            badValueCharacters
+                        )
+                );
+            result.Append (ValueSeparator);
+        }
 
-            char[] badNameCharacters = { NameSeparator };
-            char[] badValueCharacters = { ValueSeparator };
+        return result.ToString();
+    }
 
-            foreach (var parameter in parameters)
+    /// <summary>
+    /// Get the parameter with specified name.
+    /// </summary>
+    public static string? GetParameter
+        (
+            this Parameter[] parameters,
+            string name,
+            string? defaultValue
+        )
+    {
+        Sure.NotNull (parameters);
+        Sure.NotNullNorEmpty (name);
+
+        var found = parameters
+            .FirstOrDefault (p => p.Name.SameString (name));
+
+        var result = ReferenceEquals (found, null)
+            ? defaultValue
+            : found.Value;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Get the parameter with specified name.
+    /// </summary>
+    public static T? GetParameter<T>
+        (
+            this Parameter[] parameters,
+            string name,
+            T? defaultValue
+        )
+    {
+        Sure.NotNull (parameters);
+        Sure.NotNullNorEmpty (name);
+
+        var found = parameters
+            .FirstOrDefault (p => p.Name.SameString (name));
+
+        var result = ReferenceEquals (found, null)
+            ? defaultValue
+            : Utility.ConvertTo<T> (found.Value);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Get the parameter with specified name.
+    /// </summary>
+    public static T? GetParameter<T>
+        (
+            this Parameter[] parameters,
+            string name
+        )
+    {
+        Sure.NotNull (parameters);
+        Sure.NotNullNorEmpty (name);
+
+        return GetParameter (parameters, name, default (T));
+    }
+
+    /// <summary>
+    /// Parse specified string.
+    /// </summary>
+    public static Parameter[] ParseString
+        (
+            string text
+        )
+    {
+        var result = new List<Parameter>();
+        var navigator = new TextNavigator (text);
+        navigator.SkipWhitespace();
+
+        while (!navigator.IsEOF)
+        {
+            while (true)
             {
-                result.Append
-                    (
-                        Utility.Mangle
-                            (
-                                parameter.Name,
-                                EscapeCharacter,
-                                badNameCharacters
-                            )
-                    );
-                result.Append(NameSeparator);
-                result.Append
-                    (
-                        Utility.Mangle
-                            (
-                                parameter.Value,
-                                EscapeCharacter,
-                                badValueCharacters
-                            )
-                    );
-                result.Append(ValueSeparator);
-            }
-
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Get the parameter with specified name.
-        /// </summary>
-        public static string? GetParameter
-            (
-                this Parameter[] parameters,
-                string name,
-                string? defaultValue
-            )
-        {
-            Sure.NotNullNorEmpty(name, nameof(name));
-
-            var found = parameters
-                .FirstOrDefault(p => p.Name.SameString(name));
-
-            var result = ReferenceEquals(found, null)
-                ? defaultValue
-                : found.Value;
-
-            return result;
-        }
-
-        /// <summary>
-        /// Get the parameter with specified name.
-        /// </summary>
-        public static T? GetParameter<T>
-            (
-                this Parameter[] parameters,
-                string name,
-                T? defaultValue
-            )
-        {
-            Sure.NotNullNorEmpty(name, nameof(name));
-
-            var found = parameters
-                .FirstOrDefault(p => p.Name.SameString(name));
-
-            var result = ReferenceEquals(found, null)
-                ? defaultValue
-                : Utility.ConvertTo<T>(found.Value);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Get the parameter with specified name.
-        /// </summary>
-        public static T? GetParameter<T>
-            (
-                this Parameter[] parameters,
-                string name
-            )
-        {
-            return GetParameter(parameters, name, default(T));
-        }
-
-        /// <summary>
-        /// Parse specified string.
-        /// </summary>
-        public static Parameter[] ParseString
-            (
-                string text
-            )
-        {
-            var result = new List<Parameter>();
-            var navigator = new TextNavigator(text);
-            navigator.SkipWhitespace();
-
-            while (!navigator.IsEOF)
-            {
-                while (true)
+                var flag = false;
+                if (navigator.IsWhiteSpace())
                 {
-                    var flag = false;
-                    if (navigator.IsWhiteSpace())
-                    {
-                        flag = true;
-                        navigator.SkipWhitespace();
-                    }
-                    if (navigator.PeekChar() == ValueSeparator)
-                    {
-                        flag = true;
-                        navigator.SkipChar(ValueSeparator);
-                    }
-                    if (!flag)
-                    {
-                        break;
-                    }
+                    flag = true;
+                    navigator.SkipWhitespace();
                 }
 
-                var name = navigator.ReadEscapedUntil
-                    (
-                        EscapeCharacter,
-                        NameSeparator
-                    );
-                if (ReferenceEquals(name, null))
+                if (navigator.PeekChar() == ValueSeparator)
+                {
+                    flag = true;
+                    navigator.SkipChar (ValueSeparator);
+                }
+
+                if (!flag)
                 {
                     break;
                 }
-                name = name.Trim();
-                navigator.SkipWhitespace();
-
-                var value = navigator.ReadEscapedUntil
-                    (
-                        EscapeCharacter,
-                        ValueSeparator
-                    );
-                var parameter = new Parameter(name, value);
-                result.Add(parameter);
             }
 
-            return result.ToArray();
+            var name = navigator.ReadEscapedUntil
+                (
+                    EscapeCharacter,
+                    NameSeparator
+                );
+            if (ReferenceEquals (name, null))
+            {
+                break;
+            }
+
+            name = name.Trim();
+            navigator.SkipWhitespace();
+
+            var value = navigator.ReadEscapedUntil
+                (
+                    EscapeCharacter,
+                    ValueSeparator
+                );
+            var parameter = new Parameter (name, value);
+            result.Add (parameter);
         }
 
-        #endregion
+        return result.ToArray();
     }
+
+    #endregion
 }
