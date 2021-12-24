@@ -24,51 +24,54 @@ using System.Text.Json.Serialization;
 
 #nullable enable
 
-namespace AM.Json
+namespace AM.Json;
+
+/// <summary>
+/// Конвертер для типа <c>System.Type</c>, чтобы
+/// преодолеть ограничения Runtime.
+/// </summary>
+public class MagnaTypeConverter
+    : JsonConverter<Type>
 {
-    /// <summary>
-    /// Конвертер для типа <c>System.Type</c>, чтобы
-    /// преодолеть ограничения Runtime.
-    /// </summary>
-    public class MagnaTypeConverter
-        : JsonConverter<Type>
+    #region JsonConverter members
+
+    /// <inheritdoc cref="JsonConverter{T}.Read"/>
+    public override Type? Read
+        (
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options
+        )
     {
-        #region JsonConverter members
+        return Type.GetType (reader.GetString()!);
+    }
 
-        /// <inheritdoc cref="JsonConverter{T}.Read"/>
-        public override Type? Read
-            (
-                ref Utf8JsonReader reader,
-                Type typeToConvert,
-                JsonSerializerOptions options
-            )
-            => Type.GetType(reader.GetString()!);
+    /// <inheritdoc cref="JsonConverter{T}.Write"/>
+    public override void Write
+        (
+            Utf8JsonWriter writer,
+            Type value,
+            JsonSerializerOptions options
+        )
+    {
+        writer.WriteStringValue (value.AssemblyQualifiedName);
+    }
 
-        /// <inheritdoc cref="JsonConverter{T}.Write"/>
-        public override void Write
-            (
-                Utf8JsonWriter writer,
-                Type value,
-                JsonSerializerOptions options
-            )
-            => writer.WriteStringValue(value.AssemblyQualifiedName);
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
+    /// <summary>
+    /// Создание опций для сериализатора, включающих в себя
+    /// нужный нам конвертер.
+    /// </summary>
+    public static JsonSerializerOptions CreateOptions()
+    {
+        return new ()
+        {
+            Converters = { new MagnaTypeConverter() }
+        };
+    }
 
-        /// <summary>
-        /// Создание опций для сериализатора, включающих в себя
-        /// нужный нам конвертер.
-        /// </summary>
-        public static JsonSerializerOptions CreateOptions()
-            => new()
-            {
-                Converters = { new MagnaTypeConverter() }
-            };
-
-        #endregion
-
-    } // class MagnaTypeConverter
-
-} // namespace AM.Json
+    #endregion
+}

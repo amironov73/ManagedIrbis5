@@ -22,94 +22,106 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace AM
+namespace AM;
+
+/// <summary>
+/// Утилиты для логирования.
+/// </summary>
+public static class LoggingUtility
 {
+    #region Public methods
+
     /// <summary>
-    /// Утилиты для логирования.
+    /// Отладочное логирование.
     /// </summary>
-    public static class LoggingUtility
+    [Conditional ("DEBUG")]
+    public static void Debug
+        (
+            this ILogger logger,
+            Func<string> lazy
+        )
     {
-        #region Public methods
+        Sure.NotNull (logger);
+        Sure.NotNull (lazy);
 
-        /// <summary>
-        /// Отладочное логирование.
-        /// </summary>
-        [Conditional("DEBUG")]
-        public static void Debug
-            (
-                this ILogger logger,
-                Func<string> lazy
-            )
+        if (logger.IsEnabled (LogLevel.Debug))
         {
-            if (logger.IsEnabled(LogLevel.Debug))
-            {
-                logger.LogDebug(lazy());
-            }
-        } // method Debug
+            logger.LogDebug (lazy());
+        }
+    }
 
-        /// <summary>
-        /// Логирует сообщение об ошибке.
-        /// </summary>
-        public static void Error
-            (
-                this ILogger logger,
-                Func<string> lazy
-            )
+    /// <summary>
+    /// Логирует сообщение об ошибке.
+    /// </summary>
+    public static void Error
+        (
+            this ILogger logger,
+            Func<string> lazy
+        )
+    {
+        Sure.NotNull (logger);
+        Sure.NotNull (lazy);
+
+        if (logger.IsEnabled (LogLevel.Error))
         {
-            if (logger.IsEnabled(LogLevel.Error))
-            {
-                logger.LogError(lazy());
-            }
-        } // method Error
+            logger.LogError (lazy());
+        }
+    }
 
-        /// <summary>
-        /// Логирует информационное сообщение.
-        /// </summary>
-        public static void Info
-            (
-                this ILogger logger,
-                Func<string> lazy
-            )
+    /// <summary>
+    /// Логирует информационное сообщение.
+    /// </summary>
+    public static void Info
+        (
+            this ILogger logger,
+            Func<string> lazy
+        )
+    {
+        Sure.NotNull (logger);
+        Sure.NotNull (lazy);
+
+        if (logger.IsEnabled (LogLevel.Information))
         {
-            if (logger.IsEnabled(LogLevel.Information))
-            {
-                logger.LogInformation(lazy());
-            }
-        } // method Info
+            logger.LogInformation (lazy());
+        }
+    }
 
-        /// <summary>
-        /// Трассировочное сообщение сообщение.
-        /// </summary>
-        [Conditional("TRACE")]
-        public static void Trace
-            (
-                this ILogger logger,
-                Func<string> lazy
-            )
+    /// <summary>
+    /// Трассировочное сообщение сообщение.
+    /// </summary>
+    [Conditional ("TRACE")]
+    public static void Trace
+        (
+            this ILogger logger,
+            Func<string> lazy
+        )
+    {
+        Sure.NotNull (logger);
+        Sure.NotNull (lazy);
+
+        if (logger.IsEnabled (LogLevel.Trace))
         {
-            if (logger.IsEnabled(LogLevel.Trace))
-            {
-                logger.LogTrace(lazy());
-            }
-        } // method Trace
+            logger.LogTrace (lazy());
+        }
+    }
 
-        /// <summary>
-        /// Логирование предупреждения.
-        /// </summary>
-        public static void Warning
-            (
-                this ILogger logger,
-                Func<string> lazy
-            )
+    /// <summary>
+    /// Логирование предупреждения.
+    /// </summary>
+    public static void Warning
+        (
+            this ILogger logger,
+            Func<string> lazy
+        )
+    {
+        Sure.NotNull (logger);
+        Sure.NotNull (lazy);
+
+        if (logger.IsEnabled (LogLevel.Warning))
         {
-            if (logger.IsEnabled(LogLevel.Warning))
-            {
-                logger.LogWarning(lazy());
-            }
-        } // method Warning
+            logger.LogWarning (lazy());
+        }
+    }
 
-        #endregion
-
-    } // class LoggingUtility
-
-} // namespace AM
+    #endregion
+}

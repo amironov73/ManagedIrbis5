@@ -17,23 +17,20 @@ using Microsoft.Extensions.Logging;
 
 #nullable enable
 
-namespace AM.Logging
+namespace AM.Logging;
+
+/// <summary>
+/// Интерфейс поддержки логирования.
+/// </summary>
+public interface ISupportLogging
 {
     /// <summary>
-    /// Интерфейс поддержки логирования.
+    /// Логгер для текущего экземпляра.
     /// </summary>
-    public interface ISupportLogging
-    {
-        /// <summary>
-        /// Логгер для текущего экземпляра.
-        /// </summary>
-        ILogger? Logger { get; }
+    ILogger? Logger { get; }
 
-        /// <summary>
-        /// Установка нового логгера вместо текущего.
-        /// </summary>
-        void SetLogger(ILogger? logger);
-
-    } // interface ISupportLogging
-
-} // namespace ManagedIrbis
+    /// <summary>
+    /// Установка нового логгера вместо текущего.
+    /// </summary>
+    void SetLogger (ILogger? logger);
+}
