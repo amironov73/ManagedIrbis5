@@ -404,7 +404,7 @@ var value2 = String ("name").Select (a => "Hello " + a);
 * **Assert (Func<T, bool> predicate)** -- парсер, проверяющий заданный предикат;
 * **Assert (Func<T, bool> predicate, string message)** -- парсер, проверяющий заданный предикат;
 * **Assert (Func<T, bool> predicate, Func<T, string> message)** -- парсер, проверяющий заданный предикат;
-* **Configuration** -- доступ к конфигурации (о ней будет рассказано особо);
+* **Configuration** -- доступ к конфигурации (о ней будет рассказано ниже);
 * **CurrentOffset** -- текущее смещение от начала входного потока;
 * **CurrentPos** -- доступ к текущей позиции в разбираемом тексте;
 * **CurrentSourcePosDelta** - доступ к текущей позиции в разбираемом тексте;
@@ -412,3 +412,155 @@ var value2 = String ("name").Select (a => "Hello " + a);
 * **Trace (Func<T, string> message)** -- трассировочная печать;
 * **Trace (string message)** -- трассировочная печать;
 * **TraceResult()** -- трассировочная печать.
+
+## Конфигурация
+
+В Pidgin предусмотрена возможность небольшой настройки парсера с помощью интерфейса `IConfiguration<Token>`
+
+```c#
+public interface IConfiguration<Token>
+{
+    // Функция для вычисления позиции в тексте
+    Func<TToken, SoucePosDelta> SourcePosCalculator { get; }
+
+    // Провайдер пула массивов
+    IArrayPoolProvider ArrayPoolProvider { get; }
+}
+```
+
+Конфигурация задается при вызове метода `Parse` (см. далее). В большинстве случаев стандартная конфигурация работает вполне удовлетворительно.
+
+Пользователь парсера может получить конфигурацию в любой момент, вызвав метод `Configuration` (описан выше).
+
+## Методы расширения
+
+Pidgin предоставляет довольно большой ассортимент методов расширения для `Parser<TToken, TResult>`:
+
+```c#
+// запуск парсера и получение результата разбора
+public static Result<char, T> Parse<T>
+    (
+        this Parser<char, T> parser,
+        string input,
+        IConfiguration<char>? configuration = null
+    );
+
+public static Result<TToken, T> Parse<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        IList<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static Result<TToken, T> ParseReadOnlyList<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        IReadOnlyList<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static Result<TToken, T> Parse<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        IEnumerable<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static Result<TToken, T> Parse<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        IEnumerator<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static Result<byte, T> Parse<T>
+    (
+        this Parser<byte, T> parser,
+        Stream input,
+        IConfiguration<byte>? configuration = null
+    );
+
+public static Result<char, T> Parse<T>
+    (
+        this Parser<char, T> parser,
+        TextReader input,
+        IConfiguration<char>? configuration = null
+    );
+
+public static Result<TToken, T> Parse<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        TToken[] input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static Result<TToken, T> Parse<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        ReadOnlySpan<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static T ParseOrThrow<T>
+    (
+        this Parser<char, T> parser,
+        string input,
+        IConfiguration<char>? configuration = null
+    );
+
+public static T ParseOrThrow<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        IList<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static T ParseReadOnlyListOrThrow<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        IReadOnlyList<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static T ParseOrThrow<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        IEnumerable<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static T ParseOrThrow<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        IEnumerator<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static T ParseOrThrow<T>
+    (
+        this Parser<byte, T> parser,
+        Stream input,
+        IConfiguration<byte>? configuration = null
+    );
+
+public static T ParseOrThrow<T>
+    (
+        this Parser<char, T> parser,
+        TextReader input,
+        IConfiguration<char>? configuration = null
+    );
+
+public static T ParseOrThrow<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        TToken[] input,
+        IConfiguration<TToken>? configuration = null
+    );
+
+public static T ParseOrThrow<TToken, T>
+    (
+        this Parser<TToken, T> parser,
+        ReadOnlySpan<TToken> input,
+        IConfiguration<TToken>? configuration = null
+    );
+```
