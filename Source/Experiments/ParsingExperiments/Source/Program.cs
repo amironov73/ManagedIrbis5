@@ -1,6 +1,7 @@
 ﻿// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
 
-using System;
+using ParsingExperiments.Barsik;
 
 namespace ParsingExperiments;
 
@@ -16,6 +17,7 @@ static class Program
         // PidginExperimentFour.LeftRecursion();
         // PidginExperimentFive.Comments();
         // PidginExperimentSix.Positions();
-        PidginExperimentSeven.Expressor();
+        // PidginExperimentSeven.Expressor();
+        BarsikExperiment.Interprete();
     }
 }
