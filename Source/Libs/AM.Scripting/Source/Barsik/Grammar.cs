@@ -14,6 +14,7 @@
 #region Using directive
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Pidgin;
@@ -34,20 +35,51 @@ namespace AM.Scripting.Barsik;
 /// </summary>
 static class Grammar
 {
-    public static readonly Parser<char, Unit> BlockComment = CommentParser.SkipBlockComment
+    #region Public methods
+
+    /// <summary>
+    /// Разбор текста скрипта.
+    /// </summary>
+    public static ProgramNode ParseProgram
+        (
+            string sourceCode
+        )
+    {
+        Sure.NotNull (sourceCode);
+
+        return Pgm.ParseOrThrow (sourceCode);
+    }
+
+    /// <summary>
+    /// Разбор текста программы.
+    /// </summary>
+    public static AtomNode ParseExpression
+        (
+            string sourceCode
+        )
+    {
+        Sure.NotNull (sourceCode);
+
+        return Expr.Before (End).ParseOrThrow (sourceCode);
+    }
+
+    #endregion
+
+    #region Private members
+
+    private static readonly Parser<char, Unit> BlockComment = CommentParser.SkipBlockComment
         (
             Try (String ("/*")),
             Try (String ("*/"))
         );
 
-    public static readonly Parser<char, Unit> LineComment = CommentParser.SkipLineComment
+    private static readonly Parser<char, Unit> LineComment = CommentParser.SkipLineComment
         (
             Try (String ("//"))
         );
 
-    public static readonly Parser<char, Unit> Skip = Try (BlockComment)
+    private static readonly Parser<char, Unit> Skip = Try (BlockComment)
         .Or (Try (LineComment))
-        .Or (Try (Char (';')).IgnoreResult())
         .Or (Whitespace.IgnoreResult())
         .SkipMany();
 
@@ -57,6 +89,12 @@ static class Grammar
     public static Parser<char, char> Tok (char token) => Tok (Char (token));
 
     public static Parser<char, string> Tok (string token) => Tok (String (token));
+
+    public static Parser<char, TResult> CurlyBraces<TResult> (Parser<char, TResult> parser) =>
+        parser.Between (Tok ('{'), Tok ('}'));
+
+    public static Parser<char, TResult> RoundBrackets<TResult> (Parser<char, TResult> parser) =>
+        parser.Between (Tok ('('), Tok (')'));
 
     private static readonly Parser<char, string> Identifier = Tok
         (
@@ -141,16 +179,41 @@ static class Grammar
             new []
             {
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
-                new [] { BinaryLeft ("+"), BinaryLeft ("-") }
+                new [] { BinaryLeft ("+"), BinaryLeft ("-") },
+                new [] { BinaryLeft ("<<"), BinaryLeft (">>") },
+                new [] { BinaryLeft ("<="), BinaryLeft (">="), BinaryLeft ("<"), BinaryLeft (">") },
+                new [] { BinaryLeft ("=="), BinaryLeft ("!=") },
+                new [] { BinaryLeft ("&") },
+                new [] { BinaryLeft ("^") },
+                new [] { BinaryLeft ("|") },
+                new [] { BinaryLeft ("&&") },
+                new [] { BinaryLeft ("||") }
             }
         );
 
-    private static readonly Parser<char, StatementNode> Assignment = Tok (
-            from target in Identifier
+    //
+    // Дальше начинаются разнообразные стейтменты
+    //
+
+    // разделитель стейтментов
+    public static readonly Parser<char, Unit> StatementDelimiter = Try (BlockComment)
+        .Or (Try (LineComment))
+        .Or (Try (Char (';')).IgnoreResult())
+        .Or (Whitespace.IgnoreResult())
+        .SkipMany();
+
+    // блок стейтментов
+    // ReSharper disable RedundantSuppressNullableWarningExpression
+    public static readonly Parser<char, IEnumerable<StatementNode>> Block =
+        Rec (() => Statement!).SeparatedAndOptionallyTerminated (StatementDelimiter);
+    // ReSharper restore RedundantSuppressNullableWarningExpression
+
+    private static readonly Parser<char, StatementNode> Assignment = Try (Tok (
+            from target in Try (Identifier)
             from eq in Tok ("=")
             from expr in Expr
             select (StatementNode) new AssignmentNode (target, expr)
-        );
+        ));
 
     private static readonly Parser<char, StatementNode> Print = Tok (Map
         (
@@ -160,41 +223,50 @@ static class Grammar
             Expr.Separated (Tok (','))
         ));
 
+    private static readonly Parser<char, StatementNode> While = Tok (Map
+        (
+            (_, condition, body) => (StatementNode) new WhileNode (condition, body),
+            Try (Tok ("while")),
+            RoundBrackets (Expr),
+            CurlyBraces (Block)
+        ));
+
+    private static readonly Parser<char, IEnumerable<StatementNode>> Else =
+        from _ in Tok ("else")
+        from statements in CurlyBraces (Block)
+        select statements;
+
+    private static readonly Parser<char, IfNode> ElseIf =
+        from _1 in Tok ("else")
+        from _2 in Tok ("if")
+        from condition in RoundBrackets (Expr)
+        from statements in CurlyBraces (Block)
+        select new IfNode (condition, statements, null, null);
+
+    private static readonly Parser<char, StatementNode> If =
+        from _ in Tok ("if")
+        from condition in RoundBrackets (Expr)
+        from thenBlock in CurlyBraces (Block)
+        from elseIf in ElseIf.Many().Optional()
+        from elseBlock in Else.Optional()
+        select (StatementNode) new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(), elseBlock.GetValueOrDefault());
+
+    // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
+            Assignment,
+            If,
             Print,
-            Assignment
+            While
         );
 
+    //
+    // Собственно программа
+    //
+
     private static readonly Parser<char, ProgramNode> Pgm =
-        Statement.SeparatedAndOptionallyTerminated (Skip)
-            .Before (End)
+        Block.Before (End)
             .Select (s => new ProgramNode (s));
 
-    /// <summary>
-    /// Разбор текста скрипта.
-    /// </summary>
-    public static ProgramNode ParseProgram
-        (
-            string sourceCode
-        )
-    {
-        Sure.NotNull (sourceCode);
-
-        return Pgm.ParseOrThrow (sourceCode);
-    }
-
-    /// <summary>
-    /// Разбор текста программы.
-    /// </summary>
-    public static AtomNode ParseExpression
-        (
-            string sourceCode
-        )
-    {
-        Sure.NotNull (sourceCode);
-
-        return Expr.Before (End).ParseOrThrow (sourceCode);
-    }
-
+    #endregion
 }

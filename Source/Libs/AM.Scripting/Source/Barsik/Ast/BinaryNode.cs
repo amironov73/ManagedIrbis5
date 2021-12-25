@@ -69,13 +69,20 @@ internal sealed class BinaryNode : AtomNode
             "*" => left * right,
             "/" => left / right,
             "%" => left % right,
-            "^" => left ^ right,
+            "<<" => left << right,
             "<" => left < right,
             "<=" => left <= right,
+            ">>" => left >> right,
             ">" => left > right,
             ">=" => left >= right,
             "==" => left == right,
             "!=" => left != right,
+            "||" => BarsikUtility.ToBoolean (left) || BarsikUtility.ToBoolean (right),
+            "|" => left | left,
+            "&&" => BarsikUtility.ToBoolean (left) && BarsikUtility.ToBoolean (right),
+            "&" => left & right,
+            "^^" => BarsikUtility.ToBoolean (left) != BarsikUtility.ToBoolean (right),
+            "^" => left ^ right,
             _ => throw new Exception ($"Unknown operation '{_op}'")
         };
     }

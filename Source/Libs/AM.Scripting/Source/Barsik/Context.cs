@@ -248,7 +248,7 @@ public sealed class Context
             dynamic? value
         )
     {
-        // Sure.NotNullNorEmpty (name);
+        Sure.NotNullNorEmpty (name);
 
         if (Variables.ContainsKey (name))
         {
@@ -277,7 +277,7 @@ public sealed class Context
             out dynamic? value
         )
     {
-        // Sure.NotNullNorEmpty (name);
+        Sure.NotNullNorEmpty (name);
 
         if (Variables.TryGetValue (name, out value))
         {
