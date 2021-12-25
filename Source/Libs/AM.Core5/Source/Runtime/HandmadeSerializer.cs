@@ -25,241 +25,231 @@ using AM.IO;
 
 #nullable enable
 
-namespace AM.Runtime
+namespace AM.Runtime;
+
+/// <summary>
+/// Закат солнца вручную.
+/// </summary>
+public sealed class HandmadeSerializer
 {
+    #region Properties
+
     /// <summary>
-    /// Закат солнца вручную.
+    /// Пространство имен, использующееся для коротких имен типов.
     /// </summary>
-    public sealed class HandmadeSerializer
+    public string? Namespace { get; set; }
+
+    /// <summary>
+    /// Сборка, использующаяся для коротких имен типов.
+    /// </summary>
+    public Assembly? Assembly { get; set; }
+
+    /// <summary>
+    /// Длина префикса.
+    /// </summary>
+    public PrefixLength PrefixLength { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public HandmadeSerializer()
     {
-        #region Properties
+        PrefixLength = PrefixLength.Full;
+    }
 
-        /// <summary>
-        /// Namespace for short type names.
-        /// </summary>
-        public string? Namespace { get; set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public HandmadeSerializer
+        (
+            PrefixLength prefixLength
+        )
+    {
+        PrefixLength = prefixLength;
+    }
 
-        /// <summary>
-        /// Assembly for short type names.
-        /// </summary>
-        public Assembly? Assembly { get; set; }
+    #endregion
 
-        /// <summary>
-        /// Prefix length.
-        /// </summary>
-        public PrefixLength PrefixLength { get; set; }
+    #region Public methods
 
-        #endregion
+    /// <summary>
+    /// Десериализация одиночного объекта.
+    /// </summary>
+    public IHandmadeSerializable Deserialize
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
 
-        #region Construction
+        var typeName = reader.ReadString();
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public HandmadeSerializer()
+        if (PrefixLength == PrefixLength.Short)
         {
-            PrefixLength = PrefixLength.Full;
+            typeName = Namespace + "." + typeName;
+        }
 
-        } // constructor
+        var type = ReferenceEquals (Assembly, null)
+            ? Type.GetType (typeName, true)
+            : Assembly.GetType (typeName, true);
+        type = type.ThrowIfNull();
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public HandmadeSerializer
-            (
-                PrefixLength prefixLength
-            )
+        var result = (IHandmadeSerializable)Activator.CreateInstance (type)
+            .ThrowIfNull();
+
+        result.RestoreFromStream (reader);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Десериализация массива объектов.
+    /// </summary>
+    public IHandmadeSerializable[] DeserializeArray
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        var count = reader.ReadPackedInt32();
+        var typeName = reader.ReadString();
+
+        if (PrefixLength == PrefixLength.Short)
         {
-            PrefixLength = prefixLength;
+            typeName = Namespace + "." + typeName;
+        }
 
-        } // constructor
+        var type = ReferenceEquals (Assembly, null)
+            ? Type.GetType (typeName, true)
+            : Assembly.GetType (typeName, true);
+        type = type.ThrowIfNull();
 
-        #endregion
+        var result = new IHandmadeSerializable[count];
 
-        #region Public methods
-
-        /// <summary>
-        /// Десериализация одиночного объекта.
-        /// </summary>
-        public IHandmadeSerializable Deserialize
-            (
-                BinaryReader reader
-            )
+        for (var i = 0; i < count; i++)
         {
-            Sure.NotNull (reader);
-
-            var typeName = reader.ReadString();
-
-            if (PrefixLength == PrefixLength.Short)
-            {
-                typeName = Namespace + "." + typeName;
-            }
-
-            var type = ReferenceEquals (Assembly, null)
-                ? Type.GetType (typeName, true)
-                : Assembly.GetType (typeName, true);
-            type = type.ThrowIfNull();
-
-            var result = (IHandmadeSerializable)Activator.CreateInstance (type)
+            var obj = (IHandmadeSerializable)Activator.CreateInstance (type)
                 .ThrowIfNull();
+            obj.RestoreFromStream (reader);
+            result[i] = obj;
+        }
 
-            result.RestoreFromStream (reader);
+        return result;
+    }
 
-            return result;
+    /// <summary>
+    /// Получение имени типа указанного объекта.
+    /// </summary>
+    public string GetTypeName
+        (
+            object obj
+        )
+    {
+        Sure.NotNull (obj);
 
-        } // method Deserialize
+        var type = obj.GetType().ThrowIfNull();
+        string result;
 
-        /// <summary>
-        /// Десериализация массива объектов.
-        /// </summary>
-        public IHandmadeSerializable[] DeserializeArray
-            (
-                BinaryReader reader
-            )
+        switch (PrefixLength)
         {
-            Sure.NotNull (reader);
+            case PrefixLength.Short:
+                result = type.Name;
+                break;
 
-            var count = reader.ReadPackedInt32();
-            var typeName = reader.ReadString();
+            case PrefixLength.Moderate:
+                result = type.FullName.ThrowIfNull();
+                break;
 
-            if (PrefixLength == PrefixLength.Short)
-            {
-                typeName = Namespace + "." + typeName;
-            }
+            case PrefixLength.Full:
+                result = type.AssemblyQualifiedName
+                    .ThrowIfNull();
+                break;
 
-            var type = ReferenceEquals (Assembly, null)
-                ? Type.GetType (typeName, true)
-                : Assembly.GetType (typeName, true);
-            type = type.ThrowIfNull ();
-
-            var result = new IHandmadeSerializable[count];
-
-            for (var i = 0; i < count; i++)
-            {
-                var obj = (IHandmadeSerializable) Activator.CreateInstance (type)
-                    .ThrowIfNull ();
-                obj.RestoreFromStream (reader);
-                result[i] = obj;
-            }
-
-            return result;
-
-        } // DeserializeArray
-
-        /// <summary>
-        /// Получение имени типа указанного объекта.
-        /// </summary>
-        public string GetTypeName
-            (
-                object obj
-            )
-        {
-            Sure.NotNull (obj);
-
-            var type = obj.GetType().ThrowIfNull ();
-            string result;
-
-            switch (PrefixLength)
-            {
-                case PrefixLength.Short:
-                    result = type.Name;
-                    break;
-
-                case PrefixLength.Moderate:
-                    result = type.FullName.ThrowIfNull ();
-                    break;
-
-                case PrefixLength.Full:
-                    result = type.AssemblyQualifiedName
-                        .ThrowIfNull ();
-                    break;
-
-                default:
-                    Magna.Error
-                        (
-                            nameof (HandmadeSerializer)
-                            + "::"
-                            + nameof (GetTypeName)
-                            + ": unexpected PrefixLength="
-                            + PrefixLength
-                        );
-
-                    throw new InvalidOperationException();
-            }
-
-            return result.ThrowIfNull ();
-
-        } // method GetTypeName
-
-        /// <summary>
-        /// Сериализация одиночного объекта.
-        /// </summary>
-        /// <remarks>
-        /// <c>null</c> не поддерживается.
-        /// </remarks>
-        public HandmadeSerializer Serialize
-            (
-                BinaryWriter writer,
-                IHandmadeSerializable obj
-            )
-        {
-            Sure.NotNull (writer);
-            Sure.NotNull (obj);
-
-            var typeName = GetTypeName (obj);
-            writer.Write (typeName);
-
-            obj.SaveToStream (writer);
-
-            return this;
-
-        } // method Serialize
-
-        /// <summary>
-        /// Сериализация массива объектов.
-        /// </summary>
-        /// <remarks>
-        /// Пустые массивы не поддерживаются, потому что нам нужно имя типа.
-        /// </remarks>
-        public HandmadeSerializer Serialize
-            (
-                BinaryWriter writer,
-                IHandmadeSerializable[] array
-            )
-        {
-            Sure.NotNull (writer);
-            Sure.NotNull (array);
-
-            var count = array.Length;
-            if (count == 0)
-            {
+            default:
                 Magna.Error
                     (
-                        nameof (HandmadeSerializer) + "::" + nameof (Serialize)
-                        + ": count=0"
+                        nameof (HandmadeSerializer)
+                        + "::"
+                        + nameof (GetTypeName)
+                        + ": unexpected PrefixLength="
+                        + PrefixLength
                     );
 
-                throw new ArgumentException (nameof (array));
-            }
+                throw new InvalidOperationException();
+        }
 
-            writer.WritePackedInt32 (count);
+        return result.ThrowIfNull();
+    }
 
-            var first = array[0];
+    /// <summary>
+    /// Сериализация одиночного объекта.
+    /// </summary>
+    /// <remarks>
+    /// <c>null</c> не поддерживается.
+    /// </remarks>
+    public HandmadeSerializer Serialize
+        (
+            BinaryWriter writer,
+            IHandmadeSerializable obj
+        )
+    {
+        Sure.NotNull (writer);
+        Sure.NotNull (obj);
 
-            var typeName = GetTypeName (first);
-            writer.Write (typeName);
+        var typeName = GetTypeName (obj);
+        writer.Write (typeName);
 
-            foreach (var obj in array)
-            {
-                obj.SaveToStream (writer);
-            }
+        obj.SaveToStream (writer);
 
-            return this;
+        return this;
+    }
 
-        } // method Serialize
+    /// <summary>
+    /// Сериализация массива объектов.
+    /// </summary>
+    /// <remarks>
+    /// Пустые массивы не поддерживаются, потому что нам нужно имя типа.
+    /// </remarks>
+    public HandmadeSerializer Serialize
+        (
+            BinaryWriter writer,
+            IHandmadeSerializable[] array
+        )
+    {
+        Sure.NotNull (writer);
+        Sure.NotNull (array);
 
-        #endregion
+        var count = array.Length;
+        if (count == 0)
+        {
+            Magna.Error
+                (
+                    nameof (HandmadeSerializer) + "::" + nameof (Serialize)
+                    + ": count=0"
+                );
 
-    } // method HandmadeSerializer
+            throw new ArgumentException (nameof (array));
+        }
 
-} // namespace AM.Runtime
+        writer.WritePackedInt32 (count);
+
+        var first = array[0];
+
+        var typeName = GetTypeName (first);
+        writer.Write (typeName);
+
+        foreach (var obj in array)
+        {
+            obj.SaveToStream (writer);
+        }
+
+        return this;
+    }
+
+    #endregion
+}

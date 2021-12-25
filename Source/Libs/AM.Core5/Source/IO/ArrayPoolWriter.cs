@@ -35,7 +35,7 @@ namespace AM.IO;
 /// </summary>
 public sealed class ArrayPoolWriter
     : IEnumerable<ReadOnlyMemory<byte>>,
-        IDisposable
+    IDisposable
 {
     #region Constants
 

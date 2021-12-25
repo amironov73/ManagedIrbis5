@@ -9,7 +9,7 @@
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedParameter.Local
 
-/* IHandmadeSerializable.cs -- object can be stored to a stream
+/* IHandmadeSerializable.cs -- интерфейс объекта, умеющего сериализовываться самостоятельно
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,27 +19,26 @@ using System.IO;
 
 #endregion
 
-namespace AM.Runtime
+namespace AM.Runtime;
+
+/// <summary>
+/// Интерфейс объекта, умеющего сериализовываться самостоятельно.
+/// </summary>
+public interface IHandmadeSerializable
 {
     /// <summary>
-    /// The object can be stored to a stream and restored back.
+    /// Восстановление состояния объекта из потока.
     /// </summary>
-    public interface IHandmadeSerializable
-    {
-        /// <summary>
-        /// Restore the object from a stream.
-        /// </summary>
-        public void RestoreFromStream
+    public void RestoreFromStream
         (
             BinaryReader reader
         );
 
-        /// <summary>
-        /// Store the object to a stream.
-        /// </summary>
-        public void SaveToStream
+    /// <summary>
+    /// Сохранение состояния объекта в поток.
+    /// </summary>
+    public void SaveToStream
         (
             BinaryWriter writer
         );
-    }
 }
