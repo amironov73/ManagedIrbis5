@@ -19,36 +19,35 @@ using System;
 
 #nullable enable
 
-namespace AM.Reflection
+namespace AM.Reflection;
+
+/// <summary>
+///
+/// </summary>
+public sealed class MemberOrderAttribute
+    : Attribute
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Index.
     /// </summary>
-    public sealed class MemberOrderAttribute
-        : Attribute
+    public int Index { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public MemberOrderAttribute
+        (
+            int index
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Index.
-        /// </summary>
-        public int Index { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public MemberOrderAttribute
-            (
-                int index
-            )
-        {
-            Index = index;
-        }
-
-        #endregion
+        Index = index;
     }
+
+    #endregion
 }

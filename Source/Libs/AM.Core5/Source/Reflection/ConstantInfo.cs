@@ -14,42 +14,41 @@
 
 #nullable enable
 
-namespace AM.Reflection
+namespace AM.Reflection;
+
+/// <summary>
+/// Типизированная информация о константе.
+/// </summary>
+public sealed class ConstantInfo<T>
 {
+    #region Properties
+
     /// <summary>
-    /// Типизированная информация о константе.
+    /// Имя константы.
     /// </summary>
-    public sealed class ConstantInfo<T>
+    public string Name { get; }
+
+    /// <summary>
+    /// Значение константы.
+    /// </summary>
+    public T Value { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ConstantInfo
+        (
+            string name,
+            T value
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Имя константы.
-        /// </summary>
-        public string Name { get; }
-
-        /// <summary>
-        /// Значение константы.
-        /// </summary>
-        public T Value { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ConstantInfo
-            (
-                string name,
-                T value
-            )
-        {
-            Name = name;
-            Value = value;
-        }
-
-        #endregion
+        Name = name;
+        Value = value;
     }
+
+    #endregion
 }

@@ -21,108 +21,107 @@ using System;
 
 #nullable enable
 
-namespace AM.PlatformAbstraction
+namespace AM.PlatformAbstraction;
+
+/// <summary>
+/// Абстрагируемся от платформы.
+/// </summary>
+public class PlatformAbstractionLayer
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Абстрагируемся от платформы.
+    /// Current PAL.
     /// </summary>
-    public class PlatformAbstractionLayer
-        : IDisposable
+    public static PlatformAbstractionLayer Current = new ();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Exit.
+    /// </summary>
+    public virtual void Exit
+        (
+            int exitCode
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Current PAL.
-        /// </summary>
-        public static PlatformAbstractionLayer Current = new ();
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Exit.
-        /// </summary>
-        public virtual void Exit
-            (
-                int exitCode
-            )
-        {
-            Environment.Exit (exitCode);
-        }
-
-        /// <summary>
-        /// Fail fast.
-        /// </summary>
-        public virtual void FailFast
-            (
-                string message
-            )
-        {
-            Environment.FailFast (message);
-        }
-
-        /// <summary>
-        /// Get environment variable.
-        /// </summary>
-        public virtual string? GetEnvironmentVariable
-            (
-                string variableName
-            )
-        {
-            return Environment.GetEnvironmentVariable (variableName);
-        }
-
-        /// <summary>
-        /// Get the machine name.
-        /// </summary>
-        public virtual string GetMachineName()
-        {
-            return Environment.MachineName;
-        }
-
-        /// <summary>
-        /// Get random number generator.
-        /// </summary>
-        public virtual Random GetRandomGenerator()
-        {
-            return new Random();
-        }
-
-        /// <summary>
-        /// Get current date and time.
-        /// </summary>
-        public virtual DateTime Now()
-        {
-            return DateTime.Now;
-        }
-
-        /// <summary>
-        /// Get the operating system version.
-        /// </summary>
-        public virtual OperatingSystem OsVersion()
-        {
-            return Environment.OSVersion;
-        }
-
-        /// <summary>
-        /// Get today date.
-        /// </summary>
-        public virtual DateTime Today()
-        {
-            return DateTime.Today;
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose()
-        {
-            // Nothing to do here
-        }
-
-        #endregion
+        Environment.Exit (exitCode);
     }
+
+    /// <summary>
+    /// Fail fast.
+    /// </summary>
+    public virtual void FailFast
+        (
+            string message
+        )
+    {
+        Environment.FailFast (message);
+    }
+
+    /// <summary>
+    /// Get environment variable.
+    /// </summary>
+    public virtual string? GetEnvironmentVariable
+        (
+            string variableName
+        )
+    {
+        return Environment.GetEnvironmentVariable (variableName);
+    }
+
+    /// <summary>
+    /// Get the machine name.
+    /// </summary>
+    public virtual string GetMachineName()
+    {
+        return Environment.MachineName;
+    }
+
+    /// <summary>
+    /// Get random number generator.
+    /// </summary>
+    public virtual Random GetRandomGenerator()
+    {
+        return new Random();
+    }
+
+    /// <summary>
+    /// Get current date and time.
+    /// </summary>
+    public virtual DateTime Now()
+    {
+        return DateTime.Now;
+    }
+
+    /// <summary>
+    /// Get the operating system version.
+    /// </summary>
+    public virtual OperatingSystem OsVersion()
+    {
+        return Environment.OSVersion;
+    }
+
+    /// <summary>
+    /// Get today date.
+    /// </summary>
+    public virtual DateTime Today()
+    {
+        return DateTime.Today;
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        // Nothing to do here
+    }
+
+    #endregion
 }

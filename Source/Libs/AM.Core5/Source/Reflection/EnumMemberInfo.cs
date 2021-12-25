@@ -25,217 +25,227 @@ using System.ComponentModel;
 
 #nullable enable
 
-namespace AM.Reflection
+namespace AM.Reflection;
+
+/// <summary>
+/// Information about <see cref="T:System.Enum"/> member.
+/// </summary>
+public sealed class EnumMemberInfo
 {
+    #region Properties
+
     /// <summary>
-    /// Information about <see cref="T:System.Enum"/> member.
+    /// Gets the display name of the enum member.
     /// </summary>
-    public sealed class EnumMemberInfo
+    /// <value>Display name of the enum member.</value>
+    public string DisplayName { get; private set; }
+
+    /// <summary>
+    /// Gets the name.
+    /// </summary>
+    /// <value>The name.</value>
+    public string Name { get; private set; }
+
+    /// <summary>
+    /// Gets the value.
+    /// </summary>
+    /// <value>The value.</value>
+    public int Value { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Initializes a new instance of the
+    /// <see cref="EnumMemberInfo"/> class.
+    /// </summary>
+    /// <param name="name">The name.</param>
+    /// <param name="displayName">Name of the display.</param>
+    /// <param name="value">The value.</param>
+    public EnumMemberInfo
+        (
+            string name,
+            string displayName,
+            int value
+        )
     {
-        #region Properties
+        Name = name;
+        DisplayName = displayName;
+        Value = value;
+    }
 
-        /// <summary>
-        /// Gets the display name of the enum member.
-        /// </summary>
-        /// <value>Display name of the enum member.</value>
-        public string DisplayName { get; private set; }
+    #endregion
 
-        /// <summary>
-        /// Gets the name.
-        /// </summary>
-        /// <value>The name.</value>
-        public string Name { get; private set; }
+    #region Private members
 
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <value>The value.</value>
-        public int Value { get; private set; }
+    private enum SortBy
+    {
+        Name,
+        FriendlyName,
+        Value
+    }
 
-        #endregion
+    private class MemberComparer
+        : IComparer
+    {
+        private readonly SortBy _sortBy;
 
-        #region Construction
+        public MemberComparer (SortBy sortBy)
+        {
+            _sortBy = sortBy;
+        }
 
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="EnumMemberInfo"/> class.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="displayName">Name of the display.</param>
-        /// <param name="value">The value.</param>
-        public EnumMemberInfo
+        /// <inheritdoc cref="IComparer.Compare"/>
+        public int Compare
             (
-                string name,
-                string displayName,
-                int value
+                object? x,
+                object? y
             )
         {
-            Name = name;
-            DisplayName = displayName;
-            Value = value;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private enum SortBy
-        {
-            Name,
-            FriendlyName,
-            Value
-        }
-
-        private class MemberComparer
-            : IComparer
-        {
-            private readonly SortBy _sortBy;
-
-            public MemberComparer(SortBy sortBy)
+            var first = (EnumMemberInfo?)x;
+            var second = (EnumMemberInfo?)y;
+            switch (_sortBy)
             {
-                _sortBy = sortBy;
+                case SortBy.Name:
+                    return string.CompareOrdinal (first?.Name, second?.Name);
+
+                case SortBy.FriendlyName:
+                    return string.CompareOrdinal (first?.DisplayName, second?.DisplayName);
+
+                case SortBy.Value:
+                    return (first?.Value ?? default) - (second?.Value ?? default);
             }
 
-            /// <inheritdoc cref="IComparer.Compare"/>
-            public int Compare
+            return 0;
+        }
+    }
+
+    private static void _SortBy
+        (
+            EnumMemberInfo[] members,
+            SortBy sortBy
+        )
+    {
+        var comparer = new MemberComparer (sortBy);
+        Array.Sort (members, comparer);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Parses the specified enum type.
+    /// </summary>
+    /// <param name="enumType">Type of the enum.</param>
+    public static EnumMemberInfo[] Parse
+        (
+            Type enumType
+        )
+    {
+        Sure.NotNull (enumType);
+
+        var result = new List<EnumMemberInfo>();
+        if (!enumType.IsEnum)
+        {
+            Magna.Error
                 (
-                    object? x,
-                    object? y
-                )
-            {
-                var first = (EnumMemberInfo?)x;
-                var second = (EnumMemberInfo?)y;
-                switch (_sortBy)
-                {
-                    case SortBy.Name:
-                        return string.CompareOrdinal(first?.Name, second?.Name);
+                    nameof (EnumMemberInfo) + "::" + nameof (Parse)
+                    + ": type="
+                    + enumType.FullName
+                    + " is not enum"
+                );
 
-                    case SortBy.FriendlyName:
-                        return string.CompareOrdinal(first?.DisplayName, second?.DisplayName);
-
-                    case SortBy.Value:
-                        return (first?.Value ?? default) - (second?.Value ?? default);
-                }
-
-                return 0;
-            }
+            throw new ArgumentException ("enumType");
         }
 
-        private static void _SortBy
-            (
-                EnumMemberInfo[] members,
-                SortBy sortBy
-            )
+        var underlyingType = Enum.GetUnderlyingType (enumType);
+        switch (underlyingType.Name)
         {
-            var comparer = new MemberComparer(sortBy);
-            Array.Sort(members, comparer);
-        }
+            case "Byte":
+            case "SByte":
+            case "Int16":
+            case "UInt16":
+            case "Int32":
+            case "UInt32":
+                break;
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Parses the specified enum type.
-        /// </summary>
-        /// <param name="enumType">Type of the enum.</param>
-        public static EnumMemberInfo[] Parse
-            (
-                Type enumType
-            )
-        {
-            var result = new List<EnumMemberInfo>();
-            if (!enumType.IsEnum)
-            {
+            default:
                 Magna.Error
                     (
-                        "EnumMemberInfo::Parse: "
-                        + "type="
-                        + enumType.FullName
-                        + " is not enum"
+                        nameof (EnumMemberInfo) + "::" + nameof (Parse)
+                        + ": unexpected underlying type="
+                        + underlyingType.FullName
                     );
 
-                throw new ArgumentException("enumType");
-            }
-
-            var underlyingType = Enum.GetUnderlyingType(enumType);
-            switch (underlyingType.Name)
-            {
-                case "Byte":
-                case "SByte":
-                case "Int16":
-                case "UInt16":
-                case "Int32":
-                case "UInt32":
-                    break;
-
-                default:
-                    Magna.Error
-                        (
-                            "EnumMemberInfo::Parse: "
-                            + "unexpected underlying type="
-                            + underlyingType.FullName
-                        );
-
-                    throw new ArgumentException("enumType");
-            }
-
-            foreach (var name in Enum.GetNames(enumType))
-            {
-                var field = enumType.GetField (name).ThrowIfNull();
-
-                var titleAttribute = ReflectionUtility
-                    .GetCustomAttribute<DisplayNameAttribute>(field);
-
-                var displayName = ReferenceEquals(titleAttribute, null)
-                    ? name
-                    : titleAttribute.DisplayName;
-
-                var value = (int)Enum.Parse(enumType, name, false);
-                var info = new EnumMemberInfo(name, displayName, value);
-                result.Add(info);
-            }
-
-            return result.ToArray();
+                throw new ArgumentException ("enumType");
         }
 
-        /// <summary>
-        /// Sorts the name of the by display.
-        /// </summary>
-        /// <param name="members">The members.</param>
-        public static void SortByDisplayName(EnumMemberInfo[] members)
+        foreach (var name in Enum.GetNames (enumType))
         {
-            _SortBy(members, SortBy.FriendlyName);
+            var field = enumType.GetField (name).ThrowIfNull();
+
+            var titleAttribute = ReflectionUtility
+                .GetCustomAttribute<DisplayNameAttribute> (field);
+
+            var displayName = ReferenceEquals (titleAttribute, null)
+                ? name
+                : titleAttribute.DisplayName;
+
+            var value = (int)Enum.Parse (enumType, name, false);
+            var info = new EnumMemberInfo (name, displayName, value);
+            result.Add (info);
         }
 
-        /// <summary>
-        /// Sorts the name of the by.
-        /// </summary>
-        /// <param name="members">The members.</param>
-        public static void SortByName(EnumMemberInfo[] members)
-        {
-            _SortBy(members, SortBy.Name);
-        }
-
-        /// <summary>
-        /// Sorts the by value.
-        /// </summary>
-        /// <param name="members">The members.</param>
-        public static void SortByValue(EnumMemberInfo[] members)
-        {
-            _SortBy(members, SortBy.Value);
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            return DisplayName;
-        }
-
-        #endregion
+        return result.ToArray();
     }
+
+    /// <summary>
+    /// Sorts the name of the by display.
+    /// </summary>
+    /// <param name="members">The members.</param>
+    public static void SortByDisplayName
+        (
+            EnumMemberInfo[] members
+        )
+    {
+        _SortBy (members, SortBy.FriendlyName);
+    }
+
+    /// <summary>
+    /// Sorts the name of the by.
+    /// </summary>
+    /// <param name="members">The members.</param>
+    public static void SortByName
+        (
+            EnumMemberInfo[] members
+        )
+    {
+        _SortBy (members, SortBy.Name);
+    }
+
+    /// <summary>
+    /// Sorts the by value.
+    /// </summary>
+    /// <param name="members">The members.</param>
+    public static void SortByValue
+        (
+            EnumMemberInfo[] members
+        )
+    {
+        _SortBy (members, SortBy.Value);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        return DisplayName;
+    }
+
+    #endregion
 }

@@ -21,21 +21,20 @@ using System.IO;
 
 #nullable enable
 
-namespace AM.Runtime.Mere
+namespace AM.Runtime.Mere;
+
+/// <summary>
+/// Интерфейс объекта, умеющего самостоятельно сериализовываться.
+/// </summary>
+public interface IMereSerializable
 {
     /// <summary>
-    /// Интерфейс объекта, умеющего самостоятельно сериализовываться.
+    /// Сохранение в поток.
     /// </summary>
-    public interface IMereSerializable
-    {
-        /// <summary>
-        /// Сохранение в поток.
-        /// </summary>
-        void MereSerialize (BinaryWriter writer);
+    void MereSerialize (BinaryWriter writer);
 
-        /// <summary>
-        /// Восстановление из потока.
-        /// </summary>
-        void MereDeserialize (BinaryReader reader);
-    }
+    /// <summary>
+    /// Восстановление из потока.
+    /// </summary>
+    void MereDeserialize (BinaryReader reader);
 }
