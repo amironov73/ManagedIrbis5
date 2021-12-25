@@ -36,17 +36,18 @@ static class Grammar
 {
     public static readonly Parser<char, Unit> BlockComment = CommentParser.SkipBlockComment
         (
-            String ("/*"),
-            String ("*/")
+            Try (String ("/*")),
+            Try (String ("*/"))
         );
 
     public static readonly Parser<char, Unit> LineComment = CommentParser.SkipLineComment
         (
-            String ("//")
+            Try (String ("//"))
         );
 
     public static readonly Parser<char, Unit> Skip = Try (BlockComment)
         .Or (Try (LineComment))
+        .Or (Try (Char (';')).IgnoreResult())
         .Or (Whitespace.IgnoreResult())
         .SkipMany();
 
@@ -151,8 +152,22 @@ static class Grammar
             select (StatementNode) new AssignmentNode (target, expr)
         );
 
+    private static readonly Parser<char, StatementNode> Print = Tok (Map
+        (
+            (name, expressions) =>
+                (StatementNode) new PrintNode (expressions, name == "println"),
+            OneOf (Tok ("println"), Tok ("print")),
+            Expr.Separated (Tok (','))
+        ));
+
+    private static readonly Parser<char, StatementNode> Statement = OneOf
+        (
+            Print,
+            Assignment
+        );
+
     private static readonly Parser<char, ProgramNode> Pgm =
-        Assignment.SeparatedAndOptionallyTerminated (SkipWhitespaces)
+        Statement.SeparatedAndOptionallyTerminated (Skip)
             .Before (End)
             .Select (s => new ProgramNode (s));
 
@@ -172,7 +187,7 @@ static class Grammar
     /// <summary>
     /// Разбор текста программы.
     /// </summary>
-    public static AtomNode? ParseExpression
+    public static AtomNode ParseExpression
         (
             string sourceCode
         )

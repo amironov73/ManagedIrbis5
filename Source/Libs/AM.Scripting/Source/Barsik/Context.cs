@@ -226,17 +226,17 @@ public sealed class Context
 
 
 
-    // /// <summary>
-    // /// Вывод на печать значения AST-узла.
-    // /// </summary>
-    // public void Print
-    //     (
-    //         AtomNode node
-    //     )
-    // {
-    //     var value = node.Compute (this);
-    //     BarsikUtility.PrintObject (Output, value);
-    // }
+    /// <summary>
+    /// Вывод на печать значения AST-узла.
+    /// </summary>
+    public void Print
+        (
+            AtomNode node
+        )
+    {
+        var value = node.Compute (this);
+        BarsikUtility.PrintObject (Output, value);
+    }
 
     /// <summary>
     /// Установка значения переменной
