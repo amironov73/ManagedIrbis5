@@ -101,8 +101,7 @@ namespace AM.Scripting.Barsik
             Input = input ?? Console.In;
             output = new AttentiveWriter (output ?? Console.Out);
             error ??= Console.Error;
-            variables ??= new ();
-            Interpreter = new Interpreter (variables, Input, output, error);
+            Interpreter = new Interpreter (Input, output, error);
         }
 
         /// <summary>
@@ -198,9 +197,9 @@ namespace AM.Scripting.Barsik
                         Interpreter.Context.DumpVariables();
                         break;
 
-                    case "#u":
-                        Interpreter.Context.DumpNamespaces();
-                        break;
+                    // case "#u":
+                    //     Interpreter.Context.DumpNamespaces();
+                    //     break;
 
                     default:
                         ExecuteCore (sourceCode);

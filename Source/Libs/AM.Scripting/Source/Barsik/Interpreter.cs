@@ -3,127 +3,134 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
+// ReSharper disable MemberCanBePrivate.Global
 
-/* Interpreter.cs -- интерпретатор
+/* Interpreter.cs -- интерпретатор Барсика
  * Ars Magna project, http://arsmagna.ru
  */
 
-#region Using directives
+#region Using directive
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Scripting.Barsik
+namespace AM.Scripting.Barsik;
+
+/// <summary>
+/// Интерпретатор Барсика.
+/// </summary>
+public sealed class Interpreter
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Интерпретатор.
+    /// Контекст исполнения программы.
     /// </summary>
-    public sealed class Interpreter
+    public Context Context { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Interpreter
+        (
+            TextReader? input = null,
+            TextWriter? output = null,
+            TextWriter? error = null
+        )
     {
-        #region Properties
+        input ??= Console.In;
+        output ??= Console.Out;
+        error ??= Console.Error;
 
-        /// <summary>
-        /// Контекст исполнения программы.
-        /// </summary>
-        public Context Context { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Interpreter
-            (
-                Dictionary<string, dynamic?>? variables = null,
-                TextReader? input = null,
-                TextWriter? output = null,
-                TextWriter? error = null
-            )
-        {
-            variables ??= new ();
-            input ??= Console.In;
-            output ??= Console.Out;
-            error ??= Console.Error;
-
-            Context = new (variables, input, output, error);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Вычисление значения переменной.
-        /// </summary>
-        public AtomNode? Evaluate
-            (
-                string sourceCode
-            )
-        {
-            Sure.NotNull (sourceCode);
-
-            var node = Grammar.ParseExpression (sourceCode);
-
-            return node ?? null;
-        }
-
-        /// <summary>
-        /// Запуск скрипта на исполнение.
-        /// </summary>
-        public void Execute
-            (
-                string sourceCode
-            )
-        {
-            Sure.NotNull (sourceCode);
-
-            var program = Grammar.ParseProgram (sourceCode);
-
-            foreach (var statement in program.Statements)
-            {
-                if (statement is DefinitionNode node)
-                {
-                    var name = node.theName;
-                    var definition = new FunctionDefinition
-                        (
-                            name,
-                            node.theArguments,
-                            node.theBody
-                        );
-                    var descriptor = new FunctionDescriptor
-                        (
-                            name,
-                            definition.CreateCallPoint()
-                        );
-                    Context.Functions[name] = descriptor;
-                }
-            }
-
-            program.Execute (Context);
-        }
-
-        /// <summary>
-        /// Разбор текста программы.
-        /// </summary>
-        public static ProgramNode Parse
-            (
-                string sourceCode
-            )
-        {
-            return Grammar.ParseProgram (sourceCode);
-        }
-
-        #endregion
+        Context = new (input, output, error);
     }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Вычисление значения переменной.
+    /// </summary>
+    public AtomNode? Evaluate
+        (
+            string sourceCode
+        )
+    {
+        // Sure.NotNull (sourceCode);
+
+        var node = Grammar.ParseExpression (sourceCode);
+
+        return node ?? null;
+    }
+
+    /// <summary>
+    /// Запуск скрипта на исполнение.
+    /// </summary>
+    public void Execute
+        (
+            string sourceCode
+        )
+    {
+        // Sure.NotNull (sourceCode);
+
+        var program = Grammar.ParseProgram (sourceCode);
+
+        // foreach (var statement in program.Statements)
+        // {
+        //     if (statement is DefinitionNode node)
+        //     {
+        //         var name = node.theName;
+        //         var definition = new FunctionDefinition
+        //             (
+        //                 name,
+        //                 node.theArguments,
+        //                 node.theBody
+        //             );
+        //         var descriptor = new FunctionDescriptor
+        //             (
+        //                 name,
+        //                 definition.CreateCallPoint()
+        //             );
+        //         Context.Functions[name] = descriptor;
+        //     }
+        // }
+
+        program.Execute (Context);
+    }
+
+    // /// <summary>
+    // /// Разбор текста программы.
+    // /// </summary>
+    // public static ProgramNode Parse
+    //     (
+    //         string sourceCode
+    //     )
+    // {
+    //     return Grammar.ParseProgram (sourceCode);
+    // }
+    //
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        // no code here
+    }
+
+    #endregion
 }
