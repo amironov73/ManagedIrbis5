@@ -31,76 +31,71 @@ using ManagedIrbis.Pft;
 
 #endregion
 
-namespace Text2Pft
+namespace Text2Pft;
+
+class Program
 {
-    class Program
+    static void Run
+        (
+            ParseResult parseResult
+        )
     {
-        static void Run
-            (
-                ParseResult parseResult
-            )
+        try
         {
+            var inputName = parseResult.ValueForArgument<string> ("text-file")
+                .ThrowIfNullOrEmpty();
+            var outputName = parseResult.ValueForArgument<string> ("pft-file")
+                .ThrowIfNullOrEmpty();
+            var encoding = IrbisEncoding.Ansi;
+
+            using var input = new StreamReader (inputName, encoding);
+            using var output = new StreamWriter (outputName, false, encoding);
+
             try
             {
-                var inputName = parseResult.ValueForArgument<string> ("text-file")
-                    .ThrowIfNullOrEmpty ();
-                var outputName = parseResult.ValueForArgument<string> ("pft-file")
-                    .ThrowIfNullOrEmpty();
-                var encoding = IrbisEncoding.Ansi;
-
-                using var input = new StreamReader (inputName, encoding);
-                using var output = new StreamWriter (outputName, false, encoding);
-
-                try
-                {
-                    PftUtility.TextToPft (input, output);
-                }
-                catch (Exception exception)
-                {
-                    Console.Error.WriteLine (exception.Message);
-                    Environment.ExitCode = 1;
-                }
+                PftUtility.TextToPft (input, output);
             }
             catch (Exception exception)
             {
-                Console.WriteLine (exception);
+                Console.Error.WriteLine (exception.Message);
+                Environment.ExitCode = 1;
             }
-
-        } // method Run
-
-        /// <summary>
-        /// Точка входа в программу.
-        /// </summary>
-        public static void Main
-            (
-                string[] args
-            )
+        }
+        catch (Exception exception)
         {
-            var inputArgument = new Argument<string> ("text-file")
-            {
-                Arity = ArgumentArity.ExactlyOne,
-                Description = "имя текстового файла, например, ticket.html"
-            };
-            var outputArgument = new Argument<string> ("pft-file")
-            {
-                Arity = ArgumentArity.ExactlyOne,
-                Description = "имя PFT-файла (будет перезаписан!), например, ticket.pft"
-            };
-            var rootCommand = new RootCommand ("Mnu2Tre")
-            {
-                inputArgument,
-                outputArgument
-            };
-            rootCommand.Description = "Создание PFT по текстовому файлу";
-            rootCommand.Handler = CommandHandler.Create<ParseResult> (Run);
+            Console.WriteLine (exception);
+        }
+    }
 
-            new CommandLineBuilder (rootCommand)
-                .UseDefaults()
-                .Build()
-                .Invoke (args);
+    /// <summary>
+    /// Точка входа в программу.
+    /// </summary>
+    public static void Main
+        (
+            string[] args
+        )
+    {
+        var inputArgument = new Argument<string> ("text-file")
+        {
+            Arity = ArgumentArity.ExactlyOne,
+            Description = "имя текстового файла, например, ticket.html"
+        };
+        var outputArgument = new Argument<string> ("pft-file")
+        {
+            Arity = ArgumentArity.ExactlyOne,
+            Description = "имя PFT-файла (будет перезаписан!), например, ticket.pft"
+        };
+        var rootCommand = new RootCommand ("Mnu2Tre")
+        {
+            inputArgument,
+            outputArgument
+        };
+        rootCommand.Description = "Создание PFT по текстовому файлу";
+        rootCommand.Handler = CommandHandler.Create<ParseResult> (Run);
 
-        } // method Main
-
-    } // class Program
-
-} // namespace Text2Pft
+        new CommandLineBuilder (rootCommand)
+            .UseDefaults()
+            .Build()
+            .Invoke (args);
+    }
+}

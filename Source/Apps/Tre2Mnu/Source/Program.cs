@@ -27,55 +27,51 @@ using ManagedIrbis.Trees;
 
 #nullable enable
 
-namespace Tre2Mnu
+namespace Tre2Mnu;
+
+class Program
 {
-    class Program
+    static void ProcessMenu
+        (
+            string input,
+            string output
+        )
     {
-        static void ProcessMenu
+        var reader = new StreamReader (File.OpenRead (input), IrbisEncoding.Ansi);
+        var tree = TreeFile.ParseStream (reader);
+        var menu = tree.ToMenu();
+        File.WriteAllText
             (
-                string input,
-                string output
-            )
-        {
-            var reader = new StreamReader(File.OpenRead(input), IrbisEncoding.Ansi);
-            var tree = TreeFile.ParseStream(reader);
-            var menu = tree.ToMenu();
-            File.WriteAllText
-                (
-                    output,
-                    menu.ToText(),
-                    IrbisEncoding.Ansi
-                );
-        }
+                output,
+                menu.ToText(),
+                IrbisEncoding.Ansi
+            );
+    }
 
-        static int Main(string[] args)
+    static int Main (string[] args)
+    {
+        var rootCommand = new RootCommand ("Tre2Mnu")
         {
-            var rootCommand = new RootCommand("Tre2Mnu")
+            new Argument<string> ("input")
             {
-                new Argument<string>("input")
-                {
-                    Arity = ArgumentArity.ExactlyOne,
-                    Description = "Входной файл"
-                },
+                Arity = ArgumentArity.ExactlyOne,
+                Description = "Входной файл"
+            },
 
-                new Argument<string>("output")
-                {
-                    Arity = ArgumentArity.ExactlyOne,
-                    Description = "Результирующий файл"
-                }
-            };
-            rootCommand.Description = "Создание MNU-файла по TRE-файлу";
-            rootCommand.Handler = CommandHandler.Create<string, string>(ProcessMenu);
+            new Argument<string> ("output")
+            {
+                Arity = ArgumentArity.ExactlyOne,
+                Description = "Результирующий файл"
+            }
+        };
+        rootCommand.Description = "Создание MNU-файла по TRE-файлу";
+        rootCommand.Handler = CommandHandler.Create<string, string> (ProcessMenu);
 
-            new CommandLineBuilder(rootCommand)
-                .UseDefaults()
-                .Build()
-                .Invoke(args);
+        new CommandLineBuilder (rootCommand)
+            .UseDefaults()
+            .Build()
+            .Invoke (args);
 
-            return 0;
-
-        } // method Main
-
-    } // class Program
-
-} // namespace Tre2Mnu
+        return 0;
+    }
+}

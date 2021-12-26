@@ -24,34 +24,30 @@ using AM;
 
 #nullable enable
 
-namespace Uslugi5
+namespace Uslugi5;
+
+static class Program
 {
-    static class Program
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    static void Main
+        (
+            string[] args
+        )
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main
-            (
-                string[] args
-            )
+        try
         {
-            try
-            {
-                Magna.Initialize (args);
+            Magna.Initialize (args);
 
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault (false);
-                Application.Run (new MainForm());
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.ToString());
-            }
-
-        } // method Main
-
-    } // class Program
-
-} // namespace Uslugi5
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault (false);
+            Application.Run (new MainForm());
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show (exception.ToString());
+        }
+    }
+}

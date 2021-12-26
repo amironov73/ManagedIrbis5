@@ -33,129 +33,125 @@ using static System.Console;
 
 #nullable enable
 
-namespace RqstShrink
+namespace RqstShrink;
+
+internal class Program
 {
-    internal class Program
+    private static int Main (string[] args)
     {
-        private static int Main (string[] args)
+        try
         {
-            try
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            // Включаем конфигурирование в appsettings.json
+            var config = new ConfigurationBuilder()
+                .SetBasePath (AppContext.BaseDirectory)
+                .AddJsonFile ("appsettings.json", true)
+                .Build();
+
+            var connectionString = config.GetValue<string> ("ConnectionString");
+            if (string.IsNullOrEmpty (connectionString))
             {
-                var stopwatch = new Stopwatch();
-                stopwatch.Start();
-
-                // Включаем конфигурирование в appsettings.json
-                var config = new ConfigurationBuilder()
-                    .SetBasePath (AppContext.BaseDirectory)
-                    .AddJsonFile ("appsettings.json", true)
-                    .Build();
-
-                var connectionString = config.GetValue<string> ("ConnectionString");
-                if (string.IsNullOrEmpty (connectionString))
-                {
-                    Error.WriteLine ("Connection string not specified");
-
-                    return 1;
-                }
-
-                var rootCommand = new RootCommand ("RqstShrink");
-                var csArgument = new Argument ("cs")
-                {
-                    ArgumentType = typeof (string),
-                    Arity = ArgumentArity.ZeroOrOne,
-                    Description = "Connection string"
-                };
-                var exprOption = new Option ("-e", "Search expression", typeof (string));
-                rootCommand.AddArgument (csArgument);
-                rootCommand.AddOption (exprOption);
-                var builder = new CommandLineBuilder (rootCommand).Build();
-                var parseResult = builder.Parse (args);
-                var csValue = parseResult.ValueForArgument<string> (csArgument);
-                if (!string.IsNullOrEmpty (csValue))
-                {
-                    connectionString = csValue;
-                }
-
-                using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
-                {
-                    connection.ParseConnectionString (connectionString);
-                    if (!connection.Connect())
-                    {
-                        Error.WriteLine ("Can't connect");
-                        Error.WriteLine (IrbisException.GetErrorDescription (connection.LastError));
-
-                        return 1;
-                    }
-
-                    var maxMfn = connection.GetMaxMfn();
-
-                    var expression = config.GetValue<string> ("Expression");
-                    var expressionValue = parseResult.ValueForOption<string> (exprOption);
-                    if (!string.IsNullOrEmpty (expressionValue))
-                    {
-                        expression = expressionValue;
-                    }
-
-                    expression = expression.ThrowIfNull();
-
-                    Write ("Reading good records ");
-
-                    var goodRecords = BatchRecordReader.Search
-                            (
-                                connection,
-                                connection.Database!,
-                                expression,
-                                1000,
-                                batch => Write (".")
-                            )
-                        .ToArray();
-
-                    WriteLine();
-                    WriteLine ($"Good records loaded: {goodRecords.Length}");
-
-                    if (goodRecords.Length == maxMfn)
-                    {
-                        WriteLine ("No truncation needed, exiting");
-
-                        return 0;
-                    }
-
-                    connection.TruncateDatabase (connection.Database);
-
-                    WriteLine ("Database truncated");
-
-                    using (var writer = new BatchRecordWriter
-                        (
-                            connection,
-                            connection.Database!,
-                            500
-                        ))
-                    {
-                        foreach (var record in goodRecords)
-                        {
-                            record.Version = 0;
-                            record.Mfn = 0;
-                            writer.Append (record);
-                        }
-                    }
-                }
-
-                WriteLine ("Good records restored");
-
-                stopwatch.Stop();
-                WriteLine ($"Elapsed: {stopwatch.Elapsed.ToAutoString()}");
-            }
-            catch (Exception ex)
-            {
-                Error.WriteLine (ex);
+                Error.WriteLine ("Connection string not specified");
 
                 return 1;
             }
 
-            return 0;
+            var rootCommand = new RootCommand ("RqstShrink");
+            var csArgument = new Argument ("cs")
+            {
+                ArgumentType = typeof (string),
+                Arity = ArgumentArity.ZeroOrOne,
+                Description = "Connection string"
+            };
+            var exprOption = new Option ("-e", "Search expression", typeof (string));
+            rootCommand.AddArgument (csArgument);
+            rootCommand.AddOption (exprOption);
+            var builder = new CommandLineBuilder (rootCommand).Build();
+            var parseResult = builder.Parse (args);
+            var csValue = parseResult.ValueForArgument<string> (csArgument);
+            if (!string.IsNullOrEmpty (csValue))
+            {
+                connectionString = csValue;
+            }
 
-        } // method Main
+            using (var connection = ConnectionFactory.Shared.CreateSyncConnection())
+            {
+                connection.ParseConnectionString (connectionString);
+                if (!connection.Connect())
+                {
+                    Error.WriteLine ("Can't connect");
+                    Error.WriteLine (IrbisException.GetErrorDescription (connection.LastError));
 
-    } // class Program
+                    return 1;
+                }
 
-} // namespace RqstShrink
+                var maxMfn = connection.GetMaxMfn();
+
+                var expression = config.GetValue<string> ("Expression");
+                var expressionValue = parseResult.ValueForOption<string> (exprOption);
+                if (!string.IsNullOrEmpty (expressionValue))
+                {
+                    expression = expressionValue;
+                }
+
+                expression = expression.ThrowIfNull();
+
+                Write ("Reading good records ");
+
+                var goodRecords = BatchRecordReader.Search
+                        (
+                            connection,
+                            connection.Database!,
+                            expression,
+                            1000,
+                            batch => Write (".")
+                        )
+                    .ToArray();
+
+                WriteLine();
+                WriteLine ($"Good records loaded: {goodRecords.Length}");
+
+                if (goodRecords.Length == maxMfn)
+                {
+                    WriteLine ("No truncation needed, exiting");
+
+                    return 0;
+                }
+
+                connection.TruncateDatabase (connection.Database);
+
+                WriteLine ("Database truncated");
+
+                using (var writer = new BatchRecordWriter
+                           (
+                               connection,
+                               connection.Database!,
+                               500
+                           ))
+                {
+                    foreach (var record in goodRecords)
+                    {
+                        record.Version = 0;
+                        record.Mfn = 0;
+                        writer.Append (record);
+                    }
+                }
+            }
+
+            WriteLine ("Good records restored");
+
+            stopwatch.Stop();
+            WriteLine ($"Elapsed: {stopwatch.Elapsed.ToAutoString()}");
+        }
+        catch (Exception ex)
+        {
+            Error.WriteLine (ex);
+
+            return 1;
+        }
+
+        return 0;
+    }
+}

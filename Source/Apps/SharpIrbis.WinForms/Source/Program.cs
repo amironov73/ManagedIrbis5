@@ -28,101 +28,100 @@ using ManagedIrbis.Scripting;
 
 #nullable enable
 
-namespace SharpIrbis.WinForms
+namespace SharpIrbis.WinForms;
+
+static class Program
 {
-    static class Program
+    /// <summary>
+    ///  The main entry point for the application.
+    /// </summary>
+    [STAThread]
+    static int Main (string[] args)
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static int Main(string[] args)
+        Application.SetHighDpiMode (HighDpiMode.SystemAware);
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault (false);
+
+        Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+
+        var separated = ScriptCompiler.SeparateArguments (args);
+        var compilerArguments = separated[0];
+        var scriptArguments = separated[1];
+
+        var compiler = new ScriptCompiler();
+        var options = compiler.ParseArguments (compilerArguments);
+
+        // добавляем специфичные для WinForms сборки
+        compiler.AddReference (typeof (System.Drawing.Font));
+        compiler.AddReference (typeof (System.ComponentModel.Component));
+        compiler.AddReference (typeof (Form));
+        compiler.AddReference (typeof (ManagedIrbis.WinForms.BusyForm));
+
+        if (options.ExecuteOnly)
         {
-            Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-
-            var separated = ScriptCompiler.SeparateArguments(args);
-            var compilerArguments = separated[0];
-            var scriptArguments = separated[1];
-
-            var compiler = new ScriptCompiler();
-            var options = compiler.ParseArguments(compilerArguments);
-
-            // добавляем специфичные для WinForms сборки
-            compiler.AddReference(typeof(System.Drawing.Font));
-            compiler.AddReference(typeof(System.ComponentModel.Component));
-            compiler.AddReference(typeof(Form));
-            compiler.AddReference(typeof(ManagedIrbis.WinForms.BusyForm));
-
-            if (options.ExecuteOnly)
-            {
-                var fileName = Path.GetFullPath(options.OutputName);
-                var assembly = Assembly.LoadFile(fileName);
-                compiler.RunAssembly(assembly, scriptArguments);
-
-                return 0;
-            }
-
-            if (options.InputFiles.IsNullOrEmpty())
-            {
-                MessageBox.Show
-                    (
-                        "No input files specified",
-                        "Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
-
-                return 1;
-            }
-
-            try
-            {
-                var compilation = compiler.Compile(options);
-                if (options.CompileOnly)
-                {
-                    compiler.EmitAssemblyToFile(compilation, options.OutputName);
-                }
-                else
-                {
-                    var errors = new StringWriter();
-                    compiler.ErrorWriter = errors;
-                    var assembly = compiler.EmitAssemblyToMemory(compilation);
-                    if (assembly is null)
-                    {
-                        MessageBox.Show
-                            (
-                                errors.ToString(),
-                                "SharpIrbis",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error
-                            );
-
-                        return 1;
-                    }
-                    else
-                    {
-                        compiler.RunAssembly(assembly, scriptArguments);
-                    }
-                }
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show
-                    (
-                        exception.ToString(),
-                        "ScriptIrbis",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
-
-                return 1;
-            }
+            var fileName = Path.GetFullPath (options.OutputName);
+            var assembly = Assembly.LoadFile (fileName);
+            compiler.RunAssembly (assembly, scriptArguments);
 
             return 0;
         }
+
+        if (options.InputFiles.IsNullOrEmpty())
+        {
+            MessageBox.Show
+                (
+                    "No input files specified",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+
+            return 1;
+        }
+
+        try
+        {
+            var compilation = compiler.Compile (options);
+            if (options.CompileOnly)
+            {
+                compiler.EmitAssemblyToFile (compilation, options.OutputName);
+            }
+            else
+            {
+                var errors = new StringWriter();
+                compiler.ErrorWriter = errors;
+                var assembly = compiler.EmitAssemblyToMemory (compilation);
+                if (assembly is null)
+                {
+                    MessageBox.Show
+                        (
+                            errors.ToString(),
+                            "SharpIrbis",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+
+                    return 1;
+                }
+                else
+                {
+                    compiler.RunAssembly (assembly, scriptArguments);
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show
+                (
+                    exception.ToString(),
+                    "ScriptIrbis",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+
+            return 1;
+        }
+
+        return 0;
     }
 }

@@ -25,43 +25,42 @@ using RestfulIrbis.Viaf;
 
 #nullable enable
 
-namespace ViafSuggester
+namespace ViafSuggester;
+
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    public MainWindow()
     {
-        public MainWindow()
+        InitializeComponent();
+    }
+
+    private void GoButton_OnClick (object sender, RoutedEventArgs e)
+    {
+        resultBox.Clear();
+        var name = termBox.Text.Trim();
+        if (string.IsNullOrEmpty (name))
         {
-            InitializeComponent();
+            return;
         }
 
-        private void GoButton_OnClick(object sender, RoutedEventArgs e)
+        try
         {
-            resultBox.Clear();
-            var name = termBox.Text.Trim();
-            if (string.IsNullOrEmpty(name))
-            {
-                return;
-            }
-
-            try
-            {
-                var client = new ViafClient();
-                var suggestions = client.GetSuggestions(name);
-                var text = string.Join
-                    (
-                        Environment.NewLine,
-                        suggestions.Select(s => s.DisplayForm)
-                            .OrderBy(s => s)
-                    );
-                resultBox.Text = text;
-            }
-            catch (Exception exception)
-            {
-                resultBox.Text = exception.ToString();
-            }
+            var client = new ViafClient();
+            var suggestions = client.GetSuggestions (name);
+            var text = string.Join
+                (
+                    Environment.NewLine,
+                    suggestions.Select (s => s.DisplayForm)
+                        .OrderBy (s => s)
+                );
+            resultBox.Text = text;
+        }
+        catch (Exception exception)
+        {
+            resultBox.Text = exception.ToString();
         }
     }
 }

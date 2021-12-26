@@ -24,28 +24,30 @@ using AM.Text.Output;
 
 #nullable enable
 
-namespace Sigler
+namespace Sigler;
+
+class Program
 {
-    class Program
+    static void Main
+        (
+            string[] args
+        )
     {
-        static void Main(string[] args)
+        if (args.Length != 2)
         {
-            if (args.Length != 2)
-            {
-                Console.WriteLine("SIGLER <sigla.txt> <connectionString>");
-                return;
-            }
-
-            string fileName = args[0];
-            string connectionString = args[1];
-
-            var output = AbstractOutput.Console;
-            using var stamper = new SiglaStamper
-                (
-                    connectionString,
-                    output
-                );
-            stamper.ProcessFile(fileName);
+            Console.WriteLine("SIGLER <sigla.txt> <connectionString>");
+            return;
         }
+
+        string fileName = args[0];
+        string connectionString = args[1];
+
+        var output = AbstractOutput.Console;
+        using var stamper = new SiglaStamper
+            (
+                connectionString,
+                output
+            );
+        stamper.ProcessFile(fileName);
     }
 }

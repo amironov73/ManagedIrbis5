@@ -6,6 +6,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 
 /* BotCommand.cs -- абстрактная команда
@@ -25,65 +26,65 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 #endregion
 
-namespace TeleIrbis.Commands
+namespace TeleIrbis.Commands;
+
+/// <summary>
+/// Абстрактная команда.
+/// </summary>
+public abstract class BotCommand
 {
+    public abstract string Name { get; }
+
+    public virtual string[] Aliases => Array.Empty<string>();
+
+    public abstract void Execute (Message message, TelegramBotClient client);
+
     /// <summary>
-    /// Абстрактная команда.
+    /// Экранная клавиатура с командами.
     /// </summary>
-    public abstract class BotCommand
+    public virtual ReplyKeyboardMarkup GetKeyboard()
     {
-        public abstract string Name { get; }
-
-        public virtual string[] Aliases => Array.Empty<string>();
-
-        public abstract void Execute(Message message, TelegramBotClient client);
-
-        /// <summary>
-        /// Экранная клавиатура с командами.
-        /// </summary>
-        public virtual ReplyKeyboardMarkup GetKeyboard()
+        var buttons = new List<List<KeyboardButton>>()
         {
-            List<List<KeyboardButton>> buttons = new List<List<KeyboardButton>>()
+            new()
             {
-                new List<KeyboardButton>
-                {
-                    new KeyboardButton() { Text = "Анонсы" },
-                    new KeyboardButton() { Text = "Контакты" }
-                },
-                new List<KeyboardButton>
-                {
-                    new KeyboardButton() { Text = "Режим работы" },
-                    new KeyboardButton() { Text = "Помощь" }
-                }
+                new KeyboardButton() { Text = "Анонсы" },
+                new KeyboardButton() { Text = "Контакты" }
+            },
+            new()
+            {
+                new KeyboardButton() { Text = "Режим работы" },
+                new KeyboardButton() { Text = "Помощь" }
+            }
+        };
+        ReplyKeyboardMarkup result
+            = new ReplyKeyboardMarkup (buttons, true);
 
-            };
-            ReplyKeyboardMarkup result
-                = new ReplyKeyboardMarkup(buttons, true);
+        return result;
+    }
 
-            return result;
-        }
-
-        public virtual void SendMessage
+    public virtual void SendMessage
         (
             TelegramBotClient client,
             ChatId chatId,
             string text
         )
-        {
-            client.SendTextMessageAsync
+    {
+        client.SendTextMessageAsync
                 (
                     chatId,
                     text,
                     ParseMode.Html,
                     replyMarkup: GetKeyboard()
                 )
-                .Wait();
-        }
+            .Wait();
+    }
 
-        public virtual bool Contains(string command)
-        {
-            return command.StartsWith("/" + Name)
-                   || Aliases.Contains(command);
-        }
+    public virtual bool Contains
+        (
+            string command
+        )
+    {
+        return command.StartsWith ("/" + Name) || Aliases.Contains (command);
     }
 }

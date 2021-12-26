@@ -5,6 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedMember.Global
 // ReSharper disable UseNameofExpression
@@ -16,7 +17,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -29,372 +29,362 @@ using LinqToDB.Data;
 using Istu.OldModel;
 using Istu.UI;
 
-using CM=System.Configuration.ConfigurationManager;
+using CM = System.Configuration.ConfigurationManager;
 
 #endregion
 
 #nullable enable
 
-namespace Uslugi5
+namespace Uslugi5;
+
+/// <summary>
+/// Главная форма приложения.
+/// </summary>
+public partial class MainForm
+    : Form
 {
-    /// <summary>
-    /// Главная форма приложения.
-    /// </summary>
-    public partial class MainForm
-        : Form
+    private readonly DataConnection db;
+    private Reader? reader;
+    private readonly Usluga[] uslugi;
+
+    public MainForm()
     {
-        private readonly DataConnection db;
-        private Reader? reader;
-        private readonly Usluga[] uslugi;
+        InitializeComponent();
 
-        public MainForm()
-        {
-            InitializeComponent();
+        db = IstuUtility.GetMsSqlConnection ("kladovka");
 
-            db = IstuUtility.GetMsSqlConnection("kladovka");
-            // TODO добавить Unit
-            uslugi = UslugaDescription.ReadFile("uslugi.txt")
-                .Select(description => new Usluga()
-                {
-                    Title = description.Title,
-                    Price = description.Price
-                })
-                .ToArray();
-            _bindingSource.DataSource = uslugi;
-            _bindingSource.MoveFirst();
-
-            var addEnable = CM.AppSettings["add"];
-            if (addEnable != "1")
+        // TODO добавить Unit
+        uslugi = UslugaDescription.ReadFile ("uslugi.txt")
+            .Select (description => new Usluga()
             {
-                _addButton.Enabled = false;
-                _reportButton.Enabled = false;
-            }
-        } // constructor
+                Title = description.Title,
+                Price = description.Price
+            })
+            .ToArray();
+        _bindingSource.DataSource = uslugi;
+        _bindingSource.MoveFirst();
 
-        private void _readButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
+        var addEnable = CM.AppSettings["add"];
+        if (addEnable != "1")
         {
-            string rfid = _rfidBox.Text.Trim();
-            if (string.IsNullOrEmpty(rfid))
-            {
-                MessageBox.Show("Не задан RFID!");
-                return;
-            }
+            _addButton.Enabled = false;
+            _reportButton.Enabled = false;
+        }
+    }
 
-            string name = rfid + "%";
+    private void _readButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        string rfid = _rfidBox.Text.Trim();
+        if (string.IsNullOrEmpty (rfid))
+        {
+            MessageBox.Show ("Не задан RFID!");
+            return;
+        }
 
-            var candidates = db.Query<Reader>
+        string name = rfid + "%";
+
+        var candidates = db.Query<Reader>
                 (
                     "select * from [readers] where [name] like @name order by [name]",
-                    new DataParameter("@name", name)
+                    new DataParameter ("@name", name)
                 )
-                .ToArray();
+            .ToArray();
 
-            if (candidates.Length == 1)
-            {
-                reader = candidates[0];
-            }
-            else if (candidates.Length > 1)
-            {
-                reader = ChooseReaderForm.ChooseReader(this, candidates);
-            }
-            else
-            {
-                reader = db.Query<Reader>
+        if (candidates.Length == 1)
+        {
+            reader = candidates[0];
+        }
+        else if (candidates.Length > 1)
+        {
+            reader = ChooseReaderForm.ChooseReader (this, candidates);
+        }
+        else
+        {
+            reader = db.Query<Reader>
                     (
                         "select * from [readers] where [rfid]=@rfid "
                         + "or [barcode]=@rfid or [ticket]=@rfid",
-                        new DataParameter("@rfid", rfid)
+                        new DataParameter ("@rfid", rfid)
                     )
-                    .FirstOrDefault();
-            }
+                .FirstOrDefault();
+        }
 
-            if (reader == null)
-            {
-                MessageBox.Show("Нет читателя с таким RFID");
-                return;
-            }
-
-            _infoBox.Text = reader.ToString();
-
-        } // method ReadButton_Click
-
-        private void _payUsluga
-            (
-                Usluga usluga
-            )
+        if (reader == null)
         {
-            if (reader is null)
+            MessageBox.Show ("Нет читателя с таким RFID");
+            return;
+        }
+
+        _infoBox.Text = reader.ToString();
+    }
+
+    private void _payUsluga
+        (
+            Usluga usluga
+        )
+    {
+        if (reader is null)
+        {
+            MessageBox.Show ("Не задан читатель!");
+            return;
+        }
+
+        var summa = usluga.Summa;
+        db.BeginTransaction();
+        var count = db.Execute
+            (
+                @"update [readers] set [debet]=[debet] - @sum where [ticket]=@ticket",
+                new DataParameter ("@sum", summa),
+                new DataParameter ("@ticket", reader.Ticket)
+            );
+
+        if (count != 1)
+        {
+            MessageBox.Show ("Что-то пошло не так!");
+            db.RollbackTransaction();
+            throw new Exception();
+        }
+
+        usluga.Moment = DateTime.Now;
+        usluga.Ticket = reader.Ticket;
+        usluga.Summa = -usluga.Summa;
+        db.Insert (usluga);
+        db.CommitTransaction();
+    }
+
+    private void _clearTable()
+    {
+        foreach (var usluga in uslugi)
+        {
+            usluga.Amount = 0;
+        }
+
+        _bindingSource.ResetBindings (false);
+    }
+
+    private void PrepareUsluga
+        (
+            Reader theReader,
+            Usluga usluga
+        )
+    {
+        if (usluga.Title == "Подписал обходной")
+        {
+            usluga.Amount = 1;
+            usluga.Price = theReader.Debet;
+            usluga.Summa = usluga.Price;
+        }
+        else
+        {
+            usluga.Summa = usluga.Amount * usluga.Price;
+        }
+    }
+
+    private void _payButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        if (reader == null)
+        {
+            MessageBox.Show ("Не задан читатель!");
+            return;
+        }
+
+        var selected = uslugi.Where (u => u.Amount != 0).ToArray();
+        if (selected.Length == 0)
+        {
+            MessageBox.Show ("Не выбраны услуги!");
+            return;
+        }
+
+        foreach (var usluga in selected)
+        {
+            PrepareUsluga (reader, usluga);
+        }
+
+        var sum = selected.Sum (u => u.Summa);
+        if (sum > reader.Debet)
+        {
+            MessageBox.Show ("Сумма превышает баланс читателя");
+            return;
+        }
+
+        try
+        {
+            db.BeginTransaction();
+            foreach (var usluga in selected)
             {
-                MessageBox.Show("Не задан читатель!");
-                return;
+                _payUsluga (usluga);
             }
 
-            var summa = usluga.Summa;
-            db.BeginTransaction();
+            db.CommitTransaction();
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show (exception.ToString());
+            db.RollbackTransaction();
+            _clearTable();
+            return;
+        }
+
+        _clearTable();
+
+        reader = null;
+        _rfidBox.Clear();
+        _infoBox.Clear();
+        _rfidBox.Focus();
+
+        MessageBox.Show ("Оплата прошла успешно");
+    }
+
+    private void MainForm_FormClosed
+        (
+            object sender,
+            FormClosedEventArgs e
+        )
+    {
+        db.Dispose();
+    }
+
+    private void _addButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        var addEnable = CM.AppSettings["add"];
+        if (addEnable != "1")
+        {
+            _addButton.Enabled = false;
+        }
+
+        if (!decimal.TryParse (_moneyBox.Text, out var amount))
+        {
+            MessageBox.Show ("Неверно задана сумма!");
+            return;
+        }
+
+        _moneyBox.Clear();
+
+        if (amount <= 0)
+        {
+            MessageBox.Show ("Неверно задана сумма!");
+            return;
+        }
+
+        if (reader == null)
+        {
+            MessageBox.Show ("Не задан читатель!");
+            return;
+        }
+
+        db.BeginTransaction();
+        try
+        {
             var count = db.Execute
                 (
-                    @"update [readers] set [debet]=[debet] - @sum where [ticket]=@ticket",
-                    new DataParameter ("@sum", summa),
+                    @"update [readers]
+                        set [debet]=isnull([debet],0) + @amount
+                        where [ticket]=@ticket",
+                    new DataParameter ("@amount", amount),
                     new DataParameter ("@ticket", reader.Ticket)
                 );
 
-            if (count != 1)
+            if (count == 1)
             {
-                MessageBox.Show("Что-то пошло не так!");
-                db.RollbackTransaction();
-                throw new Exception();
-            }
-
-            usluga.Moment = DateTime.Now;
-            usluga.Ticket = reader.Ticket;
-            usluga.Summa = -usluga.Summa;
-            db.Insert (usluga);
-            db.CommitTransaction();
-
-        } // method _payUsluga
-
-        private void _clearTable()
-        {
-            foreach (var usluga in uslugi)
-            {
-                usluga.Amount = 0;
-            }
-
-            _bindingSource.ResetBindings (false);
-
-        } // method _clearTable
-
-        private void PrepareUsluga
-            (
-                Reader theReader,
-                Usluga usluga
-            )
-        {
-            if (usluga.Title == "Подписал обходной")
-            {
-                usluga.Amount = 1;
-                usluga.Price = theReader.Debet;
-                usluga.Summa = usluga.Price;
+                var usluga = new Usluga()
+                {
+                    Moment = DateTime.Now,
+                    Ticket = reader.Ticket,
+                    Title = "Пополнение",
+                    Price = amount,
+                    Amount = 1,
+                    Summa = amount,
+                    Operator = Environment.MachineName
+                };
+                db.Insert (usluga);
+                db.CommitTransaction();
+                MessageBox.Show ("Баланс успешно пополнен!");
             }
             else
             {
-                usluga.Summa = usluga.Amount * usluga.Price;
+                MessageBox.Show ("Что-то пошло не так!");
             }
-        } // method PrepareUsluga
-
-
-        private void _payButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
+        }
+        catch
         {
-            if (reader == null)
-            {
-                MessageBox.Show("Не задан читатель!");
-                return;
-            }
+            db.RollbackTransaction();
+        }
 
-            var selected = uslugi.Where(u => u.Amount != 0).ToArray();
-            if (selected.Length == 0)
-            {
-                MessageBox.Show("Не выбраны услуги!");
-                return;
-            }
+        _rfidBox.Text = reader.Ticket;
+        _readButton_Click (this, e);
+    }
 
-            foreach (var usluga in selected)
-            {
-                PrepareUsluga(reader, usluga);
-            }
-
-            var sum = selected.Sum(u => u.Summa);
-            if (sum > reader.Debet)
-            {
-                MessageBox.Show("Сумма превышает баланс читателя");
-                return;
-            }
-
-            try
-            {
-                db.BeginTransaction();
-                foreach (var usluga in selected)
-                {
-                    _payUsluga(usluga);
-                }
-                db.CommitTransaction();
-
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.ToString());
-                db.RollbackTransaction();
-                _clearTable();
-                return;
-            }
-
-            _clearTable();
-
-            reader = null;
-            _rfidBox.Clear();
-            _infoBox.Clear();
-            _rfidBox.Focus();
-
-            MessageBox.Show("Оплата прошла успешно");
-
-        } // method _payButton_Click
-
-        private void MainForm_FormClosed
-            (
-                object sender,
-                FormClosedEventArgs e
-            )
+    private void _balanceButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        if (reader == null)
         {
-            db.Dispose();
+            MessageBox.Show ("Не задан читатель!");
+            return;
+        }
 
-        } // method MainForm_FormClosed
-
-        private void _addButton_Click
+        var table = db.GetTable<Usluga>();
+        var list = table.Where (u => u.Ticket == reader.Ticket)
+            .OrderBy (u => u.Moment)
+            .ToArray();
+        var debet = db.Execute<decimal>
             (
-                object sender,
-                EventArgs e
-            )
+                "select [debet] from [readers] where [ticket]=@ticket",
+                new DataParameter ("@ticket", reader.Ticket)
+            );
+
+        var builder = new StringBuilder();
+        foreach (var u in list)
         {
-            var addEnable = CM.AppSettings["add"];
-            if (addEnable != "1")
-            {
-                _addButton.Enabled = false;
-            }
-
-            if (!decimal.TryParse(_moneyBox.Text, out var amount))
-            {
-                MessageBox.Show("Неверно задана сумма!");
-                return;
-            }
-
-            _moneyBox.Clear();
-
-            if (amount <= 0)
-            {
-                MessageBox.Show("Неверно задана сумма!");
-                return;
-            }
-
-            if (reader == null)
-            {
-                MessageBox.Show("Не задан читатель!");
-                return;
-            }
-
-            db.BeginTransaction();
-            try
-            {
-                var count = db.Execute
-                    (
-                        @"update [readers]
-                        set [debet]=isnull([debet],0) + @amount
-                        where [ticket]=@ticket",
-                        new DataParameter("@amount", amount),
-                        new DataParameter("@ticket", reader.Ticket)
-                    );
-
-                if (count == 1)
-                {
-                    var usluga = new Usluga()
-                    {
-                        Moment = DateTime.Now,
-                        Ticket = reader.Ticket,
-                        Title = "Пополнение",
-                        Price = amount,
-                        Amount = 1,
-                        Summa = amount,
-                        Operator = Environment.MachineName
-                    };
-                    db.Insert(usluga);
-                    db.CommitTransaction();
-                    MessageBox.Show("Баланс успешно пополнен!");
-                }
-                else
-                {
-                    MessageBox.Show("Что-то пошло не так!");
-                }
-            }
-            catch
-            {
-                db.RollbackTransaction();
-            }
-
-            _rfidBox.Text = reader.Ticket;
-            _readButton_Click(this, e);
-
-        } // method _addButton_Click
-
-        private void _balanceButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
-        {
-            if (reader == null)
-            {
-                MessageBox.Show("Не задан читатель!");
-                return;
-            }
-
-            var table = db.GetTable<Usluga>();
-            var list = table.Where (u => u.Ticket == reader.Ticket)
-                .OrderBy (u => u.Moment)
-                .ToArray();
-            var debet = db.Execute<decimal>
-                (
-                    "select [debet] from [readers] where [ticket]=@ticket",
-                    new DataParameter("@ticket", reader.Ticket)
-                );
-
-            var builder = new StringBuilder();
-            foreach (var u in list)
-            {
-                builder.AppendFormat($"{u.Moment:d} \t{u.Title,-40} \t{u.Amount} \t{u.Summa}");
-                builder.AppendLine();
-            }
-
+            builder.AppendFormat ($"{u.Moment:d} \t{u.Title,-40} \t{u.Amount} \t{u.Summa}");
             builder.AppendLine();
-            builder.AppendFormat($"Остаток на счету: {debet}");
-            PlainTextForm.ShowDialog (this, builder.ToString());
+        }
 
-        } // method _balanceButton_Click
+        builder.AppendLine();
+        builder.AppendFormat ($"Остаток на счету: {debet}");
+        PlainTextForm.ShowDialog (this, builder.ToString());
+    }
 
-        private void _reportButton_Click
-            (
-                object sender,
-                EventArgs e
-            )
+    private void _reportButton_Click
+        (
+            object sender,
+            EventArgs e
+        )
+    {
+        var table = db.GetTable<Usluga>();
+        var list = table.Where (u => u.Moment >= DateTime.Today)
+            .OrderBy (u => u.Moment)
+            .ToArray();
+        var builder = new StringBuilder();
+        foreach (var u in list)
         {
-            var table = db.GetTable<Usluga>();
-            var list = table.Where (u => u.Moment >= DateTime.Today)
-                .OrderBy (u => u.Moment)
-                .ToArray();
-            var builder = new StringBuilder();
-            foreach (var u in list)
-            {
-                builder.AppendFormat($"{u.Moment:d} \t{u.Ticket, -40} \t{u.Title,-40} \t {u.Price, -8} \t{u.Amount} \t{u.Summa}");
-                builder.AppendLine();
-            }
-
-            var summa = list
-                .Where(_ => _.Title == "Пополнение")
-                .Sum(_ => _.Summa);
+            builder.AppendFormat (
+                $"{u.Moment:d} \t{u.Ticket,-40} \t{u.Title,-40} \t {u.Price,-8} \t{u.Amount} \t{u.Summa}");
             builder.AppendLine();
-            builder.AppendFormat("Сумма прихода: {0}", summa);
+        }
 
-            builder.AppendLine();
-            PlainTextForm.ShowDialog(this, builder.ToString(), maximized: true);
+        var summa = list
+            .Where (_ => _.Title == "Пополнение")
+            .Sum (_ => _.Summa);
+        builder.AppendLine();
+        builder.AppendFormat ("Сумма прихода: {0}", summa);
 
-        } // method _reportButton_Click
-
-    } // class MainForm
-
-} // namespace Uslugi5
+        builder.AppendLine();
+        PlainTextForm.ShowDialog (this, builder.ToString(), maximized: true);
+    }
+}
