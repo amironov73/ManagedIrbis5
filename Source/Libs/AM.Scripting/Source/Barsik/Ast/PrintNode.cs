@@ -70,6 +70,7 @@ sealed class PrintNode
 
         if (_newLine)
         {
+            //BarsikUtility.PrintObject (context.Output, Environment.NewLine);
             context.Output.WriteLine();
         }
     }

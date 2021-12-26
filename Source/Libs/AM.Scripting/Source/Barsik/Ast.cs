@@ -14,14 +14,12 @@
 #region Using directive
 
 using System;
-using System.Collections.Generic;
 
 #endregion
 
 #nullable enable
 
 namespace AM.Scripting.Barsik;
-
 
 /// <summary>
 /// Префиксная операция.
@@ -58,7 +56,18 @@ sealed class PrefixNode
     /// <inheritdoc cref="AtomNode.Compute"/>
     public override dynamic? Compute (Context context)
     {
-        return _inner.Compute (context);
+        var value = _inner.Compute (context);
+
+        value = _type switch
+        {
+            "!" => ! BarsikUtility.ToBoolean (value),
+            "-" => - value,
+            "++" => value + 1,
+            "--" => value + 1,
+            _ => throw new Exception()
+        };
+
+        return value;
     }
 
     #endregion
@@ -109,7 +118,16 @@ sealed class PostfixNode
     /// <inheritdoc cref="AtomNode.Compute"/>
     public override dynamic? Compute (Context context)
     {
-        return _inner.Compute (context);
+        var value = _inner.Compute (context);
+
+        value = _type switch
+        {
+            "++" => value + 1,
+            "--" => value + 1,
+            _ => throw new Exception()
+        };
+
+        return value;
     }
 
     #endregion

@@ -36,10 +36,12 @@ internal sealed class AssignmentNode
     public AssignmentNode
         (
             string target,
+            string operation,
             AtomNode expression
         )
     {
         _target = target;
+        _operation = operation;
         _expression = expression;
     }
 
@@ -48,6 +50,7 @@ internal sealed class AssignmentNode
     #region Private members
 
     private readonly string _target;
+    private readonly string _operation;
     private readonly AtomNode _expression;
 
     #endregion
@@ -63,11 +66,36 @@ internal sealed class AssignmentNode
         PreExecute (context);
 
         var variableName = _target;
+        dynamic? variableValue = null;
+        if (_operation != "=")
+        {
+            if (!context.TryGetVariable (variableName, out variableValue))
+            {
+                context.Error.WriteLine ($"Variable {variableName} not found");
+                return;
+            }
+        }
+
         var computedValue = _expression.Compute (context);
+        computedValue = _operation switch
+        {
+            "=" => computedValue,
+            "+=" => variableValue + computedValue,
+            "-=" => variableValue - computedValue,
+            "*=" => variableValue * computedValue,
+            "/=" => variableValue / computedValue,
+            "%=" => variableValue % computedValue,
+            "&=" => variableValue & computedValue,
+            "|=" => variableValue | computedValue,
+            "^=" => variableValue ^ computedValue,
+            "<<=" => variableValue << computedValue,
+            ">>=" => variableValue >> computedValue,
+            _ => throw new Exception()
+        };
 
         context.SetVariable (variableName, computedValue);
 
-        BarsikUtility.PrintObject (context.Output, computedValue);
+        // BarsikUtility.PrintObject (context.Output, computedValue);
     }
 
     #endregion

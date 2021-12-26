@@ -1,0 +1,20 @@
+x = true;
+y = false;
+
+if (x)
+{
+    println "then";
+}
+else
+{
+    println "else";
+}
+
+if (y)
+{
+    println "then";
+}
+else
+{
+    println "else";
+}

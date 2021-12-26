@@ -199,11 +199,17 @@ static class Grammar
         .Select<AtomNode> (inner => new ParenthesisNode (inner));
     // ReSharper restore RedundantSuppressNullableWarningExpression
 
-    // private static Parser<char, Func<AtomNode, AtomNode>> Prefix (Parser<char, string> op) =>
-    //     op.Select<Func<AtomNode, AtomNode>> (type => inner => new PrefixNode (type, inner));
-    //
-    // private static Parser<char, Func<AtomNode, AtomNode>> Postfix (Parser<char, string> op) =>
-    //     op.Select<Func<AtomNode, AtomNode>> (type => inner => new PostfixNode (type, inner));
+    private static Parser<char, Func<AtomNode, AtomNode>> Prefix (Parser<char, string> op) =>
+        op.Select<Func<AtomNode, AtomNode>> (type => inner => new PrefixNode (type, inner));
+
+    private static Parser<char, Func<AtomNode, AtomNode>> Postfix (Parser<char, string> op) =>
+         op.Select<Func<AtomNode, AtomNode>> (type => inner => new PostfixNode (type, inner));
+
+    private static OperatorTableRow<char, AtomNode> Prefix (string op) =>
+        Operator.Prefix (Prefix (String (op)));
+
+    private static OperatorTableRow<char, AtomNode> Postfix (string op) =>
+        Operator.Postfix (Postfix (String (op)));
 
     private static Parser<char, Func<AtomNode, AtomNode, AtomNode>> Binary (Parser<char, string> op) =>
         op.Select<Func<AtomNode, AtomNode, AtomNode>> (type => (left, right) =>
@@ -239,6 +245,8 @@ static class Grammar
             new []
             {
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
+                new [] { Postfix ("++"), Postfix ("--") },
+                new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
                 new [] { BinaryLeft ("+"), BinaryLeft ("-") },
                 new [] { BinaryLeft ("<<"), BinaryLeft (">>") },
                 new [] { BinaryLeft ("<="), BinaryLeft (">="), BinaryLeft ("<"), BinaryLeft (">") },
@@ -268,14 +276,23 @@ static class Grammar
         Rec (() => Statement!).SeparatedAndOptionallyTerminated (StatementDelimiter);
     // ReSharper restore RedundantSuppressNullableWarningExpression
 
-    private static readonly Parser<char, StatementNode> Assignment = Try (Tok (
-            from target in Try (Identifier)
-            from eq in Tok ("=")
-            from expr in Expr
-            select (StatementNode) new AssignmentNode (target, expr)
+    // операция присваивания
+    private static readonly Parser<char, string> Operation = Try (OneOf
+        (
+            Tok ("="), Tok ("+="), Tok ("-="),
+            Tok ("*="), Tok ("/="), Tok ("%="), Tok ("&="),
+            Tok ("|="), Tok ("^="), Tok ("<<="), Tok (">>=")
         ));
 
-    private static readonly Parser<char, StatementNode> Print = Tok (Map
+    private static readonly Parser<char, StatementNode> Assignment = Try (Tok
+        (
+            from target in Try (Identifier)
+            from op in Operation
+            from expr in Expr
+            select (StatementNode) new AssignmentNode (target, op, expr)
+        ));
+
+    private static readonly Parser<char, StatementNode> Print = Try (Map
         (
             (name, expressions) =>
                 (StatementNode) new PrintNode (expressions, name == "println"),
@@ -283,7 +300,7 @@ static class Grammar
             Expr.Separated (Tok (','))
         ));
 
-    private static readonly Parser<char, StatementNode> While = Tok (Map
+    private static readonly Parser<char, StatementNode> While = Try (Map
         (
             (_, condition, body) => (StatementNode) new WhileNode (condition, body),
             Try (Tok ("while")),
@@ -291,33 +308,39 @@ static class Grammar
             CurlyBraces (Block)
         ));
 
-    private static readonly Parser<char, IEnumerable<StatementNode>> Else =
-        from _ in Tok ("else")
-        from statements in CurlyBraces (Block)
-        select statements;
+    private static readonly Parser<char, IEnumerable<StatementNode>> Else = Try
+        (
+            from _ in Tok ("else")
+            from statements in CurlyBraces (Block)
+            select statements
+        );
 
-    private static readonly Parser<char, IfNode> ElseIf =
-        from _1 in Tok ("else")
-        from _2 in Tok ("if")
-        from condition in RoundBrackets (Expr)
-        from statements in CurlyBraces (Block)
-        select new IfNode (condition, statements, null, null);
+    private static readonly Parser<char, IfNode> ElseIf = Try
+        (
+            from _1 in Tok ("else")
+            from _2 in Tok ("if")
+            from condition in RoundBrackets (Expr)
+            from statements in CurlyBraces (Block)
+        select new IfNode (condition, statements, null, null)
+        );
 
-    private static readonly Parser<char, StatementNode> If =
-        from _ in Tok ("if")
-        from condition in RoundBrackets (Expr)
-        from thenBlock in CurlyBraces (Block)
-        from elseIf in ElseIf.Many().Optional()
-        from elseBlock in Else.Optional()
-        select (StatementNode) new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(), elseBlock.GetValueOrDefault());
+    private static readonly Parser<char, StatementNode> If = Try
+        (
+            from _ in Tok ("if")
+            from condition in RoundBrackets (Expr)
+            from thenBlock in CurlyBraces (Block)
+            from elseIf in ElseIf.Many().Optional()
+            from elseBlock in Else.Optional()
+            select (StatementNode) new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(), elseBlock.GetValueOrDefault())
+        );
 
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
-            Assignment,
             If,
-            Print,
-            While
+            While,
+            Assignment,
+            Print
         );
 
     //
