@@ -135,12 +135,46 @@ static class Grammar
     private static readonly Parser<char, AtomNode> Int32Literal = Tok (DecimalNum)
         .Select<AtomNode> (v => new ConstantNode (v));
 
+    private static readonly Parser<char, AtomNode> Int64Literal =
+        Tok (LongNum.Before (OneOf ('L', 'l')))
+        .Select<AtomNode> (v => new ConstantNode (v));
+
+    private static readonly Parser<char, AtomNode> UInt32Literal =
+        Tok (UnsignedInt (10).Before (OneOf ('U', 'u')))
+        .Select<AtomNode> (v => new ConstantNode (v));
+
+    private static readonly Parser<char, AtomNode> UInt64Literal =
+        Tok (LongNum.Before (OneOf (String ("LU"), String ("lu"), String ("UL"), String ("ul"))))
+        .Select<AtomNode> (v => new ConstantNode (v));
+
+    private static readonly Parser<char, AtomNode> Hex32Literal =
+        Tok (String ("0x").Then (UnsignedInt (16)))
+            .Select<AtomNode> (v => new ConstantNode (v));
+
+    private static readonly Parser<char, AtomNode> Hex64Literal = Tok (Map
+        (
+            (_, value, _) => (AtomNode)new ConstantNode (value),
+            String ("0x").ThenReturn (0L),
+            UnsignedLong (16),
+            OneOf ('L', 'l').ThenReturn (0L)
+        ));
+
+    private static readonly Parser<char, AtomNode> FloatLiteral =
+        Tok (Real.Before (OneOf ('F', 'f')))
+            .Select (v => (AtomNode) new ConstantNode ((float) v));
+
+    private static readonly Parser<char, AtomNode> DecimalLiteral =
+        Tok (Real.Before (OneOf ('M', 'm')))
+            .Select (v => (AtomNode)new ConstantNode ((decimal) v));
+
     private static readonly Parser<char, AtomNode> DoubleLiteral = Tok (Real)
         .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> Literal = Tok (OneOf (
                 NullLiteral, BoolLiteral, CharLiteral, StringLiteral,
-                DoubleLiteral, Int32Literal
+                Hex64Literal, Hex32Literal,
+                UInt64Literal, Int64Literal, UInt32Literal,
+                FloatLiteral, DecimalLiteral, Int32Literal, DoubleLiteral
             ));
 
     private static readonly Parser<char, AtomNode> Variable = Identifier

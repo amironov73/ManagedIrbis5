@@ -13,25 +13,25 @@ using AM.Scripting.Barsik;
 
 #nullable enable
 
-namespace UnitTests.Scripting.Barsik
+namespace UnitTests.Scripting.Barsik;
+
+[TestClass]
+public sealed class InterpreterTest
+    : Common.CommonUnitTest
 {
-    [TestClass]
-    public sealed class InterpreterTest
-        : Common.CommonUnitTest
+    [TestMethod]
+    [Description ("Простое сложение двух чисел")]
+    public void Interpreter_Execute_1()
     {
-//         [TestMethod]
-//         [Description ("Простое сложение двух чисел")]
-//         public void Interpreter_Execute_1()
-//         {
-//             var interpreter = new Interpreter();
-//             var variables = interpreter.Context.Variables;
-//             variables.Add ("x", 1);
-//             variables.Add ("y", 2);
-//             interpreter.Execute ("z = x + y;");
-//             var actual = (int) (object) variables["z"]!;
-//             Assert.AreEqual (3, actual);
-//         }
-//
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables.Add ("x", 1);
+        variables.Add ("y", 2);
+        interpreter.Execute ("z = x + y;");
+        var actual = (int) (object) variables["z"]!;
+        Assert.AreEqual (3, actual);
+    }
+
 //         [TestMethod]
 //         [Description ("Блок if-then-else")]
 //         public void Interpreter_Execute_2()
@@ -78,29 +78,29 @@ namespace UnitTests.Scripting.Barsik
 //             Assert.AreEqual (1, actual);
 //         }
 //
-//         [TestMethod]
-//         [Description ("Комментарии")]
-//         public void Interpreter_Exectute_5()
-//         {
-//             var interpreter = new Interpreter();
-//             interpreter.Execute (@"// opening comment
-// x = 1;
-// // closing comment
-// ");
-//             var actual = (int) (object) interpreter.Context.Variables["x"]!;
-//             Assert.AreEqual (1, actual);
-//         }
-//
-//         [TestMethod]
-//         [Description ("Комментарии")]
-//         public void Interpreter_Exectute_6()
-//         {
-//             var interpreter = new Interpreter();
-//             interpreter.Execute ("x /* c1 */ = /* c2 */ 1 /* c3 */;");
-//             var actual = (int) (object) interpreter.Context.Variables["x"]!;
-//             Assert.AreEqual (1, actual);
-//         }
-//
+        [TestMethod]
+        [Description ("Комментарии")]
+        public void Interpreter_Execute_5()
+        {
+            var interpreter = new Interpreter();
+            interpreter.Execute (@"// opening comment
+x = 1;
+// closing comment
+");
+            var actual = (int) (object) interpreter.Context.Variables["x"]!;
+            Assert.AreEqual (1, actual);
+        }
+
+    [TestMethod]
+    [Description ("Комментарии")]
+    public void Interpreter_Execute_6()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("x /* c1 */ = /* c2 */ 1 /* c3 */;");
+        var actual = (int) (object) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (1, actual);
+    }
+
 //         [TestMethod]
 //         [Description ("Вызов функции")]
 //         public void Interpreter_Execute_7()
@@ -163,5 +163,94 @@ namespace UnitTests.Scripting.Barsik
 //             Assert.AreEqual (2, program.Statements[1].StartPosition!.Line);
 //             Assert.AreEqual (3, program.Statements[2].StartPosition!.Line);
 //         }
+
+    [TestMethod]
+    [Description ("32=битное целое со знаком")]
+    public void Interpreter_Int32_1()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("x = 123");
+        var actual = (int) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (123, actual);
+    }
+
+    [TestMethod]
+    [Description ("64-битное целое со знаком")]
+    public void Interpreter_Int64_1()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("x = 1L");
+        var actual = (long) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (1L, actual);
+
+        interpreter.Execute ("x = 2l");
+        actual = (long) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (2L, actual);
+    }
+
+    [TestMethod]
+    [Description ("32-битное целое без знака")]
+    public void Interpreter_UInt32_1()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("x = 1U");
+        var actual = (uint) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (1U, actual);
+
+        interpreter.Execute ("x = 2u");
+        actual = (uint) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (2U, actual);
+    }
+
+    [TestMethod]
+    [Description ("64-битное целое без знака")]
+    public void Interpreter_UInt64_1()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("x = 1UL");
+        var actual = (ulong) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (1UL, actual);
+
+        interpreter.Execute ("x = 2ul");
+        actual = (ulong) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (2UL, actual);
+    }
+
+    [TestMethod]
+    [Description ("32-битное шестнадцатеричное целое")]
+    public void Interpreter_HexInt32_1()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("x = 0x123");
+        var actual = (int) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (0x123, actual);
+    }
+
+    [TestMethod]
+    [Description ("64-битное шестнадцатеричное целое")]
+    public void Interpreter_HexInt64_1()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("x = 0x123L");
+        var actual = (long) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (0x123L, actual);
+
+        interpreter.Execute ("x = 0x123l");
+        actual = (long) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (0x123L, actual);
+    }
+
+    [TestMethod]
+    [Description ("64-битное шестнадцатеричное целое")]
+    public void Interpreter_Float_1()
+    {
+        var interpreter = new Interpreter();
+        interpreter.Execute ("x = 123.4F");
+        var actual = (float) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (123.4f, actual);
+
+        interpreter.Execute ("x = 123.4f");
+        actual = (float) interpreter.Context.Variables["x"]!;
+        Assert.AreEqual (123.4f, actual);
     }
 }
