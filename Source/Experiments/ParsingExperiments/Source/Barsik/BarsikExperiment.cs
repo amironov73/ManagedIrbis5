@@ -47,6 +47,7 @@ static class BarsikExperiment
     public static void Interprete()
     {
         ParseAndExecute ("x = 1 y = 2 z = x + y");
+        ParseAndExecute ("/* 1 */ x = /* 2 */ 1 /* 3 */ y = /* 4 */ 2 z = x + y /* 5 */");
         ParseAndExecute ("x = \"1\" y = \"2\" z = x + y");
     }
 }

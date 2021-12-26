@@ -103,6 +103,12 @@ public static class Resolve
             LatinOrArabicOrUnderscore.ManyString()
         ));
 
+    /// <summary>
+    /// Литерал-строка с экранированными символами.
+    /// </summary>
+    public static Parser<char, string> EscapedLiteral() =>
+        Try (new EscapeParser ('"', '\\'));
+
     #endregion
 
     #region Extension methods
