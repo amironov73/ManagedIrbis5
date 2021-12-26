@@ -177,6 +177,14 @@ static class Grammar
                 FloatLiteral, DecimalLiteral, Int32Literal, DoubleLiteral
             ));
 
+    private static readonly Parser<char, KeyValueNode> KeyAndValue = Tok (Map
+        (
+            (key, _, value) => new KeyValueNode (key, value),
+            Literal,
+            Tok (':'),
+            Literal
+        ));
+
     private static readonly Parser<char, AtomNode> Variable = Identifier
         .Select<AtomNode> (name => new VariableNode (name));
 
@@ -204,11 +212,29 @@ static class Grammar
     private static OperatorTableRow<char, AtomNode> BinaryLeft (string op) =>
         Operator.InfixL (Binary (Tok (op)));
 
+    // ReSharper disable RedundantSuppressNullableWarningExpression
+    private static readonly Parser<char, AtomNode> List = Tok (Map
+        (
+            (_, items, _) => (AtomNode) new ListNode (items),
+            Tok ('['),
+            Rec (() => Expr!).Separated (Tok (',')),
+            Tok (']')
+        ));
+    // ReSharper restore RedundantSuppressNullableWarningExpression
+
+    private static readonly Parser<char, AtomNode> Dictionary = Tok (Map
+        (
+            (_, items, _) => (AtomNode) new DictionaryNode (items),
+            Tok ('{'),
+            KeyAndValue.Separated (Tok (',')),
+            Tok ('}')
+        ));
+
     private static readonly Parser<char, AtomNode> Expr = ExpressionParser.Build
         (
             OneOf
                 (
-                    Literal, Variable, Parenthesis
+                    List, Dictionary, Literal, Variable, Parenthesis
                 ),
             new []
             {
