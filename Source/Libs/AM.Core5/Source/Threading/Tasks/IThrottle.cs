@@ -25,24 +25,21 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Threading.Tasks
+namespace AM.Threading.Tasks;
+
+/// <summary>
+/// Интерфейс дросселя, т. е. устройства, ограничивающего
+/// пропускание задач.
+/// </summary>
+public interface IThrottle
 {
     /// <summary>
-    /// Интерфейс дросселя, т. е. устройства, ограничивающего
-    /// пропускание задач.
+    /// Получение следующей задачи.
     /// </summary>
-    public interface IThrottle
-    {
-        /// <summary>
-        /// Получение следующей задачи.
-        /// </summary>
-        Task GetNext();
+    Task GetNext();
 
-        /// <summary>
-        /// Получение следующей задачи.
-        /// </summary>
-        Task GetNext (out TimeSpan delay);
-
-    } // interface IThrottle
-
-} // namespace AM.Threading.Tasks
+    /// <summary>
+    /// Получение следующей задачи.
+    /// </summary>
+    Task GetNext (out TimeSpan delay);
+}

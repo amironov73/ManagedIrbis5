@@ -65,6 +65,16 @@ public sealed class Context
     /// </summary>
     public TextWriter Error { get; }
 
+    /// <summary>
+    /// Используемые пространства имен.
+    /// </summary>
+    public Dictionary<string, object?> Namespaces { get; }
+
+    /// <summary>
+    /// Обработчик внешнего кода.
+    /// </summary>
+    public ExternalCodeHandler? ExternalCodeHandler { get; set; }
+
     #endregion
 
     #region Construction
@@ -85,6 +95,7 @@ public sealed class Context
         Input = input;
         Output = output;
         Error = error;
+        Namespaces = new ();
     }
 
     #endregion

@@ -29,197 +29,203 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace AM.Threading.Tasks
+namespace AM.Threading.Tasks;
+
+/// <summary>
+/// Простейший процессор данных.
+/// </summary>
+public sealed class SimplestDataProcessor<TInput, TOutput>
 {
+    #region Nested classes
+
     /// <summary>
-    /// Простейший процессор данных.
+    /// Один элемент данных, как входных, так и соответствующих выходных.
     /// </summary>
-    public sealed class SimplestDataProcessor<TInput, TOutput>
+    public sealed class Item
     {
-        #region Nested classes
+        #region Properties
 
         /// <summary>
-        /// Один элемент данных, как входных, так и соответствующих выходных.
+        /// Входящие данные.
         /// </summary>
-        public sealed class Item
-        {
-            #region Properties
-
-            /// <summary>
-            /// Входящие данные.
-            /// </summary>
-            public TInput? Input { get; init; }
-
-            /// <summary>
-            /// Результат их обработки.
-            /// </summary>
-            public TOutput? Output { get; set; }
-
-            /// <summary>
-            /// Исключение, которое возникло при обработке.
-            /// </summary>
-            public Exception? Exception { get; set; }
-
-            #endregion
-
-            #region Private members
-
-            internal SimplestDataProcessor<TInput, TOutput>? _processor;
-            internal Task? _task;
-
-            internal void Process()
-            {
-                try
-                {
-                    Output = _processor!._function (Input!);
-                }
-                catch (Exception exception)
-                {
-                    Exception = exception;
-                }
-
-                var runningTasks = _processor!._running;
-                lock (runningTasks)
-                {
-                    runningTasks.Remove (_task!);
-                }
-
-            } // method Process
-
-            #endregion
-
-        } // class Item
-
-        #endregion
-
-        #region Construction
+        public TInput? Input { get; init; }
 
         /// <summary>
-        /// Конструктор.
+        /// Результат их обработки.
         /// </summary>
-        public SimplestDataProcessor
-            (
-                Func<TInput, TOutput> function,
-                int parallelism = 0
-            )
-        {
-            if (parallelism < 0)
-            {
-                throw new ArgumentOutOfRangeException (nameof (parallelism));
-            }
+        public TOutput? Output { get; set; }
 
-            if (parallelism == 0)
-            {
-                parallelism = Environment.ProcessorCount;
-            }
-
-            _function = function;
-            _queue = new BlockingCollection<Item>();
-            _running = new List<Task> (parallelism);
-            _semaphore = new SemaphoreSlim (parallelism, parallelism);
-
-            Task.Factory.StartNew (_MainWorker);
-
-        } // constructor
+        /// <summary>
+        /// Исключение, которое возникло при обработке.
+        /// </summary>
+        public Exception? Exception { get; set; }
 
         #endregion
 
         #region Private members
 
-        internal readonly Func<TInput, TOutput> _function;
-        private readonly SemaphoreSlim _semaphore;
-        private readonly BlockingCollection<Item> _queue;
-        private readonly List<Task> _running;
+        internal SimplestDataProcessor<TInput, TOutput>? _processor;
+        internal Task? _task;
 
-        private void _MainWorker()
+        internal void Process()
         {
-            while (!_queue.IsCompleted)
+            try
             {
-                _semaphore.Wait();
-
-                if (!_queue.TryTake (out var item))
-                {
-                    continue;
-                }
-
-                item._processor = this;
-                var task = new Task (item.Process);
-                item._task = task;
-                lock (_running)
-                {
-                    _running.Add (task);
-                }
-
-                task.Start();
-
-            } // while
-
-        } // method _MainWorker
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Задачи больше добавляться не будут.
-        /// </summary>
-        public void Complete()
-        {
-            Magna.Trace (nameof (SimplestDataProcessor<TInput, TOutput>) + "::"
-                + nameof (Complete));
-
-            _queue.CompleteAdding();
-
-        } // method Complete
-
-        /// <summary>
-        /// Добавление задачи.
-        /// </summary>
-        public void Enqueue
-            (
-                TInput input
-            )
-        {
-            Magna.Trace (nameof (SimplestDataProcessor<TInput, TOutput>) + "::"
-                + nameof (Enqueue));
-
-            var item = new Item { Input = input };
-            _queue.Add(item);
-
-        } // method Enqueue
-
-        /// <summary>
-        /// Ожидание завершения всех задач.
-        /// </summary>
-        public void WaitForCompletion()
-        {
-            Magna.Trace (nameof (SimplestDataProcessor<TInput, TOutput>) + "::"
-                + nameof (WaitForCompletion) + ": begin");
-
-            while (!_queue.IsCompleted)
+                Output = _processor!._function (Input!);
+            }
+            catch (Exception exception)
             {
-                Thread.SpinWait (100000);
+                Exception = exception;
             }
 
-            Task[] tasks;
+            var runningTasks = _processor!._running;
+            lock (runningTasks)
+            {
+                runningTasks.Remove (_task!);
+            }
+        }
 
+        #endregion
+    }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SimplestDataProcessor
+        (
+            Func<TInput, TOutput> function,
+            int parallelism = 0
+        )
+    {
+        if (parallelism < 0)
+        {
+            throw new ArgumentOutOfRangeException (nameof (parallelism));
+        }
+
+        if (parallelism == 0)
+        {
+            parallelism = Environment.ProcessorCount;
+        }
+
+        _function = function;
+        _queue = new BlockingCollection<Item>();
+        _running = new List<Task> (parallelism);
+        _semaphore = new SemaphoreSlim (parallelism, parallelism);
+
+        Task.Factory.StartNew (_MainWorker);
+    }
+
+    #endregion
+
+    #region Private members
+
+    internal readonly Func<TInput, TOutput> _function;
+    private readonly SemaphoreSlim _semaphore;
+    private readonly BlockingCollection<Item> _queue;
+    private readonly List<Task> _running;
+
+    private void _MainWorker()
+    {
+        while (!_queue.IsCompleted)
+        {
+            _semaphore.Wait();
+
+            if (!_queue.TryTake (out var item))
+            {
+                continue;
+            }
+
+            item._processor = this;
+            var task = new Task (item.Process);
+            item._task = task;
             lock (_running)
             {
-                tasks = _running.ToArray();
+                _running.Add (task);
             }
 
-            if (tasks.Length != 0)
-            {
-                Task.WaitAll (tasks);
-            }
+            task.Start();
+        }
+    }
 
-            Magna.Trace (nameof (SimplestDataProcessor<TInput, TOutput>) + "::"
-                + nameof (WaitForCompletion) + ": end");
+    #endregion
 
-        } // method WaitForCompletion
+    #region Public methods
 
-        #endregion
+    /// <summary>
+    /// Задачи больше добавляться не будут.
+    /// </summary>
+    public void Complete()
+    {
+        Magna.Trace
+            (
+                nameof (SimplestDataProcessor<TInput, TOutput>)
+                + "::"
+                + nameof (Complete)
+            );
 
-    } // class SimplestDataProcessor
+        _queue.CompleteAdding();
+    }
 
-} // namespace AM.Threading.Tasks
+    /// <summary>
+    /// Добавление задачи.
+    /// </summary>
+    public void Enqueue
+        (
+            TInput input
+        )
+    {
+        Magna.Trace
+            (
+                nameof (SimplestDataProcessor<TInput, TOutput>)
+                + "::"
+                + nameof (Enqueue)
+            );
+
+        var item = new Item { Input = input };
+        _queue.Add (item);
+    }
+
+    /// <summary>
+    /// Ожидание завершения всех задач.
+    /// </summary>
+    public void WaitForCompletion()
+    {
+        Magna.Trace
+            (
+                nameof (SimplestDataProcessor<TInput, TOutput>)
+                + "::"
+                + nameof (WaitForCompletion)
+                + ": begin"
+            );
+
+        while (!_queue.IsCompleted)
+        {
+            Thread.SpinWait (100000);
+        }
+
+        Task[] tasks;
+
+        lock (_running)
+        {
+            tasks = _running.ToArray();
+        }
+
+        if (tasks.Length != 0)
+        {
+            Task.WaitAll (tasks);
+        }
+
+        Magna.Trace
+            (
+                nameof (SimplestDataProcessor<TInput, TOutput>)
+                + "::"
+                + nameof (WaitForCompletion) + ": end"
+            );
+    }
+
+    #endregion
+}

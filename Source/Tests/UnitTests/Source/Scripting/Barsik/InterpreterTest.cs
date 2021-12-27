@@ -125,31 +125,30 @@ x = 1;
 //             Assert.AreEqual (9, actual);
 //         }
 //
-//         [TestMethod]
-//         [Description ("Внешний код")]
-//         public void Interpreter_External_1()
-//         {
-//             void Handler (Context context, ExternalNode node)
-//             {
-//                 // самый простой нетривиальный обработчик, который я смог придумать
-//                 context.Output.Write (node.Code);
-//             }
-//
-//             var variables = new Dictionary<string, dynamic?>();
-//             var input = TextReader.Null;
-//             var output = new StringWriter();
-//             var interpreter = new Interpreter(variables, input, output)
-//             {
-//                 Context =
-//                 {
-//                     ExternalCodeHandler = Handler
-//                 }
-//             };
-//             var sourceCode = "print '<'; {Hello from inner code} print '>';";
-//             interpreter.Execute (sourceCode);
-//             var actual = output.ToString();
-//             Assert.AreEqual ("<Hello from inner code>", actual);
-//         }
+         [TestMethod]
+         [Description ("Внешний код")]
+         public void Interpreter_External_1()
+         {
+             void Handler (Context context, ExternalNode node)
+             {
+                 // самый простой нетривиальный обработчик, который я смог придумать
+                 context.Output.Write (node.Code);
+             }
+
+             var input = TextReader.Null;
+             var output = new StringWriter();
+             var interpreter = new Interpreter(input, output)
+             {
+                 Context =
+                 {
+                     ExternalCodeHandler = Handler
+                 }
+             };
+             var sourceCode = "print ('{'); <Hello from inner code> print ('}');";
+             interpreter.Execute (sourceCode);
+             var actual = output.ToString();
+             Assert.AreEqual ("{Hello from inner code}", actual);
+         }
 //
 //         [TestMethod]
 //         [Description ("Позиционирование стейтментов")]

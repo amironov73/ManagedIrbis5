@@ -366,6 +366,14 @@ static class Grammar
         select (StatementNode) new TryNode (tryBlock, catchNode.GetValueOrDefault(),
             finallyBlock.GetValueOrDefault());
 
+    private static readonly Parser<char, StatementNode> External = Map
+        (
+            (_, content, _) => (StatementNode)new ExternalNode (content),
+            Char ('<'),
+            AnyCharExcept ('>').ManyString(),
+            Char ('>')
+        );
+
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
@@ -374,6 +382,7 @@ static class Grammar
             Try (Tok (For)),
             Try (Tok (While)),
             Try (Tok (Print)),
+            Try (Tok (External)),
             Try (Tok (Assignment))
         );
 
