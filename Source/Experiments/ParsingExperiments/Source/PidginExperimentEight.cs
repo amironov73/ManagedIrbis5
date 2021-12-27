@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 
 using Pidgin;
@@ -9,7 +8,7 @@ using static Pidgin.Parser<char>;
 
 namespace ParsingExperiments;
 
-public class PidginExperimentEight
+internal static class PidginExperimentEight
 {
     private static readonly Parser<char, object> StringLiteral = Map
             (

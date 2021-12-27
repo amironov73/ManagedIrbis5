@@ -69,13 +69,13 @@ static class Grammar
 
     private static readonly Parser<char, Unit> BlockComment = CommentParser.SkipBlockComment
         (
-            String ("/*"),
-            String ("*/")
+            Try (String ("/*")),
+            Try (String ("*/"))
         );
 
     private static readonly Parser<char, Unit> LineComment = CommentParser.SkipLineComment
         (
-            String ("//")
+            Try (String ("//"))
         );
 
     private static readonly Parser<char, Unit> Filler = Try (BlockComment)
@@ -91,10 +91,10 @@ static class Grammar
     public static Parser<char, string> Tok (string token) => Tok (String (token));
 
     public static Parser<char, TResult> CurlyBraces<TResult> (Parser<char, TResult> parser) =>
-        parser.Between (Tok ('{'), Tok ('}'));
+        Tok (parser).Between (Tok ('{'), Tok ('}'));
 
     public static Parser<char, TResult> RoundBrackets<TResult> (Parser<char, TResult> parser) =>
-        parser.Between (Tok ('('), Tok (')'));
+        Tok (parser).Between (Tok ('('), Tok (')'));
 
     private static readonly Parser<char, string> Identifier = Map
         (
@@ -240,7 +240,7 @@ static class Grammar
         (
             OneOf
                 (
-                    Variable, List, Dictionary, Literal, Parenthesis
+                    Literal, Variable, List, Dictionary, Parenthesis
                 ),
             new []
             {
@@ -272,8 +272,12 @@ static class Grammar
 
     // блок стейтментов
     // ReSharper disable RedundantSuppressNullableWarningExpression
-    public static readonly Parser<char, IEnumerable<StatementNode>> Block =
-        Rec (() => Statement!).SeparatedAndOptionallyTerminated (StatementDelimiter);
+    public static readonly Parser<char, IEnumerable<StatementNode>> Block = Map
+        (
+            (_, second) => second,
+            Filler.Optional(),
+            Rec (() => Statement!).SeparatedAndOptionallyTerminated (StatementDelimiter)
+        );
     // ReSharper restore RedundantSuppressNullableWarningExpression
 
     // операция присваивания
@@ -290,21 +294,22 @@ static class Grammar
         from expr in Expr
         select (StatementNode) new AssignmentNode (target, op, expr);
 
-    private static readonly Parser<char, StatementNode> Print = Try (Map
+    private static readonly Parser<char, StatementNode> Print = Map
         (
             (name, expressions) =>
                 (StatementNode) new PrintNode (expressions, name == "println"),
-            OneOf (Tok ("println"), Tok ("print")),
-            Expr.Separated (Tok (','))
-        ));
+            OneOf (Try (Tok ("println")), Try (Tok ("print"))),
+            RoundBrackets (Tok (Expr).Separated (Tok (',')))
+        );
 
-    private static readonly Parser<char, StatementNode> While = Try (Map
+    private static readonly Parser<char, StatementNode> While = Map
         (
-            (_, condition, body) => (StatementNode) new WhileNode (condition, body),
+            (_, condition, body) =>
+                (StatementNode) new WhileNode (condition, body),
             Try (Tok ("while")),
             RoundBrackets (Expr),
             CurlyBraces (Block)
-        ));
+        );
 
     private static readonly Parser<char, IEnumerable<StatementNode>> Else =
         from _ in Tok ("else")
@@ -322,19 +327,19 @@ static class Grammar
         from _ in Tok ("if")
         from condition in RoundBrackets (Expr)
         from thenBlock in CurlyBraces (Block)
-        from elseIf in ElseIf.Many().Optional()
+        //from elseIf in ElseIf.Many().Optional()
         from elseBlock in Else.Optional()
-        select (StatementNode)new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(),
-            elseBlock.GetValueOrDefault());
+        //select (StatementNode)new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(),
+        //    elseBlock.GetValueOrDefault());
+         select (StatementNode)new IfNode (condition, thenBlock, null, elseBlock.GetValueOrDefault());
 
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
-            Try (If),
-            Try (While),
-            Try (Assignment),
-            Try (Print),
-            Assignment
+            Try (Tok (If)),
+            Try (Tok (While)),
+            Try (Tok (Print)),
+            Try (Tok (Assignment))
         );
 
     //

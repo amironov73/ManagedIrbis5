@@ -93,6 +93,7 @@ sealed class EscapeParser
             {
                 if (!escape)
                 {
+                    state.Advance();
                     result = builder.ToString();
                     StringBuilderPool.Shared.Return (builder);
 

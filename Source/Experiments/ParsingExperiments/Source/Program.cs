@@ -18,7 +18,8 @@ static class Program
         // PidginExperimentFive.Comments();
         // PidginExperimentSix.Positions();
         // PidginExperimentSeven.Expressor();
-        PidginExperimentEight.DoubleProblem();
+        //PidginExperimentEight.DoubleProblem();
+        PidginExperimentNine.Blocks();
         // BarsikExperiment.Interprete();
     }
 }

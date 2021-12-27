@@ -1,20 +1,20 @@
-x = true;
-y = false;
+x = true
+y = false
 
 if (x)
 {
-    println "then";
+    println ("then x")
 }
 else
 {
-    println "else";
+    println ("else x")
 }
 
 if (y)
 {
-    println "then";
+    println ("then y")
 }
 else
 {
-    println "else";
+    println ("else y")
 }

@@ -32,21 +32,21 @@ public sealed class InterpreterTest
         Assert.AreEqual (3, actual);
     }
 
-//         [TestMethod]
-//         [Description ("Блок if-then-else")]
-//         public void Interpreter_Execute_2()
-//         {
-//             var variables = new Dictionary<string, dynamic?>();
-//             var input = TextReader.Null;
-//             var output = new StringWriter();
-//             var interpreter = new Interpreter (variables, input, output);
-//             variables.Add ("x", 1);
-//             variables.Add ("y", 2);
-//             interpreter.Execute (@"if (x < y) { print ""x is less""; } else { print ""y is less""; }");
-//             var actual = output.ToString();
-//             Assert.AreEqual ("x is less", actual);
-//         }
-//
+         [TestMethod]
+         [Description ("Блок if-then-else")]
+         public void Interpreter_Execute_2()
+         {
+             var input = TextReader.Null;
+             var output = new StringWriter();
+             var interpreter = new Interpreter (input, output);
+             var variables = interpreter.Context.Variables;
+             variables.Add ("x", 1);
+             variables.Add ("y", 2);
+             interpreter.Execute (@"if (x < y) { print ""x is less""; } else { print ""y is less""; }");
+             var actual = output.ToString();
+             Assert.AreEqual ("x is less", actual);
+         }
+
 //         [TestMethod]
 //         [Description ("Сравнение на неравенство")]
 //         public void Interpreter_Execute_3()
@@ -78,7 +78,6 @@ public sealed class InterpreterTest
 //             Assert.AreEqual (1, actual);
 //         }
 //
-        [Ignore]
         [TestMethod]
         [Description ("Комментарии")]
         public void Interpreter_Execute_5()
