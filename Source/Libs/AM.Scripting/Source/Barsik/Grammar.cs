@@ -168,10 +168,13 @@ static class Grammar
         Real.Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> Literal = OneOf (
-                NullLiteral, BoolLiteral, CharLiteral, StringLiteral,
-                Hex64Literal, Hex32Literal,
-                UInt64Literal, Int64Literal, UInt32Literal,
-                FloatLiteral, DecimalLiteral, Int32Literal, DoubleLiteral
+                Try (NullLiteral), Try (BoolLiteral),
+                Try (CharLiteral), Try (StringLiteral),
+                //Try (Hex64Literal), Try (Hex32Literal),
+                //Try (UInt64Literal), Try (Int64Literal),
+                // Try (UInt32Literal), Try (DecimalLiteral),
+                Try (Int32Literal), //Try (FloatLiteral),
+                Try (DoubleLiteral)
             );
 
     private static readonly Parser<char, KeyValueNode> KeyAndValue = Map
@@ -213,7 +216,7 @@ static class Grammar
             new BinaryNode (left, right, type));
 
     private static OperatorTableRow<char, AtomNode> BinaryLeft (string op) =>
-        Operator.InfixL (Binary (Tok (op)));
+        Operator.InfixL (Binary (Try (Tok (op))));
 
     // ReSharper disable RedundantSuppressNullableWarningExpression
     private static readonly Parser<char, AtomNode> List = Tok (Map
@@ -237,14 +240,13 @@ static class Grammar
         (
             OneOf
                 (
-                    //Variable, List, Dictionary, Literal, Parenthesis
-                    Variable, Literal
+                    Variable, List, Dictionary, Literal, Parenthesis
                 ),
             new []
             {
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
-                new [] { Postfix ("++"), Postfix ("--") },
-                new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
+                // new [] { Postfix ("++"), Postfix ("--") },
+                // new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
                 new [] { BinaryLeft ("+"), BinaryLeft ("-") },
                 new [] { BinaryLeft ("<<"), BinaryLeft (">>") },
                 new [] { BinaryLeft ("<="), BinaryLeft (">="), BinaryLeft ("<"), BinaryLeft (">") },
@@ -331,7 +333,8 @@ static class Grammar
             Try (If),
             Try (While),
             Try (Assignment),
-            Print
+            Try (Print),
+            Assignment
         );
 
     //

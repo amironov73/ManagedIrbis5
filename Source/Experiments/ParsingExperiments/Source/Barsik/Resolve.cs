@@ -50,7 +50,7 @@ static class Resolve
         .SkipMany();
 
     public static Parser<char, T> Tok<T> (Parser<char, T> token) =>
-        Try (token).Between (Skip);
+        token.Between (Skip);
 
     public static Parser<char, char> Tok (char token) => Tok (Char (token));
 

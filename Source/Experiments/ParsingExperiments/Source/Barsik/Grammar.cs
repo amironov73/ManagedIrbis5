@@ -46,40 +46,42 @@ static class Grammar
         );
 
     private static readonly Parser<char, AtomNode> NullLiteral =
-        Tok ("null").ThenReturn ((AtomNode) new ConstantNode (null));
+        String ("null").ThenReturn ((AtomNode) new ConstantNode (null));
 
     private static readonly Parser<char, AtomNode> BoolLiteral =
-        Tok (OneOf (String ("false"), String ("true")))
+        OneOf (String ("false"), String ("true"))
             .Select<AtomNode> (v => new ConstantNode (v == "true"));
 
-    private static readonly Parser<char, AtomNode> CharLiteral = Tok (Map
-            (
-                (_, content, _) => content,
-                Char ('\''),
-                AnyCharExcept ('\''),
-                Char ('\'')
-            ))
+    private static readonly Parser<char, AtomNode> CharLiteral = Map
+        (
+            (_, content, _) => content,
+            Char ('\''),
+            AnyCharExcept ('\''),
+            Char ('\'')
+        )
         .Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> StringLiteral = Tok (Map
-            (
-                (_, content, _) => new string (content.ToArray()),
-                Char ('"'),
-                AnyCharExcept ('"').Many(),
-                Char ('"')
+    private static readonly Parser<char, AtomNode> StringLiteral = Map
+        (
+            (_, content, _) => new string (content.ToArray()),
+            Char ('"'),
+            AnyCharExcept ('"').Many(),
+            Char ('"')
 
-            ))
+        )
         .Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> Int32Literal = Tok (DecimalNum)
+    private static readonly Parser<char, AtomNode> Int32Literal = DecimalNum
         .Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> DoubleLiteral = Tok (Real)
+    private static readonly Parser<char, AtomNode> DoubleLiteral = Real
         .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> Literal = Tok (OneOf (
-                NullLiteral, BoolLiteral, CharLiteral, StringLiteral,
-                DoubleLiteral, Int32Literal
+                Try (NullLiteral), (BoolLiteral), (CharLiteral),
+                Try (StringLiteral),
+                Int32Literal,
+                DoubleLiteral
             ));
 
     private static readonly Parser<char, AtomNode> Variable = Identifier
