@@ -23,121 +23,120 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace AM.Text.Output
+namespace AM.Text.Output;
+
+/// <summary>
+/// Расщепление (повтор) потока вывода.
+/// </summary>
+public sealed class TeeOutput
+    : AbstractOutput
 {
+    #region Properties
+
     /// <summary>
-    /// Расщепление (повтор) потока вывода.
+    /// Подчинённые потоки.
     /// </summary>
-    public sealed class TeeOutput
-        : AbstractOutput
+    public List<AbstractOutput> Output { get; } = new ();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public TeeOutput()
     {
-        #region Properties
+    } // constructor
 
-        /// <summary>
-        /// Подчинённые потоки.
-        /// </summary>
-        public List<AbstractOutput> Output { get; } = new ();
+    /// <summary>
+    /// Создание объекта с заранее установленным
+    /// списком.
+    /// </summary>
+    public TeeOutput
+        (
+            params AbstractOutput[] children
+        )
+    {
+        Output.AddRange (children);
+    } // constructor
 
-        #endregion
+    #endregion
 
-        #region Construction
+    #region AbstractOutput members
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public TeeOutput()
+    /// <inheritdoc cref="AbstractOutput.HaveError"/>
+    public override bool HaveError { get; set; }
+
+    /// <inheritdoc cref="AbstractOutput.Clear"/>
+    public override AbstractOutput Clear()
+    {
+        HaveError = false;
+        foreach (AbstractOutput output in Output)
         {
-        } // constructor
-
-        /// <summary>
-        /// Создание объекта с заранее установленным
-        /// списком.
-        /// </summary>
-        public TeeOutput
-            (
-                params AbstractOutput[] children
-            )
-        {
-            Output.AddRange(children);
-        } // constructor
-
-        #endregion
-
-        #region AbstractOutput members
-
-        /// <inheritdoc cref="AbstractOutput.HaveError"/>
-        public override bool HaveError { get; set; }
-
-        /// <inheritdoc cref="AbstractOutput.Clear"/>
-        public override AbstractOutput Clear()
-        {
-            HaveError = false;
-            foreach (AbstractOutput output in Output)
-            {
-                output.Clear();
-            }
-            return this;
+            output.Clear();
         }
 
-        /// <inheritdoc cref="AbstractOutput.Configure"/>
-        public override AbstractOutput Configure
-            (
-                string configuration
-            )
-        {
-            foreach (AbstractOutput output in Output)
-            {
-                output.Configure(configuration);
-            }
+        return this;
+    }
 
-            return this;
+    /// <inheritdoc cref="AbstractOutput.Configure"/>
+    public override AbstractOutput Configure
+        (
+            string configuration
+        )
+    {
+        foreach (AbstractOutput output in Output)
+        {
+            output.Configure (configuration);
         }
 
-        /// <inheritdoc cref="AbstractOutput.Write(string)"/>
-        public override AbstractOutput Write
-            (
-                string text
-            )
+        return this;
+    }
+
+    /// <inheritdoc cref="AbstractOutput.Write(string)"/>
+    public override AbstractOutput Write
+        (
+            string text
+        )
+    {
+        foreach (AbstractOutput output in Output)
         {
-            foreach (AbstractOutput output in Output)
-            {
-                output.Write(text);
-            }
-            return this;
+            output.Write (text);
         }
 
-        /// <inheritdoc cref="AbstractOutput.WriteError(string)"/>
-        public override AbstractOutput WriteError
-            (
-                string text
-            )
-        {
-            HaveError = true;
-            foreach (AbstractOutput output in Output)
-            {
-                output.WriteError(text);
-            }
+        return this;
+    }
 
-            return this;
+    /// <inheritdoc cref="AbstractOutput.WriteError(string)"/>
+    public override AbstractOutput WriteError
+        (
+            string text
+        )
+    {
+        HaveError = true;
+        foreach (AbstractOutput output in Output)
+        {
+            output.WriteError (text);
         }
 
-        #endregion
+        return this;
+    }
 
-        #region IDisposable members
+    #endregion
 
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public override void Dispose()
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public override void Dispose()
+    {
+        foreach (AbstractOutput output in Output)
         {
-            foreach (AbstractOutput output in Output)
-            {
-                output.Dispose();
-            }
-
-            base.Dispose();
+            output.Dispose();
         }
 
-        #endregion
+        base.Dispose();
+    }
 
-    } // class TeeOutput
-
-} // namespace AM.Text.Output
+    #endregion
+}

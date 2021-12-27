@@ -9,63 +9,60 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-namespace AM.Text.Output
+namespace AM.Text.Output;
+
+/// <summary>
+/// Пустой (нулевой) объект вывода.
+/// </summary>
+public sealed class NullOutput
+    : AbstractOutput
 {
-    /// <summary>
-    /// Пустой (нулевой) объект вывода.
-    /// </summary>
-    public sealed class NullOutput
-        : AbstractOutput
+    #region AbstractOutput members
+
+    /// <inheritdoc cref="AbstractOutput.HaveError" />
+    public override bool HaveError { get; set; }
+
+    /// <inheritdoc cref="AbstractOutput.Clear" />
+    public override AbstractOutput Clear()
     {
-        #region AbstractOutput members
+        HaveError = false;
 
-        /// <inheritdoc cref="AbstractOutput.HaveError" />
-        public override bool HaveError { get; set; }
+        return this;
+    }
 
-        /// <inheritdoc cref="AbstractOutput.Clear" />
-        public override AbstractOutput Clear()
-        {
-            HaveError = false;
+    /// <inheritdoc cref="AbstractOutput.Configure" />
+    public override AbstractOutput Configure
+        (
+            string configuration
+        )
+    {
+        // Ничего делать не надо
 
-            return this;
-        } // method Clear
+        return this;
+    }
 
-        /// <inheritdoc cref="AbstractOutput.Configure" />
-        public override AbstractOutput Configure
-            (
-                string configuration
-            )
-        {
-            // Ничего делать не надо
+    /// <inheritdoc cref="AbstractOutput.Write(string)" />
+    public override AbstractOutput Write
+        (
+            string text
+        )
+    {
+        // Ничего не нужно делать
 
-            return this;
-        } // method Configure
+        return this;
+    }
 
-        /// <inheritdoc cref="AbstractOutput.Write(string)" />
-        public override AbstractOutput Write
-            (
-                string text
-            )
-        {
-            // Ничего не нужно делать
+    /// <inheritdoc cref="AbstractOutput.WriteError(string)" />
+    public override AbstractOutput WriteError
+        (
+            string text
+        )
+    {
+        // Больше ничего не нужно делать
+        HaveError = true;
 
-            return this;
-        } // method Write
+        return this;
+    }
 
-        /// <inheritdoc cref="AbstractOutput.WriteError(string)" />
-        public override AbstractOutput WriteError
-            (
-                string text
-            )
-        {
-            // Больше ничего не нужно делать
-            HaveError = true;
-
-            return this;
-        } // method WriteError
-
-        #endregion
-
-    } // class NullOutput
-
-} // namespace AM.Text.Output
+    #endregion
+}

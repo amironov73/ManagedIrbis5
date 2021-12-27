@@ -22,110 +22,117 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Text.Output
+namespace AM.Text.Output;
+
+/// <summary>
+/// Wrapper for <see cref="AbstractOutput"/>.
+/// </summary>
+public sealed class OutputWriter
+    : TextWriter
 {
+    #region Properties
+
     /// <summary>
-    /// Wrapper for <see cref="AbstractOutput"/>.
+    /// Inner <see cref="AbstractOutput"/>.
     /// </summary>
-    public sealed class OutputWriter
-        : TextWriter
+    public AbstractOutput Output { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public OutputWriter
+        (
+            AbstractOutput output
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Inner <see cref="AbstractOutput"/>.
-        /// </summary>
-        public AbstractOutput Output { get; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public OutputWriter
-            (
-                AbstractOutput output
-            )
-        {
-            Output = output;
-        }
-
-        #endregion
-
-        #region TextWriter members
-
-        /// <inheritdoc cref="TextWriter.Encoding"/>
-        public override Encoding Encoding => Encoding.Default;
-
-        /// <inheritdoc cref="TextWriter.WriteLine()"/>
-        public override void WriteLine()
-        {
-            Output.WriteLine(string.Empty);
-        }
-
-        /// <inheritdoc cref="TextWriter.Write(string?)"/>
-        public override void Write
-            (
-                string? value
-            )
-        {
-            if (value is not null)
-            {
-                Output.Write(value);
-            }
-        }
-
-        /// <inheritdoc cref="TextWriter.WriteLine(string?)"/>
-        public override void WriteLine
-            (
-                string? value
-            )
-        {
-            if (value is not null)
-            {
-                Output.WriteLine(value);
-            }
-        }
-
-        /// <inheritdoc cref="TextWriter.Write(char)"/>
-        public override void Write(char value)
-        {
-            Write(new string(value, 1));
-        }
-
-        /// <inheritdoc cref="TextWriter.Write(char[])"/>
-        public override void Write
-            (
-                char[]? buffer
-            )
-        {
-            if (buffer is not null)
-            {
-                Write(new string(buffer));
-            }
-        }
-
-        /// <inheritdoc cref="TextWriter.Write(char[],int,int)"/>
-        public override void Write(char[] buffer, int index, int count)
-        {
-            Write(new string(buffer, index, count));
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="TextWriter.Dispose(bool)"/>
-        protected override void Dispose
-            (
-                bool disposing
-            )
-        {
-            Output.Dispose();
-        }
-
-        #endregion
+        Output = output;
     }
+
+    #endregion
+
+    #region TextWriter members
+
+    /// <inheritdoc cref="TextWriter.Encoding"/>
+    public override Encoding Encoding => Encoding.Default;
+
+    /// <inheritdoc cref="TextWriter.WriteLine()"/>
+    public override void WriteLine()
+    {
+        Output.WriteLine (string.Empty);
+    }
+
+    /// <inheritdoc cref="TextWriter.Write(string?)"/>
+    public override void Write
+        (
+            string? value
+        )
+    {
+        if (value is not null)
+        {
+            Output.Write (value);
+        }
+    }
+
+    /// <inheritdoc cref="TextWriter.WriteLine(string?)"/>
+    public override void WriteLine
+        (
+            string? value
+        )
+    {
+        if (value is not null)
+        {
+            Output.WriteLine (value);
+        }
+    }
+
+    /// <inheritdoc cref="TextWriter.Write(char)"/>
+    public override void Write
+        (
+            char value
+        )
+    {
+        Write (new string (value, 1));
+    }
+
+    /// <inheritdoc cref="TextWriter.Write(char[])"/>
+    public override void Write
+        (
+            char[]? buffer
+        )
+    {
+        if (buffer is not null)
+        {
+            Write (new string (buffer));
+        }
+    }
+
+    /// <inheritdoc cref="TextWriter.Write(char[],int,int)"/>
+    public override void Write
+        (
+            char[] buffer,
+            int index,
+            int count
+        )
+    {
+        Write (new string (buffer, index, count));
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="TextWriter.Dispose(bool)"/>
+    protected override void Dispose
+        (
+            bool disposing
+        )
+    {
+        Output.Dispose();
+    }
+
+    #endregion
 }

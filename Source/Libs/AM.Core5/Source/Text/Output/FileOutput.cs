@@ -24,206 +24,205 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Text.Output
+namespace AM.Text.Output;
+
+/// <summary>
+/// Файловый вывод.
+/// </summary>
+public sealed class FileOutput
+    : AbstractOutput
 {
+    #region Properties
+
     /// <summary>
-    /// Файловый вывод.
+    /// Имя файла.
     /// </summary>
-    public sealed class FileOutput
-        : AbstractOutput
+    public string? FileName { get; private set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FileOutput()
     {
-        #region Properties
-
-        /// <summary>
-        /// Имя файла.
-        /// </summary>
-        public string? FileName { get; private set; }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public FileOutput()
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public FileOutput
-            (
-                string fileName
-            )
-        {
-            Open(fileName);
-        }
-
-        #endregion
-
-        #region Private members
-
-        private TextWriter? _writer;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Закрытие файла.
-        /// </summary>
-        public void Close()
-        {
-            Dispose();
-        }
-
-        /// <summary>
-        /// Открытие файла.
-        /// </summary>
-        public void Open
-            (
-                string fileName,
-                bool append = false
-            )
-        {
-            Close();
-            FileName = fileName;
-
-            var fileMode = append
-                ? FileMode.Append
-                : FileMode.Create;
-            _writer = new StreamWriter
-                (
-                    File.Open(fileName, fileMode)
-                );
-        }
-
-        /// <summary>
-        /// Открытие файла.
-        /// </summary>
-        public void Open
-            (
-                string fileName,
-                bool append,
-                Encoding encoding
-            )
-        {
-            Close();
-            FileName = fileName;
-
-            var fileMode = append
-                ? FileMode.Append
-                : FileMode.Create;
-            _writer = new StreamWriter
-                (
-                    File.Open(fileName, fileMode),
-                    encoding
-                );
-        }
-
-        /// <summary>
-        /// Открытие файла.
-        /// </summary>
-        public void Open
-            (
-                string fileName,
-                Encoding encoding
-            )
-        {
-            Open
-                (
-                    fileName,
-                    false,
-                    encoding
-                );
-        }
-
-        #endregion
-
-        #region AbstractOutput members
-
-        /// <summary>
-        /// Флаг: был ли вывод с помощью WriteError.
-        /// </summary>
-        public override bool HaveError { get; set; }
-
-        /// <summary>
-        /// Очищает вывод, например, окно.
-        /// Надо переопределить в потомке.
-        /// </summary>
-        public override AbstractOutput Clear()
-        {
-            // TODO: implement properly
-
-            return this;
-        }
-
-        /// <summary>
-        /// Конфигурирование объекта.
-        /// Надо переопределить в потомке.
-        /// </summary>
-        public override AbstractOutput Configure
-            (
-                string configuration
-            )
-        {
-            // TODO: implement properly
-
-            Open(configuration);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Метод, который нужно переопределить
-        /// в потомке.
-        /// </summary>
-        public override AbstractOutput Write
-            (
-                string text
-            )
-        {
-            if (!ReferenceEquals(_writer, null))
-            {
-                _writer.Write(text);
-                _writer.Flush();
-            }
-
-            return this;
-        }
-
-        /// <summary>
-        /// Выводит ошибку. Например, красным цветом.
-        /// Надо переопределить в потомке.
-        /// </summary>
-        public override AbstractOutput WriteError
-            (
-                string text
-            )
-        {
-            HaveError = true;
-            if (!ReferenceEquals(_writer, null))
-            {
-                _writer.Write(text);
-                _writer.Flush();
-            }
-
-            return this;
-        }
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public override void Dispose()
-        {
-            _writer?.Dispose();
-            base.Dispose();
-        }
-
-        #endregion
     }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public FileOutput
+        (
+            string fileName
+        )
+    {
+        Open (fileName);
+    }
+
+    #endregion
+
+    #region Private members
+
+    private TextWriter? _writer;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Закрытие файла.
+    /// </summary>
+    public void Close()
+    {
+        Dispose();
+    }
+
+    /// <summary>
+    /// Открытие файла.
+    /// </summary>
+    public void Open
+        (
+            string fileName,
+            bool append = false
+        )
+    {
+        Close();
+        FileName = fileName;
+
+        var fileMode = append
+            ? FileMode.Append
+            : FileMode.Create;
+        _writer = new StreamWriter
+            (
+                File.Open (fileName, fileMode)
+            );
+    }
+
+    /// <summary>
+    /// Открытие файла.
+    /// </summary>
+    public void Open
+        (
+            string fileName,
+            bool append,
+            Encoding encoding
+        )
+    {
+        Close();
+        FileName = fileName;
+
+        var fileMode = append
+            ? FileMode.Append
+            : FileMode.Create;
+        _writer = new StreamWriter
+            (
+                File.Open (fileName, fileMode),
+                encoding
+            );
+    }
+
+    /// <summary>
+    /// Открытие файла.
+    /// </summary>
+    public void Open
+        (
+            string fileName,
+            Encoding encoding
+        )
+    {
+        Open
+            (
+                fileName,
+                false,
+                encoding
+            );
+    }
+
+    #endregion
+
+    #region AbstractOutput members
+
+    /// <summary>
+    /// Флаг: был ли вывод с помощью WriteError.
+    /// </summary>
+    public override bool HaveError { get; set; }
+
+    /// <summary>
+    /// Очищает вывод, например, окно.
+    /// Надо переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput Clear()
+    {
+        // TODO: implement properly
+
+        return this;
+    }
+
+    /// <summary>
+    /// Конфигурирование объекта.
+    /// Надо переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput Configure
+        (
+            string configuration
+        )
+    {
+        // TODO: implement properly
+
+        Open (configuration);
+
+        return this;
+    }
+
+    /// <summary>
+    /// Метод, который нужно переопределить
+    /// в потомке.
+    /// </summary>
+    public override AbstractOutput Write
+        (
+            string text
+        )
+    {
+        if (!ReferenceEquals (_writer, null))
+        {
+            _writer.Write (text);
+            _writer.Flush();
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Выводит ошибку. Например, красным цветом.
+    /// Надо переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput WriteError
+        (
+            string text
+        )
+    {
+        HaveError = true;
+        if (!ReferenceEquals (_writer, null))
+        {
+            _writer.Write (text);
+            _writer.Flush();
+        }
+
+        return this;
+    }
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public override void Dispose()
+    {
+        _writer?.Dispose();
+        base.Dispose();
+    }
+
+    #endregion
 }

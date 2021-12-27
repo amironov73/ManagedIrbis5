@@ -16,72 +16,70 @@
 #region Using directives
 
 using System.Diagnostics.CodeAnalysis;
+
 using AM.ConsoleIO;
 
 #endregion
 
 #nullable enable
 
-namespace AM.Text.Output
+namespace AM.Text.Output;
+
+/// <summary>
+/// Вывод с помощью системной консоли.
+/// </summary>
+[ExcludeFromCodeCoverage]
+public sealed class ConsoleOutput
+    : AbstractOutput
 {
-    /// <summary>
-    /// Вывод с помощью системной консоли.
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public sealed class ConsoleOutput
-        : AbstractOutput
+    #region AbstractOutput members
+
+    /// <inheritdoc cref="AbstractOutput.HaveError" />
+    public override bool HaveError { get; set; }
+
+    /// <inheritdoc cref="AbstractOutput.Clear" />
+    public override AbstractOutput Clear()
     {
-        #region AbstractOutput members
+        HaveError = false;
+        ConsoleInput.Clear();
 
-        /// <inheritdoc cref="AbstractOutput.HaveError" />
-        public override bool HaveError { get; set; }
+        return this;
+    }
 
-        /// <inheritdoc cref="AbstractOutput.Clear" />
-        public override AbstractOutput Clear()
-        {
-            HaveError = false;
-            ConsoleInput.Clear();
+    /// <inheritdoc cref="AbstractOutput.Configure"/>
+    public override AbstractOutput Configure
+        (
+            string configuration
+        )
+    {
+        // TODO: implement properly
+        return this;
+    }
 
-            return this;
-        }
+    /// <inheritdoc cref="AbstractOutput.Write(string)" />
+    public override AbstractOutput Write
+        (
+            string text
+        )
+    {
+        ConsoleInput.Write (text);
 
-        /// <inheritdoc cref="AbstractOutput.Configure"/>
-        public override AbstractOutput Configure
-            (
-                string configuration
-            )
-        {
-            // TODO: implement properly
-            return this;
-        }
+        return this;
+    }
 
-        /// <inheritdoc cref="AbstractOutput.Write(string)" />
-        public override AbstractOutput Write
-            (
-                string text
-            )
-        {
-            ConsoleInput.Write(text);
+    /// <inheritdoc cref="AbstractOutput.WriteError(string)" />
+    public override AbstractOutput WriteError
+        (
+            string text
+        )
+    {
+        HaveError = true;
 
-            return this;
-        }
+        // TODO implement properly: System.Console.Error.Write(text);
+        ConsoleInput.Write (text);
 
-        /// <inheritdoc cref="AbstractOutput.WriteError(string)" />
-        public override AbstractOutput WriteError
-            (
-                string text
-            )
-        {
-            HaveError = true;
+        return this;
+    }
 
-            // TODO implement properly: System.Console.Error.Write(text);
-            ConsoleInput.Write(text);
-
-            return this;
-        }
-
-        #endregion
-
-    } // class ConsoleOutput
-
-} // namespace AM.Text.Output
+    #endregion
+}

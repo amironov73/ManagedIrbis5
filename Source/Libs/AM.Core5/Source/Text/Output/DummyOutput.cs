@@ -15,102 +15,99 @@
 
 #nullable enable
 
-namespace AM.Text.Output
+namespace AM.Text.Output;
+
+/// <summary>
+/// Выходной поток, который не даёт закрыться
+/// другому потоку.
+/// </summary>
+public sealed class DummyOutput
+    : AbstractOutput
 {
+    #region Properties
+
     /// <summary>
-    /// Выходной поток, который не даёт закрыться
-    /// другому потоку.
+    /// Внутренний поток.
     /// </summary>
-    public sealed class DummyOutput
-        : AbstractOutput
+    public AbstractOutput Inner { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public DummyOutput
+        (
+            AbstractOutput inner
+        )
     {
-        #region Properties
+        Inner = inner;
+    }
 
-        /// <summary>
-        /// Внутренний поток.
-        /// </summary>
-        public AbstractOutput Inner { get; }
+    #endregion
 
-        #endregion
+    #region AbstractOutput members
 
-        #region Construction
+    /// <summary>
+    /// Флаг: был ли вывод с помощью WriteError.
+    /// </summary>
+    public override bool HaveError { get; set; }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public DummyOutput
-            (
-                AbstractOutput inner
-            )
-        {
-            Inner = inner;
-        }
+    /// <summary>
+    /// Очищает вывод, например, окно.
+    /// Надо переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput Clear()
+    {
+        Inner.Clear();
+        HaveError = false;
 
-        #endregion
+        return this;
+    }
 
-        #region AbstractOutput members
+    /// <summary>
+    /// Конфигурирование объекта.
+    /// Надо переопределить в потомке.
+    /// </summary>
+    public override AbstractOutput Configure
+        (
+            string configuration
+        )
+    {
+        Inner.Configure (configuration);
 
-        /// <summary>
-        /// Флаг: был ли вывод с помощью WriteError.
-        /// </summary>
-        public override bool HaveError { get; set; }
+        return this;
+    }
 
-        /// <summary>
-        /// Очищает вывод, например, окно.
-        /// Надо переопределить в потомке.
-        /// </summary>
-        public override AbstractOutput Clear()
-        {
-            Inner.Clear();
-            HaveError = false;
+    /// <summary>
+    /// Метод, который нужно переопределить
+    /// в потомке.
+    /// </summary>
+    public override AbstractOutput Write
+        (
+            string text
+        )
+    {
+        Inner.Write (text);
 
-            return this;
-        }
+        return this;
+    }
 
-        /// <summary>
-        /// Конфигурирование объекта.
-        /// Надо переопределить в потомке.
-        /// </summary>
-        public override AbstractOutput Configure
-            (
-                string configuration
-            )
-        {
-            Inner.Configure(configuration);
+    /// <summary>
+    /// Writes the error.
+    /// </summary>
+    public override AbstractOutput WriteError
+        (
+            string text
+        )
+    {
+        Inner.WriteError (text);
+        HaveError = true;
 
-            return this;
-        }
+        return this;
+    }
 
-        /// <summary>
-        /// Метод, который нужно переопределить
-        /// в потомке.
-        /// </summary>
-        public override AbstractOutput Write
-            (
-                string text
-            )
-        {
-            Inner.Write(text);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Writes the error.
-        /// </summary>
-        public override AbstractOutput WriteError
-                    (
-                        string text
-                    )
-        {
-            Inner.WriteError(text);
-            HaveError = true;
-
-            return this;
-        }
-
-        #endregion
-
-    } // class DummyOutput
-
-} // namespace AM.Text.Output
+    #endregion
+}

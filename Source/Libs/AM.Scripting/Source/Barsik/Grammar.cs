@@ -69,13 +69,13 @@ static class Grammar
 
     private static readonly Parser<char, Unit> BlockComment = CommentParser.SkipBlockComment
         (
-            Try (String ("/*")),
-            Try (String ("*/"))
+            String ("/*"),
+            String ("*/")
         );
 
     private static readonly Parser<char, Unit> LineComment = CommentParser.SkipLineComment
         (
-            Try (String ("//"))
+            String ("//")
         );
 
     private static readonly Parser<char, Unit> Skip = Try (BlockComment)
@@ -84,7 +84,7 @@ static class Grammar
         .SkipMany();
 
     public static Parser<char, T> Tok<T> (Parser<char, T> token) =>
-        Try (token).Between (Skip);
+        token.Between (Skip);
 
     public static Parser<char, char> Tok (char token) => Tok (Char (token));
 
@@ -96,94 +96,91 @@ static class Grammar
     public static Parser<char, TResult> RoundBrackets<TResult> (Parser<char, TResult> parser) =>
         parser.Between (Tok ('('), Tok (')'));
 
-    private static readonly Parser<char, string> Identifier = Tok
+    private static readonly Parser<char, string> Identifier = Map
         (
-            Map
-                (
-                    (first, rest) => first + rest,
-                    Letter,
-                    LetterOrDigit.ManyString()
-                )
+            (first, rest) => first + rest,
+            Letter,
+            LetterOrDigit.ManyString()
         );
 
     private static readonly Parser<char, AtomNode> NullLiteral =
-        Tok ("null").ThenReturn ((AtomNode) new ConstantNode (null));
+        String ("null").ThenReturn ((AtomNode) new ConstantNode (null));
 
     private static readonly Parser<char, AtomNode> BoolLiteral =
-        Tok (OneOf (String ("false"), String ("true")))
+        OneOf (String ("false"), String ("true"))
             .Select<AtomNode> (v => new ConstantNode (v == "true"));
 
-    private static readonly Parser<char, AtomNode> CharLiteral = Tok (Map
-            (
-                (_, content, _) => content,
-                Char ('\''),
-                AnyCharExcept ('\''),
-                Char ('\'')
-            ))
+    private static readonly Parser<char, AtomNode> CharLiteral = Map
+        (
+            (_, content, _) => content,
+            Char ('\''),
+            AnyCharExcept ('\''),
+            Char ('\'')
+        )
         .Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> StringLiteral = Tok (Map
-            (
-                (_, content, _) => new string (content.ToArray()),
-                Char ('"'),
-                AnyCharExcept ('"').Many(),
-                Char ('"')
+    private static readonly Parser<char, AtomNode> StringLiteral = Map
+        (
+            (_, content, _) => new string (content.ToArray()),
+            Char ('"'),
+            AnyCharExcept ('"').Many(),
+            Char ('"')
 
-            ))
+        )
         .Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> Int32Literal = Tok (DecimalNum)
+    private static readonly Parser<char, AtomNode> Int32Literal = DecimalNum
         .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> Int64Literal =
-        Tok (LongNum.Before (OneOf ('L', 'l')))
+        LongNum.Before (OneOf ('L', 'l'))
         .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> UInt32Literal =
-        Tok (UnsignedInt (10).Before (OneOf ('U', 'u')))
+        UnsignedInt (10).Before (OneOf ('U', 'u'))
         .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> UInt64Literal =
-        Tok (LongNum.Before (OneOf (String ("LU"), String ("lu"), String ("UL"), String ("ul"))))
+        LongNum.Before (OneOf (String ("LU"), String ("lu"), String ("UL"), String ("ul")))
         .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> Hex32Literal =
-        Tok (String ("0x").Then (UnsignedInt (16)))
+        String ("0x").Then (UnsignedInt (16))
             .Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> Hex64Literal = Tok (Map
+    private static readonly Parser<char, AtomNode> Hex64Literal = Map
         (
             (_, value, _) => (AtomNode)new ConstantNode (value),
             String ("0x").ThenReturn (0L),
             UnsignedLong (16),
             OneOf ('L', 'l').ThenReturn (0L)
-        ));
+        );
 
     private static readonly Parser<char, AtomNode> FloatLiteral =
-        Tok (Real.Before (OneOf ('F', 'f')))
+        Real.Before (OneOf ('F', 'f'))
             .Select (v => (AtomNode) new ConstantNode ((float) v));
 
     private static readonly Parser<char, AtomNode> DecimalLiteral =
-        Tok (Real.Before (OneOf ('M', 'm')))
+        Real.Before (OneOf ('M', 'm'))
             .Select (v => (AtomNode)new ConstantNode ((decimal) v));
 
-    private static readonly Parser<char, AtomNode> DoubleLiteral = Tok (Real)
-        .Select<AtomNode> (v => new ConstantNode (v));
+    private static readonly Parser<char, AtomNode> DoubleLiteral =
+        Real.Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> Literal = Tok (OneOf (
+    private static readonly Parser<char, AtomNode> Literal = OneOf (
                 NullLiteral, BoolLiteral, CharLiteral, StringLiteral,
                 Hex64Literal, Hex32Literal,
                 UInt64Literal, Int64Literal, UInt32Literal,
                 FloatLiteral, DecimalLiteral, Int32Literal, DoubleLiteral
-            ));
+            );
 
-    private static readonly Parser<char, KeyValueNode> KeyAndValue = Tok (Map
+    private static readonly Parser<char, KeyValueNode> KeyAndValue = Map
         (
             (key, _, value) => new KeyValueNode (key, value),
             Literal,
             Tok (':'),
             Literal
-        ));
+        );
 
     private static readonly Parser<char, AtomNode> Variable = Identifier
         .Select<AtomNode> (name => new VariableNode (name));
@@ -240,7 +237,8 @@ static class Grammar
         (
             OneOf
                 (
-                    List, Dictionary, Literal, Variable, Parenthesis
+                    //Variable, List, Dictionary, Literal, Parenthesis
+                    Variable, Literal
                 ),
             new []
             {
@@ -277,20 +275,18 @@ static class Grammar
     // ReSharper restore RedundantSuppressNullableWarningExpression
 
     // операция присваивания
-    private static readonly Parser<char, string> Operation = Try (OneOf
+    private static readonly Parser<char, string> Operation = OneOf
         (
             Tok ("="), Tok ("+="), Tok ("-="),
             Tok ("*="), Tok ("/="), Tok ("%="), Tok ("&="),
             Tok ("|="), Tok ("^="), Tok ("<<="), Tok (">>=")
-        ));
+        );
 
-    private static readonly Parser<char, StatementNode> Assignment = Try (Tok
-        (
-            from target in Try (Identifier)
-            from op in Operation
-            from expr in Expr
-            select (StatementNode) new AssignmentNode (target, op, expr)
-        ));
+    private static readonly Parser<char, StatementNode> Assignment =
+        from target in Identifier
+        from op in Operation
+        from expr in Expr
+        select (StatementNode) new AssignmentNode (target, op, expr);
 
     private static readonly Parser<char, StatementNode> Print = Try (Map
         (
@@ -308,38 +304,33 @@ static class Grammar
             CurlyBraces (Block)
         ));
 
-    private static readonly Parser<char, IEnumerable<StatementNode>> Else = Try
-        (
-            from _ in Tok ("else")
-            from statements in CurlyBraces (Block)
-            select statements
-        );
+    private static readonly Parser<char, IEnumerable<StatementNode>> Else =
+        from _ in Tok ("else")
+        from statements in CurlyBraces (Block)
+        select statements;
 
-    private static readonly Parser<char, IfNode> ElseIf = Try
-        (
-            from _1 in Tok ("else")
-            from _2 in Tok ("if")
-            from condition in RoundBrackets (Expr)
-            from statements in CurlyBraces (Block)
-        select new IfNode (condition, statements, null, null)
-        );
+    private static readonly Parser<char, IfNode> ElseIf =
+        from _1 in Tok ("else")
+        from _2 in Tok ("if")
+        from condition in RoundBrackets (Expr)
+        from statements in CurlyBraces (Block)
+        select new IfNode (condition, statements, null, null);
 
-    private static readonly Parser<char, StatementNode> If = Try
-        (
-            from _ in Tok ("if")
-            from condition in RoundBrackets (Expr)
-            from thenBlock in CurlyBraces (Block)
-            from elseIf in ElseIf.Many().Optional()
-            from elseBlock in Else.Optional()
-            select (StatementNode) new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(), elseBlock.GetValueOrDefault())
-        );
+    private static readonly Parser<char, StatementNode> If =
+        from _ in Tok ("if")
+        from condition in RoundBrackets (Expr)
+        from thenBlock in CurlyBraces (Block)
+        from elseIf in ElseIf.Many().Optional()
+        from elseBlock in Else.Optional()
+        select (StatementNode)new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(),
+            elseBlock.GetValueOrDefault());
 
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
-            If,
-            While,
-            Assignment,
+            Try (If),
+            Try (While),
+            Try (Assignment),
             Print
         );
 

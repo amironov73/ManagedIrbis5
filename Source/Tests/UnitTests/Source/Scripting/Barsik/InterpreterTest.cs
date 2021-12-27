@@ -27,7 +27,7 @@ public sealed class InterpreterTest
         var variables = interpreter.Context.Variables;
         variables.Add ("x", 1);
         variables.Add ("y", 2);
-        interpreter.Execute ("z = x + y;");
+        interpreter.Execute ("z = x + y");
         var actual = (int) (object) variables["z"]!;
         Assert.AreEqual (3, actual);
     }
