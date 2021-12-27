@@ -2,7 +2,7 @@
 y = 2;
 s = "x + y * 3";
 r = eval (s);
-println s, " => ", r;
+println (s, " => ", r);
 
-s = "println x, \", \", y;";
+s = "println (x, \", \", y;)";
 exec (s);

@@ -14,7 +14,6 @@
 #region Using directive
 
 using System;
-using System.Collections.Generic;
 
 #endregion
 
@@ -40,6 +39,14 @@ internal sealed class AssignmentNode
             AtomNode expression
         )
     {
+        Sure.NotNullNorEmpty (target);
+        Sure.NotNullNorEmpty (operation);
+
+        if (Array.IndexOf (BarsikUtility.Keywords, target) >= 0)
+        {
+            throw new BarsikException ($"Name {target} is reserved");
+        }
+
         _target = target;
         _operation = operation;
         _expression = expression;

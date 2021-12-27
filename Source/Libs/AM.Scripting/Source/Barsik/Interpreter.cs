@@ -110,17 +110,18 @@ public sealed class Interpreter
         program.Execute (Context);
     }
 
-    // /// <summary>
-    // /// Разбор текста программы.
-    // /// </summary>
-    // public static ProgramNode Parse
-    //     (
-    //         string sourceCode
-    //     )
-    // {
-    //     return Grammar.ParseProgram (sourceCode);
-    // }
-    //
+    /// <summary>
+    /// Разбор текста программы.
+    /// </summary>
+    public static ProgramNode ParseProgram
+        (
+            string sourceCode
+        )
+    {
+        Sure.NotNull (sourceCode);
+
+        return Grammar.ParseProgram (sourceCode);
+    }
 
     #endregion
 

@@ -2,20 +2,20 @@
 
 func SayHello ()
 {
-    println "Hello from function";
+    println ("Hello from function");
 }
 
 func sum (a, b, c)
 {
-    println "a=", a, ", b=", b, " c=", c;
+    println ("a=", a, ", b=", b, " c=", c);
 
     result = a + b + c;
-    println "Sum is ", result;
+    println ("Sum is ", result);
 
     return result;
 }
 
-println "Hello from main";
+println ("Hello from main");
 SayHello();
 r = sum (1, 2, 3);
-println "Result is ", r;
+println ("Result is ", r);

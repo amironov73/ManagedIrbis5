@@ -3,10 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* VariableNode.cs -- ссыллка на переменную
  * Ars Magna project, http://arsmagna.ru
@@ -40,6 +38,13 @@ internal sealed class VariableNode
             string name
         )
     {
+        Sure.NotNullNorEmpty (name);
+
+        if (Array.IndexOf (BarsikUtility.Keywords, name) >= 0)
+        {
+            throw new BarsikException ($"Name {name} is reserved");
+        }
+
         _name = name;
     }
 

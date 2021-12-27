@@ -4,7 +4,7 @@
 }
 catch (e)
 {
-    println e.Message;
+    println (e.Message);
 }
 
 try
@@ -13,5 +13,5 @@ try
 }
 catch (e)
 {
-    println e.Message;
+    println (e.Message);
 }

@@ -1,78 +1,78 @@
 ﻿x = 1;
 y = x++;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = 1;
 y = ++x;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = 1;
 y = x--;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = 1;
 y = --x;
-println x, ", ", y;
+println (x, ", ", y);
 
-println "-------";
+println ("-------");
 
 x = 3.2;
 y = x++;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = 3.2;
 y = ++x;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = 3.2;
 y = x--;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = 3.2;
 y = --x;
-println x, ", ", y;
+println (x, ", ", y);
 
-println "-------";
+println ("-------");
 
 x = "Test1";
 y = x++;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = "Test1";
 y = ++x;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = "Test1";
 y = x--;
-println x, ", ", y;
+println (x, ", ", y);
 
 x = "Test1";
 y = --x;
-println x, ", ", y;
+println (x, ", ", y);
 
-println "-------";
+println ("-------");
 
 x = 1;
 x++;
-println x;
+println (x);
 
 x = 1;
 ++x;
-println x;
+println (x);
 
 x = 1;
 x--;
-println x;
+println (x);
 
 x = 1;
 --x;
-println x;
+println (x);
 
-println "-------";
+println ("-------");
 
 for (x = 0; x < 10; x++)
 {
-    print x, ", ";
+    print (x, ", ");
 }
 
-println x;
+println (x);

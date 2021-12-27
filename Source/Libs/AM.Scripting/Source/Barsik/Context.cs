@@ -18,14 +18,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using AM.Collections;
 using AM.IO;
-
-using Pidgin;
-using Pidgin.Comment;
-using Pidgin.Expression;
-
-using static Pidgin.Parser;
-using static Pidgin.Parser<char>;
 
 #endregion
 
@@ -51,6 +45,16 @@ public sealed class Context
     public Dictionary<string, dynamic?> Variables { get; }
 
     /// <summary>
+    /// Точки останова.
+    /// </summary>
+    public Dictionary<StatementNode, Breakpoint> Breakpoints { get; }
+
+    /// <summary>
+    /// Отладчик.
+    /// </summary>
+    public IBarsikDebugger? Debugger { get; set; }
+
+    /// <summary>
     /// Стандартный входной поток.
     /// </summary>
     public TextReader Input { get; }
@@ -64,6 +68,11 @@ public sealed class Context
     /// Выходной поток ошибок.
     /// </summary>
     public TextWriter Error { get; }
+
+    /// <summary>
+    /// Функции.
+    /// </summary>
+    public Dictionary<string, FunctionDescriptor> Functions { get; }
 
     /// <summary>
     /// Используемые пространства имен.
@@ -95,6 +104,8 @@ public sealed class Context
         Input = input;
         Output = output;
         Error = error;
+        Functions = new ();
+        Breakpoints = new ();
         Namespaces = new ();
     }
 
@@ -131,24 +142,24 @@ public sealed class Context
             );
     }
 
-    // /// <summary>
-    // /// Дамп пространств имен.
-    // /// </summary>
-    // public void DumpNamespaces()
-    // {
-    //     var keys = Namespaces.Keys.ToArray();
-    //     if (keys.IsNullOrEmpty())
-    //     {
-    //         Output.WriteLine ("(no namespaces)");
-    //         return;
-    //     }
-    //
-    //     Array.Sort (keys);
-    //     foreach (var key in keys)
-    //     {
-    //         Output.WriteLine (key);
-    //     }
-    // }
+    /// <summary>
+    /// Дамп пространств имен.
+    /// </summary>
+    public void DumpNamespaces()
+    {
+        var keys = Namespaces.Keys.ToArray();
+        if (keys.IsNullOrEmpty())
+        {
+            Output.WriteLine ("(no namespaces)");
+            return;
+        }
+
+        Array.Sort (keys);
+        foreach (var key in keys)
+        {
+            Output.WriteLine (key);
+        }
+    }
 
     /// <summary>
     /// Дамп переменных.
@@ -156,11 +167,6 @@ public sealed class Context
     public void DumpVariables()
     {
         var keys = Variables.Keys.ToArray();
-        // if (keys.IsNullOrEmpty())
-        // {
-        //     Output.WriteLine ("(no variables)");
-        //     return;
-        // }
 
         Array.Sort (keys);
         foreach (var key in keys)
@@ -177,65 +183,65 @@ public sealed class Context
         }
     }
 
-    // /// <summary>
-    // /// Получение типа по его имени.
-    // /// </summary>
-    // public Type? FindType
-    //     (
-    //         string name
-    //     )
-    // {
-    //     Type? result = Type.GetType (name, false);
-    //     if (result is not null)
-    //     {
-    //         return result;
-    //     }
-    //
-    //     foreach (var ns in Namespaces.Keys)
-    //     {
-    //         var fullName = ns + "." + name;
-    //         result = Type.GetType (fullName, false);
-    //         if (result is not null)
-    //         {
-    //             return result;
-    //         }
-    //     }
-    //
-    //     return null;
-    // }
+    /// <summary>
+    /// Получение типа по его имени.
+    /// </summary>
+    public Type? FindType
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
 
-    // /// <summary>
-    // /// Поиск функции в текущем и в родительском контекстах.
-    // /// </summary>
-    // public FunctionDescriptor GetFunction
-    //     (
-    //         string name
-    //     )
-    // {
-    //     Sure.NotNullNorEmpty (name);
-    //
-    //     if (Functions.TryGetValue (name, out var result))
-    //     {
-    //         return result;
-    //     }
-    //
-    //     for (var context = Parent; context is not null; context = context.Parent)
-    //     {
-    //         if (context.Functions.TryGetValue (name, out result))
-    //         {
-    //             return result;
-    //         }
-    //     }
-    //
-    //     if (Builtins.Registry.TryGetValue (name, out result))
-    //     {
-    //         return result;
-    //     }
-    //
-    //     throw new Exception ($"Function {name} not found");
-    // }
+        Type? result = Type.GetType (name, false);
+        if (result is not null)
+        {
+            return result;
+        }
 
+        foreach (var ns in Namespaces.Keys)
+        {
+            var fullName = ns + "." + name;
+            result = Type.GetType (fullName, false);
+            if (result is not null)
+            {
+                return result;
+            }
+        }
 
+        return null;
+    }
+
+    /// <summary>
+    /// Поиск функции в текущем и в родительском контекстах.
+    /// </summary>
+    public FunctionDescriptor GetFunction
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        if (Functions.TryGetValue (name, out var result))
+        {
+            return result;
+        }
+
+        for (var context = Parent; context is not null; context = context.Parent)
+        {
+            if (context.Functions.TryGetValue (name, out result))
+            {
+                return result;
+            }
+        }
+
+        if (Builtins.Registry.TryGetValue (name, out result))
+        {
+            return result;
+        }
+
+        throw new Exception ($"Function {name} not found");
+    }
 
     /// <summary>
     /// Вывод на печать значения AST-узла.
@@ -307,5 +313,4 @@ public sealed class Context
     }
 
     #endregion
-
 }

@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Pidgin;
 using Pidgin.Comment;
@@ -199,6 +198,17 @@ static class Grammar
         .Select<AtomNode> (inner => new ParenthesisNode (inner));
     // ReSharper restore RedundantSuppressNullableWarningExpression
 
+    // вызов свободной функции
+    // ReSharper disable RedundantSuppressNullableWarningExpression
+    private static readonly Parser<char, AtomNode> FreeFunctionCall = Map
+        (
+            (name, args) =>
+                (AtomNode) new FreeCallNode (name, args.GetValueOrDefault()),
+            Tok (Identifier),
+            RoundBrackets (Rec (() => Expr!).Separated (Tok (',')).Optional())
+        );
+    // ReSharper restore RedundantSuppressNullableWarningExpression
+
     private static Parser<char, Func<AtomNode, AtomNode>> Prefix (Parser<char, string> op) =>
         op.Select<Func<AtomNode, AtomNode>> (type => inner => new PrefixNode (type, inner));
 
@@ -240,7 +250,12 @@ static class Grammar
         (
             OneOf
                 (
-                    Literal, Variable, List, Dictionary, Parenthesis
+                    Try (Literal),
+                    Try (FreeFunctionCall),
+                    Try (Variable),
+                    Try (List),
+                    Try (Dictionary),
+                    Try (Parenthesis)
                 ),
             new []
             {
@@ -322,8 +337,8 @@ static class Grammar
         from step in Tok (Assignment)
         from close1 in Tok (')')
         from statements in CurlyBraces (Block)
-        //from elseBody in Else.Optional()
-        select (StatementNode) new ForNode (init, condition, step, statements, null);
+        from elseBody in Else.Optional()
+        select (StatementNode) new ForNode (init, condition, step, statements, elseBody.GetValueOrDefault());
 
     private static readonly Parser<char, IEnumerable<StatementNode>> Else =
         from _ in Tok ("else")
@@ -345,7 +360,7 @@ static class Grammar
         from elseBlock in Else.Optional()
         //select (StatementNode)new IfNode (condition, thenBlock, elseIf.GetValueOrDefault(),
         //    elseBlock.GetValueOrDefault());
-         select (StatementNode)new IfNode (condition, thenBlock, null, elseBlock.GetValueOrDefault());
+        select (StatementNode)new IfNode (condition, thenBlock, null, elseBlock.GetValueOrDefault());
 
     private static readonly Parser<char, CatchNode> Catch =
         from _ in Tok ("catch")
@@ -374,6 +389,15 @@ static class Grammar
             Char ('>')
         );
 
+    // оператор throw
+    // TODO переделать на Expr
+    private static readonly Parser<char, StatementNode> Throw = Map
+        (
+            (_, operand) => (StatementNode)new ThrowNode (operand),
+            Tok ("throw"),
+            Expr
+        );
+
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
@@ -383,6 +407,7 @@ static class Grammar
             Try (Tok (While)),
             Try (Tok (Print)),
             Try (Tok (External)),
+            Try (Tok (Throw)),
             Try (Tok (Assignment))
         );
 

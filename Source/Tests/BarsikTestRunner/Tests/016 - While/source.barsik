@@ -1,4 +1,4 @@
-﻿println "------";
+﻿println ("------");
 
 i = 0;
 j = 10;
@@ -6,7 +6,7 @@ j = 10;
 while (i < j)
 {
     i = i + 1;
-    println i;
+    println (i);
 }
 
-println "------";
+println ("------");
