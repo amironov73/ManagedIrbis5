@@ -247,6 +247,7 @@ static class Grammar
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
                 // new [] { Postfix ("++"), Postfix ("--") },
                 // new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
+                new [] { Prefix ("!")},
                 new [] { BinaryLeft ("+"), BinaryLeft ("-") },
                 new [] { BinaryLeft ("<<"), BinaryLeft (">>") },
                 new [] { BinaryLeft ("<="), BinaryLeft (">="), BinaryLeft ("<"), BinaryLeft (">") },
@@ -311,6 +312,19 @@ static class Grammar
             CurlyBraces (Block)
         );
 
+    private static readonly Parser<char, StatementNode> For =
+        from _1 in Tok ("for")
+        from open1 in Tok ('(')
+        from init in Assignment
+        from _2 in Tok (';')
+        from condition in Expr
+        from _3 in Token (';')
+        from step in Tok (Assignment)
+        from close1 in Tok (')')
+        from statements in CurlyBraces (Block)
+        //from elseBody in Else.Optional()
+        select (StatementNode) new ForNode (init, condition, step, statements, null);
+
     private static readonly Parser<char, IEnumerable<StatementNode>> Else =
         from _ in Tok ("else")
         from statements in CurlyBraces (Block)
@@ -333,10 +347,31 @@ static class Grammar
         //    elseBlock.GetValueOrDefault());
          select (StatementNode)new IfNode (condition, thenBlock, null, elseBlock.GetValueOrDefault());
 
+    private static readonly Parser<char, CatchNode> Catch =
+        from _ in Tok ("catch")
+        from variable in RoundBrackets(Identifier)
+        from block in CurlyBraces(Block)
+        select new CatchNode (variable, block);
+
+    private static readonly Parser<char, IEnumerable<StatementNode>> Finally =
+        from _ in Tok ("finally")
+        from block in CurlyBraces (Block)
+        select block;
+
+    private static readonly Parser<char, StatementNode> TryCatchFinally =
+        from _ in Tok ("try")
+        from tryBlock in CurlyBraces (Block)
+        from catchNode in Catch.Optional()
+        from finallyBlock in Finally.Optional()
+        select (StatementNode) new TryNode (tryBlock, catchNode.GetValueOrDefault(),
+            finallyBlock.GetValueOrDefault());
+
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
             Try (Tok (If)),
+            Try (Tok (TryCatchFinally)),
+            Try (Tok (For)),
             Try (Tok (While)),
             Try (Tok (Print)),
             Try (Tok (Assignment))

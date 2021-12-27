@@ -1,7 +1,7 @@
 before
 try1
 try2
-catch2: Operator '/' cannot be applied to operands of type 'int' and 'string'
-catch1: Attempted to divide by zero.
+catch2
+catch1
 finally1
 after

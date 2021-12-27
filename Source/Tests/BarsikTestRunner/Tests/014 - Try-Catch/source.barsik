@@ -1,19 +1,19 @@
-﻿println "before";
+﻿println ("before");
 
 try
 {
-    println "try1";
+    println ("try1");
 
     try
     {
-        println "try2";
+        println ("try2");
         a = 111;
         b = "Some text";
         c = a / b;
     }
     catch (e)
     {
-        println "catch2: ", e.Message;
+        println ("catch2");
     }
 
     x = 1;
@@ -22,11 +22,11 @@ try
 }
 catch (e)
 {
-    println "catch1: ", e.Message;
+    println ("catch1");
 }
 finally
 {
-    println "finally1";
+    println ("finally1");
 }
 
-println "after";
+println ("after");

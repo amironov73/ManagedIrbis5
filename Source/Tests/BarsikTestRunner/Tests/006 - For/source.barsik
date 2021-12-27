@@ -1,13 +1,13 @@
-﻿println "------";
+﻿println ("------");
 
 for (i = 0; i < 10; i = i + 1)
 {
     for (j = 0; j <= i; j = j + 1)
     {
-        print "[", i, ", ", j, "] ";
+        print ("[", i, ", ", j, "] ");
     }
 
-    println;
+    println ("");
 }
 
-println "------";
+println ("------");
