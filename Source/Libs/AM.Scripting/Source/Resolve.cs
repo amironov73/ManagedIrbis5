@@ -114,6 +114,11 @@ public static class Resolve
     #region Extension methods
 
     /// <summary>
+    /// Число плавающей точкой двойной точности.
+    /// </summary>
+    public static readonly Parser<char, double> Double = new DoubleParser();
+
+    /// <summary>
     /// Экранирование в строке специальных символов,
     /// таких как <c>\n</c>.
     /// </summary>

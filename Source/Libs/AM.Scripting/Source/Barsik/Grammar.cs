@@ -78,13 +78,13 @@ static class Grammar
             String ("//")
         );
 
-    private static readonly Parser<char, Unit> Skip = Try (BlockComment)
+    private static readonly Parser<char, Unit> Filler = Try (BlockComment)
         .Or (Try (LineComment))
         .Or (Whitespace.IgnoreResult())
         .SkipMany();
 
     public static Parser<char, T> Tok<T> (Parser<char, T> token) =>
-        token.Between (Skip);
+        token.Between (Filler);
 
     public static Parser<char, char> Tok (char token) => Tok (Char (token));
 
@@ -119,14 +119,8 @@ static class Grammar
         )
         .Select<AtomNode> (v => new ConstantNode (v));
 
-    private static readonly Parser<char, AtomNode> StringLiteral = Map
-        (
-            (_, content, _) => new string (content.ToArray()),
-            Char ('"'),
-            AnyCharExcept ('"').Many(),
-            Char ('"')
-
-        )
+    private static readonly Parser<char, AtomNode> StringLiteral =
+        new EscapeParser ('"', '\\')
         .Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> Int32Literal = DecimalNum
@@ -165,16 +159,22 @@ static class Grammar
             .Select (v => (AtomNode)new ConstantNode ((decimal) v));
 
     private static readonly Parser<char, AtomNode> DoubleLiteral =
-        Real.Select<AtomNode> (v => new ConstantNode (v));
+        Resolve.Double.Select<AtomNode> (v => new ConstantNode (v));
 
     private static readonly Parser<char, AtomNode> Literal = OneOf (
-                Try (NullLiteral), Try (BoolLiteral),
-                Try (CharLiteral), Try (StringLiteral),
-                //Try (Hex64Literal), Try (Hex32Literal),
-                //Try (UInt64Literal), Try (Int64Literal),
-                // Try (UInt32Literal), Try (DecimalLiteral),
-                Try (Int32Literal), //Try (FloatLiteral),
-                Try (DoubleLiteral)
+                Try (NullLiteral),
+                Try (BoolLiteral),
+                Try (CharLiteral),
+                Try (StringLiteral),
+                Try (Hex64Literal),
+                Try (Hex32Literal),
+                Try (UInt64Literal),
+                Try (Int64Literal),
+                Try (UInt32Literal),
+                Try (DecimalLiteral),
+                Try (FloatLiteral),
+                Try (DoubleLiteral),
+                Try (Int32Literal)
             );
 
     private static readonly Parser<char, KeyValueNode> KeyAndValue = Map

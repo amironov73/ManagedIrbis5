@@ -78,6 +78,7 @@ public sealed class InterpreterTest
 //             Assert.AreEqual (1, actual);
 //         }
 //
+        [Ignore]
         [TestMethod]
         [Description ("Комментарии")]
         public void Interpreter_Execute_5()
