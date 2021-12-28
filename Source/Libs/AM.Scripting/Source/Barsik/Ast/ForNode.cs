@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* ForNode.cs -- цикл for
  * Ars Magna project, http://arsmagna.ru
@@ -27,15 +24,26 @@ namespace AM.Scripting.Barsik;
 /// </summary>
 sealed class ForNode : StatementNode
 {
+    #region Construciton
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public ForNode
         (
-            StatementNode init,
+            AtomNode init,
             AtomNode condition,
-            StatementNode step,
+            AtomNode step,
             IEnumerable<StatementNode>? body,
             IEnumerable<StatementNode>? elseBody
         )
     {
+        // TODO сделать init-condition-step опциональными
+
+        Sure.NotNull (init);
+        Sure.NotNull (condition);
+        Sure.NotNull (step);
+
         _init = init;
         _condition = condition;
         _step = step;
@@ -51,17 +59,29 @@ sealed class ForNode : StatementNode
         }
     }
 
-    private readonly StatementNode _init;
+    #endregion
+
+    #region Private members
+
+    private readonly AtomNode _init;
     private readonly AtomNode _condition;
-    private readonly StatementNode _step;
+    private readonly AtomNode _step;
     private readonly List<StatementNode> _body;
     private readonly List<StatementNode>? _else;
 
-    public override void Execute (Context context)
+    #endregion
+
+    #region StatementNode members
+
+    /// <inheritdoc cref="StatementNode.Execute"/>
+    public override void Execute
+        (
+            Context context
+        )
     {
         PreExecute (context);
 
-        _init.Execute (context);
+        _init.Compute (context);
         var success = false;
         while (BarsikUtility.ToBoolean (_condition.Compute (context)))
         {
@@ -71,7 +91,7 @@ sealed class ForNode : StatementNode
                 statement.Execute (context);
             }
 
-            _step.Execute (context);
+            _step.Compute (context);
         }
 
         if (!success && _else is not null)
@@ -82,4 +102,6 @@ sealed class ForNode : StatementNode
             }
         }
     }
+
+    #endregion
 }

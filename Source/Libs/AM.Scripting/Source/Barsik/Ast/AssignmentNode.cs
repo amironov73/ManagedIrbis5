@@ -25,7 +25,7 @@ namespace AM.Scripting.Barsik;
 /// Присваивание переменной результата вычисления выражения.
 /// </summary>
 internal sealed class AssignmentNode
-    : StatementNode
+    : AtomNode
 {
     #region Construction
 
@@ -41,6 +41,7 @@ internal sealed class AssignmentNode
     {
         Sure.NotNullNorEmpty (target);
         Sure.NotNullNorEmpty (operation);
+        Sure.NotNull (expression);
 
         if (Array.IndexOf (BarsikUtility.Keywords, target) >= 0)
         {
@@ -62,16 +63,14 @@ internal sealed class AssignmentNode
 
     #endregion
 
-    #region StatementNode members
+    #region AtomNode members
 
-    /// <inheritdoc cref="StatementNode.Execute"/>
-    public override void Execute
+    /// <inheritdoc cref="AtomNode.Compute"/>
+    public override dynamic? Compute
         (
             Context context
         )
     {
-        PreExecute (context);
-
         var variableName = _target;
         dynamic? variableValue = null;
         if (_operation != "=")
@@ -79,7 +78,7 @@ internal sealed class AssignmentNode
             if (!context.TryGetVariable (variableName, out variableValue))
             {
                 context.Error.WriteLine ($"Variable {variableName} not found");
-                return;
+                return null;
             }
         }
 
@@ -102,7 +101,7 @@ internal sealed class AssignmentNode
 
         context.SetVariable (variableName, computedValue);
 
-        // BarsikUtility.PrintObject (context.Output, computedValue);
+        return computedValue;
     }
 
     #endregion

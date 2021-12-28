@@ -102,7 +102,7 @@ x = 1;
     }
 
          [TestMethod]
-         [Description ("Вызов функции")]
+         [Description ("Создание списка")]
          public void Interpreter_Execute_7()
          {
              var interpreter = new Interpreter();
@@ -251,5 +251,74 @@ x = 1;
         interpreter.Execute ("x = 123.4f");
         actual = (float) interpreter.Context.Variables["x"]!;
         Assert.AreEqual (123.4f, actual);
+    }
+
+    [TestMethod]
+    [Description ("Постфиксный инкремент")]
+    public void Interpreter_PostfixIncrement_1()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables.Add ("x", 1);
+        interpreter.Execute ("y = x++");
+        var actualX = (int) (object) variables["x"]!;
+        Assert.AreEqual (2, actualX);
+        var actualY = (int) (object) variables["y"]!;
+        Assert.AreEqual (1, actualY);
+    }
+
+    [TestMethod]
+    [Description ("Префиксный инкремент")]
+    public void Interpreter_PrefixIncrement_1()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables.Add ("x", 1);
+        interpreter.Execute ("y = ++x");
+        var actualX = (int) (object) variables["x"]!;
+        Assert.AreEqual (2, actualX);
+        var actualY = (int) (object) variables["y"]!;
+        Assert.AreEqual (2, actualY);
+    }
+
+    [TestMethod]
+    [Description ("Многократное присваивание")]
+    public void Interpreter_MultipleAssignment_1()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        interpreter.Execute ("z = y = 1");
+        var actualY = (int) (object) variables["y"]!;
+        Assert.AreEqual (1, actualY);
+        var actualZ = (int) (object) variables["z"]!;
+        Assert.AreEqual (1, actualZ);
+    }
+
+    [TestMethod]
+    [Description ("Многократное сложное присваивание")]
+    public void Interpreter_MultipleAssignment_2()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables["y"] = 1;
+        variables["z"] = 10;
+        interpreter.Execute ("z += y += 2 * (3 + 4)");
+        var actualY = (int) (object) variables["y"]!;
+        Assert.AreEqual (15, actualY);
+        var actualZ = (int) (object) variables["z"]!;
+        Assert.AreEqual (25, actualZ);
+    }
+
+    [TestMethod]
+    [Description ("Вычисление условных выражений")]
+    public void Interpreter_BooleanExpression_1()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables["a"] = 1;
+        variables["b"] = 10;
+        interpreter.Execute ("z = a != 0 and b != 0");
+        var actualZ = (bool) (object) variables["z"]!;
+        Assert.AreEqual (true, actualZ);
     }
 }

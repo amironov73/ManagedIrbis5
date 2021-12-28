@@ -13,7 +13,7 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Nod.barsik">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Now.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -88,6 +88,15 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Comment.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Eval.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="While.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Chr.barsik">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

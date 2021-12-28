@@ -1,6 +1,4 @@
-﻿#u System
-
-func SayHello ()
+﻿func SayHello ()
 {
     println ("Hello from function");
 }

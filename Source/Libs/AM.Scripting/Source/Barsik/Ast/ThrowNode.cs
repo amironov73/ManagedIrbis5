@@ -23,7 +23,7 @@ namespace AM.Scripting.Barsik;
 /// Оператор throw.
 /// </summary>
 sealed class ThrowNode
-    : StatementNode
+    : AtomNode
 {
     #region Construction
 
@@ -48,32 +48,23 @@ sealed class ThrowNode
 
     #endregion
 
-    #region StatementNode members
+    #region AtomNode members
 
-    /// <inheritdoc cref="StatementNode.Execute"/>
-    public override void Execute
+    /// <inheritdoc cref="AtomNode.Compute"/>
+    public override dynamic Compute
         (
             Context context
         )
     {
-        PreExecute (context);
-
         var value = _operand.Compute (context);
 
-        switch (value)
+        throw value switch
         {
-            case null:
-                throw new ApplicationException();
-
-            case string message:
-                throw new ApplicationException (message);
-
-            case Exception exception:
-                throw exception;
-
-            default:
-                throw new ApplicationException (((object) value).ToString());
-        }
+            null => new ApplicationException(),
+            string message => new ApplicationException (message),
+            Exception exception => exception,
+            _ => new ApplicationException (((object)value).ToString())
+        };
     }
 
     #endregion

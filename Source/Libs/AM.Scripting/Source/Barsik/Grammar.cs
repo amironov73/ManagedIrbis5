@@ -265,6 +265,36 @@ static class Grammar
     //     from falseValue in Tok (Rec (() => Expr!))
     //     select (AtomNode) new TernaryNode (condition, trueValue, falseValue);
 
+    // операция присваивания
+    private static readonly Parser<char, string> Operation = OneOf
+        (
+            Tok ("="), Tok ("+="), Tok ("-="),
+            Tok ("*="), Tok ("/="), Tok ("%="), Tok ("&="),
+            Tok ("|="), Tok ("^="), Tok ("<<="), Tok (">>=")
+        );
+
+    // оператор присваивания
+    // ReSharper disable RedundantSuppressNullableWarningExpression
+    private static readonly Parser<char, AtomNode> Assignment = Map
+        (
+            (target, op, expression) =>
+                (AtomNode) new AssignmentNode (target, op, expression),
+            Tok (Identifier),
+            Operation,
+            Rec (() => Expr!)
+        );
+    // ReSharper restore RedundantSuppressNullableWarningExpression
+
+    // оператор throw
+    // ReSharper disable RedundantSuppressNullableWarningExpression
+    private static readonly Parser<char, AtomNode> Throw = Map
+        (
+            (_, operand) => (AtomNode) new ThrowNode (operand),
+            Tok ("throw"),
+            Tok (Rec (() => Expr!))
+        );
+    // ReSharper restore RedundantSuppressNullableWarningExpression
+
     // выражение
     private static readonly Parser<char, AtomNode> Expr = ExpressionParser.Build
         (
@@ -272,12 +302,14 @@ static class Grammar
                 (
                     Try (Literal),
                     Try (New),
+                    Try (Throw),
                     // Try (Ternary),
                     Try (FreeFunctionCall),
-                    Try (Variable),
                     Try (List),
                     Try (Dictionary),
-                    Try (Parenthesis)
+                    Try (Parenthesis),
+                    Try (Assignment),
+                    Try (Variable)
                 ),
             new []
             {
@@ -292,8 +324,9 @@ static class Grammar
                 new [] { BinaryLeft ("&") },
                 new [] { BinaryLeft ("^") },
                 new [] { BinaryLeft ("|") },
-                new [] { BinaryLeft ("&&") },
-                new [] { BinaryLeft ("||") }
+                // TODO разобраться, почему не работает &&
+                new [] { BinaryLeft ("&&"), BinaryLeft ("and") },
+                new [] { BinaryLeft ("||"), BinaryLeft ("or") },
             }
         );
 
@@ -318,19 +351,9 @@ static class Grammar
         );
     // ReSharper restore RedundantSuppressNullableWarningExpression
 
-    // операция присваивания
-    private static readonly Parser<char, string> Operation = OneOf
-        (
-            Tok ("="), Tok ("+="), Tok ("-="),
-            Tok ("*="), Tok ("/="), Tok ("%="), Tok ("&="),
-            Tok ("|="), Tok ("^="), Tok ("<<="), Tok (">>=")
-        );
-
-    private static readonly Parser<char, StatementNode> Assignment =
-        from target in Identifier
-        from op in Operation
-        from expr in Expr
-        select (StatementNode) new AssignmentNode (target, op, expr);
+    // вычисление выражения
+    private static readonly Parser<char, StatementNode> ExpressionStatement =
+        Expr.Select<StatementNode> (v => new ExpressionNode (v));
 
     private static readonly Parser<char, StatementNode> Print = Map
         (
@@ -353,14 +376,14 @@ static class Grammar
     private static readonly Parser<char, StatementNode> For =
         from _1 in Tok ("for")
         from open1 in Tok ('(')
-        from init in Assignment
+        from init in Tok (Assignment)
         from _2 in Tok (';')
-        from condition in Expr
+        from condition in Tok (Expr)
         from _3 in Token (';')
         from step in Tok (Assignment)
         from close1 in Tok (')')
         from statements in CurlyBraces (Block)
-        from elseBody in Rec (() => Else!).Optional()
+        from elseBody in Rec (() => Tok (Else!)).Optional()
         select (StatementNode) new ForNode (init, condition, step, statements,
             elseBody.GetValueOrDefault());
 
@@ -370,7 +393,7 @@ static class Grammar
         from open1 in Tok ('(')
         from variableName in Tok (Identifier)
         from _2 in Tok ("in")
-        from enumerable in Expr
+        from enumerable in Tok (Expr)
         from close1 in Tok (')')
         from statements in CurlyBraces (Block)
         select (StatementNode) new ForEachNode (variableName, enumerable, statements);
@@ -416,21 +439,18 @@ static class Grammar
         select (StatementNode) new TryNode (tryBlock, catchNode.GetValueOrDefault(),
             finallyBlock.GetValueOrDefault());
 
+    // возврат из функции
+    private static readonly Parser<char, StatementNode> Return =
+        Tok ("return").Then (Tok (Expr).Optional())
+            .Select<StatementNode> (v => new ReturnNode (v.GetValueOrDefault()));
+
+    // внешний код
     private static readonly Parser<char, StatementNode> External = Map
         (
             (_, content, _) => (StatementNode)new ExternalNode (content),
             Char ('<'),
             AnyCharExcept ('>').ManyString(),
             Char ('>')
-        );
-
-    // оператор throw
-    // TODO переделать на Expr
-    private static readonly Parser<char, StatementNode> Throw = Map
-        (
-            (_, operand) => (StatementNode)new ThrowNode (operand),
-            Tok ("throw"),
-            Expr
         );
 
     // определение функции
@@ -456,6 +476,7 @@ static class Grammar
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
             Try (Tok (If)),
+            Try (Tok (Return)),
             Try (Tok (TryCatchFinally)),
             Try (Tok (ForEach)),
             Try (Tok (For)),
@@ -464,8 +485,7 @@ static class Grammar
             Try (Tok (Using)),
             Try (Tok (Print)),
             Try (Tok (External)),
-            Try (Tok (Throw)),
-            Try (Tok (Assignment))
+            Try (Tok (ExpressionStatement))
         );
 
     //

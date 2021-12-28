@@ -47,10 +47,10 @@ internal sealed class VariableNode
     {
         Sure.NotNullNorEmpty (name);
 
-        if (Array.IndexOf (BarsikUtility.Keywords, name) >= 0)
-        {
-            throw new BarsikException ($"Name {name} is reserved");
-        }
+        // if (Array.IndexOf (BarsikUtility.Keywords, name) >= 0)
+        // {
+        //     throw new BarsikException ($"Name {name} is reserved");
+        // }
 
         Name = name;
     }
