@@ -15,6 +15,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 
 #endregion
 
@@ -63,16 +64,16 @@ public sealed class Interpreter
     /// <summary>
     /// Вычисление значения переменной.
     /// </summary>
-    public AtomNode? Evaluate
+    public AtomNode Evaluate
         (
             string sourceCode
         )
     {
-        // Sure.NotNull (sourceCode);
+        Sure.NotNull (sourceCode);
 
         var node = Grammar.ParseExpression (sourceCode);
 
-        return node ?? null;
+        return node;
     }
 
     /// <summary>
@@ -83,29 +84,38 @@ public sealed class Interpreter
             string sourceCode
         )
     {
-        // Sure.NotNull (sourceCode);
+        Sure.NotNull (sourceCode);
 
         var program = Grammar.ParseProgram (sourceCode);
 
-        // foreach (var statement in program.Statements)
-        // {
-        //     if (statement is DefinitionNode node)
-        //     {
-        //         var name = node.theName;
-        //         var definition = new FunctionDefinition
-        //             (
-        //                 name,
-        //                 node.theArguments,
-        //                 node.theBody
-        //             );
-        //         var descriptor = new FunctionDescriptor
-        //             (
-        //                 name,
-        //                 definition.CreateCallPoint()
-        //             );
-        //         Context.Functions[name] = descriptor;
-        //     }
-        // }
+        var haveDefinitions = false;
+        foreach (var statement in program.Statements)
+        {
+            if (statement is DefinitionNode node)
+            {
+                haveDefinitions = true;
+                var name = node.theName;
+                var definition = new FunctionDefinition
+                    (
+                        name,
+                        node.theArguments,
+                        node.theBody
+                    );
+                var descriptor = new FunctionDescriptor
+                    (
+                        name,
+                        definition.CreateCallPoint()
+                    );
+                Context.Functions[name] = descriptor;
+            }
+        }
+
+        if (haveDefinitions)
+        {
+            program.Statements = program.Statements
+                .Where (stmt => stmt is not PseudoNode)
+                .ToList();
+        }
 
         program.Execute (Context);
     }

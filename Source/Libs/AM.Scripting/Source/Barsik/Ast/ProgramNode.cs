@@ -32,7 +32,7 @@ public sealed class ProgramNode
     /// <summary>
     /// Стейтменты программы.
     /// </summary>
-    public List<StatementNode> Statements { get; }
+    public List<StatementNode> Statements { get; internal set; }
 
     #endregion
 

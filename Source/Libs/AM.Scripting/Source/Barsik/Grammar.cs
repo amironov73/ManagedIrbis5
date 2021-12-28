@@ -238,6 +238,7 @@ static class Grammar
         ));
     // ReSharper restore RedundantSuppressNullableWarningExpression
 
+    // инициализация словаря
     private static readonly Parser<char, AtomNode> Dictionary = Tok (Map
         (
             (_, items, _) => (AtomNode) new DictionaryNode (items),
@@ -246,11 +247,32 @@ static class Grammar
             Tok ('}')
         ));
 
+    // оператор new
+    private static readonly Parser<char, AtomNode> New =
+        from _ in Tok ("new")
+        from typeName in Tok (Identifier)
+        from args in
+            RoundBrackets (Rec (() => Expr!).Separated (Tok (',')).Optional())
+        select (AtomNode) new NewNode (typeName, args.GetValueOrDefault());
+
+    // тернарный оператор
+    // TODO устранить левую рекурсию
+    // private static readonly Parser<char, AtomNode> Ternary =
+    //     from condition in Tok (Rec (() => Expr!))
+    //     from question in Tok ('?')
+    //     from trueValue in Tok (Rec (() => Expr!))
+    //     from colon in Tok (':')
+    //     from falseValue in Tok (Rec (() => Expr!))
+    //     select (AtomNode) new TernaryNode (condition, trueValue, falseValue);
+
+    // выражение
     private static readonly Parser<char, AtomNode> Expr = ExpressionParser.Build
         (
             OneOf
                 (
                     Try (Literal),
+                    Try (New),
+                    // Try (Ternary),
                     Try (FreeFunctionCall),
                     Try (Variable),
                     Try (List),
@@ -260,8 +282,8 @@ static class Grammar
             new []
             {
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
-                // new [] { Postfix ("++"), Postfix ("--") },
-                // new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
+                new [] { Postfix ("++"), Postfix ("--") },
+                new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
                 new [] { Prefix ("!")},
                 new [] { BinaryLeft ("+"), BinaryLeft ("-") },
                 new [] { BinaryLeft ("<<"), BinaryLeft (">>") },
@@ -327,6 +349,7 @@ static class Grammar
             CurlyBraces (Block)
         );
 
+    // цикл for
     private static readonly Parser<char, StatementNode> For =
         from _1 in Tok ("for")
         from open1 in Tok ('(')
@@ -337,8 +360,20 @@ static class Grammar
         from step in Tok (Assignment)
         from close1 in Tok (')')
         from statements in CurlyBraces (Block)
-        from elseBody in Else.Optional()
-        select (StatementNode) new ForNode (init, condition, step, statements, elseBody.GetValueOrDefault());
+        from elseBody in Rec (() => Else!).Optional()
+        select (StatementNode) new ForNode (init, condition, step, statements,
+            elseBody.GetValueOrDefault());
+
+    // цикл foreach
+    private static readonly Parser<char, StatementNode> ForEach =
+        from _1 in Tok ("foreach")
+        from open1 in Tok ('(')
+        from variableName in Tok (Identifier)
+        from _2 in Tok ("in")
+        from enumerable in Expr
+        from close1 in Tok (')')
+        from statements in CurlyBraces (Block)
+        select (StatementNode) new ForEachNode (variableName, enumerable, statements);
 
     private static readonly Parser<char, IEnumerable<StatementNode>> Else =
         from _ in Tok ("else")
@@ -398,13 +433,35 @@ static class Grammar
             Expr
         );
 
+    // определение функции
+    private static readonly Parser<char, StatementNode> FunctionDefinition =
+        from _ in Tok ("func")
+        from name in Tok (Identifier)
+        from args in RoundBrackets (Identifier.Separated (Tok (',')).Optional())
+        from body in CurlyBraces (Block)
+        select (StatementNode) new DefinitionNode (name, args.GetValueOrDefault(), body);
+
+    // блок using
+    private static readonly Parser<char, StatementNode> Using =
+        from _ in Tok ("using")
+        from open in Tok ('(')
+        from variable in Tok (Identifier)
+        from equal in Tok ('=')
+        from initialization in Expr
+        from close in Tok (')')
+        from body in CurlyBraces (Block)
+        select (StatementNode) new UsingNode (variable, initialization, body);
+
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
             Try (Tok (If)),
             Try (Tok (TryCatchFinally)),
+            Try (Tok (ForEach)),
             Try (Tok (For)),
+            Try (Tok (FunctionDefinition)),
             Try (Tok (While)),
+            Try (Tok (Using)),
             Try (Tok (Print)),
             Try (Tok (External)),
             Try (Tok (Throw)),

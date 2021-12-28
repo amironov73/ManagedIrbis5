@@ -26,9 +26,16 @@ namespace AM.Scripting.Barsik;
 internal sealed class VariableNode
     : AtomNode
 {
-    #region Private members
+    #region Properties
 
-    private readonly string _name;
+    /// <summary>
+    /// Имя переменной.
+    /// </summary>
+    public string Name { get; }
+
+    #endregion
+
+    #region Construction
 
     /// <summary>
     /// Конструктор.
@@ -45,7 +52,7 @@ internal sealed class VariableNode
             throw new BarsikException ($"Name {name} is reserved");
         }
 
-        _name = name;
+        Name = name;
     }
 
     #endregion
@@ -58,12 +65,12 @@ internal sealed class VariableNode
             Context context
         )
     {
-        if (context.Variables.TryGetValue (_name, out var value))
+        if (context.Variables.TryGetValue (Name, out var value))
         {
             return value;
         }
 
-        context.Error.WriteLine ($"Variable '{_name}' not defined");
+        context.Error.WriteLine ($"Variable '{Name}' not defined");
 
         return null;
     }
@@ -75,7 +82,7 @@ internal sealed class VariableNode
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        return $"variable '{_name}'";
+        return $"variable '{Name}'";
     }
 
     #endregion

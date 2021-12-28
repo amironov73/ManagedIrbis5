@@ -21,12 +21,24 @@ internal sealed class ConstantNode
 {
     #region Construction
 
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
     public ConstantNode
         (
-            object? value
+            object? value,
+            bool raw = false
         )
     {
         _value = value;
+
+        if (value is string rawText)
+        {
+            if (!raw)
+            {
+                _value = Resolve.UnescapeText (rawText);
+            }
+        }
     }
 
     #endregion
