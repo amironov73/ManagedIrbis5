@@ -20,7 +20,8 @@ static class Program
         // PidginExperimentSeven.Expressor();
         // PidginExperimentEight.DoubleProblem();
         // PidginExperimentNine.Blocks();
-        PidginExperimentTen.IndexingAssignment();
+        // PidginExperimentTen.IndexingAssignment();
+        PidginExperimentEleven.TernaryOperator();
         // BarsikExperiment.Interprete();
     }
 }

@@ -6,6 +6,8 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 // ReSharper disable UseNameofExpression
 
 /* Resolve.cs -- набор парсеров для нужд ИРБИС
@@ -57,57 +59,65 @@ public static class Resolve
     /// <summary>
     /// Арабские цифры.
     /// </summary>
-    public static readonly Parser<char, char> Arabic =
-        OneOf ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
-            .Labelled ("arabic digit");
+    public static readonly Parser<char, char> Arabic = OneOf
+        (
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+        )
+        .Labelled ("arabic digit");
 
     /// <summary>
     /// Латинская буква.
     /// </summary>
-    public static readonly Parser<char, char> Latin =
-        OneOf ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-                'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-                'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
-                'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-                'y', 'z' )
-            .Labelled ("latin character");
+    public static readonly Parser<char, char> Latin = OneOf
+        (
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+            'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+            'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
+            'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+            'y', 'z'
+        )
+        .Labelled ("latin character");
 
     /// <summary>
     /// Латинская буква или символ пдчеркивания.
     /// </summary>
-    public static readonly Parser<char, char> LatinOrUnderscore =
-        OneOf ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+    public static readonly Parser<char, char> LatinOrUnderscore = OneOf
+        (
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
             'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
             'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
             'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
-            'y', 'z', '_');
+            'y', 'z', '_'
+        );
 
     /// <summary>
     /// Латинская буква, арабская цифра или символ пдчеркивания.
     /// </summary>
-    public static readonly Parser<char, char> LatinOrArabicOrUnderscore =
-        OneOf ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+    public static readonly Parser<char, char> LatinOrArabicOrUnderscore = OneOf
+        (
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
             'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
             'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k',
             'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
             'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            '0', '_');
+            '0', '_'
+        );
 
     /// <summary>
     /// Общепринятый идентификатор.
     /// </summary>
-    public static readonly Parser<char, string> Identifier = Try (Map
+    public static readonly Parser<char, string> Identifier = Map
         (
             (first, tail) => first + tail,
             LatinOrUnderscore,
             LatinOrArabicOrUnderscore.ManyString()
-        ));
+        );
 
     /// <summary>
     /// Литерал-строка с экранированными символами.
     /// </summary>
-    public static Parser<char, string> EscapedLiteral() =>
-        Try (new EscapeParser ('"', '\\'));
+    public static Parser<char, string> EscapedStringLiteral() =>
+        new EscapeParser ('"', '\\');
 
     #endregion
 
@@ -257,19 +267,21 @@ public static class Resolve
         }
     }
 
-    // /// <summary>
-    // /// Парсинг строкового литерала с экранированными символами.
-    // /// </summary>
-    // public static Parser<char, string> EscapedLiteral
-    //     (
-    //         char limiter = '"',
-    //         char escapeSymbol = '\\'
-    //     )
-    // {
-    //     var escapist = new EscapeParser (limiter, escapeSymbol);
-    //
-    //     return i => escapist.Parse (i);
-    // }
+    /// <summary>
+    /// Создание превью-парсера.
+    /// </summary>
+    /// <param name="first">Первый парсер -- его результат нам нужен.</param>
+    /// <param name="second">Второй парсер -- его результат отбрасывается,
+    /// он должен "заглянуть вперед" и сообщить, имеет ли смысл разбирать дальше.
+    /// </param>
+    private static Parser<TToken, TResult> Preview<TToken, TResult>
+        (
+            Parser<TToken, TResult> first,
+            Parser<TToken, Unit> second
+        )
+    {
+        return new PreviewParser<TToken, TResult> (first, second);
+    }
 
     #endregion
 }

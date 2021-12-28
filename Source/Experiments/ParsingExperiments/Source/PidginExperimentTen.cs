@@ -22,7 +22,7 @@ static class PidginExperimentTen
     {
     }
 
-    class VariableNode
+    sealed class VariableNode
         : AstNode
     {
         public string Name { get; }
@@ -38,7 +38,7 @@ static class PidginExperimentTen
         }
     }
 
-    class NumberNode
+    sealed class NumberNode
         : AstNode
     {
         public int Value { get; }
@@ -54,7 +54,7 @@ static class PidginExperimentTen
         }
     }
 
-    class IndexNode
+    sealed class IndexNode
         : AstNode
     {
         public AstNode Var { get; }
@@ -72,7 +72,7 @@ static class PidginExperimentTen
         }
     }
 
-    class AssignmentNode
+    sealed class AssignmentNode
         : AstNode
     {
         public string Name { get; }

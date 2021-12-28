@@ -52,7 +52,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: пустая строка")]
     public void Resolve_EscapedLiteral_1()
     {
-        var actual = Resolve.EscapedLiteral().ParseOrThrow ("\"\"");
+        var actual = Resolve.EscapedStringLiteral().ParseOrThrow ("\"\"");
         Assert.AreEqual (string.Empty, actual);
     }
 
@@ -60,7 +60,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: пустой входной поток")]
     public void Resolve_EscapedLiteral_2()
     {
-        var actual = Resolve.EscapedLiteral().Parse (string.Empty);
+        var actual = Resolve.EscapedStringLiteral().Parse (string.Empty);
         Assert.IsFalse (actual.Success);
     }
 
@@ -68,7 +68,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: неоткрытая строка")]
     public void Resolve_EscapedLiteral_3()
     {
-        var actual = Resolve.EscapedLiteral().Parse ("hello");
+        var actual = Resolve.EscapedStringLiteral().Parse ("hello");
         Assert.IsFalse (actual.Success);
     }
 
@@ -76,7 +76,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: незакрытая строка")]
     public void Resolve_EscapedLiteral_4()
     {
-        var actual = Resolve.EscapedLiteral().Parse ("\"hello");
+        var actual = Resolve.EscapedStringLiteral().Parse ("\"hello");
         Assert.IsFalse (actual.Success);
     }
 
@@ -84,7 +84,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: непустая строка")]
     public void Resolve_EscapedLiteral_5()
     {
-        var actual = Resolve.EscapedLiteral().ParseOrThrow ("\"hello\"");
+        var actual = Resolve.EscapedStringLiteral().ParseOrThrow ("\"hello\"");
         Assert.AreEqual ("hello", actual);
     }
 
@@ -92,7 +92,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: непустая строка с экранированным символом")]
     public void Resolve_EscapedLiteral_6()
     {
-        var actual = Resolve.EscapedLiteral().ParseOrThrow ("\"hello\\nworld\"");
+        var actual = Resolve.EscapedStringLiteral().ParseOrThrow ("\"hello\\nworld\"");
         Assert.AreEqual ("hello\\nworld", actual);
     }
 
@@ -100,7 +100,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: непустая строка с экранированным символом-ограничителем")]
     public void Resolve_EscapedLiteral_7()
     {
-        var actual = Resolve.EscapedLiteral().ParseOrThrow ("\"hello\\\"world\"");
+        var actual = Resolve.EscapedStringLiteral().ParseOrThrow ("\"hello\\\"world\"");
         Assert.AreEqual ("hello\\\"world", actual);
     }
 
@@ -108,7 +108,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: строка с неверно экранированным символом-ограничителем")]
     public void Resolve_EscapedLiteral_8()
     {
-        var actual = Resolve.EscapedLiteral().Parse ("\"hello\\\"");
+        var actual = Resolve.EscapedStringLiteral().Parse ("\"hello\\\"");
         Assert.IsFalse (actual.Success);
     }
 
@@ -116,7 +116,7 @@ public sealed class ResolveTest
     [Description ("Строка с экранированными символами: строка с неверно экранированным символом-не-ограничителем")]
     public void Resolve_EscapedLiteral_9()
     {
-        var actual = Resolve.EscapedLiteral().Parse ("\"hello\\n");
+        var actual = Resolve.EscapedStringLiteral().Parse ("\"hello\\n");
         Assert.IsFalse (actual.Success);
     }
 }
