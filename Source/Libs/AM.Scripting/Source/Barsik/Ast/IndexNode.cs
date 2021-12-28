@@ -1,0 +1,121 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable ConditionIsAlwaysTrueOrFalse
+// ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
+// ReSharper disable UnusedMember.Global
+
+/* IndexNode.cs -- обращение по индексу
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+
+using AM.Text;
+
+#endregion
+
+#nullable enable
+
+namespace AM.Scripting.Barsik;
+
+/// <summary>
+/// Обращение по индексу.
+/// </summary>
+internal sealed class IndexNode
+    : AtomNode
+{
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public IndexNode
+        (
+            AtomNode obj,
+            AtomNode index
+        )
+    {
+        Sure.NotNull (obj);
+        Sure.NotNull (index);
+
+        _obj = obj;
+        _index = index;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly AtomNode _obj;
+    private readonly AtomNode _index;
+
+    #endregion
+
+    #region AtomNode members
+
+    /// <inheritdoc cref="AtomNode.Compute"/>
+    public override dynamic? Compute
+        (
+            Context context
+        )
+    {
+        // if (!context.TryGetVariable (_variableName, out var obj))
+        // {
+        //     return null;
+        // }
+
+        var obj = _obj.Compute (context);
+        if (obj is null)
+        {
+            return null;
+        }
+
+        // TODO: в классе может быть больше одного индексера
+
+        var index = _index.Compute (context);
+
+        if (obj is Array array && index is int integerIndex)
+        {
+            return array.GetValue (integerIndex);
+        }
+
+        var type = ((object) obj).GetType();
+        ParameterInfo[]? parameters;
+        PropertyInfo? indexer = null;
+        foreach (var property in type.GetProperties (BindingFlags.Instance | BindingFlags.Public))
+        {
+            parameters = property.GetIndexParameters();
+            if (parameters.Length != 0)
+            {
+                indexer = property;
+                break;
+            }
+        }
+
+        if (indexer is null)
+        {
+            return null;
+        }
+
+        var method = indexer.GetGetMethod();
+        if (method is null)
+        {
+            return null;
+        }
+
+        var result = method.Invoke (obj, new object? [] { index });
+
+        return result;
+    }
+
+    #endregion
+}

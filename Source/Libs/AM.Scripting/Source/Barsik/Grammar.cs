@@ -15,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Pidgin;
 using Pidgin.Comment;
@@ -295,6 +296,23 @@ static class Grammar
         );
     // ReSharper restore RedundantSuppressNullableWarningExpression
 
+    // обращение к свойству объекта
+    private static readonly Parser<char, AtomNode> _Property =
+        Tok ('.').Then (Identifier).Select<AtomNode> (v => new VariableNode (v));
+
+    private static Parser<char, Func<AtomNode, AtomNode>> Property (Parser<char, AtomNode> op) =>
+        op.Select<Func<AtomNode, AtomNode>> (type => v => new PropertyNode (v, type));
+
+    // обращение к элементу по индексу
+    // ReSharper disable RedundantSuppressNullableWarningExpression
+    private static readonly Parser<char, AtomNode> _Index =
+        Tok (Rec (() => Expr!)).Between (Tok ('['), Tok (']'))
+            .Select (v => v);
+    // ReSharper restore RedundantSuppressNullableWarningExpression
+
+    private static Parser<char, Func<AtomNode, AtomNode>> Index (Parser<char, AtomNode> op) =>
+        op.Select<Func<AtomNode, AtomNode>> (type => v => new IndexNode (v, type));
+
     // выражение
     private static readonly Parser<char, AtomNode> Expr = ExpressionParser.Build
         (
@@ -313,6 +331,14 @@ static class Grammar
                 ),
             new []
             {
+                new []
+                {
+                    Operator.PostfixChainable
+                        (
+                            Property (Try (_Property)),
+                            Index (Try (_Index))
+                        ),
+                },
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
                 new [] { Postfix ("++"), Postfix ("--") },
                 new [] { Prefix ("++"), Prefix ("--"), Prefix ("!"), Prefix ("-") },
@@ -472,9 +498,19 @@ static class Grammar
         from body in CurlyBraces (Block)
         select (StatementNode) new UsingNode (variable, initialization, body);
 
+    // директива
+    private static readonly Parser<char, StatementNode> Directive = Map
+        (
+            (hash, code) =>
+                (StatementNode) new DirectiveNode (hash + code, null),
+            Char ('#'),
+            Any.ManyString()
+        );
+
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
         (
+            Try (Directive),
             Try (Tok (If)),
             Try (Tok (Return)),
             Try (Tok (TryCatchFinally)),

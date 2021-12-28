@@ -62,22 +62,17 @@ public sealed class InterpreterTest
              Assert.AreEqual ("x is not equal y", actual);
          }
 
-//         [TestMethod]
-//         [Description ("Директивы")]
-//         public void Interpreter_Execute_4()
-//         {
-//             var interpreter = new Interpreter();
-//             interpreter.Execute (@"#u Namespace1
-//
-// #u Namespace2
-//
-// x = 1;
-// ");
-//             Assert.AreEqual (2, interpreter.Context.Namespaces.Count);
-//             var actual = (int) (object) interpreter.Context.Variables["x"]!;
-//             Assert.AreEqual (1, actual);
-//         }
-//
+        [TestMethod]
+        [Description ("Директивы")]
+        public void Interpreter_Directive_1()
+        {
+            var interpreter = new Interpreter();
+            interpreter.Execute ("#u Namespace1\n");
+            Assert.AreEqual (0, interpreter.Context.Namespaces.Count);
+            // var actual = (int) (object) interpreter.Context.Variables["x"]!;
+            // Assert.AreEqual (1, actual);
+        }
+
         [TestMethod]
         [Description ("Комментарии")]
         public void Interpreter_Execute_5()
@@ -320,5 +315,29 @@ x = 1;
         interpreter.Execute ("z = a != 0 and b != 0");
         var actualZ = (bool) (object) variables["z"]!;
         Assert.AreEqual (true, actualZ);
+    }
+
+    [TestMethod]
+    [Description ("Обращение к свойствам объекта")]
+    public void Interpreter_Properting_1()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables["a"] = "hello";
+        interpreter.Execute ("z = a.Length");
+        var actualZ = (int) (object) variables["z"]!;
+        Assert.AreEqual (5, actualZ);
+    }
+
+    [TestMethod]
+    [Description ("Обращение к элементу по индексу")]
+    public void Interpreter_Indexing_1()
+    {
+        var interpreter = new Interpreter();
+        var variables = interpreter.Context.Variables;
+        variables["a"] = new [] { 1, 2, 3, 4, 5 };
+        interpreter.Execute ("z = a[2]");
+        var actualZ = (int) (object) variables["z"]!;
+        Assert.AreEqual (3, actualZ);
     }
 }
