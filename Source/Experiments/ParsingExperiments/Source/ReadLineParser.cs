@@ -60,7 +60,7 @@ sealed class ReadLineParser
 
         if (!state.HasCurrent)
         {
-            // опаньки, текст закончился, мы этого не ждали
+            // опаньки, текст закончился, а мы этого не ждали
             return false;
         }
 

@@ -53,4 +53,19 @@ internal static class ParseStateUtility
             }
         }
     }
+
+    public static char ReadChar (this ref ParseState<char> state, bool advance = true)
+    {
+        char result = '\0';
+        if (state.HasCurrent)
+        {
+            result = state.Current;
+            if (advance)
+            {
+                state.Advance ();
+            }
+        }
+
+        return result;
+    }
 }
