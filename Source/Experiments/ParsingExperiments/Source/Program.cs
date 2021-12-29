@@ -21,7 +21,8 @@ static class Program
         // PidginExperimentEight.DoubleProblem();
         // PidginExperimentNine.Blocks();
         // PidginExperimentTen.IndexingAssignment();
-        PidginExperimentEleven.TernaryOperator();
+        // PidginExperimentEleven.TernaryOperator();
+        PidginExperimentTwelve.Directives();
         // BarsikExperiment.Interprete();
     }
 }
