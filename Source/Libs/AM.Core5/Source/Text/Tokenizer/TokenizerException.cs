@@ -21,50 +21,49 @@ using System;
 
 #nullable enable
 
-namespace AM.Text.Tokenizer
+namespace AM.Text.Tokenizer;
+
+/// <summary>
+/// Exception class for <see cref="StringTokenizer"/>.
+/// </summary>
+public sealed class TokenizerException
+    : ArsMagnaException
 {
+    #region Construction
+
     /// <summary>
-    /// Exception class for <see cref="StringTokenizer"/>.
+    /// Constructor.
     /// </summary>
-    public sealed class TokenizerException
-        : ArsMagnaException
+    public TokenizerException()
     {
-        #region Construction
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public TokenizerException()
-        {
-        }
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public TokenizerException
+        (
+            string message
+        )
+        : base(message)
+    {
+    }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public TokenizerException
-            (
-                string message
-            )
-            : base(message)
-        {
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public TokenizerException
-            (
-                string message,
-                Exception innerException
-            )
-            : base
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public TokenizerException
+        (
+            string message,
+            Exception innerException
+        )
+        : base
             (
                 message,
                 innerException
             )
-        {
-        }
-
-        #endregion
+    {
     }
+
+    #endregion
 }

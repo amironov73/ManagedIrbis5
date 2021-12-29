@@ -27,222 +27,219 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace AM.Text.Tokenizer
+namespace AM.Text.Tokenizer;
+
+/// <summary>
+/// Текстовый токен.
+/// </summary>
+[XmlRoot("token")]
+[DebuggerDisplay("Kind={Kind} Value='{Value}'")]
+public class Token
+    : IHandmadeSerializable
 {
+    #region Properties
+
     /// <summary>
-    /// Текстовый токен.
+    /// Тип токена.
     /// </summary>
-    [XmlRoot("token")]
-    [DebuggerDisplay("Kind={Kind} Value='{Value}'")]
-    public class Token
-        : IHandmadeSerializable
+    [XmlAttribute("kind")]
+    [JsonPropertyName("kind")]
+    public TokenKind Kind { get; private set; }
+
+    /// <summary>
+    /// Номер колонки.
+    /// </summary>
+    [XmlAttribute("column")]
+    [JsonPropertyName("column")]
+    public int Column { get; private set; }
+
+    /// <summary>
+    /// Номер строки.
+    /// </summary>
+    [XmlAttribute("line")]
+    [JsonPropertyName("line")]
+    public int Line { get; private set; }
+
+    /// <summary>
+    /// Значение.
+    /// </summary>
+    [XmlText]
+    [JsonPropertyName("value")]
+    public string? Value { get; internal set; }
+
+    /// <summary>
+    /// Признак конца текста?
+    /// </summary>
+    public bool IsEOF => Kind == TokenKind.EOF;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public Token()
     {
-        #region Properties
+    }
 
-        /// <summary>
-        /// Тип токена.
-        /// </summary>
-        [XmlAttribute("kind")]
-        [JsonPropertyName("kind")]
-        public TokenKind Kind { get; private set; }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Token
+        (
+            TokenKind kind,
+            string? value,
+            int line,
+            int column
+        )
+    {
+        Kind = kind;
+        Value = value;
+        Line = line;
+        Column = column;
+    }
 
-        /// <summary>
-        /// Номер колонки.
-        /// </summary>
-        [XmlAttribute("column")]
-        [JsonPropertyName("column")]
-        public int Column { get; private set; }
+    #endregion
 
-        /// <summary>
-        /// Номер строки.
-        /// </summary>
-        [XmlAttribute("line")]
-        [JsonPropertyName("line")]
-        public int Line { get; private set; }
+    #region Private members
 
-        /// <summary>
-        /// Значение.
-        /// </summary>
-        [XmlText]
-        [JsonPropertyName("value")]
-        public string? Value { get; internal set; }
+    #endregion
 
-        /// <summary>
-        /// Признак конца текста?
-        /// </summary>
-        public bool IsEOF
+    #region Public methods
+
+    /// <summary>
+    /// Convert array of words to array of tokens.
+    /// </summary>
+    public static Token[] Convert
+        (
+            string[] words
+        )
+    {
+        var result = new Token[words.Length];
+        for (var i = 0; i < words.Length; i++)
         {
-            get { return Kind == TokenKind.EOF; }
-        }
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public Token()
-        {
-        }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Token
-            (
-                TokenKind kind,
-                string? value,
-                int line,
-                int column
-            )
-        {
-            Kind = kind;
-            Value = value;
-            Line = line;
-            Column = column;
-        }
-
-        #endregion
-
-        #region Private members
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Convert array of words to array of tokens.
-        /// </summary>
-        public static Token[] Convert
-            (
-                string[] words
-            )
-        {
-            Token[] result = new Token[words.Length];
-            for (int i = 0; i < words.Length; i++)
-            {
-                result[i] = new Token
-                    (
-                        TokenKind.Unknown,
-                        words[i],
-                        0,
-                        0
-                    );
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Create token from <see cref="TextNavigator"/>.
-        /// </summary>
-        public static Token FromNavigator
-            (
-                TextNavigator navigator,
-                string value
-            )
-        {
-            Token result = new Token
+            result[i] = new Token
                 (
                     TokenKind.Unknown,
-                    value,
-                    navigator.Line,
-                    navigator.Column
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Create token from <see cref="TextNavigator"/>.
-        /// </summary>
-        public static Token FromNavigator
-            (
-                TextNavigator navigator,
-                TokenKind kind,
-                string value
-            )
-        {
-            Token result = new Token
-                (
-                    kind,
-                    value,
-                    navigator.Line,
-                    navigator.Column
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Convert token to string.
-        /// </summary>
-        public static implicit operator string?
-            (
-                Token? token
-            )
-        {
-            return token?.Value;
-        }
-
-        /// <summary>
-        /// Convert text to token.
-        /// </summary>
-        public static implicit operator Token
-            (
-                string? text
-            )
-        {
-            return new Token(TokenKind.Unknown, text, 0, 0);
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc />
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            Kind = (TokenKind) reader.ReadPackedInt32();
-            Column = reader.ReadPackedInt32();
-            Line = reader.ReadPackedInt32();
-            Value = reader.ReadNullableString();
-        }
-
-        /// <inheritdoc />
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer
-                .WritePackedInt32((int) Kind)
-                .WritePackedInt32(Column)
-                .WritePackedInt32(Line)
-                .WriteNullable(Value);
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return string.Format
-                (
-                    "Kind: {0}, Column: {1}, Line: {2}, Value: {3}",
-                    Kind,
-                    Column,
-                    Line,
-                    Value.ToVisibleString()
+                    words[i],
+                    0,
+                    0
                 );
         }
 
-        #endregion
+        return result;
     }
+
+    /// <summary>
+    /// Create token from <see cref="TextNavigator"/>.
+    /// </summary>
+    public static Token FromNavigator
+        (
+            TextNavigator navigator,
+            string value
+        )
+    {
+        Sure.NotNull (navigator);
+
+        var result = new Token
+            (
+                TokenKind.Unknown,
+                value,
+                navigator.Line,
+                navigator.Column
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Create token from <see cref="TextNavigator"/>.
+    /// </summary>
+    public static Token FromNavigator
+        (
+            TextNavigator navigator,
+            TokenKind kind,
+            string value
+        )
+    {
+        Sure.NotNull (navigator);
+
+        var result = new Token
+            (
+                kind,
+                value,
+                navigator.Line,
+                navigator.Column
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Convert token to string.
+    /// </summary>
+    public static implicit operator string?
+        (
+            Token? token
+        )
+    {
+        return token?.Value;
+    }
+
+    /// <summary>
+    /// Convert text to token.
+    /// </summary>
+    public static implicit operator Token
+        (
+            string? text
+        )
+    {
+        return new Token(TokenKind.Unknown, text, 0, 0);
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        Kind = (TokenKind) reader.ReadPackedInt32();
+        Column = reader.ReadPackedInt32();
+        Line = reader.ReadPackedInt32();
+        Value = reader.ReadNullableString();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer
+            .WritePackedInt32((int) Kind)
+            .WritePackedInt32(Column)
+            .WritePackedInt32(Line)
+            .WriteNullable(Value);
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString()
+    {
+        return $"Kind: {Kind}, Column: {Column}, Line: {Line}, Value: {Value.ToVisibleString()}";
+    }
+
+    #endregion
 }

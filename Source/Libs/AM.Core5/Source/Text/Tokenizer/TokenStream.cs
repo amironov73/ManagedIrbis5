@@ -15,105 +15,102 @@
 
 #nullable enable
 
-namespace AM.Text.Tokenizer
+namespace AM.Text.Tokenizer;
+
+/// <summary>
+/// Поток токенов.
+/// </summary>
+public sealed class TokenStream
 {
+    #region Properties
+
     /// <summary>
-    /// Поток токенов.
+    /// Current token.
     /// </summary>
-    public sealed class TokenStream
+    /// <remarks><c>null</c> on end of stream.</remarks>
+    public Token? Current =>
+        _position == _tokens.Length
+            ? null
+            : _tokens[_position];
+
+    /// <summary>
+    /// Has next token?
+    /// </summary>
+    public bool HasNext => _position + 1 < _tokens.Length;
+
+    /// <summary>
+    /// Position in the stream.
+    /// </summary>
+    public int Position => _position;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public TokenStream
+        (
+            string[] tokens
+        )
+        : this (Token.Convert (tokens))
     {
-        #region Properties
+    }
 
-        /// <summary>
-        /// Current token.
-        /// </summary>
-        /// <remarks><c>null</c> on end of stream.</remarks>
-        public Token? Current =>
-            _position == _tokens.Length
-                ? null
-                : _tokens[_position];
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public TokenStream
+        (
+            Token[] tokens
+        )
+    {
+        _tokens = tokens;
+    }
 
-        /// <summary>
-        /// Has next token?
-        /// </summary>
-        public bool HasNext => _position + 1 < _tokens.Length;
+    #endregion
 
-        /// <summary>
-        /// Position in the stream.
-        /// </summary>
-        public int Position => _position;
+    #region Private members
 
-        #endregion
+    private readonly Token[] _tokens;
+    private int _position;
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public TokenStream
-            (
-                string[] tokens
-            )
-            : this(Token.Convert(tokens))
+    #region Public methods
+
+    /// <summary>
+    /// Move to next token.
+    /// </summary>
+    public bool MoveNext()
+    {
+        if (_position == _tokens.Length)
         {
+            return false;
         }
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public TokenStream
-            (
-                Token[] tokens
-            )
+        _position++;
+        if (_position == _tokens.Length)
         {
-            _tokens = tokens;
+            return false;
         }
 
-        #endregion
+        return true;
+    }
 
-        #region Private members
-
-        private readonly Token[] _tokens;
-        private int _position;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Move to next token.
-        /// </summary>
-        public bool MoveNext()
+    /// <summary>
+    /// Peek the next token.
+    /// </summary>
+    public Token? Peek()
+    {
+        if (_position + 1 >= _tokens.Length)
         {
-            if (_position == _tokens.Length)
-            {
-                return false;
-            }
-
-            _position++;
-            if (_position == _tokens.Length)
-            {
-                return false;
-            }
-
-            return true;
+            return null;
         }
 
-        /// <summary>
-        /// Peek the next token.
-        /// </summary>
-        public Token? Peek()
-        {
-            if (_position + 1 >= _tokens.Length)
-            {
-                return null;
-            }
+        return _tokens[_position + 1];
+    }
 
-            return _tokens[_position + 1];
-        }
-
-        #endregion
-
-    } // class TokenStream
-
-} // namespace AM.Text.Tokenizer
+    #endregion
+}

@@ -30,376 +30,374 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace AM.Text.Ranges
+namespace AM.Text.Ranges;
+
+/// <summary>
+/// Набор диапазонов чисел.
+/// </summary>
+[DebuggerDisplay ("Count={Count}")]
+public sealed class NumberRangeCollection
+    : IEnumerable<NumberText>,
+    IHandmadeSerializable
 {
+    #region Constants
+
     /// <summary>
-    /// Набор диапазонов чисел.
+    /// Разделитель по умолчанию.
     /// </summary>
-    [DebuggerDisplay("Count={Count}")]
-    public sealed class NumberRangeCollection
-        : IEnumerable<NumberText>,
-        IHandmadeSerializable
+    public const string DefaultDelimiter = ",";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Gets the collection item count.
+    /// </summary>
+    public int Count
     {
-        #region Constants
+        get { return _items.Count; }
+    }
 
-        /// <summary>
-        /// Разделитель по умолчанию.
-        /// </summary>
-        public const string DefaultDelimiter = ",";
+    /// <summary>
+    /// Разделитель диапазонов.
+    /// </summary>
+    public string Delimiter { get; set; }
 
-        #endregion
+    #endregion
 
-        #region Properties
+    #region Construction
 
-        /// <summary>
-        /// Gets the collection item count.
-        /// </summary>
-        public int Count { get { return _items.Count; } }
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public NumberRangeCollection()
+    {
+        Delimiter = DefaultDelimiter;
+        _items = new List<NumberRange>();
+    }
 
-        /// <summary>
-        /// Разделитель диапазонов.
-        /// </summary>
-        public string Delimiter { get; set; }
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Construction
+    private readonly List<NumberRange> _items;
 
-        /// <summary>
-        /// Конструктор по умолчанию.
-        /// </summary>
-        public NumberRangeCollection()
-        {
-            Delimiter = DefaultDelimiter;
-            _items = new List<NumberRange>();
-        }
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Private members
+    /// <summary>
+    /// Добавление диапазона в набор.
+    /// </summary>
+    public NumberRangeCollection Add
+        (
+            NumberRange range
+        )
+    {
+        _items.Add (range);
 
-        private readonly List<NumberRange> _items;
+        return this;
+    }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Добавление диапазона в набор.
-        /// </summary>
-        public NumberRangeCollection Add
+    /// <summary>
+    /// Добавление диапазона в набор.
+    /// </summary>
+    public NumberRangeCollection Add
+        (
+            string start,
+            string stop
+        )
+    {
+        var result = Add
             (
-                NumberRange range
-            )
-        {
-            _items.Add(range);
+                new NumberRange (start, stop)
+            );
 
-            return this;
-        }
+        return result;
+    }
 
-        /// <summary>
-        /// Добавление диапазона в набор.
-        /// </summary>
-        public NumberRangeCollection Add
+    /// <summary>
+    /// Добавление диапазона в набор.
+    /// </summary>
+    public NumberRangeCollection Add
+        (
+            string startAndStop
+        )
+    {
+        var result = Add
             (
-                string start,
-                string stop
-            )
+                new NumberRange (startAndStop)
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Проверка, содержит ли набор указанное число.
+    /// </summary>
+    /// <param name="number"></param>
+    /// <returns></returns>
+    public bool Contains
+        (
+            NumberText number
+        )
+    {
+        var result = _items.Any
+            (
+                item => item.Contains (number)
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Parse the text representation
+    /// </summary>
+    public static NumberRangeCollection Parse
+        (
+            string text
+        )
+    {
+        var navigator = new TextNavigator (text);
+        navigator.SkipWhile (NumberRange.Delimiters);
+        if (navigator.IsEOF)
         {
-            NumberRangeCollection result = Add
+            Magna.Error
                 (
-                    new NumberRange(start, stop)
+                    "NumberRangeCollection::Parse: "
+                    + "unexpected end of stream"
                 );
 
-            return result;
+            throw new FormatException();
         }
 
-        /// <summary>
-        /// Добавление диапазона в набор.
-        /// </summary>
-        public NumberRangeCollection Add
-            (
-                string startAndStop
-            )
+        var result = new NumberRangeCollection();
+
+        while (true)
         {
-            var result = Add
-                (
-                    new NumberRange(startAndStop)
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Проверка, содержит ли набор указанное число.
-        /// </summary>
-        /// <param name="number"></param>
-        /// <returns></returns>
-        public bool Contains
-            (
-                NumberText number
-            )
-        {
-            bool result = _items.Any
-                (
-                    item => item.Contains(number)
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Parse the text representation
-        /// </summary>
-        public static NumberRangeCollection Parse
-            (
-                string text
-            )
-        {
-            var navigator = new TextNavigator(text);
-            navigator.SkipWhile(NumberRange.Delimiters);
+            navigator.SkipWhile (NumberRange.Delimiters);
             if (navigator.IsEOF)
+            {
+                break;
+            }
+
+            var start = navigator
+                .ReadUntil (NumberRange.DelimitersOrMinus).ToString();
+            NumberRange range;
+            if (string.IsNullOrEmpty (start))
             {
                 Magna.Error
                     (
                         "NumberRangeCollection::Parse: "
-                        + "unexpected end of stream"
+                        + "empty Start clause"
                     );
 
                 throw new FormatException();
             }
 
-            NumberRangeCollection result = new NumberRangeCollection();
-
-            while (true)
+            navigator.SkipWhitespace();
+            if (navigator.PeekChar() == '-')
             {
-                navigator.SkipWhile(NumberRange.Delimiters);
-                if (navigator.IsEOF)
-                {
-                    break;
-                }
-
-                string start = navigator
-                    .ReadUntil(NumberRange.DelimitersOrMinus).ToString();
-                NumberRange range;
-                if (string.IsNullOrEmpty(start))
+                navigator.ReadChar();
+                navigator.SkipWhitespace();
+                var stop = navigator
+                    .ReadUntil (NumberRange.Delimiters).ToString();
+                if (string.IsNullOrEmpty (stop))
                 {
                     Magna.Error
                         (
                             "NumberRangeCollection::Parse: "
-                            + "empty Start clause"
+                            + "empty Stop clause"
                         );
 
                     throw new FormatException();
                 }
 
-                navigator.SkipWhitespace();
-                if (navigator.PeekChar() == '-')
-                {
-                    navigator.ReadChar();
-                    navigator.SkipWhitespace();
-                    string stop = navigator
-                        .ReadUntil(NumberRange.Delimiters).ToString();
-                    if (string.IsNullOrEmpty(stop))
-                    {
-                        Magna.Error
-                            (
-                                "NumberRangeCollection::Parse: "
-                                + "empty Stop clause"
-                            );
-
-                        throw new FormatException();
-                    }
-
-                    range = new NumberRange(start, stop);
-                }
-                else
-                {
-                    range = new NumberRange(start);
-                }
-                result.Add(range);
+                range = new NumberRange (start, stop);
+            }
+            else
+            {
+                range = new NumberRange (start);
             }
 
-            return result;
+            result.Add (range);
         }
 
-        /// <summary>
-        /// Кумуляция (сжатие).
-        /// </summary>
-        public static NumberRangeCollection Cumulate
-            (
-                List<NumberText> numbers
-            )
+        return result;
+    }
+
+    /// <summary>
+    /// Кумуляция (сжатие).
+    /// </summary>
+    public static NumberRangeCollection Cumulate
+        (
+            List<NumberText> numbers
+        )
+    {
+        var result = new NumberRangeCollection();
+
+        if (numbers.Count != 0)
         {
-            var result = new NumberRangeCollection();
+            numbers.Sort();
 
-            if (numbers.Count != 0)
+            var previous = numbers[0];
+            var last = previous.Clone();
+            for (var i = 1; i < numbers.Count; i++)
             {
-                numbers.Sort();
-
-                NumberText previous = numbers[0];
-                NumberText last = previous.Clone();
-                for (int i = 1; i < numbers.Count; i++)
+                var current = numbers[i];
+                var next = last + 1;
+                if (current != next)
                 {
-                    NumberText current = numbers[i];
-                    NumberText next = last + 1;
-                    if (current != next)
-                    {
-                        result.Add
-                            (
-                                new NumberRange
-                                    (
-                                        previous,
-                                        last
-                                    )
-                            );
-                        previous = current.Clone();
-                    }
-                    last = current;
+                    result.Add
+                        (
+                            new NumberRange
+                                (
+                                    previous,
+                                    last
+                                )
+                        );
+                    previous = current.Clone();
                 }
-                result.Add
+
+                last = current;
+            }
+
+            result.Add
+                (
+                    new NumberRange
+                        (
+                            previous,
+                            last
+                        )
+                );
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Кумуляция (сжатие).
+    /// </summary>
+    public static NumberRangeCollection Cumulate
+        (
+            IEnumerable<string> texts
+        )
+    {
+        var numbers = texts
+            .Select (text => new NumberText (text))
+            .ToList();
+
+        return Cumulate (numbers);
+    }
+
+    /// <summary>
+    /// Выполнение указанного действия
+    /// на всех диапазонах набора.
+    /// </summary>
+    /// <param name="action"></param>
+    public void For
+        (
+            Action<NumberText> action
+        )
+    {
+        foreach (var range in _items)
+        {
+            foreach (var number in range)
+            {
+                action
                     (
-                        new NumberRange
-                            (
-                                previous,
-                                last
-                            )
+                        number
                     );
             }
-
-            return result;
         }
-
-        /// <summary>
-        /// Кумуляция (сжатие).
-        /// </summary>
-        public static NumberRangeCollection Cumulate
-            (
-                IEnumerable<string> texts
-            )
-        {
-            var numbers = texts
-                .Select(text => new NumberText(text))
-                .ToList();
-
-            return Cumulate(numbers);
-        }
-
-        /// <summary>
-        /// Выполнение указанного действия
-        /// на всех диапазонах набора.
-        /// </summary>
-        /// <param name="action"></param>
-        public void For
-            (
-                Action<NumberText> action
-            )
-        {
-            foreach (NumberRange range in _items)
-            {
-                foreach (NumberText number in range)
-                {
-                    action
-                        (
-                            number
-                        );
-                }
-            }
-        }
-
-        #endregion
-
-        #region IEnumerable<NumberText> members
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through
-        /// the collection.
-        /// </summary>
-        public IEnumerator<NumberText> GetEnumerator()
-        {
-            foreach (NumberRange range in _items)
-            {
-                foreach (NumberText number in range)
-                {
-                    yield return number;
-                }
-            }
-        }
-
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <summary>
-        /// Restore object state from the specified stream.
-        /// </summary>
-        public void RestoreFromStream
-            (
-                BinaryReader reader
-            )
-        {
-            _items.Clear();
-            int count = reader.ReadPackedInt32();
-            for (int i = 0; i < count; i++)
-            {
-                NumberRange item = new NumberRange();
-                item.RestoreFromStream(reader);
-                _items.Add(item);
-            }
-        }
-
-        /// <summary>
-        /// Save object state to the specified stream.
-        /// </summary>
-        public void SaveToStream
-            (
-                BinaryWriter writer
-            )
-        {
-            writer.WritePackedInt32(_items.Count);
-            for (int i = 0; i < _items.Count; i++)
-            {
-                _items[i].SaveToStream(writer);
-            }
-        }
-
-        #endregion
-
-        #region Object members
-
-        /// <summary>
-        /// Returns a <see cref="System.String" />
-        /// that represents this instance.
-        /// </summary>
-        /// <returns>A <see cref="System.String" />
-        /// that represents this instance.</returns>
-        public override string ToString()
-        {
-            StringBuilder result = new StringBuilder();
-            bool first = true;
-
-            foreach (NumberRange item in _items)
-            {
-                string text = item.ToString();
-                if (!string.IsNullOrEmpty(text))
-                {
-                    if (!first)
-                    {
-                        result.Append(Delimiter);
-                    }
-                    result.Append(text);
-                    first = false;
-                }
-            }
-
-            return result.ToString();
-        }
-
-        #endregion
     }
+
+    #endregion
+
+    #region IEnumerable<NumberText> members
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+    public IEnumerator<NumberText> GetEnumerator()
+    {
+        foreach (var range in _items)
+        {
+            foreach (var number in range)
+            {
+                yield return number;
+            }
+        }
+    }
+
+    #endregion
+
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream"/>
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        Sure.NotNull (reader);
+
+        _items.Clear();
+        var count = reader.ReadPackedInt32();
+        for (var i = 0; i < count; i++)
+        {
+            var item = new NumberRange();
+            item.RestoreFromStream (reader);
+            _items.Add (item);
+        }
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream"/>
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        writer.WritePackedInt32 (_items.Count);
+        for (var i = 0; i < _items.Count; i++)
+        {
+            _items[i].SaveToStream (writer);
+        }
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        var result = new StringBuilder();
+        var first = true;
+
+        foreach (var item in _items)
+        {
+            var text = item.ToString();
+            if (!string.IsNullOrEmpty (text))
+            {
+                if (!first)
+                {
+                    result.Append (Delimiter);
+                }
+
+                result.Append (text);
+                first = false;
+            }
+        }
+
+        return result.ToString();
+    }
+
+    #endregion
 }
