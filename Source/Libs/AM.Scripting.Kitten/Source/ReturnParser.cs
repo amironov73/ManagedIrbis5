@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* TryParser.cs -- парсер с откатом при неудаче
+/* ReturnParser.cs -- парсер, возвращающий всегда одно и то же значение
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,12 +15,14 @@ using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
+#nullable enable
+
 namespace AM.Scripting.Kitten;
 
 /// <summary>
-/// Парсер с откатом при неудаче.
+/// Парсер, возвращающий всегда одно и то же значение.
 /// </summary>
-internal sealed class TryParser<TToken, TResult>
+internal sealed class ReturnParser<TToken, TResult>
     : Parser<TToken, TResult>
 {
     #region Construction
@@ -28,23 +30,23 @@ internal sealed class TryParser<TToken, TResult>
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public TryParser
+    public ReturnParser
         (
-            Parser<TToken, TResult> inner
+            TResult result
         )
     {
-        Sure.NotNull (inner);
-
-        _inner = inner;
+        _result = result;
     }
 
     #endregion
 
     #region Private members
 
-    private readonly Parser<TToken, TResult> _inner;
+    private readonly TResult _result;
 
     #endregion
+
+    #region Parser<TToken, TResult> members
 
     /// <inheritdoc cref="Parser{TToken,TResult}.TryParse"/>
     public override bool TryParse
@@ -53,15 +55,10 @@ internal sealed class TryParser<TToken, TResult>
             [MaybeNullWhen(false)] out TResult result
         )
     {
-        state.PushBookmark();
-        if (!_inner.TryParse(state, out result))
-        {
-            state.Rewind();
-            return false;
-        }
-
-        state.PopBookmark();
+        result = _result;
 
         return true;
     }
+
+    #endregion
 }
