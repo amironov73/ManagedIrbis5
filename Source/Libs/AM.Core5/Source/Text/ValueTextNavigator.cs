@@ -21,1541 +21,1574 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Text
+namespace AM.Text;
+
+/// <summary>
+/// Навигатор по тексту, оформленный как структура.
+/// </summary>
+/// <example>
+/// Пример разбиения текста на слова.
+/// <code>
+/// var text = "У попа была собака, он её любил.";
+/// var navigator = new ValueTextNavigator (text);
+///
+/// while (true)
+/// {
+///   var word = navigator.ReadWord();
+///   if (word.IsEmpty)
+///   {
+///      break;
+///   }
+///
+///   Console.WriteLine (word.ToString());
+///
+///   if (!navigator.SkipNonWord())
+///   {
+///      break;
+///   }
+/// }
+/// </code>
+/// </example>
+/// <remarks>
+/// Все методы класса не потокобезопасные.
+/// </remarks>
+public ref struct ValueTextNavigator
 {
+    #region Constants
+
     /// <summary>
-    /// Навигатор по тексту, оформленный как структура.
+    /// Признак конца текста.
     /// </summary>
-    /// <example>
-    /// Пример разбиения текста на слова.
-    /// <code>
-    /// var text = "У попа была собака, он её любил.";
-    /// var navigator = new ValueTextNavigator (text);
-    ///
-    /// while (true)
-    /// {
-    ///   var word = navigator.ReadWord();
-    ///   if (word.IsEmpty)
-    ///   {
-    ///      break;
-    ///   }
-    ///
-    ///   Console.WriteLine (word.ToString());
-    ///
-    ///   if (!navigator.SkipNonWord())
-    ///   {
-    ///      break;
-    ///   }
-    /// }
-    /// </code>
-    /// </example>
-    /// <remarks>
-    /// Все методы класса не потокобезопасные.
-    /// </remarks>
-    public ref struct ValueTextNavigator
+    public const char EOF = '\0';
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Текст закончился?
+    /// </summary>
+    [Pure]
+    public bool IsEOF => _position >= _text.Length;
+
+    /// <summary>
+    /// Общая длина текста в символах.
+    /// </summary>
+    [Pure]
+    public int Length => _text.Length;
+
+    /// <summary>
+    /// Текущая позиция в тексте.
+    /// </summary>
+    [Pure]
+    public int Position => _position;
+
+    /// <summary>
+    /// Текст, хранимый в навигаторе.
+    /// </summary>
+    [Pure]
+    public string Text => _text.ToString();
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="text">Текст</param>
+    public ValueTextNavigator
+        (
+            ReadOnlySpan<char> text
+        )
     {
-        #region Constants
+        _text = text;
+        _position = 0;
+    }
 
-        /// <summary>
-        /// Признак конца текста.
-        /// </summary>
-        public const char EOF = '\0';
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Properties
+    private readonly ReadOnlySpan<char> _text;
+    private int _position;
 
-        /// <summary>
-        /// Текст закончился?
-        /// </summary>
-        [Pure]
-        public bool IsEOF => _position >= _text.Length;
+    #endregion
 
-        /// <summary>
-        /// Общая длина текста в символах.
-        /// </summary>
-        [Pure]
-        public int Length => _text.Length;
+    #region Public methods
 
-        /// <summary>
-        /// Текущая позиция в тексте.
-        /// </summary>
-        [Pure]
-        public int Position => _position;
-
-        /// <summary>
-        /// Текст, хранимый в навигаторе.
-        /// </summary>
-        [Pure]
-        public string Text => _text.ToString();
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="text">Текст</param>
-        public ValueTextNavigator
-            (
-                ReadOnlySpan<char> text
-            )
+    /// <summary>
+    /// Клонирование навигатора (включая текущую позицию в тексте).
+    /// </summary>
+    [Pure]
+    public ValueTextNavigator Clone()
+    {
+        var result = new ValueTextNavigator (_text)
         {
-            _text = text;
-            _position = 0;
+            _position = _position
+        };
 
-        } // constructor
+        return result;
+    }
 
-        #endregion
+    /// <summary>
+    /// Навигатор по текстовому файлу.
+    /// </summary>
+    public static ValueTextNavigator FromFile
+        (
+            string fileName,
+            Encoding? encoding = default
+        )
+    {
+        Sure.FileExists (fileName);
 
-        #region Private members
+        encoding ??= Encoding.UTF8;
+        var text = File.ReadAllText (fileName, encoding);
+        var result = new ValueTextNavigator (text);
 
-        private readonly ReadOnlySpan<char> _text;
-        private int _position;
+        return result;
+    }
 
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Клонирование навигатора (включая текущую позицию в тексте).
-        /// </summary>
-        [Pure]
-        public ValueTextNavigator Clone()
-        {
-            var result = new ValueTextNavigator (_text)
-            {
-                _position = _position
-            };
-
-            return result;
-
-        } // method Clone
-
-        /// <summary>
-        /// Навигатор по текстовому файлу.
-        /// </summary>
-        public static ValueTextNavigator FromFile
-            (
-                string fileName,
-                Encoding? encoding = default
-            )
-        {
-            Sure.FileExists (fileName);
-
-            encoding ??= Encoding.UTF8;
-            var text = File.ReadAllText (fileName, encoding);
-            var result = new ValueTextNavigator (text);
-
-            return result;
-
-        } // method FromFile
-
-        /// <summary>
-        /// Выдать остаток текста.
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        [Pure]
-        public ReadOnlySpan<char> GetRemainingText() => IsEOF
+    /// <summary>
+    /// Выдать остаток текста.
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    [Pure]
+    public ReadOnlySpan<char> GetRemainingText()
+    {
+        return IsEOF
             ? new ReadOnlySpan<char>()
             : _text.Slice (_position);
+    }
 
-        /// <summary>
-        /// Текущий символ - управляющий?
-        /// </summary>
-        [Pure]
-        public bool IsControl() => char.IsControl (PeekChar());
+    /// <summary>
+    /// Текущий символ - управляющий?
+    /// </summary>
+    [Pure]
+    public bool IsControl()
+    {
+        return char.IsControl (PeekChar());
+    }
 
-        /// <summary>
-        /// Текущий символ - цифра?
-        /// </summary>
-        [Pure]
-        public bool IsDigit() => char.IsDigit (PeekChar());
+    /// <summary>
+    /// Текущий символ - цифра?
+    /// </summary>
+    [Pure]
+    public bool IsDigit()
+    {
+        return char.IsDigit (PeekChar());
+    }
 
-        /// <summary>
-        /// Текущий символ - буква?
-        /// </summary>
-        [Pure]
-        public bool IsLetter() => char.IsLetter (PeekChar());
+    /// <summary>
+    /// Текущий символ - буква?
+    /// </summary>
+    [Pure]
+    public bool IsLetter()
+    {
+        return char.IsLetter (PeekChar());
+    }
 
-        /// <summary>
-        /// Текущий символ - буква или цифра?
-        /// </summary>
-        [Pure]
-        public bool IsLetterOrDigit() => char.IsLetterOrDigit (PeekChar());
+    /// <summary>
+    /// Текущий символ - буква или цифра?
+    /// </summary>
+    [Pure]
+    public bool IsLetterOrDigit()
+    {
+        return char.IsLetterOrDigit (PeekChar());
+    }
 
-        /// <summary>
-        /// Текущий символ - часть числа?
-        /// </summary>
-        [Pure]
-        public bool IsNumber() => char.IsNumber (PeekChar());
+    /// <summary>
+    /// Текущий символ - часть числа?
+    /// </summary>
+    [Pure]
+    public bool IsNumber()
+    {
+        return char.IsNumber (PeekChar());
+    }
 
-        /// <summary>
-        /// Текущий символ - знак пунктуации?
-        /// </summary>
-        [Pure]
-        public bool IsPunctuation() => char.IsPunctuation (PeekChar());
+    /// <summary>
+    /// Текущий символ - знак пунктуации?
+    /// </summary>
+    [Pure]
+    public bool IsPunctuation() => char.IsPunctuation (PeekChar());
 
-        /// <summary>
-        /// Текущий символ - разделитель?
-        /// </summary>
-        [Pure]
-        public bool IsSeparator() => char.IsSeparator (PeekChar());
+    /// <summary>
+    /// Текущий символ - разделитель?
+    /// </summary>
+    [Pure]
+    public bool IsSeparator()
+    {
+        return char.IsSeparator (PeekChar());
+    }
 
-        /// <summary>
-        /// Текущий символ принадлежит одной
-        /// из Unicode категорий: MathSymbol,
-        /// CurrencySymbol, ModifierSymbol либо OtherSymbol?
-        /// </summary>
-        [Pure]
-        public bool IsSymbol() => char.IsSymbol (PeekChar());
+    /// <summary>
+    /// Текущий символ принадлежит одной
+    /// из Unicode категорий: MathSymbol,
+    /// CurrencySymbol, ModifierSymbol либо OtherSymbol?
+    /// </summary>
+    [Pure]
+    public bool IsSymbol()
+    {
+        return char.IsSymbol (PeekChar());
+    }
 
-        /// <summary>
-        /// Текущий символ - пробельный?
-        /// </summary>
-        [Pure]
-        public bool IsWhiteSpace() => char.IsWhiteSpace (PeekChar());
+    /// <summary>
+    /// Текущий символ - пробельный?
+    /// </summary>
+    [Pure]
+    public bool IsWhiteSpace() => char.IsWhiteSpace (PeekChar());
 
-        /// <summary>
-        /// Заглядывание вперёд на одну позицию.
-        /// Движения по тексту не происходит.
-        /// </summary>
-        /// <remarks>Это на одну позицию дальше,
-        /// чем <see cref="PeekChar()"/>
-        /// </remarks>
-        [Pure]
-        public char LookAhead()
-        {
-            var ahead = _position + 1;
-            return ahead >= _text.Length
-                ? EOF
-                : _text[ahead];
-        } // method LookAhead
+    /// <summary>
+    /// Заглядывание вперёд на одну позицию.
+    /// Движения по тексту не происходит.
+    /// </summary>
+    /// <remarks>Это на одну позицию дальше,
+    /// чем <see cref="PeekChar()"/>
+    /// </remarks>
+    [Pure]
+    public char LookAhead()
+    {
+        var ahead = _position + 1;
+        return ahead >= _text.Length
+            ? EOF
+            : _text[ahead];
+    }
 
-        /// <summary>
-        /// Заглядывание вперёд на указанное количество символов.
-        /// Движения по тексту не происходит.
-        /// </summary>
-        [Pure]
-        public char LookAhead
-            (
-                int distance
-            )
-        {
-            Sure.NonNegative (distance, nameof (distance));
+    /// <summary>
+    /// Заглядывание вперёд на указанное количество символов.
+    /// Движения по тексту не происходит.
+    /// </summary>
+    [Pure]
+    public char LookAhead
+        (
+            int distance
+        )
+    {
+        Sure.NonNegative (distance);
 
-            var ahead = _position + distance;
-            return ahead >= _text.Length
-                ? EOF
-                : _text[ahead];
-        } // method LookAhead
+        var ahead = _position + distance;
+        return ahead >= _text.Length
+            ? EOF
+            : _text[ahead];
+    }
 
-        /// <summary>
-        /// Заглядывание назад на одну позицию.
-        /// Движения по тексту не происходит.
-        /// </summary>
-        [Pure]
-        public char LookBehind() => _position == 0 ? EOF : _text[_position - 1];
+    /// <summary>
+    /// Заглядывание назад на одну позицию.
+    /// Движения по тексту не происходит.
+    /// </summary>
+    [Pure]
+    public char LookBehind()
+    {
+        return _position == 0 ? EOF : _text[_position - 1];
+    }
 
-        /// <summary>
-        /// Заглядывание назад на указанное число позиций.
-        /// Движения по тексту не происходит.
-        /// </summary>
-        /// <param name="distance">Дистанция, на которую
-        /// предполагается заглянуть - положительное число,
-        /// означающее количество символов, на которые
-        /// нужно "отмотать назад".</param>
-        [Pure]
-        public char LookBehind
-            (
-                int distance
-            )
-        {
-            Sure.Positive (distance, nameof (distance));
+    /// <summary>
+    /// Заглядывание назад на указанное число позиций.
+    /// Движения по тексту не происходит.
+    /// </summary>
+    /// <param name="distance">Дистанция, на которую
+    /// предполагается заглянуть - положительное число,
+    /// означающее количество символов, на которые
+    /// нужно "отмотать назад".</param>
+    [Pure]
+    public char LookBehind
+        (
+            int distance
+        )
+    {
+        Sure.Positive (distance);
 
-            return _position < distance
-                ? EOF
-                : _text[_position - distance];
-        } // method LookBehind
+        return _position < distance
+            ? EOF
+            : _text[_position - distance];
+    }
 
-        /// <summary>
-        /// Относительное перемещение указателя на указанную дистанцию.
-        /// </summary>
-        /// <remarks>
-        /// Переместить указатель за пределы текста не получится,
-        /// он остановится в крайней (начальной или конечной) позиции.
-        /// </remarks>
-        public void Move (int distance) =>
-            _position = Math.Max (0, Math.Min (_position + distance, _text.Length));
+    /// <summary>
+    /// Относительное перемещение указателя на указанную дистанцию.
+    /// </summary>
+    /// <remarks>
+    /// Переместить указатель за пределы текста не получится,
+    /// он остановится в крайней (начальной или конечной) позиции.
+    /// </remarks>
+    public void Move
+        (
+            int distance
+        )
+    {
+        _position = Math.Max (0, Math.Min (_position + distance, _text.Length));
+    }
 
-        /// <summary>
-        /// Подглядывание текущего символа (т. е. символа в текущей позиции).
-        /// </summary>
-        [Pure]
-        public char PeekChar() => _position >= _text.Length
+    /// <summary>
+    /// Подглядывание текущего символа (т. е. символа в текущей позиции).
+    /// </summary>
+    [Pure]
+    public char PeekChar()
+    {
+        return _position >= _text.Length
             ? EOF
             : _text[_position];
+    }
 
-        /// <summary>
-        /// Подглядывание строки вплоть до указанной длины.
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        /// <remarks>
-        /// Символы перевода строки в данном методе
-        /// считаются обычными символами и включаются в результат.
-        /// </remarks>
-        public ReadOnlySpan<char> PeekString
-            (
-                int length
-            )
+    /// <summary>
+    /// Подглядывание строки вплоть до указанной длины.
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    /// <remarks>
+    /// Символы перевода строки в данном методе
+    /// считаются обычными символами и включаются в результат.
+    /// </remarks>
+    public ReadOnlySpan<char> PeekString
+        (
+            int length
+        )
+    {
+        Sure.Positive (length);
+
+        if (IsEOF)
         {
-            Sure.Positive (length, nameof (length));
+            return ReadOnlySpan<char>.Empty;
+        }
 
-            if (IsEOF)
+        var start = _position;
+        for (var i = 0; i < length; i++)
+        {
+            var c = ReadChar();
+            if (c == EOF)
             {
-                return ReadOnlySpan<char>.Empty;
+                break;
+            }
+        }
+
+        var result = _text.Slice (start, _position - start);
+        _position = start;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Подглядывание вплоть до указанного символа
+    /// (включая его).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    public ReadOnlySpan<char> PeekTo
+        (
+            char stopChar
+        )
+    {
+        var position = _position;
+        var result = ReadTo (stopChar);
+        _position = position;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Подглядывание вплоть до указанных символов
+    /// (включая их).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    public ReadOnlySpan<char> PeekTo
+        (
+            params char[] stopChars
+        )
+    {
+        var position = _position;
+        var result = ReadTo (stopChars);
+        _position = position;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Подглядывание вплоть до указанного символа
+    /// (не включая его).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    public ReadOnlySpan<char> PeekUntil
+        (
+            char stopChar
+        )
+    {
+        var position = _position;
+        var result = ReadUntil (stopChar);
+        _position = position;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Подглядывание вплоть до указанных символов
+    /// (не включая их).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    public ReadOnlySpan<char> PeekUntil
+        (
+            params char[] stopChars
+        )
+    {
+        var position = _position;
+        var result = ReadUntil (stopChars);
+        _position = position;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Считывание одного символа.
+    /// Если достигнут конец текста, возвращается
+    /// <see cref="EOF"/>.
+    /// </summary>
+    public char ReadChar()
+    {
+        if (_position >= _text.Length)
+        {
+            return EOF;
+        }
+
+        return _text[_position++];
+    }
+
+    /// <summary>
+    /// Считывание экранированной строки вплоть до разделителя
+    /// (не включая его).
+    /// </summary>
+    /// <param name="escapeChar">Экранирующий символ,
+    /// как правило, '\\'.</param>
+    /// <param name="stopChar">Стоп-символ (разделитель).</param>
+    /// <returns><c>null</c>, если достигнут конец текста.
+    /// </returns>
+    /// <exception cref="FormatException">Нарушен формат (есть символ
+    /// экранирования, но за ним строка обрывается).
+    /// </exception>
+    public string? ReadEscapedUntil
+        (
+            char escapeChar,
+            char stopChar
+        )
+    {
+        if (IsEOF)
+        {
+            return null;
+        }
+
+        var result = new StringBuilder();
+        while (true)
+        {
+            var c = ReadChar();
+            if (c == EOF)
+            {
+                break;
             }
 
-            var start = _position;
-            for (var i = 0; i < length; i++)
+            if (c == escapeChar)
             {
-                var c = ReadChar();
+                c = ReadChar();
                 if (c == EOF)
                 {
-                    break;
+                    Magna.Error
+                        (
+                            nameof (ValueTextNavigator)
+                            + "::"
+                            + nameof (ReadEscapedUntil)
+                            + ": "
+                            + "unexpected end of stream"
+                        );
+
+                    throw new FormatException();
                 }
+
+                result.Append (c);
             }
-
-            var result = _text.Slice (start, _position - start);
-            _position = start;
-
-            return result;
-        } // method PeekString
-
-        /// <summary>
-        /// Подглядывание вплоть до указанного символа
-        /// (включая его).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        public ReadOnlySpan<char> PeekTo
-            (
-                char stopChar
-            )
-        {
-            var position = _position;
-            var result = ReadTo (stopChar);
-            _position = position;
-
-            return result;
-        } // method PeekTo
-
-        /// <summary>
-        /// Подглядывание вплоть до указанных символов
-        /// (включая их).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        public ReadOnlySpan<char> PeekTo
-            (
-                params char[] stopChars
-            )
-        {
-            var position = _position;
-            var result = ReadTo (stopChars);
-            _position = position;
-
-            return result;
-        } // method PeekTo
-
-        /// <summary>
-        /// Подглядывание вплоть до указанного символа
-        /// (не включая его).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        public ReadOnlySpan<char> PeekUntil
-            (
-                char stopChar
-            )
-        {
-            var position = _position;
-            var result = ReadUntil (stopChar);
-            _position = position;
-
-            return result;
-        } // method PeekUntil
-
-        /// <summary>
-        /// Подглядывание вплоть до указанных символов
-        /// (не включая их).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        public ReadOnlySpan<char> PeekUntil
-            (
-                params char[] stopChars
-            )
-        {
-            var position = _position;
-            var result = ReadUntil (stopChars);
-            _position = position;
-
-            return result;
-        } // metdho PeekUntil
-
-        /// <summary>
-        /// Считывание одного символа.
-        /// Если достигнут конец текста, возвращается
-        /// <see cref="EOF"/>.
-        /// </summary>
-        public char ReadChar()
-        {
-            if (_position >= _text.Length)
+            else if (c == stopChar)
             {
-                return EOF;
+                break;
             }
-
-            return _text[_position++];
-        } // method ReadChar
-
-        /// <summary>
-        /// Считывание экранированной строки вплоть до разделителя
-        /// (не включая его).
-        /// </summary>
-        /// <param name="escapeChar">Экранирующий символ,
-        /// как правило, '\\'.</param>
-        /// <param name="stopChar">Стоп-символ (разделитель).</param>
-        /// <returns><c>null</c>, если достигнут конец текста.
-        /// </returns>
-        /// <exception cref="FormatException">Нарушен формат (есть символ
-        /// экранирования, но за ним строка обрывается).
-        /// </exception>
-        public string? ReadEscapedUntil
-            (
-                char escapeChar,
-                char stopChar
-            )
-        {
-            if (IsEOF)
+            else
             {
-                return null;
+                result.Append (c);
             }
+        }
 
-            var result = new StringBuilder();
-            while (true)
-            {
-                var c = ReadChar();
-                if (c == EOF)
-                {
-                    break;
-                }
+        return result.ToString();
+    }
 
-                if (c == escapeChar)
-                {
-                    c = ReadChar();
-                    if (c == EOF)
-                    {
-                        Magna.Error
-                            (
-                                nameof (ValueTextNavigator)
-                                + "::"
-                                + nameof (ReadEscapedUntil)
-                                + ": "
-                                + "unexpected end of stream"
-                            );
-
-                        throw new FormatException();
-                    }
-
-                    result.Append (c);
-                }
-                else if (c == stopChar)
-                {
-                    break;
-                }
-                else
-                {
-                    result.Append (c);
-                }
-            }
-
-            return result.ToString();
-        } // method ReadEscapedUntil
-
-        /// <summary>
-        /// Считывание начиная с открывающего символа
-        /// до закрывающего (включая их).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
-        /// или нет открывающего либо закрывающего символа.
-        /// </returns>
-        public ReadOnlySpan<char> ReadFrom
-            (
-                char openChar,
-                char closeChar
-            )
+    /// <summary>
+    /// Считывание начиная с открывающего символа
+    /// до закрывающего (включая их).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+    /// или нет открывающего либо закрывающего символа.
+    /// </returns>
+    public ReadOnlySpan<char> ReadFrom
+        (
+            char openChar,
+            char closeChar
+        )
+    {
+        if (IsEOF)
         {
-            if (IsEOF)
+            return ReadOnlySpan<char>.Empty;
+        }
+
+        var start = _position;
+        if (PeekChar() != openChar)
+        {
+            return ReadOnlySpan<char>.Empty;
+        }
+
+        ReadChar();
+
+        while (true)
+        {
+            var c = ReadChar();
+            if (c == EOF)
             {
+                _position = start;
                 return ReadOnlySpan<char>.Empty;
             }
 
-            var start = _position;
-            if (PeekChar() != openChar)
+            if (c == closeChar)
             {
+                break;
+            }
+        }
+
+        return _text.Slice
+            (
+                start,
+                _position - start
+            );
+    }
+
+    /// <summary>
+    /// Считывание начиная с открывающего символа
+    /// до закрывающего (включая их).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+    /// или если нет открывающего либо закрывающего символа.
+    /// </returns>
+    public ReadOnlySpan<char> ReadFrom
+        (
+            ReadOnlySpan<char> openChars,
+            ReadOnlySpan<char> closeChars
+        )
+    {
+        if (IsEOF)
+        {
+            return ReadOnlySpan<char>.Empty;
+        }
+
+        var start = _position;
+        if (!openChars.Contains (PeekChar()))
+        {
+            return ReadOnlySpan<char>.Empty;
+        }
+
+        ReadChar();
+
+        while (true)
+        {
+            var c = ReadChar();
+            if (c == EOF)
+            {
+                _position = start;
                 return ReadOnlySpan<char>.Empty;
+            }
+
+            if (closeChars.Contains (c))
+            {
+                break;
+            }
+        }
+
+        return _text.Slice
+            (
+                start,
+                _position - start
+            );
+    }
+
+    /// <summary>
+    /// Чтение беззнакового целого.
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+    /// или текущий символ не цифровой.</returns>
+    public ReadOnlySpan<char> ReadInteger()
+    {
+        if (!IsDigit())
+        {
+            return ReadOnlySpan<char>.Empty;
+        }
+
+        var startPosition = _position;
+        while (IsDigit())
+        {
+            ReadChar();
+        }
+
+        return _text.Slice
+            (
+                startPosition,
+                _position - startPosition
+            );
+    }
+
+    /// <summary>
+    /// Чтение до конца строки.
+    /// </summary>
+    public ReadOnlySpan<char> ReadLine()
+    {
+        var startPosition = _position;
+        while (!IsEOF)
+        {
+            var c = PeekChar();
+            if (c == '\r' || c == '\n')
+            {
+                break;
             }
 
             ReadChar();
+        }
 
-            while (true)
-            {
-                var c = ReadChar();
-                if (c == EOF)
-                {
-                    _position = start;
-                    return ReadOnlySpan<char>.Empty;
-                }
-
-                if (c == closeChar)
-                {
-                    break;
-                }
-            }
-
-            return _text.Slice
-                (
-                    start,
-                    _position - start
-                );
-        } // method ReadFrom
-
-        /// <summary>
-        /// Считывание начиная с открывающего символа
-        /// до закрывающего (включая их).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
-        /// или если нет открывающего либо закрывающего символа.
-        /// </returns>
-        public ReadOnlySpan<char> ReadFrom
-            (
-                ReadOnlySpan<char> openChars,
-                ReadOnlySpan<char> closeChars
-            )
+        var stopPosition = _position;
+        if (!IsEOF)
         {
-            if (IsEOF)
+            var c = PeekChar();
+            if (c == '\r')
             {
+                ReadChar();
+                c = PeekChar();
+            }
+
+            if (c == '\n')
+            {
+                ReadChar();
+            }
+        }
+
+        return _text.Slice
+            (
+                startPosition,
+                stopPosition - startPosition
+            );
+    }
+
+    /// <summary>
+    /// Чтение строки вплоть до указанной длины.
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    public ReadOnlySpan<char> ReadString
+        (
+            int length
+        )
+    {
+        Sure.Positive (length);
+
+        var startPosition = _position;
+        for (var i = 0; i < length; i++)
+        {
+            var c = ReadChar();
+            if (c == EOF)
+            {
+                break;
+            }
+        }
+
+        return Substring
+            (
+                startPosition,
+                _position - startPosition
+            );
+    }
+
+    /// <summary>
+    /// Считывание вплоть до указанного символа
+    /// (включая его).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    public ReadOnlySpan<char> ReadTo
+        (
+            char stopChar
+        )
+    {
+        var startPosition = _position;
+        while (true)
+        {
+            var c = ReadChar();
+            if (c == EOF || c == stopChar)
+            {
+                break;
+            }
+        }
+
+        return Substring
+            (
+                startPosition,
+                length: _position - startPosition
+            );
+    }
+
+    /// <summary>
+    /// Считывание вплоть до указанного разделителя
+    /// (разделитель не помещается в возвращаемое значение,
+    /// однако, считывается).
+    /// </summary>
+    /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </remarks>
+    public ReadOnlySpan<char> ReadToString
+        (
+            ReadOnlySpan<char> stopString
+        )
+    {
+        Sure.NotEmpty (stopString);
+
+        var savePosition = _position;
+        var length = 0;
+        while (true)
+        {
+            AGAIN:
+            var c = ReadChar();
+            if (c == EOF)
+            {
+                _position = savePosition;
                 return ReadOnlySpan<char>.Empty;
             }
 
-            var start = _position;
-            if (!openChars.Contains (PeekChar()))
+            length++;
+            if (length >= stopString.Length)
             {
+                var start = _position - stopString.Length;
+                for (var i = 0; i < stopString.Length; i++)
+                {
+                    if (_text[start + i] != stopString[i])
+                    {
+                        goto AGAIN;
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return Substring
+            (
+                savePosition,
+                _position - savePosition - stopString.Length
+            );
+    }
+
+    /// <summary>
+    /// Считывание вплоть до указанного разделителя
+    /// (разделитель не помещается в возвращаемое значение,
+    /// однако, считывается). Регистр символов не учитывается.
+    /// </summary>
+    /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </remarks>
+    public ReadOnlySpan<char> ReadToStringIgnoreCase
+        (
+            ReadOnlySpan<char> stopString
+        )
+    {
+        Sure.NotEmpty (stopString);
+
+        var savePosition = _position;
+        var length = 0;
+        while (true)
+        {
+            AGAIN:
+            var c = ReadChar();
+            if (c == EOF)
+            {
+                _position = savePosition;
                 return ReadOnlySpan<char>.Empty;
+            }
+
+            length++;
+            if (length >= stopString.Length)
+            {
+                var start = _position - stopString.Length;
+                for (var i = 0; i < stopString.Length; i++)
+                {
+                    if (!_text[start + i].SameChar (stopString[i]))
+                    {
+                        goto AGAIN;
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return Substring
+            (
+                savePosition,
+                _position - savePosition - stopString.Length
+            );
+    }
+
+    /// <summary>
+    /// Считывание вплоть до указанного символа
+    /// (включая один из них).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    public ReadOnlySpan<char> ReadTo
+        (
+            params char[] stopChars
+        )
+    {
+        var start = _position;
+        while (true)
+        {
+            var c = ReadChar();
+            if (c == EOF
+                || Array.IndexOf (stopChars, c) >= 0)
+            {
+                break;
+            }
+        }
+
+        var result = _text.Slice
+            (
+                start: start,
+                length: _position - start
+            );
+        return result;
+    }
+
+    /// <summary>
+    /// Считывание вплоть до указанного символа
+    /// (не включая его).
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </returns>
+    public ReadOnlySpan<char> ReadUntil
+        (
+            char stopChar
+        )
+    {
+        var start = _position;
+        while (true)
+        {
+            var c = PeekChar();
+            if (c == EOF || c == stopChar)
+            {
+                break;
             }
 
             ReadChar();
+        }
 
-            while (true)
-            {
-                var c = ReadChar();
-                if (c == EOF)
-                {
-                    _position = start;
-                    return ReadOnlySpan<char>.Empty;
-                }
+        return _text.Slice
+            (
+                start,
+                _position - start
+            );
+    }
 
-                if (closeChars.Contains (c))
-                {
-                    break;
-                }
-            }
+    /// <summary>
+    /// Считывание вплоть до указанного разделителя
+    /// (разделитель не помещается в возвращаемое значение
+    /// и не считывается).
+    /// </summary>
+    /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </remarks>
+    public ReadOnlySpan<char> ReadUntilString
+        (
+            ReadOnlySpan<char> stopString
+        )
+    {
+        Sure.NotEmpty (stopString);
 
-            return _text.Slice
-                (
-                    start,
-                    _position - start
-                );
-        } // metdhod ReadFrom
-
-        /// <summary>
-        /// Чтение беззнакового целого.
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
-        /// или текущий символ не цифровой.</returns>
-        public ReadOnlySpan<char> ReadInteger()
+        var position = _position;
+        var length = 0;
+        while (true)
         {
-            if (!IsDigit())
+            AGAIN:
+            var c = ReadChar();
+            if (c == EOF)
             {
+                _position = position;
                 return ReadOnlySpan<char>.Empty;
             }
 
-            var startPosition = _position;
-            while (IsDigit())
+            length++;
+            if (length >= stopString.Length)
             {
-                ReadChar();
-            }
-
-            return _text.Slice
-                (
-                    startPosition,
-                    _position - startPosition
-                );
-        } // method ReadInteger
-
-        /// <summary>
-        /// Чтение до конца строки.
-        /// </summary>
-        public ReadOnlySpan<char> ReadLine()
-        {
-            var startPosition = _position;
-            while (!IsEOF)
-            {
-                var c = PeekChar();
-                if (c == '\r' || c == '\n')
+                var start = _position - stopString.Length;
+                for (var i = 0; i < stopString.Length; i++)
                 {
-                    break;
-                }
-
-                ReadChar();
-            }
-
-            var stopPosition = _position;
-            if (!IsEOF)
-            {
-                var c = PeekChar();
-                if (c == '\r')
-                {
-                    ReadChar();
-                    c = PeekChar();
-                }
-
-                if (c == '\n')
-                {
-                    ReadChar();
-                }
-            }
-
-            return _text.Slice
-                (
-                    startPosition,
-                    stopPosition - startPosition
-                );
-        } // method ReadLine
-
-        /// <summary>
-        /// Чтение строки вплоть до указанной длины.
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        public ReadOnlySpan<char> ReadString
-            (
-                int length
-            )
-        {
-            Sure.Positive (length, nameof (length));
-
-            var startPosition = _position;
-            for (var i = 0; i < length; i++)
-            {
-                var c = ReadChar();
-                if (c == EOF)
-                {
-                    break;
-                }
-            }
-
-            return Substring
-                (
-                    startPosition,
-                    _position - startPosition
-                );
-        } // method ReadString
-
-        /// <summary>
-        /// Считывание вплоть до указанного символа
-        /// (включая его).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        public ReadOnlySpan<char> ReadTo
-            (
-                char stopChar
-            )
-        {
-            var startPosition = _position;
-            while (true)
-            {
-                var c = ReadChar();
-                if (c == EOF || c == stopChar)
-                {
-                    break;
-                }
-            }
-
-            return Substring
-                (
-                    startPosition,
-                    length: _position - startPosition
-                );
-        } // method ReadTo
-
-        /// <summary>
-        /// Считывание вплоть до указанного разделителя
-        /// (разделитель не помещается в возвращаемое значение,
-        /// однако, считывается).
-        /// </summary>
-        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </remarks>
-        public ReadOnlySpan<char> ReadToString
-            (
-                ReadOnlySpan<char> stopString
-            )
-        {
-            Sure.NotEmpty (stopString);
-
-            var savePosition = _position;
-            var length = 0;
-            while (true)
-            {
-                AGAIN:
-                var c = ReadChar();
-                if (c == EOF)
-                {
-                    _position = savePosition;
-                    return ReadOnlySpan<char>.Empty;
-                }
-
-                length++;
-                if (length >= stopString.Length)
-                {
-                    var start = _position - stopString.Length;
-                    for (var i = 0; i < stopString.Length; i++)
+                    if (_text[start + i] != stopString[i])
                     {
-                        if (_text[start + i] != stopString[i])
-                        {
-                            goto AGAIN;
-                        }
+                        goto AGAIN;
                     }
-
-                    break;
                 }
-            }
 
-            return Substring
-                (
-                    savePosition,
-                    _position - savePosition - stopString.Length
-                );
+                break;
+            }
         }
 
-        /// <summary>
-        /// Считывание вплоть до указанного разделителя
-        /// (разделитель не помещается в возвращаемое значение,
-        /// однако, считывается). Регистр символов не учитывается.
-        /// </summary>
-        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </remarks>
-        public ReadOnlySpan<char> ReadToStringIgnoreCase
+        var result = _text.Slice
             (
-                ReadOnlySpan<char> stopString
-            )
+                position,
+                _position - position - stopString.Length
+            );
+        _position -= stopString.Length;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Считывание вплоть до указанных символов
+    /// (не включая их).
+    /// </summary>
+    /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
+    /// </remarks>
+    public ReadOnlySpan<char> ReadUntil
+        (
+            params char[] stopChars
+        )
+    {
+        var savePosition = _position;
+        while (true)
         {
-            Sure.NotEmpty (stopString);
-
-            var savePosition = _position;
-            var length = 0;
-            while (true)
+            var c = PeekChar();
+            if (c == EOF
+                || Array.IndexOf (stopChars, c) >= 0)
             {
-                AGAIN:
-                var c = ReadChar();
-                if (c == EOF)
-                {
-                    _position = savePosition;
-                    return ReadOnlySpan<char>.Empty;
-                }
-
-                length++;
-                if (length >= stopString.Length)
-                {
-                    var start = _position - stopString.Length;
-                    for (var i = 0; i < stopString.Length; i++)
-                    {
-                        if (!_text[start + i].SameChar (stopString[i]))
-                        {
-                            goto AGAIN;
-                        }
-                    }
-
-                    break;
-                }
+                break;
             }
 
-            return Substring
-                (
-                    savePosition,
-                    _position - savePosition - stopString.Length
-                );
+            ReadChar();
         }
 
-        /// <summary>
-        /// Считывание вплоть до указанного символа
-        /// (включая один из них).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        public ReadOnlySpan<char> ReadTo
+        return _text.Slice
             (
-                params char[] stopChars
-            )
+                savePosition,
+                _position - savePosition
+            );
+    }
+
+    /// <summary>
+    /// Считывание вплоть до указанных символов
+    /// (не включая их).
+    /// </summary>
+    /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста
+    /// или текущий символ не открывающий.
+    /// </remarks>
+    public ReadOnlySpan<char> ReadUntil
+        (
+            ReadOnlySpan<char> openChars,
+            ReadOnlySpan<char> closeChars,
+            ReadOnlySpan<char> stopChars
+        )
+    {
+        var start = _position;
+        var level = 0;
+        while (true)
         {
-            var start = _position;
-            while (true)
+            var c = PeekChar();
+            if (c == EOF)
             {
-                var c = ReadChar();
-                if (c == EOF
-                    || Array.IndexOf (stopChars, c) >= 0)
+                _position = start;
+                return ReadOnlySpan<char>.Empty;
+            }
+
+            if (openChars.Contains (c))
+            {
+                level++;
+            }
+            else if (closeChars.Contains (c))
+            {
+                if (level == 0
+                    && stopChars.Contains (c))
+                {
+                    break;
+                }
+
+                level--;
+            }
+            else if (stopChars.Contains (c))
+            {
+                if (level == 0)
                 {
                     break;
                 }
             }
 
-            var result = _text.Slice
-                (
-                    start: start,
-                    length: _position - start
-                );
-            return result;
-        } // method ReadTo
+            ReadChar();
+        }
 
-        /// <summary>
-        /// Считывание вплоть до указанного символа
-        /// (не включая его).
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </returns>
-        public ReadOnlySpan<char> ReadUntil
+        return _text.Slice
             (
-                char stopChar
-            )
-        {
-            var start = _position;
-            while (true)
-            {
-                var c = PeekChar();
-                if (c == EOF || c == stopChar)
-                {
-                    break;
-                }
+                start,
+                _position - start
+            );
+    }
 
+    /// <summary>
+    /// Считывание, пока встречается указанный символ.
+    /// </summary>
+    /// <returns><c>Простой фрагмент</c>, если достигнут конец текста
+    /// или текущий символ не совпадает с указанным.
+    /// </returns>
+    public ReadOnlySpan<char> ReadWhile
+        (
+            char goodChar
+        )
+    {
+        var startPosition = _position;
+        while (true)
+        {
+            var c = PeekChar();
+            if (c == EOF || c != goodChar)
+            {
+                break;
+            }
+
+            ReadChar();
+        }
+
+        return _text.Slice
+            (
+                startPosition,
+                _position - startPosition
+            );
+    }
+
+    /// <summary>
+    /// Считывание, пока встречается указанные символы.
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+    /// или текущий символ не входит в число "хороших".
+    /// </returns>
+    public ReadOnlySpan<char> ReadWhile
+        (
+            params char[] goodChars
+        )
+    {
+        var start = _position;
+        while (true)
+        {
+            var c = PeekChar();
+            if (c == EOF
+                || Array.IndexOf (goodChars, c) < 0)
+            {
+                break;
+            }
+
+            ReadChar();
+        }
+
+        return _text.Slice
+            (
+                start,
+                _position - start
+            );
+    }
+
+    /// <summary>
+    /// Считываем слово, начиная с текущей позиции.
+    /// </summary>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+    /// или текущий символ "не-словесный".
+    /// </returns>
+    public ReadOnlySpan<char> ReadWord()
+    {
+        var startPosition = _position;
+        while (true)
+        {
+            var c = PeekChar();
+            if (c == EOF
+                || !char.IsLetterOrDigit (c))
+            {
+                break;
+            }
+
+            ReadChar();
+        }
+
+        return _text.Slice
+            (
+                startPosition,
+                _position - startPosition
+            );
+    }
+
+    /// <summary>
+    /// Считываем слово под курсором.
+    /// </summary>
+    /// <param name="additionalWordCharacters">Дополнительные символы,
+    /// которые мы полагаем "словесными".</param>
+    /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
+    /// или текущий символ "не-словесный".
+    /// </returns>
+    public ReadOnlySpan<char> ReadWord
+        (
+            params char[] additionalWordCharacters
+        )
+    {
+        var savePosition = _position;
+        while (true)
+        {
+            var c = PeekChar();
+            if (c == EOF
+                || !char.IsLetterOrDigit (c)
+                && Array.IndexOf (additionalWordCharacters, c) < 0)
+            {
+                break;
+            }
+
+            ReadChar();
+        }
+
+        return _text.Slice
+            (
+                savePosition,
+                _position - savePosition
+            );
+    }
+
+    /// <summary>
+    /// Получаем недавно считанный текст указанной длины.
+    /// </summary>
+    /// <param name="length">Желаемая длина текста в символах
+    /// (положительное целое).</param>
+    [Pure]
+    public ReadOnlySpan<char> RecentText
+        (
+            int length
+        )
+    {
+        var start = _position - length;
+        if (start < 0)
+        {
+            length += start;
+            start = 0;
+        }
+
+        if (start >= _text.Length)
+        {
+            length = 0;
+            start = _text.Length - 1;
+        }
+
+        if (length < 0)
+        {
+            length = 0;
+        }
+
+        return Substring (start, length);
+    }
+
+    /// <summary>
+    /// Пропускает один символ, если он совпадает с указанным.
+    /// </summary>
+    /// <returns><c>true</c>, если символ был съеден успешно.
+    /// </returns>
+    public bool SkipChar
+        (
+            char c
+        )
+    {
+        if (PeekChar() == c)
+        {
+            ReadChar();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Пропускает указанное число символов.
+    /// </summary>
+    /// <returns><c>true</c>, если ещё остались непрочитанные символы.
+    /// </returns>
+    public bool SkipChar
+        (
+            int n
+        )
+    {
+        for (var i = 0; i < n; i++)
+        {
+            ReadChar();
+        }
+
+        return !IsEOF;
+    }
+
+    /// <summary>
+    /// Пропускает один символ, если он совпадает с любым
+    /// из указанных.
+    /// </summary>
+    /// <returns><c>true</c>, если символ был съеден успешно
+    /// </returns>
+    public bool SkipChar
+        (
+            params char[] allowed
+        )
+    {
+        if (Array.IndexOf (allowed, PeekChar()) >= 0)
+        {
+            ReadChar();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Пропускаем управляющие символы.
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipControl()
+    {
+        while (true)
+        {
+            if (IsEOF)
+            {
+                return false;
+            }
+
+            if (IsControl())
+            {
                 ReadChar();
             }
-
-            return _text.Slice
-                (
-                    start,
-                    _position - start
-                );
-        } // method ReadUntil
-
-        /// <summary>
-        /// Считывание вплоть до указанного разделителя
-        /// (разделитель не помещается в возвращаемое значение
-        /// и не считывается).
-        /// </summary>
-        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </remarks>
-        public ReadOnlySpan<char> ReadUntilString
-            (
-                ReadOnlySpan<char> stopString
-            )
-        {
-            // Sure.NotNullNorEmpty(stopString, nameof(stopString));
-
-            var position = _position;
-            var length = 0;
-            while (true)
+            else
             {
-                AGAIN:
-                var c = ReadChar();
-                if (c == EOF)
-                {
-                    _position = position;
-                    return ReadOnlySpan<char>.Empty;
-                }
+                return true;
+            }
+        }
+    }
 
-                length++;
-                if (length >= stopString.Length)
-                {
-                    var start = _position - stopString.Length;
-                    for (var i = 0; i < stopString.Length; i++)
-                    {
-                        if (_text[start + i] != stopString[i])
-                        {
-                            goto AGAIN;
-                        }
-                    }
-
-                    break;
-                }
+    /// <summary>
+    /// Пропускаем пунктуацию.
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipPunctuation()
+    {
+        while (true)
+        {
+            if (IsEOF)
+            {
+                return false;
             }
 
-            var result = _text.Slice
-                (
-                    position,
-                    _position - position - stopString.Length
-                );
-            _position -= stopString.Length;
-
-            return result;
-        } // method ReadUntil
-
-        /// <summary>
-        /// Считывание вплоть до указанных символов
-        /// (не включая их).
-        /// </summary>
-        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста.
-        /// </remarks>
-        public ReadOnlySpan<char> ReadUntil
-            (
-                params char[] stopChars
-            )
-        {
-            var savePosition = _position;
-            while (true)
+            if (IsPunctuation())
             {
-                var c = PeekChar();
-                if (c == EOF
-                    || Array.IndexOf (stopChars, c) >= 0)
-                {
-                    break;
-                }
-
                 ReadChar();
             }
-
-            return _text.Slice
-                (
-                    savePosition,
-                    _position - savePosition
-                );
-        } // method ReadUntil
-
-        /// <summary>
-        /// Считывание вплоть до указанных символов
-        /// (не включая их).
-        /// </summary>
-        /// <remarks><c>Пустой фрагмент</c>, если достигнут конец текста
-        /// или текущий символ не открывающий.
-        /// </remarks>
-        public ReadOnlySpan<char> ReadUntil
-            (
-                ReadOnlySpan<char> openChars,
-                ReadOnlySpan<char> closeChars,
-                ReadOnlySpan<char> stopChars
-            )
-        {
-            var start = _position;
-            var level = 0;
-            while (true)
+            else
             {
-                var c = PeekChar();
-                if (c == EOF)
-                {
-                    _position = start;
-                    return ReadOnlySpan<char>.Empty;
-                }
+                return true;
+            }
+        }
+    }
 
-                if (openChars.Contains (c))
-                {
-                    level++;
-                }
-                else if (closeChars.Contains (c))
-                {
-                    if (level == 0
-                        && stopChars.Contains (c))
-                    {
-                        break;
-                    }
+    /// <summary>
+    /// Пропускаем "не-словесные" символы.
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipNonWord()
+    {
+        while (true)
+        {
+            if (IsEOF)
+            {
+                return false;
+            }
 
-                    level--;
-                }
-                else if (stopChars.Contains (c))
-                {
-                    if (level == 0)
-                    {
-                        break;
-                    }
-                }
-
+            var c = PeekChar();
+            if (!char.IsLetterOrDigit (c))
+            {
                 ReadChar();
             }
-
-            return _text.Slice
-                (
-                    start,
-                    _position - start
-                );
-        } // method ReadUntil
-
-        /// <summary>
-        /// Считывание, пока встречается указанный символ.
-        /// </summary>
-        /// <returns><c>Простой фрагмент</c>, если достигнут конец текста
-        /// или текущий символ не совпадает с указанным.
-        /// </returns>
-        public ReadOnlySpan<char> ReadWhile
-            (
-                char goodChar
-            )
-        {
-            var startPosition = _position;
-            while (true)
+            else
             {
-                var c = PeekChar();
-                if (c == EOF || c != goodChar)
-                {
-                    break;
-                }
+                return true;
+            }
+        }
+    }
 
+    /// <summary>
+    /// Пропускаем "не-словесные" символы.
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipNonWord
+        (
+            params char[] additionalWordCharacters
+        )
+    {
+        while (true)
+        {
+            if (IsEOF)
+            {
+                return false;
+            }
+
+            var c = PeekChar();
+            if (!char.IsLetterOrDigit (c)
+                && Array.LastIndexOf (additionalWordCharacters, c) < 0)
+            {
                 ReadChar();
             }
-
-            return _text.Slice
-                (
-                    startPosition,
-                    _position - startPosition
-                );
-        } // method ReadWhile
-
-        /// <summary>
-        /// Считывание, пока встречается указанные символы.
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
-        /// или текущий символ не входит в число "хороших".
-        /// </returns>
-        public ReadOnlySpan<char> ReadWhile
-            (
-                params char[] goodChars
-            )
-        {
-            var start = _position;
-            while (true)
+            else
             {
-                var c = PeekChar();
-                if (c == EOF
-                    || Array.IndexOf (goodChars, c) < 0)
-                {
-                    break;
-                }
+                return true;
+            }
+        }
+    }
 
+    /// <summary>
+    /// Пропускаем произвольное количество символов
+    /// из указанного диапазона (например, от 'A' до 'Z').
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipRange
+        (
+            char fromChar,
+            char toChar
+        )
+    {
+        while (true)
+        {
+            if (IsEOF)
+            {
+                return false;
+            }
+
+            var c = PeekChar();
+            if (c >= fromChar && c <= toChar)
+            {
                 ReadChar();
             }
-
-            return _text.Slice
-                (
-                    start,
-                    _position - start
-                );
-        } // method ReadWhile
-
-        /// <summary>
-        /// Считываем слово, начиная с текущей позиции.
-        /// </summary>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
-        /// или текущий символ "не-словесный".
-        /// </returns>
-        public ReadOnlySpan<char> ReadWord()
-        {
-            var startPosition = _position;
-            while (true)
+            else
             {
-                var c = PeekChar();
-                if (c == EOF
-                    || !char.IsLetterOrDigit (c))
-                {
-                    break;
-                }
+                return true;
+            }
+        }
+    }
 
+    /// <summary>
+    /// Пропустить указанный символ.
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipWhile
+        (
+            char skipChar
+        )
+    {
+        while (true)
+        {
+            if (IsEOF)
+            {
+                return false;
+            }
+
+            var c = PeekChar();
+            if (c == skipChar)
+            {
                 ReadChar();
             }
-
-            return _text.Slice
-                (
-                    startPosition,
-                    _position - startPosition
-                );
-        } // metdhod ReadWord
-
-        /// <summary>
-        /// Считываем слово под курсором.
-        /// </summary>
-        /// <param name="additionalWordCharacters">Дополнительные символы,
-        /// которые мы полагаем "словесными".</param>
-        /// <returns><c>Пустой фрагмент</c>, если достигнут конец текста
-        /// или текущий символ "не-словесный".
-        /// </returns>
-        public ReadOnlySpan<char> ReadWord
-            (
-                params char[] additionalWordCharacters
-            )
-        {
-            var savePosition = _position;
-            while (true)
+            else
             {
-                var c = PeekChar();
-                if (c == EOF
-                    || !char.IsLetterOrDigit (c)
-                    && Array.IndexOf (additionalWordCharacters, c) < 0)
-                {
-                    break;
-                }
+                return true;
+            }
+        }
+    }
 
+    /// <summary>
+    /// Пропустить указанные символы.
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipWhile
+        (
+            params char[] skipChars
+        )
+    {
+        while (true)
+        {
+            if (IsEOF)
+            {
+                return false;
+            }
+
+            var c = PeekChar();
+            if (Array.IndexOf (skipChars, c) >= 0)
+            {
                 ReadChar();
             }
+            else
+            {
+                return true;
+            }
+        }
+    }
 
-            return _text.Slice
-                (
-                    savePosition,
-                    _position - savePosition
-                );
-        } // method ReadWord
-
-        /// <summary>
-        /// Получаем недавно считанный текст указанной длины.
-        /// </summary>
-        /// <param name="length">Желаемая длина текста в символах
-        /// (положительное целое).</param>
-        [Pure]
-        public ReadOnlySpan<char> RecentText
-            (
-                int length
-            )
+    /// <summary>
+    /// Пропустить, пока не встретится указанный стоп-символ.
+    /// Сам стоп-символ не считывается.
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipTo
+        (
+            char stopChar
+        )
+    {
+        while (true)
         {
-            var start = _position - length;
-            if (start < 0)
+            if (IsEOF)
             {
-                length += start;
-                start = 0;
+                return false;
             }
 
-            if (start >= _text.Length)
+            var c = PeekChar();
+            if (c == stopChar)
             {
-                length = 0;
-                start = _text.Length - 1;
-            }
-
-            if (length < 0)
-            {
-                length = 0;
-            }
-
-            return Substring (start, length);
-        } // method RecentText
-
-        /// <summary>
-        /// Пропускает один символ, если он совпадает с указанным.
-        /// </summary>
-        /// <returns><c>true</c>, если символ был съеден успешно.
-        /// </returns>
-        public bool SkipChar
-            (
-                char c
-            )
-        {
-            if (PeekChar() == c)
-            {
-                ReadChar();
-
                 return true;
             }
 
-            return false;
-        } // method SkipChar
+            ReadChar();
+        }
+    }
 
-        /// <summary>
-        /// Пропускает указанное число символов.
-        /// </summary>
-        /// <returns><c>true</c>, если ещё остались непрочитанные символы.
-        /// </returns>
-        public bool SkipChar
-            (
-                int n
-            )
+    /// <summary>
+    /// Пропустить, пока не встретятся указанные символы.
+    /// </summary>
+    /// <returns><c>false</c>, если достигнут конец текста.
+    /// </returns>
+    public bool SkipWhileNot
+        (
+            params char[] goodChars
+        )
+    {
+        while (true)
         {
-            for (var i = 0; i < n; i++)
+            if (IsEOF)
+            {
+                return false;
+            }
+
+            var c = PeekChar();
+            if (Array.IndexOf (goodChars, c) < 0)
             {
                 ReadChar();
             }
-
-            return !IsEOF;
-        } // method SkipChar
-
-        /// <summary>
-        /// Пропускает один символ, если он совпадает с любым
-        /// из указанных.
-        /// </summary>
-        /// <returns><c>true</c>, если символ был съеден успешно
-        /// </returns>
-        public bool SkipChar
-            (
-                params char[] allowed
-            )
-        {
-            if (Array.IndexOf (allowed, PeekChar()) >= 0)
+            else
             {
-                ReadChar();
                 return true;
             }
+        }
+    }
 
-            return false;
-        } // method SkipChar
-
-        /// <summary>
-        /// Пропускаем управляющие символы.
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipControl()
+    /// <summary>
+    /// Пропускаем пробельные символы.
+    /// </summary>
+    public bool SkipWhitespace()
+    {
+        while (true)
         {
-            while (true)
+            if (IsEOF)
             {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                if (IsControl())
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        } // method SkipControl
-
-        /// <summary>
-        /// Пропускаем пунктуацию.
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipPunctuation()
-        {
-            while (true)
-            {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                if (IsPunctuation())
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
+                return false;
             }
 
-        } // method SkipPunctuation
-
-        /// <summary>
-        /// Пропускаем "не-словесные" символы.
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipNonWord()
-        {
-            while (true)
+            if (IsWhiteSpace())
             {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                var c = PeekChar();
-                if (!char.IsLetterOrDigit (c))
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-        } // method SkipNonWord
-
-        /// <summary>
-        /// Пропускаем "не-словесные" символы.
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipNonWord
-            (
-                params char[] additionalWordCharacters
-            )
-        {
-            while (true)
-            {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                var c = PeekChar();
-                if (!char.IsLetterOrDigit (c)
-                    && Array.LastIndexOf (additionalWordCharacters, c) < 0)
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-        } // method SkipNonWord
-
-        /// <summary>
-        /// Пропускаем произвольное количество символов
-        /// из указанного диапазона (например, от 'A' до 'Z').
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipRange
-            (
-                char fromChar,
-                char toChar
-            )
-        {
-            while (true)
-            {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                var c = PeekChar();
-                if (c >= fromChar && c <= toChar)
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-        } // method SkipRange
-
-        /// <summary>
-        /// Пропустить указанный символ.
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipWhile
-            (
-                char skipChar
-            )
-        {
-            while (true)
-            {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                var c = PeekChar();
-                if (c == skipChar)
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-        } // method SkipWhile
-
-        /// <summary>
-        /// Пропустить указанные символы.
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipWhile
-            (
-                params char[] skipChars
-            )
-        {
-            while (true)
-            {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                var c = PeekChar();
-                if (Array.IndexOf (skipChars, c) >= 0)
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-        } // method SkipWhile
-
-        /// <summary>
-        /// Пропустить, пока не встретится указанный стоп-символ.
-        /// Сам стоп-символ не считывается.
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipTo
-            (
-                char stopChar
-            )
-        {
-            while (true)
-            {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                var c = PeekChar();
-                if (c == stopChar)
-                {
-                    return true;
-                }
-
                 ReadChar();
             }
-
-        } // method SkipTo
-
-        /// <summary>
-        /// Пропустить, пока не встретятся указанные символы.
-        /// </summary>
-        /// <returns><c>false</c>, если достигнут конец текста.
-        /// </returns>
-        public bool SkipWhileNot
-            (
-                params char[] goodChars
-            )
-        {
-            while (true)
+            else
             {
-                if (IsEOF)
-                {
-                    return false;
-                }
+                return true;
+            }
+        }
+    }
 
-                var c = PeekChar();
-                if (Array.IndexOf (goodChars, c) < 0)
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
+    /// <summary>
+    /// Пропускаем пробельные символы и пунктуацию.
+    /// </summary>
+    public bool SkipWhitespaceAndPunctuation()
+    {
+        while (true)
+        {
+            if (IsEOF)
+            {
+                return false;
             }
 
-        } // method SkipWhileNot
-
-        /// <summary>
-        /// Пропускаем пробельные символы.
-        /// </summary>
-        public bool SkipWhitespace()
-        {
-            while (true)
+            if (IsWhiteSpace() || IsPunctuation())
             {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                if (IsWhiteSpace())
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
+                ReadChar();
             }
-
-        } // method SkiWhitespace
-
-        /// <summary>
-        /// Пропускаем пробельные символы и пунктуацию.
-        /// </summary>
-        public bool SkipWhitespaceAndPunctuation()
-        {
-            while (true)
+            else
             {
-                if (IsEOF)
-                {
-                    return false;
-                }
-
-                if (IsWhiteSpace() || IsPunctuation())
-                {
-                    ReadChar();
-                }
-                else
-                {
-                    return true;
-                }
+                return true;
             }
+        }
+    }
 
-        } // method SkipWhitespaceAndPunctuation
+    /// <summary>
+    /// Извлечение подстроки, начиная с указанного смещения.
+    /// </summary>
+    [Pure]
+    public ReadOnlySpan<char> Substring
+        (
+            int offset
+        )
+    {
+        return offset < 0 || offset >= _text.Length
+            ? ReadOnlySpan<char>.Empty
+            : _text.Slice (offset);
+    }
 
-        /// <summary>
-        /// Извлечение подстроки, начиная с указанного смещения.
-        /// </summary>
-        [Pure]
-        public ReadOnlySpan<char> Substring (int offset) =>
-            offset < 0 || offset >= _text.Length
-                ? ReadOnlySpan<char>.Empty
-                : _text.Slice (offset);
+    /// <summary>
+    /// Извлечение подстроки.
+    /// </summary>
+    /// <remarks>Если параметры заданы неверно,
+    /// метод может выбросить исключение
+    /// <see cref="ArgumentOutOfRangeException"/>.</remarks>
+    /// <param name="offset">Смещение до начала подстроки в символах.</param>
+    /// <param name="length">Длина подстроки в символах.</param>
+    [Pure]
+    public ReadOnlySpan<char> Substring
+        (
+            int offset,
+            int length
+        )
+    {
+        return offset < 0 || offset >= _text.Length || length <= 0
+            ? ReadOnlySpan<char>.Empty
+            : _text.Slice (offset, length);
+    }
 
-        /// <summary>
-        /// Извлечение подстроки.
-        /// </summary>
-        /// <remarks>Если параметры заданы неверно,
-        /// метод может выбросить исключение
-        /// <see cref="ArgumentOutOfRangeException"/>.</remarks>
-        /// <param name="offset">Смещение до начала подстроки в символах.</param>
-        /// <param name="length">Длина подстроки в символах.</param>
-        [Pure]
-        public ReadOnlySpan<char> Substring (int offset,int length) =>
-            offset < 0 || offset >= _text.Length || length <= 0
-                ? ReadOnlySpan<char>.Empty
-                : _text.Slice (offset, length);
+    #endregion
 
-        #endregion
+    #region Object members
 
-        #region Object members
+    /// <inheritdoc cref="object.ToString" />
+    [Pure]
+    public override string ToString()
+    {
+        return $"Position={Position}";
+    }
 
-        /// <inheritdoc cref="object.ToString" />
-        [Pure]
-        public override string ToString() => $"Position={Position}";
-
-        #endregion
-
-    } // struct ValueTextNavigator
-
-} // namespace AM.Text
+    #endregion
+}

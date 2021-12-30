@@ -23,334 +23,332 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Text
+namespace AM.Text;
+
+//
+// Вдохновлено кодом из BCL:
+// https://github.com/dotnet/runtime/blob/main/src/libraries/Common/src/System/Text/ValueStringBuilder.cs
+//
+
+/// <summary>
+/// Аналог системного <see cref="StringBuilder"/>, оформленный
+/// как структура.
+/// </summary>
+public ref struct ValueStringBuilder
 {
-    //
-    // Вдохновлено кодом из BCL:
-    // https://github.com/dotnet/runtime/blob/main/src/libraries/Common/src/System/Text/ValueStringBuilder.cs
-    //
+    #region Properties
 
     /// <summary>
-    /// Аналог системного <see cref="StringBuilder"/>, оформленный
-    /// как структура.
+    /// Емкость.
     /// </summary>
-    public ref struct ValueStringBuilder
+    public int Capacity => _characters.Length;
+
+    /// <summary>
+    /// Текущая длина.
+    /// </summary>
+    public int Length
     {
-        #region Properties
-
-        /// <summary>
-        /// Емкость.
-        /// </summary>
-        public int Capacity => _characters.Length;
-
-        /// <summary>
-        /// Текущая длина.
-        /// </summary>
-        public int Length
+        get => _position;
+        set
         {
-            get => _position;
-            set
-            {
-                Sure.NonNegative (value, nameof (value));
-                Sure.AssertState (value <= _characters.Length);
-                _position = value;
-            }
+            Sure.NonNegative (value, nameof (value));
+            Sure.AssertState (value <= _characters.Length);
+            _position = value;
+        }
+    } // property Length
 
-        } // property Length
+    /// <summary>
+    /// Сырой буфер.
+    /// </summary>
+    public ReadOnlySpan<char> RawCharacters => _characters;
 
-        /// <summary>
-        /// Сырой буфер.
-        /// </summary>
-        public ReadOnlySpan<char> RawCharacters => _characters;
+    /// <summary>
+    /// Доступ по индексу.
+    /// </summary>
+    public ref char this [int index] => ref _characters[index];
 
-        /// <summary>
-        /// Доступ по индексу.
-        /// </summary>
-        public ref char this [int index] => ref _characters[index];
+    #endregion
 
-        #endregion
+    #region Construction
 
-        #region Construction
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    /// <param name="characters">Начальный буфер.</param>
+    public ValueStringBuilder
+        (
+            Span<char> characters
+        )
+        : this()
+    {
+        _characters = characters;
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="characters">Начальный буфер.</param>
-        public ValueStringBuilder
-            (
-                Span<char> characters
-            )
-            : this()
+    #endregion
+
+    #region Private members
+
+    private char[]? _array;
+    private Span<char> _characters;
+    private int _position;
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Выдача построенного на данный момент значения как спана.
+    /// </summary>
+    public ReadOnlySpan<char> AsSpan()
+    {
+        return _characters.Slice (0, _position);
+    }
+
+    /// <summary>
+    /// Выдача построенного на данный момент значения как спана.
+    /// </summary>
+    public ReadOnlySpan<char> AsSpan (int start)
+    {
+        return _characters.Slice (start, _position - start);
+    }
+
+    /// <summary>
+    /// Выдача построенного на данный момент значения как спана.
+    /// </summary>
+    public ReadOnlySpan<char> AsSpan (int start, int length)
+    {
+        return _characters.Slice (start, length);
+    }
+
+    /// <summary>
+    /// Добавление одного символа.
+    /// </summary>
+    public void Append
+        (
+            char c
+        )
+    {
+        if (_position == _characters.Length)
         {
-            _characters = characters;
+            Grow (1);
+        }
 
-        } // constructor
+        _characters[_position] = c;
+        ++_position;
+    }
 
-        #endregion
-
-        #region Private members
-
-        private char[]? _array;
-        private Span<char> _characters;
-        private int _position;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Выдача построенного на данный момент значения как спана.
-        /// </summary>
-        public ReadOnlySpan<char> AsSpan() =>
-            _characters.Slice (0, _position);
-
-        /// <summary>
-        /// Выдача построенного на данный момент значения как спана.
-        /// </summary>
-        public ReadOnlySpan<char> AsSpan (int start) =>
-            _characters.Slice (start, _position - start);
-
-        /// <summary>
-        /// Выдача построенного на данный момент значения как спана.
-        /// </summary>
-        public ReadOnlySpan<char> AsSpan (int start, int length) =>
-            _characters.Slice (start, length);
-
-        /// <summary>
-        /// Добавление одного символа.
-        /// </summary>
-        public void Append
-            (
-                char c
-            )
+    /// <summary>
+    /// Добавление спана символов.
+    /// </summary>
+    public void Append
+        (
+            ReadOnlySpan<char> text
+        )
+    {
+        var newPosition = _position + text.Length;
+        if (newPosition > _characters.Length)
         {
-            if (_position == _characters.Length)
-            {
-                Grow (1);
-            }
+            Grow (text.Length);
+        }
 
-            _characters[_position] = c;
-            ++_position;
+        text.CopyTo (_characters.Slice (_position));
+        _position = newPosition;
+    }
 
-        } // method Append
-
-        /// <summary>
-        /// Добавление спана символов.
-        /// </summary>
-        public void Append
-            (
-                ReadOnlySpan<char> text
-            )
+    /// <summary>
+    /// Добавление пары спанов.
+    /// </summary>
+    public void Append
+        (
+            ReadOnlySpan<char> text1,
+            ReadOnlySpan<char> text2
+        )
+    {
+        var delta = text1.Length + text2.Length;
+        var newPosition = _position + delta;
+        if (newPosition > _characters.Length)
         {
-            var newPosition = _position + text.Length;
+            Grow (delta);
+        }
+
+        text1.CopyTo (_characters.Slice (_position));
+        text2.CopyTo (_characters.Slice (_position + text1.Length));
+        _position = newPosition;
+    }
+
+    /// <summary>
+    /// Добавление трех спанов.
+    /// </summary>
+    public void Append
+        (
+            ReadOnlySpan<char> text1,
+            ReadOnlySpan<char> text2,
+            ReadOnlySpan<char> text3
+        )
+    {
+        var delta = text1.Length + text2.Length + text3.Length;
+        var newPosition = _position + delta;
+        if (newPosition > _characters.Length)
+        {
+            Grow (delta);
+        }
+
+        text1.CopyTo (_characters.Slice (_position));
+        text2.CopyTo (_characters.Slice (_position + text1.Length));
+        text3.CopyTo (_characters.Slice (_position + text1.Length + text2.Length));
+        _position = newPosition;
+    }
+
+    /// <summary>
+    /// Добавление целого числа со знаком.
+    /// </summary>
+    public unsafe void Append
+        (
+            int value
+        )
+    {
+        var remaining = _characters.Length - _position;
+        if (remaining >= 10)
+        {
+            var buffer = _characters.Slice (_position);
+            var written = FastNumber.Int32ToChars (value, buffer);
+            _position += written;
+        }
+        else
+        {
+            Span<char> buffer = stackalloc char[10];
+            var written = FastNumber.Int32ToChars (value, buffer);
+            var newPosition = _position + written;
             if (newPosition > _characters.Length)
             {
-                Grow (text.Length);
+                Grow (written);
             }
 
-            text.CopyTo (_characters.Slice (_position));
+            buffer.Slice (0, written).CopyTo (_characters.Slice (_position));
             _position = newPosition;
+        }
+    }
 
-        } // method Append
+    /// <summary>
+    /// Добавление перевода строки.
+    /// </summary>
+    public void AppendLine()
+    {
+        Append (Environment.NewLine);
+    }
 
-        /// <summary>
-        /// Добавление пары спанов.
-        /// </summary>
-        public void Append
+    /// <summary>
+    /// Освобождаем ресурсы, если были заняты.
+    /// </summary>
+    public void Dispose()
+    {
+        var borrowed = _array;
+        this = default; // для спокойствия
+        if (borrowed is not null)
+        {
+            ArrayPool<char>.Shared.Return (borrowed);
+        }
+    }
+
+    /// <summary>
+    /// Увеличение емкости, если необходимо.
+    /// </summary>
+    public void EnsureCapacity
+        (
+            int capacity
+        )
+    {
+        if (capacity > _characters.Length)
+        {
+            Grow (capacity - _position);
+        }
+    }
+
+    /// <summary>
+    /// Увеличение емкости на указанное количество символов.
+    /// </summary>
+    public void Grow
+        (
+            int additional
+        )
+    {
+        var newCapacity = (int)Math.Max
             (
-                ReadOnlySpan<char> text1,
-                ReadOnlySpan<char> text2
-            )
+                (uint)(_position + additional),
+                (uint)(Capacity * 2)
+            );
+        var borrowed = ArrayPool<char>.Shared.Rent (newCapacity);
+        _characters.Slice (0, _position).CopyTo (borrowed);
+        if (_array is not null)
         {
-            var delta = text1.Length + text2.Length;
-            var newPosition = _position + delta;
-            if (newPosition > _characters.Length)
+            ArrayPool<char>.Shared.Return (_array);
+        }
+
+        _characters = _array = borrowed;
+    }
+
+    /// <summary>
+    /// Получение перечислителя.
+    /// </summary>
+    public ReadOnlySpan<char>.Enumerator GetEnumerator()
+    {
+        return AsSpan().GetEnumerator();
+    }
+
+    /// <summary>
+    /// Чтение строки непосредственно в <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="reader">Поток, из которого считывается строка.</param>
+    /// <param name="appendNewLine">Добавлять перевод строки в конец?</param>
+    /// <returns><c>false</c>, если достигнут конец потока.</returns>
+    public bool ReadLine
+        (
+            TextReader reader,
+            bool appendNewLine = false
+        )
+    {
+        Sure.NotNull (reader);
+
+        var first = true;
+        while (true)
+        {
+            var chr = reader.Read();
+            if (chr < 0)
             {
-                Grow (delta);
+                return !first;
             }
 
-            text1.CopyTo (_characters.Slice (_position));
-            text2.CopyTo (_characters.Slice (_position + text1.Length));
-            _position = newPosition;
-
-        } // method Append
-
-        /// <summary>
-        /// Добавление трех спанов.
-        /// </summary>
-        public void Append
-            (
-                ReadOnlySpan<char> text1,
-                ReadOnlySpan<char> text2,
-                ReadOnlySpan<char> text3
-            )
-        {
-            var delta = text1.Length + text2.Length + text3.Length;
-            var newPosition = _position + delta;
-            if (newPosition > _characters.Length)
+            if (chr == '\n')
             {
-                Grow (delta);
-            }
-
-            text1.CopyTo (_characters.Slice (_position));
-            text2.CopyTo (_characters.Slice (_position + text1.Length));
-            text3.CopyTo (_characters.Slice (_position + text1.Length + text2.Length));
-            _position = newPosition;
-
-        } // method Append
-
-        /// <summary>
-        /// Добавление целого числа со знаком.
-        /// </summary>
-        public unsafe void Append
-            (
-                int value
-            )
-        {
-            var remaining = _characters.Length - _position;
-            if (remaining >= 10)
-            {
-                var buffer = _characters.Slice (_position);
-                var written = FastNumber.Int32ToChars (value, buffer);
-                _position += written;
-            }
-            else
-            {
-                Span<char> buffer = stackalloc char[10];
-                var written = FastNumber.Int32ToChars (value, buffer);
-                var newPosition = _position + written;
-                if (newPosition > _characters.Length)
-                {
-                    Grow (written);
-                }
-
-                buffer.Slice (0, written).CopyTo (_characters.Slice (_position));
-                _position = newPosition;
-            }
-
-        } // method Append
-
-        /// <summary>
-        /// Добавление перевода строки.
-        /// </summary>
-        public void AppendLine() => Append (Environment.NewLine);
-
-        /// <summary>
-        /// Освобождаем ресурсы, если были заняты.
-        /// </summary>
-        public void Dispose()
-        {
-            var borrowed = _array;
-            this = default; // для спокойствия
-            if (borrowed is not null)
-            {
-                ArrayPool<char>.Shared.Return (borrowed);
-            }
-
-        } // method Dispose
-
-        /// <summary>
-        /// Увеличение емкости, если необходимо.
-        /// </summary>
-        public void EnsureCapacity
-            (
-                int capacity
-            )
-        {
-            if (capacity > _characters.Length)
-            {
-                Grow (capacity - _position);
-            }
-
-        } // method EnsureCapacity
-
-        /// <summary>
-        /// Увеличение емкости на указанное количество символов.
-        /// </summary>
-        public void Grow
-            (
-                int additional
-            )
-        {
-            var newCapacity = (int)Math.Max
-                (
-                    (uint)(_position + additional),
-                    (uint)(Capacity * 2)
-                );
-            var borrowed = ArrayPool<char>.Shared.Rent (newCapacity);
-            _characters.Slice (0, _position).CopyTo (borrowed);
-            if (_array is not null)
-            {
-                ArrayPool<char>.Shared.Return (_array);
-            }
-
-            _characters = _array = borrowed;
-
-        } // method Grow
-
-        /// <summary>
-        /// Получение перечислителя.
-        /// </summary>
-        public ReadOnlySpan<char>.Enumerator GetEnumerator() =>
-            AsSpan().GetEnumerator();
-
-        /// <summary>
-        /// Чтение строки непосредственно в <see cref="StringBuilder"/>.
-        /// </summary>
-        /// <param name="reader">Поток, из которого считывается строка.</param>
-        /// <param name="appendNewLine">Добавлять перевод строки в конец?</param>
-        /// <returns><c>false</c>, если достигнут конец потока.</returns>
-        public bool ReadLine
-            (
-                TextReader reader,
-                bool appendNewLine = false
-            )
-        {
-            var first = true;
-            while (true)
-            {
-                var chr = reader.Read();
-                if (chr < 0)
-                {
-                    return !first;
-                }
-
-                if (chr == '\n')
-                {
-                    if (appendNewLine)
-                    {
-                        Append ((char)chr);
-                    }
-
-                    return true;
-                }
-
-                if (chr != '\r')
+                if (appendNewLine)
                 {
                     Append ((char)chr);
                 }
 
-                first = false;
+                return true;
             }
 
-        } // method ReadLine
+            if (chr != '\r')
+            {
+                Append ((char)chr);
+            }
 
-        #endregion
+            first = false;
+        }
+    }
 
-        #region Object members
+    #endregion
 
-        /// <inheritdoc cref="object.ToString"/>
-        public override string ToString()
-        {
-            var result = AsSpan().ToString();
-            Dispose();
+    #region Object members
 
-            return result;
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        var result = AsSpan().ToString();
+        Dispose();
 
-        } // method ToString
+        return result;
+    }
 
-        #endregion
-
-    } // ref struct ValueStringBuilder
-
-} // namespace AM.Text
+    #endregion
+}
