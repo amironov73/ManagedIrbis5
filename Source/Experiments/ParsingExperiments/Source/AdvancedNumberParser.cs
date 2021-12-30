@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* AdvancedNumber.cs -- продвинутое целое число, как в C#
+/* AdvancedNumberParser.cs -- продвинутое целое число, как в C#
  * Ars Magna project, http://arsmagna.ru
  */
 

@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 
-/* ParserStateUtility.cs -- считывает строку целиком
+/* ParserStateUtility.cs -- работа с состоянием разбора
  * Ars Magna project, http://arsmagna.ru
  */
 
