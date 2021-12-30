@@ -19,6 +19,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 
+using AM.Scripting.Barsik;
 using AM.Text;
 
 using Pidgin;
@@ -122,6 +123,12 @@ public static class Resolve
     #endregion
 
     #region Extension methods
+
+    /// <summary>
+    /// Добавляет поглощение пробельных символов перед указанным парсером.
+    /// </summary>
+    public static Parser<char, TResult> Clear<TResult> (Parser<char, TResult> parser) =>
+        new ClearParser<TResult> (parser);
 
     /// <summary>
     /// Число плавающей точкой двойной точности.
