@@ -3,12 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
-/* ValueList.cs -- List<T>, оформленный как структура
+/* PooledList.cs -- List<T> поверх пула массивов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -25,16 +22,16 @@ using System.Collections.Generic;
 namespace AM.Collections;
 
 /// <summary>
-/// <see cref="List{T}"/>, оформленный как структура.
+/// <see cref="List{T}"/> поверх пула массивов.
 /// </summary>
-public ref struct ValueList<T>
+public ref struct PooledList<T>
 {
     #region Properties
 
     /// <summary>
     /// Текущая емкость списка.
     /// </summary>
-    public int Capacity => _values.Length;
+    public int Capacity => _array?.Length ?? 0;
 
     /// <summary>
     /// Текущая длина списка.
@@ -45,7 +42,7 @@ public ref struct ValueList<T>
         set
         {
             Sure.NonNegative (value);
-            Sure.AssertState (value <= _values.Length);
+            Sure.AssertState (value <= Capacity);
             _position = value;
         }
     }
@@ -53,48 +50,58 @@ public ref struct ValueList<T>
     /// <summary>
     /// Сырой буфер.
     /// </summary>
-    public ReadOnlySpan<T> RawBuffer => _values;
+    public ReadOnlySpan<T> RawBuffer => _array;
 
     /// <summary>
     /// Доступ по индексу.
     /// </summary>
-    public ref T this [int index] => ref _values[index];
+    public ref T this [int index] => ref _array[index];
 
     #endregion
 
     #region Construction
 
     /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public PooledList()
+    {
+        _pool = ArrayPool<T>.Shared;
+        _array = Array.Empty<T>();
+        _position = 0;
+    }
+
+    /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="initialBuffer">Начальный буфер.</param>
-    public ValueList
+    public PooledList
         (
-            Span<T> initialBuffer
+            ArrayPool<T> pool
         )
-        : this()
     {
-        _values = initialBuffer;
+        _pool = pool;
+        _array = Array.Empty<T>();
+        _position = 0;
     }
 
     #endregion
 
     #region Private members
 
-    private T[]? _array;
-    private Span<T> _values;
+    private readonly ArrayPool<T> _pool;
+    private T[] _array;
     private int _position;
 
     #endregion
 
     #region Public methods
 
-    /// <summary>
+        /// <summary>
     /// Выдача списка как спана.
     /// </summary>
     public ReadOnlySpan<T> AsSpan()
     {
-        return _values.Slice (0, _position);
+        return _array.AsSpan().Slice (0, _position);
     }
 
     /// <summary>
@@ -105,7 +112,7 @@ public ref struct ValueList<T>
             int start
         )
     {
-        return _values.Slice (start, _position - start);
+        return _array.AsSpan().Slice (start, _position - start);
     }
 
     /// <summary>
@@ -117,7 +124,7 @@ public ref struct ValueList<T>
             int length
         )
     {
-        return _values.Slice (start, length);
+        return _array.AsSpan().Slice (start, length);
     }
 
     /// <summary>
@@ -128,12 +135,12 @@ public ref struct ValueList<T>
             T one
         )
     {
-        if (_position == _values.Length)
+        if (_position == _array.Length)
         {
             Grow (1);
         }
 
-        _values[_position] = one;
+        _array[_position] = one;
         ++_position;
     }
 
@@ -146,12 +153,12 @@ public ref struct ValueList<T>
         )
     {
         var newPosition = _position + values.Length;
-        if (newPosition > _values.Length)
+        if (newPosition > _array.Length)
         {
             Grow (values.Length);
         }
 
-        values.CopyTo (_values.Slice (_position));
+        values.CopyTo (_array.AsSpan().Slice (_position));
         _position = newPosition;
     }
 
@@ -166,13 +173,14 @@ public ref struct ValueList<T>
     {
         var delta = one.Length + two.Length;
         var newPosition = _position + delta;
-        if (newPosition > _values.Length)
+        if (newPosition > _array.Length)
         {
             Grow (delta);
         }
 
-        one.CopyTo (_values.Slice (_position));
-        two.CopyTo (_values.Slice (_position + one.Length));
+        var span = _array.AsSpan();
+        one.CopyTo (span.Slice (_position));
+        two.CopyTo (span.Slice (_position + one.Length));
         _position = newPosition;
     }
 
@@ -188,28 +196,16 @@ public ref struct ValueList<T>
     {
         var delta = one.Length + two.Length + three.Length;
         int newPosition = _position + delta;
-        if (newPosition > _values.Length)
+        if (newPosition > _array.Length)
         {
             Grow (delta);
         }
 
-        one.CopyTo (_values.Slice (_position));
-        two.CopyTo (_values.Slice (_position + one.Length));
-        three.CopyTo (_values.Slice (_position + one.Length + two.Length));
+        var span = _array.AsSpan();
+        one.CopyTo (span.Slice (_position));
+        two.CopyTo (span.Slice (_position + one.Length));
+        three.CopyTo (span.Slice (_position + one.Length + two.Length));
         _position = newPosition;
-    }
-
-    /// <summary>
-    /// Освобождаем ресурсы, если были заняты.
-    /// </summary>
-    public void Dispose()
-    {
-        var borrowed = _array;
-        this = default; // для спокойствия
-        if (borrowed is not null)
-        {
-            ArrayPool<T>.Shared.Return (borrowed);
-        }
     }
 
     /// <summary>
@@ -220,7 +216,7 @@ public ref struct ValueList<T>
             int capacity
         )
     {
-        if (capacity > _values.Length)
+        if (capacity > _array.Length)
         {
             Grow (capacity - _position);
         }
@@ -242,13 +238,13 @@ public ref struct ValueList<T>
                 (uint) (Capacity * 2)
             );
         var borrowed = ArrayPool<T>.Shared.Rent (newCapacity);
-        _values.Slice (0, _position).CopyTo (borrowed);
-        if (_array is not null)
+        _array.AsSpan().Slice (0, _position).CopyTo (borrowed);
+        if (_array.Length != 0)
         {
             ArrayPool<T>.Shared.Return (_array);
         }
 
-        _values = _array = borrowed;
+        _array = _array = borrowed;
     }
 
     /// <summary>
@@ -271,5 +267,20 @@ public ref struct ValueList<T>
     }
 
     #endregion
-}
 
+    #region IDisposable members
+
+    /// <summary>
+    /// Освобождаем ресурсы, если были заняты.
+    /// </summary>
+    public void Dispose()
+    {
+        if (_array.Length != 0)
+        {
+            _pool.Return (_array);
+            _array = Array.Empty<T>();
+        }
+    }
+
+    #endregion
+}

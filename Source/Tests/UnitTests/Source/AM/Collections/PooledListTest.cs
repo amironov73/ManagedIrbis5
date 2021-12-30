@@ -13,7 +13,7 @@ using AM.Collections;
 namespace UnitTests.AM.Collections;
 
 [TestClass]
-public unsafe class ValueListTest
+public class PooledListTest
 {
     private static T[] Get<T> (ReadOnlySpan<char> span)
     {
@@ -50,23 +50,19 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Constructor_1()
+    public void PooledList_Constructor_1()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
 
         Assert.AreEqual (0, list.Length);
-        Assert.AreEqual (bufferLength, list.Capacity);
+        Assert.AreEqual (0, list.Capacity);
         Assert.AreEqual (0, list.ToArray().Length);
     }
 
     [TestMethod]
-    public void ValueList_Append_1()
+    public void PooledList_Append_1()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
 
         list.Append ('H');
         Assert.AreEqual (1, list.Length);
@@ -86,11 +82,9 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Append_2()
+    public void PooledList_Append_2()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
 
         list.Append (Get<int> ("Hello, "));
         Assert.AreEqual (7, list.Length);
@@ -104,11 +98,9 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Append_3()
+    public void PooledList_Append_3()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
 
         list.Append (Get<int> ("Hello, "), Get<int> ("world!"));
         Assert.AreEqual (13, list.Length);
@@ -120,11 +112,9 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Append_4()
+    public void PooledList_Append_4()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
         var longString = new string ('x', 80);
 
         list.Append (Get<int> (longString));
@@ -137,11 +127,9 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Append_5()
+    public void PooledList_Append_5()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
         var longString = new string ('x', 80);
 
         list.Append (Get<int> (longString), Get<int> (longString));
@@ -154,11 +142,9 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Append_6()
+    public void PooledList_Append_6()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
         var longString = new string ('x', 80);
 
         list.Append (Get<int> (longString));
@@ -172,11 +158,9 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Append_7()
+    public void PooledList_Append_7()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
         var longString = new string ('x', 80);
 
         list.Append (Get<int> (longString), Get<int> (longString),
@@ -190,11 +174,9 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Append_8()
+    public void PooledList_Append_8()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
 
         for (var i = 0; i < 100; i++)
         {
@@ -210,70 +192,18 @@ public unsafe class ValueListTest
     }
 
     [TestMethod]
-    public void ValueList_Length_1()
+    public void PooledList_EnsureCapacity_1()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
-
-        buffer.Fill ('x');
-        list.Length = 5;
-        Assert.AreEqual (5, list.Length);
-        Assert.IsTrue (Same<int>
-            (
-                Get<int> (new string ('x', 5)),
-                list.ToArray()
-            ));
-    }
-
-    [TestMethod]
-    public void ValueList_RawBuffer_1()
-    {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
-
-        buffer.Fill ('x');
-        Assert.AreEqual ('x', list.RawBuffer[0]);
-    }
-
-    [TestMethod]
-    public void ValueList_Indexer_1()
-    {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
-
-        buffer.Fill ('x');
-        Assert.AreEqual ('x', list[1]);
-        list[1] = 'X';
-        Assert.AreEqual ('X', list[1]);
-        list.Length = 2;
-        Assert.IsTrue (Same<int>
-            (
-                Get<int> ("xX"),
-                list.ToArray()
-            ));
-    }
-
-    [TestMethod]
-    public void ValueList_EnsureCapacity_1()
-    {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
 
         list.EnsureCapacity (100);
         Assert.IsTrue (100 <= list.Capacity);
-        list.Dispose();
     }
 
     [TestMethod]
-    public void ValueList_AsSpan_1()
+    public void PooledList_AsSpan_1()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
 
         list.Append (Get<int> ("Hello, world"));
         var span = list.AsSpan (7);
@@ -282,15 +212,12 @@ public unsafe class ValueListTest
                 Get<int> ("world"),
                 span.ToArray()
             ));
-        list.Dispose();
     }
 
     [TestMethod]
-    public void ValueList_AsSpan_2()
+    public void PooledList_AsSpan_2()
     {
-        const int bufferLength = 16;
-        Span<int> buffer = stackalloc int[bufferLength];
-        var list = new ValueList<int> (buffer);
+        using var list = new PooledList<int>();
 
         list.Append (Get<int> ("Hello, world"));
         var span = list.AsSpan (0, 5);
@@ -299,6 +226,5 @@ public unsafe class ValueListTest
                 Get<int> ("Hello"),
                 span.ToArray()
             ));
-        list.Dispose();
     }
 }
