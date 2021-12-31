@@ -281,7 +281,7 @@ public static class Resolve
     /// <param name="second">Второй парсер -- его результат отбрасывается,
     /// он должен "заглянуть вперед" и сообщить, имеет ли смысл разбирать дальше.
     /// </param>
-    private static Parser<TToken, TResult> Preview<TToken, TResult>
+    public static Parser<TToken, TResult> Preview<TToken, TResult>
         (
             Parser<TToken, TResult> first,
             Parser<TToken, Unit> second
@@ -289,6 +289,22 @@ public static class Resolve
     {
         return new PreviewParser<TToken, TResult> (first, second);
     }
+
+    /// <summary>
+    /// Чтение всей строки вплоть до конца.
+    /// </summary>
+    public static Parser<char, string> ReadLine
+        (
+            bool eatEol = false
+        )
+    {
+        return new ReadLineParser (eatEol);
+    }
+
+    /// <summary>
+    /// Парсер, выдающий нераспарсенный остаток текста.
+    /// </summary>
+    public static readonly Parser<char, string> Remainder = new RemainderParser();
 
     #endregion
 }

@@ -19,7 +19,7 @@ using Pidgin;
 
 #endregion
 
-namespace ParsingExperiments;
+namespace AM.Scripting;
 
 /// <summary>
 /// Парсер, съедающий комментарии в стиле C/C++.
@@ -27,7 +27,7 @@ namespace ParsingExperiments;
 /// разделители стейтментов.
 /// Короче, парсер строго для Барсика :)
 /// </summary>
-sealed class SwallowParser
+internal sealed class SwallowParser
     : Parser<char, Unit>
 {
     #region Construction
