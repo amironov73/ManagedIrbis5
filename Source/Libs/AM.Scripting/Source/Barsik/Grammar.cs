@@ -96,7 +96,7 @@ static class Grammar
     public static Parser<char, TResult> RoundBrackets<TResult> (Parser<char, TResult> parser) =>
         Tok (parser).Between (Tok ('('), Tok (')'));
 
-    private static readonly Parser<char, string> Identifier = Map
+    internal static readonly Parser<char, string> Identifier = Map
         (
             (first, rest) => first + rest,
             Letter,

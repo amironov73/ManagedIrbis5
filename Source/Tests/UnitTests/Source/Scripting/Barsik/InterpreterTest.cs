@@ -67,10 +67,12 @@ public sealed class InterpreterTest
         public void Interpreter_Directive_1()
         {
             var interpreter = new Interpreter();
-            interpreter.Execute ("#u Namespace1\n");
-            Assert.AreEqual (0, interpreter.Context.Namespaces.Count);
-            // var actual = (int) (object) interpreter.Context.Variables["x"]!;
-            // Assert.AreEqual (1, actual);
+            interpreter.Execute ("#u Namespace1\nx = 1");
+            Assert.AreEqual (1, interpreter.Context.Namespaces.Count);
+            var count = interpreter.Context.Namespaces.Count;
+            Assert.AreEqual (1, count);
+            var actual = (int) (object) interpreter.Context.Variables["x"]!;
+            Assert.AreEqual (1, actual);
         }
 
         [TestMethod]
