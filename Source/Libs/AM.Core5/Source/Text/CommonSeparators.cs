@@ -11,95 +11,95 @@
 
 #nullable enable
 
-namespace AM.Text
+namespace AM.Text;
+
+/// <summary>
+/// Широко применяемые разделители текста, тщательно
+/// собранные в одном месте.
+/// </summary>
+public static class CommonSeparators
 {
+    #region Properties
+
     /// <summary>
-    /// Широко применяемые разделители текста, тщательно
-    /// собранные в одном месте.
+    /// Colon.
     /// </summary>
-    public static class CommonSeparators
-    {
-        #region Properties
+    public static readonly char[] Colon = { ':' };
 
-        /// <summary>
-        /// Colon.
-        /// </summary>
-        public static readonly char[] Colon = { ':' };
-        /// <summary>
-        /// Comma.
-        /// </summary>
-        public static readonly char[] Comma = { ',' };
+    /// <summary>
+    /// Comma.
+    /// </summary>
+    public static readonly char[] Comma = { ',' };
 
-        /// <summary>
-        /// Comma and semicolon.
-        /// </summary>
-        public static readonly char[] CommaAndSemicolon = { ',', ';' };
+    /// <summary>
+    /// Comma and semicolon.
+    /// </summary>
+    public static readonly char[] CommaAndSemicolon = { ',', ';' };
 
-        /// <summary>
-        /// Dot.
-        /// </summary>
-        public static readonly char[] Dot = { '.' };
+    /// <summary>
+    /// Dot.
+    /// </summary>
+    public static readonly char[] Dot = { '.' };
 
-        /// <summary>
-        /// Equal sign.
-        /// </summary>
-        public static readonly char[] EqualSign = { '=' };
+    /// <summary>
+    /// Equal sign.
+    /// </summary>
+    public static readonly char[] EqualSign = { '=' };
 
-        /// <summary>
-        /// Minus sign.
-        /// </summary>
-        public static readonly char[] Minus = { '-' };
+    /// <summary>
+    /// Minus sign.
+    /// </summary>
+    public static readonly char[] Minus = { '-' };
 
-        /// <summary>
-        /// Newline.
-        /// </summary>
-        public static readonly char[] NewLine = { '\r', '\n' };
+    /// <summary>
+    /// Newline.
+    /// </summary>
+    public static readonly char[] NewLine = { '\r', '\n' };
 
-        /// <summary>
-        /// Newline and percent sign.
-        /// </summary>
-        public static readonly char[] NewLineAndPercent = { '\r', '\n', '%' };
+    /// <summary>
+    /// Newline and percent sign.
+    /// </summary>
+    public static readonly char[] NewLineAndPercent = { '\r', '\n', '%' };
 
-        /// <summary>
-        /// Number sign.
-        /// </summary>
-        public static readonly char[] NumberSign = { '#' };
+    /// <summary>
+    /// Number sign.
+    /// </summary>
+    public static readonly char[] NumberSign = { '#' };
 
-        /// <summary>
-        /// Pipe sign.
-        /// </summary>
-        public static readonly char[] Pipe = { '|' };
+    /// <summary>
+    /// Pipe sign.
+    /// </summary>
+    public static readonly char[] Pipe = { '|' };
 
-        /// <summary>
-        /// Semicolon.
-        /// </summary>
-        public static readonly char[] Semicolon = { ';' };
+    /// <summary>
+    /// Semicolon.
+    /// </summary>
+    public static readonly char[] Semicolon = { ';' };
 
-        /// <summary>
-        /// Slash.
-        /// </summary>
-        public static readonly char[] Slash = { '/' };
+    /// <summary>
+    /// Slash.
+    /// </summary>
+    public static readonly char[] Slash = { '/' };
 
-        /// <summary>
-        /// Space.
-        /// </summary>
-        public static readonly char[] Space = { ' ' };
+    /// <summary>
+    /// Space.
+    /// </summary>
+    public static readonly char[] Space = { ' ' };
 
-        /// <summary>
-        /// Space or tabulation.
-        /// </summary>
-        public static readonly char[] SpaceOrTab = { ' ', '\t' };
+    /// <summary>
+    /// Space or tabulation.
+    /// </summary>
+    public static readonly char[] SpaceOrTab = { ' ', '\t' };
 
-        /// <summary>
-        /// Tabulation.
-        /// </summary>
-        public static readonly char[] Tab = { '\t' };
+    /// <summary>
+    /// Tabulation.
+    /// </summary>
+    public static readonly char[] Tab = { '\t' };
 
-        /// <summary>
-        /// Vertical line.
-        /// </summary>
-        public static readonly char[] VerticalLine = { '|' };
+    /// <summary>
+    /// Vertical line.
+    /// </summary>
+    public static readonly char[] VerticalLine = { '|' };
 
-        #endregion
-    }
+    #endregion
 }

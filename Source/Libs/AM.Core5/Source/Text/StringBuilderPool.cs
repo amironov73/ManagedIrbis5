@@ -22,47 +22,48 @@ using Microsoft.Extensions.ObjectPool;
 
 #nullable enable
 
-namespace AM.Text
+namespace AM.Text;
+
+/// <summary>
+/// Пул для <see cref="StringBuilder"/>.
+/// </summary>
+public static class StringBuilderPool
 {
+    #region Properties
+
     /// <summary>
-    /// Пул для <see cref="StringBuilder"/>.
+    /// Общий экземпляр пула.
     /// </summary>
-    public static class StringBuilderPool
+    public static ObjectPool<StringBuilder> Shared { get; }
+        = CreateNew();
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Создание нового пула со стандартными настройками.
+    /// </summary>
+    public static ObjectPool<StringBuilder> CreateNew()
     {
-        #region Properties
+        return new DefaultObjectPoolProvider().CreateStringBuilderPool();
+    }
 
-        /// <summary>
-        /// Общий экземпляр пула.
-        /// </summary>
-        public static ObjectPool<StringBuilder> Shared { get; }
-            = CreateNew();
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Создание нового пула со стандартными настройками.
-        /// </summary>
-        public static ObjectPool<StringBuilder> CreateNew()
-            => new DefaultObjectPoolProvider().CreateStringBuilderPool();
-
-        /// <summary>
-        /// Создание нового пула с нестандартными настройками.
-        /// </summary>
-        public static ObjectPool<StringBuilder> CreateNew
-            (
-                int initialCapacity,
-                int maximumRetainedCapacity
-            )
-            => new DefaultObjectPoolProvider().CreateStringBuilderPool
+    /// <summary>
+    /// Создание нового пула с нестандартными настройками.
+    /// </summary>
+    public static ObjectPool<StringBuilder> CreateNew
+        (
+            int initialCapacity,
+            int maximumRetainedCapacity
+        )
+    {
+        return new DefaultObjectPoolProvider().CreateStringBuilderPool
             (
                 initialCapacity,
                 maximumRetainedCapacity
             );
+    }
 
-        #endregion
-
-    } // class StringBuilderPool
-
-} // namespace AM.Text
+    #endregion
+}

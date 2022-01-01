@@ -23,137 +23,136 @@ using System.Text.RegularExpressions;
 
 #nullable enable
 
-namespace AM.Text
+namespace AM.Text;
+
+/// <summary>
+/// Утилиты для работы с HTML.
+/// </summary>
+public static class HtmlText
 {
+    #region Public methods
+
     /// <summary>
-    /// Утилиты для работы с HTML.
+    /// Encode html entities.
     /// </summary>
-    public static class HtmlText
+    public static string? Encode
+        (
+            string? text
+        )
     {
-        #region Public methods
-
-        /// <summary>
-        /// Encode html entities.
-        /// </summary>
-        public static string? Encode
-            (
-                string? text
-            )
+        if (string.IsNullOrEmpty (text))
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return text;
-            }
-
-            var result = new StringBuilder(text.Length);
-
-            foreach (var c in text)
-            {
-                switch (c)
-                {
-                    case '"':
-                        result.Append("&quot;");
-                        break;
-
-                    case '#':
-                        result.Append("&num;");
-                        break;
-
-                    case '&':
-                        result.Append("&amp;");
-                        break;
-
-                    case '\'':
-                        result.Append("&apos;");
-                        break;
-
-                    case '<':
-                        result.Append("&lt;");
-                        break;
-
-                    case '>':
-                        result.Append("&gt;");
-                        break;
-
-                    case '\x00A0':
-                        // non-breaking space
-                        result.Append("&nbsp;");
-                        break;
-
-                    case '\x00A2':
-                        // cent sign
-                        result.Append("&cent;");
-                        break;
-
-                    case '\x00A3':
-                        // pound sign
-                        result.Append("&pound;");
-                        break;
-
-                    case '\x00A5':
-                        // yen sign
-                        result.Append("&yen;");
-                        break;
-
-                    case '\x00A7':
-                        // section sign
-                        result.Append("&sect;");
-                        break;
-
-                    case '\x00A9':
-                        // copyright sign
-                        result.Append("&copy;");
-                        break;
-
-                    case '\x00AD':
-                        // soft hyphen
-                        result.Append("&shy;");
-                        break;
-
-                    case '\x00AE':
-                        // registered sign
-                        result.Append("&reg;");
-                        break;
-
-                    case '\x20AC':
-                        // euro sign
-                        result.Append("&euro;");
-                        break;
-
-                    default:
-                        result.Append(c);
-                        break;
-                }
-            }
-
-            return result.ToString();
+            return text;
         }
 
-        /// <summary>
-        /// Convert HTML to plain text by stripping tags.
-        /// </summary>
-        public static string? ToPlainText
-            (
-                string? html
-            )
+        var result = new StringBuilder (text.Length);
+
+        foreach (var c in text)
         {
-            if (string.IsNullOrEmpty(html))
+            switch (c)
             {
-                return html;
+                case '"':
+                    result.Append ("&quot;");
+                    break;
+
+                case '#':
+                    result.Append ("&num;");
+                    break;
+
+                case '&':
+                    result.Append ("&amp;");
+                    break;
+
+                case '\'':
+                    result.Append ("&apos;");
+                    break;
+
+                case '<':
+                    result.Append ("&lt;");
+                    break;
+
+                case '>':
+                    result.Append ("&gt;");
+                    break;
+
+                case '\x00A0':
+                    // non-breaking space
+                    result.Append ("&nbsp;");
+                    break;
+
+                case '\x00A2':
+                    // cent sign
+                    result.Append ("&cent;");
+                    break;
+
+                case '\x00A3':
+                    // pound sign
+                    result.Append ("&pound;");
+                    break;
+
+                case '\x00A5':
+                    // yen sign
+                    result.Append ("&yen;");
+                    break;
+
+                case '\x00A7':
+                    // section sign
+                    result.Append ("&sect;");
+                    break;
+
+                case '\x00A9':
+                    // copyright sign
+                    result.Append ("&copy;");
+                    break;
+
+                case '\x00AD':
+                    // soft hyphen
+                    result.Append ("&shy;");
+                    break;
+
+                case '\x00AE':
+                    // registered sign
+                    result.Append ("&reg;");
+                    break;
+
+                case '\x20AC':
+                    // euro sign
+                    result.Append ("&euro;");
+                    break;
+
+                default:
+                    result.Append (c);
+                    break;
             }
-
-            var result = Regex.Replace
-                (
-                    html,
-                    @"<.*?>",
-                    string.Empty
-                );
-
-            result = WebUtility.HtmlDecode(result);
-
-            return result;
         }
 
-        #endregion
+        return result.ToString();
     }
+
+    /// <summary>
+    /// Convert HTML to plain text by stripping tags.
+    /// </summary>
+    public static string? ToPlainText
+        (
+            string? html
+        )
+    {
+        if (string.IsNullOrEmpty (html))
+        {
+            return html;
+        }
+
+        var result = Regex.Replace
+            (
+                html,
+                @"<.*?>",
+                string.Empty
+            );
+
+        result = WebUtility.HtmlDecode (result);
+
+        return result;
+    }
+
+    #endregion
 }

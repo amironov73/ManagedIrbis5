@@ -180,11 +180,7 @@ public sealed class UnicodeRange
             bool throwOnError
         )
     {
-        var verifier = new Verifier<UnicodeRange>
-            (
-                this,
-                throwOnError
-            );
+        var verifier = new Verifier<UnicodeRange> (this, throwOnError);
 
         verifier
             .NotNullNorEmpty (Name)

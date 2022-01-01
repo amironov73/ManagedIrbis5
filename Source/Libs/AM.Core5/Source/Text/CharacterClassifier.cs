@@ -15,67 +15,66 @@
 
 #nullable enable
 
-namespace AM.Text
+namespace AM.Text;
+
+/// <summary>
+/// Классификатор символов Unicode.
+/// </summary>
+public static class CharacterClassifier
 {
+    #region Public methods
+
     /// <summary>
-    /// Классификатор символов Unicode.
+    /// Выявление классов символов.
     /// </summary>
-    public static class CharacterClassifier
+    public static CharacterClass DetectCharacterClasses
+        (
+            string? text
+        )
     {
-        #region Public methods
+        var result = CharacterClass.None;
 
-        /// <summary>
-        /// Выявление классов символов.
-        /// </summary>
-        public static CharacterClass DetectCharacterClasses
-            (
-                string? text
-            )
+        if (string.IsNullOrEmpty (text))
         {
-            var result = CharacterClass.None;
-
-            if (string.IsNullOrEmpty(text))
-            {
-                return result;
-            }
-
-            foreach (var c in text)
-            {
-                int index = c;
-                if (index < 0x20)
-                {
-                    result |= CharacterClass.ControlCharacter;
-                }
-                else if (index >= 0x30 && index < 0x3A)
-                {
-                    result |= CharacterClass.Digit;
-                }
-                else if (index >= 0x40 && index < 0x80)
-                {
-                    result |= CharacterClass.BasicLatin;
-                }
-                else if (index >= 0x0400 && index < 0x0500)
-                {
-                    result |= CharacterClass.Cyrillic;
-                }
-            }
-
             return result;
         }
 
-        /// <summary>
-        /// Смешаны ли в тексте латиница с кириллицей?
-        /// </summary>
-        public static bool IsBothCyrillicAndLatin
-            (
-                CharacterClass value
-            )
+        foreach (var c in text)
         {
-            var mixed = CharacterClass.BasicLatin | CharacterClass.Cyrillic;
-
-            return (value & mixed) == mixed;
+            int index = c;
+            if (index < 0x20)
+            {
+                result |= CharacterClass.ControlCharacter;
+            }
+            else if (index >= 0x30 && index < 0x3A)
+            {
+                result |= CharacterClass.Digit;
+            }
+            else if (index >= 0x40 && index < 0x80)
+            {
+                result |= CharacterClass.BasicLatin;
+            }
+            else if (index >= 0x0400 && index < 0x0500)
+            {
+                result |= CharacterClass.Cyrillic;
+            }
         }
 
-        #endregion
+        return result;
     }
+
+    /// <summary>
+    /// Смешаны ли в тексте латиница с кириллицей?
+    /// </summary>
+    public static bool IsBothCyrillicAndLatin
+        (
+            CharacterClass value
+        )
+    {
+        var mixed = CharacterClass.BasicLatin | CharacterClass.Cyrillic;
+
+        return (value & mixed) == mixed;
+    }
+
+    #endregion
 }

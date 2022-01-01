@@ -22,171 +22,182 @@ using System.Text;
 
 #nullable enable
 
-namespace AM.Text
-{
-    /// <summary>
-    /// Утилиты для работы с исходным кодом C#.
-    /// </summary>
-    public static class SourceCodeUtility
-    {
-        #region Public methods
+namespace AM.Text;
 
-        /// <summary>
-        /// Convert byte value to C# source code.
-        /// </summary>
-        public static string ToSourceCode
+/// <summary>
+/// Утилиты для работы с исходным кодом C#.
+/// </summary>
+public static class SourceCodeUtility
+{
+    #region Public methods
+
+    /// <summary>
+    /// Convert byte value to C# source code.
+    /// </summary>
+    public static string ToSourceCode
+        (
+            byte value
+        )
+    {
+        return "0x" + value.ToString
             (
-                byte value
-            )
+                "X2",
+                CultureInfo.InvariantCulture
+            );
+    }
+
+    /// <summary>
+    /// Convert array of bytes to C# source code.
+    /// </summary>
+    public static string ToSourceCode
+        (
+            byte[] array
+        )
+    {
+        Sure.NotNull (array);
+
+        var result = new StringBuilder ("{");
+        for (var i = 0; i < array.Length; i++)
         {
-            return "0x" + value.ToString
+            if (i != 0)
+            {
+                result.Append (", ");
+                if (i % 10 == 0)
+                {
+                    result.AppendLine();
+                    result.Append ("  ");
+                }
+            }
+
+            result.AppendFormat
                 (
-                    "X2",
-                    CultureInfo.InvariantCulture
+                    CultureInfo.InvariantCulture,
+                    "0x{0:X2}",
+                    array[i]
                 );
         }
 
-        /// <summary>
-        /// Convert array of bytes to C# source code.
-        /// </summary>
-        public static string ToSourceCode
-            (
-                byte[] array
-            )
-        {
-            var result = new StringBuilder("{");
-            for (var i = 0; i < array.Length; i++)
-            {
-                if (i != 0)
-                {
-                    result.Append(", ");
-                    if (i % 10 == 0)
-                    {
-                        result.AppendLine();
-                        result.Append("  ");
-                    }
-                }
-                result.AppendFormat
-                    (
-                        CultureInfo.InvariantCulture,
-                        "0x{0:X2}",
-                        array[i]
-                    );
-            }
-            result.Append("}");
+        result.Append ("}");
 
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Encode one character.
-        /// </summary>
-        public static string EncodeCharacter
-            (
-                char value
-            )
-        {
-            switch (value)
-            {
-                case '\a': return "\\a";
-                case '\b': return "\\b";
-                case '\f': return "\\f";
-                case '\n': return "\\n";
-                case '\r': return "\\r";
-                case '\t': return "\\t";
-                case '\v': return "\\v";
-                case '\\': return "\\\\";
-                case '\'': return "\\'";
-                case '\"': return "\\\"";
-            }
-
-            if (value < ' ')
-            {
-                return string.Format
-                    (
-                        CultureInfo.InvariantCulture,
-                        "\\x{0:X2}",
-                        (int)value
-                    );
-            }
-
-            return value.ToString();
-        }
-
-        /// <summary>
-        /// Convert the character to C# source code.
-        /// </summary>
-        public static string ToSourceCode
-            (
-                char value
-            )
-        {
-            return "'" + EncodeCharacter(value) + "'";
-        }
-
-        /// <summary>
-        /// Convert array of characters to C# source code.
-        /// </summary>
-        public static string ToSourceCode
-            (
-                char[] array
-            )
-        {
-            var result = new StringBuilder("{");
-            for (var i = 0; i < array.Length; i++)
-            {
-                if (i != 0)
-                {
-                    result.Append(", ");
-                    if (i % 10 == 0)
-                    {
-                        result.AppendLine();
-                        result.Append("  ");
-                    }
-                }
-                result.Append
-                    (
-                        "'" + EncodeCharacter(array[i]) + "'"
-                    );
-            }
-            result.Append("}");
-
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Convert array of 32-bit integers to C# source code.
-        /// </summary>
-        public static string ToSourceCode
-            (
-                int[] array
-            )
-        {
-            var result = new StringBuilder("{");
-            for (var i = 0; i < array.Length; i++)
-            {
-                if (i != 0)
-                {
-                    result.Append(", ");
-                    if (i % 10 == 0)
-                    {
-                        result.AppendLine();
-                        result.Append("  ");
-                    }
-                }
-                result.Append
-                    (
-                        array[i].ToString
-                            (
-                                CultureInfo.InvariantCulture
-                            )
-                    );
-            }
-            result.Append("}");
-
-            return result.ToString();
-        }
-
-        #endregion
+        return result.ToString();
     }
+
+    /// <summary>
+    /// Encode one character.
+    /// </summary>
+    public static string EncodeCharacter
+        (
+            char value
+        )
+    {
+        switch (value)
+        {
+            case '\a': return "\\a";
+            case '\b': return "\\b";
+            case '\f': return "\\f";
+            case '\n': return "\\n";
+            case '\r': return "\\r";
+            case '\t': return "\\t";
+            case '\v': return "\\v";
+            case '\\': return "\\\\";
+            case '\'': return "\\'";
+            case '\"': return "\\\"";
+        }
+
+        if (value < ' ')
+        {
+            return string.Format
+                (
+                    CultureInfo.InvariantCulture,
+                    "\\x{0:X2}",
+                    (int) value
+                );
+        }
+
+        return value.ToString();
+    }
+
+    /// <summary>
+    /// Convert the character to C# source code.
+    /// </summary>
+    public static string ToSourceCode
+        (
+            char value
+        )
+    {
+        return "'" + EncodeCharacter (value) + "'";
+    }
+
+    /// <summary>
+    /// Convert array of characters to C# source code.
+    /// </summary>
+    public static string ToSourceCode
+        (
+            char[] array
+        )
+    {
+        Sure.NotNull (array);
+
+        var result = new StringBuilder ("{");
+        for (var i = 0; i < array.Length; i++)
+        {
+            if (i != 0)
+            {
+                result.Append (", ");
+                if (i % 10 == 0)
+                {
+                    result.AppendLine();
+                    result.Append ("  ");
+                }
+            }
+
+            result.Append
+                (
+                    "'" + EncodeCharacter (array[i]) + "'"
+                );
+        }
+
+        result.Append ("}");
+
+        return result.ToString();
+    }
+
+    /// <summary>
+    /// Convert array of 32-bit integers to C# source code.
+    /// </summary>
+    public static string ToSourceCode
+        (
+            int[] array
+        )
+    {
+        Sure.NotNull (array);
+
+        var result = new StringBuilder ("{");
+        for (var i = 0; i < array.Length; i++)
+        {
+            if (i != 0)
+            {
+                result.Append (", ");
+                if (i % 10 == 0)
+                {
+                    result.AppendLine();
+                    result.Append ("  ");
+                }
+            }
+
+            result.Append
+                (
+                    array[i].ToString
+                        (
+                            CultureInfo.InvariantCulture
+                        )
+                );
+        }
+
+        result.Append ("}");
+
+        return result.ToString();
+    }
+
+    #endregion
 }

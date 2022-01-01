@@ -18,84 +18,156 @@ using System.Globalization;
 
 #nullable enable
 
-namespace AM.Text
+namespace AM.Text;
+
+/// <summary>
+/// Форматирование текста, не зависящее от культуы.
+/// </summary>
+public static class InvariantFormat
 {
+    #region Private members
+
+    private static readonly IFormatProvider _formatProvider
+        = CultureInfo.InvariantCulture;
+
+    #endregion
+
+    #region Public methods
+
     /// <summary>
-    /// Форматирование текста, не зависящее от культуы.
+    /// Форматирование строки.
     /// </summary>
-    public static class InvariantFormat
+    public static string Format
+        (
+            string format,
+            object? arg0
+        )
     {
-        #region Private members
+        Sure.NotNull (format);
 
-        private static readonly IFormatProvider _formatProvider
-            = CultureInfo.InvariantCulture;
+        return string.Format (_formatProvider, format, arg0);
+    }
 
-        #endregion
+    /// <summary>
+    /// Форматирование строки.
+    /// </summary>
+    public static string Format
+        (
+            string format,
+            object? arg0,
+            object? arg1
+        )
+    {
+        Sure.NotNull (format);
 
-        #region Public methods
+        return string.Format (_formatProvider, format, arg0, arg1);
+    }
 
-        /// <summary>
-        /// Форматирование строки.
-        /// </summary>
-        public static string Format ( string format, object? arg0 ) =>
-            string.Format ( _formatProvider, format, arg0 );
+    /// <summary>
+    /// Форматирование строки.
+    /// </summary>
+    public static string Format
+        (
+            string format,
+            object? arg0,
+            object? arg1,
+            object? arg2
+        )
+    {
+        Sure.NotNull (format);
 
-        /// <summary>
-        /// Форматирование строки.
-        /// </summary>
-        public static string Format ( string format, object? arg0, object? arg1 ) =>
-            string.Format ( _formatProvider, format, arg0, arg1 );
+        return string.Format (_formatProvider, format, arg0, arg1, arg2);
+    }
 
-        /// <summary>
-        /// Форматирование строки.
-        /// </summary>
-        public static string Format ( string format, object? arg0, object? arg1, object? arg2 ) =>
-            string.Format ( _formatProvider, format, arg0, arg1, arg2 );
+    /// <summary>
+    /// Форматирование строки.
+    /// </summary>
+    public static string Format
+        (
+            string format,
+            params object[] args
+        )
+    {
+        Sure.NotNull (format);
+        Sure.NotNull (args);
 
-        /// <summary>
-        /// Форматирование строки.
-        /// </summary>
-        public static string Format ( string format, params object[] args ) =>
-            string.Format ( _formatProvider, format, args );
+        return string.Format (_formatProvider, format, args);
+    }
 
-        /// <summary>
-        /// Форматирование целого числа.
-        /// </summary>
-        public static string Format ( string format, int arg0 ) =>
-            string.Format ( _formatProvider, format, arg0 );
+    /// <summary>
+    /// Форматирование целого числа.
+    /// </summary>
+    public static string Format
+        (
+            string format,
+            int arg0
+        )
+    {
+        Sure.NotNull (format);
 
-        /// <summary>
-        /// Форматирование числа с плавающей точкой.
-        /// </summary>
-        public static string Format ( string format, double arg0 ) =>
-            string.Format ( _formatProvider, format, arg0 );
+        return string.Format (_formatProvider, format, arg0);
+    }
 
-        /// <summary>
-        /// Форматирование числа с фиксированной точкой.
-        /// </summary>
-        public static string Format ( string format, decimal arg0 ) =>
-            string.Format ( _formatProvider, format, arg0 );
+    /// <summary>
+    /// Форматирование числа с плавающей точкой.
+    /// </summary>
+    public static string Format
+        (
+            string format,
+            double arg0
+        )
+    {
+        Sure.NotNull (format);
 
-        /// <summary>
-        /// Форматирование целого числа.
-        /// </summary>
-        public static string Format ( int arg0 ) =>
-            arg0.ToString(_formatProvider);
+        return string.Format (_formatProvider, format, arg0);
+    }
 
-        /// <summary>
-        /// Форматирование числа с плавающей точкой.
-        /// </summary>
-        public static string Format ( double arg0 ) =>
-            arg0.ToString(_formatProvider);
+    /// <summary>
+    /// Форматирование числа с фиксированной точкой.
+    /// </summary>
+    public static string Format
+        (
+            string format,
+            decimal arg0
+        )
+    {
+        Sure.NotNull (format);
 
-        /// <summary>
-        /// Форматирование числа с фиксированной точкой.
-        /// </summary>
-        public static string Format ( decimal arg0 ) =>
-            arg0.ToString(_formatProvider);
+        return string.Format (_formatProvider, format, arg0);
+    }
 
-        #endregion
+    /// <summary>
+    /// Форматирование целого числа.
+    /// </summary>
+    public static string Format
+        (
+            int arg0
+        )
+    {
+        return arg0.ToString (_formatProvider);
+    }
 
-    } // class InvariantFormat
+    /// <summary>
+    /// Форматирование числа с плавающей точкой.
+    /// </summary>
+    public static string Format
+        (
+            double arg0
+        )
+    {
+        return arg0.ToString (_formatProvider);
+    }
 
-} // namespace AM.Text
+    /// <summary>
+    /// Форматирование числа с фиксированной точкой.
+    /// </summary>
+    public static string Format
+        (
+            decimal arg0
+        )
+    {
+        return arg0.ToString (_formatProvider);
+    }
+
+    #endregion
+}

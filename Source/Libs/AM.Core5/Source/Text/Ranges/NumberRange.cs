@@ -35,9 +35,9 @@ namespace AM.Text.Ranges;
 [DebuggerDisplay ("{" + nameof (Start) + "} - {" + nameof (Stop) + "}")]
 public sealed class NumberRange
     : IEnumerable<NumberText>,
-        IHandmadeSerializable,
-        IEquatable<NumberRange>,
-        IVerifiable
+    IHandmadeSerializable,
+    IEquatable<NumberRange>,
+    IVerifiable
 {
     #region Properties
 
