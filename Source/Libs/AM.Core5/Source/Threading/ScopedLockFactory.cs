@@ -22,57 +22,62 @@ using System.Threading;
 
 #nullable enable
 
-namespace AM.Threading
+namespace AM.Threading;
+
+/// <summary>
+/// Фабрика ограниченных блокировок.
+/// Создает экземпляры <see cref="ScopedLock"/>.
+/// </summary>
+/// <example>
+/// <code>
+/// using var factory = new ScopedLockFactory();
+/// ...
+/// using (var theLock = factory.CreateLock())
+/// {
+///    DoSomething();
+/// }
+/// </code>
+/// </example>
+public sealed class ScopedLockFactory
+    : IDisposable
 {
+    #region Construction
+
     /// <summary>
-    /// Фабрика ограниченных блокировок.
-    /// Создает экземпляры <see cref="ScopedLock"/>.
+    /// Конструктор.
     /// </summary>
-    /// <example>
-    /// <code>
-    /// using var factory = new ScopedLockFactory();
-    /// ...
-    /// using (var theLock = factory.CreateLock())
-    /// {
-    ///    DoSomething();
-    /// }
-    /// </code>
-    /// </example>
-    public sealed class ScopedLockFactory
-        : IDisposable
+    public ScopedLockFactory()
     {
-        #region Construction
+        _semaphore = new SemaphoreSlim (1, 1);
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public ScopedLockFactory() =>
-            _semaphore = new SemaphoreSlim(1, 1);
+    #endregion
 
-        #endregion
+    #region Private members
 
-        #region Private members
+    private readonly SemaphoreSlim _semaphore;
 
-        private readonly SemaphoreSlim _semaphore;
+    #endregion
 
-        #endregion
+    #region Public methods
 
-        #region Public methods
+    /// <summary>
+    /// Создает экземпляр блокировки.
+    /// </summary>
+    public ScopedLock CreateLock()
+    {
+        return new (_semaphore);
+    }
 
-        /// <summary>
-        /// Создает экземпляр блокировки.
-        /// </summary>
-        public ScopedLock CreateLock() => new (_semaphore);
+    #endregion
 
-        #endregion
+    #region IDisposable members
 
-        #region IDisposable members
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        _semaphore.Dispose();
+    }
 
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose() => _semaphore.Dispose();
-
-        #endregion
-
-    } // class ScopedLockFactory
-
-} // namespace AM.Threading
+    #endregion
+}

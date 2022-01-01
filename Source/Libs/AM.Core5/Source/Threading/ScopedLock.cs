@@ -22,45 +22,44 @@ using System.Threading;
 
 #nullable enable
 
-namespace AM.Threading
+namespace AM.Threading;
+
+/// <summary>
+/// Экземпляр ограниченной блокировки.
+/// См. <see cref="ScopedLockFactory"/>.
+/// </summary>
+public sealed class ScopedLock
+    : IDisposable
 {
+    #region Construction
+
     /// <summary>
-    /// Экземпляр ограниченной блокировки.
-    /// См. <see cref="ScopedLockFactory"/>.
+    /// Конструктор.
     /// </summary>
-    public sealed class ScopedLock
-        : IDisposable
+    internal ScopedLock
+        (
+            SemaphoreSlim semaphore
+        )
     {
-        #region Construction
+        _semaphore = semaphore;
+        _semaphore.Wait();
+    }
 
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        internal ScopedLock
-            (
-                SemaphoreSlim semaphore
-            )
-        {
-            _semaphore = semaphore;
-            _semaphore.Wait();
+    #endregion
 
-        } // constructor
+    #region Private members
 
-        #endregion
+    private readonly SemaphoreSlim _semaphore;
 
-        #region Private members
+    #endregion
 
-        private readonly SemaphoreSlim _semaphore;
+    #region IDisposable members
 
-        #endregion
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        _semaphore.Release();
+    }
 
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose" />
-        public void Dispose() => _semaphore.Release();
-
-        #endregion
-
-    } // class ScopedLock
-
-} // namespace AM.Threading
+    #endregion
+}

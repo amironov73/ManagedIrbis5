@@ -22,99 +22,96 @@ using System;
 
 #nullable enable
 
-namespace AM.Threading
+namespace AM.Threading;
+
+/// <summary>
+/// Обертка для захвата и освобождения <see cref="BusyState"/>.
+/// </summary>
+public readonly struct BusyGuard
+    : IDisposable
 {
+    #region Properties
+
     /// <summary>
-    /// Обертка для захвата и освобождения <see cref="BusyState"/>.
+    /// State.
     /// </summary>
-    public readonly struct BusyGuard
-        : IDisposable
+    public BusyState State { get; }
+
+    /// <summary>
+    /// Timeout.
+    /// </summary>
+    public TimeSpan Timeout { get; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public BusyGuard
+        (
+            BusyState state
+        )
     {
-        #region Properties
+        State = state;
+        Timeout = TimeSpan.Zero;
 
-        /// <summary>
-        /// State.
-        /// </summary>
-        public BusyState State { get; }
+        _Grab();
+    }
 
-        /// <summary>
-        /// Timeout.
-        /// </summary>
-        public TimeSpan Timeout { get; }
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public BusyGuard
+        (
+            BusyState state,
+            TimeSpan timeout
+        )
+    {
+        State = state;
+        Timeout = timeout;
 
-        #endregion
+        _Grab();
+    }
 
-        #region Construction
+    #endregion
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BusyGuard
-            (
-                BusyState state
-            )
+    #region Private members
+
+    private void _Grab()
+    {
+        if (Timeout.IsZeroOrLess())
         {
-            State = state;
-            Timeout = TimeSpan.Zero;
-
-            _Grab();
+            State.WaitAndGrab();
         }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public BusyGuard
-            (
-                BusyState state,
-                TimeSpan timeout
-            )
+        else
         {
-            State = state;
-            Timeout = timeout;
-
-            _Grab();
-        }
-
-        #endregion
-
-        #region Private members
-
-        private void _Grab()
-        {
-            if (Timeout.IsZeroOrLess())
+            if (!State.WaitAndGrab (Timeout))
             {
-                State.WaitAndGrab();
-            }
-            else
-            {
-                if (!State.WaitAndGrab(Timeout))
-                {
-                    Magna.Error
-                        (
-                            nameof(BusyGuard)
-                            + "::"
-                            + nameof(_Grab)
-                            + ": "
-                            + "timeout"
-                        );
+                Magna.Error
+                    (
+                        nameof (BusyGuard)
+                        + "::"
+                        + nameof (_Grab)
+                        + ": "
+                        + "timeout"
+                    );
 
-                    throw new TimeoutException();
-                }
+                throw new TimeoutException();
             }
         }
+    }
 
-        #endregion
+    #endregion
 
-        #region IDisposable members
+    #region IDisposable members
 
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            State.SetState(false);
-        }
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        State.SetState (false);
+    }
 
-        #endregion
-
-    } // struct BusyGuard
-
-} // namespace AM.Threading
+    #endregion
+}

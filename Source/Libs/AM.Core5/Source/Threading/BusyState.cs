@@ -27,328 +27,325 @@ using AM.Runtime;
 
 #nullable enable
 
-namespace AM.Threading
+namespace AM.Threading;
+
+/// <summary>
+/// Флаг, сигнализирующий о занятости некоторого ресурса.
+/// </summary>
+public sealed class BusyState
+    : IHandmadeSerializable,
+    IDisposable
 {
+    #region Events
+
     /// <summary>
-    /// Флаг, сигнализирующий о занятости некоторого ресурса.
+    /// Событие, возникающее при изменении состояния занятости ресурса.
     /// </summary>
-    public sealed class BusyState
-        : IHandmadeSerializable,
-        IDisposable
+    public event EventHandler? StateChanged;
+
+    /// <summary>
+    /// Событие, возникающее при очистке.
+    /// </summary>
+    public event EventHandler? Disposing;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Собственно состояние.
+    /// </summary>
+    public bool State => !_waitHandle.IsSet;
+
+    /// <summary>
+    /// Использовать асинхронный обработчик события?
+    /// </summary>
+    public bool UseAsync { get; set; }
+
+    /// <summary>
+    /// Хэндл для ожидания.
+    /// </summary>
+    public WaitHandle WaitHandle => _waitHandle.WaitHandle;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// Начальное состояние "ресурс не занят".
+    /// </summary>
+    public BusyState()
     {
-        #region Events
+        _waitHandle = new ManualResetEventSlim (true);
+    }
 
-        /// <summary>
-        /// Событие, возникающее при изменении состояния занятости ресурса.
-        /// </summary>
-        public event EventHandler? StateChanged;
+    #endregion
 
-        /// <summary>
-        /// Событие, возникающее при очистке.
-        /// </summary>
-        public event EventHandler? Disposing;
+    #region Private members
 
-        #endregion
+    private readonly ManualResetEventSlim _waitHandle;
 
-        #region Properties
+    #endregion
 
-        /// <summary>
-        /// Собственно состояние.
-        /// </summary>
-        public bool State => !_waitHandle.IsSet;
+    #region Public methods
 
-        /// <summary>
-        /// Использовать асинхронный обработчик события?
-        /// </summary>
-        public bool UseAsync { get; set; }
+    /// <summary>
+    /// Run some code.
+    /// </summary>
+    public void Run
+        (
+            Action action
+        )
+    {
+        WaitAndGrab();
 
-        /// <summary>
-        /// Хэндл для ожидания.
-        /// </summary>
-        public WaitHandle WaitHandle => _waitHandle.WaitHandle;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// Начальное состояние "ресурс не занят".
-        /// </summary>
-        public BusyState()
+        try
         {
-            _waitHandle = new ManualResetEventSlim(true);
+            action();
         }
-
-        #endregion
-
-        #region Private members
-
-        private readonly ManualResetEventSlim _waitHandle;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Run some code.
-        /// </summary>
-        public void Run
-            (
-                Action action
-            )
+        finally
         {
-            WaitAndGrab();
+            SetState (false);
+        }
+    }
 
-            try
+    /// <summary>
+    /// Run some code in asychronous manner.
+    /// </summary>
+    public Task RunAsync
+        (
+            Action action
+        )
+    {
+        var result = Task.Factory.StartNew
+            (
+                () => Run (action)
+            );
+
+        return result;
+    }
+
+    /// <summary>
+    /// Change the state.
+    /// </summary>
+    public void SetState
+        (
+            bool newState
+        )
+    {
+        Magna.Trace
+            (
+                nameof (BusyState)
+                + "::"
+                + nameof (SetState)
+                + ": newState="
+                + newState
+            );
+
+        if (newState != State)
+        {
+            if (newState)
             {
-                action();
+                // считаемся занятыми
+                _waitHandle.Reset();
             }
-            finally
+            else
             {
-                SetState(false);
+                // считаемся свободными
+                _waitHandle.Set();
             }
-        }
 
-        /// <summary>
-        /// Run some code in asychronous manner.
-        /// </summary>
-        public Task RunAsync
-            (
-                Action action
-            )
-        {
-            var result = Task.Factory.StartNew
-                (
-                    () => Run(action)
-                );
 
-            return result;
-        }
-
-        /// <summary>
-        /// Change the state.
-        /// </summary>
-        public void SetState
-            (
-                bool newState
-            )
-        {
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(SetState)
-                    + ": newState="
-                    + newState
-                );
-
-            if (newState != State)
+            if (UseAsync)
             {
-                if (newState)
-                {
-                    // считаемся занятыми
-                    _waitHandle.Reset();
-                }
-                else
-                {
-                    // считаемся свободными
-                    _waitHandle.Set();
-                }
-
-
-                if (UseAsync)
-                {
-                    StateChanged.RaiseAsync(this);
-                }
-                else
-                {
-                    StateChanged.Raise(this);
-                }
+                StateChanged.RaiseAsync (this);
+            }
+            else
+            {
+                StateChanged.Raise (this);
             }
         }
+    }
 
-        /// <summary>
-        /// Ожидаем, пока не освободится, и захватываем.
-        /// </summary>
-        public void WaitAndGrab()
-        {
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(WaitAndGrab)
-                    +
-                    ": enter"
-                );
-
-            WaitHandle.WaitOne();
-            SetState(true);
-
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(WaitAndGrab)
-                    +
-                    ": return"
-                );
-        }
-
-        /// <summary>
-        /// Ожидаем, пока не освободится, затем захватываем.
-        /// </summary>
-        public bool WaitAndGrab
+    /// <summary>
+    /// Ожидаем, пока не освободится, и захватываем.
+    /// </summary>
+    public void WaitAndGrab()
+    {
+        Magna.Trace
             (
-                TimeSpan timeout
-            )
-        {
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(WaitAndGrab)
-                    +
-                    ": enter"
-                );
+                nameof (BusyState)
+                + "::"
+                + nameof (WaitAndGrab)
+                +
+                ": enter"
+            );
 
-            var result = WaitHandle.WaitOne(timeout);
-            SetState(true);
+        WaitHandle.WaitOne();
+        SetState (true);
 
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(WaitAndGrab)
-                    +
-                    ": return"
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Ожидаем, пока не освободится.
-        /// </summary>
-        public void Wait()
-        {
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(Wait)
-                    + ": enter"
-                );
-
-            WaitHandle.WaitOne();
-
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(Wait)
-                    + ": return"
-                );
-        }
-
-        /// <summary>
-        /// Ожидаем, пока не освободится.
-        /// </summary>
-        public bool Wait
+        Magna.Trace
             (
-                TimeSpan timeout
-            )
-        {
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(Wait)
-                    + ": enter"
-                );
+                nameof (BusyState)
+                + "::"
+                + nameof (WaitAndGrab)
+                +
+                ": return"
+            );
+    }
 
-            var result = WaitHandle.WaitOne(timeout);
-
-            Magna.Trace
-                (
-                    nameof(BusyState)
-                    + "::"
-                    + nameof(Wait)
-                    + ": return"
-                );
-
-            return result;
-        }
-
-        /// <summary>
-        /// Оператор неявного преобразования типа.
-        /// </summary>
-        public static implicit operator bool
+    /// <summary>
+    /// Ожидаем, пока не освободится, затем захватываем.
+    /// </summary>
+    public bool WaitAndGrab
+        (
+            TimeSpan timeout
+        )
+    {
+        Magna.Trace
             (
-                BusyState state
-            )
-        {
-            return state.State;
-        }
+                nameof (BusyState)
+                + "::"
+                + nameof (WaitAndGrab)
+                +
+                ": enter"
+            );
 
-        /// <summary>
-        /// Оператор неявного преобразования типа.
-        /// </summary>
-        public static implicit operator BusyState
+        var result = WaitHandle.WaitOne (timeout);
+        SetState (true);
+
+        Magna.Trace
             (
-                bool value
-            )
-        {
-            var result = new BusyState();
-            result.SetState(value);
+                nameof (BusyState)
+                + "::"
+                + nameof (WaitAndGrab)
+                +
+                ": return"
+            );
 
-            return result;
-        }
+        return result;
+    }
 
-        #endregion
-
-        #region IHandmadeSerializable members
-
-        /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
-        public void RestoreFromStream
+    /// <summary>
+    /// Ожидаем, пока не освободится.
+    /// </summary>
+    public void Wait()
+    {
+        Magna.Trace
             (
-                BinaryReader reader
-            )
-        {
-            SetState(reader.ReadBoolean());
-            UseAsync = reader.ReadBoolean();
-        }
+                nameof (BusyState)
+                + "::"
+                + nameof (Wait)
+                + ": enter"
+            );
 
-        /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
-        public void SaveToStream
+        WaitHandle.WaitOne();
+
+        Magna.Trace
             (
-                BinaryWriter writer
-            )
-        {
-            writer.Write(State);
-            writer.Write(UseAsync);
-        }
+                nameof (BusyState)
+                + "::"
+                + nameof (Wait)
+                + ": return"
+            );
+    }
 
-        #endregion
+    /// <summary>
+    /// Ожидаем, пока не освободится.
+    /// </summary>
+    public bool Wait
+        (
+            TimeSpan timeout
+        )
+    {
+        Magna.Trace
+            (
+                nameof (BusyState)
+                + "::"
+                + nameof (Wait)
+                + ": enter"
+            );
 
-        #region IDisposable methods
+        var result = WaitHandle.WaitOne (timeout);
 
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            Disposing.Raise(this);
-            _waitHandle.Dispose();
-        }
+        Magna.Trace
+            (
+                nameof (BusyState)
+                + "::"
+                + nameof (Wait)
+                + ": return"
+            );
 
-        #endregion
+        return result;
+    }
 
-        #region Object members
+    /// <summary>
+    /// Оператор неявного преобразования типа.
+    /// </summary>
+    public static implicit operator bool
+        (
+            BusyState state
+        )
+    {
+        return state.State;
+    }
 
-        /// <inheritdoc cref="object.ToString" />
-        public override string ToString() => State.ToString();
+    /// <summary>
+    /// Оператор неявного преобразования типа.
+    /// </summary>
+    public static implicit operator BusyState
+        (
+            bool value
+        )
+    {
+        var result = new BusyState();
+        result.SetState (value);
 
-        #endregion
+        return result;
+    }
 
-    } // class BusyState
+    #endregion
 
-} // namesapce AM.Threading
+    #region IHandmadeSerializable members
+
+    /// <inheritdoc cref="IHandmadeSerializable.RestoreFromStream" />
+    public void RestoreFromStream
+        (
+            BinaryReader reader
+        )
+    {
+        SetState (reader.ReadBoolean());
+        UseAsync = reader.ReadBoolean();
+    }
+
+    /// <inheritdoc cref="IHandmadeSerializable.SaveToStream" />
+    public void SaveToStream
+        (
+            BinaryWriter writer
+        )
+    {
+        writer.Write (State);
+        writer.Write (UseAsync);
+    }
+
+    #endregion
+
+    #region IDisposable methods
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        Disposing.Raise (this);
+        _waitHandle.Dispose();
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString" />
+    public override string ToString() => State.ToString();
+
+    #endregion
+}

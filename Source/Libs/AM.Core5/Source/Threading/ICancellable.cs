@@ -16,29 +16,26 @@
 
 #nullable enable
 
-namespace AM.Threading
+namespace AM.Threading;
+
+/// <summary>
+/// Общий интерфейс объекта, поддерживающего отмену операции.
+/// Объект также должен поддерживать очистку.
+/// </summary>
+public interface ICancellable
 {
     /// <summary>
-    /// Общий интерфейс объекта, поддерживающего отмену операции.
-    /// Объект также должен поддерживать очистку.
+    /// В настоящее время объект занят выполнением длительной операции?
     /// </summary>
-    public interface ICancellable
-    {
-        /// <summary>
-        /// В настоящее время объект занят выполнением длительной операции?
-        /// </summary>
-        BusyState Busy { get; }
+    BusyState Busy { get; }
 
-        /// <summary>
-        /// Отмена текущей операции.
-        /// </summary>
-        void CancelOperation();
+    /// <summary>
+    /// Отмена текущей операции.
+    /// </summary>
+    void CancelOperation();
 
-        /// <summary>
-        /// Бросает исключение, если операция была отменена.
-        /// </summary>
-        void ThrowIfCancelled();
-
-    } // interface ICancellable
-
-} // namespace AM.Threading
+    /// <summary>
+    /// Бросает исключение, если операция была отменена.
+    /// </summary>
+    void ThrowIfCancelled();
+}

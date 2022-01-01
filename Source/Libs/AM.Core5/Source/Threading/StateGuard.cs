@@ -22,92 +22,91 @@ using System;
 
 #nullable disable
 
-namespace AM.Threading
+namespace AM.Threading;
+
+/// <summary>
+///
+/// </summary>
+public sealed class StateGuard<T>
+    : IDisposable
+    where T : IEquatable<T>
 {
+    #region Properties
+
     /// <summary>
-    ///
+    /// Current value.
     /// </summary>
-    public sealed class StateGuard<T>
-        : IDisposable
-        where T: IEquatable<T>
+    public T CurrentValue => _state.Value;
+
+    /// <summary>
+    /// Saved value.
+    /// </summary>
+    public T SavedValue { get; }
+
+    /// <summary>
+    /// State.
+    /// </summary>
+    public StateHolder<T> State => _state;
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    public StateGuard
+        (
+            StateHolder<T> state
+        )
     {
-        #region Properties
-
-        /// <summary>
-        /// Current value.
-        /// </summary>
-        public T CurrentValue => _state.Value;
-
-        /// <summary>
-        /// Saved value.
-        /// </summary>
-        public T SavedValue { get; }
-
-        /// <summary>
-        /// State.
-        /// </summary>
-        public StateHolder<T> State => _state;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public StateGuard
-            (
-                StateHolder<T> state
-            )
-        {
-            _state = state;
-            SavedValue = state.Value;
-        }
-
-        #endregion
-
-        #region Private members
-
-        private readonly StateHolder<T> _state;
-
-        private void _RestoreValue()
-        {
-            T currentValue = CurrentValue;
-            T savedValue = SavedValue;
-
-            bool null1 = ReferenceEquals(currentValue, null);
-            bool null2 = ReferenceEquals(savedValue, null);
-
-            bool restore = null1 != null2;
-
-            if (!restore)
-            {
-                if (!null1)
-                {
-                    restore = !currentValue.Equals(savedValue);
-                }
-            }
-
-            if (restore)
-            {
-                State.SetValue(savedValue);
-            }
-        }
-
-        #endregion
-
-        #region Public methods
-
-        #endregion
-
-        #region IDisposable members
-
-        /// <inheritdoc cref="IDisposable.Dispose"/>
-        public void Dispose()
-        {
-            _RestoreValue();
-        }
-
-        #endregion
+        _state = state;
+        SavedValue = state.Value;
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly StateHolder<T> _state;
+
+    private void _RestoreValue()
+    {
+        T currentValue = CurrentValue;
+        T savedValue = SavedValue;
+
+        bool null1 = ReferenceEquals (currentValue, null);
+        bool null2 = ReferenceEquals (savedValue, null);
+
+        bool restore = null1 != null2;
+
+        if (!restore)
+        {
+            if (!null1)
+            {
+                restore = !currentValue.Equals (savedValue);
+            }
+        }
+
+        if (restore)
+        {
+            State.SetValue (savedValue);
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    #endregion
+
+    #region IDisposable members
+
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    public void Dispose()
+    {
+        _RestoreValue();
+    }
+
+    #endregion
 }
