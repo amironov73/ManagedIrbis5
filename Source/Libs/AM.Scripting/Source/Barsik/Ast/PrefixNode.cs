@@ -11,6 +11,8 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+using AM.Text;
+
 #nullable enable
 
 namespace AM.Scripting.Barsik;
@@ -43,14 +45,49 @@ sealed class PrefixNode
     private readonly string _type;
     private readonly AtomNode _inner;
 
+    private dynamic Increment
+        (
+            dynamic value
+        )
+    {
+        if (value is string text)
+        {
+            var number = new NumberText (text);
+            number.Increment();
+
+            return number.ToString();
+        }
+
+        return (value + 1);
+    }
+
+    private dynamic Decrement
+        (
+            dynamic value
+        )
+    {
+        if (value is string text)
+        {
+            var number = new NumberText (text);
+            number.Increment();
+
+            return number.ToString();
+        }
+
+        return (value - 1);
+    }
+
+
     #endregion
 
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic? Compute (Context context)
+    public override dynamic? Compute
+        (
+            Context context
+        )
     {
-
         if (_inner is VariableNode variable)
         {
             var name = variable.Name;
@@ -63,8 +100,8 @@ sealed class PrefixNode
 
             var newValue = _type switch
             {
-                "++" => oldValue + 1,
-                "--" => oldValue - 1,
+                "++" => Increment (oldValue),
+                "--" => Decrement (oldValue),
                 _ => throw new BarsikException ($"Unknown operation {_type}")
             };
 
