@@ -37,7 +37,7 @@ internal sealed class RemainderParser
         )
     {
         var builder = new StringBuilder();
-        while (!state.HasCurrent)
+        while (state.HasCurrent)
         {
             builder.Append (state.ReadChar());
         }

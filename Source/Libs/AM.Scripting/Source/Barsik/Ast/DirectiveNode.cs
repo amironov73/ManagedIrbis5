@@ -11,7 +11,11 @@
 
 #region Using directives
 
-using System.Collections.Generic;
+using System;
+using System.IO;
+using System.Reflection;
+
+using AM.Text;
 
 #endregion
 
@@ -32,14 +36,15 @@ internal sealed class DirectiveNode
     /// </summary>
     public DirectiveNode
         (
-            string code,
-            string? text
+            string line
         )
     {
-        Sure.NotNullNorEmpty (code);
+        Sure.NotNullNorEmpty (line);
 
-        _code = code;
-        _text = text;
+        var navigator = new ValueTextNavigator (line);
+        _code = navigator.ReadUntil (' ', '\t').ToString();
+        navigator.SkipWhitespace();
+        _argument = navigator.GetRemainingText().EmptyToNull();
     }
 
     #endregion
@@ -47,7 +52,83 @@ internal sealed class DirectiveNode
     #region Private members
 
     private readonly string _code;
-    private readonly string? _text;
+    private readonly string? _argument;
+
+    /// <summary>
+    /// Загрузка указанной сборки.
+    /// </summary>
+    private static void Reference
+        (
+            Context context,
+            string assembly
+        )
+    {
+        Sure.NotNullNorEmpty (assembly);
+
+        assembly = assembly.Trim();
+        Sure.NotNullNorEmpty (assembly);
+
+        try
+        {
+            Assembly loaded;
+
+            if (File.Exists (assembly))
+            {
+                var fullPath = Path.GetFullPath (assembly);
+                loaded = Assembly.LoadFile (fullPath);
+            }
+            else
+            {
+                loaded = Assembly.Load (assembly);
+            }
+
+            context.Output.WriteLine ($"Assembly loaded: {loaded.GetName()}");
+        }
+        catch (Exception exception)
+        {
+            context.Error.WriteLine (exception.Message);
+        }
+    }
+
+    /// <summary>
+    /// Загрузка и исполнение скрипта из указанного файла.
+    /// </summary>
+    private static void LoadScript
+        (
+            Context context,
+            string scriptPath
+        )
+    {
+        Sure.NotNullNorEmpty (scriptPath);
+
+        var sourceCode = File.ReadAllText (scriptPath);
+        var program = Grammar.ParseProgram (sourceCode);
+        program.Execute (context);
+    }
+
+    /// <summary>
+    /// Подключение пространства имен.
+    /// </summary>
+    private static void UsingNamespace
+        (
+            Context context,
+            string? name
+        )
+    {
+        if (!string.IsNullOrEmpty (name))
+        {
+            name = name.Trim();
+        }
+
+        if (string.IsNullOrEmpty (name))
+        {
+            context.DumpNamespaces();
+        }
+        else
+        {
+            context.Namespaces[name] = null;
+        }
+    }
 
     #endregion
 
@@ -61,7 +142,24 @@ internal sealed class DirectiveNode
     {
         PreExecute (context);
 
-        context.Output.WriteLine ($"{_code}: '{_text}'");
+        switch (_code)
+        {
+            case "r":
+                Reference (context, _argument.ThrowIfNullOrEmpty ());
+                break;
+
+            case "l":
+                LoadScript (context, _argument.ThrowIfNullOrEmpty ());
+                break;
+
+            case "u":
+                UsingNamespace (context, _argument);
+                break;
+
+            default:
+                context.Error.WriteLine ($"Unknown directive: {_code} {_argument}");
+                break;
+        }
     }
 
     #endregion

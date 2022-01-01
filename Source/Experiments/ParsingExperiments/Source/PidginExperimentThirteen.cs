@@ -33,9 +33,9 @@ static class PidginExperimentThirteen
     class CallNode
     {
         public string Name { get; }
-        public IEnumerable<int>? Arguments { get; }
+        public IEnumerable<int> Arguments { get; }
 
-        public CallNode(string name, IEnumerable<int>? arguments)
+        public CallNode(string name, IEnumerable<int> arguments)
         {
             Name = name;
             Arguments = arguments;
@@ -118,15 +118,11 @@ static class PidginExperimentThirteen
         private readonly string _name;
         private readonly int[] _arguments;
 
-        public MethodSubNode (SubNode left, string name, IEnumerable<int>? arguments)
+        public MethodSubNode (SubNode left, string name, IEnumerable<int> arguments)
         {
             _left = left;
             _name = name;
-            _arguments = Array.Empty<int>();
-            if (arguments is not null)
-            {
-                _arguments = arguments.ToArray();
-            }
+            _arguments = arguments.ToArray();
         }
 
         public override dynamic? Compute (Context context)
@@ -231,11 +227,11 @@ static class PidginExperimentThirteen
 
     private static readonly Parser<char, CallNode> _Call = Map
         (
-            (_, name, _, args, _) => new CallNode (name, args.GetValueOrDefault()),
+            (_, name, _, args, _) => new CallNode (name, args),
             Tok ('.'),
             Tok (Identifier),
             Tok ('('),
-            Try (Num).Separated (Tok (',')).Optional(),
+            Try (Num).Separated (Tok (',')),
             Tok (')')
         );
 

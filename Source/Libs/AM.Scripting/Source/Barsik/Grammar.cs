@@ -335,8 +335,8 @@ static class Grammar
                 {
                     Operator.PostfixChainable
                         (
-                            Property (Try (_Property)),
-                            Index (Try (_Index))
+                            Try (Property (_Property)),
+                            Try (Index (_Index))
                         ),
                 },
                 new [] { BinaryLeft ("*"), BinaryLeft ("/"), BinaryLeft ("%") },
@@ -499,13 +499,8 @@ static class Grammar
         select (StatementNode) new UsingNode (variable, initialization, body);
 
     // директива
-    private static readonly Parser<char, StatementNode> Directive = Map
-        (
-            (hash, code) =>
-                (StatementNode) new DirectiveNode (hash + code, null),
-            Char ('#'),
-            Any.ManyString()
-        );
+    private static readonly Parser<char, StatementNode> Directive =
+        Char('#').Then (Resolve.ReadLine()).Select<StatementNode> (line => new DirectiveNode (line));
 
     // обобщенный стейтмент
     private static readonly Parser<char, StatementNode> Statement = OneOf
